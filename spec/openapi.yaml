@@ -980,6 +980,68 @@ paths:
               schema: { $ref: "#/components/schemas/Workspace" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateWorkspace
+      x-outflare-access: { scope: workspace.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Rename a workspace or change its slug
+      description: |
+        Scope: workspace.manage. Send only the fields to change. The slug is the workspace's name in web app
+        URLs (https://app.outflare.ai/{slug}/overview) and works in place of its ID in API paths. Changing it
+        breaks old links that use the slug; links and integrations that use the ID keep working.
+      tags: [access]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                name: { type: string, minLength: 1, maxLength: 100 }
+                slug:
+                  type: string
+                  pattern: "^[A-Za-z0-9][A-Za-z0-9-]{1,38}[A-Za-z0-9]$"
+                  description: 3 to 40 letters, numbers and dashes (saved in lowercase), starting and ending with a letter or number. A few words the app uses for its own pages (admin, signup, settings and so on) are reserved.
+                  example: acme
+      responses:
+        "200":
+          description: The workspace.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Workspace" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409":
+          description: "slug_taken: another workspace already uses the slug."
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/slug-availability:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: checkWorkspaceSlug
+      x-outflare-access: { scope: workspace.manage }
+      summary: Check whether a slug is free
+      description: "Scope: workspace.manage. For a settings form: says whether this workspace could take the slug, and why not."
+      tags: [access]
+      parameters:
+        - { name: slug, in: query, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: Whether the slug is free.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [slug, available, reason]
+                properties:
+                  slug: { type: string, description: The slug as it would be saved (lowercased). }
+                  available: { type: boolean, description: True when it is free or already this workspace's slug. }
+                  reason: { type: [string, "null"], description: Why it cannot be used. }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/members:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
@@ -8122,6 +8184,18 @@ webhooks:
             schema: { $ref: "#/components/schemas/WebhookEvent" }
       responses:
         "200": { description: Any 2xx answer means received; anything else is retried. }
+  workspace.updated:
+    post:
+      operationId: webhook_workspace_updated
+      summary: "The workspace was renamed or its slug (its name in URLs) changed. data has the new and previous values."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
   webhook.test:
     post:
       operationId: webhook_webhook_test
@@ -8163,7 +8237,8 @@ components:
       name: ws
       in: path
       required: true
-      schema: { type: string, format: uuid }
+      description: The workspace ID, or its slug (its name in web app URLs). IDs never change; a slug can, so store IDs.
+      schema: { type: string }
     Domain:
       name: domain
       in: path
@@ -8301,7 +8376,7 @@ components:
       required: [id, type, created_at, workspace_id, actor, target, request_id, data]
       properties:
         id: { type: string, description: "Unique per event, and the webhook-id header. Use it to ignore repeats.", example: evt_48213 }
-        type: { type: string, enum: [lead.replied, lead.unsubscribed, inbox.replied, inbox.updated, lead.bounced, mailbox.auto_paused, lead.created, lead.updated, lead.deleted, leads.imported, suppressions.added, suppression.removed, lead_list.created, lead_list.leads_added, lead_list.run_started, lead_list.build_done, lead_list.build_failed, lead_list.refresh_done, lead_list.refresh_failed, lead_list.enrich_done, lead_list.enrich_failed, import.done, import.failed, sequence.created, sequence.updated, sequence.activated, sequence.paused, sequence.archived, sequence.deleted, sequence.steps_updated, sequence.leads_enrolled, enrollment.stopped, mailbox.imported, mailbox.updated, mailbox.paused, mailbox.resumed, mailbox.stage_changed, mailbox.deleted, domain.added, domain.paused, domain.resumed, domain.removed, meeting.created, meeting.updated, meeting.deleted, deal.created, deal.updated, deal.deleted, spend.recorded, integration.connected, integration.updated, integration.disconnected, connect_request.created, project.created, project.updated, project.deleted, mission.created, mission.updated, mission.submitted, mission.approved, mission.paused, mission.resumed, mission.stopped, mission.completed, mission.action_held, mission.action_approved, mission.action_rejected, infra.plan_created, infra.plan_approved, infra.ordered, infra.order_failed, infra.domains_bought, infra.mailbox_joined, infra.plan_warming, infra.plan_ready, infra.plan_cancelled, webhook.test] }
+        type: { type: string, enum: [lead.replied, lead.unsubscribed, inbox.replied, inbox.updated, lead.bounced, mailbox.auto_paused, lead.created, lead.updated, lead.deleted, leads.imported, suppressions.added, suppression.removed, lead_list.created, lead_list.leads_added, lead_list.run_started, lead_list.build_done, lead_list.build_failed, lead_list.refresh_done, lead_list.refresh_failed, lead_list.enrich_done, lead_list.enrich_failed, import.done, import.failed, sequence.created, sequence.updated, sequence.activated, sequence.paused, sequence.archived, sequence.deleted, sequence.steps_updated, sequence.leads_enrolled, enrollment.stopped, mailbox.imported, mailbox.updated, mailbox.paused, mailbox.resumed, mailbox.stage_changed, mailbox.deleted, domain.added, domain.paused, domain.resumed, domain.removed, meeting.created, meeting.updated, meeting.deleted, deal.created, deal.updated, deal.deleted, spend.recorded, integration.connected, integration.updated, integration.disconnected, connect_request.created, project.created, project.updated, project.deleted, mission.created, mission.updated, mission.submitted, mission.approved, mission.paused, mission.resumed, mission.stopped, mission.completed, mission.action_held, mission.action_approved, mission.action_rejected, infra.plan_created, infra.plan_approved, infra.ordered, infra.order_failed, infra.domains_bought, infra.mailbox_joined, infra.plan_warming, infra.plan_ready, infra.plan_cancelled, workspace.updated, webhook.test] }
         created_at: { type: string, format: date-time }
         workspace_id: { type: string, format: uuid }
         actor: { $ref: "#/components/schemas/WebhookRef" }
@@ -9582,14 +9657,14 @@ components:
       enum: [owner, admin, operator, viewer]
     Scope:
       type: string
-      enum: [workspace.read, members.read, members.manage, tokens.manage, audit.read, mailboxes.read, mailboxes.manage, leads.read, leads.manage, suppressions.manage, sequences.read, sequences.manage, inbox.read, inbox.manage, integrations.read, integrations.manage, outcomes.read, outcomes.manage, projects.read, projects.manage, infrastructure.read, infrastructure.manage, infrastructure.approve, analytics.read, missions.read, missions.run, missions.approve, webhooks.read, webhooks.manage]
+      enum: [workspace.read, workspace.manage, members.read, members.manage, tokens.manage, audit.read, mailboxes.read, mailboxes.manage, leads.read, leads.manage, suppressions.manage, sequences.read, sequences.manage, inbox.read, inbox.manage, integrations.read, integrations.manage, outcomes.read, outcomes.manage, projects.read, projects.manage, infrastructure.read, infrastructure.manage, infrastructure.approve, analytics.read, missions.read, missions.run, missions.approve, webhooks.read, webhooks.manage]
     Workspace:
       type: object
       required: [id, name, slug]
       properties:
         id: { type: string, format: uuid }
         name: { type: string }
-        slug: { type: string }
+        slug: { type: string, description: "The workspace's name in web app URLs (https://app.outflare.ai/{slug}/overview). Works in place of id in API paths.", example: acme }
         role: { $ref: "#/components/schemas/Role" }
         agency_id: { type: [string, "null"], format: uuid, description: Set when the workspace is an agency client. }
         brand:
