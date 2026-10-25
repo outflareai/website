@@ -230,3 +230,9 @@ Every type is also in the API document, under `webhooks:` and in the `WebhookEve
 | `infra.plan_warming` | A plan's mailboxes are all in and warming up. |
 | `infra.plan_ready` | A plan's mailboxes finished warming up and are ready to send. |
 | `infra.plan_cancelled` | An infrastructure plan was cancelled. |
+
+### Workspace
+
+| Event | When |
+| --- | --- |
+| `workspace.updated` | The workspace was renamed or its slug (its name in URLs) changed. data has the new and previous values. |

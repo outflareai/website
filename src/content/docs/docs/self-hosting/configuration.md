@@ -48,7 +48,7 @@ Off by default. Set `OUTFLARE_POSTHOG_KEY` to a PostHog **project** key and the 
 
 - The browser only talks to your server. `/ingest/` forwards to PostHog and strips your session cookie and API tokens on the way.
 - Signed-in people are identified by their Outflare user id, email and name, and grouped by workspace.
-- Customer data stays out. All page text, inputs and element attributes are masked in autocapture and replays. URLs keep only the page (`/w/:ws/sequences/:item`), never ids, domains, invite tokens or query strings other than UTM tags.
+- Customer data stays out. All page text, inputs and element attributes are masked in autocapture and replays. URLs keep only the page (`/:ws/sequences/:item`), never workspace names, ids, domains, invite tokens or query strings other than UTM tags.
 - Signing out resets the identity on that browser.
 
 `GET /v1/meta` includes `product_analytics` while it's on. PostHog keeps an anonymous id in a first-party cookie, so if your users need to consent to that, add your own banner or leave this off.
