@@ -83,6 +83,28 @@ paths:
               schema:
                 $ref: "#/components/schemas/Meta"
         default: { $ref: "#/components/responses/Error" }
+  /v1/webhook-events:
+    get:
+      operationId: listWebhookEventTypes
+      security: []
+      summary: Event types webhooks can subscribe to
+      description: |
+        Every event a webhook endpoint can subscribe to. Subscribe to a type, a category wildcard such as "lead.*",
+        or "*" for all. Types are only ever added, never renamed or removed.
+      tags: [webhooks]
+      responses:
+        "200":
+          description: The event catalog.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/WebhookEventType" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/openapi.yaml:
     get:
       operationId: getOpenAPI
@@ -1147,6 +1169,230 @@ paths:
                     type: array
                     items: { $ref: "#/components/schemas/AuditEvent" }
                   next_before: { type: [integer, "null"] }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/webhooks:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listWebhooks
+      x-outflare-access: { scope: webhooks.read }
+      summary: List webhook endpoints
+      description: "Scope: webhooks.read. Signing secrets are not included."
+      tags: [webhooks]
+      responses:
+        "200":
+          description: Endpoints, oldest first.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/WebhookEndpoint" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createWebhook
+      x-outflare-access: { scope: webhooks.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Add a webhook endpoint
+      description: |
+        Scope: webhooks.manage. Outflare POSTs each subscribed event to the URL as JSON, signed the Standard Webhooks
+        way (webhook-id, webhook-timestamp and webhook-signature headers), and retries failures with backoff for
+        about three and a half hours. The answer includes the signing secret; GET .../secret shows it again.
+        The URL must be public https unless the server sets WEBHOOKS_ALLOW_PRIVATE. At most 20 per workspace.
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookCreate" }
+      responses:
+        "201":
+          description: The endpoint, with its signing secret.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/WebhookEndpointWithSecret" }
+        "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/webhooks/{id}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getWebhook
+      x-outflare-access: { scope: webhooks.read }
+      summary: Get a webhook endpoint
+      description: "Scope: webhooks.read."
+      tags: [webhooks]
+      responses:
+        "200":
+          description: The endpoint.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/WebhookEndpoint" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateWebhook
+      x-outflare-access: { scope: webhooks.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Change a webhook endpoint, or turn it off and on
+      description: |
+        Scope: webhooks.manage. Send only what changes; events replaces the whole list. enabled: true turns back on
+        an endpoint Outflare turned off (after a 410 Gone, or five days of failures) and clears its failure state.
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookUpdate" }
+      responses:
+        "200":
+          description: The endpoint.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/WebhookEndpoint" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+    delete:
+      operationId: deleteWebhook
+      x-outflare-access: { scope: webhooks.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Remove a webhook endpoint
+      description: "Scope: webhooks.manage. Deliveries still waiting are dropped."
+      tags: [webhooks]
+      responses:
+        "204": { description: Removed. }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/webhooks/{id}/secret:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getWebhookSecret
+      x-outflare-access: { scope: webhooks.manage }
+      summary: Show a webhook's signing secret
+      description: "Scope: webhooks.manage."
+      tags: [webhooks]
+      responses:
+        "200":
+          description: The endpoint, with its signing secret.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/WebhookEndpointWithSecret" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/webhooks/{id}/rotate-secret:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: rotateWebhookSecret
+      x-outflare-access: { scope: webhooks.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Make a new signing secret
+      description: |
+        Scope: webhooks.manage. For 24 hours deliveries carry two signatures, one per secret, so a receiver can move
+        to the new secret without missing any. expire_now: true stops using the old secret at once (for a leak).
+      tags: [webhooks]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                expire_now: { type: boolean, description: "true stops signing with the old secret at once. Default false." }
+      responses:
+        "200":
+          description: The endpoint, with its new signing secret.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/WebhookEndpointWithSecret" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/webhooks/{id}/test:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: testWebhook
+      x-outflare-access: { scope: webhooks.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Send a test event now
+      description: |
+        Scope: webhooks.manage. Sends a webhook.test event straight away, even to an endpoint that is off, and
+        answers with the delivery: status delivered, or failed with the receiver's status code or the error.
+      tags: [webhooks]
+      responses:
+        "200":
+          description: The test delivery and its result.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/WebhookDelivery" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/webhooks/{id}/deliveries:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: listWebhookDeliveries
+      x-outflare-access: { scope: webhooks.read }
+      summary: Deliveries to an endpoint, newest first
+      description: "Scope: webhooks.read. Kept for 30 days. Page with before=next_before."
+      tags: [webhooks]
+      parameters:
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
+        - { name: before, in: query, schema: { type: integer } }
+        - { name: status, in: query, schema: { $ref: "#/components/schemas/WebhookDeliveryStatus" } }
+        - { name: event_type, in: query, schema: { type: string }, example: lead.replied }
+      responses:
+        "200":
+          description: Deliveries.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, next_before]
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/WebhookDelivery" }
+                  next_before: { type: [integer, "null"] }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/webhooks/{id}/deliveries/{delivery}/redeliver:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      - { name: delivery, in: path, required: true, schema: { type: integer } }
+    post:
+      operationId: redeliverWebhook
+      x-outflare-access: { scope: webhooks.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Send a delivery again now
+      description: |
+        Scope: webhooks.manage. Same webhook-id as before, so a receiver that already handled it can skip it. A
+        delivery still being retried keeps its schedule if this try fails too.
+      tags: [webhooks]
+      responses:
+        "200":
+          description: The delivery and the result of this try.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/WebhookDelivery" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/mailboxes:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
@@ -6912,6 +7158,931 @@ paths:
               schema: { oneOf: [{ $ref: "#/components/schemas/Queued" }, { $ref: "#/components/schemas/MissionHeld" }] }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
+webhooks:
+  lead.replied:
+    post:
+      operationId: webhook_lead_replied
+      summary: "A lead replied. data.inbound_id is the reply (GET .../inbox/{id}); data.enrollments_stopped counts sequences stopped by it."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  lead.unsubscribed:
+    post:
+      operationId: webhook_lead_unsubscribed
+      summary: "A lead opted out (unsubscribe link, header or a reply asking to stop) and was suppressed."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  inbox.replied:
+    post:
+      operationId: webhook_inbox_replied
+      summary: "Someone in the workspace (or an agent) replied to an inbound message."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  inbox.updated:
+    post:
+      operationId: webhook_inbox_updated
+      summary: "An inbound message was marked read or its category changed."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  lead.bounced:
+    post:
+      operationId: webhook_lead_bounced
+      summary: "An email to a lead bounced permanently and the address was suppressed."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  mailbox.auto_paused:
+    post:
+      operationId: webhook_mailbox_auto_paused
+      summary: "A mailbox was paused automatically because its bounce rate crossed the limit."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  lead.created:
+    post:
+      operationId: webhook_lead_created
+      summary: "A lead was created."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  lead.updated:
+    post:
+      operationId: webhook_lead_updated
+      summary: "A lead's fields were changed."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  lead.deleted:
+    post:
+      operationId: webhook_lead_deleted
+      summary: "A lead was deleted."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  leads.imported:
+    post:
+      operationId: webhook_leads_imported
+      summary: "Leads were imported from a CSV."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  suppressions.added:
+    post:
+      operationId: webhook_suppressions_added
+      summary: "Addresses or domains were added to the suppression list."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  suppression.removed:
+    post:
+      operationId: webhook_suppression_removed
+      summary: "An entry was removed from the suppression list."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  lead_list.created:
+    post:
+      operationId: webhook_lead_list_created
+      summary: "A lead list was created."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  lead_list.leads_added:
+    post:
+      operationId: webhook_lead_list_leads_added
+      summary: "Leads were added to a lead list."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  lead_list.run_started:
+    post:
+      operationId: webhook_lead_list_run_started
+      summary: "A lead list build, refresh or enrichment from a data provider started."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  lead_list.build_done:
+    post:
+      operationId: webhook_lead_list_build_done
+      summary: "A lead list build finished."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  lead_list.build_failed:
+    post:
+      operationId: webhook_lead_list_build_failed
+      summary: "A lead list build failed. data.error says why."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  lead_list.refresh_done:
+    post:
+      operationId: webhook_lead_list_refresh_done
+      summary: "A lead list refresh finished."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  lead_list.refresh_failed:
+    post:
+      operationId: webhook_lead_list_refresh_failed
+      summary: "A lead list refresh failed."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  lead_list.enrich_done:
+    post:
+      operationId: webhook_lead_list_enrich_done
+      summary: "A lead list enrichment finished."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  lead_list.enrich_failed:
+    post:
+      operationId: webhook_lead_list_enrich_failed
+      summary: "A lead list enrichment failed."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  import.done:
+    post:
+      operationId: webhook_import_done
+      summary: "An import from a connected sequencer finished."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  import.failed:
+    post:
+      operationId: webhook_import_failed
+      summary: "An import from a connected sequencer failed."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  sequence.created:
+    post:
+      operationId: webhook_sequence_created
+      summary: "A sequence was created."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  sequence.updated:
+    post:
+      operationId: webhook_sequence_updated
+      summary: "A sequence's settings changed."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  sequence.activated:
+    post:
+      operationId: webhook_sequence_activated
+      summary: "A sequence started sending."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  sequence.paused:
+    post:
+      operationId: webhook_sequence_paused
+      summary: "A sequence was paused."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  sequence.archived:
+    post:
+      operationId: webhook_sequence_archived
+      summary: "A sequence was archived."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  sequence.deleted:
+    post:
+      operationId: webhook_sequence_deleted
+      summary: "A sequence was deleted."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  sequence.steps_updated:
+    post:
+      operationId: webhook_sequence_steps_updated
+      summary: "A sequence's steps were replaced."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  sequence.leads_enrolled:
+    post:
+      operationId: webhook_sequence_leads_enrolled
+      summary: "Leads were enrolled in a sequence."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  enrollment.stopped:
+    post:
+      operationId: webhook_enrollment_stopped
+      summary: "An enrollment was stopped by hand."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  mailbox.imported:
+    post:
+      operationId: webhook_mailbox_imported
+      summary: "Mailboxes were added or imported."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  mailbox.updated:
+    post:
+      operationId: webhook_mailbox_updated
+      summary: "A mailbox's settings changed."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  mailbox.paused:
+    post:
+      operationId: webhook_mailbox_paused
+      summary: "A mailbox was paused by hand or by its sequencer."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  mailbox.resumed:
+    post:
+      operationId: webhook_mailbox_resumed
+      summary: "A paused mailbox was resumed."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  mailbox.stage_changed:
+    post:
+      operationId: webhook_mailbox_stage_changed
+      summary: "A mailbox moved between warming, ready, resting and retired."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  mailbox.deleted:
+    post:
+      operationId: webhook_mailbox_deleted
+      summary: "A mailbox was removed."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  domain.added:
+    post:
+      operationId: webhook_domain_added
+      summary: "A sending domain was added."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  domain.paused:
+    post:
+      operationId: webhook_domain_paused
+      summary: "A sending domain was paused, which pauses its mailboxes."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  domain.resumed:
+    post:
+      operationId: webhook_domain_resumed
+      summary: "A paused sending domain was resumed."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  domain.removed:
+    post:
+      operationId: webhook_domain_removed
+      summary: "A sending domain was removed."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  meeting.created:
+    post:
+      operationId: webhook_meeting_created
+      summary: "A meeting was booked or logged."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  meeting.updated:
+    post:
+      operationId: webhook_meeting_updated
+      summary: "A meeting changed (held, no-show, cancelled, rescheduled)."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  meeting.deleted:
+    post:
+      operationId: webhook_meeting_deleted
+      summary: "A meeting was deleted."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  deal.created:
+    post:
+      operationId: webhook_deal_created
+      summary: "A deal was created."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  deal.updated:
+    post:
+      operationId: webhook_deal_updated
+      summary: "A deal changed stage or value."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  deal.deleted:
+    post:
+      operationId: webhook_deal_deleted
+      summary: "A deal was deleted."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  spend.recorded:
+    post:
+      operationId: webhook_spend_recorded
+      summary: "Spend was recorded in the ledger."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  integration.connected:
+    post:
+      operationId: webhook_integration_connected
+      summary: "A connector was connected."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  integration.updated:
+    post:
+      operationId: webhook_integration_updated
+      summary: "A connector's settings changed."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  integration.disconnected:
+    post:
+      operationId: webhook_integration_disconnected
+      summary: "A connector was disconnected."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  connect_request.created:
+    post:
+      operationId: webhook_connect_request_created
+      summary: "A one-time connect link was created for a person to finish connecting a service."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  project.created:
+    post:
+      operationId: webhook_project_created
+      summary: "A project was created."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  project.updated:
+    post:
+      operationId: webhook_project_updated
+      summary: "A project's brief or settings changed."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  project.deleted:
+    post:
+      operationId: webhook_project_deleted
+      summary: "A project was deleted."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  mission.created:
+    post:
+      operationId: webhook_mission_created
+      summary: "An agent mission was created."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  mission.updated:
+    post:
+      operationId: webhook_mission_updated
+      summary: "A mission's goal, limits or settings changed."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  mission.submitted:
+    post:
+      operationId: webhook_mission_submitted
+      summary: "A mission was submitted for a person's approval."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  mission.approved:
+    post:
+      operationId: webhook_mission_approved
+      summary: "A mission was approved and is running."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  mission.paused:
+    post:
+      operationId: webhook_mission_paused
+      summary: "A mission was paused."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  mission.resumed:
+    post:
+      operationId: webhook_mission_resumed
+      summary: "A paused mission was resumed."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  mission.stopped:
+    post:
+      operationId: webhook_mission_stopped
+      summary: "A mission was stopped."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  mission.completed:
+    post:
+      operationId: webhook_mission_completed
+      summary: "A mission was marked complete."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  mission.action_held:
+    post:
+      operationId: webhook_mission_action_held
+      summary: "A write in a mission is waiting for a person to approve it."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  mission.action_approved:
+    post:
+      operationId: webhook_mission_action_approved
+      summary: "A held mission write was approved and run."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  mission.action_rejected:
+    post:
+      operationId: webhook_mission_action_rejected
+      summary: "A held mission write was rejected."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  infra.plan_created:
+    post:
+      operationId: webhook_infra_plan_created
+      summary: "An infrastructure plan was drafted."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  infra.plan_approved:
+    post:
+      operationId: webhook_infra_plan_approved
+      summary: "An infrastructure plan was approved, which may buy domains and mailboxes."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  infra.ordered:
+    post:
+      operationId: webhook_infra_ordered
+      summary: "Mailboxes in a plan were ordered from the supplier."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  infra.order_failed:
+    post:
+      operationId: webhook_infra_order_failed
+      summary: "Ordering a plan's mailboxes failed. data.error says why."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  infra.domains_bought:
+    post:
+      operationId: webhook_infra_domains_bought
+      summary: "The domains in a plan were bought."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  infra.mailbox_joined:
+    post:
+      operationId: webhook_infra_mailbox_joined
+      summary: "A mailbox a plan ordered arrived and was added to the workspace."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  infra.plan_warming:
+    post:
+      operationId: webhook_infra_plan_warming
+      summary: "A plan's mailboxes are all in and warming up."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  infra.plan_ready:
+    post:
+      operationId: webhook_infra_plan_ready
+      summary: "A plan's mailboxes finished warming up and are ready to send."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  infra.plan_cancelled:
+    post:
+      operationId: webhook_infra_plan_cancelled
+      summary: "An infrastructure plan was cancelled."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  webhook.test:
+    post:
+      operationId: webhook_webhook_test
+      summary: "Sent by the test endpoint to check that a webhook works."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
 components:
   securitySchemes:
     bearer:
@@ -6986,6 +8157,112 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/MissionHeld" }
   schemas:
+    WebhookEventType:
+      type: object
+      required: [type, category, description]
+      properties:
+        type: { type: string, example: lead.replied }
+        category: { type: string, example: replies }
+        description: { type: string }
+    WebhookEndpoint:
+      type: object
+      required: [id, url, description, events, enabled, disabled_reason, failing_since, last_success_at, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        url: { type: string, format: uri }
+        description: { type: string }
+        events:
+          type: array
+          items: { type: string }
+          description: 'Event types, category wildcards ("lead.*") or "*".'
+        enabled: { type: boolean }
+        disabled_reason:
+          type: [string, "null"]
+          description: Why the endpoint is off, when Outflare or a person turned it off.
+        failing_since:
+          type: [string, "null"]
+          format: date-time
+          description: When deliveries started failing; null while they succeed. After five days the endpoint is turned off.
+        last_success_at: { type: [string, "null"], format: date-time }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    WebhookEndpointWithSecret:
+      allOf:
+        - { $ref: "#/components/schemas/WebhookEndpoint" }
+        - type: object
+          required: [secret]
+          properties:
+            secret:
+              type: string
+              description: The signing secret (whsec_...). Verify deliveries with any Standard Webhooks library.
+              example: whsec_MfKQ9r8GKYqrTwjUPD8ILPZIo2LaLaSw
+    WebhookCreate:
+      type: object
+      additionalProperties: false
+      required: [url]
+      properties:
+        url: { type: string, format: uri, maxLength: 2048, example: "https://example.com/hooks/outflare" }
+        description: { type: string, maxLength: 200 }
+        events:
+          type: array
+          minItems: 1
+          maxItems: 100
+          items: { type: string }
+          description: 'Event types (GET /v1/webhook-events), category wildcards such as "lead.*", or "*" for all. Default ["*"].'
+          example: [lead.replied, lead.bounced, mailbox.auto_paused]
+        enabled: { type: boolean, description: Default true. }
+    WebhookUpdate:
+      type: object
+      additionalProperties: false
+      properties:
+        url: { type: string, format: uri, maxLength: 2048 }
+        description: { type: string, maxLength: 200 }
+        events: { type: array, minItems: 1, maxItems: 100, items: { type: string } }
+        enabled: { type: boolean }
+    WebhookDeliveryStatus:
+      type: string
+      enum: [pending, delivered, failed, cancelled]
+      description: pending while it is being tried (and retried), delivered on a 2xx answer, failed once retries ran out, cancelled if the endpoint was turned off first.
+    WebhookDelivery:
+      type: object
+      required: [id, event_id, event_type, status, attempts, last_status_code, last_error, last_attempt_at, delivered_at, created_at, payload]
+      properties:
+        id: { type: integer }
+        event_id: { type: string, description: "The webhook-id header: the same for every try and redelivery." }
+        event_type: { type: string }
+        status: { $ref: "#/components/schemas/WebhookDeliveryStatus" }
+        attempts: { type: integer }
+        last_status_code: { type: [integer, "null"], description: "The receiver's answer; null when there was none (timeout, refused)." }
+        last_error: { type: [string, "null"] }
+        last_attempt_at: { type: [string, "null"], format: date-time }
+        delivered_at: { type: [string, "null"], format: date-time }
+        created_at: { type: string, format: date-time }
+        payload: { $ref: "#/components/schemas/WebhookEvent" }
+    WebhookRef:
+      type: object
+      required: [type, id]
+      properties:
+        type: { type: string, description: "For an actor: human, api_token, agent or system. For a target: the record type, such as lead or mailbox." }
+        id: { type: [string, "null"] }
+    WebhookEvent:
+      type: object
+      description: The JSON body of every webhook delivery.
+      required: [id, type, created_at, workspace_id, actor, target, request_id, data]
+      properties:
+        id: { type: string, description: "Unique per event, and the webhook-id header. Use it to ignore repeats.", example: evt_48213 }
+        type: { type: string, enum: [lead.replied, lead.unsubscribed, inbox.replied, inbox.updated, lead.bounced, mailbox.auto_paused, lead.created, lead.updated, lead.deleted, leads.imported, suppressions.added, suppression.removed, lead_list.created, lead_list.leads_added, lead_list.run_started, lead_list.build_done, lead_list.build_failed, lead_list.refresh_done, lead_list.refresh_failed, lead_list.enrich_done, lead_list.enrich_failed, import.done, import.failed, sequence.created, sequence.updated, sequence.activated, sequence.paused, sequence.archived, sequence.deleted, sequence.steps_updated, sequence.leads_enrolled, enrollment.stopped, mailbox.imported, mailbox.updated, mailbox.paused, mailbox.resumed, mailbox.stage_changed, mailbox.deleted, domain.added, domain.paused, domain.resumed, domain.removed, meeting.created, meeting.updated, meeting.deleted, deal.created, deal.updated, deal.deleted, spend.recorded, integration.connected, integration.updated, integration.disconnected, connect_request.created, project.created, project.updated, project.deleted, mission.created, mission.updated, mission.submitted, mission.approved, mission.paused, mission.resumed, mission.stopped, mission.completed, mission.action_held, mission.action_approved, mission.action_rejected, infra.plan_created, infra.plan_approved, infra.ordered, infra.order_failed, infra.domains_bought, infra.mailbox_joined, infra.plan_warming, infra.plan_ready, infra.plan_cancelled, webhook.test] }
+        created_at: { type: string, format: date-time }
+        workspace_id: { type: string, format: uuid }
+        actor: { $ref: "#/components/schemas/WebhookRef" }
+        target:
+          oneOf:
+            - { $ref: "#/components/schemas/WebhookRef" }
+            - { type: "null" }
+        request_id: { type: [string, "null"], description: "The API request that made the change, if one did (same as the audit log)." }
+        data:
+          type: object
+          additionalProperties: true
+          description: What changed. Fields depend on the type; new ones may be added.
     EmailBisonCompatCall:
       type: object
       required: [method, path, query_keys, body_keys, status, supported, user_agent, created_at]
@@ -8254,7 +9531,7 @@ components:
       enum: [owner, admin, operator, viewer]
     Scope:
       type: string
-      enum: [workspace.read, members.read, members.manage, tokens.manage, audit.read, mailboxes.read, mailboxes.manage, leads.read, leads.manage, suppressions.manage, sequences.read, sequences.manage, inbox.read, inbox.manage, integrations.read, integrations.manage, outcomes.read, outcomes.manage, projects.read, projects.manage, infrastructure.read, infrastructure.manage, infrastructure.approve, analytics.read, missions.read, missions.run, missions.approve]
+      enum: [workspace.read, members.read, members.manage, tokens.manage, audit.read, mailboxes.read, mailboxes.manage, leads.read, leads.manage, suppressions.manage, sequences.read, sequences.manage, inbox.read, inbox.manage, integrations.read, integrations.manage, outcomes.read, outcomes.manage, projects.read, projects.manage, infrastructure.read, infrastructure.manage, infrastructure.approve, analytics.read, missions.read, missions.run, missions.approve, webhooks.read, webhooks.manage]
     Workspace:
       type: object
       required: [id, name, slug]
