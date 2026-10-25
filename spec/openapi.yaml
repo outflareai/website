@@ -20,6 +20,11 @@ info:
     token. Operations without it are public.
     The engine's tests check every value against the running server.
 
+    API tokens may make API_RATE_LIMIT requests a minute (600 by default).
+    Every answer to a token carries `RateLimit` and `RateLimit-Policy`
+    headers (IETF draft) with what is left and when it resets; over the
+    limit the answer is 429 `rate_limited` with `Retry-After`.
+
     Workspace writes take an `Idempotency-Key` header: a retry with the
     same key gets the first answer back instead of running twice.
 
@@ -1220,6 +1225,38 @@ paths:
                     type: array
                     items: { $ref: "#/components/schemas/AuditEvent" }
                   next_before: { type: [integer, "null"] }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/events:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listEvents
+      x-outflare-access: { scope: webhooks.read }
+      summary: Events since a point, oldest first
+      description: |
+        Scope: webhooks.read. The same events webhooks send, for callers that cannot receive webhooks, such as agents
+        and scripts behind a firewall. Start without after to read from the beginning of the audit log, keep
+        next_after, and call again with after=next_after to get only what happened since. next_after is always set,
+        so polling never loses its place; has_more says another page is ready now.
+      tags: [webhooks]
+      parameters:
+        - { name: after, in: query, description: "An event id (evt_...) from next_after.", schema: { type: string }, example: evt_48213 }
+        - { name: types, in: query, description: 'Comma-separated event types or wildcards ("lead.*"). Default: every type.', schema: { type: string }, example: "lead.replied,mailbox.*" }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
+      responses:
+        "200":
+          description: Events.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, next_after, has_more]
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/WebhookEvent" }
+                  next_after: { type: string, description: Pass as after next time. }
+                  has_more: { type: boolean }
+        "400": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/webhooks:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
@@ -4341,8 +4378,11 @@ paths:
       description: |
         Scope: integrations.manage. The credentials are tested against the
         service before anything is saved, and refused with
-        `connector_auth` if wrong. OAuth connectors are connected through
-        `GET /integrations/oauth/{connector}/authorize` instead.
+        `connector_auth` if wrong. Works for every connector whose
+        `auth_methods` include `api_key`, including ones that also offer
+        OAuth. Connectors that only sign in (`auth_methods` is `[oauth2]`)
+        are connected through `GET /integrations/oauth/{connector}/authorize`
+        and answer `use_oauth` here.
       tags: [connectors]
       requestBody:
         required: true
@@ -4458,8 +4498,11 @@ paths:
       x-outflare-access: { scope: integrations.manage }
       summary: Start connecting an OAuth connector
       description: |
-        Scope: integrations.manage. Redirects to the service's sign-in page;
+        Scope: integrations.manage. For connectors whose `auth_methods`
+        include `oauth2`. Redirects to the service's sign-in page;
         afterwards the browser lands on the workspace's Connectors page.
+        Answers `not_configured` when this server has no OAuth app for the
+        connector; the catalog's `auth_options` says so ahead of time.
         With `format=json` it returns the link instead, for an agent to hand
         to a person.
       tags: [connectors]
@@ -4488,7 +4531,7 @@ paths:
       description: "For providers that read the OAuth client from a URL (PostHog). The document's own URL is the client id, so nobody registers an app. `{file}` is `<connector id>.json`."
       security: []
       parameters:
-        - { name: file, in: path, required: true, schema: { type: string }, example: posthog_cloud.json }
+        - { name: file, in: path, required: true, schema: { type: string }, example: posthog.json }
       responses:
         "200": { description: The client metadata document., content: { application/json: { schema: { type: object, additionalProperties: true } } } }
         "404": { $ref: "#/components/responses/Error" }
@@ -8619,7 +8662,7 @@ components:
         help: { type: string }
     Connector:
       type: object
-      required: [id, name, category, summary, description, website, docs_url, auth, fields, capabilities, status, configured, connected]
+      required: [id, name, category, summary, description, website, docs_url, auth, auth_methods, auth_options, fields, capabilities, status, configured, connected]
       properties:
         id: { type: string, example: zerobounce }
         name: { type: string }
@@ -8629,8 +8672,17 @@ components:
         website: { type: string }
         docs_url: { type: string }
         key_url: { type: string, description: Where to find the API key. }
-        auth: { type: string, enum: [api_key, oauth2, none] }
-        fields: { type: array, items: { $ref: "#/components/schemas/ConnectorField" } }
+        auth: { $ref: "#/components/schemas/ConnectorAuthMethod" }
+        auth_methods:
+          type: array
+          items: { $ref: "#/components/schemas/ConnectorAuthMethod" }
+          example: [oauth2, api_key]
+          description: "Every way to connect, recommended first. When both are listed, the person chooses: sign in (oauth2, GET .../integrations/oauth/{connector}/authorize) or paste the fields (api_key, POST .../integrations)."
+        auth_options:
+          type: array
+          items: { $ref: "#/components/schemas/ConnectorAuthOption" }
+          description: Each way to connect and whether it works on this server. The first available one is marked recommended.
+        fields: { type: array, items: { $ref: "#/components/schemas/ConnectorField" }, description: What the api_key method asks for. Empty when the connector only signs in with OAuth. }
         oauth:
           type: object
           properties:
@@ -8643,8 +8695,20 @@ components:
           type: array
           items: { type: string }
           description: Other connectors the same sign-in connects too, when the person grants them (one Google sign-in connects Google Analytics and Search Console).
-        configured: { type: boolean, description: Can be connected on this server now. }
+        configured: { type: boolean, description: "Can be connected on this server now, in at least one way." }
         connected: { type: integer, description: Accounts the workspace connected (0 in the public catalog). }
+    ConnectorAuthMethod:
+      type: string
+      enum: [api_key, oauth2, none]
+      description: "oauth2: sign in on the provider's consent screen. api_key: paste the connector's fields. none: built in."
+    ConnectorAuthOption:
+      type: object
+      required: [method, available, recommended]
+      properties:
+        method: { $ref: "#/components/schemas/ConnectorAuthMethod" }
+        available: { type: boolean, description: "False when this server cannot use the method yet, e.g. OAuth without an app configured." }
+        recommended: { type: boolean }
+        reason: { type: string, description: "Why it is not available and what the server's owner can set, e.g. CONNECTOR_CALENDLY_CLIENT_ID and CONNECTOR_CALENDLY_CLIENT_SECRET." }
     ConnectorAccount:
       type: object
       properties:
@@ -8860,10 +8924,11 @@ components:
         url: { type: string, description: The one-time link. Only in the answer to POST. }
     Integration:
       type: object
-      required: [id, connector, connector_name, category, capabilities, name, status, account, config, last_checked_at, last_error, created_at, updated_at]
+      required: [id, connector, auth_method, connector_name, category, capabilities, name, status, account, config, last_checked_at, last_error, created_at, updated_at]
       properties:
         id: { type: string, format: uuid }
         connector: { type: string }
+        auth_method: { type: string, enum: [api_key, oauth2], description: How it was connected. Pasting new credentials with PATCH switches a signed-in connection to api_key. }
         connector_name: { type: string }
         category: { $ref: "#/components/schemas/ConnectorCategory" }
         capabilities: { type: array, items: { type: string } }
@@ -10852,6 +10917,10 @@ components:
               example: /v1/openapi.yaml
         capabilities:
           type: array
+          description: |
+            Features this server has. Extensions add their own; `email_verification_required` means signed-in people
+            whose email isn't confirmed can use only their account and sign-in endpoints until they open the
+            confirmation link.
           items:
             type: string
         oauth_providers:
@@ -10910,8 +10979,13 @@ components:
               example: unavailable
             message:
               type: string
+              description: For people. It may change; branch on code and status instead.
             request_id:
               type: string
+            param:
+              type: string
+              description: The request field a 400 is about, when there is one (for example url or events).
+              example: url
     LifecycleStage:
       type: string
       enum: [warming, ready, resting, retired]

@@ -19,7 +19,7 @@ Outflare only reads, and nothing else in Outflare needs SEO connected.
 | Tool | What to paste | Where to find it |
 | --- | --- | --- |
 | DataForSEO | API login and API password | dataforseo.com, Dashboard → API Access (the API password is not your account password) |
-| Ahrefs | API key | ahrefs.com, Account settings → API keys (needs a plan with API access) |
+| Ahrefs | Sign in with Ahrefs (Ahrefs Connect), or an API key | ahrefs.com, Account settings → API keys (needs a plan with API access). Signing in needs an Ahrefs Connect app on the server (`CONNECTOR_AHREFS_CLIENT_ID`). Calls then spend the signed-in account's units. |
 
 Connect either on the Connectors page (category SEO), with
 `POST /v1/workspaces/$WS/integrations`, or let an agent ask with
