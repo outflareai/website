@@ -75,6 +75,16 @@ try {
 | `mission` | Act inside an agent mission: every call carries `Outflare-Mission`, and writes may come back held. |
 | `missions` | `true` for a client that sets the mission header itself (as the MCP server does). Types it like one with `mission`. |
 
+## Safe retries
+
+Give a write an `Idempotency-Key` and retry it freely: a repeat with the same key within 24 hours gets the first answer back instead of running again. See [Safe retries](/docs/api/#safe-retries).
+
+```ts
+const key = crypto.randomUUID();
+const send = () => gtm.POST("/v1/workspaces/{ws}/spend", { params: { path: { ws }, header: { "Idempotency-Key": key } }, body: spend });
+const res = await send().catch(() => send()); // a network error on the first try is safe to retry
+```
+
 ## Missions
 
 Inside a [mission](/docs/agents/missions/), a write may be answered `202` with a `MissionHeld` body instead of running: a dry run, or held until a person approves it. `isHeld()` tells the two apart:

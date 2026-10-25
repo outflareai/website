@@ -66,6 +66,23 @@ The audit log pages backwards in time: pass `before=` the `next_before` value fr
 
 Work that runs in the background answers `202`, always with a JSON body (`{"queued": true}` when there is nothing more to say). Inside a [mission](/docs/agents/missions/), a workspace write can also answer `202` with a `MissionHeld` body instead of running: a dry run, or held until a person approves it. Its `mission_action` tells you what to follow.
 
+## Safe retries
+
+Every workspace write accepts an `Idempotency-Key` header. Send any unique string (a UUID is ideal) and you can retry the call as often as you need: a repeat from the same caller within 24 hours gets the first answer back, marked `Idempotent-Replayed: true`, instead of creating a second lead or recording spend twice.
+
+```sh
+curl -X POST https://outflare.example.com/v1/workspaces/$WS/leads \
+  -H "Authorization: Bearer $OUTFLARE_TOKEN" \
+  -H "Idempotency-Key: 6f1c2f9e-2b1d-4c43-9a51-5c1f0d6e7a20" \
+  -H "Content-Type: application/json" \
+  -d '{"email": "ana@getacme.co"}'
+```
+
+- The key covers the method, path, query and body. Reusing it for a different request is refused with `422 idempotency_key_reused`.
+- While the first request is still running, a repeat gets `409 idempotency_in_progress`. Wait a moment and retry.
+- Client errors (`4xx`) are stored and replayed too, so a retry tells you the same thing. Server errors are not: the key is released and a retry runs again.
+- Use a new key for each distinct write. Keys belong to the caller and the workspace, and expire after 24 hours.
+
 ## Errors
 
 Every error uses the same shape, with a stable `code`, a readable `message` and the `request_id` to quote in bug reports. In the contract it is each operation's `default` response:
@@ -81,8 +98,10 @@ Every error uses the same shape, with a stable `code`, a readable `message` and 
 | `403` | `forbidden` | The token or member lacks the scope this endpoint needs. |
 | `404` | `not_found`, `invalid_invite` | Not found, including workspaces you cannot see. |
 | `409` | `conflict`, `already_set_up`, `last_owner` | Conflicts, such as running setup twice or removing the last owner. |
+| `409` | `idempotency_in_progress` | A request with this `Idempotency-Key` is still running. |
 | `413` | `invalid_request` | The upload is too large. |
 | `415` | `invalid_request` | Wrong content type, for example a mailbox import that is not `text/csv`. |
+| `422` | `idempotency_key_reused` | The `Idempotency-Key` was already used for a different request. |
 | `429` | `rate_limited` | Too many attempts, for example repeated failed sign-ins. |
 | `500`, `503` | `internal`, `unavailable` | A server problem. Quote the `request_id`. |
 

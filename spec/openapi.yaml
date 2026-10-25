@@ -19,6 +19,9 @@ info:
     only a signed-in person can use. Operations without it are public.
     The engine's tests check every value against the running server.
 
+    Workspace writes take an `Idempotency-Key` header: a retry with the
+    same key gets the first answer back instead of running twice.
+
     Errors always have the `Error` body (`default` on every operation).
     Workspace writes may also answer `202` with `MissionHeld` when made
     inside a mission.
@@ -931,6 +934,7 @@ paths:
     patch:
       operationId: updateMember
       x-outflare-access: { scope: members.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Change a member's role
       description: "Scope: members.manage. Nobody can act above their own role; only owners can grant or change owner; the last owner cannot be demoted."
       tags: [access]
@@ -952,6 +956,7 @@ paths:
     delete:
       operationId: removeMember
       x-outflare-access: { scope: members.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Remove a member
       description: "Scope: members.manage"
       tags: [access]
@@ -983,6 +988,7 @@ paths:
     post:
       operationId: createInvite
       x-outflare-access: { scope: members.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Invite someone by email
       description: "Scope: members.manage. The token and link are returned once; they expire after 7 days."
       tags: [access]
@@ -1016,6 +1022,7 @@ paths:
     delete:
       operationId: revokeInvite
       x-outflare-access: { scope: members.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Revoke a pending invite
       description: "Scope: members.manage"
       tags: [access]
@@ -1046,6 +1053,7 @@ paths:
     post:
       operationId: createAPIToken
       x-outflare-access: { scope: tokens.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Create a scoped API token
       description: "Scope: tokens.manage. A token cannot hold scopes or looser limits than its creator. The secret is returned once."
       tags: [access]
@@ -1086,6 +1094,7 @@ paths:
     patch:
       operationId: updateAPITokenLimits
       x-outflare-access: { scope: tokens.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Change a token's sending and allocation limits
       description: "Scope: tokens.manage. A token cannot change its own limits, or grant looser ones than it has. Scopes are fixed; issue a new token to change them."
       tags: [access]
@@ -1107,6 +1116,7 @@ paths:
     delete:
       operationId: revokeAPIToken
       x-outflare-access: { scope: tokens.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Revoke an API token
       description: "Scope: tokens.manage"
       tags: [access]
@@ -1169,6 +1179,7 @@ paths:
     post:
       operationId: addMailbox
       x-outflare-access: { scope: mailboxes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Add or update one mailbox
       description: |
         Scope: mailboxes.manage. Upserts by email. Google Workspace and
@@ -1217,6 +1228,7 @@ paths:
           in: query
           description: Pool name for rows that do not name one. Created if missing.
           schema: { type: string }
+        - { $ref: "#/components/parameters/IdempotencyKey" }
       requestBody:
         required: true
         content:
@@ -1254,6 +1266,7 @@ paths:
     patch:
       operationId: updateMailbox
       x-outflare-access: { scope: mailboxes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Change a mailbox's name, limits, pool, or pause and resume it
       description: |
         Scope: mailboxes.manage. Set `status` to `paused` to stop sending, or
@@ -1286,6 +1299,7 @@ paths:
     delete:
       operationId: deleteMailbox
       x-outflare-access: { scope: mailboxes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Remove a mailbox and its stored credentials
       description: "Scope: mailboxes.manage"
       tags: [mailboxes]
@@ -1301,6 +1315,7 @@ paths:
     post:
       operationId: verifyMailbox
       x-outflare-access: { scope: mailboxes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Re-check a mailbox's SMTP and IMAP sign-in and its domain's DNS
       description: "Scope: mailboxes.manage. Runs in the background; poll the mailbox for the result."
       tags: [mailboxes]
@@ -1341,6 +1356,7 @@ paths:
     post:
       operationId: updateWarmup
       x-outflare-access: { scope: mailboxes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Turn warm-up on or off, or change its settings, for many mailboxes
       description: |
         Scope: mailboxes.manage. Applies to the mailboxes in `mailbox_ids`,
@@ -1398,6 +1414,7 @@ paths:
     post:
       operationId: createMailboxPool
       x-outflare-access: { scope: mailboxes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Create a mailbox pool
       description: "Scope: mailboxes.manage"
       tags: [mailboxes]
@@ -1426,6 +1443,7 @@ paths:
     delete:
       operationId: deleteMailboxPool
       x-outflare-access: { scope: mailboxes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Delete a pool. Its mailboxes stay, without a pool.
       description: "Scope: mailboxes.manage"
       tags: [mailboxes]
@@ -1464,6 +1482,7 @@ paths:
     post:
       operationId: addSendingDomain
       x-outflare-access: { scope: mailboxes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Add a domain to track before it has mailboxes
       description: |
         Scope: mailboxes.manage. Accepts `acme.com`, `@acme.com`, a URL or an
@@ -1495,6 +1514,7 @@ paths:
     post:
       operationId: checkAllSendingDomains
       x-outflare-access: { scope: mailboxes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Re-check DNS and blocklists for every domain
       description: "Scope: mailboxes.manage. Runs in the background. Every domain is also re-checked on its own once a day."
       tags: [domains]
@@ -1526,6 +1546,7 @@ paths:
     patch:
       operationId: updateSendingDomain
       x-outflare-access: { scope: mailboxes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Pause or resume a domain, cap its daily sends, or set limits on all its mailboxes
       description: |
         Scope: mailboxes.manage. `status: paused` stops sequence and test
@@ -1560,6 +1581,7 @@ paths:
     delete:
       operationId: deleteSendingDomain
       x-outflare-access: { scope: mailboxes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Stop tracking a domain that has no mailboxes
       description: "Scope: mailboxes.manage. Returns 409 while mailboxes on the domain are connected."
       tags: [domains]
@@ -1576,6 +1598,7 @@ paths:
     post:
       operationId: checkSendingDomain
       x-outflare-access: { scope: mailboxes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Re-check a domain's DNS and blocklists now
       description: "Scope: mailboxes.manage. Runs in the background; poll the domain for a new `checked_at`. Use it after changing DNS records."
       tags: [domains]
@@ -1620,6 +1643,7 @@ paths:
     post:
       operationId: checkAllSendingServers
       x-outflare-access: { scope: mailboxes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Re-check IPs and blocklists for every server
       description: "Scope: mailboxes.manage. Runs in the background. Every server is also re-checked on its own once a day."
       tags: [servers]
@@ -1651,6 +1675,7 @@ paths:
     patch:
       operationId: updateSendingServer
       x-outflare-access: { scope: mailboxes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Pause or resume a server, cap its daily sends, or set its sending IPs
       description: |
         Scope: mailboxes.manage. `status: paused` stops sequence and test
@@ -1695,6 +1720,7 @@ paths:
     delete:
       operationId: deleteSendingServer
       x-outflare-access: { scope: mailboxes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Remove a server that no mailbox uses
       description: "Scope: mailboxes.manage. Returns 409 while mailboxes still sign in to it."
       tags: [servers]
@@ -1711,6 +1737,7 @@ paths:
     post:
       operationId: checkSendingServer
       x-outflare-access: { scope: mailboxes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Re-check a server's IPs and blocklists now
       description: "Scope: mailboxes.manage. Runs in the background; poll the server for a new `checked_at`. Use it after a delisting request."
       tags: [servers]
@@ -1751,6 +1778,7 @@ paths:
     post:
       operationId: addTrackingDomain
       x-outflare-access: { scope: mailboxes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Add a tracking domain
       description: "Scope: mailboxes.manage. Add a CNAME record from the domain to `target` first or after; the DNS is checked straight away and whenever you call check."
       tags: [tracking]
@@ -1780,6 +1808,7 @@ paths:
     delete:
       operationId: removeTrackingDomain
       x-outflare-access: { scope: mailboxes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Remove a tracking domain
       description: "Scope: mailboxes.manage. Links already sent keep working only while the domain still points here."
       tags: [tracking]
@@ -1795,6 +1824,7 @@ paths:
     post:
       operationId: checkTrackingDomain
       x-outflare-access: { scope: mailboxes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Check a tracking domain's DNS now
       description: "Scope: mailboxes.manage."
       tags: [tracking]
@@ -1840,6 +1870,7 @@ paths:
     post:
       operationId: upsertLead
       x-outflare-access: { scope: leads.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Add a lead, or update the lead with this email
       description: "Scope: leads.manage. Empty fields keep stored values; custom fields are merged."
       tags: [leads]
@@ -1884,6 +1915,7 @@ paths:
           in: query
           description: Add every imported lead to this list, created if missing.
           schema: { type: string, maxLength: 100 }
+        - { $ref: "#/components/parameters/IdempotencyKey" }
       requestBody:
         required: true
         content:
@@ -1921,6 +1953,7 @@ paths:
     patch:
       operationId: updateLead
       x-outflare-access: { scope: leads.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Change a lead's fields
       description: "Scope: leads.manage. In custom, a null value removes that field."
       tags: [leads]
@@ -1961,6 +1994,7 @@ paths:
       tags: [leads]
       parameters:
         - { name: suppress, in: query, schema: { type: boolean, default: false } }
+        - { $ref: "#/components/parameters/IdempotencyKey" }
       responses:
         "204": { description: Deleted. }
         "404": { $ref: "#/components/responses/Error" }
@@ -1993,6 +2027,7 @@ paths:
     post:
       operationId: createLeadList
       x-outflare-access: { scope: leads.manage, project_tokens: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Create a lead list, optionally built from a data provider search
       description: >-
         Scope: leads.manage. A list with search_integration_id and filters is a
@@ -2026,6 +2061,7 @@ paths:
     post:
       operationId: previewLeadList
       x-outflare-access: { scope: leads.manage, project_tokens: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Preview a search before building a list from it
       description: >-
         Scope: leads.manage. Queues a run that fetches one page (10 people) from
@@ -2073,6 +2109,7 @@ paths:
     patch:
       operationId: updateLeadList
       x-outflare-access: { scope: leads.manage, project_tokens: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Change a list's settings
       description: "Scope: leads.manage. Absent fields keep their value; filters are replaced as a whole."
       tags: [lists]
@@ -2094,6 +2131,7 @@ paths:
     delete:
       operationId: deleteLeadList
       x-outflare-access: { scope: leads.manage, project_tokens: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Delete a list. Its leads stay.
       description: "Scope: leads.manage"
       tags: [lists]
@@ -2141,6 +2179,7 @@ paths:
     post:
       operationId: addLeadsToList
       x-outflare-access: { scope: leads.manage, project_tokens: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Add leads to a list
       description: "Scope: leads.manage. Ids of leads outside the workspace are ignored."
       tags: [lists]
@@ -2177,6 +2216,7 @@ paths:
     delete:
       operationId: removeLeadFromList
       x-outflare-access: { scope: leads.manage, project_tokens: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Remove a lead from a list
       description: "Scope: leads.manage"
       tags: [lists]
@@ -2212,6 +2252,7 @@ paths:
     post:
       operationId: startListRun
       x-outflare-access: { scope: leads.manage, project_tokens: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Build, refresh or enrich a list
       description: >-
         Scope: leads.manage. Spends provider credits. build and refresh search
@@ -2265,6 +2306,7 @@ paths:
     post:
       operationId: cancelListRun
       x-outflare-access: { scope: leads.manage, project_tokens: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Stop a queued or running run. Leads already added stay.
       description: "Scope: leads.manage"
       tags: [lists]
@@ -2372,6 +2414,7 @@ paths:
     post:
       operationId: addSuppressions
       x-outflare-access: { scope: leads.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Add emails or domains to the suppression list
       description: |
         Scope: leads.manage. Each value is an email address or a domain
@@ -2420,6 +2463,7 @@ paths:
     delete:
       operationId: removeSuppression
       x-outflare-access: { scope: suppressions.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Remove a suppression entry
       description: "Scope: suppressions.manage (owners and admins by default). Audited."
       tags: [suppression]
@@ -2433,6 +2477,7 @@ paths:
     post:
       operationId: checkRecipients
       x-outflare-access: { scope: leads.read }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Ask the send policy whether addresses may be emailed
       description: |
         Scope: leads.read. Runs the same recipient checks every send goes
@@ -2472,6 +2517,7 @@ paths:
     post:
       operationId: testSendMailbox
       x-outflare-access: { scope: mailboxes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Send one test email from a mailbox now
       description: |
         Scope: mailboxes.manage. Goes through the recipient check and the
@@ -2533,6 +2579,7 @@ paths:
     post:
       operationId: createSequence
       x-outflare-access: { scope: sequences.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Create a sequence
       description: |
         Scope: sequences.manage. A new sequence is a `draft`: it sends
@@ -2584,6 +2631,7 @@ paths:
     patch:
       operationId: updateSequence
       x-outflare-access: { scope: sequences.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Change a sequence's settings, or activate, pause or archive it
       description: |
         Scope: sequences.manage. Activating needs at least one step, and a
@@ -2616,6 +2664,7 @@ paths:
     delete:
       operationId: deleteSequence
       x-outflare-access: { scope: sequences.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Delete a sequence that is not active
       description: "Scope: sequences.manage. Sent messages are kept in the message log."
       tags: [sequences]
@@ -2632,6 +2681,7 @@ paths:
     put:
       operationId: replaceSequenceSteps
       x-outflare-access: { scope: sequences.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Replace a sequence's steps
       description: |
         Scope: sequences.manage. The first step needs a subject. A later
@@ -2668,6 +2718,7 @@ paths:
     post:
       operationId: previewSequence
       x-outflare-access: { scope: sequences.read }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Render every step for one lead
       description: |
         Scope: sequences.read. Shows the subject and body each step would
@@ -2739,6 +2790,7 @@ paths:
     post:
       operationId: enrollLeads
       x-outflare-access: { scope: sequences.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Add leads to a sequence
       description: |
         Scope: sequences.manage. Send `lead_ids` or `list_id`. Suppressed
@@ -2784,6 +2836,7 @@ paths:
     post:
       operationId: stopEnrollment
       x-outflare-access: { scope: sequences.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Stop sending to one lead in a sequence
       description: "Scope: sequences.manage"
       tags: [sequences]
@@ -2858,6 +2911,7 @@ paths:
     post:
       operationId: syncMailbox
       x-outflare-access: { scope: mailboxes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Check a mailbox for new mail now
       description: "Scope: mailboxes.manage. Active mailboxes are also synced automatically every two minutes."
       tags: [inbox]
@@ -2939,6 +2993,7 @@ paths:
     patch:
       operationId: updateInboundMessage
       x-outflare-access: { scope: inbox.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Triage a message
       description: |
         Scope: inbox.manage. Send only the fields to change. Mark it read,
@@ -2975,6 +3030,7 @@ paths:
     post:
       operationId: replyToInboundMessage
       x-outflare-access: { scope: inbox.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Reply from the mailbox the message arrived at, in the same thread
       description: |
         Scope: inbox.manage. Goes through the recipient check (a suppressed
@@ -3030,6 +3086,7 @@ paths:
     post:
       operationId: createOAuthConnection
       x-outflare-access: { scope: mailboxes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Add a Google service account or a Microsoft Entra app
       description: |
         Scope: mailboxes.manage. Admin-level access to every mailbox in an
@@ -3073,6 +3130,7 @@ paths:
     delete:
       operationId: deleteOAuthConnection
       x-outflare-access: { scope: mailboxes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Remove an OAuth connection
       description: "Scope: mailboxes.manage. Refused with 409 while mailboxes use it."
       tags: [mailboxes]
@@ -3089,6 +3147,7 @@ paths:
     post:
       operationId: addOAuthConnectionMailboxes
       x-outflare-access: { scope: mailboxes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Add mailboxes that sign in through a connection
       description: |
         Scope: mailboxes.manage. Up to 5000 at once. No passwords: each
@@ -3198,6 +3257,7 @@ paths:
     post:
       operationId: syncSupplierMailboxes
       x-outflare-access: { scope: mailboxes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Refresh the supplier's mailboxes now
       description: "Scope: mailboxes.manage. Queues a full sync. Mailboxes the supplier cancelled are paused in Outflare."
       tags: [mailboxes]
@@ -3216,6 +3276,7 @@ paths:
     post:
       operationId: importSupplierMailboxes
       x-outflare-access: { scope: mailboxes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Import mailboxes from a supplier
       description: |
         Scope: mailboxes.manage. Reads each mailbox's password from the
@@ -3305,6 +3366,7 @@ paths:
     patch:
       operationId: updateSupplierSync
       x-outflare-access: { scope: mailboxes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Change how a supplier's mailboxes are synced
       description: "Scope: mailboxes.manage. Turning on auto_import queues every active mailbox not imported yet, and imports new ones as they appear."
       tags: [mailboxes]
@@ -3657,6 +3719,7 @@ paths:
     post:
       operationId: syncAllAnalytics
       x-outflare-access: { scope: analytics.read }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Sync every analytics connection soon
       description: "Scope: analytics.read. Queues a sync of each connected tool. Syncs also run by themselves every six hours (daily for Clarity)."
       tags: [analytics]
@@ -3675,6 +3738,7 @@ paths:
     post:
       operationId: syncAnalytics
       x-outflare-access: { scope: analytics.read }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Sync one analytics connection now
       description: |
         Scope: analytics.read. The first sync stores 90 days of traffic and 7 days of
@@ -3731,6 +3795,7 @@ paths:
     put:
       operationId: setAnalyticsSite
       x-outflare-access: { scope: integrations.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Set a connection's default site
       description: "Scope: integrations.manage. The site must be one the connection can read. An empty site clears the default."
       tags: [analytics]
@@ -3858,6 +3923,7 @@ paths:
     put:
       operationId: setSEOSettings
       x-outflare-access: { scope: integrations.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Set an SEO connection's domains, country, budget and snapshots
       description: "Scope: integrations.manage. Send only what changes. `domains: null` follows the domains the analytics tools line up (at most five); `monthly_budget: null` is the default ($10 for DataForSEO, 10,000 API units for Ahrefs); 0 stops every call."
       tags: [seo]
@@ -3925,6 +3991,7 @@ paths:
     post:
       operationId: syncSEO
       x-outflare-access: { scope: integrations.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Take an SEO snapshot now
       description: "Scope: integrations.manage. Stores the overview and top 50 keywords of every domain the connection follows, within its budget (this also runs weekly). Costs about $0.04 a domain on DataForSEO or 1,200 API units on Ahrefs."
       tags: [seo]
@@ -3972,6 +4039,7 @@ paths:
     post:
       operationId: createIntegration
       x-outflare-access: { scope: integrations.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Connect an account with an API key
       description: |
         Scope: integrations.manage. The credentials are tested against the
@@ -4027,6 +4095,7 @@ paths:
     patch:
       operationId: updateIntegration
       x-outflare-access: { scope: integrations.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Rename, replace the API key, or change settings
       description: "Scope: integrations.manage. New credentials are tested before they replace the old ones."
       tags: [connectors]
@@ -4054,6 +4123,7 @@ paths:
     delete:
       operationId: deleteIntegration
       x-outflare-access: { scope: integrations.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Disconnect an account
       description: "Scope: integrations.manage. Deletes the stored credentials. Features using it fall back (verification goes back to the built-in checks)."
       tags: [connectors]
@@ -4069,6 +4139,7 @@ paths:
     post:
       operationId: testIntegration
       x-outflare-access: { scope: integrations.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Sign in again with the stored credentials
       description: "Scope: integrations.manage. Reads the account (and credits, when the service reports them); changes nothing at the service and spends no credits."
       tags: [connectors]
@@ -4153,6 +4224,7 @@ paths:
     put:
       operationId: updateVerificationSettings
       x-outflare-access: { scope: leads.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Choose the verification service and what to block
       description: |
         Scope: leads.manage. Every field is optional. `integration_id` empty
@@ -4208,6 +4280,7 @@ paths:
     post:
       operationId: startVerification
       x-outflare-access: { scope: leads.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Verify addresses, a lead list, or every unverified lead
       description: |
         Scope: leads.manage. Runs in the background; results appear under
@@ -4336,6 +4409,7 @@ paths:
     post:
       operationId: runOutcomeSync
       x-outflare-access: { scope: outcomes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Sync a calendar or CRM now
       description: "Scope: outcomes.manage. Queues a sync instead of waiting for the next one."
       tags: [outcomes]
@@ -4382,6 +4456,7 @@ paths:
     post:
       operationId: createMeeting
       x-outflare-access: { scope: outcomes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Log a meeting
       description: |
         Scope: outcomes.manage. For meetings no connected calendar sees. Give
@@ -4425,6 +4500,7 @@ paths:
     patch:
       operationId: updateMeeting
       x-outflare-access: { scope: outcomes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Mark a meeting held, no-show or qualified, or fix its attribution
       description: |
         Scope: outcomes.manage. Setting sequence_id, project_id or
@@ -4450,6 +4526,7 @@ paths:
     delete:
       operationId: deleteMeeting
       x-outflare-access: { scope: outcomes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Delete a meeting
       description: "Scope: outcomes.manage. A synced meeting comes back on the next sync; mark it canceled or unattributed instead."
       tags: [outcomes]
@@ -4492,6 +4569,7 @@ paths:
     post:
       operationId: createDeal
       x-outflare-access: { scope: outcomes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Log a deal
       description: "Scope: outcomes.manage. For workspaces without a connected CRM. Give meeting_id, lead_id or contact_email to tie it to outreach."
       tags: [outcomes]
@@ -4530,6 +4608,7 @@ paths:
     patch:
       operationId: updateDeal
       x-outflare-access: { scope: outcomes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Change a deal or its attribution
       description: "Scope: outcomes.manage. A deal synced from a CRM only takes attribution changes here; change its name, stage or amount in the CRM."
       tags: [outcomes]
@@ -4551,6 +4630,7 @@ paths:
     delete:
       operationId: deleteDeal
       x-outflare-access: { scope: outcomes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Delete a deal
       description: "Scope: outcomes.manage. Removes the copy here only; the CRM is not touched."
       tags: [outcomes]
@@ -4593,6 +4673,7 @@ paths:
     post:
       operationId: recordSpend
       x-outflare-access: { scope: outcomes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Record spend
       description: |
         Scope: outcomes.manage. Give amount_cents when the money is known, or
@@ -4642,6 +4723,7 @@ paths:
     delete:
       operationId: deleteSpend
       x-outflare-access: { scope: outcomes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Delete a spend entry
       description: "Scope: outcomes.manage. For entries recorded by mistake. The deletion is in the audit log with the amount."
       tags: [outcomes]
@@ -4673,6 +4755,7 @@ paths:
     post:
       operationId: createRecurringSpend
       x-outflare-access: { scope: outcomes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Add a recurring cost
       description: "Scope: outcomes.manage."
       tags: [outcomes]
@@ -4697,6 +4780,7 @@ paths:
     put:
       operationId: updateRecurringSpend
       x-outflare-access: { scope: outcomes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Change a recurring cost
       description: "Scope: outcomes.manage. Replaces every field. To stop a cost, set ends_on; past reports keep it."
       tags: [outcomes]
@@ -4718,6 +4802,7 @@ paths:
     delete:
       operationId: deleteRecurringSpend
       x-outflare-access: { scope: outcomes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Delete a recurring cost
       description: "Scope: outcomes.manage. Removes it from every report, past ones included. Set ends_on instead to keep history."
       tags: [outcomes]
@@ -4749,6 +4834,7 @@ paths:
     put:
       operationId: setSpendRate
       x-outflare-access: { scope: outcomes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Set what a unit costs
       description: "Scope: outcomes.manage. Providers match without case. unit_price_micros is millionths of the currency unit: a $0.004 credit is 4000."
       tags: [outcomes]
@@ -4782,6 +4868,7 @@ paths:
       parameters:
         - { name: provider, in: query, required: true, schema: { type: string } }
         - { name: unit_name, in: query, required: true, schema: { type: string } }
+        - { $ref: "#/components/parameters/IdempotencyKey" }
       responses:
         "204": { description: Removed. }
         "404": { $ref: "#/components/responses/Error" }
@@ -5247,6 +5334,7 @@ paths:
     post:
       operationId: createConnectRequest
       x-outflare-access: { scope: integrations.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Ask a person to connect a service
       description: |
         Scope: integrations.manage. The agent-first way to connect anything:
@@ -5298,6 +5386,7 @@ paths:
     delete:
       operationId: cancelConnectRequest
       x-outflare-access: { scope: integrations.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Cancel a pending connect request
       description: "Scope: integrations.manage. The link stops working."
       tags: [connectors]
@@ -5419,6 +5508,7 @@ paths:
     post:
       operationId: startImport
       x-outflare-access: { scope: sequences.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Import campaigns, leads and mailboxes from another sequencer
       description: |
         Scope: sequences.manage, plus leads.manage when importing leads. Runs
@@ -5534,6 +5624,7 @@ paths:
     put:
       operationId: putHealthSettings
       x-outflare-access: { scope: mailboxes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Change automatic pausing
       description: "Scope: mailboxes.manage. Every field is optional."
       tags: [mailboxes]
@@ -5617,6 +5708,7 @@ paths:
     post:
       operationId: createProject
       x-outflare-access: { scope: projects.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Create a project
       description: "Scope: projects.manage, not available to project tokens. Names are unique in the workspace, ignoring case."
       tags: [projects]
@@ -5658,6 +5750,7 @@ paths:
     patch:
       operationId: updateProject
       x-outflare-access: { scope: projects.manage, project_tokens: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Edit a project's brief, status or daily send limit
       description: |
         Scope: projects.manage. A change to offer, audience, market, brief or
@@ -5686,6 +5779,7 @@ paths:
     delete:
       operationId: deleteProject
       x-outflare-access: { scope: projects.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Delete a project
       description: |
         Scope: projects.manage, not available to project tokens. Its domains,
@@ -5728,6 +5822,7 @@ paths:
     post:
       operationId: addToProject
       x-outflare-access: { scope: projects.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Move domains, mailboxes, lists or sequences into a project
       description: |
         Scope: projects.manage, plus mailboxes.manage for domains and
@@ -5765,6 +5860,7 @@ paths:
     post:
       operationId: removeFromProject
       x-outflare-access: { scope: projects.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Make a project's domains, mailboxes, lists or sequences shared again
       description: "Scope: projects.manage, plus read access to each kind of record moved (as addToProject). Only records in this project change."
       tags: [projects]
@@ -5809,6 +5905,7 @@ paths:
     post:
       operationId: createTeam
       x-outflare-access: { scope: members.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Create a team
       description: "Scope: members.manage. Names are unique in the workspace, ignoring case."
       tags: [allocation]
@@ -5833,6 +5930,7 @@ paths:
     patch:
       operationId: updateTeam
       x-outflare-access: { scope: members.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Rename a team, change its mode or replace its members
       description: "Scope: members.manage. member_ids replaces the whole list when sent."
       tags: [allocation]
@@ -5854,6 +5952,7 @@ paths:
     delete:
       operationId: deleteTeam
       x-outflare-access: { scope: members.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Delete a team
       description: "Scope: members.manage. Its sequences and senders stay, without a team."
       tags: [allocation]
@@ -5886,6 +5985,7 @@ paths:
     post:
       operationId: createSender
       x-outflare-access: { scope: mailboxes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Create a sender
       description: "Scope: mailboxes.manage."
       tags: [allocation]
@@ -5910,6 +6010,7 @@ paths:
     patch:
       operationId: updateSender
       x-outflare-access: { scope: mailboxes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Change a sender, or retire it
       description: "Scope: mailboxes.manage. A retired sender's mailboxes finish their follow-ups and take no new leads."
       tags: [allocation]
@@ -5931,6 +6032,7 @@ paths:
     delete:
       operationId: deleteSender
       x-outflare-access: { scope: mailboxes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Delete a sender
       description: "Scope: mailboxes.manage. Its mailboxes become unconfirmed."
       tags: [allocation]
@@ -5975,6 +6077,7 @@ paths:
     post:
       operationId: setMailboxSender
       x-outflare-access: { scope: mailboxes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Confirm who mailboxes send as, in bulk
       description: "Scope: mailboxes.manage. A null sender_id clears it."
       tags: [allocation]
@@ -6021,6 +6124,7 @@ paths:
     patch:
       operationId: updateAllocationSettings
       x-outflare-access: { scope: members.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Set the workspace's allocation mode
       description: "Scope: members.manage."
       tags: [allocation]
@@ -6068,6 +6172,7 @@ paths:
     post:
       operationId: runAllocation
       x-outflare-access: { scope: sequences.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Plan and apply now
       description: |
         Scope: sequences.manage. The allocator also runs every minute and
@@ -6113,6 +6218,7 @@ paths:
     post:
       operationId: applyAllocationSuggestion
       x-outflare-access: { scope: sequences.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Apply or approve a suggestion
       description: |
         Scope: sequences.manage. A team_approval needs a member of that team,
@@ -6139,6 +6245,7 @@ paths:
     post:
       operationId: declineAllocationSuggestion
       x-outflare-access: { scope: sequences.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Decline a suggestion, so it is not proposed again
       description: "Scope: sequences.manage."
       tags: [allocation]
@@ -6176,6 +6283,7 @@ paths:
     post:
       operationId: undoAllocationChange
       x-outflare-access: { scope: sequences.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Undo a change
       description: |
         Scope: sequences.manage. Only the latest change to a mailbox can be
@@ -6263,6 +6371,7 @@ paths:
     post:
       operationId: syncPlatform
       x-outflare-access: { scope: sequences.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Read a sequencer account now
       description: "Scope: sequences.manage. Reads mailboxes and campaigns now instead of waiting for the next 5-minute sync. Mailboxes added to or removed from a campaign in the platform are accepted as manual changes; attaches Outflare asked for are confirmed once the platform shows them."
       tags: [allocation]
@@ -6290,6 +6399,7 @@ paths:
     post:
       operationId: reviewPlatformPlan
       x-outflare-access: { scope: sequences.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Let allocation change a newly connected account
       description: "Scope: sequences.manage. Until this is called, every change for the account's campaigns is only suggested, so you can look at the first plan before anything moves. Runs a plan straight away."
       tags: [allocation]
@@ -6311,6 +6421,7 @@ paths:
     post:
       operationId: assignMailboxes
       x-outflare-access: { scope: sequences.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Assign mailboxes to a sequence by hand
       description: |
         Scope: sequences.manage. A mailbox with leads mid-sequence elsewhere
@@ -6344,6 +6455,7 @@ paths:
     post:
       operationId: releaseMailboxes
       x-outflare-access: { scope: sequences.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Take mailboxes off their sequence
       description: "Scope: sequences.manage. Mailboxes with leads in flight drain first."
       tags: [allocation]
@@ -6372,6 +6484,7 @@ paths:
     post:
       operationId: lockMailboxes
       x-outflare-access: { scope: mailboxes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Lock mailboxes, or clear their locks
       description: |
         Scope: mailboxes.manage. sequence: keep on this sequence (assigns it
@@ -6445,6 +6558,7 @@ paths:
     post:
       operationId: resolveOrphanedFollowUps
       x-outflare-access: { scope: sequences.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Decide what happens to follow-ups whose mailbox is gone
       description: |
         Scope: sequences.manage. cancel stops them. handoff sends the next
@@ -6495,6 +6609,7 @@ paths:
     post:
       operationId: previewInfraPlan
       x-outflare-access: { scope: infrastructure.read }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Draft a plan without saving it
       description: |
         Scope: infrastructure.read. Takes the same fields as creating a plan
@@ -6520,6 +6635,7 @@ paths:
     post:
       operationId: moveMailboxStage
       x-outflare-access: { scope: infrastructure.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Move mailboxes to warming, ready, resting or retired
       description: |
         Scope: infrastructure.manage. Works on any mailbox, including ones
@@ -6598,6 +6714,7 @@ paths:
     post:
       operationId: createInfraPlan
       x-outflare-access: { scope: infrastructure.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Draft a plan for domains and mailboxes
       description: |
         Scope: infrastructure.manage. "10 domains and 30 mailboxes for this
@@ -6647,6 +6764,7 @@ paths:
     patch:
       operationId: updateInfraPlan
       x-outflare-access: { scope: infrastructure.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Change a draft plan
       description: |
         Scope: infrastructure.manage. Drafts only. Domains already in the plan
@@ -6671,6 +6789,7 @@ paths:
     delete:
       operationId: deleteInfraPlan
       x-outflare-access: { scope: infrastructure.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Delete a draft or cancelled plan
       description: "Scope: infrastructure.manage. Domains and mailboxes it built stay."
       tags: [infrastructure]
@@ -6687,6 +6806,7 @@ paths:
     post:
       operationId: approveInfraPlan
       x-outflare-access: { scope: infrastructure.approve }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Approve a plan, which starts buying
       description: |
         Scope: infrastructure.approve (owners and admins; give it to an agent
@@ -6720,6 +6840,7 @@ paths:
     post:
       operationId: cancelInfraPlan
       x-outflare-access: { scope: infrastructure.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Stop a plan
       description: |
         Scope: infrastructure.manage. Steps not done yet are cancelled. An
@@ -6742,6 +6863,7 @@ paths:
     post:
       operationId: markInfraDomainsBought
       x-outflare-access: { scope: infrastructure.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Tell a plan you bought its domains
       description: |
         Scope: infrastructure.manage. For plans you buy yourself (`supplier:
@@ -6778,6 +6900,7 @@ paths:
     post:
       operationId: refreshInfraPlan
       x-outflare-access: { scope: infrastructure.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Get a new quote for a draft, or check a building plan now
       description: "Scope: infrastructure.manage. Runs in the background. Building plans are also checked every 5 minutes on their own."
       tags: [infrastructure]
@@ -6800,6 +6923,15 @@ components:
       in: cookie
       name: outflare_session
   parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      description: |
+        Makes the write safe to retry. A repeat with the same key from the same caller within 24 hours gets the first
+        answer back (with `Idempotent-Replayed: true`) instead of running again. The same key for a different request
+        is refused with 422 `idempotency_key_reused`; while the first is still running, 409 `idempotency_in_progress`.
+        Use a new random key, such as a UUID, for each distinct write.
+      schema: { type: string, minLength: 1, maxLength: 255 }
     Agency:
       name: ag
       in: path
