@@ -38,8 +38,7 @@ pnpm --filter @outflare/sdk build && pnpm --filter @outflare/mcp build
     - To keep an agent inside one motion, create the token **for a project** (the project's page has a button for this) and add `projects.read`, plus `projects.manage` if it may edit the brief. It sees only that project and its records. See [Projects](/docs/guides/projects/#agents-and-project-tokens).
     - To let it run [missions](/docs/agents/missions/), add `missions.read` and `missions.run` (the **Mission agent** preset). Never give it `missions.approve`.
     - For an outreach agent, also set its **sending limits**: a daily send budget across all the sequences it creates, the highest priority it may give a sequence, and whether it may take mailboxes from other sequences (off by default). See [Mailbox allocation](/docs/guides/mailbox-allocation/#agents).
-2. Copy the workspace id from the web app's address: `/w/<workspace id>/...`.
-3. Add the server to your client.
+2. Add the server to your client. The token already says which workspace it belongs to.
 
 **Claude Code:**
 
@@ -47,7 +46,6 @@ pnpm --filter @outflare/sdk build && pnpm --filter @outflare/mcp build
 claude mcp add outflare \
   -e OUTFLARE_URL=https://outflare.example.com \
   -e OUTFLARE_TOKEN=oft_... \
-  -e OUTFLARE_WORKSPACE=<workspace id> \
   -- node /path/to/outflare/mcp/dist/index.js
 ```
 
@@ -61,8 +59,7 @@ claude mcp add outflare \
       "args": ["/path/to/outflare/mcp/dist/index.js"],
       "env": {
         "OUTFLARE_URL": "https://outflare.example.com",
-        "OUTFLARE_TOKEN": "oft_...",
-        "OUTFLARE_WORKSPACE": "<workspace id>"
+        "OUTFLARE_TOKEN": "oft_..."
       }
     }
   }
@@ -221,9 +218,7 @@ Any agent that can make HTTP requests can use Outflare without the MCP server:
 
 3. Read what it did in the audit log, where each action is recorded under the token's name.
 
-## Coming <span class="pill later">After v1</span>
-
-- **A CLI** for scripting and CI: importing mailboxes and leads, checking domain health and managing tokens from a terminal. Like the MCP server, it is a thin client over the same API.
+For scripts and CI, the [command line client](/docs/agents/cli/) has every API operation as a command.
 
 ## Give feedback
 

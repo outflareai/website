@@ -23,7 +23,7 @@ People you add on the Team tab get their agency role (owner, admin, operator or 
 
 An **agency token** (`ofa_…`, on the Agent tokens tab) works in every client workspace with the scopes you give it. Its scopes can't go beyond your own agency role. Allow it to create clients and an agent can onboard a new client on its own.
 
-Run the [MCP server](/docs/agents/mcp/) with `OUTFLARE_AGENCY` instead of `OUTFLARE_WORKSPACE`, and the agent gets three more tools: `list_clients`, `use_client` to switch between clients, and `create_client`.
+Run the [MCP server](/docs/agents/mcp/) with an agency token, and the agent gets three more tools: `list_clients`, `use_client` to switch between clients, and `create_client`.
 
 ```sh
 claude mcp add outflare \

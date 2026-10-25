@@ -89,6 +89,7 @@ for (const [path, item] of Object.entries<any>(spec.paths)) {
 			projectTokens: !!access.project_tokens,
 			agencyRole: access.agency_role as string | undefined,
 			agencyTokens: !!access.agency_tokens,
+			anyCaller: !!access.authenticated,
 			public: Array.isArray(op.security) && op.security.length === 0,
 			fields: [...params, ...bodyFields],
 			contentType,
@@ -159,6 +160,8 @@ const count = sections.reduce((n, s) => n + s.ops.length, 0);
 								<>
 									Agency {o.agencyRole} or above{o.agencyTokens && ', or an agency token'}
 								</>
+							) : o.anyCaller ? (
+								'Any API token or signed-in person'
 							) : (
 								'Signed-in person only (not API tokens)'
 							)}
