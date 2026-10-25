@@ -18,10 +18,6 @@ You need [Docker](https://docs.docker.com/get-docker/) with the Compose plugin, 
     cd outflare
     ```
 
-    <Aside type="note">
-    While v1 is being built, the newest code is on open pull requests that have not reached `main` yet. If `deploy/` is missing after cloning, check out the branch of the newest [open pull request](https://github.com/outflareai/outflare/pulls) with `git checkout <branch>`.
-    </Aside>
-
 2. **Create your settings file**
 
     ```sh
@@ -58,11 +54,23 @@ You need [Docker](https://docs.docker.com/get-docker/) with the Compose plugin, 
 
     ```sh
     export OUTFLARE_TOKEN=oft_...
-    export WS=your-workspace-id   # listed under "workspaces" in GET /v1/me
+    curl localhost:8080/v1/whoami -H "Authorization: Bearer $OUTFLARE_TOKEN"
+    # → { "token": { "name": "…", "workspace": { "id": "…", "slug": "acme", "name": "Acme" }, "scopes": ["mailboxes.read"], … } }
 
-    curl localhost:8080/v1/workspaces/$WS/mailboxes \
+    curl localhost:8080/v1/workspaces/acme/mailboxes \
       -H "Authorization: Bearer $OUTFLARE_TOKEN"
     ```
+
+    The workspace's slug is also in the app's address bar (`localhost:8080/acme/...`). Scripts should keep the ID, which never changes.
+
+    Or use the command line client. It is the engine's own binary, and with only a server and a token it finds the workspace by itself:
+
+    ```sh
+    docker compose -f deploy/docker-compose.yml exec \
+      -e OUTFLARE_URL=http://localhost:8080 -e OUTFLARE_TOKEN engine /outflare list-mailboxes
+    ```
+
+    On any page of the app, the **API** button (top right) shows the call behind it as cURL, TypeScript and the matching MCP tool, with your IDs filled in.
 
 </Steps>
 
