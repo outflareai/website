@@ -8882,10 +8882,11 @@ components:
             allOf:
               - { $ref: "#/components/schemas/ReportMetrics" }
               - type: object
-                required: [key, label]
+                required: [key, name, label]
                 properties:
-                  key: { type: string }
-                  label: { type: string }
+                  key: { type: string, description: "The day, week start, step number, or the sequence or mailbox id." }
+                  name: { type: string, description: "What to show: the sequence name, mailbox address, \"Step 2\"." }
+                  label: { type: string, deprecated: true, description: The same as name; use name. }
     HealthSignal:
       type: object
       required: [key, level, title, detail]
