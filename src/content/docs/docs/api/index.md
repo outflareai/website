@@ -7,7 +7,7 @@ Everything in Outflare is available through one REST API. The web app uses it, t
 
 ## Base URL
 
-Your instance serves the API under `/v1`, for example `http://localhost:8080/v1` or `https://outflare.example.com/v1`. Workspace resources live under `/v1/workspaces/{ws}/...`, where `{ws}` is the workspace ID or its slug (the name in its app URL, so `/v1/workspaces/geonode/mailboxes` works). A slug can be changed in Workspace settings (`PATCH /v1/workspaces/{ws}`), so store the ID in scripts and integrations; it never changes.
+Your instance serves the API under `/v1`, for example `http://localhost:8080/v1` or `https://outflare.example.com/v1`. Workspace resources live under `/v1/workspaces/{ws}/...`, where `{ws}` is the workspace ID or its slug (the name in its app URL, so `/v1/workspaces/geonode/mailboxes` works). A slug can be changed in Workspace settings (`PATCH /v1/workspaces/{ws}`), so store the ID in scripts and integrations; it never changes. An old slug keeps working until another workspace takes it. The app's item URLs (`/geonode/sequences/q3-founders`) use readable slugs too; `GET /v1/workspaces/{ws}/links/{kind}/{ref}` turns one into the item's ID, but the rest of the API takes IDs.
 
 ## The contract
 

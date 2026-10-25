@@ -987,8 +987,8 @@ paths:
       summary: Rename a workspace or change its slug
       description: |
         Scope: workspace.manage. Send only the fields to change. The slug is the workspace's name in web app
-        URLs (https://app.outflare.ai/{slug}/overview) and works in place of its ID in API paths. Changing it
-        breaks old links that use the slug; links and integrations that use the ID keep working.
+        URLs (https://app.outflare.ai/{slug}/overview) and works in place of its ID in API paths. The old slug
+        keeps working, in the app and the API, until another workspace takes it; store the ID, which never changes.
       tags: [access]
       requestBody:
         required: true
@@ -1041,6 +1041,38 @@ paths:
                   slug: { type: string, description: The slug as it would be saved (lowercased). }
                   available: { type: boolean, description: True when it is free or already this workspace's slug. }
                   reason: { type: [string, "null"], description: Why it cannot be used. }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/links/{kind}/{ref}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: kind, in: path, required: true, schema: { type: string, enum: [sequence, project, list, mission, server, plan] } }
+      - { name: ref, in: path, required: true, description: The item's ID, or any slug it has had., schema: { type: string } }
+    get:
+      operationId: getItemLink
+      x-outflare-access: { scope: workspace.read }
+      summary: Find an item by the slug in its web app URL
+      description: |
+        Scope: workspace.read, plus the item's own read scope (sequences.read, projects.read, leads.read for lists,
+        missions.read, mailboxes.read for servers, infrastructure.read for plans). The web app names items by a slug
+        made from their name (https://app.outflare.ai/acme/sequences/q3-founders). This answers the item's ID and current
+        slug for an ID or any slug it has had, so links keep working after a rename. The API itself takes IDs.
+      tags: [access]
+      responses:
+        "200":
+          description: The item.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [kind, id, slug, name]
+                properties:
+                  kind: { type: string }
+                  id: { type: string, format: uuid }
+                  slug: { type: string, example: q3-founders }
+                  name: { type: string }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/members:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
@@ -10927,6 +10959,10 @@ components:
               example: /v1/openapi.yaml
         capabilities:
           type: array
+          description: |
+            Features this server has. Extensions add their own; `email_verification_required` means signed-in people
+            whose email isn't confirmed can use only their account and sign-in endpoints until they open the
+            confirmation link.
           items:
             type: string
         oauth_providers:
