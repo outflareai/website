@@ -72,6 +72,23 @@ try {
 | `baseUrl` | Your instance, for example `https://outflare.example.com`. Leave empty for same-origin, as the web app does. |
 | `token` | An API token. Omit it in the browser to use the signed-in session cookie. |
 | `fetch` | A custom `fetch` implementation, for tests or older runtimes. |
+| `mission` | Act inside an agent mission: every call carries `Outflare-Mission`, and writes may come back held. |
+| `missions` | `true` for a client that sets the mission header itself (as the MCP server does). Types it like one with `mission`. |
+
+## Missions
+
+Inside a [mission](/docs/agents/missions/), a write may be answered `202` with a `MissionHeld` body instead of running: a dry run, or held until a person approves it. `isHeld()` tells the two apart:
+
+```ts
+import { createClient, isHeld, ok } from "@outflare/sdk";
+
+const gtm = createClient({ baseUrl, token, mission: missionId });
+const lead = ok(await gtm.POST("/v1/workspaces/{ws}/leads", { params: { path: { ws } }, body: { email } }));
+if (isHeld(lead)) console.log(lead.message, lead.mission_action.id);
+else console.log("created", lead.id);
+```
+
+A client made without `mission` never gets those answers, so its types leave them out.
 
 ## Types
 

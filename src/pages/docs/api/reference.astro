@@ -75,7 +75,9 @@ for (const [path, item] of Object.entries<any>(spec.paths)) {
 				}))
 			: [];
 		const description: string = op.description ?? '';
-		const scope = description.match(/Scope: ([a-z.]+)/)?.[1];
+		// Who may call it: x-outflare-access, checked against the server by the engine's tests.
+		const access = op['x-outflare-access'] ?? {};
+		const scope: string | undefined = access.scope ?? description.match(/Scope: ([a-z.]+)/)?.[1];
 		const tag = op.tags?.[0] ?? 'system';
 		const entry = {
 			id: op.operationId,
@@ -84,10 +86,14 @@ for (const [path, item] of Object.entries<any>(spec.paths)) {
 			summary: op.summary,
 			description: description.replace(/Scope: [a-z.]+\.?\s*/, ''),
 			scope,
+			projectTokens: !!access.project_tokens,
+			agencyRole: access.agency_role as string | undefined,
+			agencyTokens: !!access.agency_tokens,
 			public: Array.isArray(op.security) && op.security.length === 0,
 			fields: [...params, ...bodyFields],
 			contentType,
-			responses: Object.entries<any>(op.responses ?? {}).map(([code, r]) => ({
+			// default (the standard error) is explained once above, not on every endpoint.
+			responses: Object.entries<any>(op.responses ?? {}).filter(([code]) => code !== 'default').map(([code, r]) => ({
 				code,
 				description: (resolve(r)?.description ?? '').replace(/\.$/, ''),
 			})),
@@ -124,6 +130,11 @@ const count = sections.reduce((n, s) => n + s.ops.length, 0);
 		(<code>Authorization: Bearer oft_...</code>) or a session cookie; see <a href="/docs/api/authentication/">Authentication</a>.
 		<code>{'{ws}'}</code> is a workspace ID.
 	</p>
+	<p>
+		Any endpoint can answer an error with the standard body (<code>{'{"error": {"code", "message", "request_id"}}'}</code>; see
+		<a href="/docs/api/#errors">Errors</a>). Workspace writes made inside a mission may answer <code>202</code> with
+		<code>MissionHeld</code> instead of running; see <a href="/docs/agents/missions/">Missions</a>.
+	</p>
 
 	{
 		sections.map((s) => (
@@ -142,9 +153,14 @@ const count = sections.reduce((n, s) => n + s.ops.length, 0);
 							) : o.scope ? (
 								<>
 									Scope: <code>{o.scope}</code>
+									{o.projectTokens && ' · Project tokens allowed'}
+								</>
+							) : o.agencyRole ? (
+								<>
+									Agency {o.agencyRole} or above{o.agencyTokens && ', or an agency token'}
 								</>
 							) : (
-								'Signed in'
+								'Signed-in person only (not API tokens)'
 							)}
 							{o.contentType && o.contentType !== 'application/json' && (
 								<>
