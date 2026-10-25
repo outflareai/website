@@ -11,7 +11,7 @@ There are two ways in. The MCP server is the quickest one for Claude, Cursor and
 
 ## The MCP server <span class="pill shipped">Shipped</span>
 
-[`@outflare/mcp`](https://github.com/outflareai/outflare/tree/main/mcp) is an [MCP](https://modelcontextprotocol.io) server that gives an agent 159 tools over the API (3 more in agency mode): run [missions](/docs/agents/missions/) toward a goal with approvals, read and update the brief of the project it works on, check sending domains and mailbox warm-up, import leads, check them against the suppression list, build, preview and start sequences, see and change which mailboxes each sequence sends from, and read and answer replies.
+[`@outflare/mcp`](https://github.com/outflareai/outflare/tree/main/mcp) is an [MCP](https://modelcontextprotocol.io) server that gives an agent 166 tools over the API (3 more in agency mode): run [missions](/docs/agents/missions/) toward a goal with approvals, read and update the brief of the project it works on, check sending domains and mailbox warm-up, import leads, check them against the suppression list, build, preview and start sequences, see and change which mailboxes each sequence sends from, and read and answer replies.
 
 It calls the same API with a scoped API token, so:
 
@@ -83,6 +83,7 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `list_outcome_syncs` | Each calendar and CRM source: last run and last error | |
 | `get_overview` | Mailbox health and capacity, sends, replies, bounces, unread replies | |
 | `list_mailboxes` | Sending mailboxes with status, daily limit, pool and warm-up placement | |
+| `get_mailbox` | One mailbox: status and last error, limits, pool, project, stage, warm-up and sender | |
 | `list_supplier_mailboxes` | A connected supplier's mailboxes (such as Cheap Inboxes), with import progress and why any failed | |
 | `get_mailbox_warmup` | A mailbox's warm-up results per day for 14 days | |
 | `list_domains`, `get_domain` | Sending domains with health, issues and their fixes, DNS and blocklist results, settings and sending stats | |
@@ -91,6 +92,7 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `preview_infra_plan` | Try a goal ("10 domains, 30 mailboxes by the 14th") without saving: names, timeline, capacity, warnings | |
 | `list_infra_plans`, `get_infra_plan` | Infrastructure plans, and every domain and mailbox in one with what is left to do | |
 | `list_leads` | Search leads by email, name or company | |
+| `get_lead` | One lead: fields, custom fields, lists, verification and suppression | |
 | `list_lead_lists`, `get_lead_list` | Lead lists with sizes, search settings and the latest build | |
 | `list_lead_list_members` | A list's leads with their fit score and reasons, best first | |
 | `list_data_providers` | Connected data providers that search, find emails or enrich, and the filters each understands | |
@@ -135,6 +137,10 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `mark_domains_bought`, `cancel_infra_plan` | Tell a manual plan its domains are bought; stop a plan | Yes |
 | `move_mailboxes` | Move mailboxes between warming, ready, resting and retired, with a reason | Yes |
 | `create_lead`, `import_leads_csv` | Add or update leads, one at a time or from CSV | Yes |
+| `update_lead` | Change a lead's fields | Yes |
+| `update_mailbox` | Pause or resume a mailbox, or change its name, daily limit, minimum gap or pool | Yes |
+| `add_leads_to_list`, `remove_lead_from_list` | Put existing leads in a list, or take one out | Yes |
+| `delete_lead` | Delete a lead; with `suppress: true` its address also goes on the suppression list (erasure requests) | Yes |
 | `add_suppressions` | Never email these emails or domains again | Yes |
 | `preview_lead_search` | One page of a people search at a data provider, nothing saved | Yes, provider |
 | `create_lead_list`, `update_lead_list` | A manual list, or one built from a search with an email waterfall, fit scores, dedupe and credit caps | Yes, provider |
