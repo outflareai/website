@@ -3742,6 +3742,26 @@ paths:
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/Connector" } }
         default: { $ref: "#/components/responses/Error" }
+  /v1/connectors/{id}/logo.svg:
+    get:
+      operationId: getConnectorLogo
+      summary: Get a connector's logo
+      description: |
+        The company's logo as a square SVG, unmodified apart from cropping, or a
+        monogram for connectors without one. Public, so it works in an `<img>`
+        tag. Add `theme=dark` for the variant made for dark backgrounds.
+      tags: [connectors]
+      security: []
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string }, example: hubspot }
+        - { name: theme, in: query, schema: { type: string, enum: [light, dark], default: light } }
+      responses:
+        "200":
+          description: The logo.
+          content:
+            image/svg+xml:
+              schema: { type: string }
+        "404": { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/connectors:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
@@ -8619,7 +8639,7 @@ components:
         help: { type: string }
     Connector:
       type: object
-      required: [id, name, category, summary, description, website, docs_url, auth, fields, capabilities, status, configured, connected]
+      required: [id, name, category, summary, description, website, docs_url, auth, fields, capabilities, status, configured, connected, logo_url, logo_dark_url]
       properties:
         id: { type: string, example: zerobounce }
         name: { type: string }
@@ -8645,6 +8665,8 @@ components:
           description: Other connectors the same sign-in connects too, when the person grants them (one Google sign-in connects Google Analytics and Search Console).
         configured: { type: boolean, description: Can be connected on this server now. }
         connected: { type: integer, description: Accounts the workspace connected (0 in the public catalog). }
+        logo_url: { type: string, format: uri, description: "The company's logo as a square SVG for light backgrounds, or a monogram when there is none. Public and cacheable." }
+        logo_dark_url: { type: string, format: uri, description: The same logo for dark backgrounds. }
     ConnectorAccount:
       type: object
       properties:
