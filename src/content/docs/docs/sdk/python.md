@@ -75,6 +75,8 @@ Every write carries an `Idempotency-Key`, the same one on each retry, so a retry
 
 `client.paginate(method, **params)` yields every item of a list, following `next_cursor` from page to page. To page by hand, pass `cursor=` and read `next_cursor` from each answer.
 
+Paged lists also take `fields=["email", "status"]`, which answers only those fields of each item (and `id`).
+
 ## Newer endpoints and fields
 
 - `extra_body={...}` sends body fields this version of the SDK doesn't know yet.
