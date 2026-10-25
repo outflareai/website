@@ -8,6 +8,14 @@ export const site = {
 	email: 'hello@outflare.ai',
 };
 
+// Outflare Cloud, the hosted app. Sign-up is invite-only during early access:
+// /signup without an invite code shows the request-access form.
+export const app = {
+	url: 'https://app.outflare.ai',
+	signIn: 'https://app.outflare.ai/',
+	requestAccess: 'https://app.outflare.ai/signup',
+};
+
 // The engine's public GitHub repository. Change it here and every page follows.
 export const repo = {
 	owner: 'outflareai',
