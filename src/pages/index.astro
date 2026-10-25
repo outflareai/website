@@ -1,6 +1,6 @@
 ---
 import Marketing from '../layouts/Marketing.astro';
-import { milestones, statusLabel, repo, site } from '../data/project';
+import { app, milestones, statusLabel, repo, site } from '../data/project';
 
 const shipped = milestones.filter((m) => m.status === 'shipped').length;
 const v1 = milestones.filter((m) => m.step !== null).length;
@@ -109,7 +109,7 @@ const roadmapTag: Record<string, string> = { shipped: 'badge-live', building: 'b
 
 <Marketing
 	title="Outflare: the open-source cold email engine for people and agents"
-	description="Self-host a cold email sequencer built for bulk reseller inboxes. Connect hundreds of mailboxes in one upload, warm them up, send through one policy check, and give your agents the same API as your team."
+	description="A cold email sequencer you can use hosted or run yourself, built for bulk reseller inboxes. Connect hundreds of mailboxes in one upload, warm them up, send through one policy check, and give your agents the same API as your team."
 >
 	<!-- Hero -->
 	<section class="relative overflow-hidden">
@@ -128,17 +128,13 @@ const roadmapTag: Record<string, string> = { shipped: 'badge-live', building: 'b
 				answer replies. Every send passes one policy check, and everything in the app is in the API.
 			</p>
 			<div class="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-				<a href={repo.url} class="btn btn-primary btn-lg w-full sm:w-auto">
-					Self-host on GitHub
+				<a href={app.signUp} class="btn btn-primary btn-lg w-full sm:w-auto">
+					Sign up free
 					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"></path></svg>
 				</a>
-				<button type="button" data-copy="git clone https://github.com/outflareai/outflare" class="btn btn-outline btn-lg w-full font-mono text-[13px] font-normal sm:w-auto" aria-label="Copy the git clone command">
-					<span class="sm:hidden">Copy the clone command</span><span class="hidden sm:inline"><span class="text-muted-foreground select-none">$</span> git clone github.com/outflareai/outflare</span>
-					<svg data-icon="copy" class="text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-					<svg data-icon="done" class="hidden text-brand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>
-				</button>
+				<a href={repo.url} class="btn btn-outline btn-lg w-full sm:w-auto">Self-host on GitHub</a>
 			</div>
-			<p class="mt-4 text-sm text-muted-foreground">Questions, or want help setting it up? <a href={`mailto:${site.email}`} class="font-medium text-foreground underline-offset-4 hover:underline">Get in touch</a></p>
+			<p class="mt-4 text-sm text-muted-foreground">Hosted Outflare is free during early access. Have an account? <a href={app.signIn} class="hit font-medium text-foreground underline-offset-4 hover:underline">Sign in</a></p>
 			<ul class="mt-6 flex flex-wrap justify-center gap-x-5 gap-y-2 font-mono text-xs text-muted-foreground">
 				{['AGPL-3.0', 'Go + Postgres', 'OpenAPI 3.1', 'MCP server', 'No per-mailbox fees'].map((t) => <li class="flex items-center gap-1.5"><svg class="size-3.5 text-brand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>{t}</li>)}
 			</ul>
@@ -447,7 +443,7 @@ const roadmapTag: Record<string, string> = { shipped: 'badge-live', building: 'b
 						<tbody class="divide-y">
 							{[
 								['Your data lives in', "The vendor's database", 'Your Postgres'],
-								['Pricing', 'Per seat, mailbox or contact', 'Free to self-host'],
+								['Pricing', 'Per seat, mailbox or contact', 'Free to self-host, free hosted in early access'],
 								['Send logic', 'Closed', 'Open source, one policy check'],
 								['API', 'Varies by plan', 'Everything, OpenAPI 3.1'],
 								['Agent access', 'One key per account', 'Scoped, audited tokens + MCP'],
@@ -498,13 +494,14 @@ const roadmapTag: Record<string, string> = { shipped: 'badge-live', building: 'b
 	<section class="relative overflow-hidden border-t">
 		<div class="grid-bg pointer-events-none absolute inset-0" style="--grid-mask: radial-gradient(ellipse 60% 90% at 50% 100%, #000 30%, transparent 100%)" aria-hidden="true"></div>
 		<div class="relative mx-auto max-w-3xl px-4 py-24 text-center sm:px-6">
-			<h2 class="text-3xl font-semibold tracking-tighter text-balance sm:text-5xl">Run it yourself today.</h2>
-			<p class="mx-auto mt-4 max-w-xl text-muted-foreground sm:text-lg">Two containers, one settings file, and your first mailboxes connected in about five minutes.</p>
+			<h2 class="text-3xl font-semibold tracking-tighter text-balance sm:text-5xl">Use it hosted, or run it yourself.</h2>
+			<p class="mx-auto mt-4 max-w-xl text-muted-foreground sm:text-lg">Sign up and connect your first mailboxes in a few minutes, free while we're in early access. Or run it yourself: two containers and one settings file.</p>
 			<div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-				<a href={repo.url} class="btn btn-primary btn-lg">Self-host on GitHub</a>
-				<a href={`mailto:${site.email}`} class="btn btn-outline btn-lg">Get in touch</a>
-				<a href="/docs/quickstart/" class="btn btn-ghost btn-lg">Read the quickstart</a>
+				<a href={app.signUp} class="btn btn-primary btn-lg">Sign up free</a>
+				<a href={repo.url} class="btn btn-outline btn-lg">Self-host on GitHub</a>
+				<a href={app.signIn} class="btn btn-ghost btn-lg">Sign in</a>
 			</div>
+			<p class="mt-4 text-sm text-muted-foreground">Questions, or want help setting it up? <a href={`mailto:${site.email}`} class="hit font-medium text-foreground underline-offset-4 hover:underline">Get in touch</a></p>
 			<p class="mt-6 font-mono text-xs text-muted-foreground"><span class="select-none">$ </span>docker compose -f deploy/docker-compose.yml up -d</p>
 		</div>
 	</section>
