@@ -103,6 +103,8 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `list_messages` | Every send attempt, including ones the policy blocked and why | |
 | `list_inbox`, `get_inbox_message` | Replies, and the whole conversation with a lead | |
 | `list_webhook_event_types`, `list_webhooks`, `list_webhook_deliveries` | The events webhooks can send; the workspace's webhooks and their health; what was sent to one and how the receiver answered | |
+| `list_events` | What happened since the last call: replies, bounces, opt-outs, paused mailboxes, held mission writes. Keep `next_after` and pass it back as `after` | |
+| `list_jobs`, `get_job` | Background work (syncs, imports, DNS checks) and how it went; a call that queued work returns `job.id` to follow | |
 | `import_supplier_mailboxes` | Import a supplier's mailboxes, named or all, with the same checks as a CSV | Yes |
 | `sync_supplier_mailboxes` | Read a supplier account again now | Yes |
 | `update_supplier_sync` | Turn automatic import or Google app passwords on or off, or set the daily limit for new imports | Yes |

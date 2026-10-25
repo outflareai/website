@@ -62,6 +62,8 @@ Responses are JSON. Lists are wrapped in a `data` array:
 { "data": [ { "id": "…", "email": "ana@getacme.co", "status": "active" } ] }
 ```
 
+API answers are never cached (`Cache-Control: no-store`), and every answer carries the usual security headers: `X-Content-Type-Options: nosniff`, a `Referrer-Policy`, `frame-ancestors 'none'`, and `Strict-Transport-Security` when the server is on https.
+
 ### Pagination
 
 Every list that can grow large pages the same way. It answers `next_cursor`; pass it back as `cursor` for the next page, and stop when it is `null`. `limit` sets the page size.
@@ -92,6 +94,16 @@ curl -X POST https://outflare.example.com/v1/workspaces/$WS/leads \
 - While the first request is still running, a repeat gets `409 idempotency_in_progress`. Wait a moment and retry.
 - Client errors (`4xx`) are stored and replayed too, so a retry tells you the same thing. Server errors are not: the key is released and a retry runs again.
 - Use a new key for each distinct write. Keys belong to the caller and the workspace, and expire after 24 hours.
+
+## Background work
+
+Work that takes a while (a sync, an import, a DNS check) runs in the background, and the call answers `202`. When it queued one job, the answer says which, and the `Location` header points at it:
+
+```json
+{ "queued": true, "job": { "id": "job_1042", "url": "/v1/workspaces/acme/jobs/job_1042" } }
+```
+
+Poll `GET` on that URL until `status` is `succeeded` or `failed`. A failed job carries the last attempt's `error`, and a job that failed an attempt but will retry stays `queued`, with `attempts` counting up. `GET /v1/workspaces/{ws}/jobs?status=failed` lists what went wrong anywhere in the workspace. Both need `workspace.read`. Finished jobs are kept for 14 days.
 
 ## Rate limits
 
@@ -126,6 +138,8 @@ Every error uses the same shape, with a stable `code`, a readable `message` and 
 | `422` | `idempotency_key_reused` | The `Idempotency-Key` was already used for a different request. |
 | `429` | `rate_limited` | Over the token's rate limit, or too many failed sign-ins. Wait for `Retry-After`. |
 | `500`, `503` | `internal`, `unavailable` | A server problem. Quote the `request_id`. |
+
+These are the common ones. `GET /v1/error-codes` lists every code the API can answer, with its statuses, what it means and whether retrying can help, and needs no token. A test in the engine fails if a code is added without it, so the list is always complete.
 
 ## Webhooks
 

@@ -161,6 +161,29 @@ paths:
                     type: array
                     items: { $ref: "#/components/schemas/WebhookEventType" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/error-codes:
+    get:
+      operationId: listErrorCodes
+      security: []
+      summary: Every error code the API answers
+      description: |
+        The catalog of error.code values, each with the statuses it comes with, what it means, and whether
+        retrying the same request later can succeed. Codes are only ever added, never renamed or reused.
+        A field error is invalid_request, with error.param naming the field.
+      tags: [system]
+      responses:
+        "200":
+          description: The catalog.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/ErrorCode" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/openapi.yaml:
     get:
       operationId: getOpenAPI
@@ -1241,7 +1264,7 @@ paths:
         so polling never loses its place; has_more says another page is ready now.
       tags: [webhooks]
       parameters:
-        - { name: after, in: query, description: "An event id (evt_...) from next_after.", schema: { type: string }, example: evt_48213 }
+        - { name: after, in: query, description: "An event id (evt_...) from next_after, or latest to start from now (no events, and next_after set to the newest).", schema: { type: string }, example: evt_48213 }
         - { $ref: "#/components/parameters/Cursor" }
         - { name: types, in: query, description: 'Comma-separated event types or wildcards ("lead.*"). Default: every type.', schema: { type: string }, example: "lead.replied,mailbox.*" }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
@@ -1261,6 +1284,56 @@ paths:
                   next_cursor: { $ref: "#/components/schemas/NextCursor" }
                   has_more: { type: boolean }
         "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/jobs:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listJobs
+      x-outflare-access: { scope: workspace.read }
+      summary: List background jobs, newest first
+      description: |
+        Scope: workspace.read. Work that runs in the background (syncs, imports, DNS checks, sends) is a job.
+        Filter by status to see what is still running or what failed. Finished jobs are kept for 14 days.
+      tags: [system]
+      parameters:
+        - { name: status, in: query, schema: { type: string, enum: [queued, running, succeeded, failed] } }
+        - { name: kind, in: query, description: "A job kind, such as analytics.sync.", schema: { type: string } }
+        - { name: before, in: query, description: "A job id (job_...) from next_before.", schema: { type: string } }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
+      responses:
+        "200":
+          description: Jobs.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, next_before, next_cursor]
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/Job" }
+                  next_before: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/jobs/{id}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string }, example: job_1042 }
+    get:
+      operationId: getJob
+      x-outflare-access: { scope: workspace.read }
+      summary: Get one background job
+      description: "Scope: workspace.read. Poll this after a 202 that names a job, until status is succeeded or failed."
+      tags: [system]
+      responses:
+        "200":
+          description: The job.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Job" }
+        "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/webhooks:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
@@ -4771,7 +4844,7 @@ paths:
           description: "Queued. Inside a mission, a MissionHeld answer when the call was held for approval or dry-run instead."
           content:
             application/json:
-              schema: { oneOf: [{ type: object, required: [job_id, status], properties: { job_id: { type: integer }, status: { type: string, enum: [queued] } } }, { $ref: "#/components/schemas/MissionHeld" }] }
+              schema: { oneOf: [{ $ref: "#/components/schemas/QueuedJob" }, { $ref: "#/components/schemas/MissionHeld" }] }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
@@ -8285,6 +8358,42 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/MissionHeld" }
   schemas:
+    ErrorCode:
+      type: object
+      required: [code, statuses, description, retry]
+      properties:
+        code: { type: string, example: idempotency_in_progress }
+        statuses: { type: array, items: { type: integer }, example: [409] }
+        description: { type: string }
+        retry: { type: boolean, description: True when the same request may succeed later (after Retry-After where given). }
+    Job:
+      type: object
+      required: [id, kind, status, attempts, max_attempts, error, run_at, created_at, updated_at]
+      properties:
+        id: { type: string, example: job_1042 }
+        kind: { type: string, example: analytics.sync }
+        status:
+          type: string
+          enum: [queued, running, succeeded, failed]
+          description: queued also covers a job waiting to retry after a failed attempt (see attempts and error).
+        attempts: { type: integer }
+        max_attempts: { type: integer }
+        error: { type: [string, "null"], description: The last attempt's error, if it failed. }
+        run_at: { type: string, format: date-time, description: When the job runs next (or ran). }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    QueuedJob:
+      type: object
+      required: [queued, job]
+      description: Work was queued as a job. Follow it with GET job.url (also in the Location header).
+      properties:
+        queued: { type: boolean, enum: [true] }
+        job:
+          type: object
+          required: [id, url]
+          properties:
+            id: { type: string, example: job_1042 }
+            url: { type: string, example: /v1/workspaces/acme/jobs/job_1042 }
     NextCursor:
       type: [string, "null"]
       description: Pass as cursor to get the next page; null on the last page.
@@ -10934,6 +11043,10 @@ components:
               example: /v1/openapi.yaml
         capabilities:
           type: array
+          description: |
+            Features this server has. Extensions add their own; `email_verification_required` means signed-in people
+            whose email isn't confirmed can use only their account and sign-in endpoints until they open the
+            confirmation link.
           items:
             type: string
         oauth_providers:
@@ -10948,9 +11061,20 @@ components:
           type: string
           example: postmark
           description: |
-            How account emails (confirmation, password reset) are sent: `log`, `postmark` or `resend` in the
+            How account emails (confirmation, password reset) are sent: `log`, `postmark`, `resend` or `cloudflare` in the
             open-source engine; a build with its own mail service may name another. `log` means no email service is set up
-            (POSTMARK_SERVER_TOKEN or RESEND_API_KEY, with EMAIL_FROM), so links only appear in the server log.
+            (POSTMARK_SERVER_TOKEN, RESEND_API_KEY or CLOUDFLARE_EMAIL_API_TOKEN, with EMAIL_FROM), so links only appear in the server log.
+        product_analytics:
+          type: object
+          description: |
+            Present only when the operator set OUTFLARE_POSTHOG_KEY. The web app then sends product analytics to the
+            operator's PostHog project through `api_host` on this server. Separate from the anonymous telemetry.
+          required: [provider, key, api_host, ui_host]
+          properties:
+            provider: { type: string, enum: [posthog] }
+            key: { type: string, description: "PostHog project key (public, it ships to the browser).", example: phc_abc123 }
+            api_host: { type: string, example: /ingest }
+            ui_host: { type: string, example: "https://us.posthog.com" }
     Passkey:
       type: object
       required: [id, name, created_at, last_used_at, synced]
@@ -10978,6 +11102,7 @@ components:
           properties:
             code:
               type: string
+              description: Stable and machine-readable. GET /v1/error-codes lists every code; new ones may be added.
               example: unavailable
             message:
               type: string

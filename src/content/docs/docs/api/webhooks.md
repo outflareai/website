@@ -83,7 +83,19 @@ curl "https://outflare.example.com/v1/workspaces/$WS/events?types=lead.replied,m
 # → { "data": [ { "id": "evt_48213", "type": "lead.replied", ... } ], "next_cursor": "...", "has_more": false }
 ```
 
-Keep `next_cursor` and pass it as `cursor` next time to get only what happened since. Unlike other lists, `next_cursor` is always set here, so polling never loses its place; `has_more` says another page is ready right now. Without a cursor the feed starts from the beginning of the audit log. Agents use the `list_events` MCP tool, and the CLI `outflare list-events --types lead.replied`.
+Keep `next_cursor` and pass it as `cursor` next time to get only what happened since. Unlike other lists, `next_cursor` is always set here, so polling never loses its place; `has_more` says another page is ready right now. Without a cursor the feed starts from the beginning of the audit log; pass `after=latest` to start from now instead. Agents use the `list_events` MCP tool, and the CLI `outflare list-events --types lead.replied`.
+
+## Test a receiver on your machine
+
+`outflare listen` sends new events to a receiver running on your laptop, with no public URL or tunnel:
+
+```sh
+outflare listen --forward-to http://localhost:3000/webhooks --types lead.*
+# Forwarding events to http://localhost:3000/webhooks, signed with whsec_…
+# 10:42:07  lead.replied              200 OK  evt_48213  12ms
+```
+
+Each event is POSTed with the same `webhook-id`, `webhook-timestamp` and `webhook-signature` headers as a real delivery, signed with the secret it prints when it starts, so your signature check is tested too. Pass that secret to `verifyWebhook`, or bring your own with `--secret`. A failed forward is shown, not retried. Without `--forward-to` it prints each event as JSON. It reads the events feed, so it needs `webhooks.read`.
 
 ## Self-hosted servers
 
