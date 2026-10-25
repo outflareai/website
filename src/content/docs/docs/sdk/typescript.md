@@ -100,6 +100,29 @@ else console.log("created", lead.id);
 
 A client made without `mission` never gets those answers, so its types leave them out.
 
+## Webhooks
+
+`verifyWebhook()` checks a [webhook](/docs/api/webhooks/) delivery's signature and age, and returns the typed event. Pass the raw body, before any JSON parsing. It uses Web Crypto, so it runs in Node 18+, Deno, Bun, Cloudflare Workers and browsers:
+
+```ts
+import { verifyWebhook, WebhookVerificationError } from "@outflare/sdk";
+
+export default {
+  async fetch(req: Request, env: { OUTFLARE_WEBHOOK_SECRET: string }) {
+    try {
+      const event = await verifyWebhook(await req.text(), req.headers, env.OUTFLARE_WEBHOOK_SECRET);
+      if (event.type === "lead.replied") await notifyRep(event);
+      return new Response(null, { status: 204 });
+    } catch (e) {
+      if (e instanceof WebhookVerificationError) return new Response("bad signature", { status: 401 });
+      throw e;
+    }
+  },
+};
+```
+
+With Express, read the body with `express.text({ type: "application/json" })` and pass `req.headers`.
+
 ## Types
 
 Common schemas are exported as types, including `Workspace`, `WorkspaceStats`, `Member`, `APIToken`, `Mailbox`, `OAuthConnection`, `ImportResult`, `Lead`, `LeadList`, `Suppression`, `Sequence`, `Step`, `Enrollment`, `Message`, `InboundMessage`, `ThreadEntry`, `Meta` and `ApiError`. The full generated `paths` and `components` types are exported too.
