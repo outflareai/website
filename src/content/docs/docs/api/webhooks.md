@@ -7,6 +7,8 @@ Webhooks tell your own systems what happened as it happens: a lead replied, an e
 
 ## Add an endpoint
 
+In the app, go to **Settings → Webhooks**, add the URL and pick the events: everything, whole categories, or single types. Each endpoint opens its delivery log, where you can see every payload and your receiver's answer, and send any delivery again. Over the API:
+
 ```sh
 curl -X POST https://outflare.example.com/v1/workspaces/$WS/webhooks \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" \
@@ -71,6 +73,29 @@ Answer with any `2xx` status within 10 seconds. Anything else, a timeout or a re
 ## Rotate the secret
 
 `POST .../webhooks/{id}/rotate-secret` returns a new secret. For the next 24 hours every delivery carries two signatures, one per secret, so you can deploy the new secret without missing anything. If the old secret leaked, send `{"expire_now": true}` to stop using it at once.
+
+## No public URL? Read the events feed
+
+Agents and scripts that can't receive webhooks can read the same events instead. `GET /v1/workspaces/{ws}/events` returns them oldest first, in the same shape as a delivery, and needs `webhooks.read`:
+
+```sh
+curl "https://outflare.example.com/v1/workspaces/$WS/events?types=lead.replied,mailbox.*" -H "Authorization: Bearer $OUTFLARE_TOKEN"
+# → { "data": [ { "id": "evt_48213", "type": "lead.replied", ... } ], "next_cursor": "...", "has_more": false }
+```
+
+Keep `next_cursor` and pass it as `cursor` next time to get only what happened since. Unlike other lists, `next_cursor` is always set here, so polling never loses its place; `has_more` says another page is ready right now. Without a cursor the feed starts from the beginning of the audit log; pass `after=latest` to start from now instead. Agents use the `list_events` MCP tool, and the CLI `outflare list-events --types lead.replied`.
+
+## Test a receiver on your machine
+
+`outflare listen` sends new events to a receiver running on your laptop, with no public URL or tunnel:
+
+```sh
+outflare listen --forward-to http://localhost:3000/webhooks --types lead.*
+# Forwarding events to http://localhost:3000/webhooks, signed with whsec_…
+# 10:42:07  lead.replied              200 OK  evt_48213  12ms
+```
+
+Each event is POSTed with the same `webhook-id`, `webhook-timestamp` and `webhook-signature` headers as a real delivery, signed with the secret it prints when it starts, so your signature check is tested too. Pass that secret to `verifyWebhook`, or bring your own with `--secret`. A failed forward is shown, not retried. Without `--forward-to` it prints each event as JSON. It reads the events feed, so it needs `webhooks.read`.
 
 ## Self-hosted servers
 
@@ -205,3 +230,9 @@ Every type is also in the API document, under `webhooks:` and in the `WebhookEve
 | `infra.plan_warming` | A plan's mailboxes are all in and warming up. |
 | `infra.plan_ready` | A plan's mailboxes finished warming up and are ready to send. |
 | `infra.plan_cancelled` | An infrastructure plan was cancelled. |
+
+### Workspace
+
+| Event | When |
+| --- | --- |
+| `workspace.updated` | The workspace was renamed or its slug (its name in URLs) changed. data has the new and previous values. |

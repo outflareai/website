@@ -161,6 +161,29 @@ paths:
                     type: array
                     items: { $ref: "#/components/schemas/WebhookEventType" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/error-codes:
+    get:
+      operationId: listErrorCodes
+      security: []
+      summary: Every error code the API answers
+      description: |
+        The catalog of error.code values, each with the statuses it comes with, what it means, and whether
+        retrying the same request later can succeed. Codes are only ever added, never renamed or reused.
+        A field error is invalid_request, with error.param naming the field.
+      tags: [system]
+      responses:
+        "200":
+          description: The catalog.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/ErrorCode" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/openapi.yaml:
     get:
       operationId: getOpenAPI
@@ -985,6 +1008,100 @@ paths:
               schema: { $ref: "#/components/schemas/Workspace" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateWorkspace
+      x-outflare-access: { scope: workspace.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Rename a workspace or change its slug
+      description: |
+        Scope: workspace.manage. Send only the fields to change. The slug is the workspace's name in web app
+        URLs (https://app.outflare.ai/{slug}/overview) and works in place of its ID in API paths. The old slug
+        keeps working, in the app and the API, until another workspace takes it; store the ID, which never changes.
+      tags: [access]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                name: { type: string, minLength: 1, maxLength: 100 }
+                slug:
+                  type: string
+                  pattern: "^[A-Za-z0-9][A-Za-z0-9-]{1,38}[A-Za-z0-9]$"
+                  description: 3 to 40 letters, numbers and dashes (saved in lowercase), starting and ending with a letter or number. A few words the app uses for its own pages (admin, signup, settings and so on) are reserved.
+                  example: acme
+      responses:
+        "200":
+          description: The workspace.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Workspace" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409":
+          description: "slug_taken: another workspace already uses the slug."
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/slug-availability:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: checkWorkspaceSlug
+      x-outflare-access: { scope: workspace.manage }
+      summary: Check whether a slug is free
+      description: "Scope: workspace.manage. For a settings form: says whether this workspace could take the slug, and why not."
+      tags: [access]
+      parameters:
+        - { name: slug, in: query, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: Whether the slug is free.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [slug, available, reason]
+                properties:
+                  slug: { type: string, description: The slug as it would be saved (lowercased). }
+                  available: { type: boolean, description: True when it is free or already this workspace's slug. }
+                  reason: { type: [string, "null"], description: Why it cannot be used. }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/links/{kind}/{ref}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: kind, in: path, required: true, schema: { type: string, enum: [sequence, project, list, mission, server, plan] } }
+      - { name: ref, in: path, required: true, description: The item's ID, or any slug it has had., schema: { type: string } }
+    get:
+      operationId: getItemLink
+      x-outflare-access: { scope: workspace.read }
+      summary: Find an item by the slug in its web app URL
+      description: |
+        Scope: workspace.read, plus the item's own read scope (sequences.read, projects.read, leads.read for lists,
+        missions.read, mailboxes.read for servers, infrastructure.read for plans). The web app names items by a slug
+        made from their name (https://app.outflare.ai/acme/sequences/q3-founders). This answers the item's ID and current
+        slug for an ID or any slug it has had, so links keep working after a rename. The API itself takes IDs.
+      tags: [access]
+      responses:
+        "200":
+          description: The item.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [kind, id, slug, name]
+                properties:
+                  kind: { type: string }
+                  id: { type: string, format: uuid }
+                  slug: { type: string, example: q3-founders }
+                  name: { type: string }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/members:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
@@ -1213,6 +1330,7 @@ paths:
       parameters:
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
         - { name: before, in: query, schema: { type: integer } }
+        - { $ref: "#/components/parameters/Cursor" }
       responses:
         "200":
           description: Events.
@@ -1225,6 +1343,7 @@ paths:
                     type: array
                     items: { $ref: "#/components/schemas/AuditEvent" }
                   next_before: { type: [integer, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/events:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
@@ -1239,7 +1358,8 @@ paths:
         so polling never loses its place; has_more says another page is ready now.
       tags: [webhooks]
       parameters:
-        - { name: after, in: query, description: "An event id (evt_...) from next_after.", schema: { type: string }, example: evt_48213 }
+        - { name: after, in: query, description: "An event id (evt_...) from next_after, or latest to start from now (no events, and next_after set to the newest).", schema: { type: string }, example: evt_48213 }
+        - { $ref: "#/components/parameters/Cursor" }
         - { name: types, in: query, description: 'Comma-separated event types or wildcards ("lead.*"). Default: every type.', schema: { type: string }, example: "lead.replied,mailbox.*" }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
       responses:
@@ -1249,14 +1369,65 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [data, next_after, has_more]
+                required: [data, next_after, has_more, next_cursor]
                 properties:
                   data:
                     type: array
                     items: { $ref: "#/components/schemas/WebhookEvent" }
                   next_after: { type: string, description: Pass as after next time. }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
                   has_more: { type: boolean }
         "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/jobs:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listJobs
+      x-outflare-access: { scope: workspace.read }
+      summary: List background jobs, newest first
+      description: |
+        Scope: workspace.read. Work that runs in the background (syncs, imports, DNS checks, sends) is a job.
+        Filter by status to see what is still running or what failed. Finished jobs are kept for 14 days.
+      tags: [system]
+      parameters:
+        - { name: status, in: query, schema: { type: string, enum: [queued, running, succeeded, failed] } }
+        - { name: kind, in: query, description: "A job kind, such as analytics.sync.", schema: { type: string } }
+        - { name: before, in: query, description: "A job id (job_...) from next_before.", schema: { type: string } }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
+      responses:
+        "200":
+          description: Jobs.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, next_before, next_cursor]
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/Job" }
+                  next_before: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/jobs/{id}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string }, example: job_1042 }
+    get:
+      operationId: getJob
+      x-outflare-access: { scope: workspace.read }
+      summary: Get one background job
+      description: "Scope: workspace.read. Poll this after a 202 that names a job, until status is succeeded or failed."
+      tags: [system]
+      responses:
+        "200":
+          description: The job.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Job" }
+        "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/webhooks:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
@@ -1441,6 +1612,7 @@ paths:
       parameters:
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
         - { name: before, in: query, schema: { type: integer } }
+        - { $ref: "#/components/parameters/Cursor" }
         - { name: status, in: query, schema: { $ref: "#/components/schemas/WebhookDeliveryStatus" } }
         - { name: event_type, in: query, schema: { type: string }, example: lead.replied }
       responses:
@@ -1450,12 +1622,13 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [data, next_before]
+                required: [data, next_before, next_cursor]
                 properties:
                   data:
                     type: array
                     items: { $ref: "#/components/schemas/WebhookDelivery" }
                   next_before: { type: [integer, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
@@ -2186,6 +2359,7 @@ paths:
         - { name: verification, in: query, description: "Latest verification result, or unverified for never checked.", schema: { type: string, enum: [deliverable, undeliverable, risky, unknown, unverified] } }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
         - { name: after, in: query, description: "next_after from the previous page.", schema: { type: string } }
+        - { $ref: "#/components/parameters/Cursor" }
       responses:
         "200":
           description: Leads.
@@ -2193,13 +2367,14 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [data, total, next_after]
+                required: [data, total, next_after, next_cursor]
                 properties:
                   data:
                     type: array
                     items: { $ref: "#/components/schemas/Lead" }
                   total: { type: integer, description: Matches across all pages. }
                   next_after: { type: [string, "null"], description: Pass as after to get the next page. }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         default: { $ref: "#/components/responses/Error" }
     post:
       operationId: upsertLead
@@ -2490,6 +2665,7 @@ paths:
         - { name: min_score, in: query, schema: { type: integer, minimum: 0, maximum: 100 } }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
         - { name: offset, in: query, schema: { type: integer, minimum: 0, default: 0 } }
+        - { $ref: "#/components/parameters/Cursor" }
       responses:
         "200":
           description: Members.
@@ -2497,13 +2673,14 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [data, total, next_offset]
+                required: [data, total, next_offset, next_cursor]
                 properties:
                   data:
                     type: array
                     items: { $ref: "#/components/schemas/LeadListMember" }
                   total: { type: integer }
                   next_offset: { type: [integer, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/lead-lists/{id}/leads:
@@ -2730,6 +2907,7 @@ paths:
         - { name: q, in: query, schema: { type: string } }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
         - { name: after, in: query, description: "next_after from the previous page.", schema: { type: string } }
+        - { $ref: "#/components/parameters/Cursor" }
       responses:
         "200":
           description: Entries.
@@ -2737,13 +2915,14 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [data, total, next_after]
+                required: [data, total, next_after, next_cursor]
                 properties:
                   data:
                     type: array
                     items: { $ref: "#/components/schemas/Suppression" }
                   total: { type: integer, description: Matches across all pages. }
                   next_after: { type: [string, "null"], description: Pass as after to get the next page. }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         default: { $ref: "#/components/responses/Error" }
     post:
       operationId: addSuppressions
@@ -3107,6 +3286,7 @@ paths:
         - { name: status, in: query, schema: { $ref: "#/components/schemas/EnrollmentStatus" } }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
         - { name: after, in: query, description: "next_after from the previous page.", schema: { type: string } }
+        - { $ref: "#/components/parameters/Cursor" }
       responses:
         "200":
           description: Enrollments.
@@ -3114,12 +3294,13 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [data, next_after]
+                required: [data, next_after, next_cursor]
                 properties:
                   data:
                     type: array
                     items: { $ref: "#/components/schemas/Enrollment" }
                   next_after: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         default: { $ref: "#/components/responses/Error" }
     post:
       operationId: enrollLeads
@@ -3197,6 +3378,7 @@ paths:
         - { name: status, in: query, schema: { type: string, enum: [sending, sent, failed, blocked, unknown] } }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
         - { name: before, in: query, description: "next_before from the previous page.", schema: { type: string, format: date-time } }
+        - { $ref: "#/components/parameters/Cursor" }
       responses:
         "200":
           description: Messages.
@@ -3204,12 +3386,13 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [data, next_before]
+                required: [data, next_before, next_cursor]
                 properties:
                   data:
                     type: array
                     items: { $ref: "#/components/schemas/Message" }
                   next_before: { type: [string, "null"], format: date-time }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         default: { $ref: "#/components/responses/Error" }
   /u/{token}:
     parameters:
@@ -3282,6 +3465,7 @@ paths:
         - { name: q, in: query, description: Search sender and subject., schema: { type: string } }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
         - { name: before, in: query, description: "next_before from the previous page.", schema: { type: string, format: date-time } }
+        - { $ref: "#/components/parameters/Cursor" }
       responses:
         "200":
           description: Messages.
@@ -3289,12 +3473,13 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [data, next_before, unread_replies]
+                required: [data, next_before, unread_replies, next_cursor]
                 properties:
                   data:
                     type: array
                     items: { $ref: "#/components/schemas/InboundMessage" }
                   next_before: { type: [string, "null"], format: date-time }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
                   unread_replies: { type: integer, description: "Unread replies not yet marked done, across the workspace." }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/inbox/{id}:
@@ -3564,6 +3749,7 @@ paths:
       - { name: q, in: query, schema: { type: string }, description: Part of the email address. }
       - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 1000, default: 100 } }
       - { name: offset, in: query, schema: { type: integer, minimum: 0, default: 0 } }
+      - { $ref: "#/components/parameters/Cursor" }
     get:
       operationId: listSupplierMailboxes
       x-outflare-access: { scope: mailboxes.read }
@@ -3779,6 +3965,26 @@ paths:
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/Connector" } }
         default: { $ref: "#/components/responses/Error" }
+  /v1/connectors/{id}/logo.svg:
+    get:
+      operationId: getConnectorLogo
+      summary: Get a connector's logo
+      description: |
+        The company's logo as a square SVG, unmodified apart from cropping, or a
+        monogram for connectors without one. Public, so it works in an `<img>`
+        tag. Add `theme=dark` for the variant made for dark backgrounds.
+      tags: [connectors]
+      security: []
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string }, example: hubspot }
+        - { name: theme, in: query, schema: { type: string, enum: [light, dark], default: light } }
+      responses:
+        "200":
+          description: The logo.
+          content:
+            image/svg+xml:
+              schema: { type: string }
+        "404": { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/connectors:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
@@ -4758,7 +4964,7 @@ paths:
           description: "Queued. Inside a mission, a MissionHeld answer when the call was held for approval or dry-run instead."
           content:
             application/json:
-              schema: { oneOf: [{ type: object, required: [job_id, status], properties: { job_id: { type: integer }, status: { type: string, enum: [queued] } } }, { $ref: "#/components/schemas/MissionHeld" }] }
+              schema: { oneOf: [{ $ref: "#/components/schemas/QueuedJob" }, { $ref: "#/components/schemas/MissionHeld" }] }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
@@ -4781,6 +4987,7 @@ paths:
         - { name: attributed, in: query, schema: { type: boolean }, description: Only meetings tied to outreach. }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
         - { name: before, in: query, schema: { type: string, format: date-time } }
+        - { $ref: "#/components/parameters/Cursor" }
       responses:
         "200":
           description: Meetings.
@@ -4788,10 +4995,11 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [data, next_before]
+                required: [data, next_before, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/Meeting" } }
                   next_before: { type: [string, "null"], format: date-time }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         default: { $ref: "#/components/responses/Error" }
     post:
       operationId: createMeeting
@@ -4894,6 +5102,7 @@ paths:
         - { name: attributed, in: query, schema: { type: boolean } }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
         - { name: before, in: query, schema: { type: string, format: date-time } }
+        - { $ref: "#/components/parameters/Cursor" }
       responses:
         "200":
           description: Deals.
@@ -4901,10 +5110,11 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [data, next_before]
+                required: [data, next_before, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/Deal" } }
                   next_before: { type: [string, "null"], format: date-time }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         default: { $ref: "#/components/responses/Error" }
     post:
       operationId: createDeal
@@ -4998,6 +5208,7 @@ paths:
         - { name: provider, in: query, schema: { type: string } }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 1000, default: 100 } }
         - { name: before, in: query, schema: { type: string, format: date-time } }
+        - { $ref: "#/components/parameters/Cursor" }
       responses:
         "200":
           description: Entries.
@@ -5005,10 +5216,11 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [data, next_before]
+                required: [data, next_before, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/SpendEntry" } }
                   next_before: { type: [string, "null"], format: date-time }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         default: { $ref: "#/components/responses/Error" }
     post:
       operationId: recordSpend
@@ -5480,6 +5692,7 @@ paths:
       parameters:
         - { name: writes, in: query, schema: { type: boolean }, description: Only writes. }
         - { name: before, in: query, schema: { type: integer }, description: A call id, for the next page. }
+        - { $ref: "#/components/parameters/Cursor" }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
       responses:
         "200":
@@ -5488,8 +5701,11 @@ paths:
             application/json:
               schema:
                 type: object
+                required: [data, next_before, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/MissionCall" } }
+                  next_before: { type: [integer, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/missions/{id}/actions:
     parameters:
@@ -5580,6 +5796,7 @@ paths:
       parameters:
         - { name: open_requests, in: query, schema: { type: boolean }, description: Only connect requests not yet resolved. }
         - { name: before, in: query, schema: { type: integer } }
+        - { $ref: "#/components/parameters/Cursor" }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
       responses:
         "200":
@@ -5588,8 +5805,11 @@ paths:
             application/json:
               schema:
                 type: object
+                required: [data, next_before, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/MissionUpdate" } }
+                  next_before: { type: [integer, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         default: { $ref: "#/components/responses/Error" }
     post:
       operationId: postMissionUpdate
@@ -8165,6 +8385,18 @@ webhooks:
             schema: { $ref: "#/components/schemas/WebhookEvent" }
       responses:
         "200": { description: Any 2xx answer means received; anything else is retried. }
+  workspace.updated:
+    post:
+      operationId: webhook_workspace_updated
+      summary: "The workspace was renamed or its slug (its name in URLs) changed. data has the new and previous values."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
   webhook.test:
     post:
       operationId: webhook_webhook_test
@@ -8188,6 +8420,13 @@ components:
       in: cookie
       name: outflare_session
   parameters:
+    Cursor:
+      name: cursor
+      in: query
+      description: |
+        next_cursor from the previous page, unchanged. Every paged list takes it, so one loop pages them all:
+        call, then call again with cursor=next_cursor until next_cursor is null. Cursors are opaque; don't build them.
+      schema: { type: string }
     IdempotencyKey:
       name: Idempotency-Key
       in: header
@@ -8206,7 +8445,8 @@ components:
       name: ws
       in: path
       required: true
-      schema: { type: string, format: uuid }
+      description: The workspace ID, or its slug (its name in web app URLs). IDs never change; a slug can, so store IDs.
+      schema: { type: string }
     Domain:
       name: domain
       in: path
@@ -8251,6 +8491,45 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/MissionHeld" }
   schemas:
+    ErrorCode:
+      type: object
+      required: [code, statuses, description, retry]
+      properties:
+        code: { type: string, example: idempotency_in_progress }
+        statuses: { type: array, items: { type: integer }, example: [409] }
+        description: { type: string }
+        retry: { type: boolean, description: True when the same request may succeed later (after Retry-After where given). }
+    Job:
+      type: object
+      required: [id, kind, status, attempts, max_attempts, error, run_at, created_at, updated_at]
+      properties:
+        id: { type: string, example: job_1042 }
+        kind: { type: string, example: analytics.sync }
+        status:
+          type: string
+          enum: [queued, running, succeeded, failed]
+          description: queued also covers a job waiting to retry after a failed attempt (see attempts and error).
+        attempts: { type: integer }
+        max_attempts: { type: integer }
+        error: { type: [string, "null"], description: The last attempt's error, if it failed. }
+        run_at: { type: string, format: date-time, description: When the job runs next (or ran). }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    QueuedJob:
+      type: object
+      required: [queued, job]
+      description: Work was queued as a job. Follow it with GET job.url (also in the Location header).
+      properties:
+        queued: { type: boolean, enum: [true] }
+        job:
+          type: object
+          required: [id, url]
+          properties:
+            id: { type: string, example: job_1042 }
+            url: { type: string, example: /v1/workspaces/acme/jobs/job_1042 }
+    NextCursor:
+      type: [string, "null"]
+      description: Pass as cursor to get the next page; null on the last page.
     WebhookEventType:
       type: object
       required: [type, category, description]
@@ -8344,7 +8623,7 @@ components:
       required: [id, type, created_at, workspace_id, actor, target, request_id, data]
       properties:
         id: { type: string, description: "Unique per event, and the webhook-id header. Use it to ignore repeats.", example: evt_48213 }
-        type: { type: string, enum: [lead.replied, lead.unsubscribed, inbox.replied, inbox.updated, lead.bounced, mailbox.auto_paused, lead.created, lead.updated, lead.deleted, leads.imported, suppressions.added, suppression.removed, lead_list.created, lead_list.leads_added, lead_list.run_started, lead_list.build_done, lead_list.build_failed, lead_list.refresh_done, lead_list.refresh_failed, lead_list.enrich_done, lead_list.enrich_failed, import.done, import.failed, sequence.created, sequence.updated, sequence.activated, sequence.paused, sequence.archived, sequence.deleted, sequence.steps_updated, sequence.leads_enrolled, enrollment.stopped, mailbox.imported, mailbox.updated, mailbox.paused, mailbox.resumed, mailbox.stage_changed, mailbox.deleted, domain.added, domain.paused, domain.resumed, domain.removed, meeting.created, meeting.updated, meeting.deleted, deal.created, deal.updated, deal.deleted, spend.recorded, integration.connected, integration.updated, integration.disconnected, connect_request.created, project.created, project.updated, project.deleted, mission.created, mission.updated, mission.submitted, mission.approved, mission.paused, mission.resumed, mission.stopped, mission.completed, mission.action_held, mission.action_approved, mission.action_rejected, infra.plan_created, infra.plan_approved, infra.ordered, infra.order_failed, infra.domains_bought, infra.mailbox_joined, infra.plan_warming, infra.plan_ready, infra.plan_cancelled, webhook.test] }
+        type: { type: string, enum: [lead.replied, lead.unsubscribed, inbox.replied, inbox.updated, lead.bounced, mailbox.auto_paused, lead.created, lead.updated, lead.deleted, leads.imported, suppressions.added, suppression.removed, lead_list.created, lead_list.leads_added, lead_list.run_started, lead_list.build_done, lead_list.build_failed, lead_list.refresh_done, lead_list.refresh_failed, lead_list.enrich_done, lead_list.enrich_failed, import.done, import.failed, sequence.created, sequence.updated, sequence.activated, sequence.paused, sequence.archived, sequence.deleted, sequence.steps_updated, sequence.leads_enrolled, enrollment.stopped, mailbox.imported, mailbox.updated, mailbox.paused, mailbox.resumed, mailbox.stage_changed, mailbox.deleted, domain.added, domain.paused, domain.resumed, domain.removed, meeting.created, meeting.updated, meeting.deleted, deal.created, deal.updated, deal.deleted, spend.recorded, integration.connected, integration.updated, integration.disconnected, connect_request.created, project.created, project.updated, project.deleted, mission.created, mission.updated, mission.submitted, mission.approved, mission.paused, mission.resumed, mission.stopped, mission.completed, mission.action_held, mission.action_approved, mission.action_rejected, infra.plan_created, infra.plan_approved, infra.ordered, infra.order_failed, infra.domains_bought, infra.mailbox_joined, infra.plan_warming, infra.plan_ready, infra.plan_cancelled, workspace.updated, webhook.test] }
         created_at: { type: string, format: date-time }
         workspace_id: { type: string, format: uuid }
         actor: { $ref: "#/components/schemas/WebhookRef" }
@@ -8662,7 +8941,7 @@ components:
         help: { type: string }
     Connector:
       type: object
-      required: [id, name, category, summary, description, website, docs_url, auth, auth_methods, auth_options, fields, capabilities, status, configured, connected]
+      required: [id, name, category, summary, description, website, docs_url, auth, auth_methods, auth_options, fields, capabilities, status, configured, connected, logo_url, logo_dark_url]
       properties:
         id: { type: string, example: zerobounce }
         name: { type: string }
@@ -8697,6 +8976,8 @@ components:
           description: Other connectors the same sign-in connects too, when the person grants them (one Google sign-in connects Google Analytics and Search Console).
         configured: { type: boolean, description: "Can be connected on this server now, in at least one way." }
         connected: { type: integer, description: Accounts the workspace connected (0 in the public catalog). }
+        logo_url: { type: string, format: uri, description: "The company's logo as a square SVG for light backgrounds, or a monogram when there is none. Public and cacheable." }
+        logo_dark_url: { type: string, format: uri, description: The same logo for dark backgrounds. }
     ConnectorAuthMethod:
       type: string
       enum: [api_key, oauth2, none]
@@ -8757,10 +9038,11 @@ components:
             allOf:
               - { $ref: "#/components/schemas/ReportMetrics" }
               - type: object
-                required: [key, label]
+                required: [key, name, label]
                 properties:
-                  key: { type: string }
-                  label: { type: string }
+                  key: { type: string, description: "The day, week start, step number, or the sequence or mailbox id." }
+                  name: { type: string, description: "What to show: the sequence name, mailbox address, \"Step 2\"." }
+                  label: { type: string, deprecated: true, description: The same as name; use name. }
     HealthSignal:
       type: object
       required: [key, level, title, detail]
@@ -9647,14 +9929,14 @@ components:
       enum: [owner, admin, operator, viewer]
     Scope:
       type: string
-      enum: [workspace.read, members.read, members.manage, tokens.manage, audit.read, mailboxes.read, mailboxes.manage, leads.read, leads.manage, suppressions.manage, sequences.read, sequences.manage, inbox.read, inbox.manage, integrations.read, integrations.manage, outcomes.read, outcomes.manage, projects.read, projects.manage, infrastructure.read, infrastructure.manage, infrastructure.approve, analytics.read, missions.read, missions.run, missions.approve, webhooks.read, webhooks.manage]
+      enum: [workspace.read, workspace.manage, members.read, members.manage, tokens.manage, audit.read, mailboxes.read, mailboxes.manage, leads.read, leads.manage, suppressions.manage, sequences.read, sequences.manage, inbox.read, inbox.manage, integrations.read, integrations.manage, outcomes.read, outcomes.manage, projects.read, projects.manage, infrastructure.read, infrastructure.manage, infrastructure.approve, analytics.read, missions.read, missions.run, missions.approve, webhooks.read, webhooks.manage]
     Workspace:
       type: object
       required: [id, name, slug]
       properties:
         id: { type: string, format: uuid }
         name: { type: string }
-        slug: { type: string }
+        slug: { type: string, description: "The workspace's name in web app URLs (https://app.outflare.ai/{slug}/overview). Works in place of id in API paths.", example: acme }
         role: { $ref: "#/components/schemas/Role" }
         agency_id: { type: [string, "null"], format: uuid, description: Set when the workspace is an agency client. }
         brand:
@@ -10865,7 +11147,7 @@ components:
         last_sync_error: { type: [string, "null"] }
     SupplierMailboxList:
       type: object
-      required: [integration, sync, synced, counts, total, mailboxes]
+      required: [integration, sync, synced, counts, total, mailboxes, next_offset, next_cursor]
       properties:
         integration: { type: object, additionalProperties: true, description: "The integration, as GET /v1/workspaces/{ws}/integrations/{id} returns it." }
         sync: { $ref: "#/components/schemas/SupplierSync" }
@@ -10881,6 +11163,8 @@ components:
             connected_to: { type: object, additionalProperties: { type: integer } }
         total: { type: integer, description: How many match the filters. }
         mailboxes: { type: array, items: { $ref: "#/components/schemas/SupplierMailbox" } }
+        next_offset: { type: [integer, "null"] }
+        next_cursor: { $ref: "#/components/schemas/NextCursor" }
     SupplierImportResult:
       type: object
       required: [queued, waiting, not_found]
@@ -10976,6 +11260,7 @@ components:
           properties:
             code:
               type: string
+              description: Stable and machine-readable. GET /v1/error-codes lists every code; new ones may be added.
               example: unavailable
             message:
               type: string
