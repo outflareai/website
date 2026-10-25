@@ -56,7 +56,7 @@ Analytics are off unless the build sets their IDs, so forks and local builds sen
 
 | Variable | What it turns on |
 | --- | --- |
-| `PUBLIC_GTM_ID` | Google Tag Manager (`GTM-…`). The container loads GA4 and sets consent defaults: no analytics or ad cookies for EEA, UK and Swiss visitors. |
+| `PUBLIC_GTM_ID` | Google Tag Manager (`GTM-…`). The container loads GA4. The site sets consent defaults before GTM: no analytics or ad cookies for EEA, UK and Swiss visitors (GA gets cookieless pings), analytics only elsewhere, ads never. |
 | `PUBLIC_POSTHOG_KEY` | PostHog (`phc_…`) in cookieless mode, so no banner. Needs "Cookieless server hash mode" on in the PostHog project. |
 | `PUBLIC_POSTHOG_REGION` | `us` (default) or `eu`. Also read at runtime by `functions/ingest/`, which forwards PostHog traffic through `outflare.ai/ingest/`. |
 
