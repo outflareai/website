@@ -1,0 +1,47 @@
+---
+// A light/dark switch, the same control the web app has in its sidebar.
+// Used in the docs header (as Starlight's ThemeSelect) and on the home page.
+---
+
+<button type="button" class="theme-toggle" data-theme-toggle aria-label="Switch to light theme" title="Switch theme">
+	<svg class="icon-sun" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
+	<svg class="icon-moon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"></path></svg>
+</button>
+
+<script>
+	const sync = () => {
+		const dark = document.documentElement.dataset.theme !== 'light';
+		document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]').forEach((b) => {
+			b.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+		});
+	};
+	document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]').forEach((b) =>
+		b.addEventListener('click', () => {
+			const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+			document.documentElement.dataset.theme = next;
+			try { localStorage.setItem('starlight-theme', next); } catch {}
+			sync();
+		}),
+	);
+	sync();
+</script>
+
+<style>
+	.theme-toggle {
+		display: inline-grid;
+		place-items: center;
+		width: 2rem;
+		height: 2rem;
+		border-radius: var(--radius-md);
+		border: 1px solid var(--border);
+		background: transparent;
+		color: var(--muted-foreground);
+		cursor: pointer;
+		transition: background-color 0.15s, color 0.15s;
+	}
+	.theme-toggle:hover { background: var(--accent); color: var(--foreground); }
+	.theme-toggle:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+	.icon-sun { display: none; }
+	:global([data-theme='dark']) .icon-sun { display: block; }
+	:global([data-theme='dark']) .icon-moon { display: none; }
+</style>

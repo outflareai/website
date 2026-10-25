@@ -1,0 +1,43 @@
+---
+title: Introduction
+description: What Outflare is, what works today, and how these docs are organised.
+---
+
+import { Card, CardGrid, LinkCard, Aside } from '@astrojs/starlight/components';
+
+Outflare is open-source go-to-market infrastructure that people and AI agents share. You run it yourself, it keeps your mailboxes, leads and send history in your own Postgres, and every client (the web app, the SDK, your scripts and your agents) uses the same documented API.
+
+The first module is a **cold-email sequencer** built for teams that buy inboxes in bulk: connect hundreds of reseller mailboxes on Google Workspace or Microsoft 365 at once, run multi-step sequences across mailbox pools, and send every email through one suppression and policy check.
+
+<Aside type="caution" title="Early development">
+Outflare is being built in public. Workspaces, access control and bulk mailbox connection work today. Lead import, sequences, sending and the reply inbox are next. Pages for features that are not built yet are marked **Planned** and describe the intended design, so you can give feedback before it ships. See [Status and roadmap](/docs/project/roadmap/).
+</Aside>
+
+## What you can do today
+
+- [Self-host](/docs/self-hosting/docker-compose/) the engine, web app and Postgres with one Docker Compose file.
+- Create a workspace, [invite teammates with roles](/docs/guides/workspaces-and-access/), and read the audit log of every change.
+- [Bulk import mailboxes](/docs/guides/import-mailboxes/) from your reseller's CSV. Each one is signed in to over SMTP and IMAP, and each sending domain's SPF, DKIM and DMARC are checked.
+- Create [scoped API tokens](/docs/api/authentication/) for scripts and agents, and call the [REST API](/docs/api/) described by an OpenAPI 3.1 contract.
+
+## Find your way
+
+<CardGrid>
+	<LinkCard title="Quickstart" description="Run Outflare locally and import your first mailboxes in about five minutes." href="/docs/quickstart/" />
+	<LinkCard title="How it works" description="One Go binary, Postgres as the database and the job queue, and an OpenAPI contract." href="/docs/concepts/architecture/" />
+	<LinkCard title="API reference" description="Every endpoint, generated from the same OpenAPI file the server serves." href="/docs/api/reference/" />
+	<LinkCard title="Agents and MCP" description="Connect Claude, Cursor or any MCP client to a workspace with a scoped token." href="/docs/agents/mcp/" />
+</CardGrid>
+
+## Where the code lives
+
+All of the product is in one public repository, [outflareai/outflare](https://github.com/outflareai/outflare). These docs live in [outflareai/website](https://github.com/outflareai/website); every page has an "Edit page" link at the bottom.
+
+| Path in the repo | What it is | License |
+| --- | --- | --- |
+| `engine/` | Go engine: API, job queue, sending, inbox sync, policy check | AGPL-3.0 |
+| `api/openapi.yaml` | The API contract that SDKs and these docs are generated from | AGPL-3.0 |
+| `web/` | React web app | AGPL-3.0 |
+| `sdk/ts/` | TypeScript SDK | Apache-2.0 |
+| `deploy/` | Docker Compose for self-hosting | AGPL-3.0 |
+| `docs/adr/` | Architecture decision records | |

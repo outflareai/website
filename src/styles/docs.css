@@ -1,0 +1,195 @@
+/* Starlight mapped onto the web app's design tokens (tokens.css), so the
+   docs look like the product. Selectors match Starlight's own specificity
+   and load after it, so these win. */
+:root[data-theme='dark'],
+:root[data-theme='light'] {
+	--sl-font: var(--font-sans);
+	--sl-font-mono: var(--font-mono);
+
+	--sl-color-bg: var(--background);
+	--sl-color-bg-nav: var(--background);
+	--sl-color-bg-sidebar: var(--background);
+	--sl-color-bg-inline-code: var(--muted);
+	--sl-color-hairline: var(--border);
+	--sl-color-hairline-light: var(--input);
+	--sl-color-hairline-shade: var(--border);
+	--sl-color-text: var(--foreground);
+	--sl-color-text-accent: var(--brand-ink);
+	--sl-color-text-invert: var(--primary-foreground);
+	--sl-color-bg-accent: var(--primary);
+}
+
+:root[data-theme='dark'] {
+	--sl-color-white: oklch(0.985 0 0);
+	--sl-color-gray-1: oklch(0.92 0.004 286.3);
+	--sl-color-gray-2: oklch(0.871 0.006 286.3);
+	--sl-color-gray-3: oklch(0.65 0.016 285.9);
+	--sl-color-gray-4: oklch(0.47 0.017 285.8);
+	--sl-color-gray-5: oklch(0.255 0.006 286);
+	--sl-color-gray-6: oklch(0.19 0.005 285.9);
+	--sl-color-black: oklch(0.145 0.004 285.8);
+	--sl-color-accent-low: oklch(0.3 0.07 152);
+	--sl-color-accent: oklch(0.72 0.17 152);
+	--sl-color-accent-high: oklch(0.86 0.1 152);
+	--sl-color-backdrop-overlay: oklch(0.145 0.004 285.8 / 0.7);
+}
+
+:root[data-theme='light'] {
+	--sl-color-white: oklch(0.145 0.004 285.8);
+	--sl-color-gray-1: oklch(0.19 0.005 285.9);
+	--sl-color-gray-2: oklch(0.34 0.012 285.8);
+	--sl-color-gray-3: oklch(0.55 0.016 285.9);
+	--sl-color-gray-4: oklch(0.705 0.015 286.1);
+	--sl-color-gray-5: oklch(0.92 0.004 286.3);
+	--sl-color-gray-6: oklch(0.967 0.001 286.4);
+	--sl-color-gray-7: oklch(0.985 0 0);
+	--sl-color-black: oklch(1 0 0);
+	--sl-color-accent-low: oklch(0.95 0.05 152);
+	--sl-color-accent: oklch(0.62 0.17 152);
+	--sl-color-accent-high: oklch(0.42 0.12 152);
+	--sl-color-backdrop-overlay: oklch(0.145 0.004 285.8 / 0.4);
+}
+
+/* Type: Geist, a little tighter, like the app. */
+body { font-feature-settings: 'ss01', 'cv11'; -webkit-font-smoothing: antialiased; }
+.sl-markdown-content :is(h1, h2, h3, h4) { letter-spacing: -0.02em; font-weight: 600; }
+h1#_top { letter-spacing: -0.03em; font-weight: 600; }
+.sl-markdown-content :not(pre) > code {
+	border: 1px solid var(--border);
+	border-radius: var(--radius-sm);
+	padding: 0.05em 0.35em;
+	font-size: 0.86em;
+}
+
+/* Header and sidebar: quiet, like the app's shell. */
+header.header { border-bottom: 1px solid var(--border); }
+.sidebar-pane { border-inline-end: 1px solid var(--border); }
+nav.sidebar .group-label .large,
+nav.sidebar summary .large {
+	font-family: var(--font-mono);
+	font-size: 0.7rem;
+	font-weight: 500;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--muted-foreground);
+}
+nav.sidebar a {
+	border-radius: var(--radius-md);
+	color: var(--sl-color-gray-2);
+}
+nav.sidebar a:hover { background: var(--accent); color: var(--foreground); }
+nav.sidebar a[aria-current='page'],
+nav.sidebar a[aria-current='page']:hover,
+nav.sidebar a[aria-current='page']:focus {
+	background: var(--sidebar-accent);
+	color: var(--foreground);
+	font-weight: 500;
+	box-shadow: inset 2px 0 0 var(--brand);
+}
+
+/* Table of contents current item uses the brand colour. */
+starlight-toc a[aria-current='true'],
+starlight-toc a[aria-current='true']:hover { color: var(--brand-ink); }
+
+/* Links in prose: brand ink, underline on hover. */
+.sl-markdown-content a:not(:where(.not-content *)) { color: var(--brand-ink); text-underline-offset: 3px; }
+
+/* Tables: dense rows and quiet mono headings, as in the app. */
+.sl-markdown-content table { font-size: 0.9rem; }
+.sl-markdown-content th {
+	font-family: var(--font-mono);
+	font-size: 0.7rem;
+	font-weight: 500;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	color: var(--muted-foreground);
+}
+.sl-markdown-content :is(th, td) { border-color: var(--border); }
+
+/* Cards and asides on the app's surfaces. */
+.card, .sl-link-card { border-radius: var(--radius-xl); border-color: var(--border) !important; background: var(--card); box-shadow: none; }
+.sl-link-card:hover { background: var(--accent); border-color: var(--input) !important; }
+.starlight-aside { border-radius: var(--radius-lg); border-inline-start-width: 2px; }
+
+/* Theme toggle sits where Starlight's select was. */
+starlight-theme-select, .theme-toggle { flex-shrink: 0; }
+
+/* Status pills used in docs: <span class="pill shipped">Shipped</span> */
+.pill {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35em;
+	padding: 0.1rem 0.5rem;
+	border-radius: 999px;
+	font-family: var(--font-mono);
+	font-size: 0.7rem;
+	font-weight: 500;
+	letter-spacing: 0.02em;
+	vertical-align: middle;
+	border: 1px solid var(--border);
+	background: var(--muted);
+	color: var(--muted-foreground);
+}
+.pill::before { content: ''; width: 6px; height: 6px; border-radius: 999px; background: currentColor; }
+.pill.shipped { color: var(--status-live); }
+.pill.building { color: var(--status-next); }
+.pill.planned { color: var(--status-planned); }
+.pill.later { color: var(--muted-foreground); }
+
+/* API reference */
+.endpoint { border: 1px solid var(--border); border-radius: var(--radius-xl); background: var(--card); padding: 0.9rem 1rem; margin-top: 1rem; }
+.endpoint h3 { margin: 0; font-size: 1rem; display: flex; gap: 0.6rem; align-items: baseline; flex-wrap: wrap; }
+.endpoint h3 code { background: none; border: 0; padding: 0; font-size: 0.95rem; word-break: break-all; }
+.method {
+	font-family: var(--font-mono);
+	font-size: 0.68rem;
+	font-weight: 600;
+	padding: 0.1rem 0.45rem;
+	border-radius: var(--radius-sm);
+	text-transform: uppercase;
+	border: 1px solid currentColor;
+	background: color-mix(in oklch, currentColor 12%, transparent);
+}
+.method.get { color: var(--status-live); }
+.method.post { color: var(--status-planned); }
+.method.patch, .method.put { color: var(--status-next); }
+.method.delete { color: var(--destructive); }
+.endpoint .summary { margin-top: 0.4rem; font-weight: 600; }
+.endpoint .meta { font-size: 0.85rem; color: var(--muted-foreground); }
+.endpoint table { font-size: 0.85rem; }
+
+/* Header details: neutral site title and icons, a smaller mark. */
+.site-title { color: var(--foreground) !important; font-weight: 600; letter-spacing: -0.02em; font-size: 1.05rem; }
+.site-title img { height: 1.5rem; width: auto; }
+.site-title { font-size: 0.95rem; }
+/* The home page's header: 56px, translucent over the page. */
+:root { --sl-nav-height: 3.5rem; --sl-text-h1: 2.25rem; --sl-text-h2: 1.5rem; --sl-text-h3: 1.2rem; }
+.page > header.header { background: color-mix(in oklch, var(--background) 80%, transparent); backdrop-filter: blur(12px); }
+.social-icons { gap: 0.5rem !important; }
+.social-icons a, a.sl-flex[href*='github.com'] { color: var(--muted-foreground); }
+.social-icons a:hover { color: var(--foreground); }
+
+/* Asides: the app's quiet callouts, a coloured edge and icon on a card. */
+.starlight-aside {
+	background: var(--card);
+	border: 1px solid var(--border);
+	border-inline-start: 2px solid var(--sl-color-asides-border);
+	color: var(--foreground);
+}
+.starlight-aside--note { --sl-color-asides-border: var(--status-planned); --sl-color-asides-text-accent: var(--status-planned); }
+.starlight-aside--tip { --sl-color-asides-border: var(--brand); --sl-color-asides-text-accent: var(--brand-ink); }
+.starlight-aside--caution { --sl-color-asides-border: var(--status-next); --sl-color-asides-text-accent: var(--status-next); }
+.starlight-aside--danger { --sl-color-asides-border: var(--destructive); --sl-color-asides-text-accent: var(--destructive); }
+.starlight-aside__title { font-size: 0.95rem; font-weight: 600; }
+
+/* Phone menu button: the app's outline icon button, not a filled circle. */
+.sl-menu-button {
+	background: transparent !important;
+	border: 1px solid var(--input) !important;
+	border-radius: var(--radius-md) !important;
+	box-shadow: none !important;
+	color: var(--foreground) !important;
+	--sl-menu-button-size: 2rem;
+	padding: 0.4rem !important;
+}
+.sl-menu-button:hover { background: var(--accent) !important; }

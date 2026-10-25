@@ -1,0 +1,168 @@
+/* Marketing pages. This is the web app's own stylesheet (outflare
+   web/src/index.css): the same Tailwind v4 theme, shadcn/ui tokens, Geist
+   fonts and dark default, so the site and the dashboard are one design.
+   Keep the @theme and token blocks in step with the app. */
+@import "tailwindcss";
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/geist-mono";
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+@theme {
+  --font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono Variable", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --color-neutral-50: oklch(0.985 0 0);
+  --color-neutral-100: oklch(0.967 0.001 286.4);
+  --color-neutral-200: oklch(0.92 0.004 286.3);
+  --color-neutral-300: oklch(0.871 0.006 286.3);
+  --color-neutral-400: oklch(0.705 0.015 286.1);
+  --color-neutral-500: oklch(0.6 0.016 285.9);
+  --color-neutral-600: oklch(0.47 0.017 285.8);
+  --color-neutral-700: oklch(0.34 0.012 285.8);
+  --color-neutral-800: oklch(0.255 0.006 286);
+  --color-neutral-900: oklch(0.19 0.005 285.9);
+  --color-neutral-950: oklch(0.145 0.004 285.8);
+
+  --color-brand: oklch(0.72 0.17 152);
+  --color-brand-strong: oklch(0.62 0.17 152);
+}
+
+:root {
+  --radius: 0.5rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0.004 285.8);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0.004 285.8);
+  --primary: oklch(0.19 0.005 285.9);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.967 0.001 286.4);
+  --secondary-foreground: oklch(0.19 0.005 285.9);
+  --muted: oklch(0.967 0.001 286.4);
+  --muted-foreground: oklch(0.55 0.016 285.9);
+  --accent: oklch(0.967 0.001 286.4);
+  --accent-foreground: oklch(0.19 0.005 285.9);
+  --destructive: oklch(0.577 0.245 27.3);
+  --border: oklch(0.92 0.004 286.3);
+  --input: oklch(0.92 0.004 286.3);
+  --ring: oklch(0.705 0.015 286.1);
+}
+
+[data-theme="dark"] {
+  --background: oklch(0.145 0.004 285.8);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.165 0.004 285.8);
+  --card-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.985 0 0);
+  --primary-foreground: oklch(0.19 0.005 285.9);
+  --secondary: oklch(0.255 0.006 286);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.21 0.005 285.9);
+  --muted-foreground: oklch(0.65 0.016 285.9);
+  --accent: oklch(0.235 0.006 286);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.2);
+  --border: oklch(1 0 0 / 9%);
+  --input: oklch(1 0 0 / 12%);
+  --ring: oklch(0.55 0.016 285.9);
+}
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+    font-feature-settings: "ss01", "cv11";
+    scroll-behavior: smooth;
+  }
+  html[data-theme="dark"] {
+    color-scheme: dark;
+  }
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background font-sans text-[15px] leading-6 text-foreground antialiased;
+  }
+  td, th, dd, output {
+    font-variant-numeric: tabular-nums;
+  }
+  code, kbd, samp, pre {
+    @apply font-mono;
+  }
+  ::selection {
+    @apply bg-brand/30;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-ring;
+  }
+}
+
+/* The app's shadcn Button, Badge and Card, as classes for Astro markup. */
+@layer components {
+  .btn {
+    @apply inline-flex h-9 shrink-0 items-center justify-center gap-2 rounded-md px-4 text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 [&_svg]:size-4 [&_svg]:shrink-0;
+  }
+  .btn-lg { @apply h-10 px-5; }
+  .btn-sm { @apply h-8 gap-1.5 px-3; }
+  .btn-primary { @apply bg-primary text-primary-foreground hover:bg-primary/90; }
+  .btn-outline { @apply border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50; }
+  .btn-ghost { @apply text-muted-foreground hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50; }
+
+  .badge {
+    @apply inline-flex w-fit shrink-0 items-center gap-1 rounded-md border px-1.5 py-px font-mono text-[11px] font-medium whitespace-nowrap;
+  }
+  .badge-live { @apply border-brand/30 bg-brand/10 text-brand-strong dark:text-brand; }
+  .badge-next { @apply border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400; }
+  .badge-muted { @apply border-border bg-muted text-muted-foreground; }
+
+  .card { @apply rounded-xl border bg-card text-card-foreground; }
+
+  .eyebrow { @apply font-mono text-xs font-medium tracking-wider text-muted-foreground uppercase; }
+  .h2 { @apply text-3xl font-semibold tracking-tight text-balance sm:text-4xl; }
+  .sub { @apply mt-3 max-w-2xl text-base text-pretty text-muted-foreground sm:text-lg; }
+
+  /* Code blocks: the app's quiet panel, with simple token colours. */
+  .code-panel { @apply overflow-x-auto p-4 font-mono text-[12.5px] leading-[1.7] text-neutral-800 dark:text-neutral-200; }
+  .code-panel .c { @apply text-neutral-400 dark:text-neutral-500; }
+  .code-panel .k { @apply text-violet-600 dark:text-violet-400; }
+  .code-panel .s { @apply text-brand-strong dark:text-brand; }
+  .code-panel .p { @apply text-neutral-400 select-none dark:text-neutral-600; }
+  .code-panel .o { @apply text-sky-700 dark:text-sky-400; }
+}
+
+/* Faint grid behind the hero and final call to action. */
+.grid-bg {
+  background-image:
+    linear-gradient(to right, color-mix(in oklch, var(--foreground) 6%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklch, var(--foreground) 6%, transparent) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: var(--grid-mask, radial-gradient(ellipse 70% 60% at 50% 0%, #000 40%, transparent 100%));
+}
+
+/* Product screenshots follow the theme. */
+[data-theme="dark"] .only-light,
+:root:not([data-theme="dark"]) .only-dark {
+  display: none;
+}

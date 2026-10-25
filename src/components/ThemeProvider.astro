@@ -1,0 +1,13 @@
+---
+// Replaces Starlight's ThemeProvider. Like the web app, the site is dark by
+// default and remembers an explicit light or dark choice per browser.
+---
+
+<script is:inline>
+	window.StarlightThemeProvider = (() => {
+		let stored = null;
+		try { stored = localStorage.getItem('starlight-theme'); } catch {}
+		document.documentElement.dataset.theme = stored === 'light' ? 'light' : 'dark';
+		return { updatePickers() {} };
+	})();
+</script>

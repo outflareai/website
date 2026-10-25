@@ -1,0 +1,168 @@
+---
+import Marketing from '../layouts/Marketing.astro';
+
+// The numbers come from Outflare Cloud's public endpoint
+// (GET /v1/cloud/stats/public), read in the visitor's browser so the page
+// stays current without a rebuild. Set PUBLIC_STATS_URL at build time; until
+// then the page says plainly that there is nothing to show yet.
+const source = import.meta.env.PUBLIC_STATS_URL ?? '';
+---
+
+<Marketing title="Usage stats · Outflare" description="How many self-hosted Outflare servers are running, which versions they run and which connectors they use, from the anonymous daily report.">
+	<section class="relative border-b">
+		<div class="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
+			<p class="eyebrow">Usage stats</p>
+			<h1 class="mt-3 text-4xl font-semibold tracking-tighter text-balance sm:text-5xl">Servers running Outflare</h1>
+			<p class="sub">
+				Self-hosted servers send one anonymous report a day unless their owner turns it off, so these numbers are a floor, not a total.{' '}
+				<a href="/docs/self-hosting/telemetry/" class="font-medium text-foreground underline-offset-4 hover:underline">What is sent and how to turn it off</a>.
+			</p>
+		</div>
+	</section>
+
+	<div id="stats" data-source={source} class="mx-auto max-w-6xl space-y-10 px-4 py-14 sm:px-6">
+		<p data-state="loading" class="text-sm text-muted-foreground" hidden>Loading the latest numbers…</p>
+
+		<div data-state="empty" class="card p-8" hidden>
+			<h2 class="text-lg font-semibold">No numbers to show yet</h2>
+			<p data-empty-reason class="mt-2 max-w-2xl text-sm text-muted-foreground">
+				The stats server isn't public yet, so no self-hosted server has reported. This page fills in on its own once it is.
+			</p>
+			<p class="mt-4 text-sm text-muted-foreground">
+				Until then, GitHub's own numbers are on the <a href="https://github.com/outflareai/outflare" class="font-medium text-foreground underline-offset-4 hover:underline">repository page</a>.
+			</p>
+		</div>
+
+		<div data-state="ready" class="space-y-10" hidden>
+			<div class="grid gap-px overflow-hidden rounded-xl border bg-border sm:grid-cols-2 lg:grid-cols-4">
+				<div class="bg-background p-5"><p class="text-sm text-muted-foreground">Running, last 30 days</p><p data-k="servers_30d" class="mt-1 text-3xl font-semibold tabular-nums"></p><p data-k="servers_7d_sub" class="mt-1 text-xs text-muted-foreground"></p></div>
+				<div class="bg-background p-5"><p class="text-sm text-muted-foreground">Sending mail this week</p><p data-k="sending_7d" class="mt-1 text-3xl font-semibold tabular-nums"></p><p data-k="sending_sub" class="mt-1 text-xs text-muted-foreground"></p></div>
+				<div class="bg-background p-5"><p class="text-sm text-muted-foreground">New, last 30 days</p><p data-k="new_30d" class="mt-1 text-3xl font-semibold tabular-nums"></p><p class="mt-1 text-xs text-muted-foreground">Servers reporting for the first time</p></div>
+				<div class="bg-background p-5"><p class="text-sm text-muted-foreground">In Docker or Kubernetes</p><p data-k="container" class="mt-1 text-3xl font-semibold tabular-nums"></p><p data-k="latest_sub" class="mt-1 text-xs text-muted-foreground"></p></div>
+			</div>
+
+			<section>
+				<h2 class="text-base font-semibold">Servers reporting each day</h2>
+				<p class="mt-1 text-sm text-muted-foreground">Last 90 days. Hover or tap a bar for the day's count.</p>
+				<div class="card mt-4 p-4">
+					<div data-k="daily" class="flex h-36 items-end gap-[2px]" role="img" aria-label="Servers reporting per day, last 90 days"></div>
+					<div class="mt-2 flex justify-between font-mono text-[11px] text-muted-foreground"><span data-k="day_first"></span><span data-k="day_max"></span><span data-k="day_last"></span></div>
+				</div>
+			</section>
+
+			<div class="grid gap-6 md:grid-cols-2">
+				<section class="card" data-share="versions" data-title="Versions" data-note="Servers seen in the last 30 days"></section>
+				<section class="card" data-share="connectors" data-title="Connectors in use" data-note="Servers using each one; a server can use several"></section>
+				<section class="card" data-share="platforms" data-title="Platforms" data-note="Operating system and processor"></section>
+				<section class="card" data-share="countries" data-title="Countries" data-note="From the network edge; addresses are never stored"></section>
+			</div>
+
+			<p data-k="footnote" class="text-xs text-muted-foreground"></p>
+		</div>
+
+		<section class="grid gap-6 border-t pt-10 md:grid-cols-3">
+			<div>
+				<h2 class="text-sm font-semibold">How servers are counted</h2>
+				<p class="mt-2 text-sm text-muted-foreground">Each server has a random id made when it first starts. A server counts as running on any day it reports. "Sending" means it sent mail in the 24 hours before a report.</p>
+			</div>
+			<div>
+				<h2 class="text-sm font-semibold">What's kept private</h2>
+				<p class="mt-2 text-sm text-muted-foreground">No names, emails, domains or addresses are sent or stored. Any group of fewer than five servers is folded into "other" here, so no single server can be picked out.</p>
+			</div>
+			<div>
+				<h2 class="text-sm font-semibold">Use the data</h2>
+				<p class="mt-2 text-sm text-muted-foreground">The same numbers are JSON at <code data-k="endpoint" class="font-mono text-xs">/v1/cloud/stats/public</code> on Outflare Cloud, updated every 10 minutes. Anyone may read them.</p>
+			</div>
+		</section>
+	</div>
+</Marketing>
+
+<script>
+	type Share = { value: string; instances: number };
+	type Stats = {
+		updated_at: string;
+		servers_30d: number;
+		servers_7d: number;
+		sending_7d: number;
+		new_30d: number;
+		container_share: number;
+		latest_version: string;
+		daily: { day: string; servers: number }[] | null;
+		versions: Share[];
+		platforms: Share[];
+		countries: Share[];
+		connectors: Share[];
+		stars: number | null;
+		min_group: number;
+	};
+
+	const root = document.getElementById('stats')!;
+	const source = root.dataset.source ?? '';
+	const $ = (k: string) => root.querySelector<HTMLElement>(`[data-k="${k}"]`)!;
+	const n = (v: number) => v.toLocaleString();
+	const show = (state: string) => root.querySelectorAll<HTMLElement>('[data-state]').forEach((el) => (el.hidden = el.dataset.state !== state));
+	const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+
+	function empty(reason?: string) {
+		if (reason) root.querySelector('[data-empty-reason]')!.textContent = reason;
+		show('empty');
+	}
+
+	function share(el: HTMLElement, rows: Share[], total: number, highlight?: string) {
+		const head = `<header class="border-b px-4 py-3"><h2 class="text-sm font-semibold">${esc(el.dataset.title!)}</h2><p class="text-xs text-muted-foreground">${esc(el.dataset.note!)}</p></header>`;
+		if (!rows.length) {
+			el.innerHTML = head + '<p class="px-4 py-6 text-center text-sm text-muted-foreground">Not enough servers yet to show this safely</p>';
+			return;
+		}
+		el.innerHTML =
+			head +
+			'<ul class="divide-y">' +
+			rows
+				.map((r) => {
+					const pct = total ? Math.min(100, (100 * r.instances) / total) : 0;
+					const tag = highlight && r.value === highlight ? ' <span class="badge badge-live ml-1">latest</span>' : '';
+					return `<li class="grid grid-cols-[minmax(0,1fr)_40%_3.5rem] items-center gap-3 px-4 py-2 text-sm"><span class="truncate font-mono text-xs">${esc(r.value)}${tag}</span><span class="h-1.5 rounded-full bg-muted"><span class="block h-1.5 rounded-full bg-brand" style="width:${pct}%"></span></span><span class="text-right tabular-nums">${n(r.instances)}</span></li>`;
+				})
+				.join('') +
+			'</ul>';
+	}
+
+	function render(s: Stats) {
+		if (!s.servers_30d) return empty('The stats server is up, but no self-hosted server has reported in the last 30 days.');
+		$('servers_30d').textContent = n(s.servers_30d);
+		$('servers_7d_sub').textContent = `${n(s.servers_7d)} in the last 7 days`;
+		$('sending_7d').textContent = n(s.sending_7d);
+		$('sending_sub').textContent = s.servers_7d ? `${Math.round((100 * s.sending_7d) / s.servers_7d)}% of servers running this week` : '';
+		$('new_30d').textContent = n(s.new_30d);
+		$('container').textContent = `${Math.round(100 * s.container_share)}%`;
+		$('latest_sub').textContent = s.latest_version ? `Latest release ${s.latest_version}` : 'No release published yet';
+
+		const days = s.daily ?? [];
+		const max = Math.max(1, ...days.map((d) => d.servers));
+		$('daily').innerHTML = days
+			.map((d) => `<div class="group flex h-full flex-1 items-end" title="${d.day}: ${d.servers} servers"><div class="w-full rounded-t-[3px] bg-brand/80 group-hover:bg-brand" style="height:${(100 * d.servers) / max}%;min-height:${d.servers ? 2 : 0}px"></div></div>`)
+			.join('');
+		$('day_first').textContent = days[0]?.day ?? '';
+		$('day_max').textContent = `max ${n(max)}`;
+		$('day_last').textContent = days[days.length - 1]?.day ?? '';
+
+		const rows: Record<string, Share[]> = { versions: s.versions, connectors: s.connectors, platforms: s.platforms, countries: s.countries };
+		root.querySelectorAll<HTMLElement>('[data-share]').forEach((el) => {
+			const key = el.dataset.share!;
+			share(el, rows[key] ?? [], s.servers_30d, key === 'versions' ? s.latest_version : undefined);
+		});
+		$('footnote').textContent = `Updated ${new Date(s.updated_at).toLocaleString()}. Groups of fewer than ${s.min_group} servers are shown as "other".${s.stars != null ? ` ${n(s.stars)} stars on GitHub.` : ''}`;
+		show('ready');
+	}
+
+	if (!source) {
+		empty();
+	} else {
+		$('endpoint').textContent = source;
+		show('loading');
+		fetch(source, { headers: { Accept: 'application/json' } })
+			.then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
+			.then(render)
+			.catch(() => empty("The stats server didn't answer just now. Try again in a few minutes."));
+	}
+</script>

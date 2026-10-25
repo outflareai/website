@@ -1,0 +1,32 @@
+---
+import { milestones, statusLabel } from '../data/project';
+---
+
+<ol class="roadmap not-content">
+	{
+		milestones.map((m) => (
+			<li class={`rm ${m.status}`}>
+				<span class="rm-step">{m.step ?? '+'}</span>
+				<div>
+					<div class="rm-head">
+						<strong>{m.docs ? <a href={m.docs}>{m.title}</a> : m.title}</strong>
+						<span class={`pill ${m.status}`}>{statusLabel[m.status]}</span>
+					</div>
+					<p>{m.summary}</p>
+				</div>
+			</li>
+		))
+	}
+</ol>
+
+<style>
+	.roadmap { list-style: none; padding: 0; margin: 1.5rem 0; display: grid; gap: 0.6rem; }
+	.rm { display: grid; grid-template-columns: 1.75rem 1fr; gap: 0.75rem; padding: 0.85rem 1rem; border: 1px solid var(--border); border-radius: var(--radius-xl); background: var(--card); }
+	.rm > div { min-width: 0; }
+	.rm-step { width: 1.75rem; height: 1.75rem; border-radius: var(--radius-md); display: grid; place-items: center; font-family: var(--font-mono); font-size: 0.78rem; background: var(--muted); border: 1px solid var(--border); color: var(--foreground); }
+	.rm.shipped .rm-step { background: color-mix(in oklch, var(--brand) 16%, transparent); border-color: color-mix(in oklch, var(--brand) 45%, transparent); color: var(--brand-ink); }
+	.rm-head { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; }
+	.rm-head a { color: var(--foreground); text-decoration: none; font-weight: 500; }
+	.rm-head a:hover { text-decoration: underline; text-underline-offset: 3px; }
+	.rm p { margin: 0.25rem 0 0; color: var(--muted-foreground); font-size: 0.9rem; }
+</style>

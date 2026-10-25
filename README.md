@@ -1,0 +1,65 @@
+# Outflare website
+
+**Live at [outflare.ai](https://outflare.ai)** · [Docs](https://outflare.ai/docs/) · [Engine repo](https://github.com/outflareai/outflare) · [hello@outflare.ai](mailto:hello@outflare.ai)
+
+The marketing site and documentation for [Outflare](https://outflare.ai), open-source GTM infrastructure for humans and agents. The product itself lives in [outflareai/outflare](https://github.com/outflareai/outflare).
+
+Built with [Astro](https://astro.build) and [Starlight](https://starlight.astro.build). The output is a static site with built-in search.
+
+## Develop
+
+Needs Node 22.23 or later (24 recommended, see `.nvmrc`).
+
+```sh
+npm install
+npm run dev        # http://localhost:4321
+npm run build      # static site in dist/
+npm run preview    # serve dist/
+```
+
+Canonical URLs, the sitemap and `llms.txt` use `https://outflare.ai` (no `www`). Set `SITE_URL` only to build for another address, such as a preview.
+
+`PUBLIC_STATS_URL` points the [usage stats page](src/pages/stats.astro) at Outflare Cloud's public endpoint (`https://<cloud host>/v1/cloud/stats/public`). Visitors' browsers read it directly, so the page stays current without a rebuild. Without it, `/stats/` says there are no numbers yet.
+
+## Where things are
+
+| Path | What |
+| --- | --- |
+| `src/pages/index.astro` | Marketing home page |
+| `src/pages/stats.astro` | Public usage stats (`/stats/`), read live from Outflare Cloud |
+| `src/content/docs/docs/` | Docs pages in Markdown and MDX, served under `/docs/` |
+| `src/pages/docs/api/reference.astro` | Endpoint reference, generated from `spec/openapi.yaml` |
+| `src/data/project.ts` | The site URL, contact email, GitHub repo links, and roadmap and feature status |
+| `spec/openapi.yaml` | Copy of `api/openapi.yaml` from the main repo |
+| `src/pages/llms.txt.ts` | `/llms.txt`, an index of the docs for LLMs and agents |
+| `src/styles/marketing.css` | Home page styles: the web app's own Tailwind v4 theme and shadcn tokens (`outflare/web/src/index.css`), plus button, badge and card classes matching the app's components. Update both together. |
+| `src/styles/tokens.css` | The same tokens as plain CSS variables for the docs, which Starlight styles. |
+| `public/app/` | Screenshots of the real web app on demo data, dark and light, for the home page. Retake them when the app's look changes. |
+| `astro.config.mjs` | Site config and docs sidebar |
+
+## Hosting
+
+The site is meant for Cloudflare Pages, with the domain's DNS on Cloudflare (the app itself runs on Fly.io; see `docs/deploy.md` in the private cloud repo). In the Cloudflare dashboard, Workers & Pages → Create → Pages → Connect to Git, pick this repository and set:
+
+| Setting | Value |
+| --- | --- |
+| Production branch | `main` |
+| Build command | `npm run build` |
+| Build output directory | `dist` |
+| Environment variables | `NODE_VERSION` = `24` |
+
+Then add `outflare.ai` and `www.outflare.ai` (redirected to `outflare.ai`) under Custom domains. Every push to `main` deploys, and pull requests get preview links. `public/_headers` sets security headers and long caching for `/_astro/` files.
+
+## Keeping the docs honest
+
+The docs describe what Outflare does today. Pages for features that have not shipped are marked **Planned** and describe the intended design.
+
+When the main repo changes:
+
+1. Refresh the API contract: `npm run sync-spec` (from `main`), or `npm run sync-spec -- <branch>`, or `OUTFLARE_DIR=../outflare npm run sync-spec` from a local checkout.
+2. Update `src/data/project.ts` when a roadmap step ships, and remove the **Planned** label from its docs page.
+3. Check install and configuration pages against `README.md`, `deploy/` and `engine/internal/config` in the main repo.
+
+## License
+
+Apache-2.0. The Outflare core is AGPL-3.0; see its repository.

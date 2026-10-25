@@ -1,0 +1,198 @@
+---
+// The endpoint reference, generated at build time from spec/openapi.yaml, a
+// copy of api/openapi.yaml in the main repo (refresh it with `npm run sync-spec`).
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import specText from '../../../../spec/openapi.yaml?raw';
+import { parse } from 'yaml';
+import { repo } from '../../../data/project';
+
+const spec = parse(specText);
+const methods = ['get', 'post', 'put', 'patch', 'delete'] as const;
+
+const tagNames: Record<string, string> = {
+	system: 'System and discovery',
+	access: 'Setup, auth, workspaces and access',
+	mailboxes: 'Mailboxes',
+	domains: 'Sending domains',
+	leads: 'Leads',
+	lists: 'Lead lists and data providers',
+	suppression: 'Suppression',
+	sequences: 'Sequences',
+	inbox: 'Inbox',
+};
+
+function resolve(node: any): any {
+	if (node && typeof node === 'object' && typeof node.$ref === 'string') {
+		const path = node.$ref.replace(/^#\//, '').split('/');
+		return resolve(path.reduce((o: any, k: string) => o?.[k], spec));
+	}
+	return node;
+}
+
+function typeOf(s: any): string {
+	s = resolve(s);
+	if (!s) return '';
+	if (s.enum) return s.enum.filter((v: unknown) => v !== null).map((v: unknown) => JSON.stringify(v)).join(' | ');
+	const t = Array.isArray(s.type) ? s.type.filter((x: string) => x !== 'null').join(' | ') : s.type;
+	if (t === 'array') return `${typeOf(s.items)}[]`;
+	return [t, s.format].filter(Boolean).join(', ');
+}
+
+function escape(s: string) {
+	return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// Descriptions use Markdown inline code only.
+function inline(s = '') {
+	return escape(s.trim()).replace(/`([^`]+)`/g, '<code>$1</code>');
+}
+
+interface Field { name: string; where: string; type: string; required: boolean; description: string }
+
+const groups = new Map<string, any[]>();
+for (const [path, item] of Object.entries<any>(spec.paths)) {
+	const shared = (item.parameters ?? []).map(resolve);
+	for (const method of methods) {
+		const op = item[method];
+		if (!op) continue;
+		const params: Field[] = [...shared, ...(op.parameters ?? []).map(resolve)].map((p: any) => ({
+			name: p.name,
+			where: p.in,
+			type: typeOf(p.schema),
+			required: !!p.required,
+			description: p.description ?? '',
+		}));
+		const content = op.requestBody?.content ?? {};
+		const contentType = Object.keys(content)[0];
+		const body = resolve(content[contentType]?.schema);
+		const bodyFields: Field[] = body?.properties
+			? Object.entries<any>(body.properties).map(([name, s]) => ({
+					name,
+					where: 'body',
+					type: typeOf(s),
+					required: (body.required ?? []).includes(name),
+					description: resolve(s)?.description ?? '',
+				}))
+			: [];
+		const description: string = op.description ?? '';
+		const scope = description.match(/Scope: ([a-z.]+)/)?.[1];
+		const tag = op.tags?.[0] ?? 'system';
+		const entry = {
+			id: op.operationId,
+			method,
+			path,
+			summary: op.summary,
+			description: description.replace(/Scope: [a-z.]+\.?\s*/, ''),
+			scope,
+			public: Array.isArray(op.security) && op.security.length === 0,
+			fields: [...params, ...bodyFields],
+			contentType,
+			responses: Object.entries<any>(op.responses ?? {}).map(([code, r]) => ({
+				code,
+				description: (resolve(r)?.description ?? '').replace(/\.$/, ''),
+			})),
+		};
+		if (!groups.has(tag)) groups.set(tag, []);
+		groups.get(tag)!.push(entry);
+	}
+}
+
+const sections = [...groups.entries()].map(([tag, ops]) => ({ tag, title: tagNames[tag] ?? tag, ops }));
+const headings = sections.flatMap((s) => [
+	{ depth: 2, slug: s.tag, text: s.title },
+	...s.ops.map((o) => ({ depth: 3, slug: o.id, text: o.summary })),
+]);
+const count = sections.reduce((n, s) => n + s.ops.length, 0);
+---
+
+<StarlightPage
+	frontmatter={{
+		title: 'Endpoint reference',
+		description: 'Every Outflare API endpoint, generated from the OpenAPI contract.',
+		tableOfContents: { minHeadingLevel: 2, maxHeadingLevel: 2 },
+	}}
+	headings={headings}
+>
+	<p>
+		{count} endpoints in API version <code>{spec.info.version}</code>, generated from
+		<a href={`${repo.url}/blob/main/api/openapi.yaml`}><code>api/openapi.yaml</code></a>. Your instance serves the
+		exact contract it runs at <code>/v1/openapi.yaml</code>. Download <a href="/openapi.yaml">this copy</a> to
+		generate a client or import it into an API tool.
+	</p>
+	<p>
+		Endpoints marked <span class="pill shipped">Public</span> need no credentials. All others take an API token
+		(<code>Authorization: Bearer oft_...</code>) or a session cookie; see <a href="/docs/api/authentication/">Authentication</a>.
+		<code>{'{ws}'}</code> is a workspace ID.
+	</p>
+
+	{
+		sections.map((s) => (
+			<>
+				<h2 id={s.tag}>{s.title}</h2>
+				{s.ops.map((o) => (
+					<section class="endpoint" id={o.id}>
+						<h3>
+							<span class={`method ${o.method}`}>{o.method}</span>
+							<code>{o.path}</code>
+						</h3>
+						<div class="summary">{o.summary}</div>
+						<div class="meta">
+							{o.public ? (
+								<span class="pill shipped">Public</span>
+							) : o.scope ? (
+								<>
+									Scope: <code>{o.scope}</code>
+								</>
+							) : (
+								'Signed in'
+							)}
+							{o.contentType && o.contentType !== 'application/json' && (
+								<>
+									{' '}
+									· Body: <code>{o.contentType}</code>
+								</>
+							)}
+						</div>
+						{o.description && <p set:html={inline(o.description)} />}
+						{o.fields.length > 0 && (
+							<table>
+								<thead>
+									<tr>
+										<th>Parameter</th>
+										<th>In</th>
+										<th>Type</th>
+										<th>Description</th>
+									</tr>
+								</thead>
+								<tbody>
+									{o.fields.map((f) => (
+										<tr>
+											<td>
+												<code>{f.name}</code>
+												{f.required && ' *'}
+											</td>
+											<td>{f.where}</td>
+											<td>
+												<code>{f.type}</code>
+											</td>
+											<td set:html={inline(f.description)} />
+										</tr>
+									))}
+								</tbody>
+							</table>
+						)}
+						<div class="meta">
+							Responses:{' '}
+							{o.responses.map((r, i) => (
+								<>
+									{i > 0 && ', '}
+									<code>{r.code}</code> {r.description}
+								</>
+							))}
+						</div>
+					</section>
+				))}
+			</>
+		))
+	}
+</StarlightPage>

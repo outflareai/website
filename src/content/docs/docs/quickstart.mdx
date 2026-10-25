@@ -1,0 +1,71 @@
+---
+title: Quickstart
+description: Run Outflare with Docker Compose, create your workspace, import mailboxes and make your first API call.
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+This gets a local instance running with Docker Compose. You need [Docker](https://docs.docker.com/get-docker/) with the Compose plugin, `git` and `openssl`.
+
+<Steps>
+
+1. **Clone the repository**
+
+    ```sh
+    git clone https://github.com/outflareai/outflare
+    cd outflare
+    ```
+
+    <Aside type="note">
+    While v1 is being built, the newest code is on open pull requests that have not reached `main` yet. If `deploy/` is missing after cloning, check out the branch of the newest [open pull request](https://github.com/outflareai/outflare/pulls) with `git checkout <branch>`.
+    </Aside>
+
+2. **Create your settings file**
+
+    ```sh
+    cp deploy/.env.example deploy/.env
+    echo "OUTFLARE_SECRET_KEY=$(openssl rand -base64 32)" >> deploy/.env
+    ```
+
+    Open `deploy/.env` and change `POSTGRES_PASSWORD`. `OUTFLARE_SECRET_KEY` encrypts mailbox passwords at rest. Compose refuses to start without it.
+
+    <Aside type="caution">
+    Back up `OUTFLARE_SECRET_KEY` together with your database. If the key is lost, stored mailbox credentials cannot be read and every mailbox has to be imported again.
+    </Aside>
+
+3. **Start it**
+
+    ```sh
+    docker compose -f deploy/docker-compose.yml up -d
+    curl localhost:8080/readyz
+    ```
+
+    `readyz` returns `{"status":"ok"}` once the engine can reach Postgres. The engine runs its database migrations on start.
+
+4. **Create the first user and workspace**
+
+    Open [http://localhost:8080](http://localhost:8080). The first visit runs setup: you enter your name, email, a password of at least 10 characters and a workspace name, and you become the workspace owner. Setup only works while the instance has no users.
+
+5. **Import your mailboxes**
+
+    Go to **Mailboxes → Import CSV** and upload the file your inbox reseller gave you. The only required columns are `email` and `password` (an app password). Each mailbox is signed in to over SMTP and IMAP, and each domain's SPF, DKIM and DMARC are checked. See [Import mailboxes](/docs/guides/import-mailboxes/) for every column that is recognised.
+
+6. **Create an API token and call the API**
+
+    Go to **API tokens**, create a token with the `mailboxes.read` scope, and copy it. It starts with `oft_` and is shown once.
+
+    ```sh
+    export OUTFLARE_TOKEN=oft_...
+    export WS=your-workspace-id   # listed under "workspaces" in GET /v1/me
+
+    curl localhost:8080/v1/workspaces/$WS/mailboxes \
+      -H "Authorization: Bearer $OUTFLARE_TOKEN"
+    ```
+
+</Steps>
+
+## Next steps
+
+- Put the instance behind HTTPS and set up backups: [Self-hosting with Docker Compose](/docs/self-hosting/docker-compose/).
+- Invite your team and decide who can manage mailboxes: [Workspaces and access](/docs/guides/workspaces-and-access/).
+- Explore the API: [API overview](/docs/api/) and the [endpoint reference](/docs/api/reference/).
