@@ -9538,9 +9538,9 @@ components:
           type: string
           example: postmark
           description: |
-            How account emails (confirmation, password reset) are sent: `log`, `postmark` or `resend` in the
+            How account emails (confirmation, password reset) are sent: `log`, `postmark`, `resend` or `cloudflare` in the
             open-source engine; a build with its own mail service may name another. `log` means no email service is set up
-            (POSTMARK_SERVER_TOKEN or RESEND_API_KEY, with EMAIL_FROM), so links only appear in the server log.
+            (POSTMARK_SERVER_TOKEN, RESEND_API_KEY or CLOUDFLARE_EMAIL_API_TOKEN, with EMAIL_FROM), so links only appear in the server log.
         product_analytics:
           type: object
           description: |
