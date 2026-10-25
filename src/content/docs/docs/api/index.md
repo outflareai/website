@@ -105,6 +105,10 @@ Every error uses the same shape, with a stable `code`, a readable `message` and 
 | `429` | `rate_limited` | Too many attempts, for example repeated failed sign-ins. |
 | `500`, `503` | `internal`, `unavailable` | A server problem. Quote the `request_id`. |
 
+## Webhooks
+
+To hear about replies, bounces and paused mailboxes without polling, register a [webhook](/docs/api/webhooks/). Deliveries are signed (Standard Webhooks) and retried.
+
 ## Health
 
 `GET /healthz` reports that the process is up and `GET /readyz` that it can reach Postgres. Neither needs authentication.

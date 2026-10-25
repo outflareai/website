@@ -86,6 +86,8 @@ The scopes are:
 | `sequences.manage` | Create, change, activate, pause and delete sequences; add and stop leads. |
 | `inbox.read` | Read the inbox and conversations. |
 | `inbox.manage` | Mark messages read and reply from the inbox. |
+| `integrations.read` | List connectors and their status. |
+| `integrations.manage` | Connect, change and disconnect connectors, which means handling their API keys. |
 | `outcomes.read` | Read meetings, deals, spend and cost reports; export them. |
 | `outcomes.manage` | Log and correct meetings, deals and spend; set unit prices and recurring costs; sync now. |
 | `projects.read` | List projects and read their briefs. |
@@ -93,9 +95,12 @@ The scopes are:
 | `infrastructure.manage` | Draft, change and cancel plans; move mailboxes between stages. |
 | `infrastructure.approve` | Approve a plan, which buys domains and mailboxes on your accounts. Owners and admins only by default. |
 | `projects.manage` | Create, change, pause and delete projects; move records in and out (with each record's own manage scope). |
+| `analytics.read` | Read reports from connected analytics and SEO tools. |
 | `missions.read` | List missions and read their brief, calls, held changes and updates. |
 | `missions.run` | Create and change missions, submit a plan, post updates and connector requests, pause, stop and complete. What an agent needs. |
 | `missions.approve` | Approve a mission's plan, resume it, and approve or reject held changes. Never give this to the agent that runs the mission. |
+| `webhooks.read` | List [webhooks](/docs/api/webhooks/) and their deliveries. |
+| `webhooks.manage` | Add, change, test and remove webhooks, and see and rotate their signing secrets. Owners and admins only by default, since webhooks receive workspace data. |
 
 Give each agent its own token with only the scopes it needs, so its actions are attributed to it in the audit log and you can revoke it on its own.
 
