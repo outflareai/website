@@ -1,8 +1,10 @@
 ---
 // Site analytics, all off unless the build sets the IDs (Cloudflare Pages >
 // Settings > Variables). Forks and local builds send nothing.
-//   PUBLIC_GTM_ID          Google Tag Manager container; it loads GA4 and
-//                          sets consent defaults (no cookies in the EEA/UK).
+//   PUBLIC_GTM_ID          Google Tag Manager container; it loads GA4. Consent
+//                          defaults are set here, before GTM: EEA/UK/CH deny
+//                          storage (GA sends cookieless pings), elsewhere
+//                          analytics is granted and ads are always denied.
 //   PUBLIC_POSTHOG_KEY     PostHog project key, cookieless on this site, sent
 //   PUBLIC_POSTHOG_REGION  through /ingest (functions/ingest) on our own domain.
 // Cloudflare Web Analytics needs no code: Pages injects it when it is enabled.
@@ -17,6 +19,16 @@ const phKey = /^phc_[A-Za-z0-9_-]{10,80}$/.test(posthogKey) ? posthogKey : '';
 
 {gtmId && (
 	<script is:inline define:vars={{ gtmId }}>
+		window.dataLayer = window.dataLayer || [];
+		function gtag() { dataLayer.push(arguments); }
+		var noAds = { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied' };
+		// EEA, UK and Switzerland: nothing stored until someone opts in (we never ask).
+		gtag('consent', 'default', Object.assign({ analytics_storage: 'denied', region: [
+			'AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU','IE','IT','LV','LT','LU','MT','NL',
+			'PL','PT','RO','SK','SI','ES','SE','IS','LI','NO','GB','CH',
+		] }, noAds));
+		gtag('consent', 'default', Object.assign({ analytics_storage: 'granted' }, noAds));
+		gtag('set', 'ads_data_redaction', true);
 		(function (w, d, s, l, i) {
 			w[l] = w[l] || [];
 			w[l].push({ 'gtm.start': Date.now(), event: 'gtm.js' });
