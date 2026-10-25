@@ -11,7 +11,7 @@ There are two ways in. The MCP server is the quickest one for Claude, Cursor and
 
 ## The MCP server <span class="pill shipped">Shipped</span>
 
-[`@outflare/mcp`](https://github.com/outflareai/outflare/tree/main/mcp) is an [MCP](https://modelcontextprotocol.io) server that gives an agent 166 tools over the API (3 more in agency mode): run [missions](/docs/agents/missions/) toward a goal with approvals, read and update the brief of the project it works on, check sending domains and mailbox warm-up, import leads, check them against the suppression list, build, preview and start sequences, see and change which mailboxes each sequence sends from, and read and answer replies.
+[`@outflare/mcp`](https://github.com/outflareai/outflare/tree/main/mcp) is an [MCP](https://modelcontextprotocol.io) server that gives an agent 174 tools over the API (3 more in agency mode): run [missions](/docs/agents/missions/) toward a goal with approvals, read and update the brief of the project it works on, check sending domains and mailbox warm-up, import leads, check them against the suppression list, build, preview and start sequences, see and change which mailboxes each sequence sends from, and read and answer replies.
 
 It calls the same API with a scoped API token, so:
 
@@ -105,6 +105,7 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `list_enrollments` | The leads in a sequence and where each one is | |
 | `list_messages` | Every send attempt, including ones the policy blocked and why | |
 | `list_inbox`, `get_inbox_message` | Replies, and the whole conversation with a lead | |
+| `list_webhook_event_types`, `list_webhooks`, `list_webhook_deliveries` | The events webhooks can send; the workspace's webhooks and their health; what was sent to one and how the receiver answered | |
 | `import_supplier_mailboxes` | Import a supplier's mailboxes, named or all, with the same checks as a CSV | Yes |
 | `sync_supplier_mailboxes` | Read a supplier account again now | Yes |
 | `update_supplier_sync` | Turn automatic import or Google app passwords on or off, or set the daily limit for new imports | Yes |
@@ -152,6 +153,8 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `stop_enrollment` | Stop emailing one lead in a sequence | Yes |
 | `mark_inbox_read` | Mark a message read or unread | Yes |
 | `reply_to_inbox_message` | Reply now, from the same mailbox and thread | Yes, sends |
+| `create_webhook`, `update_webhook`, `delete_webhook` | Send events to a URL (signed, retried); change its events or turn it off; remove it | Yes |
+| `test_webhook`, `redeliver_webhook` | Send a test event, or one delivery again, and see the result | Yes |
 | `assign_mailboxes`, `release_mailboxes` | Move mailboxes to a sequence or free them; busy ones finish their follow-ups first | Yes |
 | `lock_mailboxes` | Keep mailboxes on a sequence or team, or out of automatic allocation | Yes |
 | `run_mailbox_allocation` | Allocate now instead of waiting for the next minute | Yes |
