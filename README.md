@@ -39,7 +39,7 @@ Canonical URLs, the sitemap and `llms.txt` use `https://outflare.ai` (no `www`).
 
 ## Hosting
 
-The site is meant for Cloudflare Pages, with the domain's DNS on Cloudflare (the app itself runs on Fly.io; see `docs/deploy.md` in the private cloud repo). In the Cloudflare dashboard, Workers & Pages → Create → Pages → Connect to Git, pick this repository and set:
+The site is meant for Cloudflare Pages, with the domain's DNS on Cloudflare (the hosted app runs separately, from the private cloud repo). In the Cloudflare dashboard, Workers & Pages → Create → Pages → Connect to Git, pick this repository and set:
 
 | Setting | Value |
 | --- | --- |
@@ -49,6 +49,18 @@ The site is meant for Cloudflare Pages, with the domain's DNS on Cloudflare (the
 | Environment variables | `NODE_VERSION` = `24` |
 
 Then add `outflare.ai` and `www.outflare.ai` (redirected to `outflare.ai`) under Custom domains. Every push to `main` deploys, and pull requests get preview links. `public/_headers` sets security headers and long caching for `/_astro/` files.
+
+### Analytics
+
+Analytics are off unless the build sets their IDs, so forks and local builds send nothing. On the Pages project, Settings → Variables and Secrets → Production, as plain-text variables:
+
+| Variable | What it turns on |
+| --- | --- |
+| `PUBLIC_GTM_ID` | Google Tag Manager (`GTM-…`). The container loads GA4 and sets consent defaults: no analytics or ad cookies for EEA, UK and Swiss visitors. |
+| `PUBLIC_POSTHOG_KEY` | PostHog (`phc_…`) in cookieless mode, so no banner. Needs "Cookieless server hash mode" on in the PostHog project. |
+| `PUBLIC_POSTHOG_REGION` | `us` (default) or `eu`. Also read at runtime by `functions/ingest/`, which forwards PostHog traffic through `outflare.ai/ingest/`. |
+
+Cloudflare Web Analytics needs no code: enable it under the Pages project's Metrics tab and Pages injects it. The tags themselves live in `src/components/Analytics.astro`, used by both the marketing layout and the docs head.
 
 ## Keeping the docs honest
 

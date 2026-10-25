@@ -30,6 +30,7 @@ export default defineConfig({
 				ThemeProvider: './src/components/ThemeProvider.astro',
 				ThemeSelect: './src/components/ThemeSelect.astro',
 				SocialIcons: './src/components/HeaderLinks.astro',
+				Head: './src/components/Head.astro',
 			},
 			expressiveCode: {
 				themes: ['github-dark-default', 'github-light-default'],
