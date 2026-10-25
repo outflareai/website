@@ -11,6 +11,14 @@ sidebar:
 
 A workspace holds everything for one team or client: mailboxes, pools, leads, lists, the suppression list, sequences, sent and received mail, members and tokens. Nothing is shared between workspaces. Agencies typically create one workspace per client. Anyone signed in can create a workspace and becomes its owner.
 
+### Workspace URL
+
+Each workspace has a short name for its URL, made from its name when it is created: a workspace called Geonode opens at `https://app.outflare.ai/geonode`, and each page follows it, such as `/geonode/connectors` or `/geonode/sequences`. Owners and admins can rename the workspace and change its URL under **Settings → Workspace settings**. The URL can use 3 to 40 lowercase letters, numbers and dashes, and a few words the app needs for its own pages (such as `admin`, `signup` and `settings`) are taken.
+
+Changing the URL doesn't break links: the old one keeps leading to the workspace until another workspace takes it. Links from before workspace URLs existed (`/w/<workspace id>/...`) still work and switch to the new address.
+
+Sequences, projects, lead lists, missions, sending servers and infrastructure plans get readable URLs too, made from their names: `/geonode/sequences/q3-founders`, `/geonode/projects/fintech-au`. Two with the same name become `q3-founders` and `q3-founders-2`. Renaming one gives it a new URL, and its old URL still opens it, so shared links keep working.
+
 ## Roles
 
 Each member has one role in each workspace. Roles grant scopes, and every API endpoint states the scope it needs.
@@ -73,6 +81,7 @@ The scopes are:
 | Scope | Allows |
 | --- | --- |
 | `workspace.read` | Read the workspace. |
+| `workspace.manage` | Rename the workspace and change its URL (slug). Owners and admins only by default. |
 | `members.read` | List members. |
 | `members.manage` | Change roles, remove members, manage invites. |
 | `tokens.manage` | Create and revoke API tokens. |
