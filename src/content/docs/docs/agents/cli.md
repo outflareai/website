@@ -37,7 +37,7 @@ outflare import-leads --data @leads.csv
 
 | Flag | What it does |
 | --- | --- |
-| `--all` | Follows `next_before`, `next_after` or `next_offset` and prints every item as one `{"data": [...]}`. |
+| `--all` | Follows `next_cursor` to the last page and prints every item as one `{"data": [...]}`. |
 | `--curl` | Prints the request as a `curl` command instead of sending it, with the token as `$OUTFLARE_TOKEN`. |
 | `--mission ID` | Acts inside an [agent mission](/docs/agents/missions/). A held write prints its `MissionHeld` answer and says so. |
 | `--idempotency-key K` | Sets the [retry key](/docs/api/#safe-retries). Without it, every write gets a fresh one. |

@@ -20,6 +20,11 @@ info:
     token. Operations without it are public.
     The engine's tests check every value against the running server.
 
+    API tokens may make API_RATE_LIMIT requests a minute (600 by default).
+    Every answer to a token carries `RateLimit` and `RateLimit-Policy`
+    headers (IETF draft) with what is left and when it resets; over the
+    limit the answer is 429 `rate_limited` with `Retry-After`.
+
     Workspace writes take an `Idempotency-Key` header: a retry with the
     same key gets the first answer back instead of running twice.
 
@@ -1208,6 +1213,7 @@ paths:
       parameters:
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
         - { name: before, in: query, schema: { type: integer } }
+        - { $ref: "#/components/parameters/Cursor" }
       responses:
         "200":
           description: Events.
@@ -1220,6 +1226,41 @@ paths:
                     type: array
                     items: { $ref: "#/components/schemas/AuditEvent" }
                   next_before: { type: [integer, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/events:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listEvents
+      x-outflare-access: { scope: webhooks.read }
+      summary: Events since a point, oldest first
+      description: |
+        Scope: webhooks.read. The same events webhooks send, for callers that cannot receive webhooks, such as agents
+        and scripts behind a firewall. Start without after to read from the beginning of the audit log, keep
+        next_after, and call again with after=next_after to get only what happened since. next_after is always set,
+        so polling never loses its place; has_more says another page is ready now.
+      tags: [webhooks]
+      parameters:
+        - { name: after, in: query, description: "An event id (evt_...) from next_after.", schema: { type: string }, example: evt_48213 }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { name: types, in: query, description: 'Comma-separated event types or wildcards ("lead.*"). Default: every type.', schema: { type: string }, example: "lead.replied,mailbox.*" }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
+      responses:
+        "200":
+          description: Events.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, next_after, has_more, next_cursor]
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/WebhookEvent" }
+                  next_after: { type: string, description: Pass as after next time. }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+                  has_more: { type: boolean }
+        "400": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/webhooks:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
@@ -1404,6 +1445,7 @@ paths:
       parameters:
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
         - { name: before, in: query, schema: { type: integer } }
+        - { $ref: "#/components/parameters/Cursor" }
         - { name: status, in: query, schema: { $ref: "#/components/schemas/WebhookDeliveryStatus" } }
         - { name: event_type, in: query, schema: { type: string }, example: lead.replied }
       responses:
@@ -1413,12 +1455,13 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [data, next_before]
+                required: [data, next_before, next_cursor]
                 properties:
                   data:
                     type: array
                     items: { $ref: "#/components/schemas/WebhookDelivery" }
                   next_before: { type: [integer, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
@@ -2149,6 +2192,7 @@ paths:
         - { name: verification, in: query, description: "Latest verification result, or unverified for never checked.", schema: { type: string, enum: [deliverable, undeliverable, risky, unknown, unverified] } }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
         - { name: after, in: query, description: "next_after from the previous page.", schema: { type: string } }
+        - { $ref: "#/components/parameters/Cursor" }
       responses:
         "200":
           description: Leads.
@@ -2156,13 +2200,14 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [data, total, next_after]
+                required: [data, total, next_after, next_cursor]
                 properties:
                   data:
                     type: array
                     items: { $ref: "#/components/schemas/Lead" }
                   total: { type: integer, description: Matches across all pages. }
                   next_after: { type: [string, "null"], description: Pass as after to get the next page. }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         default: { $ref: "#/components/responses/Error" }
     post:
       operationId: upsertLead
@@ -2453,6 +2498,7 @@ paths:
         - { name: min_score, in: query, schema: { type: integer, minimum: 0, maximum: 100 } }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
         - { name: offset, in: query, schema: { type: integer, minimum: 0, default: 0 } }
+        - { $ref: "#/components/parameters/Cursor" }
       responses:
         "200":
           description: Members.
@@ -2460,13 +2506,14 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [data, total, next_offset]
+                required: [data, total, next_offset, next_cursor]
                 properties:
                   data:
                     type: array
                     items: { $ref: "#/components/schemas/LeadListMember" }
                   total: { type: integer }
                   next_offset: { type: [integer, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/lead-lists/{id}/leads:
@@ -2693,6 +2740,7 @@ paths:
         - { name: q, in: query, schema: { type: string } }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
         - { name: after, in: query, description: "next_after from the previous page.", schema: { type: string } }
+        - { $ref: "#/components/parameters/Cursor" }
       responses:
         "200":
           description: Entries.
@@ -2700,13 +2748,14 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [data, total, next_after]
+                required: [data, total, next_after, next_cursor]
                 properties:
                   data:
                     type: array
                     items: { $ref: "#/components/schemas/Suppression" }
                   total: { type: integer, description: Matches across all pages. }
                   next_after: { type: [string, "null"], description: Pass as after to get the next page. }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         default: { $ref: "#/components/responses/Error" }
     post:
       operationId: addSuppressions
@@ -3070,6 +3119,7 @@ paths:
         - { name: status, in: query, schema: { $ref: "#/components/schemas/EnrollmentStatus" } }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
         - { name: after, in: query, description: "next_after from the previous page.", schema: { type: string } }
+        - { $ref: "#/components/parameters/Cursor" }
       responses:
         "200":
           description: Enrollments.
@@ -3077,12 +3127,13 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [data, next_after]
+                required: [data, next_after, next_cursor]
                 properties:
                   data:
                     type: array
                     items: { $ref: "#/components/schemas/Enrollment" }
                   next_after: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         default: { $ref: "#/components/responses/Error" }
     post:
       operationId: enrollLeads
@@ -3160,6 +3211,7 @@ paths:
         - { name: status, in: query, schema: { type: string, enum: [sending, sent, failed, blocked, unknown] } }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
         - { name: before, in: query, description: "next_before from the previous page.", schema: { type: string, format: date-time } }
+        - { $ref: "#/components/parameters/Cursor" }
       responses:
         "200":
           description: Messages.
@@ -3167,12 +3219,13 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [data, next_before]
+                required: [data, next_before, next_cursor]
                 properties:
                   data:
                     type: array
                     items: { $ref: "#/components/schemas/Message" }
                   next_before: { type: [string, "null"], format: date-time }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         default: { $ref: "#/components/responses/Error" }
   /u/{token}:
     parameters:
@@ -3245,6 +3298,7 @@ paths:
         - { name: q, in: query, description: Search sender and subject., schema: { type: string } }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
         - { name: before, in: query, description: "next_before from the previous page.", schema: { type: string, format: date-time } }
+        - { $ref: "#/components/parameters/Cursor" }
       responses:
         "200":
           description: Messages.
@@ -3252,12 +3306,13 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [data, next_before, unread_replies]
+                required: [data, next_before, unread_replies, next_cursor]
                 properties:
                   data:
                     type: array
                     items: { $ref: "#/components/schemas/InboundMessage" }
                   next_before: { type: [string, "null"], format: date-time }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
                   unread_replies: { type: integer, description: "Unread replies not yet marked done, across the workspace." }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/inbox/{id}:
@@ -3527,6 +3582,7 @@ paths:
       - { name: q, in: query, schema: { type: string }, description: Part of the email address. }
       - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 1000, default: 100 } }
       - { name: offset, in: query, schema: { type: integer, minimum: 0, default: 0 } }
+      - { $ref: "#/components/parameters/Cursor" }
     get:
       operationId: listSupplierMailboxes
       x-outflare-access: { scope: mailboxes.read }
@@ -4738,6 +4794,7 @@ paths:
         - { name: attributed, in: query, schema: { type: boolean }, description: Only meetings tied to outreach. }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
         - { name: before, in: query, schema: { type: string, format: date-time } }
+        - { $ref: "#/components/parameters/Cursor" }
       responses:
         "200":
           description: Meetings.
@@ -4745,10 +4802,11 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [data, next_before]
+                required: [data, next_before, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/Meeting" } }
                   next_before: { type: [string, "null"], format: date-time }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         default: { $ref: "#/components/responses/Error" }
     post:
       operationId: createMeeting
@@ -4851,6 +4909,7 @@ paths:
         - { name: attributed, in: query, schema: { type: boolean } }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
         - { name: before, in: query, schema: { type: string, format: date-time } }
+        - { $ref: "#/components/parameters/Cursor" }
       responses:
         "200":
           description: Deals.
@@ -4858,10 +4917,11 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [data, next_before]
+                required: [data, next_before, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/Deal" } }
                   next_before: { type: [string, "null"], format: date-time }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         default: { $ref: "#/components/responses/Error" }
     post:
       operationId: createDeal
@@ -4955,6 +5015,7 @@ paths:
         - { name: provider, in: query, schema: { type: string } }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 1000, default: 100 } }
         - { name: before, in: query, schema: { type: string, format: date-time } }
+        - { $ref: "#/components/parameters/Cursor" }
       responses:
         "200":
           description: Entries.
@@ -4962,10 +5023,11 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [data, next_before]
+                required: [data, next_before, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/SpendEntry" } }
                   next_before: { type: [string, "null"], format: date-time }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         default: { $ref: "#/components/responses/Error" }
     post:
       operationId: recordSpend
@@ -5437,6 +5499,7 @@ paths:
       parameters:
         - { name: writes, in: query, schema: { type: boolean }, description: Only writes. }
         - { name: before, in: query, schema: { type: integer }, description: A call id, for the next page. }
+        - { $ref: "#/components/parameters/Cursor" }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
       responses:
         "200":
@@ -5445,8 +5508,11 @@ paths:
             application/json:
               schema:
                 type: object
+                required: [data, next_before, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/MissionCall" } }
+                  next_before: { type: [integer, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/missions/{id}/actions:
     parameters:
@@ -5537,6 +5603,7 @@ paths:
       parameters:
         - { name: open_requests, in: query, schema: { type: boolean }, description: Only connect requests not yet resolved. }
         - { name: before, in: query, schema: { type: integer } }
+        - { $ref: "#/components/parameters/Cursor" }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
       responses:
         "200":
@@ -5545,8 +5612,11 @@ paths:
             application/json:
               schema:
                 type: object
+                required: [data, next_before, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/MissionUpdate" } }
+                  next_before: { type: [integer, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         default: { $ref: "#/components/responses/Error" }
     post:
       operationId: postMissionUpdate
@@ -8145,6 +8215,13 @@ components:
       in: cookie
       name: outflare_session
   parameters:
+    Cursor:
+      name: cursor
+      in: query
+      description: |
+        next_cursor from the previous page, unchanged. Every paged list takes it, so one loop pages them all:
+        call, then call again with cursor=next_cursor until next_cursor is null. Cursors are opaque; don't build them.
+      schema: { type: string }
     IdempotencyKey:
       name: Idempotency-Key
       in: header
@@ -8208,6 +8285,9 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/MissionHeld" }
   schemas:
+    NextCursor:
+      type: [string, "null"]
+      description: Pass as cursor to get the next page; null on the last page.
     WebhookEventType:
       type: object
       required: [type, category, description]
@@ -10800,7 +10880,7 @@ components:
         last_sync_error: { type: [string, "null"] }
     SupplierMailboxList:
       type: object
-      required: [integration, sync, synced, counts, total, mailboxes]
+      required: [integration, sync, synced, counts, total, mailboxes, next_offset, next_cursor]
       properties:
         integration: { type: object, additionalProperties: true, description: "The integration, as GET /v1/workspaces/{ws}/integrations/{id} returns it." }
         sync: { $ref: "#/components/schemas/SupplierSync" }
@@ -10816,6 +10896,8 @@ components:
             connected_to: { type: object, additionalProperties: { type: integer } }
         total: { type: integer, description: How many match the filters. }
         mailboxes: { type: array, items: { $ref: "#/components/schemas/SupplierMailbox" } }
+        next_offset: { type: [integer, "null"] }
+        next_cursor: { $ref: "#/components/schemas/NextCursor" }
     SupplierImportResult:
       type: object
       required: [queued, waiting, not_found]
@@ -10866,20 +10948,9 @@ components:
           type: string
           example: postmark
           description: |
-            How account emails (confirmation, password reset) are sent: `log`, `postmark`, `resend` or `cloudflare` in the
+            How account emails (confirmation, password reset) are sent: `log`, `postmark` or `resend` in the
             open-source engine; a build with its own mail service may name another. `log` means no email service is set up
-            (POSTMARK_SERVER_TOKEN, RESEND_API_KEY or CLOUDFLARE_EMAIL_API_TOKEN, with EMAIL_FROM), so links only appear in the server log.
-        product_analytics:
-          type: object
-          description: |
-            Present only when the operator set OUTFLARE_POSTHOG_KEY. The web app then sends product analytics to the
-            operator's PostHog project through `api_host` on this server. Separate from the anonymous telemetry.
-          required: [provider, key, api_host, ui_host]
-          properties:
-            provider: { type: string, enum: [posthog] }
-            key: { type: string, description: "PostHog project key (public, it ships to the browser).", example: phc_abc123 }
-            api_host: { type: string, example: /ingest }
-            ui_host: { type: string, example: "https://us.posthog.com" }
+            (POSTMARK_SERVER_TOKEN or RESEND_API_KEY, with EMAIL_FROM), so links only appear in the server log.
     Passkey:
       type: object
       required: [id, name, created_at, last_used_at, synced]
@@ -10910,8 +10981,13 @@ components:
               example: unavailable
             message:
               type: string
+              description: For people. It may change; branch on code and status instead.
             request_id:
               type: string
+            param:
+              type: string
+              description: The request field a 400 is about, when there is one (for example url or events).
+              example: url
     LifecycleStage:
       type: string
       enum: [warming, ready, resting, retired]
