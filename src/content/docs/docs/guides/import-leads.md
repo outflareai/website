@@ -62,7 +62,7 @@ Lists group leads for a sequence, for example one per campaign or segment. A lea
 
 ## Search
 
-`GET /v1/workspaces/{ws}/leads` lists leads ordered by email, 100 per page (up to 500 with `limit`). Filter with `q` (email, name or company), `list_id` and `suppressed=true|false`. The response includes `total` and `next_after`; pass it back as `after` for the next page.
+`GET /v1/workspaces/{ws}/leads` lists leads ordered by email, 100 per page (up to 500 with `limit`). Filter with `q` (email, name or company), `list_id` and `suppressed=true|false`. The response includes `total` and `next_cursor`; pass it back as `cursor` for the next page.
 
 ## The suppression list
 

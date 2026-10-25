@@ -37,7 +37,7 @@ outflare import-leads --data @leads.csv
 
 | Flag | What it does |
 | --- | --- |
-| `--all` | Follows `next_before`, `next_after` or `next_offset` and prints every item as one `{"data": [...]}`. |
+| `--all` | Follows `next_cursor` to the last page and prints every item as one `{"data": [...]}`. |
 | `--curl` | Prints the request as a `curl` command instead of sending it, with the token as `$OUTFLARE_TOKEN`. |
 | `--mission ID` | Acts inside an [agent mission](/docs/agents/missions/). A held write prints its `MissionHeld` answer and says so. |
 | `--idempotency-key K` | Sets the [retry key](/docs/api/#safe-retries). Without it, every write gets a fresh one. |
@@ -45,6 +45,15 @@ outflare import-leads --data @leads.csv
 | `--raw` | Prints the answer exactly as the server sent it. |
 
 When a body field has the same name as one of these (a webhook's `--url`), the flag goes to the body; set the server with `OUTFLARE_URL` for that call.
+
+## Listen for events
+
+`outflare listen` shows what happens in the workspace as it happens, from now on. Add `--forward-to URL` to send each event to a receiver on your machine, signed like a real webhook delivery; see [Test a receiver on your machine](/docs/api/webhooks/#test-a-receiver-on-your-machine).
+
+```sh
+outflare listen --types lead.replied,mailbox.auto_paused
+outflare listen --forward-to http://localhost:3000/webhooks
+```
 
 ## Scripting
 
@@ -54,4 +63,4 @@ Answers go to stdout as JSON, pretty-printed in a terminal and compact when pipe
 outflare list-mailboxes --all | jq -r '.data[] | select(.status == "error") | .email'
 ```
 
-Errors go to stderr as `outflare: 404 Not Found: not_found: lead not found (request …)` and the exit code is 1 (2 for a mistake in the command itself). Network errors, `429` and `502` to `504` are retried with backoff; writes are only retried because they carry an `Idempotency-Key`, so a retry never does anything twice.
+Errors go to stderr as `outflare: 404 Not Found: not_found: lead not found (request …)` and the exit code is 1 (2 for a mistake in the command itself). Network errors, `429` and `502` to `504` are retried with backoff, waiting as long as `Retry-After` asks (up to a minute); writes are only retried because they carry an `Idempotency-Key`, so a retry never does anything twice.
