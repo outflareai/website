@@ -193,3 +193,13 @@ starlight-theme-select, .theme-toggle { flex-shrink: 0; }
 	padding: 0.4rem !important;
 }
 .sl-menu-button:hover { background: var(--accent) !important; }
+
+/* Everything clickable gets the hand, and 44px touch targets on phones and
+   touch screens for the header controls Starlight sizes at 32px. */
+summary, button:not(:disabled) { cursor: pointer; }
+@media (max-width: 50rem), (pointer: coarse) {
+	site-search > button,
+	.sl-menu-button,
+	.theme-toggle,
+	.gh { min-width: 2.75rem; min-height: 2.75rem; }
+}

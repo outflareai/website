@@ -115,7 +115,7 @@ const roadmapTag: Record<string, string> = { shipped: 'badge-live', building: 'b
 	<section class="relative overflow-hidden">
 		<div class="grid-bg pointer-events-none absolute inset-0" aria-hidden="true"></div>
 		<div class="relative mx-auto max-w-6xl px-4 pt-16 pb-10 text-center sm:px-6 sm:pt-24">
-			<a href="/docs/project/roadmap/" class="group inline-flex items-center gap-2 rounded-full border bg-background/80 py-1 pr-3 pl-1 text-xs text-muted-foreground shadow-xs backdrop-blur transition-colors hover:text-foreground">
+			<a href="/docs/project/roadmap/" class="hit group inline-flex items-center gap-2 rounded-full border bg-background/80 py-1 pr-3 pl-1 text-xs text-muted-foreground shadow-xs backdrop-blur transition-colors hover:text-foreground">
 				<span class="badge badge-live rounded-full">Open source</span>
 				{shipped} of {v1} v1 steps shipped
 				<span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">→</span>
@@ -146,11 +146,11 @@ const roadmapTag: Record<string, string> = { shipped: 'badge-live', building: 'b
 
 		<!-- Product -->
 		<div class="relative mx-auto max-w-6xl px-4 pb-20 sm:px-6">
-			<div class="mb-4 flex justify-center">
+			<div class="relative z-10 mb-4 flex justify-center">
 				<div role="tablist" aria-label="App screens" class="inline-flex max-w-full gap-1 overflow-x-auto rounded-lg border bg-muted/60 p-1">
 					{
 						shots.map((s, i) => (
-							<button type="button" role="tab" id={`tab-${s.id}`} aria-controls={`shot-${s.id}`} aria-selected={i === 0 ? 'true' : 'false'} data-shot={s.id} class="rounded-md px-3 py-1.5 text-sm whitespace-nowrap text-muted-foreground transition-colors hover:text-foreground aria-selected:bg-background aria-selected:text-foreground aria-selected:shadow-xs">
+							<button type="button" role="tab" id={`tab-${s.id}`} aria-controls={`shot-${s.id}`} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1} data-shot={s.id} class="tab px-3 py-1.5 text-sm hover:bg-background/50 aria-selected:bg-background aria-selected:text-foreground aria-selected:shadow-xs">
 								{s.label}
 							</button>
 						))
@@ -158,7 +158,7 @@ const roadmapTag: Record<string, string> = { shipped: 'badge-live', building: 'b
 				</div>
 			</div>
 			<div class="relative">
-				<div class="absolute -inset-x-10 -top-10 -bottom-4 -z-0 rounded-[2rem] bg-[radial-gradient(ellipse_at_top,color-mix(in_oklch,var(--color-brand)_22%,transparent),transparent_65%)] blur-2xl" aria-hidden="true"></div>
+				<div class="pointer-events-none absolute -inset-x-10 -top-10 -bottom-4 -z-0 rounded-[2rem] bg-[radial-gradient(ellipse_at_top,color-mix(in_oklch,var(--color-brand)_22%,transparent),transparent_65%)] blur-2xl" aria-hidden="true"></div>
 				<div class="relative overflow-hidden rounded-xl border bg-card shadow-2xl shadow-black/20 ring-1 ring-black/5 dark:shadow-black/60 dark:ring-white/5">
 					<div class="flex items-center gap-2 border-b px-4 py-2.5">
 						<span class="size-2.5 rounded-full bg-neutral-300 dark:bg-neutral-700"></span>
@@ -365,7 +365,7 @@ const roadmapTag: Record<string, string> = { shipped: 'badge-live', building: 'b
 				<div class="flex items-center gap-1 border-b px-2 py-1.5" role="tablist" aria-label="Code examples">
 					{
 						snippets.map((s, i) => (
-							<button type="button" role="tab" id={`code-tab-${s.id}`} aria-controls={`code-${s.id}`} aria-selected={i === 0 ? 'true' : 'false'} data-code={s.id} class="rounded-md px-2.5 py-1 text-[13px] text-muted-foreground transition-colors hover:text-foreground aria-selected:bg-muted aria-selected:text-foreground">
+							<button type="button" role="tab" id={`code-tab-${s.id}`} aria-controls={`code-${s.id}`} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1} data-code={s.id} class="tab px-2.5 py-1 text-[13px] hover:bg-muted/50 aria-selected:bg-muted aria-selected:text-foreground">
 								{s.label}
 							</button>
 						))
@@ -373,7 +373,7 @@ const roadmapTag: Record<string, string> = { shipped: 'badge-live', building: 'b
 				</div>
 				{
 					snippets.map((s, i) => (
-						<pre role="tabpanel" id={`code-${s.id}`} aria-labelledby={`code-tab-${s.id}`} hidden={i !== 0} data-code-panel={s.id} class="code-panel lg:min-h-[19rem]"><code set:html={hl(s.code)} /></pre>
+						<pre role="tabpanel" id={`code-${s.id}`} aria-labelledby={`code-tab-${s.id}`} hidden={i !== 0} data-code-panel={s.id} class="code-panel lg:min-h-[19.5rem]"><code set:html={hl(s.code)} /></pre>
 					))
 				}
 			</div>
@@ -382,7 +382,7 @@ const roadmapTag: Record<string, string> = { shipped: 'badge-live', building: 'b
 			<div class="card overflow-hidden">
 				<div class="flex flex-wrap items-center justify-between gap-2 border-b px-4 py-3">
 					<span class="text-sm font-medium">Every screen is an endpoint</span>
-					<a href="/docs/api/reference/" class="font-mono text-xs text-muted-foreground hover:text-foreground">/v1/workspaces/{'{ws}'}/… · full reference →</a>
+					<a href="/docs/api/reference/" class="hit font-mono text-xs text-muted-foreground hover:text-foreground">/v1/workspaces/{'{ws}'}/… · full reference →</a>
 				</div>
 				<ul class="grid divide-y md:grid-cols-2 md:divide-y-0 [&>li]:border-b md:[&>li:nth-last-child(-n+2)]:border-b-0 md:[&>li:nth-child(odd)]:border-r">
 					{endpoints.map((e) => (
@@ -459,7 +459,7 @@ const roadmapTag: Record<string, string> = { shipped: 'badge-live', building: 'b
 					</table>
 				</div>
 			</div>
-			<a href="/docs/project/license/" class="mt-8 inline-block text-sm font-medium underline-offset-4 hover:underline">How the licensing works →</a>
+			<a href="/docs/project/license/" class="hit mt-8 inline-block text-sm font-medium underline-offset-4 hover:underline">How the licensing works →</a>
 		</div>
 	</section>
 
@@ -480,12 +480,12 @@ const roadmapTag: Record<string, string> = { shipped: 'badge-live', building: 'b
 			<ol class="mt-10 grid gap-px overflow-hidden rounded-xl border bg-border sm:grid-cols-2 lg:grid-cols-3">
 				{
 					milestones.map((m) => (
-						<li class="bg-background p-5">
+						<li class={`relative bg-background p-5 ${m.docs ? 'transition-colors has-[a:hover]:bg-muted/40' : ''}`}>
 							<div class="flex items-center justify-between gap-2">
 								<span class="font-mono text-xs text-muted-foreground">{m.step ? `Step ${m.step}` : 'After v1'}</span>
 								<span class={`badge ${roadmapTag[m.status]}`}>{statusLabel[m.status]}</span>
 							</div>
-							{m.docs ? <a href={m.docs} class="mt-2 block font-medium hover:underline">{m.title}</a> : <p class="mt-2 font-medium">{m.title}</p>}
+							{m.docs ? <a href={m.docs} class="mt-2 block font-medium after:absolute after:inset-0 after:content-[''] hover:underline">{m.title}</a> : <p class="mt-2 font-medium">{m.title}</p>}
 							<p class="mt-1 text-sm text-muted-foreground">{m.summary}</p>
 						</li>
 					))
@@ -516,15 +516,22 @@ const roadmapTag: Record<string, string> = { shipped: 'badge-live', building: 'b
 		const buttons = [...document.querySelectorAll<HTMLButtonElement>(`[${attr}]`)];
 		const select = (b: HTMLButtonElement) => {
 			const id = b.getAttribute(attr);
-			buttons.forEach((x) => x.setAttribute('aria-selected', String(x === b)));
+			buttons.forEach((x) => {
+				x.setAttribute('aria-selected', String(x === b));
+				x.tabIndex = x === b ? 0 : -1;
+			});
 			document.querySelectorAll<HTMLElement>(`[${panelAttr}]`).forEach((p) => (p.hidden = p.getAttribute(panelAttr) !== id));
 		};
 		buttons.forEach((b, i) => {
 			b.addEventListener('click', () => select(b));
 			b.addEventListener('keydown', (e) => {
-				if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
-				const next = buttons[(i + (e.key === 'ArrowRight' ? 1 : buttons.length - 1)) % buttons.length];
+				const last = buttons.length - 1;
+				const to = { ArrowRight: i === last ? 0 : i + 1, ArrowLeft: i === 0 ? last : i - 1, Home: 0, End: last }[e.key];
+				if (to === undefined) return;
+				e.preventDefault();
+				const next = buttons[to];
 				next.focus();
+				next.scrollIntoView({ block: 'nearest', inline: 'nearest' });
 				select(next);
 			});
 		});

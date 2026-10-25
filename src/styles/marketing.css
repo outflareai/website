@@ -117,6 +117,10 @@
   :focus-visible {
     @apply outline-2 outline-offset-2 outline-ring;
   }
+  /* Tailwind's reset gives buttons the arrow cursor; everything clickable gets the hand. */
+  button:not(:disabled), [role="button"], [role="tab"], summary, label[for] {
+    cursor: pointer;
+  }
 }
 
 /* The app's shadcn Button, Badge and Card, as classes for Astro markup. */
@@ -128,6 +132,22 @@
   .btn-sm { @apply h-8 gap-1.5 px-3; }
   .btn-primary { @apply bg-primary text-primary-foreground hover:bg-primary/90; }
   .btn-outline { @apply border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50; }
+  .btn-icon { @apply aspect-square px-0; }
+
+  /* Segmented tabs: the whole pill is the button. */
+  .tab {
+    @apply inline-flex shrink-0 items-center justify-center rounded-md whitespace-nowrap text-muted-foreground transition-colors select-none hover:text-foreground focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring;
+  }
+
+  /* Touch targets: at least 44px on phones and touch screens. .touch sets the
+     element's own height; .hit grows the clickable area without moving layout. */
+  @media (max-width: 639px), (pointer: coarse) {
+    .btn, .tab, .touch { min-height: 2.75rem; }
+    .btn-icon { min-width: 2.75rem; }
+    .hit { position: relative; }
+    .hit::after { content: ""; position: absolute; inset: 50% -4px auto; height: max(100%, 2.75rem); translate: 0 -50%; }
+  }
+
   .btn-ghost { @apply text-muted-foreground hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50; }
 
   .badge {

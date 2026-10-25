@@ -77,7 +77,7 @@ const footer = [
 		<a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-foreground">Skip to content</a>
 		<header class="sticky top-0 z-40 border-b border-border/60 bg-background/75 backdrop-blur-lg supports-[backdrop-filter]:bg-background/60">
 			<div class="mx-auto flex h-14 max-w-6xl items-center gap-6 border-border/70 px-4 sm:px-6 lg:border-x">
-				<a href="/" class="flex items-center gap-2 text-[15px] font-semibold tracking-tight" aria-label="Outflare home">
+				<a href="/" class="touch flex items-center gap-2 text-[15px] font-semibold tracking-tight" aria-label="Outflare home">
 					<span aria-hidden="true" class="flex size-6 items-center justify-center rounded-md bg-neutral-900 font-mono text-[11px] font-bold text-white dark:bg-white dark:text-neutral-950">&gt;_</span>
 					Outflare
 					<span class="badge badge-muted hidden sm:inline-flex">alpha</span>
@@ -86,7 +86,7 @@ const footer = [
 					{nav.map((l) => <a href={l.href} class="rounded-md px-2.5 py-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground">{l.label}</a>)}
 				</nav>
 				<div class="ml-auto flex items-center gap-2">
-					<button type="button" data-theme-toggle class="btn btn-ghost btn-sm size-8 px-0" aria-label="Switch theme" title="Switch theme">
+					<button type="button" data-theme-toggle class="btn btn-ghost btn-sm btn-icon size-8 px-0" aria-label="Switch theme" title="Switch theme">
 						<svg class="hidden dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
 						<svg class="dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"></path></svg>
 					</button>
@@ -97,9 +97,9 @@ const footer = [
 					<a href="/docs/quickstart/" class="btn btn-primary btn-sm">Get started</a>
 				</div>
 			</div>
-			<nav class="flex gap-1 overflow-x-auto border-t border-border/60 px-2 py-1 md:hidden" aria-label="Main">
-				{nav.map((l) => <a href={l.href} class="rounded-md px-2.5 py-1.5 text-sm text-muted-foreground hover:text-foreground">{l.label}</a>)}
-				<a href={repo.url} class="rounded-md px-2.5 py-1.5 text-sm text-muted-foreground hover:text-foreground">GitHub</a>
+			<nav class="flex gap-1 overflow-x-auto border-t border-border/60 px-2 md:hidden" aria-label="Main">
+				{nav.map((l) => <a href={l.href} class="touch inline-flex shrink-0 items-center rounded-md px-2.5 text-sm text-muted-foreground hover:text-foreground">{l.label}</a>)}
+				<a href={repo.url} class="touch inline-flex shrink-0 items-center rounded-md px-2.5 text-sm text-muted-foreground hover:text-foreground">GitHub</a>
 			</nav>
 		</header>
 
@@ -110,9 +110,9 @@ const footer = [
 		</main>
 
 		<footer class="border-t">
-			<div class="mx-auto grid max-w-6xl gap-10 border-border/70 px-4 py-14 sm:px-6 md:grid-cols-[1.4fr_repeat(3,1fr)] lg:border-x">
-				<div>
-					<a href="/" class="flex items-center gap-2 font-semibold tracking-tight">
+			<div class="mx-auto grid max-w-6xl gap-10 border-border/70 px-4 py-14 max-md:grid-cols-2 sm:px-6 md:grid-cols-[1.4fr_repeat(3,1fr)] lg:border-x">
+				<div class="max-md:col-span-2">
+					<a href="/" class="touch inline-flex items-center gap-2 font-semibold tracking-tight">
 						<span aria-hidden="true" class="flex size-6 items-center justify-center rounded-md bg-neutral-900 font-mono text-[11px] font-bold text-white dark:bg-white dark:text-neutral-950">&gt;_</span>
 						Outflare
 					</a>
@@ -122,9 +122,9 @@ const footer = [
 					footer.map((col) => (
 						<div>
 							<h2 class="eyebrow">{col.title}</h2>
-							<ul class="mt-4 space-y-2.5 text-sm">
+							<ul class="mt-4 space-y-2.5 text-sm max-sm:mt-2 max-sm:space-y-0">
 								{col.links.map(([label, href]) => (
-									<li><a href={href} class="text-muted-foreground transition-colors hover:text-foreground">{label}</a></li>
+									<li><a href={href} class="touch inline-flex items-center text-muted-foreground transition-colors hover:text-foreground">{label}</a></li>
 								))}
 							</ul>
 						</div>
@@ -133,7 +133,7 @@ const footer = [
 			</div>
 			<div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 border-t px-4 py-6 text-xs text-muted-foreground sm:px-6 lg:border-x lg:border-x-border/70">
 				<span>Core licensed AGPL-3.0. SDK and this site licensed Apache-2.0.</span>
-				<span class="flex gap-4"><a href={`mailto:${site.email}`} class="hover:text-foreground">{site.email}</a><a href={repo.url} class="hover:text-foreground">github.com/{repo.owner}/{repo.name}</a></span>
+				<span class="flex flex-wrap gap-x-4"><a href={`mailto:${site.email}`} class="touch inline-flex items-center hover:text-foreground">{site.email}</a><a href={repo.url} class="touch inline-flex items-center hover:text-foreground">github.com/{repo.owner}/{repo.name}</a></span>
 			</div>
 		</footer>
 
