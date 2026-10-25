@@ -26,6 +26,8 @@ The engine is configured only through environment variables. When you use the bu
 | `CLIENT_IP_HEADER` | no | none | Header your proxy puts the visitor's address in, such as `Fly-Client-IP` or `CF-Connecting-IP`. Rate limits use it. Only set it when every request comes through that proxy, or visitors could fake it. |
 | `OUTFLARE_TELEMETRY` | no | on | `off` stops the anonymous daily usage report and update check. See [Usage stats and update checks](/docs/self-hosting/telemetry/). |
 | `DO_NOT_TRACK` | no | none | `1` does the same as `OUTFLARE_TELEMETRY=off`. |
+| `OUTFLARE_POSTHOG_KEY` | no | none | Your own PostHog project key (`phc_...`). Turns on product analytics in the web app, sent to your PostHog through `/ingest/` on your server, with page text, inputs and ids in URLs masked. See [Product analytics](#product-analytics). |
+| `OUTFLARE_POSTHOG_HOST` | no | `https://us.i.posthog.com` | Where those events go: `https://eu.i.posthog.com` for EU Cloud, or your self-hosted PostHog. |
 | `TELEMETRY_URL` | no | set by official releases | Where the daily report goes. Empty sends nothing. |
 
 Compose-only settings:
@@ -38,3 +40,14 @@ Compose-only settings:
 ## Rotating the secret key
 
 There is no key rotation command yet. Changing `OUTFLARE_SECRET_KEY` makes existing stored mailbox credentials unreadable, so mailboxes would need to be imported again. Keep the key stable and backed up.
+
+## Product analytics
+
+Off by default. Set `OUTFLARE_POSTHOG_KEY` to a PostHog **project** key and the web app reports how people on your server use it to your own PostHog project: pages opened, clicks, and session replays. This is separate from the [anonymous usage report](/docs/self-hosting/telemetry/), which never includes people or content.
+
+- The browser only talks to your server. `/ingest/` forwards to PostHog and strips your session cookie and API tokens on the way.
+- Signed-in people are identified by their Outflare user id, email and name, and grouped by workspace.
+- Customer data stays out. All page text, inputs and element attributes are masked in autocapture and replays. URLs keep only the page (`/w/:ws/sequences/:item`), never ids, domains, invite tokens or query strings other than UTM tags.
+- Signing out resets the identity on that browser.
+
+`GET /v1/meta` includes `product_analytics` while it's on. PostHog keeps an anonymous id in a first-party cookie, so if your users need to consent to that, add your own banner or leave this off.

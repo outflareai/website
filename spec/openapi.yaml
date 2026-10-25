@@ -9541,6 +9541,17 @@ components:
             How account emails (confirmation, password reset) are sent: `log`, `postmark` or `resend` in the
             open-source engine; a build with its own mail service may name another. `log` means no email service is set up
             (POSTMARK_SERVER_TOKEN or RESEND_API_KEY, with EMAIL_FROM), so links only appear in the server log.
+        product_analytics:
+          type: object
+          description: |
+            Present only when the operator set OUTFLARE_POSTHOG_KEY. The web app then sends product analytics to the
+            operator's PostHog project through `api_host` on this server. Separate from the anonymous telemetry.
+          required: [provider, key, api_host, ui_host]
+          properties:
+            provider: { type: string, enum: [posthog] }
+            key: { type: string, description: "PostHog project key (public, it ships to the browser).", example: phc_abc123 }
+            api_host: { type: string, example: /ingest }
+            ui_host: { type: string, example: "https://us.posthog.com" }
     Passkey:
       type: object
       required: [id, name, created_at, last_used_at, synced]
