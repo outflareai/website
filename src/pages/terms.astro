@@ -1,0 +1,62 @@
+---
+import Marketing from '../layouts/Marketing.astro';
+import { site } from '../data/project';
+
+const updated = '25 October 2026';
+---
+
+<Marketing title="Terms of service · Outflare" description="The terms for using the hosted Outflare app at app.outflare.ai, including the rules for sending email.">
+	<section class="relative border-b">
+		<div class="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
+			<p class="eyebrow">Legal</p>
+			<h1 class="mt-3 text-4xl font-semibold tracking-tighter text-balance sm:text-5xl">Terms of service</h1>
+			<p class="sub">Last updated {updated}.</p>
+		</div>
+	</section>
+
+	<div class="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+		<div class="legal">
+			<p>
+				These terms cover the hosted app at app.outflare.ai ("the service"). By creating an account you agree to them. The open-source software itself is licensed separately: the core under AGPL-3.0 and the SDK under Apache-2.0, as set out on the{' '}
+				<a href="/docs/project/license/">licensing page</a>.
+			</p>
+
+			<h2>Access</h2>
+			<p>The service is invite-only and free while it is in early access. We may change what's included, add paid plans later (with notice before you're charged anything), or end early access.</p>
+
+			<h2>Your account</h2>
+			<p>Keep your sign-in details and API tokens safe; you're responsible for what happens under your account and its tokens, including actions taken by agents you connect. Tell us straight away at <a href={`mailto:${site.email}`}>{site.email}</a> if you think your account has been misused.</p>
+
+			<h2>Sending email</h2>
+			<p>You are the sender of every email you send through Outflare. You must:</p>
+			<ul>
+				<li>Follow the law where you and your recipients are, including anti-spam and privacy laws such as the Australian Spam Act 2003, CAN-SPAM, GDPR and PECR.</li>
+				<li>Have a lawful basis to contact each recipient, identify yourself honestly, and honour unsubscribe requests promptly.</li>
+				<li>Follow the terms of your mailbox and email providers.</li>
+				<li>Not send malware, phishing, deceptive content, or anything illegal, and not try to get around Outflare's sending limits or policy checks.</li>
+			</ul>
+			<p>We may pause sending, or suspend an account, to stop abuse or protect mailboxes, domains and other users.</p>
+
+			<h2>Your data</h2>
+			<p>Your data stays yours. You let us store and process it only to run the service for you, as described in our <a href="/privacy/">privacy policy</a>. You can export or delete it at any time.</p>
+
+			<h2>Third-party services</h2>
+			<p>When you connect a provider, such as Google, Microsoft, a mailbox supplier or a data provider, your use of it is under that provider's terms, and you pay them directly for anything they charge. We aren't responsible for their services.</p>
+
+			<h2>No warranty</h2>
+			<p>The service is provided "as is" during early access. We work to keep it reliable but don't promise it will be uninterrupted, error-free, or that any email will be delivered.</p>
+
+			<h2>Liability</h2>
+			<p>To the extent the law allows, we aren't liable for indirect or consequential loss, lost profits, or lost data, and our total liability is limited to the amount you paid us in the 12 months before the claim. Nothing in these terms limits rights you have under consumer law that can't be excluded, including the Australian Consumer Law.</p>
+
+			<h2>Ending</h2>
+			<p>You can close your account at any time. We can suspend or close an account that breaks these terms, or end the service with 30 days' notice by email.</p>
+
+			<h2>Changes</h2>
+			<p>If these terms change in a way that matters, we'll update the date above and tell account holders by email before the change takes effect.</p>
+
+			<h2>Contact</h2>
+			<p><a href={`mailto:${site.email}`}>{site.email}</a></p>
+		</div>
+	</div>
+</Marketing>
