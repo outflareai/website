@@ -10,7 +10,7 @@ export async function GET({ site }: { site: URL }) {
 		'> Open-source GTM infrastructure for humans and agents. A self-hostable cold-email sequencer with bulk mailbox connection, scoped API tokens and a policy check on every send. Go engine, Postgres, OpenAPI 3.1 REST API, AGPL-3.0 core and Apache-2.0 SDK.',
 		'',
 		'Source: https://github.com/outflareai/outflare',
-		'Hosted app (invite-only early access): https://app.outflare.ai (request access at https://app.outflare.ai/signup)',
+		'Hosted app (free during early access): https://app.outflare.ai (sign up at https://app.outflare.ai/signup)',
 		`API contract: ${new URL('/openapi.yaml', site).href}`,
 		'',
 		'## Docs',
