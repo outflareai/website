@@ -11,6 +11,17 @@ info:
     against the mission, and a write may be answered `202` with a
     `MissionHeld` body instead of running: a dry run, or held until a
     person approves it. See the missions endpoints.
+
+    Every operation says who may call it in `x-outflare-access`: `scope`
+    (the API token scope it needs in the workspace) and `project_tokens`
+    (whether a project token may call it), `agency_role` and
+    `agency_tokens` for agency endpoints, or `signed_in` for endpoints
+    only a signed-in person can use. Operations without it are public.
+    The engine's tests check every value against the running server.
+
+    Errors always have the `Error` body (`default` on every operation).
+    Workspace writes may also answer `202` with `MissionHeld` when made
+    inside a mission.
   license:
     name: AGPL-3.0-only
     identifier: AGPL-3.0-only
@@ -34,6 +45,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Status"
+        default: { $ref: "#/components/responses/Error" }
   /readyz:
     get:
       operationId: getReadiness
@@ -53,6 +65,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+        default: { $ref: "#/components/responses/Error" }
   /v1/meta:
     get:
       operationId: getMeta
@@ -66,6 +79,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Meta"
+        default: { $ref: "#/components/responses/Error" }
   /v1/openapi.yaml:
     get:
       operationId: getOpenAPI
@@ -77,6 +91,7 @@ paths:
           description: The OpenAPI document.
           content:
             application/yaml: {}
+        default: { $ref: "#/components/responses/Error" }
   /.well-known/outflare.json:
     get:
       operationId: getDiscovery
@@ -90,6 +105,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Meta"
+        default: { $ref: "#/components/responses/Error" }
   /v1/setup:
     get:
       operationId: getSetupStatus
@@ -113,6 +129,7 @@ paths:
                     properties:
                       enabled: { type: boolean }
                       disabled_by: { $ref: "#/components/schemas/TelemetryOffReason" }
+        default: { $ref: "#/components/responses/Error" }
     post:
       operationId: setup
       summary: Create the first user and workspace
@@ -146,6 +163,7 @@ paths:
                   user_id: { type: string, format: uuid }
                   workspace_id: { type: string, format: uuid }
         "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/auth/login:
     post:
       operationId: login
@@ -167,6 +185,7 @@ paths:
         "200": { description: Signed in. }
         "401": { $ref: "#/components/responses/Error" }
         "429": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/auth/logout:
     post:
       operationId: logout
@@ -174,6 +193,7 @@ paths:
       tags: [access]
       responses:
         "204": { description: Signed out. }
+        default: { $ref: "#/components/responses/Error" }
   /v1/auth/password-reset:
     post:
       operationId: requestPasswordReset
@@ -197,6 +217,7 @@ paths:
         "202": { description: Sent, if the email has an account. }
         "400": { $ref: "#/components/responses/Error" }
         "429": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/auth/password-reset/confirm:
     post:
       operationId: confirmPasswordReset
@@ -218,6 +239,7 @@ paths:
         "200": { description: Password changed and signed in. }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/auth/verify-email:
     post:
       operationId: verifyEmail
@@ -241,9 +263,11 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/EmailVerification" }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/me/email-verification:
     post:
       operationId: resendEmailVerification
+      x-outflare-access: { signed_in: true }
       summary: Send the confirmation link again
       description: Replaces any earlier link. Answers 200 without sending when the address is already confirmed.
       tags: [access]
@@ -260,6 +284,7 @@ paths:
               schema: { $ref: "#/components/schemas/EmailVerification" }
         "429": { $ref: "#/components/responses/Error" }
         "502": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/auth/passkey/options:
     post:
       operationId: startPasskeySignIn
@@ -277,6 +302,7 @@ paths:
             application/json:
               schema: { type: object, additionalProperties: true }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/auth/passkey:
     post:
       operationId: passkeySignIn
@@ -295,9 +321,11 @@ paths:
         "401": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         "429": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/me/passkeys:
     get:
       operationId: listPasskeys
+      x-outflare-access: { signed_in: true }
       summary: Your passkeys
       tags: [access]
       responses:
@@ -313,8 +341,10 @@ paths:
                     type: array
                     items: { $ref: "#/components/schemas/Passkey" }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
     post:
       operationId: addPasskey
+      x-outflare-access: { signed_in: true }
       summary: Save a new passkey
       description: The body is the browser's new credential (`PublicKeyCredential.toJSON()`), answering /v1/me/passkeys/options.
       tags: [access]
@@ -332,9 +362,11 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/Passkey" }
         "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/me/passkeys/options:
     post:
       operationId: startAddingPasskey
+      x-outflare-access: { signed_in: true }
       summary: Start adding a passkey
       description: Returns WebAuthn creation options (`publicKey`) for `navigator.credentials.create`, and sets the `outflare_passkey` challenge cookie. Up to 10 passkeys.
       tags: [access]
@@ -346,11 +378,13 @@ paths:
               schema: { type: object, additionalProperties: true }
         "404": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/me/passkeys/{id}:
     parameters:
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     patch:
       operationId: renamePasskey
+      x-outflare-access: { signed_in: true }
       summary: Rename a passkey
       tags: [access]
       requestBody:
@@ -369,13 +403,16 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/Passkey" }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
     delete:
       operationId: removePasskey
+      x-outflare-access: { signed_in: true }
       summary: Remove a passkey
       tags: [access]
       responses:
         "204": { description: Removed. It no longer signs you in. }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/auth/google/start:
     get:
       operationId: startGoogleSignIn
@@ -397,6 +434,7 @@ paths:
       responses:
         "302": { description: To Google. }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/auth/google/callback:
     get:
       operationId: googleSignInCallback
@@ -406,6 +444,7 @@ paths:
       security: []
       responses:
         "302": { description: Back to the app. }
+        default: { $ref: "#/components/responses/Error" }
   /v1/invites/accept:
     post:
       operationId: acceptInvite
@@ -432,9 +471,11 @@ paths:
         "200": { description: Joined; a session cookie is set. }
         "401": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/instance/telemetry:
     get:
       operationId: getTelemetry
+      x-outflare-access: { signed_in: true }
       summary: Usage stats and update check for this server
       description: |
         Self-hosted servers send one anonymous report a day (version,
@@ -449,8 +490,10 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/TelemetryStatus" }
         "403": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
     patch:
       operationId: updateTelemetry
+      x-outflare-access: { signed_in: true }
       summary: Turn usage stats on or off
       description: Only the person who set up the server can change it. Refused with 409 when the server's environment (OUTFLARE_TELEMETRY, DO_NOT_TRACK) or the build decides.
       tags: [instance]
@@ -472,9 +515,11 @@ paths:
         "400": { $ref: "#/components/responses/Error" }
         "403": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/instance/telemetry/preview:
     get:
       operationId: previewTelemetry
+      x-outflare-access: { signed_in: true }
       summary: The exact report this server would send
       tags: [instance]
       responses:
@@ -484,9 +529,11 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/TelemetryReport" }
         "403": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/me:
     get:
       operationId: getMe
+      x-outflare-access: { signed_in: true }
       summary: The signed-in user and their workspaces
       tags: [access]
       responses:
@@ -517,9 +564,11 @@ paths:
                   agencies:
                     type: array
                     items: { $ref: "#/components/schemas/Agency" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/agencies:
     get:
       operationId: listAgencies
+      x-outflare-access: { signed_in: true }
       summary: Agencies the signed-in user belongs to
       tags: [agencies]
       responses:
@@ -531,8 +580,10 @@ paths:
                 type: object
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/Agency" } }
+        default: { $ref: "#/components/responses/Error" }
     post:
       operationId: createAgency
+      x-outflare-access: { signed_in: true }
       summary: Create an agency
       description: |
         Signed-in users only. The creator becomes the agency's owner. Pass
@@ -555,10 +606,12 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/Agency" }
         "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/agencies/{ag}:
     parameters: [{ $ref: "#/components/parameters/Agency" }]
     get:
       operationId: getAgency
+      x-outflare-access: { agency_role: viewer, agency_tokens: true }
       summary: An agency
       description: Agency members, or the agency's own tokens.
       tags: [agencies]
@@ -569,8 +622,10 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/Agency" }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
     patch:
       operationId: updateAgency
+      x-outflare-access: { agency_role: admin }
       summary: Rename the agency or change its white label
       description: Agency admins. Client members see the brand name, logo and accent colour in place of Outflare.
       tags: [agencies]
@@ -593,10 +648,12 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/Agency" }
         "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/agencies/{ag}/clients:
     parameters: [{ $ref: "#/components/parameters/Agency" }]
     get:
       operationId: listAgencyClients
+      x-outflare-access: { agency_role: viewer, agency_tokens: true }
       summary: Every client with this week's numbers
       description: Agency members or agency tokens. Worst bounce rate first.
       tags: [agencies]
@@ -609,8 +666,10 @@ paths:
                 type: object
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/AgencyClient" } }
+        default: { $ref: "#/components/responses/Error" }
     post:
       operationId: addAgencyClient
+      x-outflare-access: { agency_role: admin, agency_tokens: true }
       summary: Create a client workspace, or bring in one you own
       description: |
         Send name to create a new client workspace (agency admins, or agency
@@ -635,22 +694,26 @@ paths:
               schema: { $ref: "#/components/schemas/Workspace" }
         "400": { $ref: "#/components/responses/Error" }
         "403": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/agencies/{ag}/clients/{ws}:
     parameters:
       - { $ref: "#/components/parameters/Agency" }
       - { $ref: "#/components/parameters/Workspace" }
     delete:
       operationId: removeAgencyClient
+      x-outflare-access: { agency_role: owner }
       summary: Take a workspace out of the agency
       description: Agency owners. The workspace and its data stay. If nobody owns it directly, you become its owner.
       tags: [agencies]
       responses:
         "204": { description: Removed. }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/agencies/{ag}/members:
     parameters: [{ $ref: "#/components/parameters/Agency" }]
     get:
       operationId: listAgencyMembers
+      x-outflare-access: { agency_role: viewer }
       summary: Agency members
       tags: [agencies]
       responses:
@@ -662,8 +725,10 @@ paths:
                 type: object
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/Member" } }
+        default: { $ref: "#/components/responses/Error" }
     post:
       operationId: addAgencyMember
+      x-outflare-access: { agency_role: admin }
       summary: Add someone who already has an account
       description: Agency admins. They get this role in every client workspace. Nobody can give a role above their own.
       tags: [agencies]
@@ -687,12 +752,14 @@ paths:
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/Member" } }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/agencies/{ag}/members/{user}:
     parameters:
       - { $ref: "#/components/parameters/Agency" }
       - { name: user, in: path, required: true, schema: { type: string, format: uuid } }
     patch:
       operationId: updateAgencyMember
+      x-outflare-access: { agency_role: admin }
       summary: Change an agency member's role
       tags: [agencies]
       requestBody:
@@ -713,17 +780,21 @@ paths:
                 type: object
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/Member" } }
+        default: { $ref: "#/components/responses/Error" }
     delete:
       operationId: removeAgencyMember
+      x-outflare-access: { agency_role: admin }
       summary: Remove someone from the agency
       description: The last owner can't be removed.
       tags: [agencies]
       responses:
         "204": { description: Removed. }
+        default: { $ref: "#/components/responses/Error" }
   /v1/agencies/{ag}/api-tokens:
     parameters: [{ $ref: "#/components/parameters/Agency" }]
     get:
       operationId: listAgencyTokens
+      x-outflare-access: { agency_role: admin }
       summary: Active agency tokens
       tags: [agencies]
       responses:
@@ -735,8 +806,10 @@ paths:
                 type: object
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/AgencyToken" } }
+        default: { $ref: "#/components/responses/Error" }
     post:
       operationId: createAgencyToken
+      x-outflare-access: { agency_role: admin }
       summary: Create a token that works in every client workspace
       description: Agency admins. Scopes apply in each client and can't exceed your agency role. The secret is returned once.
       tags: [agencies]
@@ -762,20 +835,24 @@ paths:
                 properties:
                   api_token: { $ref: "#/components/schemas/AgencyToken" }
                   token: { type: string, description: "The secret, starting ofa_. Shown once." }
+        default: { $ref: "#/components/responses/Error" }
   /v1/agencies/{ag}/api-tokens/{id}:
     parameters:
       - { $ref: "#/components/parameters/Agency" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     delete:
       operationId: revokeAgencyToken
+      x-outflare-access: { agency_role: admin }
       summary: Revoke an agency token
       tags: [agencies]
       responses:
         "204": { description: Revoked. }
+        default: { $ref: "#/components/responses/Error" }
   /v1/agencies/{ag}/events:
     parameters: [{ $ref: "#/components/parameters/Agency" }]
     get:
       operationId: listAgencyEvents
+      x-outflare-access: { agency_role: admin }
       summary: Agency log
       description: Agency admins. Clients, members, tokens and branding changes, newest first (last 200).
       tags: [agencies]
@@ -788,9 +865,11 @@ paths:
                 type: object
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/AgencyEvent" } }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces:
     post:
       operationId: createWorkspace
+      x-outflare-access: { signed_in: true }
       summary: Create a workspace owned by the signed-in user
       tags: [access]
       requestBody:
@@ -808,10 +887,12 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/Workspace" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: getWorkspace
+      x-outflare-access: { scope: workspace.read }
       summary: Get a workspace
       description: "Scope: workspace.read"
       tags: [access]
@@ -822,10 +903,12 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/Workspace" }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/members:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listMembers
+      x-outflare-access: { scope: members.read }
       summary: List members
       description: "Scope: members.read"
       tags: [access]
@@ -840,12 +923,14 @@ paths:
                   data:
                     type: array
                     items: { $ref: "#/components/schemas/Member" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/members/{user}:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: user, in: path, required: true, schema: { type: string, format: uuid } }
     patch:
       operationId: updateMember
+      x-outflare-access: { scope: members.manage }
       summary: Change a member's role
       description: "Scope: members.manage. Nobody can act above their own role; only owners can grant or change owner; the last owner cannot be demoted."
       tags: [access]
@@ -862,18 +947,24 @@ paths:
         "200": { description: Updated. }
         "403": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
     delete:
       operationId: removeMember
+      x-outflare-access: { scope: members.manage }
       summary: Remove a member
       description: "Scope: members.manage"
       tags: [access]
       responses:
         "204": { description: Removed. }
         "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/invites:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listInvites
+      x-outflare-access: { scope: members.manage }
       summary: List pending invites
       description: "Scope: members.manage"
       tags: [access]
@@ -888,8 +979,10 @@ paths:
                   data:
                     type: array
                     items: { $ref: "#/components/schemas/Invite" }
+        default: { $ref: "#/components/responses/Error" }
     post:
       operationId: createInvite
+      x-outflare-access: { scope: members.manage }
       summary: Invite someone by email
       description: "Scope: members.manage. The token and link are returned once; they expire after 7 days."
       tags: [access]
@@ -914,21 +1007,27 @@ paths:
                   invite: { $ref: "#/components/schemas/Invite" }
                   token: { type: string }
                   invite_url: { type: string }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/invites/{id}:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     delete:
       operationId: revokeInvite
+      x-outflare-access: { scope: members.manage }
       summary: Revoke a pending invite
       description: "Scope: members.manage"
       tags: [access]
       responses:
         "204": { description: Revoked. }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/api-tokens:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listAPITokens
+      x-outflare-access: { scope: tokens.manage }
       summary: List active API tokens
       description: "Scope: tokens.manage. Secrets are never returned after creation."
       tags: [access]
@@ -943,8 +1042,10 @@ paths:
                   data:
                     type: array
                     items: { $ref: "#/components/schemas/APIToken" }
+        default: { $ref: "#/components/responses/Error" }
     post:
       operationId: createAPIToken
+      x-outflare-access: { scope: tokens.manage }
       summary: Create a scoped API token
       description: "Scope: tokens.manage. A token cannot hold scopes or looser limits than its creator. The secret is returned once."
       tags: [access]
@@ -976,12 +1077,15 @@ paths:
                 properties:
                   api_token: { $ref: "#/components/schemas/APIToken" }
                   token: { type: string, description: "The secret, starting oft_. Shown once." }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/api-tokens/{id}:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     patch:
       operationId: updateAPITokenLimits
+      x-outflare-access: { scope: tokens.manage }
       summary: Change a token's sending and allocation limits
       description: "Scope: tokens.manage. A token cannot change its own limits, or grant looser ones than it has. Scopes are fixed; issue a new token to change them."
       tags: [access]
@@ -998,17 +1102,23 @@ paths:
               schema: { $ref: "#/components/schemas/APIToken" }
         "400": { $ref: "#/components/responses/Error" }
         "403": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
     delete:
       operationId: revokeAPIToken
+      x-outflare-access: { scope: tokens.manage }
       summary: Revoke an API token
       description: "Scope: tokens.manage"
       tags: [access]
       responses:
         "204": { description: Revoked. }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/audit-events:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listAuditEvents
+      x-outflare-access: { scope: audit.read }
       summary: Audit log, newest first
       description: "Scope: audit.read. Page with before=next_before."
       tags: [access]
@@ -1027,10 +1137,12 @@ paths:
                     type: array
                     items: { $ref: "#/components/schemas/AuditEvent" }
                   next_before: { type: [integer, "null"] }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/mailboxes:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listMailboxes
+      x-outflare-access: { scope: mailboxes.read, project_tokens: true }
       summary: List mailboxes
       description: "Scope: mailboxes.read. Credentials are never returned."
       tags: [mailboxes]
@@ -1053,8 +1165,10 @@ paths:
                   data:
                     type: array
                     items: { $ref: "#/components/schemas/Mailbox" }
+        default: { $ref: "#/components/responses/Error" }
     post:
       operationId: addMailbox
+      x-outflare-access: { scope: mailboxes.manage }
       summary: Add or update one mailbox
       description: |
         Scope: mailboxes.manage. Upserts by email. Google Workspace and
@@ -1079,10 +1193,13 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/Mailbox" }
         "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/mailboxes/import:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     post:
       operationId: importMailboxes
+      x-outflare-access: { scope: mailboxes.manage }
       summary: Bulk import mailboxes from CSV
       description: |
         Scope: mailboxes.manage. Send the CSV file as the body (up to 5 MB and
@@ -1114,12 +1231,15 @@ paths:
         "400": { $ref: "#/components/responses/Error" }
         "413": { $ref: "#/components/responses/Error" }
         "415": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/mailboxes/{id}:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: getMailbox
+      x-outflare-access: { scope: mailboxes.read, project_tokens: true }
       summary: Get a mailbox
       description: "Scope: mailboxes.read"
       tags: [mailboxes]
@@ -1130,8 +1250,10 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/Mailbox" }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
     patch:
       operationId: updateMailbox
+      x-outflare-access: { scope: mailboxes.manage }
       summary: Change a mailbox's name, limits, pool, or pause and resume it
       description: |
         Scope: mailboxes.manage. Set `status` to `paused` to stop sending, or
@@ -1159,32 +1281,44 @@ paths:
               schema: { $ref: "#/components/schemas/Mailbox" }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
     delete:
       operationId: deleteMailbox
+      x-outflare-access: { scope: mailboxes.manage }
       summary: Remove a mailbox and its stored credentials
       description: "Scope: mailboxes.manage"
       tags: [mailboxes]
       responses:
         "204": { description: Removed. }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/mailboxes/{id}/verify:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: verifyMailbox
+      x-outflare-access: { scope: mailboxes.manage }
       summary: Re-check a mailbox's SMTP and IMAP sign-in and its domain's DNS
       description: "Scope: mailboxes.manage. Runs in the background; poll the mailbox for the result."
       tags: [mailboxes]
       responses:
-        "202": { description: Queued. }
+        "202":
+          description: "Queued. Inside a mission, a MissionHeld answer when the call was held for approval or dry-run instead."
+          content:
+            application/json:
+              schema: { oneOf: [{ $ref: "#/components/schemas/Queued" }, { $ref: "#/components/schemas/MissionHeld" }] }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/mailboxes/{id}/warmup:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: getMailboxWarmup
+      x-outflare-access: { scope: mailboxes.read }
       summary: A mailbox's warm-up results for each of the last 14 days
       description: "Scope: mailboxes.read. Days are UTC, oldest first."
       tags: [mailboxes]
@@ -1201,10 +1335,12 @@ paths:
                     type: array
                     items: { $ref: "#/components/schemas/WarmupDay" }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/mailboxes/warmup:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     post:
       operationId: updateWarmup
+      x-outflare-access: { scope: mailboxes.manage }
       summary: Turn warm-up on or off, or change its settings, for many mailboxes
       description: |
         Scope: mailboxes.manage. Applies to the mailboxes in `mailbox_ids`,
@@ -1236,10 +1372,13 @@ paths:
                 properties:
                   updated: { type: integer }
         "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/mailbox-pools:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listMailboxPools
+      x-outflare-access: { scope: mailboxes.read }
       summary: List mailbox pools
       description: "Scope: mailboxes.read"
       tags: [mailboxes]
@@ -1255,8 +1394,10 @@ paths:
                   data:
                     type: array
                     items: { $ref: "#/components/schemas/MailboxPool" }
+        default: { $ref: "#/components/responses/Error" }
     post:
       operationId: createMailboxPool
+      x-outflare-access: { scope: mailboxes.manage }
       summary: Create a mailbox pool
       description: "Scope: mailboxes.manage"
       tags: [mailboxes]
@@ -1276,22 +1417,28 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/MailboxPool" }
         "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/mailbox-pools/{id}:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     delete:
       operationId: deleteMailboxPool
+      x-outflare-access: { scope: mailboxes.manage }
       summary: Delete a pool. Its mailboxes stay, without a pool.
       description: "Scope: mailboxes.manage"
       tags: [mailboxes]
       responses:
         "204": { description: Deleted. }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/sending-domains:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listSendingDomains
+      x-outflare-access: { scope: mailboxes.read, project_tokens: true }
       summary: List sending domains with health, settings and sending stats
       description: |
         Scope: mailboxes.read. Every domain your mailboxes send from, plus
@@ -1313,8 +1460,10 @@ paths:
                   data:
                     type: array
                     items: { $ref: "#/components/schemas/SendingDomain" }
+        default: { $ref: "#/components/responses/Error" }
     post:
       operationId: addSendingDomain
+      x-outflare-access: { scope: mailboxes.manage }
       summary: Add a domain to track before it has mailboxes
       description: |
         Scope: mailboxes.manage. Accepts `acme.com`, `@acme.com`, a URL or an
@@ -1339,29 +1488,30 @@ paths:
               schema: { $ref: "#/components/schemas/SendingDomain" }
         "400": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/sending-domains/check:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     post:
       operationId: checkAllSendingDomains
+      x-outflare-access: { scope: mailboxes.manage }
       summary: Re-check DNS and blocklists for every domain
       description: "Scope: mailboxes.manage. Runs in the background. Every domain is also re-checked on its own once a day."
       tags: [domains]
       responses:
         "202":
-          description: Queued.
+          description: "Queued. Inside a mission, a MissionHeld answer when the call was held for approval or dry-run instead."
           content:
             application/json:
-              schema:
-                type: object
-                required: [queued]
-                properties:
-                  queued: { type: integer, description: Domains queued for a check. }
+              schema: { oneOf: [{ type: object, required: [queued], properties: { queued: { type: integer, description: "Domains queued for a check." } } }, { $ref: "#/components/schemas/MissionHeld" }] }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/sending-domains/{domain}:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { $ref: "#/components/parameters/Domain" }
     get:
       operationId: getSendingDomain
+      x-outflare-access: { scope: mailboxes.read, project_tokens: true }
       summary: Get a domain, with daily sends, replies and bounces for 14 days
       description: "Scope: mailboxes.read. List the domain's mailboxes with `GET /mailboxes?domain=`."
       tags: [domains]
@@ -1372,8 +1522,10 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/SendingDomainDetail" }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
     patch:
       operationId: updateSendingDomain
+      x-outflare-access: { scope: mailboxes.manage }
       summary: Pause or resume a domain, cap its daily sends, or set limits on all its mailboxes
       description: |
         Scope: mailboxes.manage. `status: paused` stops sequence and test
@@ -1403,8 +1555,11 @@ paths:
               schema: { $ref: "#/components/schemas/SendingDomain" }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
     delete:
       operationId: deleteSendingDomain
+      x-outflare-access: { scope: mailboxes.manage }
       summary: Stop tracking a domain that has no mailboxes
       description: "Scope: mailboxes.manage. Returns 409 while mailboxes on the domain are connected."
       tags: [domains]
@@ -1412,22 +1567,31 @@ paths:
         "204": { description: Removed. }
         "404": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/sending-domains/{domain}/check:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { $ref: "#/components/parameters/Domain" }
     post:
       operationId: checkSendingDomain
+      x-outflare-access: { scope: mailboxes.manage }
       summary: Re-check a domain's DNS and blocklists now
       description: "Scope: mailboxes.manage. Runs in the background; poll the domain for a new `checked_at`. Use it after changing DNS records."
       tags: [domains]
       responses:
-        "202": { description: Queued. }
+        "202":
+          description: "Queued. Inside a mission, a MissionHeld answer when the call was held for approval or dry-run instead."
+          content:
+            application/json:
+              schema: { oneOf: [{ $ref: "#/components/schemas/Queued" }, { $ref: "#/components/schemas/MissionHeld" }] }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/sending-servers:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listSendingServers
+      x-outflare-access: { scope: mailboxes.read }
       summary: List sending servers with IPs, blocklist results, settings and sending stats
       description: |
         Scope: mailboxes.read. A sending server is the SMTP host a group of
@@ -1450,29 +1614,29 @@ paths:
                   data:
                     type: array
                     items: { $ref: "#/components/schemas/SendingServer" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/sending-servers/check:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     post:
       operationId: checkAllSendingServers
+      x-outflare-access: { scope: mailboxes.manage }
       summary: Re-check IPs and blocklists for every server
       description: "Scope: mailboxes.manage. Runs in the background. Every server is also re-checked on its own once a day."
       tags: [servers]
       responses:
         "202":
-          description: Queued.
+          description: "Queued. Inside a mission, a MissionHeld answer when the call was held for approval or dry-run instead."
           content:
             application/json:
-              schema:
-                type: object
-                required: [queued]
-                properties:
-                  queued: { type: integer, description: Servers queued for a check. }
+              schema: { oneOf: [{ type: object, required: [queued], properties: { queued: { type: integer, description: "Servers queued for a check." } } }, { $ref: "#/components/schemas/MissionHeld" }] }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/sending-servers/{id}:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: getSendingServer
+      x-outflare-access: { scope: mailboxes.read }
       summary: Get a sending server
       description: "Scope: mailboxes.read. List its mailboxes with `GET /mailboxes?server_id=`."
       tags: [servers]
@@ -1483,8 +1647,10 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/SendingServer" }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
     patch:
       operationId: updateSendingServer
+      x-outflare-access: { scope: mailboxes.manage }
       summary: Pause or resume a server, cap its daily sends, or set its sending IPs
       description: |
         Scope: mailboxes.manage. `status: paused` stops sequence and test
@@ -1524,8 +1690,11 @@ paths:
               schema: { $ref: "#/components/schemas/SendingServer" }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
     delete:
       operationId: deleteSendingServer
+      x-outflare-access: { scope: mailboxes.manage }
       summary: Remove a server that no mailbox uses
       description: "Scope: mailboxes.manage. Returns 409 while mailboxes still sign in to it."
       tags: [servers]
@@ -1533,22 +1702,31 @@ paths:
         "204": { description: Removed. }
         "404": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/sending-servers/{id}/check:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: checkSendingServer
+      x-outflare-access: { scope: mailboxes.manage }
       summary: Re-check a server's IPs and blocklists now
       description: "Scope: mailboxes.manage. Runs in the background; poll the server for a new `checked_at`. Use it after a delisting request."
       tags: [servers]
       responses:
-        "202": { description: Queued. }
+        "202":
+          description: "Queued. Inside a mission, a MissionHeld answer when the call was held for approval or dry-run instead."
+          content:
+            application/json:
+              schema: { oneOf: [{ $ref: "#/components/schemas/Queued" }, { $ref: "#/components/schemas/MissionHeld" }] }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/tracking-domains:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listTrackingDomains
+      x-outflare-access: { scope: mailboxes.read }
       summary: List tracking domains
       description: |
         Scope: mailboxes.read. Optional. Once a domain is verified, the
@@ -1569,8 +1747,10 @@ paths:
                     type: array
                     items: { $ref: "#/components/schemas/TrackingDomain" }
                   target: { type: string }
+        default: { $ref: "#/components/responses/Error" }
     post:
       operationId: addTrackingDomain
+      x-outflare-access: { scope: mailboxes.manage }
       summary: Add a tracking domain
       description: "Scope: mailboxes.manage. Add a CNAME record from the domain to `target` first or after; the DNS is checked straight away and whenever you call check."
       tags: [tracking]
@@ -1591,24 +1771,30 @@ paths:
               schema: { $ref: "#/components/schemas/TrackingDomain" }
         "400": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/tracking-domains/{id}:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     delete:
       operationId: removeTrackingDomain
+      x-outflare-access: { scope: mailboxes.manage }
       summary: Remove a tracking domain
       description: "Scope: mailboxes.manage. Links already sent keep working only while the domain still points here."
       tags: [tracking]
       responses:
         "204": { description: Removed. }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/tracking-domains/{id}/check:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: checkTrackingDomain
+      x-outflare-access: { scope: mailboxes.manage }
       summary: Check a tracking domain's DNS now
       description: "Scope: mailboxes.manage."
       tags: [tracking]
@@ -1619,10 +1805,13 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/TrackingDomain" }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/leads:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listLeads
+      x-outflare-access: { scope: leads.read }
       summary: List and search leads, ordered by email
       description: "Scope: leads.read"
       tags: [leads]
@@ -1647,8 +1836,10 @@ paths:
                     items: { $ref: "#/components/schemas/Lead" }
                   total: { type: integer, description: Matches across all pages. }
                   next_after: { type: [string, "null"], description: Pass as after to get the next page. }
+        default: { $ref: "#/components/responses/Error" }
     post:
       operationId: upsertLead
+      x-outflare-access: { scope: leads.manage }
       summary: Add a lead, or update the lead with this email
       description: "Scope: leads.manage. Empty fields keep stored values; custom fields are merged."
       tags: [leads]
@@ -1669,10 +1860,13 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/Lead" }
         "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/leads/import:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     post:
       operationId: importLeads
+      x-outflare-access: { scope: leads.manage }
       summary: Bulk import leads from CSV
       description: |
         Scope: leads.manage. Send the CSV file as the body (up to 50 MB and
@@ -1704,12 +1898,15 @@ paths:
         "400": { $ref: "#/components/responses/Error" }
         "413": { $ref: "#/components/responses/Error" }
         "415": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/leads/{id}:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: getLead
+      x-outflare-access: { scope: leads.read }
       summary: Get a lead
       description: "Scope: leads.read"
       tags: [leads]
@@ -1720,8 +1917,10 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/Lead" }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
     patch:
       operationId: updateLead
+      x-outflare-access: { scope: leads.manage }
       summary: Change a lead's fields
       description: "Scope: leads.manage. In custom, a null value removes that field."
       tags: [leads]
@@ -1749,8 +1948,11 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/Lead" }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
     delete:
       operationId: deleteLead
+      x-outflare-access: { scope: leads.manage }
       summary: Delete a lead
       description: |
         Scope: leads.manage. With suppress=true the address is also added to
@@ -1762,10 +1964,13 @@ paths:
       responses:
         "204": { description: Deleted. }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/lead-lists:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listLeadLists
+      x-outflare-access: { scope: leads.read, project_tokens: true }
       summary: List lead lists, with each list's latest run
       description: "Scope: leads.read. A project token sees only its project's lists."
       tags: [lists]
@@ -1784,8 +1989,10 @@ paths:
                   data:
                     type: array
                     items: { $ref: "#/components/schemas/LeadList" }
+        default: { $ref: "#/components/responses/Error" }
     post:
       operationId: createLeadList
+      x-outflare-access: { scope: leads.manage, project_tokens: true }
       summary: Create a lead list, optionally built from a data provider search
       description: >-
         Scope: leads.manage. A list with search_integration_id and filters is a
@@ -1812,10 +2019,13 @@ paths:
               schema: { $ref: "#/components/schemas/LeadList" }
         "400": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/lead-lists/preview:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     post:
       operationId: previewLeadList
+      x-outflare-access: { scope: leads.manage, project_tokens: true }
       summary: Preview a search before building a list from it
       description: >-
         Scope: leads.manage. Queues a run that fetches one page (10 people) from
@@ -1836,17 +2046,19 @@ paths:
                 project_id: { type: [string, "null"], format: uuid, description: Score the sample against this project's ICP. }
       responses:
         "202":
-          description: Queued.
+          description: "Queued. Inside a mission, a MissionHeld answer when the call was held for approval or dry-run instead."
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/ListRun" }
+              schema: { oneOf: [{ $ref: "#/components/schemas/ListRun" }, { $ref: "#/components/schemas/MissionHeld" }] }
         "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/lead-lists/{id}:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: getLeadList
+      x-outflare-access: { scope: leads.read, project_tokens: true }
       summary: Get a lead list and its latest run
       description: "Scope: leads.read"
       tags: [lists]
@@ -1857,8 +2069,10 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/LeadList" }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
     patch:
       operationId: updateLeadList
+      x-outflare-access: { scope: leads.manage, project_tokens: true }
       summary: Change a list's settings
       description: "Scope: leads.manage. Absent fields keep their value; filters are replaced as a whole."
       tags: [lists]
@@ -1875,20 +2089,26 @@ paths:
               schema: { $ref: "#/components/schemas/LeadList" }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
     delete:
       operationId: deleteLeadList
+      x-outflare-access: { scope: leads.manage, project_tokens: true }
       summary: Delete a list. Its leads stay.
       description: "Scope: leads.manage"
       tags: [lists]
       responses:
         "204": { description: Deleted. }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/lead-lists/{id}/members:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: listLeadListMembers
+      x-outflare-access: { scope: leads.read, project_tokens: true }
       summary: List a list's leads with their ICP fit scores
       description: "Scope: leads.read. Sorted by score, best first, unless sort says otherwise."
       tags: [lists]
@@ -1913,12 +2133,14 @@ paths:
                   total: { type: integer }
                   next_offset: { type: [integer, "null"] }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/lead-lists/{id}/leads:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: addLeadsToList
+      x-outflare-access: { scope: leads.manage, project_tokens: true }
       summary: Add leads to a list
       description: "Scope: leads.manage. Ids of leads outside the workspace are ignored."
       tags: [lists]
@@ -1945,6 +2167,8 @@ paths:
                 properties:
                   added: { type: integer }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/lead-lists/{id}/leads/{lead}:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
@@ -1952,18 +2176,22 @@ paths:
       - { name: lead, in: path, required: true, schema: { type: string, format: uuid } }
     delete:
       operationId: removeLeadFromList
+      x-outflare-access: { scope: leads.manage, project_tokens: true }
       summary: Remove a lead from a list
       description: "Scope: leads.manage"
       tags: [lists]
       responses:
         "204": { description: Removed. }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/lead-lists/{id}/runs:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: listListRuns
+      x-outflare-access: { scope: leads.read, project_tokens: true }
       summary: List a list's runs, newest first
       description: "Scope: leads.read"
       tags: [lists]
@@ -1980,8 +2208,10 @@ paths:
                     type: array
                     items: { $ref: "#/components/schemas/ListRun" }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
     post:
       operationId: startListRun
+      x-outflare-access: { scope: leads.manage, project_tokens: true }
       summary: Build, refresh or enrich a list
       description: >-
         Scope: leads.manage. Spends provider credits. build and refresh search
@@ -2002,19 +2232,21 @@ paths:
                 credit_cap: { type: number, minimum: 0 }
       responses:
         "202":
-          description: Queued.
+          description: "Queued. Inside a mission, a MissionHeld answer when the call was held for approval or dry-run instead."
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/ListRun" }
+              schema: { oneOf: [{ $ref: "#/components/schemas/ListRun" }, { $ref: "#/components/schemas/MissionHeld" }] }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/list-runs/{run}:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: run, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: getListRun
+      x-outflare-access: { scope: leads.read, project_tokens: true }
       summary: Get a run's progress or result
       description: "Scope: leads.read"
       tags: [lists]
@@ -2025,12 +2257,14 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/ListRun" }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/list-runs/{run}/cancel:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: run, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: cancelListRun
+      x-outflare-access: { scope: leads.manage, project_tokens: true }
       summary: Stop a queued or running run. Leads already added stay.
       description: "Scope: leads.manage"
       tags: [lists]
@@ -2042,10 +2276,13 @@ paths:
               schema: { $ref: "#/components/schemas/ListRun" }
         "404": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/data-providers:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listDataProviders
+      x-outflare-access: { scope: leads.read, project_tokens: true }
       summary: Data providers that can search for people, find emails or enrich
       description: >-
         Scope: leads.read. Every data connector, available or planned, with the
@@ -2067,12 +2304,14 @@ paths:
                   filters: { type: array, items: { type: string } }
                   seniorities: { type: array, items: { type: string } }
                   employee_ranges: { type: array, items: { type: string } }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/leads/{id}/sources:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: listLeadSources
+      x-outflare-access: { scope: leads.read }
       summary: Where a lead's data came from
       description: "Scope: leads.read. The providers that supplied this lead, their id for the person, and the list run that added it."
       tags: [leads]
@@ -2100,10 +2339,12 @@ paths:
                         first_seen_at: { type: string, format: date-time }
                         last_seen_at: { type: string, format: date-time }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/suppressions:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listSuppressions
+      x-outflare-access: { scope: leads.read }
       summary: List the suppression list, ordered by value
       description: "Scope: leads.read"
       tags: [suppression]
@@ -2127,8 +2368,10 @@ paths:
                     items: { $ref: "#/components/schemas/Suppression" }
                   total: { type: integer, description: Matches across all pages. }
                   next_after: { type: [string, "null"], description: Pass as after to get the next page. }
+        default: { $ref: "#/components/responses/Error" }
     post:
       operationId: addSuppressions
+      x-outflare-access: { scope: leads.manage }
       summary: Add emails or domains to the suppression list
       description: |
         Scope: leads.manage. Each value is an email address or a domain
@@ -2168,22 +2411,28 @@ paths:
                         value: { type: string }
                         error: { type: string }
         "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/suppressions/{id}:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     delete:
       operationId: removeSuppression
+      x-outflare-access: { scope: suppressions.manage }
       summary: Remove a suppression entry
       description: "Scope: suppressions.manage (owners and admins by default). Audited."
       tags: [suppression]
       responses:
         "204": { description: Removed. }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/recipients/check:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     post:
       operationId: checkRecipients
+      x-outflare-access: { scope: leads.read }
       summary: Ask the send policy whether addresses may be emailed
       description: |
         Scope: leads.read. Runs the same recipient checks every send goes
@@ -2214,12 +2463,15 @@ paths:
                   data:
                     type: array
                     items: { $ref: "#/components/schemas/RecipientDecision" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/mailboxes/{id}/test-send:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: testSendMailbox
+      x-outflare-access: { scope: mailboxes.manage }
       summary: Send one test email from a mailbox now
       description: |
         Scope: mailboxes.manage. Goes through the recipient check and the
@@ -2253,10 +2505,13 @@ paths:
         "404": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
         "502": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/sequences:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listSequences
+      x-outflare-access: { scope: sequences.read, project_tokens: true }
       summary: List sequences (archived ones are left out)
       description: "Scope: sequences.read"
       tags: [sequences]
@@ -2274,8 +2529,10 @@ paths:
                   data:
                     type: array
                     items: { $ref: "#/components/schemas/Sequence" }
+        default: { $ref: "#/components/responses/Error" }
     post:
       operationId: createSequence
+      x-outflare-access: { scope: sequences.manage }
       summary: Create a sequence
       description: |
         Scope: sequences.manage. A new sequence is a `draft`: it sends
@@ -2304,12 +2561,15 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/Sequence" }
         "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/sequences/{id}:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: getSequence
+      x-outflare-access: { scope: sequences.read, project_tokens: true }
       summary: Get a sequence
       description: "Scope: sequences.read"
       tags: [sequences]
@@ -2320,8 +2580,10 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/Sequence" }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
     patch:
       operationId: updateSequence
+      x-outflare-access: { scope: sequences.manage }
       summary: Change a sequence's settings, or activate, pause or archive it
       description: |
         Scope: sequences.manage. Activating needs at least one step, and a
@@ -2349,8 +2611,11 @@ paths:
               schema: { $ref: "#/components/schemas/Sequence" }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
     delete:
       operationId: deleteSequence
+      x-outflare-access: { scope: sequences.manage }
       summary: Delete a sequence that is not active
       description: "Scope: sequences.manage. Sent messages are kept in the message log."
       tags: [sequences]
@@ -2358,12 +2623,15 @@ paths:
         "204": { description: Deleted. }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/sequences/{id}/steps:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     put:
       operationId: replaceSequenceSteps
+      x-outflare-access: { scope: sequences.manage }
       summary: Replace a sequence's steps
       description: |
         Scope: sequences.manage. The first step needs a subject. A later
@@ -2391,12 +2659,15 @@ paths:
               schema: { $ref: "#/components/schemas/Sequence" }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/sequences/{id}/preview:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: previewSequence
+      x-outflare-access: { scope: sequences.read }
       summary: Render every step for one lead
       description: |
         Scope: sequences.read. Shows the subject and body each step would
@@ -2435,12 +2706,15 @@ paths:
                           type: array
                           items: { type: string }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/sequences/{id}/enrollments:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: listEnrollments
+      x-outflare-access: { scope: sequences.read, project_tokens: true }
       summary: List the leads in a sequence, ordered by email
       description: "Scope: sequences.read"
       tags: [sequences]
@@ -2461,8 +2735,10 @@ paths:
                     type: array
                     items: { $ref: "#/components/schemas/Enrollment" }
                   next_after: { type: [string, "null"] }
+        default: { $ref: "#/components/responses/Error" }
     post:
       operationId: enrollLeads
+      x-outflare-access: { scope: sequences.manage }
       summary: Add leads to a sequence
       description: |
         Scope: sequences.manage. Send `lead_ids` or `list_id`. Suppressed
@@ -2498,6 +2774,8 @@ paths:
                   active_elsewhere: { type: integer }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/sequences/{id}/enrollments/{eid}/stop:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
@@ -2505,16 +2783,20 @@ paths:
       - { name: eid, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: stopEnrollment
+      x-outflare-access: { scope: sequences.manage }
       summary: Stop sending to one lead in a sequence
       description: "Scope: sequences.manage"
       tags: [sequences]
       responses:
         "204": { description: Stopped. }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/messages:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listMessages
+      x-outflare-access: { scope: sequences.read }
       summary: List sent, failed and blocked messages, newest first
       description: |
         Scope: sequences.read. Every send attempt is recorded, including the
@@ -2541,6 +2823,7 @@ paths:
                     type: array
                     items: { $ref: "#/components/schemas/Message" }
                   next_before: { type: [string, "null"], format: date-time }
+        default: { $ref: "#/components/responses/Error" }
   /u/{token}:
     parameters:
       - { name: token, in: path, required: true, schema: { type: string } }
@@ -2555,6 +2838,7 @@ paths:
       responses:
         "200": { description: HTML page., content: { text/html: {} } }
         "404": { description: The link is not valid., content: { text/html: {} } }
+        default: { $ref: "#/components/responses/Error" }
     post:
       operationId: unsubscribe
       security: []
@@ -2566,23 +2850,31 @@ paths:
       responses:
         "200": { description: HTML confirmation., content: { text/html: {} } }
         "404": { description: The link is not valid., content: { text/html: {} } }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/mailboxes/{id}/sync:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: syncMailbox
+      x-outflare-access: { scope: mailboxes.manage }
       summary: Check a mailbox for new mail now
       description: "Scope: mailboxes.manage. Active mailboxes are also synced automatically every two minutes."
       tags: [inbox]
       responses:
-        "202": { description: Sync queued. }
+        "202":
+          description: "Sync queued. Inside a mission, a MissionHeld answer when the call was held for approval or dry-run instead."
+          content:
+            application/json:
+              schema: { oneOf: [{ $ref: "#/components/schemas/Queued" }, { $ref: "#/components/schemas/MissionHeld" }] }
         "404": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/inbox:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listInbox
+      x-outflare-access: { scope: inbox.read }
       summary: List received mail, newest first
       description: |
         Scope: inbox.read. By default only replies and auto-replies from
@@ -2616,12 +2908,14 @@ paths:
                     items: { $ref: "#/components/schemas/InboundMessage" }
                   next_before: { type: [string, "null"], format: date-time }
                   unread_replies: { type: integer, description: "Unread replies not yet marked done, across the workspace." }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/inbox/{id}:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: getInboundMessage
+      x-outflare-access: { scope: inbox.read }
       summary: Get a received message and its conversation
       description: |
         Scope: inbox.read. `thread` holds everything sent to and received
@@ -2641,8 +2935,10 @@ paths:
                     type: array
                     items: { $ref: "#/components/schemas/ThreadEntry" }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
     patch:
       operationId: updateInboundMessage
+      x-outflare-access: { scope: inbox.manage }
       summary: Triage a message
       description: |
         Scope: inbox.manage. Send only the fields to change. Mark it read,
@@ -2670,12 +2966,15 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/InboundMessage" }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/inbox/{id}/reply:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: replyToInboundMessage
+      x-outflare-access: { scope: inbox.manage }
       summary: Reply from the mailbox the message arrived at, in the same thread
       description: |
         Scope: inbox.manage. Goes through the recipient check (a suppressed
@@ -2707,10 +3006,13 @@ paths:
         "404": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
         "502": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/oauth-connections:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listOAuthConnections
+      x-outflare-access: { scope: mailboxes.read }
       summary: List admin OAuth connections
       description: "Scope: mailboxes.read. Secrets are never returned."
       tags: [mailboxes]
@@ -2724,8 +3026,10 @@ paths:
                 required: [data]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/OAuthConnection" } }
+        default: { $ref: "#/components/responses/Error" }
     post:
       operationId: createOAuthConnection
+      x-outflare-access: { scope: mailboxes.manage }
       summary: Add a Google service account or a Microsoft Entra app
       description: |
         Scope: mailboxes.manage. Admin-level access to every mailbox in an
@@ -2760,12 +3064,15 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/OAuthConnection" }
         "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/oauth-connections/{id}:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     delete:
       operationId: deleteOAuthConnection
+      x-outflare-access: { scope: mailboxes.manage }
       summary: Remove an OAuth connection
       description: "Scope: mailboxes.manage. Refused with 409 while mailboxes use it."
       tags: [mailboxes]
@@ -2773,12 +3080,15 @@ paths:
         "204": { description: Removed. }
         "404": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/oauth-connections/{id}/mailboxes:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: addOAuthConnectionMailboxes
+      x-outflare-access: { scope: mailboxes.manage }
       summary: Add mailboxes that sign in through a connection
       description: |
         Scope: mailboxes.manage. Up to 5000 at once. No passwords: each
@@ -2814,6 +3124,8 @@ paths:
               schema: { $ref: "#/components/schemas/ImportResult" }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/oauth/{provider}/authorize:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
@@ -2821,6 +3133,7 @@ paths:
       - { name: pool, in: query, schema: { type: string }, description: Pool for the connected mailbox. }
     get:
       operationId: authorizeOAuth
+      x-outflare-access: { scope: mailboxes.manage }
       summary: Connect one mailbox through the provider's consent screen
       description: |
         Scope: mailboxes.manage, signed-in users only (not API tokens).
@@ -2834,6 +3147,7 @@ paths:
         "302": { description: Redirect to the consent screen. }
         "400": { $ref: "#/components/responses/Error" }
         "403": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/oauth/callback:
     get:
       operationId: oauthCallback
@@ -2847,6 +3161,7 @@ paths:
         - { name: error, in: query, schema: { type: string } }
       responses:
         "302": { description: Redirect to the web app with the outcome. }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/integrations/{id}/mailboxes:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
@@ -2858,6 +3173,7 @@ paths:
       - { name: offset, in: query, schema: { type: integer, minimum: 0, default: 0 } }
     get:
       operationId: listSupplierMailboxes
+      x-outflare-access: { scope: mailboxes.read }
       summary: List the mailboxes held at a supplier
       description: |
         Scope: mailboxes.read. Every mailbox the connected supplier account
@@ -2874,24 +3190,32 @@ paths:
               schema: { $ref: "#/components/schemas/SupplierMailboxList" }
         "404": { $ref: "#/components/responses/Error" }
         "422": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/integrations/{id}/mailboxes/sync:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: syncSupplierMailboxes
+      x-outflare-access: { scope: mailboxes.manage }
       summary: Refresh the supplier's mailboxes now
       description: "Scope: mailboxes.manage. Queues a full sync. Mailboxes the supplier cancelled are paused in Outflare."
       tags: [mailboxes]
       responses:
-        "202": { description: Queued. }
+        "202":
+          description: "Queued. Inside a mission, a MissionHeld answer when the call was held for approval or dry-run instead."
+          content:
+            application/json:
+              schema: { oneOf: [{ $ref: "#/components/schemas/Queued" }, { $ref: "#/components/schemas/MissionHeld" }] }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/integrations/{id}/mailboxes/import:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: importSupplierMailboxes
+      x-outflare-access: { scope: mailboxes.manage }
       summary: Import mailboxes from a supplier
       description: |
         Scope: mailboxes.manage. Reads each mailbox's password from the
@@ -2916,16 +3240,18 @@ paths:
                 emails: { type: array, maxItems: 5000, items: { type: string } }
       responses:
         "202":
-          description: Queued.
+          description: "Queued. Inside a mission, a MissionHeld answer when the call was held for approval or dry-run instead."
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/SupplierImportResult" }
+              schema: { oneOf: [{ $ref: "#/components/schemas/SupplierImportResult" }, { $ref: "#/components/schemas/MissionHeld" }] }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/emailbison-compat/calls:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listEmailBisonCompatCalls
+      x-outflare-access: { scope: mailboxes.read }
       summary: List calls made to the EmailBison-compatible API
       description: |
         Scope: mailboxes.read. Outflare answers a subset of the EmailBison API
@@ -2957,12 +3283,14 @@ paths:
                     items: { $ref: "#/components/schemas/EmailBisonCompatCall" }
         "401": { $ref: "#/components/responses/Error" }
         "403": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/integrations/{id}/mailbox-sync:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: getSupplierSync
+      x-outflare-access: { scope: mailboxes.read }
       summary: How a supplier's mailboxes are synced
       description: "Scope: mailboxes.read."
       tags: [mailboxes]
@@ -2973,8 +3301,10 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/SupplierSync" }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
     patch:
       operationId: updateSupplierSync
+      x-outflare-access: { scope: mailboxes.manage }
       summary: Change how a supplier's mailboxes are synced
       description: "Scope: mailboxes.manage. Turning on auto_import queues every active mailbox not imported yet, and imports new ones as they appear."
       tags: [mailboxes]
@@ -2996,6 +3326,8 @@ paths:
               schema: { $ref: "#/components/schemas/SupplierSync" }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/integrations/{id}/webhook:
     parameters:
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
@@ -3013,10 +3345,12 @@ paths:
         "200": { description: Accepted. }
         "401": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/stats:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: getWorkspaceStats
+      x-outflare-access: { scope: workspace.read }
       summary: Workspace overview
       description: "Scope: workspace.read. Mailbox health, sending and reply counts, in one call. Windows are rolling (last 24 hours, last 7 days)."
       tags: [access]
@@ -3026,6 +3360,7 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/WorkspaceStats" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/connectors:
     get:
       operationId: listConnectorCatalog
@@ -3047,10 +3382,12 @@ paths:
                 required: [data]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/Connector" } }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/connectors:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listConnectors
+      x-outflare-access: { scope: integrations.read }
       summary: The catalog, with how many accounts the workspace connected to each
       description: "Scope: integrations.read."
       tags: [connectors]
@@ -3066,11 +3403,13 @@ paths:
                 required: [data]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/Connector" } }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/analytics:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
     get:
       operationId: listAnalyticsSources
+      x-outflare-access: { scope: analytics.read }
       summary: List connected analytics tools
       description: |
         Scope: analytics.read. Every connection that reads website or
@@ -3091,11 +3430,13 @@ paths:
                 required: [data]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/AnalyticsSource" } }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/analytics/summary:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
     get:
       operationId: analyticsSummary
+      x-outflare-access: { scope: analytics.read }
       summary: Traffic totals from every analytics tool
       description: |
         Scope: analytics.read. The traffic report's totals from every
@@ -3121,11 +3462,13 @@ paths:
                   to: { type: string, format: date }
                   data: { type: array, items: { $ref: "#/components/schemas/AnalyticsSummaryItem" } }
         "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/analytics/history:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
     get:
       operationId: getAnalyticsHistory
+      x-outflare-access: { scope: analytics.read }
       summary: Query stored analytics history
       description: |
         Scope: analytics.read. Reads what the sync stored, without calling the tools.
@@ -3158,11 +3501,13 @@ paths:
                   data: { type: array, items: { $ref: "#/components/schemas/AnalyticsHistoryRow" } }
                   notes: { type: array, items: { type: string } }
         "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/analytics/overview:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
     get:
       operationId: getAnalyticsOverview
+      x-outflare-access: { scope: analytics.read }
       summary: Every website across every tool
       description: "Scope: analytics.read. Stored traffic totals per website (by domain), with each tool side by side, search clicks added up across search consoles, and every connection's sync status."
       tags: [analytics]
@@ -3184,11 +3529,13 @@ paths:
                   syncs: { type: array, items: { $ref: "#/components/schemas/AnalyticsSync" } }
                   notes: { type: array, items: { type: string } }
         "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/analytics/changes:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
     get:
       operationId: getAnalyticsChanges
+      x-outflare-access: { scope: analytics.read }
       summary: What changed on each website
       description: >-
         Scope: analytics.read. Reads stored data only, so it is free. For each website (by domain): each tool's metrics over its own
@@ -3218,11 +3565,13 @@ paths:
                   notes: { type: array, items: { type: string } }
                   gaps: { type: array, description: "Only when no website is stored yet.", items: { $ref: "#/components/schemas/AnalyticsGap" } }
         "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/analytics/catalog:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
     get:
       operationId: getAnalyticsCatalog
+      x-outflare-access: { scope: analytics.read }
       summary: What each website can be asked
       description: >-
         Scope: analytics.read. For each website: the analytics tools, which metrics each has stored per report, the days stored and
@@ -3243,11 +3592,13 @@ paths:
                   reports: { type: object, additionalProperties: { type: string } }
                   ask: { type: object, additionalProperties: { type: string } }
                   gaps: { type: array, items: { $ref: "#/components/schemas/AnalyticsGap" } }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/analytics/compare:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
     get:
       operationId: compareAnalyticsTools
+      x-outflare-access: { scope: analytics.read }
       summary: Compare tools for one website, day by day
       description: "Scope: analytics.read. Each tool's stored daily traffic for one domain."
       tags: [analytics]
@@ -3279,11 +3630,13 @@ paths:
                         series: { type: array, items: { $ref: "#/components/schemas/AnalyticsPoint" } }
                   notes: { type: array, items: { type: string } }
         "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/analytics/syncs:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
     get:
       operationId: listAnalyticsSyncs
+      x-outflare-access: { scope: analytics.read }
       summary: What the sync has stored for each connection
       description: "Scope: analytics.read."
       tags: [analytics]
@@ -3297,31 +3650,31 @@ paths:
                 required: [data]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/AnalyticsSync" } }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/analytics/sync:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
     post:
       operationId: syncAllAnalytics
+      x-outflare-access: { scope: analytics.read }
       summary: Sync every analytics connection soon
       description: "Scope: analytics.read. Queues a sync of each connected tool. Syncs also run by themselves every six hours (daily for Clarity)."
       tags: [analytics]
       responses:
         "202":
-          description: Queued.
+          description: "Queued. Inside a mission, a MissionHeld answer when the call was held for approval or dry-run instead."
           content:
             application/json:
-              schema:
-                type: object
-                required: [queued]
-                properties:
-                  queued: { type: array, items: { type: string, format: uuid } }
+              schema: { oneOf: [{ type: object, required: [queued], properties: { queued: { type: array, items: { type: string, format: uuid } } } }, { $ref: "#/components/schemas/MissionHeld" }] }
         "503": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/analytics/{id}/sync:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: syncAnalytics
+      x-outflare-access: { scope: analytics.read }
       summary: Sync one analytics connection now
       description: |
         Scope: analytics.read. The first sync stores 90 days of traffic and 7 days of
@@ -3343,12 +3696,15 @@ paths:
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         "422": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/analytics/{id}/sites:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid }, description: The integration id. }
     get:
       operationId: listAnalyticsSites
+      x-outflare-access: { scope: analytics.read }
       summary: List the sites a connection can read
       description: "Scope: analytics.read. GA4 properties, Search Console properties, PostHog projects, Fathom or Umami sites, and so on. Pass an id as `site` on reports, or make it the default."
       tags: [analytics]
@@ -3367,12 +3723,14 @@ paths:
                   site: { type: string, description: The default site; empty when none is set. }
         "404": { $ref: "#/components/responses/Error" }
         "422": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/analytics/{id}/site:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     put:
       operationId: setAnalyticsSite
+      x-outflare-access: { scope: integrations.manage }
       summary: Set a connection's default site
       description: "Scope: integrations.manage. The site must be one the connection can read. An empty site clears the default."
       tags: [analytics]
@@ -3399,6 +3757,8 @@ paths:
                   domain: { type: string }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/analytics/{id}/reports/{report}:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
@@ -3406,6 +3766,7 @@ paths:
       - { name: report, in: path, required: true, schema: { $ref: "#/components/schemas/AnalyticsReportName" } }
     get:
       operationId: getAnalyticsReport
+      x-outflare-access: { scope: analytics.read }
       summary: Read one analytics report
       description: |
         Scope: analytics.read. The same report from any provider:
@@ -3434,11 +3795,13 @@ paths:
         "422": { $ref: "#/components/responses/Error" }
         "429": { $ref: "#/components/responses/Error" }
         "502": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/seo:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
     get:
       operationId: listSEO
+      x-outflare-access: { scope: analytics.read }
       summary: List SEO connections
       description: "Scope: analytics.read. DataForSEO and Ahrefs connections with their reports, the domains they follow, the country, the weekly snapshot setting and this month's budget and spend. Empty means none is connected; nothing else needs one."
       tags: [seo]
@@ -3452,11 +3815,13 @@ paths:
                 required: [data]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/SEOSource" } }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/seo/history:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
     get:
       operationId: getSEOHistory
+      x-outflare-access: { scope: analytics.read }
       summary: Read stored SEO snapshots
       description: |
         Scope: analytics.read. Reads what the weekly snapshots stored, without
@@ -3485,12 +3850,14 @@ paths:
                   report: { $ref: "#/components/schemas/SEOReportName" }
                   data: { type: array, items: { $ref: "#/components/schemas/SEOHistoryRow" } }
         "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/seo/{id}/settings:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     put:
       operationId: setSEOSettings
+      x-outflare-access: { scope: integrations.manage }
       summary: Set an SEO connection's domains, country, budget and snapshots
       description: "Scope: integrations.manage. Send only what changes. `domains: null` follows the domains the analytics tools line up (at most five); `monthly_budget: null` is the default ($10 for DataForSEO, 10,000 API units for Ahrefs); 0 stops every call."
       tags: [seo]
@@ -3513,6 +3880,8 @@ paths:
               schema: { $ref: "#/components/schemas/SEOSource" }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/seo/{id}/reports/{report}:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
@@ -3520,6 +3889,7 @@ paths:
       - { name: report, in: path, required: true, schema: { $ref: "#/components/schemas/SEOReportName" } }
     get:
       operationId: getSEOReport
+      x-outflare-access: { scope: analytics.read }
       summary: Read one SEO report live (costs money)
       description: |
         Scope: analytics.read. Asks the provider now, which costs money:
@@ -3547,12 +3917,14 @@ paths:
         "422": { $ref: "#/components/responses/Error" }
         "429": { $ref: "#/components/responses/Error" }
         "502": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/seo/{id}/sync:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: syncSEO
+      x-outflare-access: { scope: integrations.manage }
       summary: Take an SEO snapshot now
       description: "Scope: integrations.manage. Stores the overview and top 50 keywords of every domain the connection follows, within its budget (this also runs weekly). Costs about $0.04 a domain on DataForSEO or 1,200 API units on Ahrefs."
       tags: [seo]
@@ -3573,10 +3945,13 @@ paths:
         "402": { $ref: "#/components/responses/Error" }
         "422": { $ref: "#/components/responses/Error" }
         "503": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/integrations:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listIntegrations
+      x-outflare-access: { scope: integrations.read }
       summary: List connected accounts
       description: "Scope: integrations.read. Credentials are never returned."
       tags: [connectors]
@@ -3593,8 +3968,10 @@ paths:
                 required: [data]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/Integration" } }
+        default: { $ref: "#/components/responses/Error" }
     post:
       operationId: createIntegration
+      x-outflare-access: { scope: integrations.manage }
       summary: Connect an account with an API key
       description: |
         Scope: integrations.manage. The credentials are tested against the
@@ -3627,12 +4004,15 @@ paths:
         "422": { $ref: "#/components/responses/Error" }
         "429": { $ref: "#/components/responses/Error" }
         "502": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/integrations/{id}:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: getIntegration
+      x-outflare-access: { scope: integrations.read }
       summary: Get a connected account
       description: "Scope: integrations.read."
       tags: [connectors]
@@ -3643,8 +4023,10 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/Integration" }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
     patch:
       operationId: updateIntegration
+      x-outflare-access: { scope: integrations.manage }
       summary: Rename, replace the API key, or change settings
       description: "Scope: integrations.manage. New credentials are tested before they replace the old ones."
       tags: [connectors]
@@ -3667,20 +4049,26 @@ paths:
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         "422": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
     delete:
       operationId: deleteIntegration
+      x-outflare-access: { scope: integrations.manage }
       summary: Disconnect an account
       description: "Scope: integrations.manage. Deletes the stored credentials. Features using it fall back (verification goes back to the built-in checks)."
       tags: [connectors]
       responses:
         "204": { description: Disconnected. }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/integrations/{id}/test:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: testIntegration
+      x-outflare-access: { scope: integrations.manage }
       summary: Sign in again with the stored credentials
       description: "Scope: integrations.manage. Reads the account (and credits, when the service reports them); changes nothing at the service and spends no credits."
       tags: [connectors]
@@ -3691,12 +4079,15 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/Integration" }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/integrations/oauth/{connector}/authorize:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: connector, in: path, required: true, schema: { type: string } }
     get:
       operationId: authorizeIntegration
+      x-outflare-access: { scope: integrations.manage }
       summary: Start connecting an OAuth connector
       description: |
         Scope: integrations.manage. Redirects to the service's sign-in page;
@@ -3720,6 +4111,7 @@ paths:
         "302": { description: Redirect to the sign-in page. }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/integrations/oauth/clients/{file}:
     get:
       operationId: integrationOAuthClientMetadata
@@ -3732,6 +4124,7 @@ paths:
       responses:
         "200": { description: The client metadata document., content: { application/json: { schema: { type: object, additionalProperties: true } } } }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/integrations/oauth/callback:
     get:
       operationId: integrationOAuthCallback
@@ -3741,10 +4134,12 @@ paths:
       tags: [connectors]
       responses:
         "302": { description: Redirect to the web app. }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/verification-settings:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: getVerificationSettings
+      x-outflare-access: { scope: leads.read }
       summary: How the workspace verifies addresses
       description: "Scope: leads.read."
       tags: [verification]
@@ -3754,8 +4149,10 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/VerificationSettings" }
+        default: { $ref: "#/components/responses/Error" }
     put:
       operationId: updateVerificationSettings
+      x-outflare-access: { scope: leads.manage }
       summary: Choose the verification service and what to block
       description: |
         Scope: leads.manage. Every field is optional. `integration_id` empty
@@ -3783,10 +4180,13 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/VerificationSettings" }
         "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/verifications:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listVerifications
+      x-outflare-access: { scope: leads.read }
       summary: Verification results, newest first
       description: "Scope: leads.read."
       tags: [verification]
@@ -3804,8 +4204,10 @@ paths:
                 required: [data]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/Verification" } }
+        default: { $ref: "#/components/responses/Error" }
     post:
       operationId: startVerification
+      x-outflare-access: { scope: leads.manage }
       summary: Verify addresses, a lead list, or every unverified lead
       description: |
         Scope: leads.manage. Runs in the background; results appear under
@@ -3825,20 +4227,17 @@ paths:
                 force: { type: boolean }
       responses:
         "202":
-          description: Queued.
+          description: "Queued. Inside a mission, a MissionHeld answer when the call was held for approval or dry-run instead."
           content:
             application/json:
-              schema:
-                type: object
-                required: [queued, jobs]
-                properties:
-                  queued: { type: integer }
-                  jobs: { type: integer }
+              schema: { oneOf: [{ type: object, required: [queued, jobs], properties: { queued: { type: integer }, jobs: { type: integer } } }, { $ref: "#/components/schemas/MissionHeld" }] }
         "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/verifications/summary:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: getVerificationSummary
+      x-outflare-access: { scope: leads.read }
       summary: Lead counts by verification status
       description: "Scope: leads.read."
       tags: [verification]
@@ -3848,11 +4247,13 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/VerificationSummary" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/outcomes/report:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
     get:
       operationId: outcomesReport
+      x-outflare-access: { scope: outcomes.read }
       summary: Cost per reply, meeting and deal
       description: |
         Scope: outcomes.read. Sends, replies, meetings, deals and spend over a
@@ -3879,11 +4280,13 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/OutcomesReport" }
         "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/outcomes/export:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
     get:
       operationId: exportOutcomes
+      x-outflare-access: { scope: outcomes.read }
       summary: Export meetings, deals, spend or the report
       description: |
         Scope: outcomes.read. Rows for a warehouse or a spreadsheet, as CSV
@@ -3905,11 +4308,13 @@ paths:
             text/csv: { schema: { type: string } }
             application/x-ndjson: { schema: { type: string } }
         "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/outcomes/syncs:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
     get:
       operationId: listOutcomeSyncs
+      x-outflare-access: { scope: outcomes.read }
       summary: Calendar and CRM sync status
       description: "Scope: outcomes.read. Every connected calendar, booking tool and CRM, with when each stream (meetings, deals, push) last ran, what it changed and its last error. Syncs run every 15 minutes."
       tags: [outcomes]
@@ -3923,33 +4328,32 @@ paths:
                 required: [data]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/OutcomeSync" } }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/outcomes/syncs/{id}/run:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid }, description: The integration id. }
     post:
       operationId: runOutcomeSync
+      x-outflare-access: { scope: outcomes.manage }
       summary: Sync a calendar or CRM now
       description: "Scope: outcomes.manage. Queues a sync instead of waiting for the next one."
       tags: [outcomes]
       responses:
         "202":
-          description: Queued.
+          description: "Queued. Inside a mission, a MissionHeld answer when the call was held for approval or dry-run instead."
           content:
             application/json:
-              schema:
-                type: object
-                required: [job_id, status]
-                properties:
-                  job_id: { type: integer }
-                  status: { type: string, enum: [queued] }
+              schema: { oneOf: [{ type: object, required: [job_id, status], properties: { job_id: { type: integer }, status: { type: string, enum: [queued] } } }, { $ref: "#/components/schemas/MissionHeld" }] }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/meetings:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
     get:
       operationId: listMeetings
+      x-outflare-access: { scope: outcomes.read }
       summary: List meetings with leads
       description: "Scope: outcomes.read. Newest first. Page with before=next_before."
       tags: [outcomes]
@@ -3974,8 +4378,10 @@ paths:
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/Meeting" } }
                   next_before: { type: [string, "null"], format: date-time }
+        default: { $ref: "#/components/responses/Error" }
     post:
       operationId: createMeeting
+      x-outflare-access: { scope: outcomes.manage }
       summary: Log a meeting
       description: |
         Scope: outcomes.manage. For meetings no connected calendar sees. Give
@@ -3996,12 +4402,15 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/Meeting" }
         "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/meetings/{id}:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: getMeeting
+      x-outflare-access: { scope: outcomes.read }
       summary: Get a meeting
       description: "Scope: outcomes.read."
       tags: [outcomes]
@@ -4012,8 +4421,10 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/Meeting" }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
     patch:
       operationId: updateMeeting
+      x-outflare-access: { scope: outcomes.manage }
       summary: Mark a meeting held, no-show or qualified, or fix its attribution
       description: |
         Scope: outcomes.manage. Setting sequence_id, project_id or
@@ -4034,19 +4445,25 @@ paths:
               schema: { $ref: "#/components/schemas/Meeting" }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
     delete:
       operationId: deleteMeeting
+      x-outflare-access: { scope: outcomes.manage }
       summary: Delete a meeting
       description: "Scope: outcomes.manage. A synced meeting comes back on the next sync; mark it canceled or unattributed instead."
       tags: [outcomes]
       responses:
         "204": { description: Deleted. }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/deals:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
     get:
       operationId: listDeals
+      x-outflare-access: { scope: outcomes.read }
       summary: List deals
       description: "Scope: outcomes.read. Deals from the CRM, plus any logged by hand. Newest first."
       tags: [outcomes]
@@ -4071,8 +4488,10 @@ paths:
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/Deal" } }
                   next_before: { type: [string, "null"], format: date-time }
+        default: { $ref: "#/components/responses/Error" }
     post:
       operationId: createDeal
+      x-outflare-access: { scope: outcomes.manage }
       summary: Log a deal
       description: "Scope: outcomes.manage. For workspaces without a connected CRM. Give meeting_id, lead_id or contact_email to tie it to outreach."
       tags: [outcomes]
@@ -4088,12 +4507,15 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/Deal" }
         "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/deals/{id}:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: getDeal
+      x-outflare-access: { scope: outcomes.read }
       summary: Get a deal
       description: "Scope: outcomes.read."
       tags: [outcomes]
@@ -4104,8 +4526,10 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/Deal" }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
     patch:
       operationId: updateDeal
+      x-outflare-access: { scope: outcomes.manage }
       summary: Change a deal or its attribution
       description: "Scope: outcomes.manage. A deal synced from a CRM only takes attribution changes here; change its name, stage or amount in the CRM."
       tags: [outcomes]
@@ -4122,19 +4546,25 @@ paths:
               schema: { $ref: "#/components/schemas/Deal" }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
     delete:
       operationId: deleteDeal
+      x-outflare-access: { scope: outcomes.manage }
       summary: Delete a deal
       description: "Scope: outcomes.manage. Removes the copy here only; the CRM is not touched."
       tags: [outcomes]
       responses:
         "204": { description: Deleted. }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/spend:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
     get:
       operationId: listSpend
+      x-outflare-access: { scope: outcomes.read }
       summary: List the spend ledger
       description: "Scope: outcomes.read. One-off charges, newest first. The ledger records cost; it never bills. Providers are paid directly."
       tags: [outcomes]
@@ -4159,8 +4589,10 @@ paths:
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/SpendEntry" } }
                   next_before: { type: [string, "null"], format: date-time }
+        default: { $ref: "#/components/responses/Error" }
     post:
       operationId: recordSpend
+      x-outflare-access: { scope: outcomes.manage }
       summary: Record spend
       description: |
         Scope: outcomes.manage. Give amount_cents when the money is known, or
@@ -4187,12 +4619,15 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/SpendEntry" }
         "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/spend/{id}:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: getSpend
+      x-outflare-access: { scope: outcomes.read }
       summary: Get a spend entry
       description: "Scope: outcomes.read."
       tags: [outcomes]
@@ -4203,19 +4638,24 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/SpendEntry" }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
     delete:
       operationId: deleteSpend
+      x-outflare-access: { scope: outcomes.manage }
       summary: Delete a spend entry
       description: "Scope: outcomes.manage. For entries recorded by mistake. The deletion is in the audit log with the amount."
       tags: [outcomes]
       responses:
         "204": { description: Deleted. }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/spend-recurring:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
     get:
       operationId: listRecurringSpend
+      x-outflare-access: { scope: outcomes.read }
       summary: List recurring costs
       description: "Scope: outcomes.read. Mailbox seats, subscriptions, people. Reports spread each over the days it was active."
       tags: [outcomes]
@@ -4229,8 +4669,10 @@ paths:
                 required: [data]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/RecurringSpend" } }
+        default: { $ref: "#/components/responses/Error" }
     post:
       operationId: createRecurringSpend
+      x-outflare-access: { scope: outcomes.manage }
       summary: Add a recurring cost
       description: "Scope: outcomes.manage."
       tags: [outcomes]
@@ -4246,12 +4688,15 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/RecurringSpend" }
         "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/spend-recurring/{id}:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     put:
       operationId: updateRecurringSpend
+      x-outflare-access: { scope: outcomes.manage }
       summary: Change a recurring cost
       description: "Scope: outcomes.manage. Replaces every field. To stop a cost, set ends_on; past reports keep it."
       tags: [outcomes]
@@ -4268,19 +4713,25 @@ paths:
               schema: { $ref: "#/components/schemas/RecurringSpend" }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
     delete:
       operationId: deleteRecurringSpend
+      x-outflare-access: { scope: outcomes.manage }
       summary: Delete a recurring cost
       description: "Scope: outcomes.manage. Removes it from every report, past ones included. Set ends_on instead to keep history."
       tags: [outcomes]
       responses:
         "204": { description: Deleted. }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/spend-rates:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
     get:
       operationId: listSpendRates
+      x-outflare-access: { scope: outcomes.read }
       summary: List unit prices
       description: "Scope: outcomes.read. Every rate, plus a zero-priced row for each provider and unit used in the ledger without one, so it is clear what still needs a price."
       tags: [outcomes]
@@ -4294,8 +4745,10 @@ paths:
                 required: [data]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/SpendRate" } }
+        default: { $ref: "#/components/responses/Error" }
     put:
       operationId: setSpendRate
+      x-outflare-access: { scope: outcomes.manage }
       summary: Set what a unit costs
       description: "Scope: outcomes.manage. Providers match without case. unit_price_micros is millionths of the currency unit: a $0.004 credit is 4000."
       tags: [outcomes]
@@ -4318,8 +4771,11 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/SpendRate" }
         "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
     delete:
       operationId: deleteSpendRate
+      x-outflare-access: { scope: outcomes.manage }
       summary: Remove a unit price
       description: "Scope: outcomes.manage."
       tags: [outcomes]
@@ -4329,10 +4785,13 @@ paths:
       responses:
         "204": { description: Removed. }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/missions:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listMissions
+      x-outflare-access: { scope: missions.read }
       summary: List missions
       description: "Scope: missions.read. Waiting for approval first, then running, paused, drafts and ended."
       tags: [missions]
@@ -4348,8 +4807,10 @@ paths:
                 type: object
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/Mission" } }
+        default: { $ref: "#/components/responses/Error" }
     post:
       operationId: createMission
+      x-outflare-access: { scope: missions.run }
       summary: Create a mission
       description: |
         Scope: missions.run. Starts as a draft: writes made in it are dry
@@ -4369,10 +4830,12 @@ paths:
         "201": { description: Created., content: { application/json: { schema: { $ref: "#/components/schemas/Mission" } } } }
         "400": { $ref: "#/components/responses/Error" }
         "403": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/missions/plan:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     post:
       operationId: planMission
+      x-outflare-access: { scope: missions.run }
       summary: Plan a mission from a goal
       description: |
         Scope: missions.run. Type a goal in plain words ("book 10 meetings
@@ -4403,12 +4866,14 @@ paths:
         "403": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
         "502": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/missions/{id}:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: getMission
+      x-outflare-access: { scope: missions.read }
       summary: Check in on a mission
       description: |
         Scope: missions.read. What an agent reads before it acts: the
@@ -4434,8 +4899,10 @@ paths:
                       reason_header: { type: string }
                       writes: { type: string }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
     patch:
       operationId: updateMission
+      x-outflare-access: { scope: missions.run }
       summary: Change a mission
       description: |
         Scope: missions.run. Once a mission is approved, changing its mode,
@@ -4452,12 +4919,14 @@ paths:
         "400": { $ref: "#/components/responses/Error" }
         "403": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/missions/{id}/submit:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: submitMission
+      x-outflare-access: { scope: missions.run }
       summary: Submit the plan for approval
       description: "Scope: missions.run. From draft. Writes stay dry runs until approved."
       tags: [missions]
@@ -4468,12 +4937,14 @@ paths:
       responses:
         "200": { description: Submitted., content: { application/json: { schema: { $ref: "#/components/schemas/Mission" } } } }
         "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/missions/{id}/approve:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: approveMission
+      x-outflare-access: { scope: missions.approve }
       summary: Approve and start a mission
       description: |
         Scope: missions.approve. A person, or an approver token that is not
@@ -4505,12 +4976,14 @@ paths:
         "200": { description: Running., content: { application/json: { schema: { $ref: "#/components/schemas/Mission" } } } }
         "403": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/missions/{id}/pause:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: pauseMission
+      x-outflare-access: { scope: missions.run }
       summary: Pause a mission
       description: "Scope: missions.run, so an agent can pause itself. Writes are refused and its campaigns stop sending until it resumes."
       tags: [missions]
@@ -4519,12 +4992,14 @@ paths:
       responses:
         "200": { description: Paused., content: { application/json: { schema: { $ref: "#/components/schemas/Mission" } } } }
         "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/missions/{id}/resume:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: resumeMission
+      x-outflare-access: { scope: missions.approve }
       summary: Resume a paused mission
       description: "Scope: missions.approve, and not the mission's own agent."
       tags: [missions]
@@ -4532,12 +5007,14 @@ paths:
         "200": { description: Running., content: { application/json: { schema: { $ref: "#/components/schemas/Mission" } } } }
         "403": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/missions/{id}/stop:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: stopMission
+      x-outflare-access: { scope: missions.run }
       summary: Stop a mission now
       description: "Scope: missions.run. Ends it: held writes are canceled, its campaigns are paused, and further calls in it are refused."
       tags: [missions]
@@ -4546,12 +5023,14 @@ paths:
       responses:
         "200": { description: Stopped., content: { application/json: { schema: { $ref: "#/components/schemas/Mission" } } } }
         "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/missions/{id}/complete:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: completeMission
+      x-outflare-access: { scope: missions.run }
       summary: Finish a mission with a report
       description: "Scope: missions.run. The agent's final report, in Markdown. Its campaigns are paused."
       tags: [missions]
@@ -4560,12 +5039,14 @@ paths:
       responses:
         "200": { description: Completed., content: { application/json: { schema: { $ref: "#/components/schemas/Mission" } } } }
         "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/missions/{id}/calls:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: listMissionCalls
+      x-outflare-access: { scope: missions.read }
       summary: Every call made in the mission, newest first
       description: "Scope: missions.read. What a write changed is in the audit log under the same request_id."
       tags: [missions]
@@ -4582,12 +5063,14 @@ paths:
                 type: object
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/MissionCall" } }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/missions/{id}/actions:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: listMissionActions
+      x-outflare-access: { scope: missions.read }
       summary: Writes the mission held or dry-ran
       description: "Scope: missions.read."
       tags: [missions]
@@ -4602,6 +5085,7 @@ paths:
                 type: object
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/MissionAction" } }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/missions/{id}/actions/{action}:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
@@ -4609,12 +5093,14 @@ paths:
       - { name: action, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: getMissionAction
+      x-outflare-access: { scope: missions.read }
       summary: One held write, with its decision and result
       description: "Scope: missions.read. Agents poll this after a 202."
       tags: [missions]
       responses:
         "200": { description: The action., content: { application/json: { schema: { $ref: "#/components/schemas/MissionAction" } } } }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/missions/{id}/actions/{action}/approve:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
@@ -4622,6 +5108,7 @@ paths:
       - { name: action, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: approveMissionAction
+      x-outflare-access: { scope: missions.approve }
       summary: Approve and run a held write
       description: |
         Scope: missions.approve. Runs the stored request as the agent that
@@ -4635,6 +5122,7 @@ paths:
         "200": { description: The action, executed or failed., content: { application/json: { schema: { $ref: "#/components/schemas/MissionAction" } } } }
         "403": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/missions/{id}/actions/{action}/reject:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
@@ -4642,6 +5130,7 @@ paths:
       - { name: action, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: rejectMissionAction
+      x-outflare-access: { scope: missions.approve }
       summary: Reject a held write
       description: "Scope: missions.approve. A note is passed to the agent as an instruction."
       tags: [missions]
@@ -4650,12 +5139,14 @@ paths:
       responses:
         "200": { description: Rejected., content: { application/json: { schema: { $ref: "#/components/schemas/MissionAction" } } } }
         "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/missions/{id}/updates:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: listMissionUpdates
+      x-outflare-access: { scope: missions.read }
       summary: Notes between the agent and people
       description: "Scope: missions.read."
       tags: [missions]
@@ -4672,8 +5163,10 @@ paths:
                 type: object
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/MissionUpdate" } }
+        default: { $ref: "#/components/responses/Error" }
     post:
       operationId: postMissionUpdate
+      x-outflare-access: { scope: missions.run }
       summary: Post a note, question, instruction or connect request
       description: |
         Scope: missions.run. kind connect_request asks a person to connect
@@ -4695,6 +5188,7 @@ paths:
         "201": { description: Posted., content: { application/json: { schema: { $ref: "#/components/schemas/MissionUpdate" } } } }
         "400": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/missions/{id}/updates/{update}/resolve:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
@@ -4702,6 +5196,7 @@ paths:
       - { name: update, in: path, required: true, schema: { type: integer } }
     post:
       operationId: resolveMissionConnectRequest
+      x-outflare-access: { scope: missions.run }
       summary: Close a connect request
       description: "Scope: missions.run. The tool was connected, or a person decided not to."
       tags: [missions]
@@ -4710,10 +5205,12 @@ paths:
       responses:
         "204": { description: Resolved. }
         "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/mission-actions:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listPendingMissionActions
+      x-outflare-access: { scope: missions.read }
       summary: Writes waiting for a person, across missions
       description: "Scope: missions.read. The approval inbox."
       tags: [missions]
@@ -4726,11 +5223,13 @@ paths:
                 type: object
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/MissionAction" } }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/connect-requests:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
     get:
       operationId: listConnectRequests
+      x-outflare-access: { scope: integrations.read }
       summary: List connect requests
       description: "Scope: integrations.read. The 100 newest, with status pending, connected, cancelled or expired."
       tags: [connectors]
@@ -4744,8 +5243,10 @@ paths:
                 required: [data]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/ConnectRequest" } }
+        default: { $ref: "#/components/responses/Error" }
     post:
       operationId: createConnectRequest
+      x-outflare-access: { scope: integrations.manage }
       summary: Ask a person to connect a service
       description: |
         Scope: integrations.manage. The agent-first way to connect anything:
@@ -4774,12 +5275,15 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/ConnectRequest" }
         "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/connect-requests/{id}:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: getConnectRequest
+      x-outflare-access: { scope: integrations.read }
       summary: Read a connect request
       description: "Scope: integrations.read. Once status is connected, integration_id is the new integration."
       tags: [connectors]
@@ -4790,14 +5294,18 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/ConnectRequest" }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
     delete:
       operationId: cancelConnectRequest
+      x-outflare-access: { scope: integrations.manage }
       summary: Cancel a pending connect request
       description: "Scope: integrations.manage. The link stops working."
       tags: [connectors]
       responses:
         "204": { description: Cancelled. }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/connect/lookup:
     post:
       operationId: connectLookup
@@ -4827,6 +5335,7 @@ paths:
                   expires_at: { type: string, format: date-time }
         "404": { $ref: "#/components/responses/Error" }
         "410": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/connect/complete:
     post:
       operationId: connectComplete
@@ -4861,6 +5370,7 @@ paths:
         "409": { $ref: "#/components/responses/Error" }
         "410": { $ref: "#/components/responses/Error" }
         "422": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/connect/oauth:
     post:
       operationId: connectOAuth
@@ -4880,12 +5390,14 @@ paths:
               schema: { type: object, required: [url], properties: { url: { type: string } } }
         "400": { $ref: "#/components/responses/Error" }
         "410": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/integrations/{id}/import-preview:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: importPreview
+      x-outflare-access: { scope: integrations.read }
       summary: See what an import from another sequencer would bring over
       description: "Scope: integrations.read. Reads the connected Instantly or Smartlead account live: campaigns with their steps, and sending accounts matched to this workspace's mailboxes by address. Changes nothing."
       tags: [imports]
@@ -4899,12 +5411,14 @@ paths:
         "404": { $ref: "#/components/responses/Error" }
         "422": { $ref: "#/components/responses/Error" }
         "502": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/integrations/{id}/imports:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: startImport
+      x-outflare-access: { scope: sequences.manage }
       summary: Import campaigns, leads and mailboxes from another sequencer
       description: |
         Scope: sequences.manage, plus leads.manage when importing leads. Runs
@@ -4925,18 +5439,20 @@ paths:
                 mailboxes: { type: boolean, description: "Match sending accounts. Default true." }
       responses:
         "202":
-          description: Queued.
+          description: "Queued. Inside a mission, a MissionHeld answer when the call was held for approval or dry-run instead."
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/ImportRun" }
+              schema: { oneOf: [{ $ref: "#/components/schemas/ImportRun" }, { $ref: "#/components/schemas/MissionHeld" }] }
         "400": { $ref: "#/components/responses/Error" }
         "403": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/imports:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
     get:
       operationId: listImports
+      x-outflare-access: { scope: sequences.read }
       summary: List imports
       description: "Scope: sequences.read. The 50 newest."
       tags: [imports]
@@ -4950,12 +5466,14 @@ paths:
                 required: [data]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/ImportRun" } }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/imports/{id}:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: getImport
+      x-outflare-access: { scope: sequences.read }
       summary: Read an import and what it did
       description: "Scope: sequences.read."
       tags: [imports]
@@ -4966,11 +5484,13 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/ImportRun" }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/mailbox-health:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
     get:
       operationId: mailboxHealth
+      x-outflare-access: { scope: mailboxes.read }
       summary: How every sending mailbox is doing
       description: |
         Scope: mailboxes.read. Graded from every signal: sign-in and inbox sync
@@ -4994,11 +5514,13 @@ paths:
                   summary: { $ref: "#/components/schemas/MailboxHealthSummary" }
                   data: { type: array, items: { $ref: "#/components/schemas/MailboxHealth" } }
         "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/mailbox-health/settings:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
     get:
       operationId: getHealthSettings
+      x-outflare-access: { scope: mailboxes.read }
       summary: Automatic pausing settings
       description: "Scope: mailboxes.read."
       tags: [mailboxes]
@@ -5008,8 +5530,10 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/HealthSettings" }
+        default: { $ref: "#/components/responses/Error" }
     put:
       operationId: putHealthSettings
+      x-outflare-access: { scope: mailboxes.manage }
       summary: Change automatic pausing
       description: "Scope: mailboxes.manage. Every field is optional."
       tags: [mailboxes]
@@ -5030,11 +5554,14 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/HealthSettings" }
         "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/reports:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
     get:
       operationId: report
+      x-outflare-access: { scope: sequences.read }
       summary: Outreach and deliverability report
       description: |
         Scope: sequences.read. Sends, leads contacted, new leads and follow-ups,
@@ -5058,10 +5585,12 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/Report" }
         "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/projects:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listProjects
+      x-outflare-access: { scope: projects.read, project_tokens: true }
       summary: List projects
       description: |
         Scope: projects.read. A project is one go-to-market motion: an offer
@@ -5084,8 +5613,10 @@ paths:
                 required: [data]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/Project" } }
+        default: { $ref: "#/components/responses/Error" }
     post:
       operationId: createProject
+      x-outflare-access: { scope: projects.manage }
       summary: Create a project
       description: "Scope: projects.manage, not available to project tokens. Names are unique in the workspace, ignoring case."
       tags: [projects]
@@ -5104,12 +5635,15 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/Project" }
         "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/projects/{id}:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: getProject
+      x-outflare-access: { scope: projects.read, project_tokens: true }
       summary: Get a project
       description: "Scope: projects.read."
       tags: [projects]
@@ -5120,8 +5654,10 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/Project" }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
     patch:
       operationId: updateProject
+      x-outflare-access: { scope: projects.manage, project_tokens: true }
       summary: Edit a project's brief, status or daily send limit
       description: |
         Scope: projects.manage. A change to offer, audience, market, brief or
@@ -5145,8 +5681,11 @@ paths:
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
     delete:
       operationId: deleteProject
+      x-outflare-access: { scope: projects.manage }
       summary: Delete a project
       description: |
         Scope: projects.manage, not available to project tokens. Its domains,
@@ -5158,12 +5697,15 @@ paths:
         "204": { description: Deleted. }
         "404": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/projects/{id}/brief:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: getProjectBrief
+      x-outflare-access: { scope: projects.read, project_tokens: true }
       summary: Read a project's brief
       description: |
         Scope: projects.read. What an agent should read before writing copy,
@@ -5178,12 +5720,14 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/ProjectBrief" }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/projects/{id}/add:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: addToProject
+      x-outflare-access: { scope: projects.manage }
       summary: Move domains, mailboxes, lists or sequences into a project
       description: |
         Scope: projects.manage, plus mailboxes.manage for domains and
@@ -5212,14 +5756,17 @@ paths:
         "400": { $ref: "#/components/responses/Error" }
         "403": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/projects/{id}/remove:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: removeFromProject
+      x-outflare-access: { scope: projects.manage }
       summary: Make a project's domains, mailboxes, lists or sequences shared again
-      description: "Same scopes as addToProject. Only records in this project change."
+      description: "Scope: projects.manage, plus read access to each kind of record moved (as addToProject). Only records in this project change."
       tags: [projects]
       requestBody:
         required: true
@@ -5239,10 +5786,13 @@ paths:
         "400": { $ref: "#/components/responses/Error" }
         "403": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/teams:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listTeams
+      x-outflare-access: { scope: members.read }
       summary: List teams
       description: "Scope: members.read. Teams own sequences and senders. A workspace with no teams shares every mailbox."
       tags: [allocation]
@@ -5255,8 +5805,10 @@ paths:
                 type: object
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/Team" } }
+        default: { $ref: "#/components/responses/Error" }
     post:
       operationId: createTeam
+      x-outflare-access: { scope: members.manage }
       summary: Create a team
       description: "Scope: members.manage. Names are unique in the workspace, ignoring case."
       tags: [allocation]
@@ -5272,12 +5824,15 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/Team" }
         "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/teams/{id}:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     patch:
       operationId: updateTeam
+      x-outflare-access: { scope: members.manage }
       summary: Rename a team, change its mode or replace its members
       description: "Scope: members.manage. member_ids replaces the whole list when sent."
       tags: [allocation]
@@ -5294,18 +5849,24 @@ paths:
               schema: { $ref: "#/components/schemas/Team" }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
     delete:
       operationId: deleteTeam
+      x-outflare-access: { scope: members.manage }
       summary: Delete a team
       description: "Scope: members.manage. Its sequences and senders stay, without a team."
       tags: [allocation]
       responses:
         "204": { description: Deleted. }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/senders:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listSenders
+      x-outflare-access: { scope: mailboxes.read }
       summary: List senders
       description: |
         Scope: mailboxes.read. A sender is who mailboxes send as: a person, a
@@ -5321,8 +5882,10 @@ paths:
                 type: object
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/Sender" } }
+        default: { $ref: "#/components/responses/Error" }
     post:
       operationId: createSender
+      x-outflare-access: { scope: mailboxes.manage }
       summary: Create a sender
       description: "Scope: mailboxes.manage."
       tags: [allocation]
@@ -5338,12 +5901,15 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/Sender" }
         "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/senders/{id}:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     patch:
       operationId: updateSender
+      x-outflare-access: { scope: mailboxes.manage }
       summary: Change a sender, or retire it
       description: "Scope: mailboxes.manage. A retired sender's mailboxes finish their follow-ups and take no new leads."
       tags: [allocation]
@@ -5360,18 +5926,24 @@ paths:
               schema: { $ref: "#/components/schemas/Sender" }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
     delete:
       operationId: deleteSender
+      x-outflare-access: { scope: mailboxes.manage }
       summary: Delete a sender
       description: "Scope: mailboxes.manage. Its mailboxes become unconfirmed."
       tags: [allocation]
       responses:
         "204": { description: Deleted. }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/senders/matches:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listSenderMatches
+      x-outflare-access: { scope: mailboxes.read }
       summary: Suggest senders for unconfirmed mailboxes
       description: |
         Scope: mailboxes.read. Matches a mailbox to a sender only when its
@@ -5397,10 +5969,12 @@ paths:
                         sender_id: { type: string, format: uuid }
                         sender_name: { type: string }
                   unconfirmed: { type: integer }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/mailboxes/sender:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     post:
       operationId: setMailboxSender
+      x-outflare-access: { scope: mailboxes.manage }
       summary: Confirm who mailboxes send as, in bulk
       description: "Scope: mailboxes.manage. A null sender_id clears it."
       tags: [allocation]
@@ -5424,10 +5998,13 @@ paths:
                 properties:
                   updated: { type: integer }
         "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/allocation/settings:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: getAllocationSettings
+      x-outflare-access: { scope: sequences.read }
       summary: Get the workspace's allocation mode
       description: "Scope: sequences.read. Teams and sequences can override the mode."
       tags: [allocation]
@@ -5440,8 +6017,10 @@ paths:
                 type: object
                 properties:
                   mode: { $ref: "#/components/schemas/AllocationMode" }
+        default: { $ref: "#/components/responses/Error" }
     patch:
       operationId: updateAllocationSettings
+      x-outflare-access: { scope: members.manage }
       summary: Set the workspace's allocation mode
       description: "Scope: members.manage."
       tags: [allocation]
@@ -5463,10 +6042,13 @@ paths:
                 type: object
                 properties:
                   mode: { $ref: "#/components/schemas/AllocationMode" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/allocation/plan:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: previewAllocation
+      x-outflare-access: { scope: sequences.read }
       summary: Dry run, showing what the allocator would change now
       description: "Scope: sequences.read. Changes nothing."
       tags: [allocation]
@@ -5480,10 +6062,12 @@ paths:
                 properties:
                   changes: { type: array, items: { $ref: "#/components/schemas/PlannedChange" } }
                   capacity: { type: array, items: { $ref: "#/components/schemas/AllocationCapacity" } }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/allocation/run:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     post:
       operationId: runAllocation
+      x-outflare-access: { scope: sequences.manage }
       summary: Plan and apply now
       description: |
         Scope: sequences.manage. The allocator also runs every minute and
@@ -5500,10 +6084,13 @@ paths:
                 properties:
                   applied: { type: array, items: { $ref: "#/components/schemas/PlannedChange" } }
                   suggested: { type: array, items: { $ref: "#/components/schemas/PlannedChange" } }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/allocation/suggestions:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listAllocationSuggestions
+      x-outflare-access: { scope: sequences.read }
       summary: List suggestions waiting on a person
       description: "Scope: sequences.read."
       tags: [allocation]
@@ -5518,12 +6105,14 @@ paths:
                 type: object
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/AllocationSuggestion" } }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/allocation/suggestions/{id}/apply:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: applyAllocationSuggestion
+      x-outflare-access: { scope: sequences.manage }
       summary: Apply or approve a suggestion
       description: |
         Scope: sequences.manage. A team_approval needs a member of that team,
@@ -5541,22 +6130,28 @@ paths:
                   applied: { $ref: "#/components/schemas/PlannedChange" }
         "403": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/allocation/suggestions/{id}/decline:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: declineAllocationSuggestion
+      x-outflare-access: { scope: sequences.manage }
       summary: Decline a suggestion, so it is not proposed again
       description: "Scope: sequences.manage."
       tags: [allocation]
       responses:
         "204": { description: Declined. }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/allocation/changes:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listAllocationChanges
+      x-outflare-access: { scope: sequences.read }
       summary: Mailbox assignment history, newest first
       description: "Scope: sequences.read."
       tags: [allocation]
@@ -5573,12 +6168,14 @@ paths:
                 type: object
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/AllocationChange" } }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/allocation/changes/{id}/undo:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: undoAllocationChange
+      x-outflare-access: { scope: sequences.manage }
       summary: Undo a change
       description: |
         Scope: sequences.manage. Only the latest change to a mailbox can be
@@ -5596,10 +6193,13 @@ paths:
                   applied: { $ref: "#/components/schemas/PlannedChange" }
         "400": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/allocation/attention:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: getAllocationAttention
+      x-outflare-access: { scope: sequences.read }
       summary: What needs a person
       description: "Scope: sequences.read. Approvals, suggestions to review, shortages, follow-ups whose mailbox is gone and unconfirmed senders."
       tags: [allocation]
@@ -5637,10 +6237,12 @@ paths:
                     type: array
                     description: Platform accounts that are out of date, have a first plan to review, or have mailboxes in conflict.
                     items: { $ref: "#/components/schemas/PlatformAccount" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/platforms:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listPlatforms
+      x-outflare-access: { scope: sequences.read }
       summary: List connected sequencer accounts
       description: "Scope: sequences.read. Every connected account of an outside sequencer (EmailBison, Instantly, Smartlead) that mailbox allocation reads. Outflare reads each one every 5 minutes; its live campaigns become sequences with `links`, and its mailboxes become mailboxes with `has_login: false` unless Outflare already has them."
       tags: [allocation]
@@ -5653,12 +6255,14 @@ paths:
                 type: object
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/PlatformAccount" } }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/platforms/{id}/sync:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, description: The connection (integration) id., schema: { type: string, format: uuid } }
     post:
       operationId: syncPlatform
+      x-outflare-access: { scope: sequences.manage }
       summary: Read a sequencer account now
       description: "Scope: sequences.manage. Reads mailboxes and campaigns now instead of waiting for the next 5-minute sync. Mailboxes added to or removed from a campaign in the platform are accepted as manual changes; attaches Outflare asked for are confirmed once the platform shows them."
       tags: [allocation]
@@ -5677,12 +6281,15 @@ paths:
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         "502": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/platforms/{id}/review:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, description: The connection (integration) id., schema: { type: string, format: uuid } }
     post:
       operationId: reviewPlatformPlan
+      x-outflare-access: { scope: sequences.manage }
       summary: Let allocation change a newly connected account
       description: "Scope: sequences.manage. Until this is called, every change for the account's campaigns is only suggested, so you can look at the first plan before anything moves. Runs a plan straight away."
       tags: [allocation]
@@ -5697,10 +6304,13 @@ paths:
                   applied: { type: array, items: { $ref: "#/components/schemas/AllocationChange" } }
                   suggested: { type: array, items: { $ref: "#/components/schemas/AllocationChange" } }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/mailboxes/assign:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     post:
       operationId: assignMailboxes
+      x-outflare-access: { scope: sequences.manage }
       summary: Assign mailboxes to a sequence by hand
       description: |
         Scope: sequences.manage. A mailbox with leads mid-sequence elsewhere
@@ -5727,10 +6337,13 @@ paths:
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/MailboxAllocationResult" } }
         "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/mailboxes/release:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     post:
       operationId: releaseMailboxes
+      x-outflare-access: { scope: sequences.manage }
       summary: Take mailboxes off their sequence
       description: "Scope: sequences.manage. Mailboxes with leads in flight drain first."
       tags: [allocation]
@@ -5752,10 +6365,13 @@ paths:
                 type: object
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/MailboxAllocationResult" } }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/mailboxes/lock:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     post:
       operationId: lockMailboxes
+      x-outflare-access: { scope: mailboxes.manage }
       summary: Lock mailboxes, or clear their locks
       description: |
         Scope: mailboxes.manage. sequence: keep on this sequence (assigns it
@@ -5787,12 +6403,15 @@ paths:
                   updated: { type: integer }
                   assignments: { type: array, items: { $ref: "#/components/schemas/MailboxAllocationResult" } }
         "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/sequences/{id}/allocation:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: getSequenceAllocation
+      x-outflare-access: { scope: sequences.read }
       summary: A sequence's mailboxes, capacity, suggestions and history
       description: "Scope: sequences.read."
       tags: [allocation]
@@ -5818,12 +6437,14 @@ paths:
                   orphaned_follow_ups: { type: integer }
                   links: { type: array, items: { $ref: "#/components/schemas/CampaignLink" } }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/sequences/{id}/orphaned-follow-ups:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: resolveOrphanedFollowUps
+      x-outflare-access: { scope: sequences.manage }
       summary: Decide what happens to follow-ups whose mailbox is gone
       description: |
         Scope: sequences.manage. cancel stops them. handoff sends the next
@@ -5848,10 +6469,13 @@ paths:
                 type: object
                 properties:
                   updated: { type: integer }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/infrastructure:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: getInfrastructure
+      x-outflare-access: { scope: infrastructure.read }
       summary: Mailboxes by lifecycle stage, the ones not ready, and plans in progress
       description: |
         Scope: infrastructure.read. Counts of mailboxes in each lifecycle
@@ -5865,10 +6489,12 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/InfrastructureOverview" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/infrastructure/preview:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     post:
       operationId: previewInfraPlan
+      x-outflare-access: { scope: infrastructure.read }
       summary: Draft a plan without saving it
       description: |
         Scope: infrastructure.read. Takes the same fields as creating a plan
@@ -5887,10 +6513,13 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/InfraPlanDraft" }
         "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/infrastructure/move:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     post:
       operationId: moveMailboxStage
+      x-outflare-access: { scope: infrastructure.manage }
       summary: Move mailboxes to warming, ready, resting or retired
       description: |
         Scope: infrastructure.manage. Works on any mailbox, including ones
@@ -5943,10 +6572,13 @@ paths:
                         to: { $ref: "#/components/schemas/LifecycleStage" }
                         skipped: { type: string }
         "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/infra-plans:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listInfraPlans
+      x-outflare-access: { scope: infrastructure.read }
       summary: List infrastructure plans
       description: "Scope: infrastructure.read. Newest first, without their items."
       tags: [infrastructure]
@@ -5962,8 +6594,10 @@ paths:
                   data:
                     type: array
                     items: { $ref: "#/components/schemas/InfraPlan" }
+        default: { $ref: "#/components/responses/Error" }
     post:
       operationId: createInfraPlan
+      x-outflare-access: { scope: infrastructure.manage }
       summary: Draft a plan for domains and mailboxes
       description: |
         Scope: infrastructure.manage. "10 domains and 30 mailboxes for this
@@ -5990,12 +6624,15 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/InfraPlan" }
         "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/infra-plans/{id}:
     parameters:
       - $ref: "#/components/parameters/Workspace"
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: getInfraPlan
+      x-outflare-access: { scope: infrastructure.read }
       summary: Get a plan with every domain and mailbox and where each one is
       description: "Scope: infrastructure.read"
       tags: [infrastructure]
@@ -6006,8 +6643,10 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/InfraPlan" }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
     patch:
       operationId: updateInfraPlan
+      x-outflare-access: { scope: infrastructure.manage }
       summary: Change a draft plan
       description: |
         Scope: infrastructure.manage. Drafts only. Domains already in the plan
@@ -6027,8 +6666,11 @@ paths:
               schema: { $ref: "#/components/schemas/InfraPlan" }
         "400": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
     delete:
       operationId: deleteInfraPlan
+      x-outflare-access: { scope: infrastructure.manage }
       summary: Delete a draft or cancelled plan
       description: "Scope: infrastructure.manage. Domains and mailboxes it built stay."
       tags: [infrastructure]
@@ -6036,12 +6678,15 @@ paths:
         "204": { description: Deleted. }
         "404": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/infra-plans/{id}/approve:
     parameters:
       - $ref: "#/components/parameters/Workspace"
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: approveInfraPlan
+      x-outflare-access: { scope: infrastructure.approve }
       summary: Approve a plan, which starts buying
       description: |
         Scope: infrastructure.approve (owners and admins; give it to an agent
@@ -6066,12 +6711,15 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/InfraPlan" }
         "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/infra-plans/{id}/cancel:
     parameters:
       - $ref: "#/components/parameters/Workspace"
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: cancelInfraPlan
+      x-outflare-access: { scope: infrastructure.manage }
       summary: Stop a plan
       description: |
         Scope: infrastructure.manage. Steps not done yet are cancelled. An
@@ -6085,12 +6733,15 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/InfraPlan" }
         "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/infra-plans/{id}/bought:
     parameters:
       - $ref: "#/components/parameters/Workspace"
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: markInfraDomainsBought
+      x-outflare-access: { scope: infrastructure.manage }
       summary: Tell a plan you bought its domains
       description: |
         Scope: infrastructure.manage. For plans you buy yourself (`supplier:
@@ -6118,18 +6769,26 @@ paths:
                 properties:
                   updated: { type: integer }
         "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/infra-plans/{id}/refresh:
     parameters:
       - $ref: "#/components/parameters/Workspace"
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: refreshInfraPlan
+      x-outflare-access: { scope: infrastructure.manage }
       summary: Get a new quote for a draft, or check a building plan now
       description: "Scope: infrastructure.manage. Runs in the background. Building plans are also checked every 5 minutes on their own."
       tags: [infrastructure]
       responses:
-        "202": { description: Queued. }
+        "202":
+          description: "Queued. Inside a mission, a MissionHeld answer when the call was held for approval or dry-run instead."
+          content:
+            application/json:
+              schema: { oneOf: [{ $ref: "#/components/schemas/Queued" }, { $ref: "#/components/schemas/MissionHeld" }] }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
 components:
   securitySchemes:
     bearer:
@@ -6187,6 +6846,13 @@ components:
       content:
         application/json:
           schema: { $ref: "#/components/schemas/Error" }
+    MissionHeld:
+      description: |
+        Only for a call made inside a mission (with the Outflare-Mission header): the write did not run. It was recorded
+        as a dry run, or held until a person approves it. Read mission_action to follow it.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/MissionHeld" }
   schemas:
     EmailBisonCompatCall:
       type: object
@@ -6450,9 +7116,16 @@ components:
         result: { description: The response when it ran. }
         request_id: { type: [string, "null"] }
         created_at: { type: string, format: date-time }
+    Queued:
+      type: object
+      description: The work was queued and runs in the background.
+      required: [queued]
+      properties:
+        queued: { type: boolean, enum: [true] }
     MissionHeld:
       type: object
       description: "Answer (202) to a write made in a mission that did not run: a dry run, or held for approval."
+      required: [mission_action, dry_run, approval_required, message]
       properties:
         mission_action: { $ref: "#/components/schemas/MissionAction" }
         dry_run: { type: boolean }
@@ -7758,7 +8431,7 @@ components:
         daily_limit: { type: [integer, "null"], description: Cap on sends from all the domain's mailboxes together in 24 hours. Null is no domain cap. }
         project_id: { type: [string, "null"], format: uuid, description: "The project that owns the domain, or null when shared. Move it with POST /projects/{id}/add." }
         notes: { type: string }
-        source: { type: string, enum: [mailbox, manual], description: "mailbox: added when a mailbox on it was connected. manual: added by hand." }
+        source: { type: string, enum: [mailbox, manual, plan], description: "mailbox: added when a mailbox on it was connected. manual: added by hand. plan: bought by an infrastructure plan." }
         health: { type: string, enum: [healthy, warning, critical, pending], description: The most severe issue; pending until the first check. }
         issues:
           type: array
@@ -8731,9 +9404,10 @@ components:
           items: { type: string, enum: [password, google, passkey] }
         account_email:
           type: string
-          enum: [log, postmark, resend]
+          example: postmark
           description: |
-            How account emails (confirmation, password reset) are sent. `log` means no email service is set up
+            How account emails (confirmation, password reset) are sent: `log`, `postmark` or `resend` in the
+            open-source engine; a build with its own mail service may name another. `log` means no email service is set up
             (POSTMARK_SERVER_TOKEN or RESEND_API_KEY, with EMAIL_FROM), so links only appear in the server log.
     Passkey:
       type: object
@@ -8742,7 +9416,7 @@ components:
         id: { type: string, format: uuid }
         name: { type: string }
         created_at: { type: string, format: date-time }
-        last_used_at: { type: string, format: date-time, nullable: true }
+        last_used_at: { type: [string, "null"], format: date-time }
         synced:
           type: boolean
           description: Backed up by a password manager (iCloud Keychain, Google Password Manager, 1Password), so it survives losing the device.

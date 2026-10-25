@@ -40,7 +40,19 @@ Send an API token as a bearer token:
 curl localhost:8080/v1/workspaces/$WS/mailboxes -H "Authorization: Bearer oft_..."
 ```
 
-Tokens are scoped to one workspace and a list of scopes. Each endpoint's description in the reference names the scope it needs. See [Authentication](/docs/api/authentication/).
+Tokens are scoped to one workspace and a list of scopes. See [Authentication](/docs/api/authentication/).
+
+Every operation in the contract says who may call it in `x-outflare-access`, so a client or agent can check before calling:
+
+| `x-outflare-access` | Who may call it |
+| --- | --- |
+| `{ scope: leads.manage }` | A member or workspace API token with that scope |
+| `{ scope: leads.read, project_tokens: true }` | The same, and project tokens (which only see their project) |
+| `{ agency_role: admin, agency_tokens: true }` | Agency members with that role or above, and the agency's tokens |
+| `{ signed_in: true }` | Only a signed-in person, never an API token |
+| (none) | Anyone: the endpoint is public |
+
+The engine's tests check every value against the running server, so the contract cannot drift from what the server enforces.
 
 ## Responses
 
@@ -52,9 +64,11 @@ Responses are JSON. Lists are wrapped in a `data` array:
 
 The audit log pages backwards in time: pass `before=` the `next_before` value from the previous page.
 
+Work that runs in the background answers `202`, always with a JSON body (`{"queued": true}` when there is nothing more to say). Inside a [mission](/docs/agents/missions/), a workspace write can also answer `202` with a `MissionHeld` body instead of running: a dry run, or held until a person approves it. Its `mission_action` tells you what to follow.
+
 ## Errors
 
-Every error uses the same shape, with a stable `code`, a readable `message` and the `request_id` to quote in bug reports:
+Every error uses the same shape, with a stable `code`, a readable `message` and the `request_id` to quote in bug reports. In the contract it is each operation's `default` response:
 
 ```json
 { "error": { "code": "not_found", "message": "workspace not found", "request_id": "…" } }
