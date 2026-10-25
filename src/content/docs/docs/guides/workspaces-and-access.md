@@ -57,7 +57,7 @@ People who set a password get an email asking them to confirm their address; unt
 
 **Forgot your password?** on the sign-in page emails a link that works for an hour (`POST /v1/auth/password-reset`, which answers the same whether or not the address has an account). Setting a new password from it (`POST /v1/auth/password-reset/confirm`) signs the person out everywhere else and confirms their email. People who only use Google can set a password the same way from **Your account**. Requests are rate limited per address and per IP.
 
-These emails go through Postmark or Resend (`EMAIL_FROM` with `POSTMARK_SERVER_TOKEN` or `RESEND_API_KEY`), never through your sending mailboxes. Without either, each link is written to the server log, which is fine on your own machine; `account_email` in `GET /v1/meta` shows which is in use.
+These emails go through Postmark, Resend or Cloudflare Email Service (`EMAIL_FROM` with `POSTMARK_SERVER_TOKEN`, `RESEND_API_KEY`, or `CLOUDFLARE_EMAIL_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`), never through your sending mailboxes. Without one, each link is written to the server log, which is fine on your own machine; `account_email` in `GET /v1/meta` shows which is in use.
 
 ## API tokens
 

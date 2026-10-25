@@ -19,7 +19,9 @@ The engine is configured only through environment variables. When you use the bu
 | `MICROSOFT_OAUTH_CLIENT_ID`, `MICROSOFT_OAUTH_CLIENT_SECRET` | no | none | The same for Microsoft's consent screen, with an Entra app registration. |
 | `EMAIL_FROM` | with a key below | none | Sender for account emails (email confirmation and password reset), for example `Outflare <login@example.com>`. Use a domain you don't send cold email from. |
 | `POSTMARK_SERVER_TOKEN` | no | none | Sends account emails through [Postmark](https://postmarkapp.com). |
-| `RESEND_API_KEY` | no | none | Sends account emails through [Resend](https://resend.com). Set this or `POSTMARK_SERVER_TOKEN`, not both. With neither, links are written to the server log and nothing is sent. |
+| `RESEND_API_KEY` | no | none | Sends account emails through [Resend](https://resend.com). |
+| `CLOUDFLARE_EMAIL_API_TOKEN` | no | none | Sends account emails through [Cloudflare Email Service](https://developers.cloudflare.com/email-service/), with `CLOUDFLARE_ACCOUNT_ID`. Needs the Workers Paid plan and the sender's domain onboarded to Email Sending. Set only one of the three email keys. With none, links are written to the server log and nothing is sent. |
+| `CLOUDFLARE_ACCOUNT_ID` | with the Cloudflare key | none | The Cloudflare account that sends, shown in the dashboard's account home. |
 | `PASSKEYS` | no | `auto` | `auto` turns passkey sign-in on once `PUBLIC_URL` is `https://`. `on` also allows `http://localhost` for trying them out; `off` turns them off. Passkeys are tied to `PUBLIC_URL`, so set its final address first. |
 | `CLIENT_IP_HEADER` | no | none | Header your proxy puts the visitor's address in, such as `Fly-Client-IP` or `CF-Connecting-IP`. Rate limits use it. Only set it when every request comes through that proxy, or visitors could fake it. |
 | `WEBHOOKS_ALLOW_PRIVATE` | no | `false` | `true` lets [webhooks](/docs/api/webhooks/) go to private, loopback and plain-`http` addresses, for receivers on the same network as the server. Leave it off on a server anyone else can add webhooks to. |
