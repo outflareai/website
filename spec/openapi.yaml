@@ -20,6 +20,11 @@ info:
     token. Operations without it are public.
     The engine's tests check every value against the running server.
 
+    API tokens may make API_RATE_LIMIT requests a minute (600 by default).
+    Every answer to a token carries `RateLimit` and `RateLimit-Policy`
+    headers (IETF draft) with what is left and when it resets; over the
+    limit the answer is 429 `rate_limited` with `Retry-After`.
+
     Workspace writes take an `Idempotency-Key` header: a retry with the
     same key gets the first answer back instead of running twice.
 
@@ -1314,6 +1319,38 @@ paths:
                     type: array
                     items: { $ref: "#/components/schemas/AuditEvent" }
                   next_before: { type: [integer, "null"] }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/events:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listEvents
+      x-outflare-access: { scope: webhooks.read }
+      summary: Events since a point, oldest first
+      description: |
+        Scope: webhooks.read. The same events webhooks send, for callers that cannot receive webhooks, such as agents
+        and scripts behind a firewall. Start without after to read from the beginning of the audit log, keep
+        next_after, and call again with after=next_after to get only what happened since. next_after is always set,
+        so polling never loses its place; has_more says another page is ready now.
+      tags: [webhooks]
+      parameters:
+        - { name: after, in: query, description: "An event id (evt_...) from next_after.", schema: { type: string }, example: evt_48213 }
+        - { name: types, in: query, description: 'Comma-separated event types or wildcards ("lead.*"). Default: every type.', schema: { type: string }, example: "lead.replied,mailbox.*" }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
+      responses:
+        "200":
+          description: Events.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, next_after, has_more]
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/WebhookEvent" }
+                  next_after: { type: string, description: Pass as after next time. }
+                  has_more: { type: boolean }
+        "400": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/webhooks:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
@@ -11021,8 +11058,13 @@ components:
               example: unavailable
             message:
               type: string
+              description: For people. It may change; branch on code and status instead.
             request_id:
               type: string
+            param:
+              type: string
+              description: The request field a 400 is about, when there is one (for example url or events).
+              example: url
     LifecycleStage:
       type: string
       enum: [warming, ready, resting, retired]
