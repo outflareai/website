@@ -16,7 +16,8 @@ info:
     (the API token scope it needs in the workspace) and `project_tokens`
     (whether a project token may call it), `agency_role` and
     `agency_tokens` for agency endpoints, or `signed_in` for endpoints
-    only a signed-in person can use. Operations without it are public.
+    only a signed-in person can use, `authenticated` for any session or
+    token. Operations without it are public.
     The engine's tests check every value against the running server.
 
     Workspace writes take an `Idempotency-Key` header: a retry with the
@@ -82,6 +83,56 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Meta"
+        default: { $ref: "#/components/responses/Error" }
+  /v1/whoami:
+    get:
+      operationId: whoami
+      x-outflare-access: { authenticated: true }
+      summary: Who the caller is
+      description: |
+        Any session or token. For an API token: its workspace (or agency), project, scopes and expiry, so a client
+        holding only a token can find everything else. For a signed-in person: the user (GET /v1/me lists their
+        workspaces).
+      tags: [access]
+      responses:
+        "200":
+          description: The caller.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [actor, token, user]
+                properties:
+                  actor:
+                    type: object
+                    required: [id, type]
+                    properties:
+                      id: { type: string, format: uuid }
+                      type: { type: string, enum: [human, api_token] }
+                  token:
+                    oneOf:
+                      - type: "null"
+                      - type: object
+                        required: [id, name, kind, workspace_id, agency_id, project_id, scopes, expires_at]
+                        properties:
+                          id: { type: string, format: uuid }
+                          name: { type: string }
+                          kind: { type: string, enum: [workspace, agency] }
+                          workspace_id: { type: [string, "null"], format: uuid }
+                          agency_id: { type: [string, "null"], format: uuid }
+                          project_id: { type: [string, "null"], format: uuid }
+                          scopes: { type: array, items: { type: string } }
+                          expires_at: { type: [string, "null"], format: date-time }
+                  user:
+                    oneOf:
+                      - type: "null"
+                      - type: object
+                        required: [id, email, name]
+                        properties:
+                          id: { type: string, format: uuid }
+                          email: { type: string }
+                          name: { type: string }
+        "401": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
   /v1/webhook-events:
     get:
