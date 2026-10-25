@@ -2,7 +2,7 @@
 title: Command line
 description: The outflare CLI has every API operation as a command, for scripts, CI and quick checks from a terminal.
 sidebar:
-  order: 4
+  order: 5
 ---
 
 The `outflare` binary that runs the server is also a client for any Outflare server. Its commands are read from the API document built into it, so every endpoint is there, with the same names, parameters and scopes as the [endpoint reference](/docs/api/reference/).

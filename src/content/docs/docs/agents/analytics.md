@@ -2,7 +2,7 @@
 title: Analytics for agents
 description: How an agent asks Outflare how a website is doing, what changed and why, in one call, with the tool and dates for every number and the fix for anything missing.
 sidebar:
-  order: 3
+  order: 4
 ---
 
 <span class="pill shipped">Shipped</span> In the REST API and the MCP server.
