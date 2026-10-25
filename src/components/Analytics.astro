@@ -8,6 +8,10 @@
 //   PUBLIC_POSTHOG_KEY     PostHog project key, cookieless on this site, sent
 //   PUBLIC_POSTHOG_REGION  through /ingest (functions/ingest) on our own domain.
 // Cloudflare Web Analytics needs no code: Pages injects it when it is enabled.
+//
+// Every click on a sign-up, sign-in, GitHub or contact link (or element with data-track) and
+// every script error is an event, sent to both (track below). AGENTS.md has
+// the rule and the names.
 const gtm = (import.meta.env.PUBLIC_GTM_ID ?? '').trim();
 const posthogKey = (import.meta.env.PUBLIC_POSTHOG_KEY ?? '').trim();
 const region = import.meta.env.PUBLIC_POSTHOG_REGION === 'eu' ? 'eu' : 'us';
@@ -54,6 +58,40 @@ const phKey = /^phc_[A-Za-z0-9_-]{10,80}$/.test(posthogKey) ? posthogKey : '';
 			capture_pageview: true,
 			capture_pageleave: true,
 			disable_session_recording: true,
+		});
+	</script>
+)}
+
+{(gtmId || phKey) && (
+	<script is:inline>
+		// One helper for the site's events: GA4 through the dataLayer (event
+		// names are snake_case, GA allows no dots) and PostHog. Properties
+		// are fixed labels only: never what someone typed.
+		window.outflareTrack = function (name, props) {
+			props = props || {};
+			if (window.dataLayer) window.dataLayer.push(Object.assign({ event: name }, props));
+			if (window.posthog) window.posthog.capture(name, props);
+		};
+		// Links are classified by where they go, so no page needs its own code.
+		function linkEvent(a) {
+			var href = a.getAttribute('href') || '';
+			if (a.dataset.track) return a.dataset.track;
+			if (/^https:\/\/app\.outflare\.ai\/signup/.test(href)) return 'sign_up_click';
+			if (/^https:\/\/app\.outflare\.ai/.test(href)) return 'sign_in_click';
+			if (/^https:\/\/github\.com\/outflareai/.test(href)) return 'github_click';
+			if (/^mailto:/.test(href)) return 'contact_click';
+			return '';
+		}
+		document.addEventListener('click', function (e) {
+			var a = e.target && e.target.closest && e.target.closest('a[href], [data-track]');
+			if (!a) return;
+			var name = linkEvent(a);
+			if (!name) return;
+			var where = a.closest('header') ? 'header' : a.closest('footer') ? 'footer' : a.closest('nav, aside') ? 'nav' : 'page';
+			window.outflareTrack(name, { location: where, page: location.pathname });
+		}, true);
+		window.addEventListener('error', function (e) {
+			window.outflareTrack('site_error', { page: location.pathname, message: String(e.message || '').slice(0, 200) });
 		});
 	</script>
 )}
