@@ -69,7 +69,7 @@ another two-letter country per connection or per call.
 
 Once a week each SEO connection takes an overview and the top 50 keywords
 for each of its domains and stores them (`seo_snapshots`). That is what the
-Analytics page, `GET /seo/history` and the overview read, so looking is free.
+SEO page, `GET /seo/history` and the overview read, so looking is free.
 
 - **Domains:** the connection's `domains` setting, or else the websites
   your analytics tools follow (up to five).

@@ -11,7 +11,7 @@ Outflare reads the analytics tools already on your website, so a person, a scrip
 
 ## Connect
 
-Open **Connectors** and pick the **Analytics** category, or go straight to the **Analytics** page and click **Choose a tool**. Google tools connect with a read-only Google sign-in, and one sign-in connects both Google Analytics and Search Console. They also take a service account key. PostHog and Cloudflare offer a sign-in or a key, and you choose. The rest take an API key. An agent can ask for a connection with `request_connection`: you get a one-time link to paste the key into or sign in from, so the key never passes through the chat.
+Open **Connectors** and pick the **Analytics** category, or go straight to **Analytics → Website analytics** and click **Choose a tool**. Google tools connect with a read-only Google sign-in, and one sign-in connects both Google Analytics and Search Console. They also take a service account key. PostHog and Cloudflare offer a sign-in or a key, and you choose. The rest take an API key. An agent can ask for a connection with `request_connection`: you get a one-time link to paste the key into or sign in from, so the key never passes through the chat.
 
 One sign-in often sees many sites (every GA4 property, Search Console property or PostHog project the login can open). Every one of them syncs unless you switch it off, up to 20 per connection. The Website analytics page lists them with a sync switch and a domain field for each.
 
@@ -118,7 +118,7 @@ only, because its API allows ten calls a day and three days of history.
 - **Websites line up by domain.** Each site gets a domain
   (`example.com`, without `www.`), taken from the site's address. Google
   Analytics properties and Vercel projects do not show one, so set it on the
-  Analytics page or with `PATCH .../analytics/$ID/sites/$SITE` and `"domain"`. Stored
+  Website analytics page or with `PATCH .../analytics/$ID/sites/$SITE` and `"domain"`. Stored
   history moves with it.
 
 Reading history never calls a provider, so it is fast and free:
