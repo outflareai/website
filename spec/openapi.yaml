@@ -28,6 +28,17 @@ info:
     Workspace writes take an `Idempotency-Key` header: a retry with the
     same key gets the first answer back instead of running twice.
 
+    Test workspaces are the sandbox. Create one with `"test": true` on
+    POST /v1/workspaces (and `"sample_data": true` for mailboxes and leads
+    to start from). Everything works as in a live workspace, but every
+    mailbox is simulated: sends are recorded and delivered nowhere,
+    verification is made up from the address (an address containing
+    `undeliverable`, `risky` or `unknown` gets that result), and nothing
+    can be bought. Every answer from one carries
+    `Outflare-Test-Workspace: true`. The `/test/` endpoints play the
+    outside world: answer a sent email with a reply, auto-reply, opt-out
+    or bounce, and send a sequence's next step at once.
+
     Errors always have the `Error` body (`default` on every operation).
     Workspace writes may also answer `202` with `MissionHeld` when made
     inside a mission.
@@ -129,11 +140,12 @@ paths:
                             oneOf:
                               - type: "null"
                               - type: object
-                                required: [id, slug, name]
+                                required: [id, slug, name, test]
                                 properties:
                                   id: { type: string, format: uuid }
                                   slug: { type: string, example: acme }
                                   name: { type: string, example: Acme Outbound }
+                                  test: { type: boolean, description: A test workspace, where nothing reaches the outside world. }
                           agency_id: { type: [string, "null"], format: uuid }
                           project_id: { type: [string, "null"], format: uuid }
                           scopes: { type: array, items: { type: string }, description: "As granted. Any scope in an area includes reading it: leads.manage can also list leads." }
@@ -995,6 +1007,8 @@ paths:
               required: [name]
               properties:
                 name: { type: string }
+                test: { type: boolean, default: false, description: "A test workspace (the sandbox): mailboxes are simulated and nothing is delivered, verified for real or bought. It cannot be changed later." }
+                sample_data: { type: boolean, default: false, description: "With test: three simulated mailboxes and ten leads to start from." }
       responses:
         "201":
           description: Created.
@@ -3463,6 +3477,66 @@ paths:
         "404": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/test/inbound:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    post:
+      operationId: simulateInbound
+      x-outflare-access: { scope: inbox.manage }
+      summary: Simulate an answer to a sent email (test workspaces)
+      description: |
+        Delivers a made-up reply, auto-reply, opt-out or bounce to a sent email, as if the lead's mail server had
+        sent it. It is handled exactly like real mail: it shows in the inbox, a reply stops the lead's sequence, an
+        opt-out or bounce suppresses the address, and webhooks fire. Only in a test workspace; a live one answers
+        409 `live_workspace`.
+      tags: [sandbox]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message_id: { type: string, format: uuid, description: "The sent email to answer. Give this or lead_id." }
+                lead_id: { type: string, format: uuid, description: "Answer the latest email sent to this lead." }
+                kind: { type: string, enum: [reply, auto_reply, opt_out, bounce], default: reply }
+                body: { type: string, description: "The text of a reply, auto-reply or opt-out; a sensible default otherwise." }
+      responses:
+        "201":
+          description: The message as it arrived in the inbox.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/InboundMessage" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/test/send-now:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    post:
+      operationId: sendNow
+      x-outflare-access: { scope: sequences.manage }
+      summary: Send every due step now (test workspaces)
+      description: |
+        Sends the next step of every active enrollment at once, without waiting for step delays, the sending
+        window or the new-lead cap, so a whole sequence can be tried in a minute. Mailbox daily limits still
+        apply. Only in a test workspace; a live one answers 409 `live_workspace`.
+      tags: [sandbox]
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sequence_id: { type: string, format: uuid, description: Only this sequence. }
+      responses:
+        "202":
+          description: Queued.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [queued]
+                properties:
+                  queued: { type: integer, description: Emails queued to send. }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/inbox:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
@@ -4335,7 +4409,7 @@ paths:
       operationId: listAnalyticsSites
       x-outflare-access: { scope: analytics.read }
       summary: List the sites a connection can read
-      description: "Scope: analytics.read. GA4 properties, Search Console properties, PostHog projects, Fathom or Umami sites, and so on, each with the domain it counts under and whether the sync stores it. Every site syncs unless switched off, up to 20 per connection. Pass an id as `site` on reports, or make it the default."
+      description: "Scope: analytics.read. GA4 properties, Search Console properties, PostHog projects, Fathom or Umami sites, and so on. Pass an id as `site` on reports, or make it the default."
       tags: [analytics]
       parameters:
         - { $ref: "#/components/parameters/AnalyticsFresh" }
@@ -4348,42 +4422,10 @@ paths:
                 type: object
                 required: [data, site]
                 properties:
-                  data: { type: array, items: { $ref: "#/components/schemas/AnalyticsSitePlan" } }
+                  data: { type: array, items: { $ref: "#/components/schemas/AnalyticsSite" } }
                   site: { type: string, description: The default site; empty when none is set. }
         "404": { $ref: "#/components/responses/Error" }
         "422": { $ref: "#/components/responses/Error" }
-        default: { $ref: "#/components/responses/Error" }
-  /v1/workspaces/{ws}/analytics/{id}/sites/{site}:
-    parameters:
-      - { $ref: "#/components/parameters/Workspace" }
-      - { name: id, in: path, required: true, schema: { type: string, format: uuid }, description: The integration id. }
-      - { name: site, in: path, required: true, schema: { type: string }, description: "The site's id from GET .../sites, URL-encoded (Search Console ids contain `:` and `/`)." }
-    patch:
-      operationId: updateAnalyticsSite
-      x-outflare-access: { scope: integrations.manage }
-      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
-      summary: Switch a site on or off, or set its domain
-      description: "Scope: integrations.manage. Switching a site off stops its sync and deletes what was stored for it, so totals by domain stop counting it. Switching one on starts its 90-day backfill now. The domain lines the site up with other tools for the same website; an empty string goes back to the tool's own."
-      tags: [analytics]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                sync: { type: boolean }
-                domain: { type: string, example: example.com }
-      responses:
-        "200":
-          description: The site as it is now.
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/AnalyticsSitePlan" }
-        "400": { $ref: "#/components/responses/Error" }
-        "404": { $ref: "#/components/responses/Error" }
-        "422": { $ref: "#/components/responses/Error" }
-        "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/analytics/{id}/site:
     parameters:
@@ -9511,15 +9553,6 @@ components:
         id: { type: string, example: "123456789" }
         name: { type: string, example: "acme.com (Acme)" }
         url: { type: string }
-    AnalyticsSitePlan:
-      allOf:
-        - { $ref: "#/components/schemas/AnalyticsSite" }
-        - type: object
-          required: [host, domain, sync]
-          properties:
-            host: { type: string, example: example.com, description: "The domain the site counts under in the overview, compare and history; empty when unknown." }
-            domain: { type: string, description: "The domain someone set for this site, overriding the tool's own; empty when none is set." }
-            sync: { type: boolean, description: Whether the sync stores this site. }
     AnalyticsMetrics:
       type: object
       description: Every field is optional. A missing field means the provider does not measure it; zero means it measured none.
@@ -9583,7 +9616,7 @@ components:
         name: { type: string }
         connector: { type: string }
         site: { type: string }
-        host: { type: string, description: "The website's domain; empty when the tool shows none. Set it with PATCH .../analytics/{id}/sites/{site}." }
+        host: { type: string, description: "The website's domain; empty when the tool shows none. Set it with PUT .../analytics/{id}/site." }
         first_day: { type: [string, "null"], format: date }
         last_day: { type: [string, "null"], format: date }
         last_run_at: { type: [string, "null"], format: date-time }
@@ -10207,10 +10240,11 @@ components:
       enum: [workspace.read, workspace.manage, context.manage, members.read, members.manage, tokens.manage, audit.read, mailboxes.read, mailboxes.manage, leads.read, leads.manage, suppressions.manage, sequences.read, sequences.manage, inbox.read, inbox.manage, integrations.read, integrations.manage, outcomes.read, outcomes.manage, projects.read, projects.manage, infrastructure.read, infrastructure.manage, infrastructure.approve, analytics.read, missions.read, missions.run, missions.approve, webhooks.read, webhooks.manage]
     Workspace:
       type: object
-      required: [id, name, slug]
+      required: [id, name, slug, test]
       properties:
         id: { type: string, format: uuid }
         name: { type: string }
+        test: { type: boolean, description: "A test workspace (the sandbox): mailboxes are simulated and nothing is delivered, verified for real or bought." }
         slug: { type: string, description: "The workspace's name in web app URLs (https://app.outflare.ai/{slug}/overview). Works in place of id in API paths.", example: acme }
         role: { $ref: "#/components/schemas/Role" }
         agency_id: { type: [string, "null"], format: uuid, description: Set when the workspace is an agency client. }
@@ -10348,7 +10382,7 @@ components:
         email: { type: string }
         domain: { type: string }
         display_name: { type: string }
-        provider: { type: string, enum: [google, microsoft, other] }
+        provider: { type: string, enum: [google, microsoft, other, simulated], description: "simulated: a test workspace's mailbox, which delivers nothing." }
         project_id: { type: [string, "null"], format: uuid, description: "The project that owns the mailbox; it then sends only for that project's sequences. Null: shared by the workspace." }
         auth_method: { type: string, enum: [password, oauth] }
         smtp_host: { type: string }
