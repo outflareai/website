@@ -1,0 +1,1269 @@
+[
+	{
+		"id": "amplitude",
+		"name": "Amplitude",
+		"category": "analytics",
+		"summary": "Active users, page views, top pages and event counts from Amplitude.",
+		"description": "Reads one project with its API key and secret key. Traffic uses active users and the [Amplitude] Page Viewed event from the browser SDK.",
+		"website": "https://amplitude.com",
+		"docs_url": "https://amplitude.com/docs/apis/analytics/dashboard-rest",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"analytics.read"
+		],
+		"status": "available",
+		"pricing": "Free tier"
+	},
+	{
+		"id": "bing_webmaster",
+		"name": "Bing Webmaster Tools",
+		"category": "analytics",
+		"summary": "Clicks, impressions and the search queries people used on Bing before visiting your site.",
+		"description": "Reads every verified site in your Bing Webmaster Tools account. Bing keeps about six months of search data.",
+		"website": "https://www.bing.com/webmasters",
+		"docs_url": "https://learn.microsoft.com/en-us/dotnet/api/microsoft.bing.webmaster.api.interfaces.iwebmasterapi",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"analytics.read"
+		],
+		"status": "available",
+		"pricing": "Free"
+	},
+	{
+		"id": "cloudflare_web_analytics",
+		"name": "Cloudflare Web Analytics",
+		"category": "analytics",
+		"summary": "Page views, visits, top pages and referrers from Cloudflare's free Web Analytics.",
+		"description": "Reads every Web Analytics site on one Cloudflare account. Cloudflare counts visits and page views but not unique visitors.",
+		"website": "https://www.cloudflare.com/web-analytics/",
+		"docs_url": "https://developers.cloudflare.com/analytics/graphql-api/",
+		"auth_methods": [
+			"oauth2",
+			"api_key"
+		],
+		"capabilities": [
+			"analytics.read"
+		],
+		"status": "available",
+		"pricing": "Free"
+	},
+	{
+		"id": "fathom",
+		"name": "Fathom Analytics",
+		"category": "analytics",
+		"summary": "Visitors, pages, referrers and event conversions from Fathom.",
+		"description": "Reads every site on the account with an API key. Events count as conversions.",
+		"website": "https://usefathom.com",
+		"docs_url": "https://usefathom.com/api",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"analytics.read"
+		],
+		"status": "available",
+		"pricing": "Paid plans"
+	},
+	{
+		"id": "google_analytics",
+		"name": "Google Analytics",
+		"category": "analytics",
+		"summary": "Visitors, top pages, traffic sources and key events from Google Analytics 4.",
+		"description": "Signs in with Google (or uses a service account key) and reads any GA4 property the account can see, with read-only access. Pick the property once, or name it on each call. Conversions are GA4 key events. The same sign-in also connects Search Console.",
+		"website": "https://analytics.google.com",
+		"docs_url": "https://developers.google.com/analytics/devguides/reporting/data/v1",
+		"auth_methods": [
+			"oauth2",
+			"api_key"
+		],
+		"capabilities": [
+			"analytics.read"
+		],
+		"status": "available",
+		"pricing": "Free"
+	},
+	{
+		"id": "google_search_console",
+		"name": "Google Search Console",
+		"category": "analytics",
+		"summary": "What people search on Google before they click through to your site, and how you rank.",
+		"description": "Signs in with Google (or uses a service account key) and reads every Search Console property the account can see, with read-only access. Domain properties show as sc-domain:example.com. The same sign-in also connects Google Analytics.",
+		"website": "https://search.google.com/search-console",
+		"docs_url": "https://developers.google.com/webmaster-tools/v1/searchanalytics/query",
+		"auth_methods": [
+			"oauth2",
+			"api_key"
+		],
+		"capabilities": [
+			"analytics.read"
+		],
+		"status": "available",
+		"pricing": "Free"
+	},
+	{
+		"id": "matomo",
+		"name": "Matomo",
+		"category": "analytics",
+		"summary": "Visitors, pages, referrers, events and goal conversions from Matomo, cloud or self-hosted.",
+		"description": "Reads every site the token can view. The token is sent in the request body, never the address.",
+		"website": "https://matomo.org",
+		"docs_url": "https://developer.matomo.org/api-reference/reporting-api",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"analytics.read"
+		],
+		"status": "available",
+		"pricing": "Free (self-hosted)"
+	},
+	{
+		"id": "microsoft_clarity",
+		"name": "Microsoft Clarity",
+		"category": "analytics",
+		"summary": "Sessions, visitors and frustration signals (rage and dead clicks) from Clarity, for the last three days.",
+		"description": "Clarity's export API only covers the last one to three days and allows ten calls a day per project, so Outflare keeps each answer for six hours. Use it for a recent snapshot, not history.",
+		"website": "https://clarity.microsoft.com",
+		"docs_url": "https://learn.microsoft.com/en-us/clarity/setup-and-installation/clarity-data-export-api",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"analytics.read"
+		],
+		"status": "available",
+		"pricing": "Free"
+	},
+	{
+		"id": "mixpanel",
+		"name": "Mixpanel",
+		"category": "analytics",
+		"summary": "Page views, pages, referrers and event counts from Mixpanel.",
+		"description": "Uses a service account. Traffic comes from Mixpanel's page view event ($mp_web_page_view unless you name another). Mixpanel allows about 60 report queries an hour, so Outflare keeps each answer for an hour.",
+		"website": "https://mixpanel.com",
+		"docs_url": "https://developer.mixpanel.com/reference/query-api",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"analytics.read"
+		],
+		"status": "available",
+		"pricing": "Free tier"
+	},
+	{
+		"id": "plausible",
+		"name": "Plausible",
+		"category": "analytics",
+		"summary": "Visitors, pages, sources and goal conversions from Plausible, cloud or self-hosted.",
+		"description": "Reads one site with a Stats API key. Goals count as conversions.",
+		"website": "https://plausible.io",
+		"docs_url": "https://plausible.io/docs/stats-api",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"analytics.read"
+		],
+		"status": "available",
+		"pricing": "Paid plans"
+	},
+	{
+		"id": "posthog",
+		"name": "PostHog",
+		"category": "analytics",
+		"summary": "Visitors, pages, referrers and custom events from PostHog. Sign in with PostHog Cloud, US or EU, or use a personal API key.",
+		"description": "Signs in with PostHog and reads the projects you allow, with read-only access to queries. A personal API key works too, and is the way for self-hosted PostHog. Visitors are distinct people with a $pageview; sources are the referring domain.",
+		"website": "https://posthog.com",
+		"docs_url": "https://posthog.com/docs/api/queries",
+		"auth_methods": [
+			"oauth2",
+			"api_key"
+		],
+		"capabilities": [
+			"analytics.read"
+		],
+		"status": "available",
+		"pricing": "Free tier",
+		"dark_logo": true
+	},
+	{
+		"id": "simple_analytics",
+		"name": "Simple Analytics",
+		"category": "analytics",
+		"summary": "Visitors, pages and referrers from Simple Analytics.",
+		"description": "Reads one website. Public dashboards need only the domain; private ones need an API key and your user id.",
+		"website": "https://www.simpleanalytics.com",
+		"docs_url": "https://docs.simpleanalytics.com/api/stats",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"analytics.read"
+		],
+		"status": "available",
+		"pricing": "Paid plans"
+	},
+	{
+		"id": "umami",
+		"name": "Umami",
+		"category": "analytics",
+		"summary": "Visitors, pages, referrers and events from Umami, cloud or self-hosted.",
+		"description": "Umami Cloud: paste an API key. Self-hosted: give the address and a user that can view the websites; Outflare signs in for each report.",
+		"website": "https://umami.is",
+		"docs_url": "https://umami.is/docs/api",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"analytics.read"
+		],
+		"status": "available",
+		"pricing": "Free (self-hosted)",
+		"dark_logo": true
+	},
+	{
+		"id": "vercel_analytics",
+		"name": "Vercel Web Analytics",
+		"category": "analytics",
+		"summary": "Page views, visitors, top pages, referrers and custom events from Vercel Web Analytics.",
+		"description": "Reads every project on one Vercel account or team. Only production traffic counts, as on Vercel's own dashboard. Projects need Web Analytics turned on.",
+		"website": "https://vercel.com/analytics",
+		"docs_url": "https://vercel.com/docs/analytics/web-analytics-api",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"analytics.read"
+		],
+		"status": "available",
+		"pricing": "Free on Hobby, more events on Pro",
+		"dark_logo": true
+	},
+	{
+		"id": "cal_com",
+		"name": "Cal.com",
+		"category": "calendar",
+		"summary": "Count meetings leads book through your Cal.com links.",
+		"description": "Reads your Cal.com bookings and their attendees. Nothing is changed in Cal.com.",
+		"website": "https://cal.com",
+		"docs_url": "https://cal.com/docs/api-reference/v2/bookings/get-all-bookings",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"meetings.sync"
+		],
+		"status": "available",
+		"pricing": "Free",
+		"dark_logo": true
+	},
+	{
+		"id": "calendly",
+		"name": "Calendly",
+		"category": "calendar",
+		"summary": "Count meetings leads book through your Calendly links.",
+		"description": "Reads scheduled events for your Calendly organization and their invitees. Nothing is changed in Calendly.",
+		"website": "https://calendly.com",
+		"docs_url": "https://developer.calendly.com/api-docs",
+		"auth_methods": [
+			"oauth2",
+			"api_key"
+		],
+		"capabilities": [
+			"meetings.sync"
+		],
+		"status": "available",
+		"pricing": "Included with paid Calendly plans"
+	},
+	{
+		"id": "google_calendar",
+		"name": "Google Calendar",
+		"category": "calendar",
+		"summary": "Count meetings booked with leads, from any Google Workspace or Gmail calendar.",
+		"description": "Reads events from one calendar (the primary one unless calendar_id is set) and keeps only those with a lead or a lead's colleague among the guests. Nothing is written to the calendar.",
+		"website": "https://calendar.google.com",
+		"docs_url": "https://developers.google.com/calendar/api/v3/reference/events/list",
+		"auth_methods": [
+			"oauth2"
+		],
+		"capabilities": [
+			"meetings.sync"
+		],
+		"status": "available",
+		"pricing": "Free"
+	},
+	{
+		"id": "outlook_calendar",
+		"name": "Outlook Calendar",
+		"category": "calendar",
+		"summary": "Count meetings booked with leads, from a Microsoft 365 or Outlook.com calendar.",
+		"description": "Reads the signed-in person's calendar and keeps only meetings with a lead or a lead's colleague among the attendees. Nothing is written to the calendar.",
+		"website": "https://outlook.office.com/calendar",
+		"docs_url": "https://learn.microsoft.com/graph/api/event-delta",
+		"auth_methods": [
+			"oauth2"
+		],
+		"capabilities": [
+			"meetings.sync"
+		],
+		"status": "available",
+		"pricing": "Free"
+	},
+	{
+		"id": "hubspot",
+		"name": "HubSpot",
+		"category": "crm",
+		"summary": "Count meetings and deals from outreach, and log booked meetings on the contact.",
+		"description": "Reads deals (stage, amount, close date) and meetings, and ties each to the lead and campaign that started it. Optionally writes meetings booked from outreach onto the HubSpot contact (off by default, since HubSpot may already log them from its own calendar sync). Deals are never changed.",
+		"website": "https://www.hubspot.com",
+		"docs_url": "https://developers.hubspot.com/docs/api/crm/deals",
+		"auth_methods": [
+			"oauth2",
+			"api_key"
+		],
+		"capabilities": [
+			"deals.sync",
+			"meetings.sync",
+			"crm.push"
+		],
+		"status": "available",
+		"pricing": "Works on every HubSpot plan, including free"
+	},
+	{
+		"id": "apollo",
+		"name": "Apollo",
+		"category": "data",
+		"summary": "Search Apollo's people database and reveal work emails with your Apollo credits.",
+		"description": "Build lists from Apollo searches by title, seniority, company size, industry and location. Searching is free; revealing an email uses one Apollo credit per person found. Mailboxes also connected in Apollo are flagged on the Mailboxes page, since Apollo may send from them too.",
+		"website": "https://www.apollo.io",
+		"docs_url": "https://docs.apollo.io/reference/people-api-search",
+		"auth_methods": [
+			"oauth2",
+			"api_key"
+		],
+		"capabilities": [
+			"data.search_people",
+			"data.enrich_person",
+			"data.find_email",
+			"observe.mailboxes"
+		],
+		"status": "available",
+		"pricing": "Free search; one credit per revealed email"
+	},
+	{
+		"id": "findymail",
+		"name": "Findymail",
+		"category": "data",
+		"summary": "Find verified work emails from a name and company domain.",
+		"description": "Fills in verified work emails for people found elsewhere. Charges only when it finds one.",
+		"website": "https://www.findymail.com",
+		"docs_url": "https://app.findymail.com/docs",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"data.enrich_person",
+			"data.find_email"
+		],
+		"status": "available",
+		"pricing": "One credit per email found",
+		"dark_logo": true
+	},
+	{
+		"id": "leadmagic",
+		"name": "LeadMagic",
+		"category": "data",
+		"summary": "Find work emails from a name and company domain.",
+		"description": "Fills in work emails for people found elsewhere. Charges only when it finds a valid address.",
+		"website": "https://leadmagic.io",
+		"docs_url": "https://leadmagic.io/docs/v1/reference/email-finder",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"data.enrich_person",
+			"data.find_email"
+		],
+		"status": "available",
+		"pricing": "One credit per email found"
+	},
+	{
+		"id": "peopledatalabs",
+		"name": "People Data Labs",
+		"category": "data",
+		"summary": "Search and enrich people from People Data Labs with your own credits.",
+		"description": "Build lists from People Data Labs searches by title, seniority, industry, company size and location, and fill in missing fields on leads you already have.",
+		"website": "https://www.peopledatalabs.com",
+		"docs_url": "https://docs.peopledatalabs.com/docs/person-search-api",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"data.search_people",
+			"data.enrich_person"
+		],
+		"status": "available",
+		"pricing": "One credit per person returned"
+	},
+	{
+		"id": "prospeo",
+		"name": "Prospeo",
+		"category": "data",
+		"summary": "Find verified work emails from a name and company, or a LinkedIn URL.",
+		"description": "Fills in work emails for people found elsewhere. Only verified addresses are returned, and you are charged only when one is found.",
+		"website": "https://prospeo.io",
+		"docs_url": "https://prospeo.io/api-docs/enrich-person",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"data.enrich_person",
+			"data.find_email"
+		],
+		"status": "available",
+		"pricing": "One credit per email found"
+	},
+	{
+		"id": "bouncer",
+		"name": "Bouncer",
+		"category": "email_verification",
+		"summary": "EU-hosted email verification with toxicity checks.",
+		"description": "Verifies each address and reports catch-all, disposable and role accounts, with a 0–100 score.",
+		"website": "https://www.usebouncer.com",
+		"docs_url": "https://docs.usebouncer.com",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"verify"
+		],
+		"status": "available",
+		"pricing": "Pay per credit"
+	},
+	{
+		"id": "debounce",
+		"name": "DeBounce",
+		"category": "email_verification",
+		"summary": "Email verification that marks addresses safe to send, risky or invalid.",
+		"description": "Verifies each address and flags spam traps, disposable, catch-all and role addresses.",
+		"website": "https://debounce.io",
+		"docs_url": "https://developers.debounce.io",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"verify"
+		],
+		"status": "available",
+		"pricing": "Pay per credit"
+	},
+	{
+		"id": "emailable",
+		"name": "Emailable",
+		"category": "email_verification",
+		"summary": "Email verification with a quality score for every address.",
+		"description": "Verifies each address and returns a state, a reason and a 0–100 score.",
+		"website": "https://emailable.com",
+		"docs_url": "https://emailable.com/docs/api",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"verify"
+		],
+		"status": "available",
+		"pricing": "Pay per credit"
+	},
+	{
+		"id": "hunter",
+		"name": "Hunter",
+		"category": "email_verification",
+		"summary": "Find and verify work emails with Hunter.",
+		"description": "Verifies each address with SMTP checks and a confidence score.",
+		"website": "https://hunter.io",
+		"docs_url": "https://hunter.io/api-documentation/v2#email-verifier",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"verify",
+			"data.enrich_person",
+			"data.find_email"
+		],
+		"status": "available",
+		"pricing": "Monthly plans with search and verification credits"
+	},
+	{
+		"id": "millionverifier",
+		"name": "MillionVerifier",
+		"category": "email_verification",
+		"summary": "Low-cost email verification popular with cold email teams.",
+		"description": "Verifies each address and marks catch-all, disposable and role addresses.",
+		"website": "https://www.millionverifier.com",
+		"docs_url": "https://developer.millionverifier.com",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"verify"
+		],
+		"status": "available",
+		"pricing": "Pay per credit",
+		"dark_logo": true
+	},
+	{
+		"id": "neverbounce",
+		"name": "NeverBounce",
+		"category": "email_verification",
+		"summary": "Real-time email verification with a deliverability guarantee.",
+		"description": "Verifies each address and flags disposable and catch-all domains.",
+		"website": "https://neverbounce.com",
+		"docs_url": "https://developers.neverbounce.com/docs/verifying-an-email",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"verify"
+		],
+		"status": "available",
+		"pricing": "Pay per credit"
+	},
+	{
+		"id": "reoon",
+		"name": "Reoon Email Verifier",
+		"category": "email_verification",
+		"summary": "Low-cost verification with a power mode that checks the mailbox over SMTP.",
+		"description": "Verifies each address in power mode and flags catch-all, disposable, role and full mailboxes.",
+		"website": "https://www.reoon.com/email-verifier/",
+		"docs_url": "https://www.reoon.com/articles/api-documentation-of-reoon-email-verifier/",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"verify"
+		],
+		"status": "available",
+		"pricing": "Pay per credit; unknown results are refunded"
+	},
+	{
+		"id": "zerobounce",
+		"name": "ZeroBounce",
+		"category": "email_verification",
+		"summary": "Email validation with spam-trap, abuse and catch-all detection.",
+		"description": "Checks each address before it is emailed and flags spam traps, known complainers and catch-all domains.",
+		"website": "https://www.zerobounce.net",
+		"docs_url": "https://www.zerobounce.net/docs/email-validation-api-quickstart/",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"verify"
+		],
+		"status": "available",
+		"pricing": "Pay per credit"
+	},
+	{
+		"id": "cheapinboxes",
+		"name": "Cheap Inboxes",
+		"category": "mailbox_provider",
+		"summary": "Import your Google and Microsoft mailboxes from Cheap Inboxes and keep them in sync.",
+		"description": "Connect your Cheap Inboxes account with an API key. Outflare lists every mailbox, imports the ones you pick (or all of them, automatically) with their passwords, checks SMTP, IMAP and DNS, and picks up new and cancelled mailboxes on its own. Google mailboxes get an app password from Cheap Inboxes, since Google refuses plain passwords.",
+		"website": "https://cheapinboxes.com",
+		"docs_url": "https://api.cheapinboxes.com/docs",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"vendor.mailboxes",
+			"import.mailboxes"
+		],
+		"status": "available",
+		"pricing": "You pay Cheap Inboxes directly"
+	},
+	{
+		"id": "claude",
+		"name": "Claude",
+		"category": "model",
+		"summary": "Plan and run missions from a goal you type, with your own Claude API key. Anthropic's Claude models.",
+		"description": "Outflare sends the model the goal, the project brief and a summary of the workspace (mailbox capacity, lead counts, campaigns, connectors) to plan, and the mission's progress and API answers while Outflare's agent runs it. Your key is encrypted, only ever sent to Claude's own API, and never shown again, logged or given to the model. Usage is billed to your Claude account; set a monthly limit under Settings → AI model.",
+		"website": "https://www.anthropic.com/api",
+		"docs_url": "https://docs.anthropic.com/en/api/getting-started",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"plan"
+		],
+		"status": "available",
+		"pricing": "Pay per token, billed by Claude"
+	},
+	{
+		"id": "gemini",
+		"name": "Gemini",
+		"category": "model",
+		"summary": "Plan and run missions from a goal you type, with your own Gemini API key. Google's Gemini models.",
+		"description": "Outflare sends the model the goal, the project brief and a summary of the workspace (mailbox capacity, lead counts, campaigns, connectors) to plan, and the mission's progress and API answers while Outflare's agent runs it. Your key is encrypted, only ever sent to Gemini's own API, and never shown again, logged or given to the model. Usage is billed to your Gemini account; set a monthly limit under Settings → AI model.",
+		"website": "https://ai.google.dev/",
+		"docs_url": "https://ai.google.dev/gemini-api/docs",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"plan"
+		],
+		"status": "available",
+		"pricing": "Pay per token, billed by Gemini"
+	},
+	{
+		"id": "mistral",
+		"name": "Mistral",
+		"category": "model",
+		"summary": "Plan and run missions from a goal you type, with your own Mistral API key. Mistral's models, hosted in the EU.",
+		"description": "Outflare sends the model the goal, the project brief and a summary of the workspace (mailbox capacity, lead counts, campaigns, connectors) to plan, and the mission's progress and API answers while Outflare's agent runs it. Your key is encrypted, only ever sent to Mistral's own API, and never shown again, logged or given to the model. Usage is billed to your Mistral account; set a monthly limit under Settings → AI model.",
+		"website": "https://mistral.ai/",
+		"docs_url": "https://docs.mistral.ai/",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"plan"
+		],
+		"status": "available",
+		"pricing": "Pay per token, billed by Mistral"
+	},
+	{
+		"id": "openai",
+		"name": "OpenAI",
+		"category": "model",
+		"summary": "Plan and run missions from a goal you type, with your own OpenAI API key. OpenAI's GPT models.",
+		"description": "Outflare sends the model the goal, the project brief and a summary of the workspace (mailbox capacity, lead counts, campaigns, connectors) to plan, and the mission's progress and API answers while Outflare's agent runs it. Your key is encrypted, only ever sent to OpenAI's own API, and never shown again, logged or given to the model. Usage is billed to your OpenAI account; set a monthly limit under Settings → AI model.",
+		"website": "https://openai.com/api/",
+		"docs_url": "https://platform.openai.com/docs/overview",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"plan"
+		],
+		"status": "available",
+		"pricing": "Pay per token, billed by OpenAI",
+		"dark_logo": true
+	},
+	{
+		"id": "ahrefs",
+		"name": "Ahrefs",
+		"category": "seo",
+		"summary": "Domain Rating, backlinks, organic keywords, competitors and Site Audit health for your domains.",
+		"description": "Needs an Ahrefs plan with API access and an API key. Reads Site Explorer for any domain and Site Audit for projects your account already crawls. Calls spend Ahrefs API units; Outflare records an estimate of each call in Outcomes and stops at the connection's monthly budget.",
+		"website": "https://ahrefs.com",
+		"docs_url": "https://docs.ahrefs.com/docs/api/reference/introduction",
+		"auth_methods": [
+			"oauth2",
+			"api_key"
+		],
+		"capabilities": [
+			"seo.read"
+		],
+		"status": "available",
+		"pricing": "API units from your Ahrefs plan"
+	},
+	{
+		"id": "dataforseo",
+		"name": "DataForSEO",
+		"category": "seo",
+		"summary": "Keyword rankings, estimated search traffic, competitors and backlinks for any domain, paid per call.",
+		"description": "Uses DataForSEO Labs for rankings, traffic and competitors, and the Backlinks API for links (a separate DataForSEO subscription; without it the overview skips links). Every call's cost comes back from DataForSEO and is recorded in Outcomes; a monthly budget on the connection stops calls before they go over.",
+		"website": "https://dataforseo.com",
+		"docs_url": "https://docs.dataforseo.com/v3/",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"seo.read"
+		],
+		"status": "available",
+		"pricing": "Pay per call, about $0.01 to $0.05 a report"
+	},
+	{
+		"id": "emailbison",
+		"name": "EmailBison",
+		"category": "sequencer",
+		"summary": "Let Outflare decide which sender emails each EmailBison campaign uses.",
+		"description": "Outflare reads your sender emails and campaigns every few minutes, adds and removes sender emails on campaigns as mailbox allocation decides, and accepts changes you make in EmailBison as manual ones.",
+		"website": "https://emailbison.com",
+		"docs_url": "https://docs.emailbison.com",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"observe.mailboxes",
+			"control.mailboxes"
+		],
+		"status": "available",
+		"dark_logo": true
+	},
+	{
+		"id": "instantly",
+		"name": "Instantly",
+		"category": "sequencer",
+		"summary": "Switching from Instantly? Import campaigns, leads and sending accounts in one go.",
+		"description": "Reads your Instantly campaigns (with every step and variant), their leads and where each lead got to, and your sending accounts. Importing only reads. Once connected, mailbox allocation also adds and removes sending accounts on Instantly campaigns, and accepts changes you make in Instantly as manual ones.",
+		"website": "https://instantly.ai",
+		"docs_url": "https://developer.instantly.ai/",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"import.campaigns",
+			"import.leads",
+			"import.mailboxes",
+			"observe.mailboxes",
+			"control.mailboxes"
+		],
+		"status": "available",
+		"pricing": "Included in Instantly's Hypergrowth plan and above"
+	},
+	{
+		"id": "smartlead",
+		"name": "Smartlead",
+		"category": "sequencer",
+		"summary": "Switching from Smartlead? Import campaigns, leads and email accounts in one go.",
+		"description": "Reads your Smartlead campaigns (with every step and variant), their leads and where each lead got to, and your email accounts. Importing only reads. Once connected, mailbox allocation also adds and removes email accounts on Smartlead campaigns, and accepts changes you make in Smartlead as manual ones.",
+		"website": "https://www.smartlead.ai",
+		"docs_url": "https://api.smartlead.ai/reference/welcome",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"import.campaigns",
+			"import.leads",
+			"import.mailboxes",
+			"observe.mailboxes",
+			"control.mailboxes"
+		],
+		"status": "available"
+	},
+	{
+		"id": "hotjar",
+		"name": "Hotjar",
+		"category": "analytics",
+		"summary": "Hotjar's API covers surveys and user lookups, not traffic, so there is nothing to report yet.",
+		"website": "https://www.hotjar.com",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [],
+		"status": "planned"
+	},
+	{
+		"id": "segment",
+		"name": "Segment",
+		"category": "analytics",
+		"summary": "Segment forwards events but does not count visits. Planned as a source of events, not a report.",
+		"website": "https://segment.com",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [],
+		"status": "planned"
+	},
+	{
+		"id": "chili_piper",
+		"name": "Chili Piper",
+		"category": "calendar",
+		"summary": "Meetings booked through Chili Piper routers.",
+		"website": "https://www.chilipiper.com",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"meetings.sync"
+		],
+		"status": "planned"
+	},
+	{
+		"id": "savvycal",
+		"name": "SavvyCal",
+		"category": "calendar",
+		"summary": "Meetings booked through SavvyCal links.",
+		"website": "https://savvycal.com",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"meetings.sync"
+		],
+		"status": "planned"
+	},
+	{
+		"id": "zoom_scheduler",
+		"name": "Zoom Scheduler",
+		"category": "calendar",
+		"summary": "Meetings booked through Zoom Scheduler.",
+		"website": "https://www.zoom.com/en/products/scheduler/",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"meetings.sync"
+		],
+		"status": "planned"
+	},
+	{
+		"id": "attio",
+		"name": "Attio",
+		"category": "crm",
+		"summary": "Sync replies and interested leads to Attio.",
+		"website": "https://attio.com",
+		"auth_methods": [
+			"oauth2",
+			"api_key"
+		],
+		"capabilities": [],
+		"status": "planned",
+		"dark_logo": true
+	},
+	{
+		"id": "pipedrive",
+		"name": "Pipedrive",
+		"category": "crm",
+		"summary": "Create deals in Pipedrive from interested replies.",
+		"website": "https://www.pipedrive.com",
+		"auth_methods": [
+			"oauth2",
+			"api_key"
+		],
+		"capabilities": [],
+		"status": "planned"
+	},
+	{
+		"id": "salesforce",
+		"name": "Salesforce",
+		"category": "crm",
+		"summary": "Sync replies, interested leads and meetings to Salesforce.",
+		"website": "https://www.salesforce.com",
+		"auth_methods": [
+			"oauth2"
+		],
+		"capabilities": [],
+		"status": "planned"
+	},
+	{
+		"id": "bettercontact",
+		"name": "BetterContact",
+		"category": "data",
+		"summary": "Waterfall email and phone finding.",
+		"website": "https://bettercontact.rocks",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"data.find_email"
+		],
+		"status": "planned"
+	},
+	{
+		"id": "clay",
+		"name": "Clay",
+		"category": "data",
+		"summary": "Send enriched rows from a Clay table straight into a list.",
+		"website": "https://www.clay.com",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [],
+		"status": "planned"
+	},
+	{
+		"id": "cognism",
+		"name": "Cognism",
+		"category": "data",
+		"summary": "Search Cognism's European-strong contact data.",
+		"website": "https://www.cognism.com",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"data.search_people",
+			"data.enrich_person"
+		],
+		"status": "planned"
+	},
+	{
+		"id": "contactout",
+		"name": "ContactOut",
+		"category": "data",
+		"summary": "Emails and phones from LinkedIn profiles.",
+		"website": "https://contactout.com",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"data.enrich_person",
+			"data.find_email"
+		],
+		"status": "planned"
+	},
+	{
+		"id": "dropcontact",
+		"name": "Dropcontact",
+		"category": "data",
+		"summary": "GDPR-friendly email finding and enrichment.",
+		"website": "https://www.dropcontact.com",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"data.find_email"
+		],
+		"status": "planned"
+	},
+	{
+		"id": "fullenrich",
+		"name": "FullEnrich",
+		"category": "data",
+		"summary": "Waterfall email and phone finding across many sources.",
+		"website": "https://fullenrich.com",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"data.find_email"
+		],
+		"status": "planned",
+		"dark_logo": true
+	},
+	{
+		"id": "icypeas",
+		"name": "Icypeas",
+		"category": "data",
+		"summary": "Low-cost email finding and verification.",
+		"website": "https://www.icypeas.com",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"data.find_email"
+		],
+		"status": "planned"
+	},
+	{
+		"id": "lusha",
+		"name": "Lusha",
+		"category": "data",
+		"summary": "Find emails and phone numbers with your Lusha credits.",
+		"website": "https://www.lusha.com",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"data.enrich_person",
+			"data.find_email"
+		],
+		"status": "planned"
+	},
+	{
+		"id": "rocketreach",
+		"name": "RocketReach",
+		"category": "data",
+		"summary": "Search people and reveal emails and phones.",
+		"website": "https://rocketreach.co",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"data.search_people",
+			"data.enrich_person"
+		],
+		"status": "planned"
+	},
+	{
+		"id": "wiza",
+		"name": "Wiza",
+		"category": "data",
+		"summary": "Emails and phones for LinkedIn and Sales Navigator lists.",
+		"website": "https://wiza.co",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"data.enrich_person",
+			"data.find_email"
+		],
+		"status": "planned"
+	},
+	{
+		"id": "zoominfo",
+		"name": "ZoomInfo",
+		"category": "data",
+		"summary": "Search ZoomInfo contacts and companies with your own licence.",
+		"website": "https://www.zoominfo.com",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"data.search_people",
+			"data.enrich_person"
+		],
+		"status": "planned"
+	},
+	{
+		"id": "route53",
+		"name": "Amazon Route 53",
+		"category": "dns",
+		"summary": "Set SPF, DKIM, DMARC and tracking records automatically.",
+		"website": "https://aws.amazon.com/route53/",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [],
+		"status": "planned"
+	},
+	{
+		"id": "cloudflare",
+		"name": "Cloudflare",
+		"category": "dns",
+		"summary": "Set SPF, DKIM, DMARC and tracking records automatically.",
+		"website": "https://www.cloudflare.com",
+		"auth_methods": [
+			"oauth2",
+			"api_key"
+		],
+		"capabilities": [],
+		"status": "planned"
+	},
+	{
+		"id": "godaddy",
+		"name": "GoDaddy",
+		"category": "dns",
+		"summary": "Set SPF, DKIM, DMARC and tracking records automatically.",
+		"website": "https://www.godaddy.com",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [],
+		"status": "planned"
+	},
+	{
+		"id": "namecheap",
+		"name": "Namecheap",
+		"category": "dns",
+		"summary": "Set SPF, DKIM, DMARC and tracking records automatically.",
+		"website": "https://www.namecheap.com",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [],
+		"status": "planned"
+	},
+	{
+		"id": "bounceban",
+		"name": "BounceBan",
+		"category": "email_verification",
+		"summary": "Verifies catch-all addresses other tools mark unknown.",
+		"website": "https://bounceban.com",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"verify"
+		],
+		"status": "planned"
+	},
+	{
+		"id": "briteverify",
+		"name": "BriteVerify",
+		"category": "email_verification",
+		"summary": "Email verification from Validity.",
+		"website": "https://www.validity.com/briteverify/",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"verify"
+		],
+		"status": "planned"
+	},
+	{
+		"id": "cheapverifier",
+		"name": "Cheap Verifier",
+		"category": "email_verification",
+		"summary": "Low-cost verification from the Cheap Inboxes team.",
+		"website": "https://cheapinboxes.com",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"verify"
+		],
+		"status": "planned"
+	},
+	{
+		"id": "clearout",
+		"name": "Clearout",
+		"category": "email_verification",
+		"summary": "Real-time and bulk email verification.",
+		"website": "https://clearout.io",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"verify"
+		],
+		"status": "planned"
+	},
+	{
+		"id": "kickbox",
+		"name": "Kickbox",
+		"category": "email_verification",
+		"summary": "Email verification with a Sendex quality score.",
+		"website": "https://kickbox.com",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"verify"
+		],
+		"status": "planned"
+	},
+	{
+		"id": "scrubby",
+		"name": "Scrubby",
+		"category": "email_verification",
+		"summary": "Catch-all and unknown address validation.",
+		"website": "https://scrubby.io",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"verify"
+		],
+		"status": "planned"
+	},
+	{
+		"id": "infraforge",
+		"name": "Infraforge",
+		"category": "mailbox_provider",
+		"summary": "Unconfirmed: no public API checked yet. Upload its mailboxes by SMTP and IMAP; they are watched as a sending server.",
+		"website": "https://www.infraforge.ai",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [],
+		"status": "planned"
+	},
+	{
+		"id": "mailreef",
+		"name": "Mailreef",
+		"category": "mailbox_provider",
+		"summary": "Unconfirmed: no public API checked yet. Upload its mailboxes by SMTP and IMAP; they are watched as a sending server.",
+		"website": "https://mailreef.com",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [],
+		"status": "planned"
+	},
+	{
+		"id": "plusvibe",
+		"name": "PlusVibe",
+		"category": "sequencer",
+		"summary": "Move campaigns, leads and mailboxes over from PlusVibe.",
+		"website": "https://plusvibe.ai",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [],
+		"status": "planned"
+	},
+	{
+		"id": "commonroom",
+		"name": "Common Room",
+		"category": "signals",
+		"summary": "Community, product and website signals in one place.",
+		"website": "https://www.commonroom.io",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [],
+		"status": "planned",
+		"dark_logo": true
+	},
+	{
+		"id": "crunchbase",
+		"name": "Crunchbase",
+		"category": "signals",
+		"summary": "Funding rounds and acquisitions as reasons to reach out.",
+		"website": "https://www.crunchbase.com",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [],
+		"status": "planned"
+	},
+	{
+		"id": "predictleads",
+		"name": "PredictLeads",
+		"category": "signals",
+		"summary": "Hiring, news and technology changes at target companies.",
+		"website": "https://predictleads.com",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [],
+		"status": "planned"
+	},
+	{
+		"id": "rb2b",
+		"name": "RB2B",
+		"category": "signals",
+		"summary": "People visiting your website, by name.",
+		"website": "https://www.rb2b.com",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [],
+		"status": "planned"
+	},
+	{
+		"id": "theirstack",
+		"name": "TheirStack",
+		"category": "signals",
+		"summary": "Companies hiring for roles that signal a need, and the tech they use.",
+		"website": "https://theirstack.com",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [],
+		"status": "planned"
+	},
+	{
+		"id": "trigify",
+		"name": "Trigify",
+		"category": "signals",
+		"summary": "LinkedIn engagement and job-change signals.",
+		"website": "https://trigify.io",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [],
+		"status": "planned"
+	},
+	{
+		"id": "usergems",
+		"name": "UserGems",
+		"category": "signals",
+		"summary": "Past customers and champions who changed jobs.",
+		"website": "https://www.usergems.com",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [],
+		"status": "planned"
+	}
+]

@@ -7,19 +7,20 @@ Every API call made in a workspace is in its request log: calls from the web app
 
 ## In the app
 
-Go to **Settings → Logs** (owners and admins).
+Open **Logs** in the sidebar (owners and admins).
 
-- **Search** the path, operation, error code, request ID or MCP tool. Paste the `request_id` from an error message to find that call.
+- **Search** the path, operation, error code, request ID or MCP tool. Paste the `request_id` from an error message to find that call. Press `/` to jump to the search box.
 - **Filter** by time range (15 minutes to 30 days), source (web app, API, MCP, missions, CLI, SDK), status (`2xx`, `4xx`, `5xx`, or a code such as `429`) and level: **Info** worked, **Warning** was refused (a `4xx`, such as bad input or a missing scope), **Error** broke (a `5xx`). The brand picker narrows logs to calls about one brand.
+- **The chart** shows calls over the time range by level, with the share that failed. Click a bar to zoom in to that stretch of time.
 - **Live** shows new calls at the top every two seconds.
-- **Open a call** to see its request ID, route, source, MCP tool, who made it and what it changed (the [audit log](/docs/guides/workspaces-and-access/) entries it wrote). Click a value, such as the operation or the token, to show only calls like it.
+- **Open a call** to see why it failed and what to do: its error code and what it means, the field a bad request named or the scope a refused call was missing, and whether retrying can work. It also shows the request ID, route, source, MCP tool, who made it and what it changed (the [audit log](/docs/guides/workspaces-and-access/) entries it wrote). Click a value, such as the operation, the error or the token, to show only calls like it. Press ↑ and ↓ to step through calls, and copy a call's details for a bug report.
 - **Share** copies a link to the view with its filters, for anyone in the workspace who can see logs.
 - **Export** downloads the filtered calls as CSV, or as JSON with one call per line.
-- **Background jobs** lists syncs, imports, DNS checks and other work running in the background, and why any failed.
+- **Background jobs** lists syncs, imports, DNS checks and other work running in the background. Open a failed job to read its whole error.
 
 ## What is kept, and for how long
 
-Logs keep only what describes a call: the method, path, operation, status, duration, error code, source, client, MCP tool, agent app, mission, who made it, the brand and project it was about, the request ID and the **names** of query parameters. They never keep request or response bodies, query values (so searches and email addresses stay out), headers, API keys or IP addresses.
+Logs keep only what describes a call: the method, path, operation, status, duration, error code (with the field or scope it named), source, client, MCP tool, agent app, mission, who made it, the brand and project it was about, the request ID and the **names** of query parameters. They never keep request or response bodies, query values (so searches and email addresses stay out), headers, API keys or IP addresses.
 
 Logs are kept for **30 days**. On a self-hosted server, set `OUTFLARE_LOG_RETENTION_DAYS` to change that (see [Configuration](/docs/self-hosting/configuration/)).
 

@@ -73,7 +73,11 @@ export default defineConfig({
 						{ label: 'Overview', link: '/docs/api/' },
 						{ label: 'Authentication', link: '/docs/api/authentication/' },
 						{ label: 'Webhooks', link: '/docs/api/webhooks/' },
+<<<<<<< HEAD
 						{ label: 'Logs', link: '/docs/api/logs/' },
+=======
+						{ label: 'Test workspaces', link: '/docs/api/sandbox/' },
+>>>>>>> origin/main
 						{ label: 'Endpoint reference', link: '/docs/api/reference/' },
 					],
 				},
