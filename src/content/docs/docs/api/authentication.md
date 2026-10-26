@@ -39,7 +39,7 @@ See [Workspaces and access](/docs/guides/workspaces-and-access/#api-tokens) for 
 
 ## Session cookie
 
-The web app signs people in with `POST /v1/auth/login` (email and password), which sets the `outflare_session` cookie. The SDK uses the cookie automatically in the browser when you do not give it a token. Ten failed attempts for one email lock it for 15 minutes. `POST /v1/auth/logout` ends the session.
+The web app signs people in with `POST /v1/auth/login` (email and password), which sets the `outflare_session` cookie. The SDK uses the cookie automatically in the browser when you do not give it a token. Ten failed attempts for one email, or 100 from one network, in 15 minutes are refused until the window passes (`429` with `Retry-After`). `POST /v1/auth/logout` ends the session.
 
 ## First-run setup
 
