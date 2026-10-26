@@ -49,6 +49,7 @@ If the server has no OAuth app for a provider, the dialog says so and asks for t
 | Google Calendar | Google | |
 | Outlook Calendar | Microsoft | |
 | HubSpot | HubSpot | Private app token |
+| Attio | Attio | Access token |
 | PostHog | PostHog Cloud, no app to register | Personal API key (also self-hosted) |
 | Calendly | Calendly | Personal access token |
 | Apollo | Apollo | Master API key |
@@ -73,6 +74,7 @@ Signing in needs an app registered with the provider. Self-hosters set `CONNECTO
 | Provider | Register the app at | Variables |
 | --- | --- | --- |
 | HubSpot | developers.hubspot.com, Apps, Create app | `CONNECTOR_HUBSPOT_CLIENT_ID`, `_CLIENT_SECRET` |
+| Attio | build.attio.com, create an app with read access (scopes are set on the app) | `CONNECTOR_ATTIO_CLIENT_ID`, `_CLIENT_SECRET` |
 | Calendly | developer.calendly.com, scopes `users:read` and `scheduled_events:read` | `CONNECTOR_CALENDLY_CLIENT_ID`, `_CLIENT_SECRET` |
 | Apollo | Apollo, Settings, Integrations, API, OAuth registration | `CONNECTOR_APOLLO_CLIENT_ID`, `_CLIENT_SECRET` |
 | Ahrefs | Ahrefs, Account settings, Ahrefs Connect (Ahrefs approves production access) | `CONNECTOR_AHREFS_CLIENT_ID`, `_CLIENT_SECRET` |
