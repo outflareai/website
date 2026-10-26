@@ -5,9 +5,11 @@ sidebar:
   order: 13
 ---
 
-<span class="pill shipped">Shipped</span> Sites, ownership checks, crawls and the audit, through the API and agents. The SEO pages in the app and the fixes list come next.
+<span class="pill shipped">Shipped</span> Sites, ownership checks, crawls, the audit and the fixes list, in the app, through the API and for agents.
 
 Outflare reads your own websites with its crawler, [OutflareBot](/bot/), and records every page it finds: its HTTP status, where redirects lead, which pages ask not to be indexed, and which pages your robots.txt keeps crawlers away from. It needs no connector or API key. SEO tools like [DataForSEO and Ahrefs](/docs/integrations/seo/) add what others see of your site, and are separate.
+
+In the app, open **SEO** in the sidebar. **Site audits** lists your sites with their health and latest crawl, and opens each one's issues, ownership proof, crawl history and settings. **Fixes** is the fixes list below. **Rankings & backlinks** is the [SEO tools](/docs/integrations/seo/) page.
 
 ## Add a site
 
@@ -60,6 +62,15 @@ Issues are grouped by **URL template**, the path with the parts that change betw
 
 Duplicates count only among pages meant to be indexed: a page marked `noindex`, or whose canonical points elsewhere, is a declared copy. [The engine docs](https://github.com/outflareai/outflare/blob/main/docs/crawler.md#the-audit) list every rule id.
 
+## The fixes list
+
+Each audit's issues go on the workspace's **fixes list**: one list of work for everyone in the workspace and their agents, so nothing is tracked in two places. A site audit adds one fix per rule and URL template, such as "pages in /blog/* have no meta description", with how many pages are left.
+
+- Take a fix, mark it in progress, done or ignored (when the issue is intended), and leave a note.
+- The next complete crawl checks a fix marked done. If the issue is gone, the crawl confirms it. If it is still there, or comes back later, the fix opens again.
+- Fixes follow their site's brand, so a brand filter shows that brand's work.
+- On the **Fixes** page, the list starts on what is still to do. Filter by status, severity or site, and open a fix to see why it matters, how to fix it and the pages it covers.
+
 ## Pages your firewall blocks, and pages built by JavaScript
 
 Two kinds of page can't be read as served. A firewall or bot protection (Cloudflare, Akamai, DataDome and the like) can answer OutflareBot with a `403` or a challenge page instead of your page. And some sites send an almost empty page and build it in the browser with JavaScript (React, Vue, Angular and the like), so read as served it has no title, words or links.
@@ -86,8 +97,11 @@ curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/workspaces/$W
 curl -H "Authorization: Bearer $TOKEN" https://app.outflare.ai/v1/workspaces/$WS/crawls/$CRAWL/pages/$PAGE
 curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/workspaces/$WS/crawls/$CRAWL/issues?severity=error"
 curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/workspaces/$WS/crawls/$CRAWL/issues/link_broken?template=/blog/*"
+curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/workspaces/$WS/fixes?subject_id=$SITE&status=open"
+curl -X PATCH -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"status": "in_progress", "assignee_id": "me"}' https://app.outflare.ai/v1/workspaces/$WS/fixes/$FIX
 ```
 
-Reading needs the `seo.read` scope; adding sites, checking ownership and crawling needs `seo.manage`. Agents use the MCP tools `add_seo_site`, `verify_seo_site`, `start_crawl`, `get_crawl`, `list_crawl_pages`, `get_crawl_page`, `list_crawl_issues` and `get_crawl_issue` (see [MCP](/docs/agents/mcp/)).
+Reading needs the `seo.read` scope; adding sites, checking ownership and crawling needs `seo.manage`. Agents use the MCP tools `add_seo_site`, `verify_seo_site`, `start_crawl`, `get_crawl`, `list_crawl_pages`, `get_crawl_page`, `list_crawl_issues`, `get_crawl_issue`, `list_fixes` and `update_fix` (see [MCP](/docs/agents/mcp/)).
 
 On a self-hosted server, OutflareBot only visits public sites. Set `OUTFLARE_CRAWL_ALLOW_PRIVATE=true` to audit an intranet or a site in development.

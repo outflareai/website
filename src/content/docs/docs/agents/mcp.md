@@ -13,7 +13,7 @@ There are two ways in. The MCP server is the quickest one for Claude, ChatGPT, C
 
 ## The MCP server <span class="pill shipped">Shipped</span>
 
-[`@outflare/mcp`](https://github.com/outflareai/outflare/tree/main/mcp) is an [MCP](https://modelcontextprotocol.io) server that gives an agent 262 tools over the API (3 more in agency mode): run [missions](/docs/agents/missions/) toward a goal with approvals, read and update the brief of the project it works on, check sending domains and mailbox warm-up, import leads, check them against the suppression list, build, preview and start sequences, see and change which mailboxes each sequence sends from, and read and answer replies.
+[`@outflare/mcp`](https://github.com/outflareai/outflare/tree/main/mcp) is an [MCP](https://modelcontextprotocol.io) server that gives an agent 272 tools over the API (3 more in agency mode): run [missions](/docs/agents/missions/) toward a goal with approvals, read and update the brief of the project it works on, check sending domains and mailbox warm-up, import leads, check them against the suppression list, build, preview and start sequences, see and change which mailboxes each sequence sends from, and read and answer replies.
 
 It calls the same API with a scoped token, so:
 
@@ -75,6 +75,8 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | Tool | What it does | Changes data |
 | --- | --- | --- |
 | `get_context` | Start here: what Outflare knows about the company, its memories and projects, and what is blocked. See [Memory and status](/docs/agents/memory/) | |
+| `get_onboarding` | The [Get started](/docs/guides/getting-started/) steps (website, goal, AI, tools, first mission, then team), each done or skipped, with the tool that does it | |
+| `update_onboarding` | Pick what to do first, skip Get started steps, bring them back, or close the walk-through in the app | Yes |
 | `get_status` | Everything stopping the workspace, worst first, with the tool that fixes each and who must act | |
 | `list_memories` | Search the preferences, decisions and facts people and agents saved | |
 | `update_context`, `remember`, `update_memory`, `forget` | Save the company context, remember something lasting, correct or forget a memory | Yes |
@@ -107,7 +109,8 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `preview_sequence` | Render every step for one lead, with missing variables | |
 | `list_enrollments` | The leads in a sequence and where each one is | |
 | `list_messages` | Every send attempt, including ones the policy blocked and why | |
-| `list_inbox`, `get_inbox_message` | Replies, and the whole conversation with a lead | |
+| `list_inbox`, `get_inbox_message` | Replies from every mailbox and connected sequencer, filtered by label group (hot, later, closed, automatic), source, tag or review, and the whole conversation with a lead | |
+| `list_inbox_tags`, `list_inbox_views` | Reply tags with counts, and the inbox views people saved | |
 | `list_webhook_event_types`, `list_webhooks`, `list_webhook_deliveries` | The events webhooks can send; the workspace's webhooks and their health; what was sent to one and how the receiver answered | |
 | `list_events` | What happened since the last call: replies, bounces, opt-outs, paused mailboxes, held mission writes. Keep `next_after` and pass it back as `after` | |
 | `list_logs`, `get_log` | Every API call in the workspace with status, duration, error code and who made it; filter by level, source, operation, tool and time, or look one up by the `request_id` an error returned. Needs `audit.read`. See [Logs](/docs/api/logs/) | |
@@ -186,7 +189,9 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `get_mailbox_health`, `update_mailbox_health_settings` | Every mailbox graded worst first with the fix, and when mailboxes pause automatically | Yes |
 | `preview_import`, `start_import`, `get_import` | Bring campaigns, leads and sending accounts over from Instantly or Smartlead: look first, import, check progress | Yes |
 | `get_report` | Sends, contacts, bounces, replies, opt-outs and warm-up placement for a period | |
-| `list_members`, `triage_inbox_message` | Workspace members; sort, assign, snooze or close a reply | Yes |
+| `list_members`, `triage_inbox_message` | Workspace members; label, assign, snooze, tag, close or flag a reply for review | Yes |
+| `create_inbox_tag`, `update_inbox_tag`, `delete_inbox_tag` | Add, rename, recolour or delete a reply tag | Yes |
+| `create_inbox_view`, `update_inbox_view`, `delete_inbox_view` | Save, change or delete a shared set of inbox filters | Yes |
 | `list_tracking_domains`, `add_tracking_domain`, `check_tracking_domain` | Optional own domain for unsubscribe and click links, verified by CNAME | Yes |
 | `list_analytics`, `get_analytics_summary` | Connected website analytics tools, and traffic across all of them for a period | |
 | `get_analytics_report` | One tool's traffic, pages, sources, search queries or events report | |
@@ -200,6 +205,8 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `list_seo_sites`, `add_seo_site`, `update_seo_site`, `delete_seo_site` | The websites OutflareBot audits: ownership, crawl settings and limits, latest crawl. See [Crawl and audit your sites](/docs/guides/site-audits/) | Yes |
 | `verify_seo_site`, `start_crawl`, `get_crawl`, `list_crawls`, `stop_crawl` | Check the DNS record, meta tag or file that proves ownership; crawl a site and follow the crawl | Yes |
 | `list_crawl_pages`, `get_crawl_page` | Every URL a crawl found: HTTP status, redirects, noindex, nofollow, robots.txt blocks, title, description, canonical, h1, hreflang, structured data, word count, links in and out | |
+| `list_crawl_issues`, `get_crawl_issue` | A crawl's audit: the rules its pages break, by URL template, with why and how to fix each, and the pages behind one rule | |
+| `list_fixes`, `update_fix` | The workspace's shared fixes list (site audits' fixes so far): take a fix, mark it done (the next crawl checks), ignore it, or leave a note | Yes |
 | `list_clients`, `use_client`, `create_client` | Agency mode only (`OUTFLARE_AGENCY`): every client with this week's numbers, switch client, add a client | Yes |
 
 The tools that make email go out, the ones that can spend data provider credits (marked *provider*), and `approve_infra_plan`, which spends money, are marked as reaching the outside world in their MCP annotations, so clients that support it can ask you before running them.
