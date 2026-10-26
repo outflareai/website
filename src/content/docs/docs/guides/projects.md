@@ -100,6 +100,8 @@ An API token can be bound to one project when you create it, with `project_id`. 
 - It sees only its own project: `GET /projects` lists just that one, and other projects answer 404.
 - It can read and edit its project and brief (scopes `projects.read` and `projects.manage`), but not create, delete or move records in or out of projects.
 - It can read its project's sending domains, mailboxes, sequences and their leads. Records outside the project answer 404, and asking for `?project_id=none` or another project does too.
+- With `leads.manage` it builds and runs its project's [lead lists](/docs/guides/lead-lists/); new lists go into its project.
+- With `sequences.manage` it creates, edits, starts, pauses and deletes its project's sequences, changes their steps and adds leads. Its new sequences always belong to its project and it can't move one out. It adds only leads on its project's lists: a list from elsewhere is refused, and lead ids from outside its lists are skipped.
 - Every other endpoint refuses it with a 403. Endpoints open to project tokens as they learn to stay inside one project, so a project token can never reach the rest of the workspace by accident.
 
 A project with live tokens can't be deleted until you revoke them, so no agent is left holding a token for a project that no longer exists.

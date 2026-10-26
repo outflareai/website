@@ -74,16 +74,35 @@ try {
 | `fetch` | A custom `fetch` implementation, for tests or older runtimes. |
 | `mission` | Act inside an agent mission: every call carries `Outflare-Mission`, and writes may come back held. |
 | `missions` | `true` for a client that sets the mission header itself (as the MCP server does). Types it like one with `mission`. |
+| `maxRetries` | How many times to retry a network error, `429`, `502`, `503` or `504`. Default 3; `0` turns retries off. |
+| `clientName` | Names your app in the `Outflare-Client` header. Default `sdk-ts/<version>`. |
 
-## Safe retries
+## Retries and idempotency
 
-Give a write an `Idempotency-Key` and retry it freely: a repeat with the same key within 24 hours gets the first answer back instead of running again. See [Safe retries](/docs/api/#safe-retries).
+The client retries a call that failed on the network or was answered `429`, `502`, `503` or `504`, up to `maxRetries` times. It waits as long as `Retry-After` asks, up to a minute, or else backs off from half a second with jitter.
+
+Every write carries an `Idempotency-Key`, the same one on each retry, so a retry after a timeout gets the first answer back instead of creating a second lead. To make a whole job safe to run twice, pass your own key; see [Safe retries](/docs/api/#safe-retries):
 
 ```ts
-const key = crypto.randomUUID();
-const send = () => gtm.POST("/v1/workspaces/{ws}/spend", { params: { path: { ws }, header: { "Idempotency-Key": key } }, body: spend });
-const res = await send().catch(() => send()); // a network error on the first try is safe to retry
+const key = `spend-${invoice.id}`;
+ok(await gtm.POST("/v1/workspaces/{ws}/spend", { params: { path: { ws }, header: { "Idempotency-Key": key } }, body: spend }));
 ```
+
+## Paging and fields
+
+`paginate()` yields every item of a paged list, following `next_cursor`. Pass a function that makes the call for a cursor:
+
+```ts
+import { paginate } from '@outflare/sdk';
+
+for await (const lead of paginate((cursor) =>
+	gtm.GET('/v1/workspaces/{ws}/leads', { params: { path: { ws }, query: { q: 'acme', cursor, fields: ['email'] } } }),
+)) {
+	console.log(lead.email);
+}
+```
+
+`fields` trims each item to the fields you read (and `id`). See [Choose the fields](/docs/api/#choose-the-fields).
 
 ## Missions
 
@@ -129,4 +148,4 @@ Common schemas are exported as types, including `Workspace`, `WorkspaceStats`, `
 
 ## Other languages
 
-Generate a client from your instance's `/v1/openapi.yaml` with any OpenAPI 3.1 generator, such as [openapi-generator](https://openapi-generator.tech/) for Python, Go or Java.
+Python has its own [SDK](/docs/sdk/python/). For other languages, generate a client from your instance's `/v1/openapi.yaml` with any OpenAPI 3.1 generator, such as [openapi-generator](https://openapi-generator.tech/) for Go or Java.

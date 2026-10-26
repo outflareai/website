@@ -1,3 +1,5 @@
+<a href="https://outflare.ai"><picture><source media="(prefers-color-scheme: dark)" srcset="https://outflare.ai/brand/svg/outflare-lockup-white.svg"><img src="https://outflare.ai/brand/svg/outflare-lockup-black.svg" alt="Outflare" width="140" height="28"></picture></a>
+
 # Outflare website
 
 **Live at [outflare.ai](https://outflare.ai)** · [Docs](https://outflare.ai/docs/) · [Engine repo](https://github.com/outflareai/outflare) · [hello@outflare.ai](mailto:hello@outflare.ai)
@@ -19,14 +21,11 @@ npm run preview    # serve dist/
 
 Canonical URLs, the sitemap and `llms.txt` use `https://outflare.ai` (no `www`). Set `SITE_URL` only to build for another address, such as a preview.
 
-`PUBLIC_STATS_URL` points the [usage stats page](src/pages/stats.astro) at Outflare Cloud's public endpoint (`https://<cloud host>/v1/cloud/stats/public`). Visitors' browsers read it directly, so the page stays current without a rebuild. Without it, `/stats/` says there are no numbers yet.
-
 ## Where things are
 
 | Path | What |
 | --- | --- |
 | `src/pages/index.astro` | Marketing home page |
-| `src/pages/stats.astro` | Public usage stats (`/stats/`), read live from Outflare Cloud |
 | `src/content/docs/docs/` | Docs pages in Markdown and MDX, served under `/docs/` |
 | `src/pages/docs/api/reference.astro` | Endpoint reference, generated from `spec/openapi.yaml` |
 | `src/data/project.ts` | The site URL, contact email, GitHub repo links, and roadmap and feature status |
@@ -62,7 +61,7 @@ Analytics are off unless the build sets their IDs, so forks and local builds sen
 
 Cloudflare Web Analytics needs no code: enable it under the Pages project's Metrics tab and Pages injects it. The tags themselves live in `src/components/Analytics.astro`, used by both the marketing layout and the docs head.
 
-With either tag on, clicks on sign-up (`sign_up_click`), sign-in (`sign_in_click`), GitHub (`github_click`) and contact (`contact_click`) links, and script errors (`site_error`), are sent to GA4 and PostHog by one helper, `window.outflareTrack`. In GA4, mark `sign_up_click` as a key event once it arrives. [`AGENTS.md`](AGENTS.md) has the rule for new events.
+With either tag on, clicks on sign-up (`sign_up_click`), sign-in (`sign_in_click`), GitHub (`github_click`) and contact (`contact_click`) links, brand page downloads (`brand_kit_download`, `brand_asset_download`) and colour copies (`brand_color_copy`), and script errors (`site_error`), are sent to GA4 and PostHog by one helper, `window.outflareTrack`. In GA4, mark `sign_up_click` as a key event once it arrives. [`AGENTS.md`](AGENTS.md) has the rule for new events.
 
 ## Keeping the docs honest
 

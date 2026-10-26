@@ -118,15 +118,25 @@ paths:
                     oneOf:
                       - type: "null"
                       - type: object
-                        required: [id, name, kind, workspace_id, agency_id, project_id, scopes, expires_at]
+                        required: [id, name, kind, workspace_id, workspace, agency_id, project_id, scopes, expires_at]
                         properties:
                           id: { type: string, format: uuid }
                           name: { type: string }
                           kind: { type: string, enum: [workspace, agency] }
                           workspace_id: { type: [string, "null"], format: uuid }
+                          workspace:
+                            description: The token's workspace, with its slug and name; null for an agency token.
+                            oneOf:
+                              - type: "null"
+                              - type: object
+                                required: [id, slug, name]
+                                properties:
+                                  id: { type: string, format: uuid }
+                                  slug: { type: string, example: acme }
+                                  name: { type: string, example: Acme Outbound }
                           agency_id: { type: [string, "null"], format: uuid }
                           project_id: { type: [string, "null"], format: uuid }
-                          scopes: { type: array, items: { type: string } }
+                          scopes: { type: array, items: { type: string }, description: "As granted. Any scope in an area includes reading it: leads.manage can also list leads." }
                           expires_at: { type: [string, "null"], format: date-time }
                   user:
                     oneOf:
@@ -272,7 +282,9 @@ paths:
     post:
       operationId: login
       summary: Sign in with email and password
-      description: Sets a session cookie. Ten failed attempts for one email lock it for 15 minutes.
+      description: |
+        Sets a session cookie. Ten failed attempts for one email, or 100 from one network (an IPv6 /64), in 15 minutes
+        are refused with 429 and `Retry-After`. Accepting an invite with an existing account's password counts too.
       tags: [access]
       security: []
       requestBody:
@@ -304,8 +316,9 @@ paths:
       summary: Email a password reset link
       description: |
         Sends a one-time link (valid an hour) to `<PUBLIC_URL>/reset-password#<token>`, through the account email service
-        (see `account_email` in /v1/meta). The answer is the same whether or not the email has an account. Ten requests
-        for one email, or from one network, in 15 minutes are refused.
+        (see `account_email` in /v1/meta). The answer is the same whether or not the email has an account. An account gets
+        at most one link a minute, five an hour and ten a day; asks past that answer the same and send nothing. Ten
+        requests for one email, or 20 from one network, in 15 minutes are refused with 429.
       tags: [access]
       security: []
       requestBody:
@@ -373,7 +386,10 @@ paths:
       operationId: resendEmailVerification
       x-outflare-access: { signed_in: true }
       summary: Send the confirmation link again
-      description: Replaces any earlier link. Answers 200 without sending when the address is already confirmed.
+      description: |
+        Replaces any earlier link. Answers 200 without sending when the address is already confirmed. One person gets at
+        most one link a minute, five an hour and ten a day, and one network at most 20 in 15 minutes; past that it answers
+        429 with `Retry-After`, sending nothing. `GET /v1/me` has `email_resend_after` so a button can count down.
       tags: [access]
       responses:
         "200":
@@ -575,6 +591,7 @@ paths:
         "200": { description: Joined; a session cookie is set. }
         "401": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
+        "429": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
   /v1/instance/telemetry:
     get:
@@ -661,6 +678,9 @@ paths:
                       has_password:
                         type: boolean
                         description: False for accounts made with Google, until they set a password with a reset link.
+                      email_resend_after:
+                        type: integer
+                        description: Seconds until another confirmation email can be sent (`POST /v1/me/email-verification`); 0 when one can be sent now or the address is confirmed.
                   workspaces:
                     type: array
                     description: Workspaces the user is a member of, plus every client workspace of their agencies, each with their strongest role.
@@ -1331,6 +1351,7 @@ paths:
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
         - { name: before, in: query, schema: { type: integer } }
         - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
       responses:
         "200":
           description: Events.
@@ -1360,6 +1381,7 @@ paths:
       parameters:
         - { name: after, in: query, description: "An event id (evt_...) from next_after, or latest to start from now (no events, and next_after set to the newest).", schema: { type: string }, example: evt_48213 }
         - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
         - { name: types, in: query, description: 'Comma-separated event types or wildcards ("lead.*"). Default: every type.', schema: { type: string }, example: "lead.replied,mailbox.*" }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
       responses:
@@ -1394,6 +1416,7 @@ paths:
         - { name: kind, in: query, description: "A job kind, such as analytics.sync.", schema: { type: string } }
         - { name: before, in: query, description: "A job id (job_...) from next_before.", schema: { type: string } }
         - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
       responses:
         "200":
@@ -1613,6 +1636,7 @@ paths:
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
         - { name: before, in: query, schema: { type: integer } }
         - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
         - { name: status, in: query, schema: { $ref: "#/components/schemas/WebhookDeliveryStatus" } }
         - { name: event_type, in: query, schema: { type: string }, example: lead.replied }
       responses:
@@ -2360,6 +2384,7 @@ paths:
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
         - { name: after, in: query, description: "next_after from the previous page.", schema: { type: string } }
         - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
       responses:
         "200":
           description: Leads.
@@ -2666,6 +2691,7 @@ paths:
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
         - { name: offset, in: query, schema: { type: integer, minimum: 0, default: 0 } }
         - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
       responses:
         "200":
           description: Members.
@@ -2908,6 +2934,7 @@ paths:
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
         - { name: after, in: query, description: "next_after from the previous page.", schema: { type: string } }
         - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
       responses:
         "200":
           description: Entries.
@@ -3091,7 +3118,7 @@ paths:
         default: { $ref: "#/components/responses/Error" }
     post:
       operationId: createSequence
-      x-outflare-access: { scope: sequences.manage }
+      x-outflare-access: { scope: sequences.manage, project_tokens: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Create a sequence
       description: |
@@ -3099,6 +3126,7 @@ paths:
         nothing until its status is set to `active`. Defaults: UTC,
         Monday to Friday, 09:00 to 17:00, no daily cap on new leads, stop on
         reply.
+        A project token's sequences always belong to its project.
       tags: [sequences]
       requestBody:
         required: true
@@ -3143,7 +3171,7 @@ paths:
         default: { $ref: "#/components/responses/Error" }
     patch:
       operationId: updateSequence
-      x-outflare-access: { scope: sequences.manage }
+      x-outflare-access: { scope: sequences.manage, project_tokens: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Change a sequence's settings, or activate, pause or archive it
       description: |
@@ -3176,7 +3204,7 @@ paths:
         default: { $ref: "#/components/responses/Error" }
     delete:
       operationId: deleteSequence
-      x-outflare-access: { scope: sequences.manage }
+      x-outflare-access: { scope: sequences.manage, project_tokens: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Delete a sequence that is not active
       description: "Scope: sequences.manage. Sent messages are kept in the message log."
@@ -3193,7 +3221,7 @@ paths:
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     put:
       operationId: replaceSequenceSteps
-      x-outflare-access: { scope: sequences.manage }
+      x-outflare-access: { scope: sequences.manage, project_tokens: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Replace a sequence's steps
       description: |
@@ -3230,7 +3258,7 @@ paths:
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: previewSequence
-      x-outflare-access: { scope: sequences.read }
+      x-outflare-access: { scope: sequences.read, project_tokens: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Render every step for one lead
       description: |
@@ -3287,6 +3315,7 @@ paths:
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
         - { name: after, in: query, description: "next_after from the previous page.", schema: { type: string } }
         - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
       responses:
         "200":
           description: Enrollments.
@@ -3304,7 +3333,7 @@ paths:
         default: { $ref: "#/components/responses/Error" }
     post:
       operationId: enrollLeads
-      x-outflare-access: { scope: sequences.manage }
+      x-outflare-access: { scope: sequences.manage, project_tokens: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Add leads to a sequence
       description: |
@@ -3312,6 +3341,8 @@ paths:
         leads are skipped, and so are leads active in another sequence
         unless `skip_active_elsewhere` is false. Adding a lead twice does
         nothing.
+        A project token can only use `list_id` for one of its project's
+        lists, and `lead_ids` reach only leads on its project's lists.
       tags: [sequences]
       requestBody:
         required: true
@@ -3350,7 +3381,7 @@ paths:
       - { name: eid, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: stopEnrollment
-      x-outflare-access: { scope: sequences.manage }
+      x-outflare-access: { scope: sequences.manage, project_tokens: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Stop sending to one lead in a sequence
       description: "Scope: sequences.manage"
@@ -3379,6 +3410,7 @@ paths:
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
         - { name: before, in: query, description: "next_before from the previous page.", schema: { type: string, format: date-time } }
         - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
       responses:
         "200":
           description: Messages.
@@ -3466,6 +3498,7 @@ paths:
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
         - { name: before, in: query, description: "next_before from the previous page.", schema: { type: string, format: date-time } }
         - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
       responses:
         "200":
           description: Messages.
@@ -3750,6 +3783,7 @@ paths:
       - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 1000, default: 100 } }
       - { name: offset, in: query, schema: { type: integer, minimum: 0, default: 0 } }
       - { $ref: "#/components/parameters/Cursor" }
+      - { $ref: "#/components/parameters/Fields" }
     get:
       operationId: listSupplierMailboxes
       x-outflare-access: { scope: mailboxes.read }
@@ -3985,6 +4019,7 @@ paths:
             image/svg+xml:
               schema: { type: string }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/connectors:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
@@ -4310,7 +4345,7 @@ paths:
       operationId: listAnalyticsSites
       x-outflare-access: { scope: analytics.read }
       summary: List the sites a connection can read
-      description: "Scope: analytics.read. GA4 properties, Search Console properties, PostHog projects, Fathom or Umami sites, and so on. Pass an id as `site` on reports, or make it the default."
+      description: "Scope: analytics.read. GA4 properties, Search Console properties, PostHog projects, Fathom or Umami sites, and so on, each with the domain it counts under and whether the sync stores it. Every site syncs unless switched off, up to 20 per connection. Pass an id as `site` on reports, or make it the default."
       tags: [analytics]
       parameters:
         - { $ref: "#/components/parameters/AnalyticsFresh" }
@@ -4323,10 +4358,42 @@ paths:
                 type: object
                 required: [data, site]
                 properties:
-                  data: { type: array, items: { $ref: "#/components/schemas/AnalyticsSite" } }
+                  data: { type: array, items: { $ref: "#/components/schemas/AnalyticsSitePlan" } }
                   site: { type: string, description: The default site; empty when none is set. }
         "404": { $ref: "#/components/responses/Error" }
         "422": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/analytics/{id}/sites/{site}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid }, description: The integration id. }
+      - { name: site, in: path, required: true, schema: { type: string }, description: "The site's id from GET .../sites, URL-encoded (Search Console ids contain `:` and `/`)." }
+    patch:
+      operationId: updateAnalyticsSite
+      x-outflare-access: { scope: integrations.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Switch a site on or off, or set its domain
+      description: "Scope: integrations.manage. Switching a site off stops its sync and deletes what was stored for it, so totals by domain stop counting it. Switching one on starts its 90-day backfill now. The domain lines the site up with other tools for the same website; an empty string goes back to the tool's own."
+      tags: [analytics]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sync: { type: boolean }
+                domain: { type: string, example: example.com }
+      responses:
+        "200":
+          description: The site as it is now.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AnalyticsSitePlan" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "422": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/analytics/{id}/site:
     parameters:
@@ -4812,6 +4879,9 @@ paths:
         - { name: status, in: query, schema: { $ref: "#/components/schemas/VerificationStatus" } }
         - { name: email, in: query, schema: { type: string }, description: "One or more addresses, comma-separated or repeated." }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 1000, default: 100 } }
+        - { name: offset, in: query, schema: { type: integer, minimum: 0, default: 0 } }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
       responses:
         "200":
           description: Results.
@@ -4819,9 +4889,11 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [data]
+                required: [data, next_offset, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/Verification" } }
+                  next_offset: { type: [integer, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         default: { $ref: "#/components/responses/Error" }
     post:
       operationId: startVerification
@@ -4988,6 +5060,7 @@ paths:
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
         - { name: before, in: query, schema: { type: string, format: date-time } }
         - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
       responses:
         "200":
           description: Meetings.
@@ -5103,6 +5176,7 @@ paths:
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
         - { name: before, in: query, schema: { type: string, format: date-time } }
         - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
       responses:
         "200":
           description: Deals.
@@ -5209,6 +5283,7 @@ paths:
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 1000, default: 100 } }
         - { name: before, in: query, schema: { type: string, format: date-time } }
         - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
       responses:
         "200":
           description: Entries.
@@ -5700,6 +5775,7 @@ paths:
         - { name: writes, in: query, schema: { type: boolean }, description: Only writes. }
         - { name: before, in: query, schema: { type: integer }, description: A call id, for the next page. }
         - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
       responses:
         "200":
@@ -5804,6 +5880,7 @@ paths:
         - { name: open_requests, in: query, schema: { type: boolean }, description: Only connect requests not yet resolved. }
         - { name: before, in: query, schema: { type: integer } }
         - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
       responses:
         "200":
@@ -6319,6 +6396,7 @@ paths:
         - { name: limit, in: query, description: 1 to 200. Default 50., schema: { type: integer, minimum: 1, maximum: 200 } }
         - { name: offset, in: query, schema: { type: integer, minimum: 0 } }
         - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
       responses:
         "200":
           description: Memories.
@@ -7013,6 +7091,9 @@ paths:
         - { name: sequence_id, in: query, schema: { type: string, format: uuid } }
         - { name: mailbox_id, in: query, schema: { type: string, format: uuid } }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
+        - { name: offset, in: query, schema: { type: integer, minimum: 0, default: 0 } }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
       responses:
         "200":
           description: Changes.
@@ -7020,8 +7101,11 @@ paths:
             application/json:
               schema:
                 type: object
+                required: [data, next_offset, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/AllocationChange" } }
+                  next_offset: { type: [integer, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/allocation/changes/{id}/undo:
     parameters:
@@ -8614,6 +8698,15 @@ components:
         next_cursor from the previous page, unchanged. Every paged list takes it, so one loop pages them all:
         call, then call again with cursor=next_cursor until next_cursor is null. Cursors are opaque; don't build them.
       schema: { type: string }
+    Fields:
+      name: fields
+      in: query
+      description: |
+        Only these fields of each item, comma separated (fields=id,email,status); id always comes back.
+        Paging fields stay. A field the items don't have answers 400 naming the ones they do. Any GET takes it.
+      style: form
+      explode: false
+      schema: { type: array, items: { type: string, pattern: "^[a-z][a-z0-9_]*$" } }
     IdempotencyKey:
       name: Idempotency-Key
       in: header
@@ -9432,6 +9525,15 @@ components:
         id: { type: string, example: "123456789" }
         name: { type: string, example: "acme.com (Acme)" }
         url: { type: string }
+    AnalyticsSitePlan:
+      allOf:
+        - { $ref: "#/components/schemas/AnalyticsSite" }
+        - type: object
+          required: [host, domain, sync]
+          properties:
+            host: { type: string, example: example.com, description: "The domain the site counts under in the overview, compare and history; empty when unknown." }
+            domain: { type: string, description: "The domain someone set for this site, overriding the tool's own; empty when none is set." }
+            sync: { type: boolean, description: Whether the sync stores this site. }
     AnalyticsMetrics:
       type: object
       description: Every field is optional. A missing field means the provider does not measure it; zero means it measured none.
@@ -9495,7 +9597,7 @@ components:
         name: { type: string }
         connector: { type: string }
         site: { type: string }
-        host: { type: string, description: "The website's domain; empty when the tool shows none. Set it with PUT .../analytics/{id}/site." }
+        host: { type: string, description: "The website's domain; empty when the tool shows none. Set it with PATCH .../analytics/{id}/sites/{site}." }
         first_day: { type: [string, "null"], format: date }
         last_day: { type: [string, "null"], format: date }
         last_run_at: { type: [string, "null"], format: date-time }
@@ -10931,7 +11033,7 @@ components:
       properties:
         context: { $ref: "#/components/schemas/CompanyContext" }
         memories: { type: array, items: { $ref: "#/components/schemas/Memory" }, description: Pinned memories first, then the 30 most recent. }
-        memory_count: { type: integer, description: Every memory the caller can see; search the rest with GET .../memories?q=. }
+        memory_count: { type: integer, description: "Every memory the caller can see; search the rest with GET .../memories?q=." }
         projects:
           type: array
           items:
@@ -11562,6 +11664,9 @@ components:
       properties:
         email: { type: string }
         email_verified: { type: boolean }
+        resend_after:
+          type: integer
+          description: Seconds before another link can be sent. Present when one was just sent.
     Error:
       type: object
       required: [error]
