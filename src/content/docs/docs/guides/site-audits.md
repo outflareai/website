@@ -46,6 +46,19 @@ Each page also shows how it was found (from the start page, a link, a sitemap or
 
 For each HTML page, Outflare also keeps what an audit checks: the title, meta description, canonical, h1, language and hreflang, the structured data types, the word count, images without alt text, the viewport tag, and a fingerprint that matches pages with the same words. It never stores the page's text. It also keeps every link on the page, with its anchor text, so you can see a page's links out with the status each one returned (a 404 is a broken link) and the pages that link to it. A page in your sitemap that nothing links to is an orphan. A meta refresh counts as a redirect, and links marked `nofollow`, `ugc` or `sponsored` are not followed.
 
+## Pages your firewall blocks, and pages built by JavaScript
+
+Two kinds of page can't be read as served. A firewall or bot protection (Cloudflare, Akamai, DataDome and the like) can answer OutflareBot with a `403` or a challenge page instead of your page. And some sites send an almost empty page and build it in the browser with JavaScript (React, Vue, Angular and the like), so read as served it has no title, words or links.
+
+For a site you have proved you own, a crawl can read both through **Geonode's Scraper API** with your own Geonode account: connect Geonode on the [Connectors](/docs/integrations/connectors/) page, and the next crawl uses it. Outflare never reads these pages with an account or key of its own.
+
+- A blocked page is one that answered `403` or a challenge page. A rate limit (`429`) is waited out, not got around.
+- A JavaScript page is one that looks like an empty app shell: under 150 words and a framework's mount point, such as `id="root"`. Geonode loads it in a browser and the audit checks what it built. Pages marked `noindex` are kept as served.
+- Pages robots.txt disallows are never requested, through Geonode or otherwise.
+- A page read this way shows `fetched_via: "geonode"`, and the crawl's `pages_fallback` counts them. Each costs Geonode tokens on your plan, and a page loaded in a browser costs more.
+
+A crawl's `pages_firewalled` counts the blocked pages, and its `fallback_hint` says what would let the next crawl read them: `verify_site` (prove you own the site) or `connect_geonode`. Better still, let OutflareBot through your firewall: its user agent is on [outflare.ai/bot](/bot/).
+
 ## From the API or an agent
 
 ```sh
