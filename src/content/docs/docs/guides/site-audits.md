@@ -5,9 +5,11 @@ sidebar:
   order: 13
 ---
 
-<span class="pill shipped">Shipped</span> Sites, ownership checks, crawls, the audit and the fixes list, through the API and agents. The SEO pages in the app come next.
+<span class="pill shipped">Shipped</span> Sites, ownership checks, crawls, the audit and the fixes list, in the app, through the API and for agents.
 
 Outflare reads your own websites with its crawler, [OutflareBot](/bot/), and records every page it finds: its HTTP status, where redirects lead, which pages ask not to be indexed, and which pages your robots.txt keeps crawlers away from. It needs no connector or API key. SEO tools like [DataForSEO and Ahrefs](/docs/integrations/seo/) add what others see of your site, and are separate.
+
+In the app, open **SEO** in the sidebar. **Site audits** lists your sites with their health and latest crawl, and opens each one's issues, ownership proof, crawl history and settings. **Fixes** is the fixes list below. **Rankings & backlinks** is the [SEO tools](/docs/integrations/seo/) page.
 
 ## Add a site
 
@@ -67,6 +69,7 @@ Each audit's issues go on the workspace's **fixes list**: one list of work for e
 - Take a fix, mark it in progress, done or ignored (when the issue is intended), and leave a note.
 - The next complete crawl checks a fix marked done. If the issue is gone, the crawl confirms it. If it is still there, or comes back later, the fix opens again.
 - Fixes follow their site's brand, so a brand filter shows that brand's work.
+- On the **Fixes** page, the list starts on what is still to do. Filter by status, severity or site, and open a fix to see why it matters, how to fix it and the pages it covers.
 
 ## Pages your firewall blocks, and pages built by JavaScript
 
