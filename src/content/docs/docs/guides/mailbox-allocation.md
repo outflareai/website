@@ -15,7 +15,7 @@ Teams with dozens or thousands of mailboxes spend hours deciding which inboxes g
 
 - **One sequence per mailbox.** Each mailbox sends for one sequence at a time. The database enforces this, so no API call, agent or integration can break it.
 - **Follow-ups never change mailbox.** A follow-up always goes from the mailbox that sent the lead's first email, in the same thread. A mailbox that has to move while leads are mid-sequence **drains** first: it takes no new leads, finishes those follow-ups, then moves.
-- **Only ready mailboxes get new work.** A mailbox is ready when it is active, its domain is not paused or blocklisted and has SPF, its [warm-up](/docs/guides/warmup/) ramp is done, and its 7-day inbox placement is at least 75%. A mailbox that stops being ready keeps finishing its follow-ups but takes no new leads.
+- **Only ready mailboxes get new work.** A mailbox is ready when it is active, its domain is not paused or blocklisted and has SPF, it is in the ready stage, and any [warm-up](/docs/guides/warmup/) score its sequencer reports is at least 75. A mailbox that stops being ready keeps finishing its follow-ups but takes no new leads.
 - **Every change has a reason**, recorded with who or what made it, and can be undone.
 
 ## How much a sequence gets
@@ -35,7 +35,7 @@ When a sequence is short, Outflare looks for free, ready mailboxes in this order
 
 Within each group it spreads across domains, then prefers the largest daily limits. If nothing free is left, a **higher-priority** sequence may take mailboxes from a lower-priority one, down to that sequence's **never go below** minimum. Sequences of equal priority never take from each other.
 
-When a sequence is still short, its Mailboxes card says by how much and why, for example "Short by 40 sends a day: 3 not ready: still warming up".
+When a sequence is still short, its Mailboxes card says by how much and why, for example "Short by 40 sends a day: 3 not ready: mailbox is warming".
 
 ## Teams and senders
 
@@ -76,7 +76,7 @@ Connect an **EmailBison**, **Instantly** or **Smartlead** account under **Connec
 ![The Allocation page with a connected EmailBison account awaiting its first review](/screens/allocation-platforms.png)
 
 - **Each live campaign becomes a sequence** that says where it runs. The platform keeps its steps, leads, schedule and status. Outflare decides which mailboxes it uses and adds or removes them in the platform. Set a **daily send target** on it to start allocating.
-- **Mailboxes that exist only in the platform** are added without a login. They can serve that platform's campaigns, but Outflare never sends from them, reads their inbox or warms them up. If you use teams, confirm their sender like any other mailbox.
+- **Mailboxes that exist only in the platform** are added without a login. They can serve that platform's campaigns, but Outflare never sends from them or reads their inbox. Their [warm-up](/docs/guides/warmup/) is switched in the platform like any other mailbox's. If you use teams, confirm their sender like any other mailbox.
 - **Nothing moves until you review.** A newly connected account's first plan is only suggested. Check the suggestions, then choose **Allow changes**.
 - **Follow-ups still stay put.** Platforms don't say which leads each mailbox owes follow-ups, so a mailbox taken off a platform campaign stays for the campaign's sequence length (14 days unless the platform says) before it is removed.
 - **Changes in the platform count.** Adding or removing a mailbox in the platform itself is accepted as a manual change, and shows in the history as made in the platform.

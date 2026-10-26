@@ -22,7 +22,7 @@ Google Workspace and Microsoft 365 are detected automatically. Any provider with
 One import takes up to 5000 mailboxes, and you can run as many imports as you like. The engine is a Go binary built for thousands of concurrent SMTP and IMAP connections, with Postgres as its only dependency.
 
 **Does it warm up mailboxes?**
-Yes. Turn on [warm-up](/docs/guides/warmup/) and your mailboxes email each other at a slowly rising volume, rescue that mail from spam and reply to some of it. You also see how much of each mailbox's and each domain's mail reaches the inbox. Warm-up runs between the mailboxes in your workspace, so it needs at least two.
+Through your sequencer. Outflare doesn't send warm-up mail itself: connect EmailBison, Instantly or Smartlead, and Outflare turns their [warm-up](/docs/guides/warmup/) on for your mailboxes and shows each one's warm-up score.
 
 **Is there a hosted version?**
 Not yet. A managed Cloud is on the roadmap after v1. Today you self-host.

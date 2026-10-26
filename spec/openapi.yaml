@@ -2233,8 +2233,9 @@ paths:
     get:
       operationId: getMailboxWarmup
       x-outflare-access: { scope: mailboxes.read }
-      summary: A mailbox's warm-up results for each of the last 14 days
-      description: "Scope: mailboxes.read. Days are UTC, oldest first."
+      deprecated: true
+      summary: A mailbox's results from Outflare's own warm-up for each of the last 14 days
+      description: "Scope: mailboxes.read. Days are UTC, oldest first. Outflare no longer sends warm-up mail itself, so the days run down to zero; a connected sequencer's warm-up score is in the mailbox's `warmup.platform`."
       tags: [mailboxes]
       responses:
         "200":
@@ -2256,14 +2257,17 @@ paths:
       operationId: updateWarmup
       x-outflare-access: { scope: mailboxes.manage }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
-      summary: Turn warm-up on or off, or change its settings, for many mailboxes
+      summary: Turn warm-up on or off in connected sequencers for many mailboxes
       description: |
         Scope: mailboxes.manage. Applies to the mailboxes in `mailbox_ids`,
         or to every mailbox in `pool_id`, or to every mailbox in the
-        workspace when neither is given. Warming mailboxes email each other,
-        so turn it on for at least two, ideally on different domains.
-        Turning warm-up on starts the ramp from its first day: 2 emails a
-        day, then 2 more each day up to `daily_target`.
+        workspace when neither is given. Outflare doesn't send warm-up mail
+        itself: a connected sequencer with its own warm-up (EmailBison,
+        Instantly, Smartlead) runs it, and Outflare switches it there.
+        Turning warm-up on without `provider` keeps each mailbox's
+        sequencer, or picks a connected one it is in; a listed mailbox in
+        none is a 400, and for the whole workspace such mailboxes are left
+        out.
       tags: [mailboxes]
       requestBody:
         required: true
@@ -14823,24 +14827,24 @@ components:
         updated_at: { type: string, format: date-time }
     MailboxWarmup:
       type: object
-      description: Warm-up settings and the last 7 days of results.
+      description: "Warm-up settings. A connected sequencer runs the warm-up; its view, including its warm-up score, is in `platform`. The 7-day counts, `daily_target`, `reply_rate`, `today_target`, `last_error` and `inbox_rate` were for Outflare's own warm-up, which is gone, and run down to zero or null."
       required: [enabled, daily_target, reply_rate, started_at, today_target, sent_7d, inbox_7d, spam_7d, missing_7d, failed_7d, last_error, provider, platform, waiting_on, inbox_rate]
       properties:
         enabled: { type: boolean }
-        daily_target: { type: integer, minimum: 1, maximum: 100, description: Warm-up emails a day once fully ramped up. }
-        reply_rate: { type: integer, minimum: 0, maximum: 100, description: Percent of received warm-up emails that are answered. }
+        daily_target: { type: integer, minimum: 1, maximum: 100, deprecated: true, description: Outflare's own warm-up only. }
+        reply_rate: { type: integer, minimum: 0, maximum: 100, deprecated: true, description: Outflare's own warm-up only. }
         started_at: { type: [string, "null"], format: date-time, description: When warm-up was last turned on. }
-        today_target: { type: integer, description: Today's volume on the ramp; 0 when off. }
-        sent_7d: { type: integer }
-        inbox_7d: { type: integer, description: Sent warm-up mail found in the recipient's inbox. }
-        spam_7d: { type: integer, description: Found in spam, and moved to the inbox. }
-        missing_7d: { type: integer, description: Not found within two days. }
-        failed_7d: { type: integer, description: Warm-up sends the mailbox's SMTP server refused. }
-        last_error: { type: [string, "null"], description: Why the latest warm-up send failed; null once a send succeeds again. }
-        provider: { type: string, description: "Who runs the warm-up: outflare, or the id of the connected sequencer (integration) that runs it with its own warm-up. A mailbox a sequencer already warms up when it is first synced, and that Outflare isn't warming up, takes that sequencer as its provider." }
+        today_target: { type: integer, deprecated: true, description: Outflare's own warm-up only; always 0. }
+        sent_7d: { type: integer, deprecated: true }
+        inbox_7d: { type: integer, deprecated: true, description: Sent warm-up mail found in the recipient's inbox. }
+        spam_7d: { type: integer, deprecated: true, description: Found in spam, and moved to the inbox. }
+        missing_7d: { type: integer, deprecated: true, description: Not found within two days. }
+        failed_7d: { type: integer, deprecated: true, description: Warm-up sends the mailbox's SMTP server refused. }
+        last_error: { type: [string, "null"], deprecated: true, description: Why the latest warm-up send failed. }
+        provider: { type: string, description: "The id of the connected sequencer (integration) that runs the warm-up, or outflare when none does. A mailbox a sequencer already warms up when it is first synced takes that sequencer as its provider." }
         platform:
           type: [object, "null"]
-          description: The sequencer's own view of its warm-up, as of its last sync; null when Outflare runs it.
+          description: The sequencer's own view of its warm-up, as of its last sync; null when no sequencer runs it.
           required: [integration_id, name, enabled, score, observed_at]
           properties:
             integration_id: { type: string, format: uuid }
@@ -14851,18 +14855,18 @@ components:
         waiting_on:
           type: [string, "null"]
           enum: [another_mailbox, connection, paused, platform, null]
-          description: "Why a mailbox with warm-up on sends nothing: another_mailbox when no other mailbox in the workspace has warm-up on, connection when it is not connected or Outflare has no login for it, paused when the mailbox is paused, platform until the sequencer running it shows its warm-up on. Null while it can send."
-        inbox_rate: { type: [number, "null"], minimum: 0, maximum: 1, description: "inbox_7d over all placed messages; null until any are placed." }
+          description: "platform while warm-up is on here but the sequencer running it doesn't show it on yet; null otherwise. another_mailbox, connection and paused were for Outflare's own warm-up and no longer occur."
+        inbox_rate: { type: [number, "null"], minimum: 0, maximum: 1, deprecated: true, description: "inbox_7d over all placed messages; null until any are placed." }
     WarmupSettings:
       type: object
       description: Unset fields are left as they are.
       properties:
         enabled: { type: boolean }
-        daily_target: { type: integer, minimum: 1, maximum: 100, description: Outflare's warm-up only. }
-        reply_rate: { type: integer, minimum: 0, maximum: 100, description: Outflare's warm-up only. }
+        daily_target: { type: integer, minimum: 1, maximum: 100, deprecated: true, description: "Outflare's own warm-up only, which is gone: accepted and ignored." }
+        reply_rate: { type: integer, minimum: 0, maximum: 100, deprecated: true, description: "Outflare's own warm-up only, which is gone: accepted and ignored." }
         provider:
           type: string
-          description: "Who runs the warm-up: outflare, or the id of a connected sequencer with the control.warmup capability (EmailBison, Instantly, Smartlead), which then runs it with its own warm-up. The mailboxes must be in that sequencer's account. On the bulk endpoint without mailbox_ids or pool_id, it applies to every mailbox that sequencer has."
+          description: "The id of a connected sequencer with the control.warmup capability (EmailBison, Instantly, Smartlead), which runs the warm-up with its own. The mailboxes must be in that sequencer's account. On the bulk endpoint without mailbox_ids or pool_id, it applies to every mailbox that sequencer has. outflare is accepted only with enabled false, and detaches the mailboxes from their sequencer's warm-up; Outflare doesn't send warm-up mail itself."
     WarmupDay:
       type: object
       required: [date, sent, inbox, spam, missing, replies]
@@ -16158,7 +16162,7 @@ components:
       type: object
       description: Mailboxes that could not be used, grouped by why.
       properties:
-        reason: { type: string, example: "not ready: still warming up" }
+        reason: { type: string, example: "not ready: mailbox is warming" }
         count: { type: integer }
     PlannedChange:
       type: object
