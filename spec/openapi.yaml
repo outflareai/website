@@ -7500,10 +7500,10 @@ paths:
         default: { $ref: "#/components/responses/Error" }
     post:
       operationId: createBrand
-      x-outflare-access: { scope: workspace.manage }
+      x-outflare-access: { scope: context.manage }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Add a brand
-      description: "Scope: workspace.manage. Names and handles are unique in the workspace. Then write its context with PATCH /brands/{brand}/context and move its projects and domains in with POST /brands/{brand}/add."
+      description: "Scope: context.manage. Names and handles are unique in the workspace. Then write its context with PATCH /brands/{brand}/context and move its projects and domains in with POST /brands/{brand}/add."
       tags: [brands]
       requestBody:
         required: true
@@ -7542,10 +7542,10 @@ paths:
         default: { $ref: "#/components/responses/Error" }
     patch:
       operationId: updateBrand
-      x-outflare-access: { scope: workspace.manage, brand_limited: true }
+      x-outflare-access: { scope: context.manage, brand_limited: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Change or archive a brand
-      description: "Scope: workspace.manage. Send only the fields to change. Brands are archived, not deleted: status archived hides it from pickers and keeps its records."
+      description: "Scope: context.manage. Send only the fields to change. Brands are archived, not deleted: status archived hides it from pickers and keeps its records."
       tags: [brands]
       requestBody:
         required: true
@@ -10738,12 +10738,13 @@ components:
           type: array
           items:
             type: object
-            required: [integration_id, name, connector, site, totals, first_day, last_day, last_synced_at]
+            required: [integration_id, name, connector, site, site_name, totals, first_day, last_day, last_synced_at]
             properties:
               integration_id: { type: string, format: uuid }
               name: { type: string }
               connector: { type: string }
               site: { type: string }
+              site_name: { type: string, description: "The site's name in the tool (a GA4 property's name); empty until a sync stores it." }
               totals: { $ref: "#/components/schemas/AnalyticsMetrics" }
               first_day: { type: [string, "null"], format: date }
               last_day: { type: [string, "null"], format: date }
