@@ -7,19 +7,19 @@ sidebar:
 
 <span class="pill shipped">Shipped</span> Missions in the REST API, the MCP server and the web app.
 
-A **mission** is a goal an agent works toward inside a [project](/docs/guides/projects/), such as "book 10 meetings with fintech CFOs in Australia by 30 November". Type the goal in plain words and Claude drafts the plan, or let your own agent start one. Either way the agent reads the project's brief, rehearses, sends you its plan, and works within the mode and limits you approve. You see every call it made and why, approve or reject its changes, answer its questions, and pause or stop it at any time, from the dashboard or over the API.
+A **mission** is a goal an agent works toward inside a [project](/docs/guides/projects/), such as "book 10 meetings with fintech CFOs in Australia by 30 November". Type the goal in plain words and the AI model you chose drafts the plan, or let your own agent start one. Either way the agent reads the project's brief, rehearses, sends you its plan, and works within the mode and limits you approve. You see every call it made and why, approve or reject its changes, answer its questions, and pause or stop it at any time, from the dashboard or over the API.
 
 ![The Missions list: status, how changes run, progress toward the goal, and what needs you](/screens/missions-list.png)
 
 ## Start from a goal
 
-You don't need an agent of your own. Connect **Claude** under Connectors (AI) with your Anthropic API key; usage is billed to your Anthropic account. Then type the goal in the box at the top of the Missions page.
+You don't need an agent of your own. Connect an [AI model](/docs/agents/ai-models/) (Claude, OpenAI, Gemini or Mistral) with your own API key; usage is billed by the provider, to your account. Then type the goal in the box at the top of the Missions page, which says which model it uses.
 
 ![The goal box on the Missions page](/screens/goal-box.png)
 
-Claude drafts the mission from a summary of your workspace: mailbox counts and capacity, lead and suppression counts, sequence names, the project brief and which connectors are connected. **Lead lists, email addresses and credentials are never sent.** The draft holds a name, a goal to track, the steps, instructions, email and spend limits, an end date, the connectors it needs (as connect requests) and its questions. It is saved waiting for your approval, so nothing runs yet.
+The model drafts the mission from a summary of your workspace: mailbox counts and capacity, lead and suppression counts, sequence names, the project brief and which connectors are connected. **Lead lists, email addresses and credentials are never sent.** The draft holds a name, a goal to track, the steps, instructions, email and spend limits, an end date, the connectors it needs (as connect requests) and its questions. It is saved waiting for your approval, so nothing runs yet.
 
-![A mission Claude planned: its question and the connector it needs, waiting for approval](/screens/planned-mission.png)
+![A planned mission: its question and the connector it needs, waiting for approval](/screens/planned-mission.png)
 
 Over the API it is one call, and over MCP the `plan_mission` tool:
 
@@ -29,7 +29,7 @@ curl -X POST "$OUTFLARE_URL/v1/workspaces/$WS/missions/plan" \
   -d '{"goal": "Book 10 meetings with fintech CFOs in Australia by 30 November"}'
 ```
 
-Without Claude connected, it answers `409` with `connector_needed`.
+Without an AI model connected, it answers `409` with `connector_needed`; with no model picked, `ai_model_needed`; past the workspace's monthly AI limit, `ai_budget_reached`.
 
 ## Who runs it
 
@@ -37,14 +37,14 @@ When you approve a mission, choose who carries it out.
 
 ![Approving: who runs it, and how its changes run](/screens/approve-runner.png)
 
-- **Outflare's agent** (`"runner": "builtin"`). Claude carries out the plan with your key, in turns. It gets an API token of its own: operator scopes, never more than yours, and never `missions.approve`. It goes through the same gate as any agent, so the mode below still decides whether its changes run, wait for you or are dry runs. A turn runs straight away, whenever you write to the mission or decide on a held change, and when the agent asks to look again (15 minutes to a day). Each turn's cost is recorded in the mission's spend. If Claude is disconnected, the spend limit is reached, Claude declines, or three turns fail in a row, the mission pauses and says why.
+- **Outflare's agent** (`"runner": "builtin"`). Your chosen AI model carries out the plan with your key, in turns. It gets an API token of its own: operator scopes, never more than yours, and never `missions.approve`. It goes through the same gate as any agent, so the mode below still decides whether its changes run, wait for you or are dry runs. Even in autonomous mode, changes that could send data out or change where mail goes (email replies, mailboxes, senders, webhooks, connectors, tokens and so on) wait for you, because the agent reads text from outside your workspace. See [how the agent is kept on course](/docs/agents/ai-models/#how-the-agent-is-kept-on-course). A turn runs straight away, whenever you write to the mission or decide on a held change, and when the agent asks to look again (15 minutes to a day). Each turn's cost is recorded in the mission's spend. If the model is disconnected or its key stops working, the mission's spend limit or the workspace's monthly AI limit is reached, the model declines, or three turns fail in a row, the mission pauses and says why.
 - **Your own agent** (`"runner": "external"`), such as Claude Code over MCP or a script. It acts by sending the mission header, as below.
 
 ![A mission run by Outflare's agent after its first turn: a held sequence, its progress note, and when it looks again](/screens/builtin-agent.png)
 
 ## How a mission runs
 
-1. **The mission is created**, by Claude from your goal or by your agent. It starts as a draft or waiting for approval. Nothing it changes in a draft runs: every write is a dry run.
+1. **The mission is created**, by Outflare from your goal or by your agent. It starts as a draft or waiting for approval. Nothing it changes in a draft runs: every write is a dry run.
 2. **It reads the brief and rehearses.** `GET /v1/workspaces/{ws}/missions/{id}` returns the mission, the project brief, the limits, progress, open requests and your latest notes.
 3. **It asks for the tools it needs.** If it needs an email verifier or a data provider that isn't connected, it posts a connect request. You connect it (paste the key or sign in), or press **Send a link** to get a one-time link for whoever holds the key; they don't need an Outflare account. The request closes by itself once the tool is connected, and Outflare's agent carries on straight away. If the tool is already connected, the request is refused with `already_connected`, so an agent never asks twice.
 4. **It submits its plan.** You approve it and choose how its changes run.
@@ -128,7 +128,7 @@ When you create the agent's token, choose **Can make changes**: it includes `mis
 | --- | --- |
 | `GET`, `POST /v1/workspaces/{ws}/missions` | List and create |
 | `GET`, `PATCH .../missions/{id}` | Check in (with the brief and notes); change |
-| `POST /v1/workspaces/{ws}/missions/plan` | Claude drafts a mission from a goal |
+| `POST /v1/workspaces/{ws}/missions/plan` | Draft a mission from a goal with your AI model |
 | `POST .../missions/{id}/submit`, `/approve` | Send the plan; approve and choose the mode and who runs it |
 | `POST .../missions/{id}/pause`, `/resume`, `/stop`, `/complete` | Control it; finish with a report |
 | `GET .../missions/{id}/calls` | Every call, newest first |

@@ -6078,9 +6078,21 @@ paths:
         calendar month (UTC); null means no workspace limit. The default is
         5000 (US$50).
 
+        `task_models` picks a model per task, on the same connection, so
+        routine work doesn't pay for the strongest model: `plan` (drafting a
+        mission), `turn` (Outflare's agent starting work, answering a person
+        or acting on a decision), `check_in` (a scheduled check-in with
+        nothing new from people), `reply_labelling` (labelling replies to
+        outreach) and `classify_domain` (domain research, below). A task left
+        out uses the main model, except that `check_in` uses the provider's
+        lighter model (Claude Sonnet 5.5) and `reply_labelling` and
+        `classify_domain` its cheapest (Claude Haiku 5.5), when they cost
+        less than the main model. Omit `task_models` to keep the current
+        choices.
+
         `domain_research` turns on research into unknown email domains: the
         workspace's own page reader (connect Geonode) fetches the domain's
-        homepage and the model above reads it. It needs both connections,
+        homepage and the `classify_domain` model reads it. It needs both connections,
         spends the workspace's own money, and is off until asked for.
         `domain_research_limit_cents` caps that research each calendar
         month, 20000 (US$200) by default, and 0 stops it; the overall AI
@@ -6099,6 +6111,16 @@ paths:
                 input_cents_per_million: { type: [number, "null"], exclusiveMinimum: 0, maximum: 10000000 }
                 output_cents_per_million: { type: [number, "null"], exclusiveMinimum: 0, maximum: 10000000 }
                 monthly_limit_cents: { type: [integer, "null"], minimum: 0, maximum: 10000000 }
+                task_models:
+                  type: object
+                  description: A model per task; replaces the current choices. A task left out or null uses its default.
+                  properties:
+                    plan: { $ref: "#/components/schemas/AITaskModelInput" }
+                    turn: { $ref: "#/components/schemas/AITaskModelInput" }
+                    check_in: { $ref: "#/components/schemas/AITaskModelInput" }
+                    reply_labelling: { $ref: "#/components/schemas/AITaskModelInput" }
+                    classify_domain: { $ref: "#/components/schemas/AITaskModelInput" }
+                  additionalProperties: false
                 domain_research: { type: boolean, description: Omitted leaves it as it is. }
                 domain_research_limit_cents: { type: integer, minimum: 0, maximum: 10000000, description: Omitted leaves it as it is; 0 stops research. }
       responses:
@@ -14706,13 +14728,41 @@ components:
         output_cents_per_million: { type: number, example: 2000 }
     AISettings:
       type: object
-      required: [integration_id, model, input_cents_per_million, output_cents_per_million, monthly_limit_cents, spent_this_month_cents, domain_research, domain_research_limit_cents, domain_research_spent_this_month_cents, active, problem, providers, updated_at]
+      required: [integration_id, model, input_cents_per_million, output_cents_per_million, monthly_limit_cents, task_models, tasks, spent_this_month_cents, domain_research, domain_research_limit_cents, domain_research_spent_this_month_cents, active, problem, providers, updated_at]
       properties:
         integration_id: { type: [string, "null"], format: uuid, description: The chosen connection; null uses the first connected AI model. }
         model: { type: string, description: The chosen model; empty uses the provider's default. }
         input_cents_per_million: { type: [number, "null"] }
         output_cents_per_million: { type: [number, "null"] }
         monthly_limit_cents: { type: [integer, "null"], description: Most AI calls may cost in a calendar month (UTC); null is no limit. }
+        task_models:
+          type: object
+          description: The models the workspace chose per task, as saved. A choice made for another provider than the one in use is kept but ignored.
+          additionalProperties:
+            type: object
+            required: [provider, model]
+            properties:
+              provider: { type: string, enum: [claude, openai, gemini, mistral] }
+              model: { type: string }
+              input_cents_per_million: { type: number }
+              output_cents_per_million: { type: number }
+        tasks:
+          type: array
+          description: Each task the AI model does and the model it uses now.
+          items:
+            type: object
+            required: [task, name, description, model, price, price_source, custom]
+            properties:
+              task: { type: string, enum: [plan, turn, check_in, reply_labelling, classify_domain] }
+              name: { type: string }
+              description: { type: string }
+              model: { type: [string, "null"], description: Null when no model can run yet. }
+              price:
+                oneOf:
+                  - type: "null"
+                  - $ref: "#/components/schemas/AIPrice"
+              price_source: { type: [string, "null"], enum: [list, workspace, "", null] }
+              custom: { type: boolean, description: True when the workspace chose this task's model. }
         spent_this_month_cents: { type: integer }
         domain_research: { type: boolean, description: "Whether unknown email domains are researched by reading their homepage with this workspace's own page reader and AI key. Off by default, because it spends the workspace's money with two providers." }
         domain_research_limit_cents: { type: [integer, "null"], description: "Most domain research may cost in a calendar month (UTC); the workspace's overall AI limit still applies and research stops at whichever comes first. 20000 (US$200) by default." }
@@ -14743,11 +14793,13 @@ components:
           type: array
           items:
             type: object
-            required: [connector, name, default_model, key_url, pricing_url, connections, known_prices]
+            required: [connector, name, default_model, light_model, cheap_model, key_url, pricing_url, connections, known_prices]
             properties:
               connector: { type: string, enum: [claude, openai, gemini, mistral] }
               name: { type: string }
               default_model: { type: [string, "null"] }
+              light_model: { type: [string, "null"], description: The lighter model routine check-ins use by default; null uses the main model. }
+              cheap_model: { type: [string, "null"], description: The cheapest model reply labelling and domain research use by default; null falls back to light_model, then the main model. }
               key_url: { type: string, format: uri }
               pricing_url: { type: string, format: uri }
               connections:
@@ -14763,6 +14815,15 @@ components:
                 description: List prices Outflare knows, by model id.
                 additionalProperties: { $ref: "#/components/schemas/AIPrice" }
         updated_at: { type: [string, "null"], format: date-time }
+    AITaskModelInput:
+      oneOf:
+        - type: "null"
+        - type: object
+          required: [model]
+          properties:
+            model: { type: string, maxLength: 200, description: "A model id from GET /integrations/{id}/models; empty uses the task's default." }
+            input_cents_per_million: { type: [number, "null"], exclusiveMinimum: 0, maximum: 10000000, description: Required when Outflare doesn't know the model's price. }
+            output_cents_per_million: { type: [number, "null"], exclusiveMinimum: 0, maximum: 10000000 }
     VerificationSettings:
       type: object
       required: [integration_id, provider, verify_on_import, verify_before_send, block_risky, block_catch_all, block_unknown, max_age_days]
