@@ -4009,6 +4009,7 @@ paths:
             image/svg+xml:
               schema: { type: string }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/connectors:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
@@ -4836,6 +4837,9 @@ paths:
         - { name: status, in: query, schema: { $ref: "#/components/schemas/VerificationStatus" } }
         - { name: email, in: query, schema: { type: string }, description: "One or more addresses, comma-separated or repeated." }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 1000, default: 100 } }
+        - { name: offset, in: query, schema: { type: integer, minimum: 0, default: 0 } }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
       responses:
         "200":
           description: Results.
@@ -4843,9 +4847,11 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [data]
+                required: [data, next_offset, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/Verification" } }
+                  next_offset: { type: [integer, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         default: { $ref: "#/components/responses/Error" }
     post:
       operationId: startVerification
@@ -7039,6 +7045,9 @@ paths:
         - { name: sequence_id, in: query, schema: { type: string, format: uuid } }
         - { name: mailbox_id, in: query, schema: { type: string, format: uuid } }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
+        - { name: offset, in: query, schema: { type: integer, minimum: 0, default: 0 } }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
       responses:
         "200":
           description: Changes.
@@ -7046,8 +7055,11 @@ paths:
             application/json:
               schema:
                 type: object
+                required: [data, next_offset, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/AllocationChange" } }
+                  next_offset: { type: [integer, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/allocation/changes/{id}/undo:
     parameters:
@@ -10966,7 +10978,7 @@ components:
       properties:
         context: { $ref: "#/components/schemas/CompanyContext" }
         memories: { type: array, items: { $ref: "#/components/schemas/Memory" }, description: Pinned memories first, then the 30 most recent. }
-        memory_count: { type: integer, description: Every memory the caller can see; search the rest with GET .../memories?q=. }
+        memory_count: { type: integer, description: "Every memory the caller can see; search the rest with GET .../memories?q=." }
         projects:
           type: array
           items:
