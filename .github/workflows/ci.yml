@@ -4,6 +4,8 @@ on:
   push:
     branches: [main]
   pull_request:
+    # edited: the "Needs" lines in the description can change.
+    types: [opened, synchronize, reopened, edited]
 
 jobs:
   build:
@@ -20,3 +22,24 @@ jobs:
       - run: npm run build
       - name: Internal links resolve
         run: node scripts/check-links.mjs
+
+  # Docs merge only once app.outflare.ai runs what they describe
+  # (scripts/check-deployed.mjs, AGENTS.md "Docs after the deploy").
+  deployed:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - name: Production runs what these docs describe
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+          DEPLOY_CHECK_TOKEN: ${{ secrets.DEPLOY_CHECK_TOKEN }}
+          BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          if git diff --quiet "$BASE"...HEAD -- spec/openapi.yaml; then export SPEC_CHANGED=0; else export SPEC_CHANGED=1; fi
+          node scripts/check-deployed.mjs
