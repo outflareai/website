@@ -1,27 +1,29 @@
 ---
 title: Agents and MCP
-description: Connect Claude, Cursor or any MCP client to an Outflare workspace, held to a scoped API token and the send policy.
+description: The Outflare MCP server's tools, and how to run it on your own computer with an API token. To connect Claude, ChatGPT or Cursor, see Connect your AI.
 sidebar:
   order: 1
 ---
 
 Outflare is built so that an AI agent can do anything a person can, through the same API, with the same limits. Agents are a first-class client, not an afterthought bolted onto a UI.
 
-There are two ways in. The MCP server is the quickest one for Claude, Cursor and other MCP clients. Any other agent framework can use the API directly.
+There are two ways in. The MCP server is the quickest one for Claude, ChatGPT, Cursor and other MCP apps. Any other agent framework can use the API directly.
+
+**Just want to connect your AI?** Use the hosted server at `https://app.outflare.ai/mcp`: no install, you sign in and approve the app. [Connect your AI](/docs/agents/connect/) has the steps for each app.
 
 ## The MCP server <span class="pill shipped">Shipped</span>
 
 [`@outflare/mcp`](https://github.com/outflareai/outflare/tree/main/mcp) is an [MCP](https://modelcontextprotocol.io) server that gives an agent 185 tools over the API (3 more in agency mode): run [missions](/docs/agents/missions/) toward a goal with approvals, read and update the brief of the project it works on, check sending domains and mailbox warm-up, import leads, check them against the suppression list, build, preview and start sequences, see and change which mailboxes each sequence sends from, and read and answer replies.
 
-It calls the same API with a scoped API token, so:
+It calls the same API with a scoped token, so:
 
-- the agent can do only what the token's scopes allow;
+- the agent can do only what its token's scopes allow;
 - every email still goes through the [policy check](/docs/concepts/policy-check/), however the agent is prompted;
 - every change is in the audit log under the token's name.
 
-### Install
+### Run it on your computer
 
-The server is not on npm yet. Build it from the repository (Node 18 or later):
+The hosted server at `/mcp` is the easy way ([Connect your AI](/docs/agents/connect/)). Run the server yourself instead when your app only starts local servers, or to pin it to one project or mission. It is not on npm yet. Build it from the repository (Node 18 or later):
 
 ```sh
 git clone https://github.com/outflareai/outflare.git
@@ -30,7 +32,7 @@ pnpm install
 pnpm --filter @outflare/sdk build && pnpm --filter @outflare/mcp build
 ```
 
-### Configure
+Then configure it:
 
 1. In the web app, open **API tokens** and create a token for the agent:
     - A reporting agent needs `workspace.read`, `mailboxes.read`, `leads.read`, `sequences.read` and `inbox.read`.
