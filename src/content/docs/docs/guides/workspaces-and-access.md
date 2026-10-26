@@ -13,7 +13,7 @@ A workspace holds everything for one team or client: mailboxes, pools, leads, li
 
 ### Workspace URL
 
-Each workspace has a short name for its URL, made from its name when it is created: a workspace called Geonode opens at `https://app.outflare.ai/geonode`, and each page follows it, such as `/geonode/connectors` or `/geonode/sequences`. Owners and admins can rename the workspace and change its URL under **Settings → Workspace settings**. The URL can use 3 to 40 lowercase letters, numbers and dashes, and a few words the app needs for its own pages (such as `admin`, `signup` and `settings`) are taken.
+Each workspace has a short name for its URL, made from its name when it is created: a workspace called Geonode opens at `https://app.outflare.ai/geonode`, and each page follows it, such as `/geonode/connectors` or `/geonode/sequences`. Owners and admins can rename the workspace and change its URL under **Settings → General**. The URL can use 3 to 40 lowercase letters, numbers and dashes, and a few words the app needs for its own pages (such as `admin`, `signup` and `settings`) are taken.
 
 Changing the URL doesn't break links: the old one keeps leading to the workspace until another workspace takes it. Links from before workspace URLs existed (`/w/<workspace id>/...`) still work and switch to the new address.
 
@@ -38,7 +38,7 @@ Admins and owners invite people by email from **Members**, choosing `admin`, `op
 
 ## Signing in
 
-People sign in with email and password and get a session cookie (`outflare_session`). Ten failed attempts for one email lock it for 15 minutes.
+People sign in with email and password and get a session cookie (`outflare_session`). Ten failed attempts for one email, or 100 from one network, in 15 minutes are refused until the window passes (`429` with `Retry-After`).
 
 ### Sign in with Google
 
@@ -46,7 +46,7 @@ When the instance has a Google OAuth app (`GOOGLE_OAUTH_CLIENT_ID` and `GOOGLE_O
 
 Google sign-in never creates an account on its own:
 
-- A Google account whose verified email matches an existing person signs them in and is linked to them, so later sign-ins match by Google account even if the email changes.
+- A Google account whose verified email matches an existing person signs them in and is linked to them, so later sign-ins match by Google account even if the email changes. If nobody had confirmed that person's email yet, the password, passkeys, sessions and API tokens made before are removed, since whoever made them may not own the address; a reset link sets a new password.
 - A Google account nobody uses goes back to the sign-in page with a message to ask for an invite.
 - An invite can be accepted with Google instead of a password, as long as the Google email is the invited address. Accounts made this way have no password and sign in with Google from then on.
 - Google emails that aren't verified are refused.
@@ -61,7 +61,7 @@ A passkey belongs to one web address, so passkeys turn on by themselves once `PU
 
 ### Confirming your email and resetting your password
 
-People who set a password get an email asking them to confirm their address; until they do, a banner offers to send the link again (`POST /v1/me/email-verification`). Google sign-ins are confirmed already. `GET /v1/me` shows `email_verified` and `has_password`.
+People who set a password get an email asking them to confirm their address; until they do, a banner offers to send the link again (`POST /v1/me/email-verification`). Each person gets at most one link a minute, five an hour and ten a day; the button counts down until the next one is allowed (`email_resend_after` on `GET /v1/me`). Google sign-ins are confirmed already. `GET /v1/me` shows `email_verified` and `has_password`.
 
 **Forgot your password?** on the sign-in page emails a link that works for an hour (`POST /v1/auth/password-reset`, which answers the same whether or not the address has an account). Setting a new password from it (`POST /v1/auth/password-reset/confirm`) signs the person out everywhere else and confirms their email. People who only use Google can set a password the same way from **Your account**. Requests are rate limited per address and per IP.
 

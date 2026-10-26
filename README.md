@@ -21,14 +21,11 @@ npm run preview    # serve dist/
 
 Canonical URLs, the sitemap and `llms.txt` use `https://outflare.ai` (no `www`). Set `SITE_URL` only to build for another address, such as a preview.
 
-`PUBLIC_STATS_URL` points the [usage stats page](src/pages/stats.astro) at Outflare Cloud's public endpoint (`https://<cloud host>/v1/cloud/stats/public`). Visitors' browsers read it directly, so the page stays current without a rebuild. Without it, `/stats/` says there are no numbers yet.
-
 ## Where things are
 
 | Path | What |
 | --- | --- |
 | `src/pages/index.astro` | Marketing home page |
-| `src/pages/stats.astro` | Public usage stats (`/stats/`), read live from Outflare Cloud |
 | `src/content/docs/docs/` | Docs pages in Markdown and MDX, served under `/docs/` |
 | `src/pages/docs/api/reference.astro` | Endpoint reference, generated from `spec/openapi.yaml` |
 | `src/data/project.ts` | The site URL, contact email, GitHub repo links, and roadmap and feature status |

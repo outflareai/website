@@ -25,3 +25,7 @@ This site deploys on every push to main (Cloudflare Pages), but app.outflare.ai 
 3. **Re-copy the spec before merging.** `spec/openapi.yaml` must equal the engine's `api/openapi.yaml` that production runs (`npm run sync-spec -- <that commit>`), not a branch.
 4. **Never say "live" or "deployed"** about a feature until production's `/v1/meta` version contains it.
 5. **No releases from here.** Self-hosted releases are tags on the engine, and only Jack pushes them.
+
+## Costs registry (hard rule)
+
+Every third-party service Outflare runs on or pays for, including the ones this site uses (Cloudflare Pages, Web Analytics, Google Tag Manager and GA4, PostHog, the domain), is listed in the costs registry in the private Cloud repository (`internal/costs/registry.go`), which feeds the staff Costs tab. Whenever we sign up for, create or change a third-party service for the site, such as a new analytics tool, form provider, font service, plan or domain, update the registry in the same change. Never buy, upgrade or change a plan to do it; that is the owner's call.

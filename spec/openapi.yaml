@@ -282,7 +282,9 @@ paths:
     post:
       operationId: login
       summary: Sign in with email and password
-      description: Sets a session cookie. Ten failed attempts for one email lock it for 15 minutes.
+      description: |
+        Sets a session cookie. Ten failed attempts for one email, or 100 from one network (an IPv6 /64), in 15 minutes
+        are refused with 429 and `Retry-After`. Accepting an invite with an existing account's password counts too.
       tags: [access]
       security: []
       requestBody:
@@ -314,8 +316,9 @@ paths:
       summary: Email a password reset link
       description: |
         Sends a one-time link (valid an hour) to `<PUBLIC_URL>/reset-password#<token>`, through the account email service
-        (see `account_email` in /v1/meta). The answer is the same whether or not the email has an account. Ten requests
-        for one email, or from one network, in 15 minutes are refused.
+        (see `account_email` in /v1/meta). The answer is the same whether or not the email has an account. An account gets
+        at most one link a minute, five an hour and ten a day; asks past that answer the same and send nothing. Ten
+        requests for one email, or 20 from one network, in 15 minutes are refused with 429.
       tags: [access]
       security: []
       requestBody:
@@ -383,7 +386,10 @@ paths:
       operationId: resendEmailVerification
       x-outflare-access: { signed_in: true }
       summary: Send the confirmation link again
-      description: Replaces any earlier link. Answers 200 without sending when the address is already confirmed.
+      description: |
+        Replaces any earlier link. Answers 200 without sending when the address is already confirmed. One person gets at
+        most one link a minute, five an hour and ten a day, and one network at most 20 in 15 minutes; past that it answers
+        429 with `Retry-After`, sending nothing. `GET /v1/me` has `email_resend_after` so a button can count down.
       tags: [access]
       responses:
         "200":
@@ -585,6 +591,7 @@ paths:
         "200": { description: Joined; a session cookie is set. }
         "401": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
+        "429": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
   /v1/instance/telemetry:
     get:
@@ -671,6 +678,9 @@ paths:
                       has_password:
                         type: boolean
                         description: False for accounts made with Google, until they set a password with a reset link.
+                      email_resend_after:
+                        type: integer
+                        description: Seconds until another confirmation email can be sent (`POST /v1/me/email-verification`); 0 when one can be sent now or the address is confirmed.
                   workspaces:
                     type: array
                     description: Workspaces the user is a member of, plus every client workspace of their agencies, each with their strongest role.
@@ -5892,7 +5902,11 @@ paths:
       description: |
         Scope: missions.run. kind connect_request asks a person to connect
         a tool the agent needs (they paste the key or sign in with OAuth);
-        give connector as the connector id.
+        give connector as the connector id. The request closes by itself,
+        with a note in the mission, once the workspace has a working
+        connection to that connector; Outflare's agent then takes a turn
+        straight away. A connector that is already connected answers 409
+        `already_connected`: use the connection instead.
       tags: [missions]
       requestBody:
         required: true
@@ -11650,6 +11664,9 @@ components:
       properties:
         email: { type: string }
         email_verified: { type: boolean }
+        resend_after:
+          type: integer
+          description: Seconds before another link can be sent. Present when one was just sent.
     Error:
       type: object
       required: [error]

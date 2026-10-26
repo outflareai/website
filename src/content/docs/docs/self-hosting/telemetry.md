@@ -76,4 +76,4 @@ The first report goes a few minutes after the server starts, then once a day at 
 
 ## Where the numbers go
 
-The totals are public on the [usage stats page](/stats/), like WordPress's: servers running, versions, platforms, countries and connectors in use. Any group of fewer than five servers is shown as "other" there, so no single server can be picked out. Mail volumes and mailbox counts are only seen by the Outflare team.
+Reports go to Outflare Cloud and are seen only by the Outflare team, as totals: servers running, versions, platforms, countries and connectors in use. They are not published.
