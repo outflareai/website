@@ -46,6 +46,8 @@ Already paying for warm-up in a sequencer? A mailbox that is also in an EmailBis
 - **All of an account's mailboxes:** the Mailboxes page shows a card for each connected sequencer that can run warm-up, with **Warm up all N in EmailBison** and **Use Outflare's warm-up instead**.
 - **Mailboxes Outflare has no login for** (they only live in the sequencer) warm up in the sequencer when you turn warm-up on.
 
+**Already warming up there?** When Outflare first reads the account, a mailbox whose warm-up is already on in the sequencer, and that Outflare isn't warming up, is taken as warming up there. Nothing is switched. The **Warm-up** column shows **On in EmailBison** for sequencer warm-up that Outflare doesn't run, and **Also warming in EmailBison** for a mailbox that warms up in both places, which doubles its warm-up mail. Pick one for it. Over the API, each mailbox's `platforms[].warmup_enabled` says which sequencers have their own warm-up on.
+
 Outflare then leaves the mailbox out of its own warm-up and turns the sequencer's warm-up on or off whenever you turn it on or off here. The **Warm-up** column shows the sequencer's warm-up score. For a mailbox in an [infrastructure plan](/docs/guides/infrastructure/), that score stands in for inbox placement when deciding the mailbox is ready. Switching back to Outflare turns the sequencer's warm-up off.
 
 Over the API, send `provider` with the integration id. Without `mailbox_ids` or `pool_id`, it applies to every mailbox that account has:

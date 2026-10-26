@@ -10321,6 +10321,7 @@ components:
               status: { type: string, enum: [ok, paused, error, disconnected] }
               status_reason: { type: [string, "null"] }
               daily_limit: { type: [integer, "null"] }
+              warmup_enabled: { type: boolean, description: "Whether that sequencer's own warm-up is on for it, whoever runs warm-up in Outflare." }
               warmup_score: { type: [integer, "null"] }
               campaigns: { type: integer, description: Live campaigns it is on there. }
               observed_at: { type: string, format: date-time }
@@ -10342,7 +10343,7 @@ components:
         missing_7d: { type: integer, description: Not found within two days. }
         failed_7d: { type: integer, description: Warm-up sends the mailbox's SMTP server refused. }
         last_error: { type: [string, "null"], description: Why the latest warm-up send failed; null once a send succeeds again. }
-        provider: { type: string, description: "Who runs the warm-up: outflare, or the id of the connected sequencer (integration) that runs it with its own warm-up." }
+        provider: { type: string, description: "Who runs the warm-up: outflare, or the id of the connected sequencer (integration) that runs it with its own warm-up. A mailbox a sequencer already warms up when it is first synced, and that Outflare isn't warming up, takes that sequencer as its provider." }
         platform:
           type: [object, "null"]
           description: The sequencer's own view of its warm-up, as of its last sync; null when Outflare runs it.
