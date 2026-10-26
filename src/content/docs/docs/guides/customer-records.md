@@ -5,7 +5,7 @@ sidebar:
   order: 1.5
 ---
 
-<span class="pill shipped">Shipped</span> Records, identities, links, the shared catalog, product events, timelines and consent, through the REST API and the MCP server. Merges, segments and the customer pages come next.
+<span class="pill shipped">Shipped</span> Records, identities, links, the shared catalog, product events, duplicates and merges, timelines and consent, through the REST API and the MCP server. Segments and the customer pages come next.
 
 Outflare keeps one record of each person and company your business knows, plus anything else you track, such as deals, subscriptions or partners. The customer data platform, the CRM and lifecycle email all use the same records, so nobody types the same detail twice and nothing ends up in a separate copy.
 
@@ -46,6 +46,18 @@ Two different user ids are never merged, and an email someone only typed in neve
 
 Traits that match a field in the catalog fill in the record: `firstName` is first name, `title` is job title. The rest stay on the event, and the response lists them so you can add the fields you want. A `group` call finds or makes the company by its id and adds it to the person's companies. Send a `messageId` with each event so a retry is stored once. A new event name arrives quarantined, so it drives nothing until someone approves it in the catalog.
 
+## Duplicates
+
+When two records share an email or phone number, they might be the same person. Outflare lists each such pair once, with both records side by side, so someone can decide. This includes pairs you already had before the upgrade.
+
+- **Merge** keeps one record. The other one's emails and ids, links, product events and consent move to the kept record, and its details fill in whatever the kept record is missing. The usual "which value wins" order still applies, so a CRM value never replaces one someone typed. The merged record stays in the archive, so its history and any old links still lead to the record you kept.
+- **Link** keeps both records but marks them as the same person, for example one person with two accounts in your product.
+- **Dismiss** says they are different people. You won't be asked about the pair again.
+
+Two records that each have their own user id from your product are two accounts, so they are never merged. You can only link or dismiss them.
+
+Outflare merges on its own in one case only. If your product reports that someone proved they own an email, and that email is held by a record with no user id of its own (for example one from an import or a CRM sync), that record is merged into theirs.
+
 ## Timeline
 
 Every person and company has a timeline, newest first: their product events, changes to their details, emails and ids added or replaced, and consent given or taken back. Lifecycle email will add each email's delivery to it.
@@ -59,7 +71,7 @@ Consent is recorded per person and channel (email, SMS, push, WhatsApp, in-app),
 | Permission | Allows | Roles |
 | --- | --- | --- |
 | Read customers | See records, their identities, links, history, timeline and consent, product events, and the catalog | Everyone |
-| Manage customers | Add and change records, identities and links, send product events and record consent | Owners, admins and operators |
+| Manage customers | Add and change records, identities and links, merge duplicates, send product events and record consent | Owners, admins and operators |
 | Manage catalog | Add and change record types, fields, option lists and events | Owners and admins |
 
 People and tokens kept to some brands see only their brands' records and the ones every brand shares.
@@ -87,6 +99,6 @@ curl -X POST https://app.outflare.ai/v1/workspaces/$WS/customer-events \
          "properties": {"total": 42}}]}'
 ```
 
-Agents use `track_customer_events`, `get_record_timeline`, `list_record_consents` and `record_consent`.
+Agents use `track_customer_events`, `get_record_timeline`, `list_record_consents`, `record_consent`, `list_record_duplicates` and `merge_records`.
 
 The full reference is under [API](/docs/api/), at `/v1/workspaces/{ws}/catalog`, `/v1/workspaces/{ws}/records` and `/v1/workspaces/{ws}/customer-events`.
