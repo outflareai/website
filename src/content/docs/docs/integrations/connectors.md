@@ -27,6 +27,7 @@ By category, including what is planned:
 | CRMs and calendars | HubSpot, Salesforce, Pipedrive, Attio, Google Calendar, Outlook, Calendly, Cal.com |
 | Website analytics | [Google Analytics, Search Console, Bing Webmaster Tools, PostHog, Plausible, Fathom, Matomo, Umami, Mixpanel, Amplitude, Cloudflare, Simple Analytics, Clarity, Vercel](/docs/integrations/analytics/) |
 | SEO | [DataForSEO, Ahrefs](/docs/integrations/seo/), paid per call within a monthly budget |
+| Code and deploys | [GitHub, Vercel](/docs/integrations/deploys/): when each website ships, read only |
 | DNS and registrars | Cloudflare, Namecheap, GoDaddy, Route 53 |
 | Custom | Any HTTP API or MCP server you register |
 

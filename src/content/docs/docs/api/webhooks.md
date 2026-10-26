@@ -194,6 +194,13 @@ Every type is also in the API document, under `webhooks:` and in the `WebhookEve
 | `integration.disconnected` | A connector was disconnected. |
 | `connect_request.created` | A one-time connect link was created for a person to finish connecting a service. |
 
+### Deploys
+
+| Event | When |
+| --- | --- |
+| `deploy.detected` | A watched repository or project went live in production. `data` has `target_id`, `site_id` (the site it serves, or null), `kind` (`deployment` or `push`), `commit`, `ref` and `deployed_at`. |
+| `deploy.failed` | A production deploy of a watched repository or project failed. |
+
 ### Projects
 
 | Event | When |
