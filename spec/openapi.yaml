@@ -1353,8 +1353,8 @@ paths:
       operationId: updateAPITokenLimits
       x-outflare-access: { scope: tokens.manage }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
-      summary: Change a token's sending and allocation limits
-      description: "Scope: tokens.manage. A token cannot change its own limits, or grant looser ones than it has. Scopes are fixed; issue a new token to change them."
+      summary: Change a token's name, permissions or limits
+      description: "Scope: tokens.manage. Only the fields sent change. A token cannot change itself, add a scope it lacks, or grant looser limits than it has; taking a scope away is always allowed. A connected app's token is changed with updateAgentApp instead (400)."
       tags: [access]
       requestBody:
         required: true
@@ -1388,7 +1388,7 @@ paths:
       operationId: listAgentApps
       x-outflare-access: { scope: workspace.read }
       summary: List AI apps connected with OAuth
-      description: "Scope: workspace.read. Apps such as Claude, ChatGPT or Cursor that a person connected to the hosted MCP server (`/mcp`) by signing in. Members see the apps they connected; people with tokens.manage see everyone's. Each app runs on an API token, which also shows under API tokens."
+      description: "Scope: workspace.read. Apps such as Claude, ChatGPT or Cursor that a person connected to the hosted MCP server (`/mcp`) by signing in. Members see the apps they connected; people with tokens.manage see everyone's. Each app runs on an API token, which listAPITokens leaves out."
       tags: [access]
       responses:
         "200":
@@ -1406,6 +1406,30 @@ paths:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    patch:
+      operationId: updateAgentApp
+      x-outflare-access: { scope: workspace.read }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Change what a connected AI app may do
+      description: "Scope: workspace.read for an app you connected, tokens.manage for anyone's; people only, never a token, so an app can't change its own access. The app keeps reading what the person who connected it can read; `scopes` lists the changes it may make, from the app's `available_scopes`. Takes effect on the app's next call, with no need to connect again."
+      tags: [access]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [scopes]
+              properties:
+                scopes: { type: array, items: { $ref: "#/components/schemas/Scope" }, description: "The write scopes to allow. Empty is read only." }
+      responses:
+        "200":
+          description: The app.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AgentApp" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
     delete:
       operationId: disconnectAgentApp
       x-outflare-access: { scope: workspace.read }
@@ -7476,10 +7500,10 @@ paths:
         default: { $ref: "#/components/responses/Error" }
     post:
       operationId: createBrand
-      x-outflare-access: { scope: workspace.manage }
+      x-outflare-access: { scope: context.manage }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Add a brand
-      description: "Scope: workspace.manage. Names and handles are unique in the workspace. Then write its context with PATCH /brands/{brand}/context and move its projects and domains in with POST /brands/{brand}/add."
+      description: "Scope: context.manage. Names and handles are unique in the workspace. Then write its context with PATCH /brands/{brand}/context and move its projects and domains in with POST /brands/{brand}/add."
       tags: [brands]
       requestBody:
         required: true
@@ -7518,10 +7542,10 @@ paths:
         default: { $ref: "#/components/responses/Error" }
     patch:
       operationId: updateBrand
-      x-outflare-access: { scope: workspace.manage, brand_limited: true }
+      x-outflare-access: { scope: context.manage, brand_limited: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Change or archive a brand
-      description: "Scope: workspace.manage. Send only the fields to change. Brands are archived, not deleted: status archived hides it from pickers and keeps its records."
+      description: "Scope: context.manage. Send only the fields to change. Brands are archived, not deleted: status archived hides it from pickers and keeps its records."
       tags: [brands]
       requestBody:
         required: true
@@ -10455,7 +10479,10 @@ components:
         name: { type: string }
         status: { type: string, enum: [connected, error], description: "error: the service refused the credentials; see last_error." }
         account: { $ref: "#/components/schemas/ConnectorAccount" }
-        config: { type: object, additionalProperties: true }
+        config:
+          type: object
+          additionalProperties: true
+          description: "Settings for this connection, never secret. warmup_tags (a sequencer with control.warmup): the tags it puts in its warm-up mail, at most 20 of 4 to 100 characters. The inbox leaves out received mail whose subject or body holds one, without reading or moving it."
         last_checked_at: { type: [string, "null"], format: date-time }
         last_error: { type: [string, "null"] }
         created_at: { type: string, format: date-time }
@@ -10711,12 +10738,13 @@ components:
           type: array
           items:
             type: object
-            required: [integration_id, name, connector, site, totals, first_day, last_day, last_synced_at]
+            required: [integration_id, name, connector, site, site_name, totals, first_day, last_day, last_synced_at]
             properties:
               integration_id: { type: string, format: uuid }
               name: { type: string }
               connector: { type: string }
               site: { type: string }
+              site_name: { type: string, description: "The site's name in the tool (a GA4 property's name); empty until a sync stores it." }
               totals: { $ref: "#/components/schemas/AnalyticsMetrics" }
               first_day: { type: [string, "null"], format: date }
               last_day: { type: [string, "null"], format: date }
@@ -11417,7 +11445,7 @@ components:
       description: The app, told from where it sends people back to (not from the name it registered with). local is an app on the person's computer (a loopback address); unknown is any other site.
     AgentApp:
       type: object
-      required: [id, token_id, name, app, uri, scopes, user_id, user_name, created_at, last_used_at]
+      required: [id, token_id, name, app, uri, scopes, available_scopes, user_id, user_name, created_at, last_used_at]
       properties:
         id: { type: string, format: uuid }
         token_id: { type: string, format: uuid, description: The API token the app runs on. }
@@ -11425,6 +11453,7 @@ components:
         app: { $ref: "#/components/schemas/AgentAppKind" }
         uri: { type: string }
         scopes: { type: array, items: { $ref: "#/components/schemas/Scope" } }
+        available_scopes: { type: array, items: { $ref: "#/components/schemas/Scope" }, description: "The write scopes the app could be given: what the role of the person who connected it allows, less what apps never get." }
         user_id: { type: string, format: uuid, description: Who connected it. }
         user_name: { type: string }
         created_at: { type: string, format: date-time }
@@ -11450,6 +11479,8 @@ components:
     APITokenLimits:
       type: object
       properties:
+        name: { type: string, description: "A new name. It shows in the audit log next to everything the token does." }
+        scopes: { type: array, minItems: 1, items: { $ref: "#/components/schemas/Scope" }, description: "Replaces the token's scopes. Takes effect on its next request." }
         daily_send_budget: { type: [integer, "null"], minimum: 1, maximum: 1000000 }
         max_priority: { type: [string, "null"], enum: [low, normal, high, null] }
         may_take_mailboxes: { type: boolean }
@@ -11555,6 +11586,7 @@ components:
               status: { type: string, enum: [ok, paused, error, disconnected] }
               status_reason: { type: [string, "null"] }
               daily_limit: { type: [integer, "null"] }
+              warmup_enabled: { type: boolean, description: "Whether that sequencer's own warm-up is on for it, whoever runs warm-up in Outflare." }
               warmup_score: { type: [integer, "null"] }
               campaigns: { type: integer, description: Live campaigns it is on there. }
               observed_at: { type: string, format: date-time }
@@ -11563,7 +11595,7 @@ components:
     MailboxWarmup:
       type: object
       description: Warm-up settings and the last 7 days of results.
-      required: [enabled, daily_target, reply_rate, started_at, today_target, sent_7d, inbox_7d, spam_7d, missing_7d, failed_7d, last_error, waiting_on, inbox_rate]
+      required: [enabled, daily_target, reply_rate, started_at, today_target, sent_7d, inbox_7d, spam_7d, missing_7d, failed_7d, last_error, provider, platform, waiting_on, inbox_rate]
       properties:
         enabled: { type: boolean }
         daily_target: { type: integer, minimum: 1, maximum: 100, description: Warm-up emails a day once fully ramped up. }
@@ -11576,18 +11608,32 @@ components:
         missing_7d: { type: integer, description: Not found within two days. }
         failed_7d: { type: integer, description: Warm-up sends the mailbox's SMTP server refused. }
         last_error: { type: [string, "null"], description: Why the latest warm-up send failed; null once a send succeeds again. }
+        provider: { type: string, description: "Who runs the warm-up: outflare, or the id of the connected sequencer (integration) that runs it with its own warm-up. A mailbox a sequencer already warms up when it is first synced, and that Outflare isn't warming up, takes that sequencer as its provider." }
+        platform:
+          type: [object, "null"]
+          description: The sequencer's own view of its warm-up, as of its last sync; null when Outflare runs it.
+          required: [integration_id, name, enabled, score, observed_at]
+          properties:
+            integration_id: { type: string, format: uuid }
+            name: { type: string }
+            enabled: { type: boolean, description: Whether the sequencer shows its warm-up on for this mailbox. }
+            score: { type: [integer, "null"], description: "The sequencer's warm-up score, 0 to 100." }
+            observed_at: { type: [string, "null"], format: date-time }
         waiting_on:
           type: [string, "null"]
-          enum: [another_mailbox, connection, paused, null]
-          description: "Why a mailbox with warm-up on sends nothing: another_mailbox when no other mailbox in the workspace has warm-up on, connection when it is not connected or Outflare has no login for it, paused when the mailbox is paused. Null while it can send."
+          enum: [another_mailbox, connection, paused, platform, null]
+          description: "Why a mailbox with warm-up on sends nothing: another_mailbox when no other mailbox in the workspace has warm-up on, connection when it is not connected or Outflare has no login for it, paused when the mailbox is paused, platform until the sequencer running it shows its warm-up on. Null while it can send."
         inbox_rate: { type: [number, "null"], minimum: 0, maximum: 1, description: "inbox_7d over all placed messages; null until any are placed." }
     WarmupSettings:
       type: object
       description: Unset fields are left as they are.
       properties:
         enabled: { type: boolean }
-        daily_target: { type: integer, minimum: 1, maximum: 100 }
-        reply_rate: { type: integer, minimum: 0, maximum: 100 }
+        daily_target: { type: integer, minimum: 1, maximum: 100, description: Outflare's warm-up only. }
+        reply_rate: { type: integer, minimum: 0, maximum: 100, description: Outflare's warm-up only. }
+        provider:
+          type: string
+          description: "Who runs the warm-up: outflare, or the id of a connected sequencer with the control.warmup capability (EmailBison, Instantly, Smartlead), which then runs it with its own warm-up. The mailboxes must be in that sequencer's account. On the bulk endpoint without mailbox_ids or pool_id, it applies to every mailbox that sequencer has."
     WarmupDay:
       type: object
       required: [date, sent, inbox, spam, missing, replies]
