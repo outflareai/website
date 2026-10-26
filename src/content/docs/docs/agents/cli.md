@@ -46,6 +46,15 @@ outflare import-leads --data @leads.csv
 
 When a body field has the same name as one of these (a webhook's `--url`), the flag goes to the body; set the server with `OUTFLARE_URL` for that call.
 
+## Follow request logs
+
+`outflare logs` prints the latest API calls in the workspace, and `--follow` keeps printing new ones as they happen, like `tail -f`. Filter with `--level`, `--surface`, `--status`, `--operation`, `--mcp-tool`, `--q` and `--since`. It needs the `audit.read` scope. See [Logs](/docs/api/logs/).
+
+```sh
+outflare logs --follow --level warning,error
+outflare logs --surface mcp --since 1h
+```
+
 ## Listen for events
 
 `outflare listen` shows what happens in the workspace as it happens, from now on. Add `--forward-to URL` to send each event to a receiver on your machine, signed like a real webhook delivery; see [Test a receiver on your machine](/docs/api/webhooks/#test-a-receiver-on-your-machine).

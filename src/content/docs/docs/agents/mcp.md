@@ -13,7 +13,7 @@ There are two ways in. The MCP server is the quickest one for Claude, ChatGPT, C
 
 ## The MCP server <span class="pill shipped">Shipped</span>
 
-[`@outflare/mcp`](https://github.com/outflareai/outflare/tree/main/mcp) is an [MCP](https://modelcontextprotocol.io) server that gives an agent 211 tools over the API (3 more in agency mode): run [missions](/docs/agents/missions/) toward a goal with approvals, read and update the brief of the project it works on, check sending domains and mailbox warm-up, import leads, check them against the suppression list, build, preview and start sequences, see and change which mailboxes each sequence sends from, and read and answer replies.
+[`@outflare/mcp`](https://github.com/outflareai/outflare/tree/main/mcp) is an [MCP](https://modelcontextprotocol.io) server that gives an agent 213 tools over the API (3 more in agency mode): run [missions](/docs/agents/missions/) toward a goal with approvals, read and update the brief of the project it works on, check sending domains and mailbox warm-up, import leads, check them against the suppression list, build, preview and start sequences, see and change which mailboxes each sequence sends from, and read and answer replies.
 
 It calls the same API with a scoped token, so:
 
@@ -110,6 +110,7 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `list_inbox`, `get_inbox_message` | Replies, and the whole conversation with a lead | |
 | `list_webhook_event_types`, `list_webhooks`, `list_webhook_deliveries` | The events webhooks can send; the workspace's webhooks and their health; what was sent to one and how the receiver answered | |
 | `list_events` | What happened since the last call: replies, bounces, opt-outs, paused mailboxes, held mission writes. Keep `next_after` and pass it back as `after` | |
+| `list_logs`, `get_log` | Every API call in the workspace with status, duration, error code and who made it; filter by level, source, operation, tool and time, or look one up by the `request_id` an error returned. Needs `audit.read`. See [Logs](/docs/api/logs/) | |
 | `list_jobs`, `get_job` | Background work (syncs, imports, DNS checks) and how it went; a call that queued work returns `job.id` to follow | |
 | `import_supplier_mailboxes` | Import a supplier's mailboxes, named or all, with the same checks as a CSV | Yes |
 | `sync_supplier_mailboxes` | Read a supplier account again now | Yes |

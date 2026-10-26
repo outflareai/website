@@ -15,7 +15,7 @@ A new inbox that sends cold email straight away lands in spam. Google and Micros
 
 When warm-up is on, your mailboxes email each other:
 
-1. **A slow ramp.** A mailbox sends 2 warm-up emails on its first day and 2 more each day after that, up to its daily target (20 by default). Sends are spread over the day.
+1. **A slow ramp.** A mailbox sends 2 warm-up emails on its first day and 2 more each day after that, up to its daily target (20 by default). Sends are spread over working hours, 8am to 6pm in the time zone your sequences send in (UTC until you have a sequence), and drop to a third on Saturdays and Sundays, the way a person at work sends mail.
 2. **Natural mail.** Each email is a short, plain note between colleagues, written fresh from varied parts. Nothing in it marks it as warm-up: the receiving mailbox recognises it by the Message-ID the engine recorded when it sent it.
 3. **Engagement.** About every 20 minutes the receiving mailbox looks for its warm-up mail in the inbox and the spam folder. It finds each one by its hidden Message-ID, so warm-up mail carries no visible tag that spam filters could learn. It marks each message read, stars about one in five, **moves it to the inbox if it landed in spam** (the same as clicking Not spam), and answers some of them (30% by default) a few minutes to an hour and a half later, in the same thread. Then it files the message in an **Outflare Warmup** folder (a label in Gmail), so warm-up mail stays out of your real inbox.
 4. **Placement.** Where each message landed is recorded: inbox, spam, or missing if it never arrived within two days.

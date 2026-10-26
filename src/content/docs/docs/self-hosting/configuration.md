@@ -24,8 +24,10 @@ The engine is configured only through environment variables. When you use the bu
 | `CLOUDFLARE_EMAIL_API_TOKEN` | no | none | Sends account emails through [Cloudflare Email Service](https://developers.cloudflare.com/email-service/), with `CLOUDFLARE_ACCOUNT_ID`. Needs the Workers Paid plan and the sender's domain onboarded to Email Sending. Set only one of the three email keys. With none, links are written to the server log and nothing is sent. |
 | `CLOUDFLARE_ACCOUNT_ID` | with the Cloudflare key | none | The Cloudflare account that sends, shown in the dashboard's account home. |
 | `PASSKEYS` | no | `auto` | `auto` turns passkey sign-in on once `PUBLIC_URL` is `https://`. `on` also allows `http://localhost` for trying them out; `off` turns them off. Passkeys are tied to `PUBLIC_URL`, so set its final address first. |
+| `OUTFLARE_SIGNED_IN_COOKIE_DOMAIN` | no | none | A parent domain of `PUBLIC_URL`'s host, such as `example.com` for `app.example.com`. While someone is signed in, the server keeps an `outflare_signed_in=1` cookie there, so your website can show a **Dashboard** link instead of **Sign in**. The cookie says nothing else and scripts on your site can read it; the session cookie itself stays HttpOnly on the app's own host. The server refuses to start if the domain isn't its own host or a parent of it. |
 | `CLIENT_IP_HEADER` | no | none | Header your proxy puts the visitor's address in, such as `Fly-Client-IP` or `CF-Connecting-IP`. Rate limits use it. Only set it when every request comes through that proxy, or visitors could fake it. |
 | `WEBHOOKS_ALLOW_PRIVATE` | no | `false` | `true` lets [webhooks](/docs/api/webhooks/) go to private, loopback and plain-`http` addresses, for receivers on the same network as the server. Leave it off on a server anyone else can add webhooks to. |
+| `OUTFLARE_LOG_RETENTION_DAYS` | no | `30` | Days to keep [request logs](/docs/api/logs/) (the Logs page), from 1 to 3650. Older calls are deleted every hour. |
 | `OUTFLARE_CRAWL_ALLOW_PRIVATE` | no | `false` | `true` lets [site audits](/docs/guides/site-audits/) crawl private addresses and other ports, to audit an intranet or a site in development. Leave it off on a server other people use. |
 | `OUTFLARE_TELEMETRY` | no | on | `off` stops the anonymous daily usage report and update check. See [Usage stats and update checks](/docs/self-hosting/telemetry/). |
 | `DO_NOT_TRACK` | no | none | `1` does the same as `OUTFLARE_TELEMETRY=off`. |
@@ -39,6 +41,10 @@ Compose-only settings:
 | --- | --- | --- |
 | `POSTGRES_PASSWORD` | `outflare` | Password for the bundled Postgres container. |
 | `PORT` | `8080` | Host port that the engine is published on. |
+
+## Third-party keys
+
+Every workspace brings its own keys for every third-party API, AI models and connectors alike, with no exceptions: each one connects its own Claude, OpenAI, Gemini, Mistral, Geonode, Apollo or DataForSEO account on the [Connectors](/docs/integrations/connectors/) page. Outflare never lends a key of its own, and neither does your server. At start-up the engine removes vendor keys such as `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY` or `GOOGLE_APPLICATION_CREDENTIALS` from its environment and logs which it ignored, so setting one does nothing. The only third-party settings above are for running Outflare itself: account email, OAuth app ids (people still sign in to their own accounts) and your own product analytics.
 
 ## Rotating the secret key
 
