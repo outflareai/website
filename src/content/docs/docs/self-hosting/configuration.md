@@ -40,6 +40,10 @@ Compose-only settings:
 | `POSTGRES_PASSWORD` | `outflare` | Password for the bundled Postgres container. |
 | `PORT` | `8080` | Host port that the engine is published on. |
 
+## Third-party keys
+
+Every workspace brings its own keys for every third-party API, AI models and connectors alike, with no exceptions: each one connects its own Claude, OpenAI, Gemini, Mistral, Geonode, Apollo or DataForSEO account on the [Connectors](/docs/integrations/connectors/) page. Outflare never lends a key of its own, and neither does your server. At start-up the engine removes vendor keys such as `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY` or `GOOGLE_APPLICATION_CREDENTIALS` from its environment and logs which it ignored, so setting one does nothing. The only third-party settings above are for running Outflare itself: account email, OAuth app ids (people still sign in to their own accounts) and your own product analytics.
+
 ## Rotating the secret key
 
 To rotate the key:
