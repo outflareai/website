@@ -5254,6 +5254,7 @@ paths:
       tags: [seo]
       parameters:
         - { name: status, in: query, schema: { type: string, enum: [queued, fetched, blocked, failed, skipped] } }
+        - { name: http_status, in: query, description: "Only pages that answered this, like 404.", schema: { type: integer, minimum: 100, maximum: 599 } }
         - { name: after, in: query, description: "A page id from next_after.", schema: { type: string } }
         - { $ref: "#/components/parameters/Cursor" }
         - { $ref: "#/components/parameters/Fields" }
@@ -5271,6 +5272,31 @@ paths:
                   next_after: { type: [string, "null"] }
                   next_cursor: { $ref: "#/components/schemas/NextCursor" }
         "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/crawls/{crawl}/pages/{page}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: crawl, in: path, required: true, schema: { type: string, format: uuid } }
+      - { name: page, in: path, required: true, schema: { type: string }, example: "1042" }
+    get:
+      operationId: getCrawlPage
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: Read one crawled page with its links
+      description: "Scope: seo.read. The page, every link on it (up to 500, with the linked page's status in this crawl, so broken links show as 404) and the pages that link to it (up to 500)."
+      tags: [seo]
+      responses:
+        "200":
+          description: The page and its links.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [page, links_out, links_in]
+                properties:
+                  page: { $ref: "#/components/schemas/CrawlPage" }
+                  links_out: { type: array, items: { $ref: "#/components/schemas/CrawlLink" } }
+                  links_in: { type: array, items: { $ref: "#/components/schemas/CrawlLink" }, description: "The pages linking here: url is the linking page." }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/integrations:
@@ -10875,7 +10901,7 @@ components:
         finished_at: { type: [string, "null"], format: date-time }
     CrawlPage:
       type: object
-      required: [id, url, depth, source, found_on, status, reason, http_status, content_type, bytes, duration_ms, redirect_to, noindex, nofollow, links_out, fetched_at]
+      required: [id, url, depth, source, found_on, status, reason, http_status, content_type, bytes, duration_ms, redirect_to, noindex, nofollow, links_out, links_in, fetched_at, x_robots_tag, title, title_count, meta_description, canonical, canonical_count, h1, lang, hreflang, schema_types, word_count, images, images_no_alt, content_hash, viewport]
       properties:
         id: { type: string, example: "1042" }
         url: { type: string, example: "https://www.example.com/pricing" }
@@ -10891,8 +10917,40 @@ components:
         redirect_to: { type: [string, "null"], description: "Where a 3xx answer pointed; on the same site it is a page of its own." }
         noindex: { type: boolean }
         nofollow: { type: boolean, description: "The page asked crawlers not to follow its links, so its links were not queued." }
-        links_out: { type: integer }
+        links_out: { type: integer, description: Links on the page, to the site and elsewhere. }
+        links_in: { type: integer, description: "Pages of the site that link here, counted when the crawl ends. 0 on a page found only in a sitemap is an orphan." }
         fetched_at: { type: [string, "null"], format: date-time }
+        x_robots_tag: { type: [string, "null"], description: "The X-Robots-Tag header, which can also say noindex or nofollow." }
+        title: { type: [string, "null"], description: The first <title>, spaces tidied. }
+        title_count: { type: integer, description: "<title> tags on the page; more than one is a problem." }
+        meta_description: { type: [string, "null"] }
+        canonical: { type: [string, "null"], description: The first rel=canonical link, made absolute. }
+        canonical_count: { type: integer }
+        h1: { type: array, items: { type: string }, description: The page's h1 headings (up to 10). }
+        lang: { type: [string, "null"], example: en-AU, description: The html element's lang. }
+        hreflang:
+          type: array
+          items:
+            type: object
+            required: [lang, url]
+            properties:
+              lang: { type: string, example: de }
+              url: { type: string }
+        schema_types: { type: array, items: { type: string }, example: [Organization, Product], description: "Schema.org @type values in the page's JSON-LD." }
+        word_count: { type: integer, description: Words a reader sees (not scripts or the title). }
+        images: { type: integer }
+        images_no_alt: { type: integer, description: Images with no alt attribute (an empty alt marks a decorative image and is fine). }
+        content_hash: { type: [string, "null"], description: "The same for pages with the same words: duplicates." }
+        viewport: { type: boolean, description: Whether the page has a viewport meta tag (mobile friendly). }
+    CrawlLink:
+      type: object
+      required: [url, anchor, internal, nofollow, http_status]
+      properties:
+        url: { type: string }
+        anchor: { type: string, description: "The link's text, or an image's alt text." }
+        internal: { type: boolean, description: On the site (its host or its www. twin). }
+        nofollow: { type: boolean, description: rel nofollow, ugc or sponsored. }
+        http_status: { type: [integer, "null"], description: "The status this crawl got from the page; null when it did not read it." }
     SEOSource:
       type: object
       required: [id, name, connector, connector_name, status, last_error, account, reports, country, sync, domains_set, domains, budget]
