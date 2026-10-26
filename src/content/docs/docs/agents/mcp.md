@@ -72,6 +72,10 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 
 | Tool | What it does | Changes data |
 | --- | --- | --- |
+| `get_context` | Start here: what Outflare knows about the company, its memories and projects, and what is blocked. See [Memory and status](/docs/agents/memory/) | |
+| `get_status` | Everything stopping the workspace, worst first, with the tool that fixes each and who must act | |
+| `list_memories` | Search the preferences, decisions and facts people and agents saved | |
+| `update_context`, `remember`, `update_memory`, `forget` | Save the company context, remember something lasting, correct or forget a memory | Yes |
 | `list_projects` | Projects (one motion each: offer, ideal customer, market), with status, limits, what they own and sends | |
 | `get_project_brief` | A project's offer, audience, market, ideal customer filters and brief, plus all of it as Markdown for a prompt | |
 | `get_outcomes_report` | Cost per reply, meeting and won deal, for the workspace or by project or sequence, with what is estimated or unpriced | |

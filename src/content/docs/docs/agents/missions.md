@@ -2,7 +2,7 @@
 title: Missions
 description: Give an agent a goal inside a project, with a brief, a mode, limits and approvals, and see every call it makes.
 sidebar:
-  order: 2
+  order: 3
 ---
 
 <span class="pill shipped">Shipped</span> Missions in the REST API, the MCP server and the web app.
