@@ -11021,6 +11021,178 @@ paths:
         "404": { $ref: "#/components/responses/Error" }
         "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/email-broadcasts:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listEmailBroadcasts
+      x-outflare-access: { scope: emails.read }
+      summary: List broadcasts, newest first
+      description: "Scope: emails.read. The latest 200."
+      tags: [emails]
+      parameters:
+        - { name: status, in: query, schema: { $ref: "#/components/schemas/EmailBroadcastStatus" } }
+      responses:
+        "200":
+          description: Broadcasts.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/EmailBroadcast" } }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createEmailBroadcast
+      x-outflare-access: { scope: emails.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Create a broadcast
+      description: |
+        Scope: emails.manage. A draft that sends one lifecycle template to many people on customer records. The audience
+        is everyone its topic may go to (kind topic), or a list of records (kind records). It takes the template's topic
+        unless you name another.
+      tags: [emails]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/EmailBroadcastInput" }
+      responses:
+        "201":
+          description: The broadcast.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/EmailBroadcast" }
+        "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/email-broadcasts/{id}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getEmailBroadcast
+      x-outflare-access: { scope: emails.read }
+      summary: Get a broadcast with its results
+      description: "Scope: emails.read. audience_size is how many people the audience has now, until it starts."
+      tags: [emails]
+      responses:
+        "200":
+          description: The broadcast.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/EmailBroadcast" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateEmailBroadcast
+      x-outflare-access: { scope: emails.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Change a draft broadcast
+      description: "Scope: emails.manage. Once it is scheduled or sending, only the name can change."
+      tags: [emails]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/EmailBroadcastInput" }
+      responses:
+        "200":
+          description: The broadcast.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/EmailBroadcast" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/email-broadcasts/{id}/send:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: sendEmailBroadcast
+      x-outflare-access: { scope: emails.send }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Send a draft broadcast now or later
+      description: |
+        Scope: emails.send. Checks that the email can go (the template is published, the sender's domain is verified,
+        the provider sends lifecycle email), freezes the template's published version and starts, or waits for send_at.
+        Each person gets their own email; people who left its topic or all marketing email, opt-in topics they never
+        joined, and prospects who never agreed to marketing email are skipped, with why.
+      tags: [emails]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                send_at: { type: string, format: date-time, description: Within 30 days. Leave out to send now. }
+      responses:
+        "200":
+          description: The broadcast, sending or scheduled.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/EmailBroadcast" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/email-broadcasts/{id}/cancel:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: cancelEmailBroadcast
+      x-outflare-access: { scope: emails.send }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Cancel a scheduled or sending broadcast
+      description: "Scope: emails.send. Its emails that have not gone yet are cancelled too."
+      tags: [emails]
+      responses:
+        "200":
+          description: The broadcast, cancelled.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/EmailBroadcast" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/email-broadcasts/{id}/recipients:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: listEmailBroadcastRecipients
+      x-outflare-access: { scope: emails.read }
+      summary: Who a broadcast went to, or skipped and why
+      description: "Scope: emails.read. In record order; page with cursor=next_cursor."
+      tags: [emails]
+      parameters:
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
+        - { name: skipped, in: query, schema: { type: string, enum: ["true", "false"] } }
+        - { name: after, in: query, description: A record id; the people after it., schema: { type: string, format: uuid } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
+      responses:
+        "200":
+          description: A page of recipients.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, next_after, next_cursor]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/EmailBroadcastRecipient" } }
+                  next_after: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/emails:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
@@ -11043,6 +11215,7 @@ paths:
         - { name: trigger, in: query, schema: { type: string, enum: [api, test, event, journey, broadcast, system] } }
         - { name: request_id, in: query, description: Emails queued by this API call., schema: { type: string } }
         - { name: topic, in: query, description: "Emails in this topic, by key or id.", schema: { type: string } }
+        - { name: broadcast, in: query, description: The emails a broadcast made., schema: { type: string, format: uuid } }
       responses:
         "200":
           description: A page of emails.
@@ -13125,6 +13298,97 @@ components:
         sent_30d: { type: integer, description: "Emails in this topic in the last 30 days, not counting tests." }
         created_at: { type: string, format: date-time }
         updated_at: { type: string, format: date-time }
+    EmailBroadcastStatus: { type: string, enum: [draft, scheduled, sending, sent, cancelled, failed] }
+    EmailBroadcastAudience:
+      type: object
+      required: [kind]
+      properties:
+        kind: { type: string, enum: [topic, records, list], description: "topic: everyone the topic may go to. records: the listed records. list: a saved list (not yet)." }
+        record_ids: { type: array, maxItems: 10000, items: { type: string, format: uuid } }
+        ref: { type: [string, "null"], description: "The saved list or segment, for kind list." }
+    EmailBroadcastInput:
+      type: object
+      properties:
+        name: { type: string, maxLength: 200 }
+        template: { type: string, description: "A lifecycle template's id or handle." }
+        topic: { type: [string, "null"], description: "A topic's key or id; the template's when left out." }
+        from: { type: string, description: "The sender; the template's when empty." }
+        provider_id: { type: [string, "null"], format: uuid }
+        brand_id: { type: [string, "null"], format: uuid, description: "Only people of this brand." }
+        audience: { $ref: "#/components/schemas/EmailBroadcastAudience" }
+        data: { type: object, additionalProperties: true, description: "Template variables for everyone. Each person's own are under person (person.first_name)." }
+        track:
+          type: object
+          properties:
+            opens: { type: [boolean, "null"], description: "null: the template's setting." }
+            clicks: { type: [boolean, "null"] }
+    EmailBroadcast:
+      type: object
+      required: [id, name, status, status_reason, template, template_version, topic, from, provider_id, brand_id, audience, audience_size,
+        data, track, send_at, started_at, finished_at, recipients, skipped, stats, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        status: { $ref: "#/components/schemas/EmailBroadcastStatus" }
+        status_reason: { type: [string, "null"] }
+        template:
+          type: object
+          required: [id, handle, name]
+          properties:
+            id: { type: string, format: uuid }
+            handle: { type: string }
+            name: { type: string }
+        template_version: { type: [integer, "null"], description: The published version it sends, once it starts. }
+        topic: { oneOf: [{ $ref: "#/components/schemas/EmailTopicRef" }, { type: "null" }] }
+        from: { type: string }
+        provider_id: { type: [string, "null"], format: uuid }
+        brand_id: { type: [string, "null"], format: uuid }
+        audience:
+          type: object
+          required: [kind, record_ids, ref]
+          properties:
+            kind: { type: string, enum: [topic, records, list] }
+            record_ids: { type: array, items: { type: string, format: uuid } }
+            ref: { type: [string, "null"] }
+        audience_size: { type: [integer, "null"], description: "People in the audience now, before their choices; only on a single draft or scheduled broadcast." }
+        data: { type: object, additionalProperties: true }
+        track:
+          type: object
+          required: [opens, clicks]
+          properties:
+            opens: { type: [boolean, "null"] }
+            clicks: { type: [boolean, "null"] }
+        send_at: { type: [string, "null"], format: date-time }
+        started_at: { type: [string, "null"], format: date-time }
+        finished_at: { type: [string, "null"], format: date-time }
+        recipients: { type: integer, description: Emails made. }
+        skipped: { type: integer, description: People skipped because of what they chose. }
+        stats:
+          type: object
+          required: [emails, sent, delivered, opened, clicked, bounced, complained, unsubscribed, not_sent]
+          properties:
+            emails: { type: integer }
+            sent: { type: integer }
+            delivered: { type: integer }
+            opened: { type: integer }
+            clicked: { type: integer }
+            bounced: { type: integer }
+            complained: { type: integer }
+            unsubscribed: { type: integer }
+            not_sent: { type: integer, description: "Suppressed at send time, failed or cancelled." }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    EmailBroadcastRecipient:
+      type: object
+      required: [record_id, name, address, email_id, status, skipped, created_at]
+      properties:
+        record_id: { type: string, format: uuid }
+        name: { type: string }
+        address: { type: [string, "null"] }
+        email_id: { type: [string, "null"], format: uuid }
+        status: { oneOf: [{ $ref: "#/components/schemas/EmailStatus" }, { type: "null" }] }
+        skipped: { type: [string, "null"], description: Why this person did not get it. }
+        created_at: { type: string, format: date-time }
     EmailTopicInput:
       type: object
       properties:
