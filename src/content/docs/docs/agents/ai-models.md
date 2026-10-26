@@ -1,17 +1,17 @@
 ---
 title: AI models
-description: Choose the AI model that plans missions and runs Outflare's own agent (Claude, OpenAI, Gemini or Mistral) with your own API key, and how that key and your spend are kept safe.
+description: Choose the AI model that plans missions and runs Outflare's own agent (Claude, OpenAI, Gemini, Mistral or OpenRouter) with your own API key, and how that key and your spend are kept safe.
 sidebar:
   order: 4
 ---
 
-<span class="pill shipped">Shipped</span> Claude, OpenAI, Gemini and Mistral, a model picker, and a monthly AI limit.
+<span class="pill shipped">Shipped</span> Claude, OpenAI, Gemini, Mistral and OpenRouter, a model picker, and a monthly AI limit.
 
 Outflare plans [missions](/docs/agents/missions/) from a goal and runs its own agent with an AI model you connect, using **your own API key**. Usage is billed by the provider, to your account. Every workspace brings its own key: Outflare never supplies, pays for or shares one. You don't need one to use Outflare: your own agent over [MCP](/docs/agents/mcp/) or the API needs no model here at all.
 
 ## Pick a provider and a model
 
-1. Open **Connectors** and connect one of the AI providers with its API key: **Claude** (Anthropic), **OpenAI**, **Gemini** (Google AI Studio) or **Mistral**. The key is checked with the provider before it is saved.
+1. Open **Connectors** and connect one of the AI providers with its API key: **Claude** (Anthropic), **OpenAI**, **Gemini** (Google AI Studio), **Mistral** or **OpenRouter** (one key for many vendors' models). The key is checked with the provider before it is saved.
 2. Open **Settings**, **General**, and find **AI model**. Choose the provider and pick a model. The list comes live from the provider, with only the chat models your key can use.
 3. Save. The Missions page then says which model it uses, with a link to change it.
 
@@ -19,7 +19,7 @@ Outflare plans [missions](/docs/agents/missions/) from a goal and runs its own a
 
 With no choice saved, Outflare uses the first connected provider in the order above with its default model. Only Claude has one (Claude Opus 5.5); for the others you pick, because their line-ups change too often to guess.
 
-Outflare knows the list price of Claude models. For a model it doesn't know, enter the provider's price in US$ per million input and output tokens, from the pricing page linked in the form. Prices are needed so spend limits work.
+Outflare knows the list price of Claude models, and OpenRouter reports the cost of every call. For a model it doesn't know, enter the provider's price in US$ per million input and output tokens, from the pricing page linked in the form. Prices are needed so spend limits work.
 
 ![Choosing an OpenAI model and entering its price](/screens/ai-model-price.png)
 
@@ -34,6 +34,7 @@ Not every task needs the strongest model. Under **Model for each task** you can 
 | **Routine check-ins** | Looking in on a running mission when nothing new came from you | The provider's cheaper model, when it costs less: Claude Sonnet 5.5 under Claude Opus 5.5 |
 | **Reply labelling** | Labelling replies to your outreach that the built-in rules can't place: interested, not now, out of office and so on | The provider's cheapest model: Claude Haiku 5.5 |
 | **Domain research** | Reading an unknown email domain's homepage to classify it | The provider's cheapest model: Claude Haiku 5.5 |
+| **AI visibility** | Reading what AI models answer about your brands, such as checking answers against your brand's facts. The questions themselves go to the models you pick for [AI visibility](/docs/guides/ai-visibility/) | The provider's cheaper model: Claude Sonnet 5.5 under Claude Opus 5.5 |
 
 The cheaper defaults are Claude's; with another provider every task uses the main model until you pick one. Each list shows what the model costs, in US$ per million input/output tokens, and every call is priced at its own model's price. A choice belongs to the provider it was made for: switch provider and the tasks go back to their defaults.
 

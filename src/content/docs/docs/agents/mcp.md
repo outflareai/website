@@ -208,8 +208,14 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `verify_seo_site`, `start_crawl`, `get_crawl`, `list_crawls`, `stop_crawl` | Check the DNS record, meta tag or file that proves ownership; crawl a site and follow the crawl | Yes |
 | `list_crawl_pages`, `get_crawl_page` | Every URL a crawl found: HTTP status, redirects, noindex, nofollow, robots.txt blocks, title, description, canonical, h1, hreflang, structured data, word count, links in and out | |
 | `list_crawl_issues`, `get_crawl_issue` | A crawl's audit: the rules its pages break, by URL template, with why and how to fix each, and the pages behind one rule | |
-| `list_fixes`, `update_fix` | The workspace's shared fixes list (site audits' fixes so far): take a fix, mark it done (the next crawl checks), ignore it, or leave a note | Yes |
+| `list_fixes`, `update_fix` | The workspace's shared fixes list (site audits' and AI visibility's fixes): take a fix, mark it done (the next crawl or run checks), ignore it, or leave a note | Yes |
 | `get_fix_prompt`, `verify_fix` | Hand a fix to a coding agent as a prompt, then report it live so a fresh crawl confirms it or opens it again | Yes |
+| `get_ai_visibility` | How often AI answers name each brand: mention rate, share of voice against competitors, position, cited pages, by model and week. See [AI visibility](/docs/guides/ai-visibility/) | |
+| `get_ai_visibility_settings`, `update_ai_visibility_settings` | Which models AI visibility asks (on your own AI connections), answers per prompt, and its monthly limit | Yes |
+| `list_ai_cohorts`, `create_ai_cohort`, `update_ai_cohort`, `delete_ai_cohort` | Prompt cohorts: a brand's questions, other names, competitors, locale and schedule | Yes |
+| `list_ai_prompts`, `add_ai_prompts`, `update_ai_prompt`, `delete_ai_prompt` | The questions in a cohort | Yes |
+| `run_ai_prompts`, `list_ai_runs`, `get_ai_run`, `stop_ai_run` | Ask every model a cohort's questions now (costs money on your AI key), follow the run, stop it | Yes |
+| `list_ai_samples`, `get_ai_sample` | Each AI answer: model, text, brands named, pages cited | |
 | `list_clients`, `use_client`, `create_client` | Agency mode only (`OUTFLARE_AGENCY`): every client with this week's numbers, switch client, add a client | Yes |
 
 The tools that make email go out, the ones that can spend data provider credits (marked *provider*), and `approve_infra_plan`, which spends money, are marked as reaching the outside world in their MCP annotations, so clients that support it can ask you before running them.
