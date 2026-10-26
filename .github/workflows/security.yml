@@ -3,7 +3,7 @@
 # everyone forever, so a leaked secret has to be revoked, not just deleted.
 #
 # - secrets: gitleaks. A pull request scans its own commits; main and the
-#   daily run scan the whole history of every branch.
+#   daily run scan the whole history of every branch and every pull request head.
 # - workflows: zizmor, for workflow mistakes a public repo can't afford
 #   (unpinned actions, write tokens, untrusted input in scripts).
 # - dependencies: npm audit (high and critical, shipped packages only),
@@ -51,11 +51,19 @@ jobs:
           EVENT: ${{ github.event_name }}
           BASE: ${{ github.event.pull_request.base.sha }}
           HEAD: ${{ github.event.pull_request.head.sha }}
+          # Read-only (permissions above), used only for this fetch, never
+          # written to .git/config. Without it the fetch fails while the
+          # repository is private.
+          TOKEN: ${{ github.token }}
         run: |
           if [ "$EVENT" = pull_request ]; then
             range="$BASE..$HEAD"
           else
-            git fetch --quiet origin '+refs/heads/*:refs/remotes/origin/*'
+            # Every branch, plus every pull request's head: those stay
+            # readable on GitHub after their branch is deleted.
+            auth="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$TOKEN" | base64 -w0)"
+            git -c http.https://github.com/.extraheader="$auth" fetch --quiet origin \
+              '+refs/heads/*:refs/remotes/origin/*' '+refs/pull/*/head:refs/remotes/pull/*'
             range="--all"
           fi
           gitleaks git --no-banner --redact --log-opts="$range" .

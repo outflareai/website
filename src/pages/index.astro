@@ -211,7 +211,7 @@ const roadmapTag: Record<string, string> = { shipped: 'badge-live', building: 'b
 						<thead><tr class="font-mono text-[11px] tracking-wide text-muted-foreground uppercase"><th class="w-[44%] py-1.5 font-medium">Mailbox</th><th class="py-1.5 font-medium">Status</th><th class="hidden py-1.5 font-medium sm:table-cell">Warm-up</th><th class="py-1.5 text-right font-medium">Limit</th></tr></thead>
 						<tbody class="divide-y">
 							{
-								[['alex@trynorthwind.com', '96%', 40], ['sam@trynorthwind.com', '94%', 40], ['jordan@northwindhq.com', '95%', 50], ['riley@getnorthwind.io', '93%', 30]].map(([m, w, l]) => (
+								[['alex@trynorthpeak.example', '96%', 40], ['sam@trynorthpeak.example', '94%', 40], ['jordan@northpeak.example', '95%', 50], ['riley@northpeakmail.example', '93%', 30]].map(([m, w, l]) => (
 									<tr><td class="py-1.5 font-mono text-xs">{m}</td><td><span class="badge badge-live">Sending</span></td><td class="hidden sm:table-cell"><span class="badge badge-live">{w} inbox</span></td><td class="text-right tabular-nums">{l}/day</td></tr>
 								))
 							}
@@ -239,7 +239,7 @@ const roadmapTag: Record<string, string> = { shipped: 'badge-live', building: 'b
 				<h3 class="font-semibold">Domain health, checked daily</h3>
 				<p class="mt-1.5 text-sm text-muted-foreground">SPF, DKIM, DMARC, MX and blocklists for every sending domain, with the exact record to fix.</p>
 				<ul class="mt-5 space-y-2.5">
-					{[['trynorthwind.com', ['SPF', 'DKIM', 'DMARC'], ''], ['northwindhq.com', ['SPF', 'DKIM', 'DMARC'], ''], ['getnorthwind.io', ['SPF', 'DKIM'], 'DMARC']].map(([d, ok, warn]) => (
+					{[['trynorthpeak.example', ['SPF', 'DKIM', 'DMARC'], ''], ['northpeak.example', ['SPF', 'DKIM', 'DMARC'], ''], ['northpeakmail.example', ['SPF', 'DKIM'], 'DMARC']].map(([d, ok, warn]) => (
 						<li class="flex flex-wrap items-center justify-between gap-2">
 							<span class="font-mono text-xs">{d}</span>
 							<span class="flex gap-1">
@@ -289,7 +289,7 @@ const roadmapTag: Record<string, string> = { shipped: 'badge-live', building: 'b
 				<ul class="mt-5 space-y-1.5 font-mono text-xs">
 					<li class="flex gap-3"><span class="text-muted-foreground">12:04</span><span class="badge badge-muted">token: sdr-agent</span><span>sequence.started</span></li>
 					<li class="flex gap-3"><span class="text-muted-foreground">11:58</span><span class="badge badge-muted">token: sdr-agent</span><span>leads.imported <span class="text-muted-foreground">240 rows</span></span></li>
-					<li class="flex gap-3"><span class="text-muted-foreground">11:41</span><span class="badge badge-muted">maya@northwind.dev</span><span>mailbox.paused</span></li>
+					<li class="flex gap-3"><span class="text-muted-foreground">11:41</span><span class="badge badge-muted">maya@northpeak.example</span><span>mailbox.paused</span></li>
 				</ul>
 			</a>
 
@@ -300,7 +300,7 @@ const roadmapTag: Record<string, string> = { shipped: 'badge-live', building: 'b
 				<p class="mt-1.5 text-sm text-muted-foreground">Steps are rendered for real leads, and a lead missing a variable with no fallback is held back, not sent.</p>
 				<div class="mt-5 grid gap-2 font-mono text-xs sm:grid-cols-2">
 					<div class="rounded-lg border bg-muted/40 p-3"><span class="text-muted-foreground">template</span><br />Hi <span class="text-violet-600 dark:text-violet-400">{'{{first_name}}'}</span>, saw <span class="text-violet-600 dark:text-violet-400">{'{{company}}'}</span> just raised.</div>
-					<div class="rounded-lg border bg-muted/40 p-3"><span class="text-muted-foreground">zoe.okafor@vercel.com</span><br />Hi <span class="text-brand-strong dark:text-brand">Zoe</span>, saw <span class="text-brand-strong dark:text-brand">Vercel</span> just raised.</div>
+					<div class="rounded-lg border bg-muted/40 p-3"><span class="text-muted-foreground">ana@northpeak.example</span><br />Hi <span class="text-brand-strong dark:text-brand">Ana</span>, saw <span class="text-brand-strong dark:text-brand">Northpeak</span> just raised.</div>
 				</div>
 				<p class="mt-2 flex items-center gap-2 text-xs"><span class="badge badge-next">3 leads held</span><span class="text-muted-foreground">missing <code class="font-mono">company</code></span></p>
 			</a>
@@ -346,7 +346,7 @@ const roadmapTag: Record<string, string> = { shipped: 'badge-live', building: 'b
 				<h2 class="h2 mt-3">Your agents get a real API, not a browser.</h2>
 				<p class="sub">The web app has no private endpoints. Whatever it does, your scripts and agents can do through the same documented API, with limits they can't talk their way past.</p>
 				<dl class="mt-8 grid gap-5 sm:grid-cols-2">
-					<div><dt class="font-medium">Connect your AI</dt><dd class="mt-1 text-sm text-muted-foreground">One URL for Claude, ChatGPT, Cursor and any MCP app, with 210 tools. Sign in, approve, then just ask.</dd></div>
+					<div><dt class="font-medium">Connect your AI</dt><dd class="mt-1 text-sm text-muted-foreground">One URL for Claude, ChatGPT, Cursor and any MCP app, with 211 tools. Sign in, approve, then just ask.</dd></div>
 					<div><dt class="font-medium">OpenAPI 3.1</dt><dd class="mt-1 text-sm text-muted-foreground">One contract, served by every instance at <code class="text-xs">/v1/openapi.yaml</code>.</dd></div>
 					<div><dt class="font-medium">Typed SDK</dt><dd class="mt-1 text-sm text-muted-foreground">An Apache-2.0 TypeScript client generated from the contract.</dd></div>
 					<div><dt class="font-medium">Attributed</dt><dd class="mt-1 text-sm text-muted-foreground">Every action lands in the audit log under the token's name.</dd></div>

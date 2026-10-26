@@ -13,7 +13,7 @@ There are two ways in. The MCP server is the quickest one for Claude, ChatGPT, C
 
 ## The MCP server <span class="pill shipped">Shipped</span>
 
-[`@outflare/mcp`](https://github.com/outflareai/outflare/tree/main/mcp) is an [MCP](https://modelcontextprotocol.io) server that gives an agent 210 tools over the API (3 more in agency mode): run [missions](/docs/agents/missions/) toward a goal with approvals, read and update the brief of the project it works on, check sending domains and mailbox warm-up, import leads, check them against the suppression list, build, preview and start sequences, see and change which mailboxes each sequence sends from, and read and answer replies.
+[`@outflare/mcp`](https://github.com/outflareai/outflare/tree/main/mcp) is an [MCP](https://modelcontextprotocol.io) server that gives an agent 211 tools over the API (3 more in agency mode): run [missions](/docs/agents/missions/) toward a goal with approvals, read and update the brief of the project it works on, check sending domains and mailbox warm-up, import leads, check them against the suppression list, build, preview and start sequences, see and change which mailboxes each sequence sends from, and read and answer replies.
 
 It calls the same API with a scoped token, so:
 
@@ -38,7 +38,7 @@ Then configure it:
     - A reporting agent needs `workspace.read`, `mailboxes.read`, `leads.read`, `sequences.read` and `inbox.read`.
     - An agent that runs outreach also needs `leads.manage`, `sequences.manage` and `inbox.manage`, and `mailboxes.manage` to pause domains or change their limits.
     - To keep an agent inside one motion, create the token **for a project** (the project's page has a button for this) and add `projects.read`, plus `projects.manage` if it may edit the brief. It sees only that project and its records. See [Projects](/docs/guides/projects/#agents-and-project-tokens).
-    - To let it run [missions](/docs/agents/missions/), add `missions.read` and `missions.run` (the **Mission agent** preset). Never give it `missions.approve`.
+    - To let it run [missions](/docs/agents/missions/), add `missions.read` and `missions.run` (set **Missions** to **Change**). Never give it `missions.approve`.
     - For an outreach agent, also set its **sending limits**: a daily send budget across all the sequences it creates, the highest priority it may give a sequence, and whether it may take mailboxes from other sequences (off by default). See [Mailbox allocation](/docs/guides/mailbox-allocation/#agents).
 2. Add the server to your client. The token already says which workspace it belongs to.
 
@@ -197,7 +197,7 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `update_seo_settings`, `sync_seo` | An SEO connection's domains, country, monthly budget and weekly snapshots; take a snapshot now (*provider*) | Yes |
 | `list_seo_sites`, `add_seo_site`, `update_seo_site`, `delete_seo_site` | The websites OutflareBot audits: ownership, crawl settings and limits, latest crawl. See [Crawl and audit your sites](/docs/guides/site-audits/) | Yes |
 | `verify_seo_site`, `start_crawl`, `get_crawl`, `list_crawls`, `stop_crawl` | Check the DNS record, meta tag or file that proves ownership; crawl a site and follow the crawl | Yes |
-| `list_crawl_pages` | Every URL a crawl found: HTTP status, redirects, noindex, nofollow, robots.txt blocks | |
+| `list_crawl_pages`, `get_crawl_page` | Every URL a crawl found: HTTP status, redirects, noindex, nofollow, robots.txt blocks, title, description, canonical, h1, hreflang, structured data, word count, links in and out | |
 | `list_clients`, `use_client`, `create_client` | Agency mode only (`OUTFLARE_AGENCY`): every client with this week's numbers, switch client, add a client | Yes |
 
 The tools that make email go out, the ones that can spend data provider credits (marked *provider*), and `approve_infra_plan`, which spends money, are marked as reaching the outside world in their MCP annotations, so clients that support it can ask you before running them.
