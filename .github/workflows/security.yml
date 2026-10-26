@@ -4,6 +4,8 @@
 #
 # - secrets: gitleaks. A pull request scans its own commits; main and the
 #   daily run scan the whole history of every branch and every pull request head.
+# - fake-data: a pull request may not add a real email address, in its
+#   code, title or description (scripts/check-fake-data.mjs).
 # - workflows: zizmor, for workflow mistakes a public repo can't afford
 #   (unpinned actions, write tokens, untrusted input in scripts).
 # - dependencies: npm audit (high and critical, shipped packages only),
@@ -67,6 +69,22 @@ jobs:
             range="--all"
           fi
           gitleaks git --no-banner --redact --log-opts="$range" .
+
+  fake-data:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: No real email addresses in the change, title or description
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: node scripts/check-fake-data.mjs "$BASE" "$HEAD"
 
   workflows:
     runs-on: ubuntu-latest
