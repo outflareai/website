@@ -97,7 +97,7 @@ export const milestones: Milestone[] = [
 		step: 9,
 		title: 'MCP server for agents',
 		status: 'shipped',
-		summary: 'Claude, Cursor and other MCP clients run a workspace through 301 tools over the API, held to the token\'s scopes and the send policy.',
+		summary: 'Claude, Cursor and other MCP clients run a workspace through 307 tools over the API, held to the token\'s scopes and the send policy.',
 		docs: '/docs/agents/mcp/',
 	},
 	{
@@ -146,7 +146,7 @@ export const milestones: Milestone[] = [
 		step: 16,
 		title: 'Agent missions',
 		status: 'shipped',
-		summary: 'Type a goal and Claude drafts the mission, then Outflare\'s own agent runs it with your key, or give the goal to your own agent: it reads the brief, rehearses in a dry run, sends its plan for approval, asks for the tools it needs, and works within send and spend limits, with every call logged and changes held for approval when you choose.',
+		summary: 'Type a goal and the AI model you pick (Claude, OpenAI, Gemini or Mistral) drafts the mission, then Outflare\'s own agent runs it with your key, or give the goal to your own agent: it reads the brief, rehearses in a dry run, sends its plan for approval, asks for the tools it needs, and works within send and spend limits, with every call logged and changes held for approval when you choose.',
 		docs: '/docs/agents/missions/',
 	},
 	{

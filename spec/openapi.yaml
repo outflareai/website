@@ -5774,6 +5774,150 @@ paths:
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/seo-sites/{site}/search:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: site, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getSiteSearch
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: Read a site's search performance by page and query
+      description: |
+        Scope: seo.read. Clicks, impressions, click-through rate and average
+        position from Google Search Console, for each page of the site, each
+        query, or each page and query together. The analytics sync stores
+        them from the workspace's own Search Console sign-in: 90 days at
+        first, then back to 16 months a few weeks at a time, so nothing here
+        calls Google. `source` is the property the numbers come from (a
+        domain property first), or null when no Search Console property
+        covers the site; connect Google Search Console to fill it. Dates
+        default to the 28 days ending on the newest day Search Console has
+        sent, usually two or three days ago.
+      tags: [seo]
+      parameters:
+        - { name: group, in: query, schema: { type: string, enum: [page, query, page_query], default: page } }
+        - { name: from, in: query, schema: { type: string, format: date } }
+        - { name: to, in: query, schema: { type: string, format: date } }
+        - { name: page, in: query, description: "Only this page (its full URL).", schema: { type: string } }
+        - { name: keyword, in: query, description: "Only this query, as people typed it.", schema: { type: string } }
+        - { name: contains, in: query, description: "Only pages or queries that contain this text.", schema: { type: string } }
+        - { name: sort, in: query, schema: { type: string, enum: [clicks, impressions, ctr, position], default: clicks } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 1000, default: 100 } }
+      responses:
+        "200":
+          description: Rows, best first, and the totals of every row that matches.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [source, from, to, group, data, totals]
+                properties:
+                  source: { oneOf: [{ $ref: "#/components/schemas/SearchSource" }, { type: "null" }] }
+                  from: { type: string, format: date }
+                  to: { type: string, format: date }
+                  group: { type: string, enum: [page, query, page_query] }
+                  data: { type: array, items: { $ref: "#/components/schemas/SearchRow" } }
+                  totals: { $ref: "#/components/schemas/SearchRow" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/seo-sites/{site}/search/history:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: site, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getSiteSearchHistory
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: Read a site's search performance day by day
+      description: "Scope: seo.read. One point a day for the whole site, one page (`page`) or one query (`keyword`), or both, from what the sync stored. Same dates and source as GET .../search."
+      tags: [seo]
+      parameters:
+        - { name: from, in: query, schema: { type: string, format: date } }
+        - { name: to, in: query, schema: { type: string, format: date } }
+        - { name: page, in: query, schema: { type: string } }
+        - { name: keyword, in: query, description: "Only this query.", schema: { type: string } }
+      responses:
+        "200":
+          description: Days, oldest first.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [source, from, to, data]
+                properties:
+                  source: { oneOf: [{ $ref: "#/components/schemas/SearchSource" }, { type: "null" }] }
+                  from: { type: string, format: date }
+                  to: { type: string, format: date }
+                  data: { type: array, items: { $ref: "#/components/schemas/SearchDay" } }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/seo-sites/{site}/indexing:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: site, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getSiteIndexing
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: Read how Google indexed a site's pages
+      description: |
+        Scope: seo.read. What Search Console's URL Inspection says about the
+        site's pages: indexed or not and why, the canonical Google chose
+        against the page's own, when Google last crawled it, and when the
+        verdict last changed. Each sync inspects up to 100 pages a property
+        (the pages OutflareBot crawled and the pages Google showed, never
+        inspected first, then most shown), and inspects each again after 7
+        days, within Google's limit of about 2,000 a day.
+      tags: [seo]
+      parameters:
+        - { name: state, in: query, schema: { type: string, enum: [indexed, not_indexed, canonical_differs, changed] }, description: "changed is a verdict that changed in the last 7 days." }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 1000, default: 200 } }
+      responses:
+        "200":
+          description: Pages not indexed first.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [source, summary, data]
+                properties:
+                  source: { oneOf: [{ $ref: "#/components/schemas/SearchSource" }, { type: "null" }] }
+                  summary:
+                    type: object
+                    required: [inspected, indexed, not_indexed, canonical_differs, changed]
+                    properties:
+                      inspected: { type: integer }
+                      indexed: { type: integer }
+                      not_indexed: { type: integer }
+                      canonical_differs: { type: integer }
+                      changed: { type: integer }
+                  data: { type: array, items: { $ref: "#/components/schemas/URLInspection" } }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/seo-sites/{site}/sitemaps:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: site, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getSiteSitemaps
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: Read the sitemaps Google knows for a site
+      description: "Scope: seo.read. Each sitemap submitted to Search Console for the site: when it was submitted and last read, its errors and warnings, and how many of its URLs are indexed. Read once a day."
+      tags: [seo]
+      responses:
+        "200":
+          description: Sitemaps, those with errors first.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [source, data]
+                properties:
+                  source: { oneOf: [{ $ref: "#/components/schemas/SearchSource" }, { type: "null" }] }
+                  data: { type: array, items: { $ref: "#/components/schemas/SearchSitemap" } }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/seo-rules:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
@@ -5865,6 +6009,60 @@ paths:
         "403": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/fixes/{fix}/prompt:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: fix, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getFixPrompt
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: Turn a fix into a prompt for a coding agent
+      description: "Scope: seo.read. A plain-text prompt a coding agent (Claude Code, Cursor, Codex) can act on: the issue, why it matters, how to fix it, up to 25 example pages from the latest crawl, and how to report back (verify_url). Page details are marked as data, not instructions."
+      tags: [fixes]
+      responses:
+        "200":
+          description: The prompt.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/FixPrompt" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/fixes/{fix}/verify:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: fix, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: verifyFix
+      x-outflare-access: { scope: seo.manage, brand_limited: true }
+      summary: Say a fix is out and check it
+      description: "Scope: seo.manage. The callback for whoever made the change, a person or a coding agent: marks the fix done and starts a crawl of its site. A complete crawl that no longer finds the issue confirms it (webhook fix.confirmed); one that still finds it opens it again (fix.reopened). The body is optional. Only site audits' fixes can be checked."
+      tags: [fixes]
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                note: { type: string, maxLength: 2000, description: "What was changed, such as a pull request link. Replaces the fix's note." }
+      responses:
+        "202":
+          description: "Marked done, and the crawl that checks it has started; or the call is held for a person's approval in a mission."
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: object
+                    required: [fix, crawl]
+                    properties:
+                      fix: { $ref: "#/components/schemas/Fix" }
+                      crawl: { $ref: "#/components/schemas/Crawl" }
+                  - { $ref: "#/components/schemas/MissionHeld" }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/integrations:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
@@ -6078,9 +6276,21 @@ paths:
         calendar month (UTC); null means no workspace limit. The default is
         5000 (US$50).
 
+        `task_models` picks a model per task, on the same connection, so
+        routine work doesn't pay for the strongest model: `plan` (drafting a
+        mission), `turn` (Outflare's agent starting work, answering a person
+        or acting on a decision), `check_in` (a scheduled check-in with
+        nothing new from people), `reply_labelling` (labelling replies to
+        outreach) and `classify_domain` (domain research, below). A task left
+        out uses the main model, except that `check_in` uses the provider's
+        lighter model (Claude Sonnet 5.5) and `reply_labelling` and
+        `classify_domain` its cheapest (Claude Haiku 5.5), when they cost
+        less than the main model. Omit `task_models` to keep the current
+        choices.
+
         `domain_research` turns on research into unknown email domains: the
         workspace's own page reader (connect Geonode) fetches the domain's
-        homepage and the model above reads it. It needs both connections,
+        homepage and the `classify_domain` model reads it. It needs both connections,
         spends the workspace's own money, and is off until asked for.
         `domain_research_limit_cents` caps that research each calendar
         month, 20000 (US$200) by default, and 0 stops it; the overall AI
@@ -6099,6 +6309,16 @@ paths:
                 input_cents_per_million: { type: [number, "null"], exclusiveMinimum: 0, maximum: 10000000 }
                 output_cents_per_million: { type: [number, "null"], exclusiveMinimum: 0, maximum: 10000000 }
                 monthly_limit_cents: { type: [integer, "null"], minimum: 0, maximum: 10000000 }
+                task_models:
+                  type: object
+                  description: A model per task; replaces the current choices. A task left out or null uses its default.
+                  properties:
+                    plan: { $ref: "#/components/schemas/AITaskModelInput" }
+                    turn: { $ref: "#/components/schemas/AITaskModelInput" }
+                    check_in: { $ref: "#/components/schemas/AITaskModelInput" }
+                    reply_labelling: { $ref: "#/components/schemas/AITaskModelInput" }
+                    classify_domain: { $ref: "#/components/schemas/AITaskModelInput" }
+                  additionalProperties: false
                 domain_research: { type: boolean, description: Omitted leaves it as it is. }
                 domain_research_limit_cents: { type: integer, minimum: 0, maximum: 10000000, description: Omitted leaves it as it is; 0 stops research. }
       responses:
@@ -12477,6 +12697,66 @@ webhooks:
             schema: { $ref: "#/components/schemas/WebhookEvent" }
       responses:
         "200": { description: Any 2xx answer means received; anything else is retried. }
+  fix.found:
+    post:
+      operationId: webhook_fix_found
+      summary: "A new fix was added to the fixes list (a site audit found an issue). data has source, rule, subject_type, subject_id and run_id. GET .../fixes/{id}/prompt turns it into a prompt for a coding agent."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  fix.updated:
+    post:
+      operationId: webhook_fix_updated
+      summary: "Someone or an agent took, finished, ignored or reopened a fix, or changed its note. data holds what changed."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  fix.verify_requested:
+    post:
+      operationId: webhook_fix_verify_requested
+      summary: "Someone or an agent said a fix is out and asked for a check (POST .../fixes/{id}/verify). data.run_id is the crawl that checks it."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  fix.confirmed:
+    post:
+      operationId: webhook_fix_confirmed
+      summary: "A complete crawl no longer found a fix's issue, so it is done. data.run_id is the crawl."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  fix.reopened:
+    post:
+      operationId: webhook_fix_reopened
+      summary: "A fix marked done was found again by a crawl, so it is open again. data.run_id is the crawl."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
   workspace.updated:
     post:
       operationId: webhook_workspace_updated
@@ -12877,7 +13157,7 @@ components:
       required: [id, type, created_at, workspace_id, actor, target, request_id, data]
       properties:
         id: { type: string, description: "Unique per event, and the webhook-id header. Use it to ignore repeats.", example: evt_48213 }
-        type: { type: string, enum: [lead.replied, lead.unsubscribed, inbox.replied, inbox.updated, inbox.classified, lead.bounced, mailbox.auto_paused, lead.created, lead.updated, lead.deleted, leads.imported, suppressions.added, suppression.removed, lead_list.created, lead_list.leads_added, lead_list.run_started, lead_list.build_done, lead_list.build_failed, lead_list.refresh_done, lead_list.refresh_failed, lead_list.enrich_done, lead_list.enrich_failed, import.done, import.failed, sequence.created, sequence.updated, sequence.activated, sequence.paused, sequence.archived, sequence.deleted, sequence.steps_updated, sequence.leads_enrolled, enrollment.stopped, mailbox.imported, mailbox.updated, mailbox.paused, mailbox.resumed, mailbox.stage_changed, mailbox.deleted, domain.added, domain.paused, domain.resumed, domain.removed, email.queued, email.sent, email.delivered, email.bounced, email.complained, email.failed, email.suppressed, email.cancelled, email.unsubscribed, email.opened, email.clicked, email.preferences_changed, email_domain.verified, email_domain.verification_failed, email_provider.events_failed, email_template.published, meeting.created, meeting.updated, meeting.deleted, deal.created, deal.updated, deal.deleted, spend.recorded, integration.connected, integration.updated, integration.disconnected, connect_request.created, project.created, project.updated, project.deleted, mission.created, mission.updated, mission.submitted, mission.approved, mission.paused, mission.resumed, mission.stopped, mission.completed, mission.action_held, mission.action_approved, mission.action_rejected, infra.plan_created, infra.plan_approved, infra.ordered, infra.order_failed, infra.domains_bought, infra.mailbox_joined, infra.plan_warming, infra.plan_ready, infra.plan_cancelled, workspace.updated, webhook.test] }
+        type: { type: string, enum: [lead.replied, lead.unsubscribed, inbox.replied, inbox.updated, inbox.classified, lead.bounced, mailbox.auto_paused, lead.created, lead.updated, lead.deleted, leads.imported, suppressions.added, suppression.removed, lead_list.created, lead_list.leads_added, lead_list.run_started, lead_list.build_done, lead_list.build_failed, lead_list.refresh_done, lead_list.refresh_failed, lead_list.enrich_done, lead_list.enrich_failed, import.done, import.failed, sequence.created, sequence.updated, sequence.activated, sequence.paused, sequence.archived, sequence.deleted, sequence.steps_updated, sequence.leads_enrolled, enrollment.stopped, mailbox.imported, mailbox.updated, mailbox.paused, mailbox.resumed, mailbox.stage_changed, mailbox.deleted, domain.added, domain.paused, domain.resumed, domain.removed, email.queued, email.sent, email.delivered, email.bounced, email.complained, email.failed, email.suppressed, email.cancelled, email.unsubscribed, email.opened, email.clicked, email.preferences_changed, email_domain.verified, email_domain.verification_failed, email_provider.events_failed, email_template.published, meeting.created, meeting.updated, meeting.deleted, deal.created, deal.updated, deal.deleted, spend.recorded, integration.connected, integration.updated, integration.disconnected, connect_request.created, project.created, project.updated, project.deleted, mission.created, mission.updated, mission.submitted, mission.approved, mission.paused, mission.resumed, mission.stopped, mission.completed, mission.action_held, mission.action_approved, mission.action_rejected, infra.plan_created, infra.plan_approved, infra.ordered, infra.order_failed, infra.domains_bought, infra.mailbox_joined, infra.plan_warming, infra.plan_ready, infra.plan_cancelled, fix.found, fix.updated, fix.verify_requested, fix.confirmed, fix.reopened, workspace.updated, webhook.test] }
         created_at: { type: string, format: date-time }
         workspace_id: { type: string, format: uuid }
         actor: { $ref: "#/components/schemas/WebhookRef" }
@@ -14362,6 +14642,74 @@ components:
         cached: { type: boolean, description: A kept answer under a day old; it cost nothing. }
         fetched_at: { type: string, format: date-time }
         budget: { $ref: "#/components/schemas/SEOBudget" }
+    SearchSource:
+      type: object
+      description: The Search Console property a site's search numbers come from.
+      required: [integration_id, property, host, oldest_day, newest_day, last_run_at, last_error]
+      properties:
+        integration_id: { type: string, format: uuid }
+        property: { type: string, description: "https://example.com/ or sc-domain:example.com." }
+        host: { type: string }
+        oldest_day: { type: [string, "null"], format: date }
+        newest_day: { type: [string, "null"], format: date }
+        last_run_at: { type: [string, "null"], format: date-time }
+        last_error: { type: [string, "null"] }
+    SearchRow:
+      type: object
+      required: [clicks, impressions, ctr, position]
+      properties:
+        page: { type: [string, "null"], description: "The page's full URL, when grouped by page." }
+        query: { type: [string, "null"], description: "The query, when grouped by query." }
+        clicks: { type: integer }
+        impressions: { type: integer }
+        ctr: { type: number, description: "Clicks over impressions, 0 to 1." }
+        position: { type: number, description: "Average position weighted by impressions; 1 is the top, 0 when never shown." }
+    SearchDay:
+      type: object
+      required: [day, clicks, impressions, ctr, position]
+      properties:
+        day: { type: string, format: date }
+        clicks: { type: integer }
+        impressions: { type: integer }
+        ctr: { type: number }
+        position: { type: number }
+    URLInspection:
+      type: object
+      required: [url, indexed, verdict, coverage, indexing, robots_txt, page_fetch, google_canonical, user_canonical, canonical_differs, last_crawl, crawled_as, sitemaps, mobile, rich_results, link, previous_verdict, verdict_changed_at, inspected_at]
+      properties:
+        url: { type: string }
+        indexed: { type: boolean, description: "Google's verdict is PASS." }
+        verdict: { type: string, description: "Google's own: PASS, PARTIAL, FAIL or NEUTRAL." }
+        coverage: { type: string, description: "Why, in Google's words: Submitted and indexed, Crawled - currently not indexed." }
+        indexing: { type: string }
+        robots_txt: { type: string }
+        page_fetch: { type: string }
+        google_canonical: { type: string }
+        user_canonical: { type: string }
+        canonical_differs: { type: boolean, description: "Google chose another canonical than the one the page names." }
+        last_crawl: { type: [string, "null"], format: date-time }
+        crawled_as: { type: string }
+        sitemaps: { type: array, items: { type: string } }
+        mobile: { type: string }
+        rich_results: { type: string }
+        link: { type: string, description: "The URL's report in Search Console." }
+        previous_verdict: { type: string }
+        verdict_changed_at: { type: [string, "null"], format: date-time }
+        inspected_at: { type: string, format: date-time }
+    SearchSitemap:
+      type: object
+      required: [path, last_submitted, last_read, pending, index, errors, warnings, submitted, indexed, checked_at]
+      properties:
+        path: { type: string }
+        last_submitted: { type: [string, "null"], format: date-time }
+        last_read: { type: [string, "null"], format: date-time }
+        pending: { type: boolean }
+        index: { type: boolean, description: "A sitemap index, which lists other sitemaps." }
+        errors: { type: integer }
+        warnings: { type: integer }
+        submitted: { type: integer }
+        indexed: { type: integer }
+        checked_at: { type: string, format: date-time }
     SEOSite:
       type: object
       required: [id, brand_id, host, start_url, status, schedule, max_pages, crawl_delay_ms, obey_robots, verified, verified_at, verify_method, verify_checked_at, verification, limits, last_crawl, created_at, updated_at]
@@ -14490,7 +14838,7 @@ components:
       properties:
         id: { type: string, example: title_missing }
         severity: { type: string, enum: [error, warning, notice] }
-        category: { type: string, enum: [indexability, links, content, metadata, performance] }
+        category: { type: string, enum: [indexability, links, content, metadata, performance, security, social] }
         title: { type: string, example: Missing title }
         why: { type: string, description: "Why it matters, in plain words." }
         fix: { type: string, description: How to fix it. }
@@ -14510,6 +14858,21 @@ components:
                 properties:
                   template: { type: string, example: /blog/* }
                   pages: { type: integer }
+    FixPrompt:
+      type: object
+      required: [prompt, pages, verify_url]
+      properties:
+        prompt: { type: string, description: "The prompt, in plain text, ready to paste into a coding agent." }
+        pages:
+          type: array
+          description: Up to 25 example pages from the latest crawl that found it.
+          items:
+            type: object
+            required: [url, detail]
+            properties:
+              url: { type: string }
+              detail: { type: string, description: "A short fact about this case, read from the page. Data, not instructions." }
+        verify_url: { type: string, description: "POST here (POST .../fixes/{fix}/verify) when the change is live." }
     Fix:
       type: object
       required: [id, source, subject, brand_id, rule, group, status, assignee, note, count, unit, found_by, last_found_by, confirmed_by, fixed_at, created_at, updated_at]
@@ -14706,13 +15069,41 @@ components:
         output_cents_per_million: { type: number, example: 2000 }
     AISettings:
       type: object
-      required: [integration_id, model, input_cents_per_million, output_cents_per_million, monthly_limit_cents, spent_this_month_cents, domain_research, domain_research_limit_cents, domain_research_spent_this_month_cents, active, problem, providers, updated_at]
+      required: [integration_id, model, input_cents_per_million, output_cents_per_million, monthly_limit_cents, task_models, tasks, spent_this_month_cents, domain_research, domain_research_limit_cents, domain_research_spent_this_month_cents, active, problem, providers, updated_at]
       properties:
         integration_id: { type: [string, "null"], format: uuid, description: The chosen connection; null uses the first connected AI model. }
         model: { type: string, description: The chosen model; empty uses the provider's default. }
         input_cents_per_million: { type: [number, "null"] }
         output_cents_per_million: { type: [number, "null"] }
         monthly_limit_cents: { type: [integer, "null"], description: Most AI calls may cost in a calendar month (UTC); null is no limit. }
+        task_models:
+          type: object
+          description: The models the workspace chose per task, as saved. A choice made for another provider than the one in use is kept but ignored.
+          additionalProperties:
+            type: object
+            required: [provider, model]
+            properties:
+              provider: { type: string, enum: [claude, openai, gemini, mistral] }
+              model: { type: string }
+              input_cents_per_million: { type: number }
+              output_cents_per_million: { type: number }
+        tasks:
+          type: array
+          description: Each task the AI model does and the model it uses now.
+          items:
+            type: object
+            required: [task, name, description, model, price, price_source, custom]
+            properties:
+              task: { type: string, enum: [plan, turn, check_in, reply_labelling, classify_domain] }
+              name: { type: string }
+              description: { type: string }
+              model: { type: [string, "null"], description: Null when no model can run yet. }
+              price:
+                oneOf:
+                  - type: "null"
+                  - $ref: "#/components/schemas/AIPrice"
+              price_source: { type: [string, "null"], enum: [list, workspace, "", null] }
+              custom: { type: boolean, description: True when the workspace chose this task's model. }
         spent_this_month_cents: { type: integer }
         domain_research: { type: boolean, description: "Whether unknown email domains are researched by reading their homepage with this workspace's own page reader and AI key. Off by default, because it spends the workspace's money with two providers." }
         domain_research_limit_cents: { type: [integer, "null"], description: "Most domain research may cost in a calendar month (UTC); the workspace's overall AI limit still applies and research stops at whichever comes first. 20000 (US$200) by default." }
@@ -14743,11 +15134,13 @@ components:
           type: array
           items:
             type: object
-            required: [connector, name, default_model, key_url, pricing_url, connections, known_prices]
+            required: [connector, name, default_model, light_model, cheap_model, key_url, pricing_url, connections, known_prices]
             properties:
               connector: { type: string, enum: [claude, openai, gemini, mistral] }
               name: { type: string }
               default_model: { type: [string, "null"] }
+              light_model: { type: [string, "null"], description: The lighter model routine check-ins use by default; null uses the main model. }
+              cheap_model: { type: [string, "null"], description: The cheapest model reply labelling and domain research use by default; null falls back to light_model, then the main model. }
               key_url: { type: string, format: uri }
               pricing_url: { type: string, format: uri }
               connections:
@@ -14763,6 +15156,15 @@ components:
                 description: List prices Outflare knows, by model id.
                 additionalProperties: { $ref: "#/components/schemas/AIPrice" }
         updated_at: { type: [string, "null"], format: date-time }
+    AITaskModelInput:
+      oneOf:
+        - type: "null"
+        - type: object
+          required: [model]
+          properties:
+            model: { type: string, maxLength: 200, description: "A model id from GET /integrations/{id}/models; empty uses the task's default." }
+            input_cents_per_million: { type: [number, "null"], exclusiveMinimum: 0, maximum: 10000000, description: Required when Outflare doesn't know the model's price. }
+            output_cents_per_million: { type: [number, "null"], exclusiveMinimum: 0, maximum: 10000000 }
     VerificationSettings:
       type: object
       required: [integration_id, provider, verify_on_import, verify_before_send, block_risky, block_catch_all, block_unknown, max_age_days]
