@@ -111,7 +111,7 @@ export const milestones: Milestone[] = [
 		step: 11,
 		title: 'Warm-up',
 		status: 'shipped',
-		summary: 'Mailboxes warm each other up with a daily ramp, spam rescue and replies, and every mailbox and domain gets an inbox placement score.',
+		summary: 'Turn warm-up on in your connected EmailBison, Instantly or Smartlead account, and see each mailbox\'s warm-up score.',
 		docs: '/docs/guides/warmup/',
 	},
 	{

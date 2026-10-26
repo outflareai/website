@@ -13,7 +13,7 @@ There are two ways in. The MCP server is the quickest one for Claude, ChatGPT, C
 
 ## The MCP server <span class="pill shipped">Shipped</span>
 
-[`@outflare/mcp`](https://github.com/outflareai/outflare/tree/main/mcp) is an [MCP](https://modelcontextprotocol.io) server that gives an agent 272 tools over the API (3 more in agency mode): run [missions](/docs/agents/missions/) toward a goal with approvals, read and update the brief of the project it works on, check sending domains and mailbox warm-up, import leads, check them against the suppression list, build, preview and start sequences, see and change which mailboxes each sequence sends from, and read and answer replies.
+[`@outflare/mcp`](https://github.com/outflareai/outflare/tree/main/mcp) is an [MCP](https://modelcontextprotocol.io) server that gives an agent 271 tools over the API (3 more in agency mode): run [missions](/docs/agents/missions/) toward a goal with approvals, read and update the brief of the project it works on, check sending domains and mailbox warm-up, import leads, check them against the suppression list, build, preview and start sequences, see and change which mailboxes each sequence sends from, and read and answer replies.
 
 It calls the same API with a scoped token, so:
 
@@ -87,10 +87,9 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `list_spend`, `list_recurring_spend`, `list_spend_rates` | The spend ledger, recurring costs, and unit prices with usage still unpriced | |
 | `list_outcome_syncs` | Each calendar and CRM source: last run and last error | |
 | `get_overview` | Mailbox health and capacity, sends, replies, bounces, unread replies | |
-| `list_mailboxes` | Sending mailboxes with status, daily limit, pool and warm-up placement | |
+| `list_mailboxes` | Sending mailboxes with status, daily limit, pool, and warm-up with its sequencer's score | |
 | `get_mailbox` | One mailbox: status and last error, limits, pool, project, stage, warm-up and sender | |
 | `list_supplier_mailboxes` | A connected supplier's mailboxes (such as Cheap Inboxes), with import progress and why any failed | |
-| `get_mailbox_warmup` | A mailbox's warm-up results per day for 14 days | |
 | `list_domains`, `get_domain` | Sending domains with health, issues and their fixes, DNS and blocklist results, settings and sending stats | |
 | `list_sending_servers`, `get_sending_server` | Sending servers (shared SMTP host and IPs, such as an SMTP vendor's box or your own mail server) with IP blocklist results, health, shared limit and sending stats | |
 | `get_infrastructure` | Mailboxes by stage (warming, ready, resting, retired), the ones not ready with why and until when, plans in progress | |
@@ -136,7 +135,7 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `record_spend`, `delete_spend_entry` | Record a charge in money or units, with a `ref` so retries count once; delete one | Yes |
 | `set_spend_rate`, `add_recurring_spend` | Price a unit; add a monthly or yearly cost | Yes |
 | `sync_outcomes_now` | Read a calendar or CRM now | Yes |
-| `set_warmup` | Turn warm-up on or off, or change its volume and reply rate, for mailboxes, a pool or all | Yes, sends |
+| `set_warmup` | Turn warm-up on or off in a connected sequencer (EmailBison, Instantly, Smartlead) for mailboxes, a pool or all | Yes, sends |
 | `add_domain` | Track a domain, such as one just bought, and check its DNS | Yes |
 | `update_domain` | Pause or resume a domain, cap its daily sends, or set limits on all its mailboxes | Yes |
 | `check_domain` | Re-check a domain's DNS and blocklists after a DNS change | Yes |
@@ -188,7 +187,7 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `get_verification_settings`, `update_verification_settings` | Which service verifies and what happens to each result | Yes |
 | `get_mailbox_health`, `update_mailbox_health_settings` | Every mailbox graded worst first with the fix, and when mailboxes pause automatically | Yes |
 | `preview_import`, `start_import`, `get_import` | Bring campaigns, leads and sending accounts over from Instantly or Smartlead: look first, import, check progress | Yes |
-| `get_report` | Sends, contacts, bounces, replies, opt-outs and warm-up placement for a period | |
+| `get_report` | Sends, contacts, bounces, replies and opt-outs for a period | |
 | `list_members`, `triage_inbox_message` | Workspace members; label, assign, snooze, tag, close or flag a reply for review | Yes |
 | `create_inbox_tag`, `update_inbox_tag`, `delete_inbox_tag` | Add, rename, recolour or delete a reply tag | Yes |
 | `create_inbox_view`, `update_inbox_view`, `delete_inbox_view` | Save, change or delete a shared set of inbox filters | Yes |
