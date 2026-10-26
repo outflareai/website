@@ -13,7 +13,7 @@ Connect them under **Connectors**, like any other connector: paste an API key, o
 | --- | --- | --- | --- |
 | Google Calendar | OAuth (read-only events) | Meetings, incrementally | Nothing |
 | Outlook | OAuth (`Calendars.Read`) | Meetings, incrementally | Nothing |
-| Calendly | Personal access token | Scheduled events and invitees | Nothing |
+| Calendly | OAuth, or a personal access token | Scheduled events and invitees | Nothing |
 | Cal.com | API key; base URL for self-hosted Cal.com | Accepted bookings | Nothing |
 | HubSpot | OAuth, or a private app token | Meetings with their outcome; deals with stage and amount | Booked meetings, when turned on |
 
@@ -30,15 +30,16 @@ Each connection takes these settings as `config` with `PATCH /v1/workspaces/{ws}
 
 ## OAuth apps for self-hosting
 
-On a self-hosted instance, Google Calendar, Outlook and HubSpot OAuth need an app you register with the provider. Use `<PUBLIC_URL>/v1/integrations/oauth/callback` as the redirect URL and set:
+On a self-hosted instance, signing in needs an app registered with the provider. Google Calendar and Outlook use the server's Google and Microsoft apps (`GOOGLE_OAUTH_CLIENT_ID`, `MICROSOFT_OAUTH_CLIENT_ID`) unless you override them. Use `<PUBLIC_URL>/v1/integrations/oauth/callback` as the redirect URL and set:
 
 | Connector | Variables |
 | --- | --- |
 | Google Calendar | `CONNECTOR_GOOGLE_CALENDAR_CLIENT_ID`, `CONNECTOR_GOOGLE_CALENDAR_CLIENT_SECRET` |
 | Outlook | `CONNECTOR_OUTLOOK_CALENDAR_CLIENT_ID`, `CONNECTOR_OUTLOOK_CALENDAR_CLIENT_SECRET` |
 | HubSpot | `CONNECTOR_HUBSPOT_CLIENT_ID`, `CONNECTOR_HUBSPOT_CLIENT_SECRET` |
+| Calendly | `CONNECTOR_CALENDLY_CLIENT_ID`, `CONNECTOR_CALENDLY_CLIENT_SECRET` |
 
-Calendly, Cal.com and HubSpot private app tokens need no app registration. Chili Piper, SavvyCal and Zoom Scheduler are planned.
+Calendly tokens, Cal.com keys and HubSpot private app tokens need no app registration, so those connectors work without one. Chili Piper, SavvyCal and Zoom Scheduler are planned.
 
 ## Adding a source
 

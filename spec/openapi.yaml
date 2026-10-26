@@ -20,6 +20,11 @@ info:
     token. Operations without it are public.
     The engine's tests check every value against the running server.
 
+    API tokens may make API_RATE_LIMIT requests a minute (600 by default).
+    Every answer to a token carries `RateLimit` and `RateLimit-Policy`
+    headers (IETF draft) with what is left and when it resets; over the
+    limit the answer is 429 `rate_limited` with `Retry-After`.
+
     Workspace writes take an `Idempotency-Key` header: a retry with the
     same key gets the first answer back instead of running twice.
 
@@ -155,6 +160,29 @@ paths:
                   data:
                     type: array
                     items: { $ref: "#/components/schemas/WebhookEventType" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/error-codes:
+    get:
+      operationId: listErrorCodes
+      security: []
+      summary: Every error code the API answers
+      description: |
+        The catalog of error.code values, each with the statuses it comes with, what it means, and whether
+        retrying the same request later can succeed. Codes are only ever added, never renamed or reused.
+        A field error is invalid_request, with error.param naming the field.
+      tags: [system]
+      responses:
+        "200":
+          description: The catalog.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/ErrorCode" }
         default: { $ref: "#/components/responses/Error" }
   /v1/openapi.yaml:
     get:
@@ -980,6 +1008,100 @@ paths:
               schema: { $ref: "#/components/schemas/Workspace" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateWorkspace
+      x-outflare-access: { scope: workspace.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Rename a workspace or change its slug
+      description: |
+        Scope: workspace.manage. Send only the fields to change. The slug is the workspace's name in web app
+        URLs (https://app.outflare.ai/{slug}/overview) and works in place of its ID in API paths. The old slug
+        keeps working, in the app and the API, until another workspace takes it; store the ID, which never changes.
+      tags: [access]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                name: { type: string, minLength: 1, maxLength: 100 }
+                slug:
+                  type: string
+                  pattern: "^[A-Za-z0-9][A-Za-z0-9-]{1,38}[A-Za-z0-9]$"
+                  description: 3 to 40 letters, numbers and dashes (saved in lowercase), starting and ending with a letter or number. A few words the app uses for its own pages (admin, signup, settings and so on) are reserved.
+                  example: acme
+      responses:
+        "200":
+          description: The workspace.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Workspace" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409":
+          description: "slug_taken: another workspace already uses the slug."
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/slug-availability:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: checkWorkspaceSlug
+      x-outflare-access: { scope: workspace.manage }
+      summary: Check whether a slug is free
+      description: "Scope: workspace.manage. For a settings form: says whether this workspace could take the slug, and why not."
+      tags: [access]
+      parameters:
+        - { name: slug, in: query, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: Whether the slug is free.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [slug, available, reason]
+                properties:
+                  slug: { type: string, description: The slug as it would be saved (lowercased). }
+                  available: { type: boolean, description: True when it is free or already this workspace's slug. }
+                  reason: { type: [string, "null"], description: Why it cannot be used. }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/links/{kind}/{ref}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: kind, in: path, required: true, schema: { type: string, enum: [sequence, project, list, mission, server, plan] } }
+      - { name: ref, in: path, required: true, description: The item's ID, or any slug it has had., schema: { type: string } }
+    get:
+      operationId: getItemLink
+      x-outflare-access: { scope: workspace.read }
+      summary: Find an item by the slug in its web app URL
+      description: |
+        Scope: workspace.read, plus the item's own read scope (sequences.read, projects.read, leads.read for lists,
+        missions.read, mailboxes.read for servers, infrastructure.read for plans). The web app names items by a slug
+        made from their name (https://app.outflare.ai/acme/sequences/q3-founders). This answers the item's ID and current
+        slug for an ID or any slug it has had, so links keep working after a rename. The API itself takes IDs.
+      tags: [access]
+      responses:
+        "200":
+          description: The item.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [kind, id, slug, name]
+                properties:
+                  kind: { type: string }
+                  id: { type: string, format: uuid }
+                  slug: { type: string, example: q3-founders }
+                  name: { type: string }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/members:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
@@ -1208,6 +1330,7 @@ paths:
       parameters:
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
         - { name: before, in: query, schema: { type: integer } }
+        - { $ref: "#/components/parameters/Cursor" }
       responses:
         "200":
           description: Events.
@@ -1220,6 +1343,91 @@ paths:
                     type: array
                     items: { $ref: "#/components/schemas/AuditEvent" }
                   next_before: { type: [integer, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/events:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listEvents
+      x-outflare-access: { scope: webhooks.read }
+      summary: Events since a point, oldest first
+      description: |
+        Scope: webhooks.read. The same events webhooks send, for callers that cannot receive webhooks, such as agents
+        and scripts behind a firewall. Start without after to read from the beginning of the audit log, keep
+        next_after, and call again with after=next_after to get only what happened since. next_after is always set,
+        so polling never loses its place; has_more says another page is ready now.
+      tags: [webhooks]
+      parameters:
+        - { name: after, in: query, description: "An event id (evt_...) from next_after, or latest to start from now (no events, and next_after set to the newest).", schema: { type: string }, example: evt_48213 }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { name: types, in: query, description: 'Comma-separated event types or wildcards ("lead.*"). Default: every type.', schema: { type: string }, example: "lead.replied,mailbox.*" }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
+      responses:
+        "200":
+          description: Events.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, next_after, has_more, next_cursor]
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/WebhookEvent" }
+                  next_after: { type: string, description: Pass as after next time. }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+                  has_more: { type: boolean }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/jobs:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listJobs
+      x-outflare-access: { scope: workspace.read }
+      summary: List background jobs, newest first
+      description: |
+        Scope: workspace.read. Work that runs in the background (syncs, imports, DNS checks, sends) is a job.
+        Filter by status to see what is still running or what failed. Finished jobs are kept for 14 days.
+      tags: [system]
+      parameters:
+        - { name: status, in: query, schema: { type: string, enum: [queued, running, succeeded, failed] } }
+        - { name: kind, in: query, description: "A job kind, such as analytics.sync.", schema: { type: string } }
+        - { name: before, in: query, description: "A job id (job_...) from next_before.", schema: { type: string } }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
+      responses:
+        "200":
+          description: Jobs.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, next_before, next_cursor]
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/Job" }
+                  next_before: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/jobs/{id}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string }, example: job_1042 }
+    get:
+      operationId: getJob
+      x-outflare-access: { scope: workspace.read }
+      summary: Get one background job
+      description: "Scope: workspace.read. Poll this after a 202 that names a job, until status is succeeded or failed."
+      tags: [system]
+      responses:
+        "200":
+          description: The job.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Job" }
+        "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/webhooks:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
@@ -1404,6 +1612,7 @@ paths:
       parameters:
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
         - { name: before, in: query, schema: { type: integer } }
+        - { $ref: "#/components/parameters/Cursor" }
         - { name: status, in: query, schema: { $ref: "#/components/schemas/WebhookDeliveryStatus" } }
         - { name: event_type, in: query, schema: { type: string }, example: lead.replied }
       responses:
@@ -1413,12 +1622,13 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [data, next_before]
+                required: [data, next_before, next_cursor]
                 properties:
                   data:
                     type: array
                     items: { $ref: "#/components/schemas/WebhookDelivery" }
                   next_before: { type: [integer, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
@@ -2149,6 +2359,7 @@ paths:
         - { name: verification, in: query, description: "Latest verification result, or unverified for never checked.", schema: { type: string, enum: [deliverable, undeliverable, risky, unknown, unverified] } }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
         - { name: after, in: query, description: "next_after from the previous page.", schema: { type: string } }
+        - { $ref: "#/components/parameters/Cursor" }
       responses:
         "200":
           description: Leads.
@@ -2156,13 +2367,14 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [data, total, next_after]
+                required: [data, total, next_after, next_cursor]
                 properties:
                   data:
                     type: array
                     items: { $ref: "#/components/schemas/Lead" }
                   total: { type: integer, description: Matches across all pages. }
                   next_after: { type: [string, "null"], description: Pass as after to get the next page. }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         default: { $ref: "#/components/responses/Error" }
     post:
       operationId: upsertLead
@@ -2453,6 +2665,7 @@ paths:
         - { name: min_score, in: query, schema: { type: integer, minimum: 0, maximum: 100 } }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
         - { name: offset, in: query, schema: { type: integer, minimum: 0, default: 0 } }
+        - { $ref: "#/components/parameters/Cursor" }
       responses:
         "200":
           description: Members.
@@ -2460,13 +2673,14 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [data, total, next_offset]
+                required: [data, total, next_offset, next_cursor]
                 properties:
                   data:
                     type: array
                     items: { $ref: "#/components/schemas/LeadListMember" }
                   total: { type: integer }
                   next_offset: { type: [integer, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/lead-lists/{id}/leads:
@@ -2693,6 +2907,7 @@ paths:
         - { name: q, in: query, schema: { type: string } }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
         - { name: after, in: query, description: "next_after from the previous page.", schema: { type: string } }
+        - { $ref: "#/components/parameters/Cursor" }
       responses:
         "200":
           description: Entries.
@@ -2700,13 +2915,14 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [data, total, next_after]
+                required: [data, total, next_after, next_cursor]
                 properties:
                   data:
                     type: array
                     items: { $ref: "#/components/schemas/Suppression" }
                   total: { type: integer, description: Matches across all pages. }
                   next_after: { type: [string, "null"], description: Pass as after to get the next page. }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         default: { $ref: "#/components/responses/Error" }
     post:
       operationId: addSuppressions
@@ -3070,6 +3286,7 @@ paths:
         - { name: status, in: query, schema: { $ref: "#/components/schemas/EnrollmentStatus" } }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
         - { name: after, in: query, description: "next_after from the previous page.", schema: { type: string } }
+        - { $ref: "#/components/parameters/Cursor" }
       responses:
         "200":
           description: Enrollments.
@@ -3077,12 +3294,13 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [data, next_after]
+                required: [data, next_after, next_cursor]
                 properties:
                   data:
                     type: array
                     items: { $ref: "#/components/schemas/Enrollment" }
                   next_after: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         default: { $ref: "#/components/responses/Error" }
     post:
       operationId: enrollLeads
@@ -3160,6 +3378,7 @@ paths:
         - { name: status, in: query, schema: { type: string, enum: [sending, sent, failed, blocked, unknown] } }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
         - { name: before, in: query, description: "next_before from the previous page.", schema: { type: string, format: date-time } }
+        - { $ref: "#/components/parameters/Cursor" }
       responses:
         "200":
           description: Messages.
@@ -3167,12 +3386,13 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [data, next_before]
+                required: [data, next_before, next_cursor]
                 properties:
                   data:
                     type: array
                     items: { $ref: "#/components/schemas/Message" }
                   next_before: { type: [string, "null"], format: date-time }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         default: { $ref: "#/components/responses/Error" }
   /u/{token}:
     parameters:
@@ -3245,6 +3465,7 @@ paths:
         - { name: q, in: query, description: Search sender and subject., schema: { type: string } }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
         - { name: before, in: query, description: "next_before from the previous page.", schema: { type: string, format: date-time } }
+        - { $ref: "#/components/parameters/Cursor" }
       responses:
         "200":
           description: Messages.
@@ -3252,12 +3473,13 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [data, next_before, unread_replies]
+                required: [data, next_before, unread_replies, next_cursor]
                 properties:
                   data:
                     type: array
                     items: { $ref: "#/components/schemas/InboundMessage" }
                   next_before: { type: [string, "null"], format: date-time }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
                   unread_replies: { type: integer, description: "Unread replies not yet marked done, across the workspace." }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/inbox/{id}:
@@ -3527,6 +3749,7 @@ paths:
       - { name: q, in: query, schema: { type: string }, description: Part of the email address. }
       - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 1000, default: 100 } }
       - { name: offset, in: query, schema: { type: integer, minimum: 0, default: 0 } }
+      - { $ref: "#/components/parameters/Cursor" }
     get:
       operationId: listSupplierMailboxes
       x-outflare-access: { scope: mailboxes.read }
@@ -3742,6 +3965,26 @@ paths:
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/Connector" } }
         default: { $ref: "#/components/responses/Error" }
+  /v1/connectors/{id}/logo.svg:
+    get:
+      operationId: getConnectorLogo
+      summary: Get a connector's logo
+      description: |
+        The company's logo as a square SVG, unmodified apart from cropping, or a
+        monogram for connectors without one. Public, so it works in an `<img>`
+        tag. Add `theme=dark` for the variant made for dark backgrounds.
+      tags: [connectors]
+      security: []
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string }, example: hubspot }
+        - { name: theme, in: query, schema: { type: string, enum: [light, dark], default: light } }
+      responses:
+        "200":
+          description: The logo.
+          content:
+            image/svg+xml:
+              schema: { type: string }
+        "404": { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/connectors:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
@@ -4341,8 +4584,11 @@ paths:
       description: |
         Scope: integrations.manage. The credentials are tested against the
         service before anything is saved, and refused with
-        `connector_auth` if wrong. OAuth connectors are connected through
-        `GET /integrations/oauth/{connector}/authorize` instead.
+        `connector_auth` if wrong. Works for every connector whose
+        `auth_methods` include `api_key`, including ones that also offer
+        OAuth. Connectors that only sign in (`auth_methods` is `[oauth2]`)
+        are connected through `GET /integrations/oauth/{connector}/authorize`
+        and answer `use_oauth` here.
       tags: [connectors]
       requestBody:
         required: true
@@ -4458,8 +4704,11 @@ paths:
       x-outflare-access: { scope: integrations.manage }
       summary: Start connecting an OAuth connector
       description: |
-        Scope: integrations.manage. Redirects to the service's sign-in page;
+        Scope: integrations.manage. For connectors whose `auth_methods`
+        include `oauth2`. Redirects to the service's sign-in page;
         afterwards the browser lands on the workspace's Connectors page.
+        Answers `not_configured` when this server has no OAuth app for the
+        connector; the catalog's `auth_options` says so ahead of time.
         With `format=json` it returns the link instead, for an agent to hand
         to a person.
       tags: [connectors]
@@ -4488,7 +4737,7 @@ paths:
       description: "For providers that read the OAuth client from a URL (PostHog). The document's own URL is the client id, so nobody registers an app. `{file}` is `<connector id>.json`."
       security: []
       parameters:
-        - { name: file, in: path, required: true, schema: { type: string }, example: posthog_cloud.json }
+        - { name: file, in: path, required: true, schema: { type: string }, example: posthog.json }
       responses:
         "200": { description: The client metadata document., content: { application/json: { schema: { type: object, additionalProperties: true } } } }
         "404": { $ref: "#/components/responses/Error" }
@@ -4715,7 +4964,7 @@ paths:
           description: "Queued. Inside a mission, a MissionHeld answer when the call was held for approval or dry-run instead."
           content:
             application/json:
-              schema: { oneOf: [{ type: object, required: [job_id, status], properties: { job_id: { type: integer }, status: { type: string, enum: [queued] } } }, { $ref: "#/components/schemas/MissionHeld" }] }
+              schema: { oneOf: [{ $ref: "#/components/schemas/QueuedJob" }, { $ref: "#/components/schemas/MissionHeld" }] }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
@@ -4738,6 +4987,7 @@ paths:
         - { name: attributed, in: query, schema: { type: boolean }, description: Only meetings tied to outreach. }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
         - { name: before, in: query, schema: { type: string, format: date-time } }
+        - { $ref: "#/components/parameters/Cursor" }
       responses:
         "200":
           description: Meetings.
@@ -4745,10 +4995,11 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [data, next_before]
+                required: [data, next_before, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/Meeting" } }
                   next_before: { type: [string, "null"], format: date-time }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         default: { $ref: "#/components/responses/Error" }
     post:
       operationId: createMeeting
@@ -4851,6 +5102,7 @@ paths:
         - { name: attributed, in: query, schema: { type: boolean } }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
         - { name: before, in: query, schema: { type: string, format: date-time } }
+        - { $ref: "#/components/parameters/Cursor" }
       responses:
         "200":
           description: Deals.
@@ -4858,10 +5110,11 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [data, next_before]
+                required: [data, next_before, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/Deal" } }
                   next_before: { type: [string, "null"], format: date-time }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         default: { $ref: "#/components/responses/Error" }
     post:
       operationId: createDeal
@@ -4955,6 +5208,7 @@ paths:
         - { name: provider, in: query, schema: { type: string } }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 1000, default: 100 } }
         - { name: before, in: query, schema: { type: string, format: date-time } }
+        - { $ref: "#/components/parameters/Cursor" }
       responses:
         "200":
           description: Entries.
@@ -4962,10 +5216,11 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [data, next_before]
+                required: [data, next_before, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/SpendEntry" } }
                   next_before: { type: [string, "null"], format: date-time }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         default: { $ref: "#/components/responses/Error" }
     post:
       operationId: recordSpend
@@ -5262,6 +5517,7 @@ paths:
       description: |
         Scope: missions.read. What an agent reads before it acts: the
         mission, the project brief (and whether it changed since approval),
+        what Outflare knows about the company (context and pinned memories),
         limits, progress, open connect requests and the latest notes.
       tags: [missions]
       responses:
@@ -5274,6 +5530,12 @@ paths:
                 properties:
                   mission: { $ref: "#/components/schemas/Mission" }
                   brief: { oneOf: [{ $ref: "#/components/schemas/MissionBrief" }, { type: "null" }] }
+                  company:
+                    type: object
+                    properties:
+                      context: { $ref: "#/components/schemas/CompanyContext" }
+                      memories: { type: array, items: { $ref: "#/components/schemas/Memory" }, description: Pinned memories. }
+                      markdown: { type: string }
                   updates: { type: array, items: { $ref: "#/components/schemas/MissionUpdate" } }
                   open_connect_requests: { type: array, items: { $ref: "#/components/schemas/MissionUpdate" } }
                   how_to_act:
@@ -5437,6 +5699,7 @@ paths:
       parameters:
         - { name: writes, in: query, schema: { type: boolean }, description: Only writes. }
         - { name: before, in: query, schema: { type: integer }, description: A call id, for the next page. }
+        - { $ref: "#/components/parameters/Cursor" }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
       responses:
         "200":
@@ -5445,8 +5708,11 @@ paths:
             application/json:
               schema:
                 type: object
+                required: [data, next_before, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/MissionCall" } }
+                  next_before: { type: [integer, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/missions/{id}/actions:
     parameters:
@@ -5537,6 +5803,7 @@ paths:
       parameters:
         - { name: open_requests, in: query, schema: { type: boolean }, description: Only connect requests not yet resolved. }
         - { name: before, in: query, schema: { type: integer } }
+        - { $ref: "#/components/parameters/Cursor" }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
       responses:
         "200":
@@ -5545,8 +5812,11 @@ paths:
             application/json:
               schema:
                 type: object
+                required: [data, next_before, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/MissionUpdate" } }
+                  next_before: { type: [integer, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         default: { $ref: "#/components/responses/Error" }
     post:
       operationId: postMissionUpdate
@@ -5973,6 +6243,182 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/Report" }
         "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/context:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: getContext
+      x-outflare-access: { scope: workspace.read, project_tokens: true }
+      summary: Read what Outflare knows about the company
+      description: |
+        Scope: workspace.read. What an agent reads at the start of every
+        conversation, so the person never has to repeat themselves: the
+        company context (who they are, goals, voice, rules), pinned and
+        recent memories, and the projects whose briefs hold each motion's
+        offer and audience. `context.missing` lists the onboarding fields
+        still empty; when `context.ask_for_missing` is true, ask the person
+        for them once and save the answers with PATCH. A project token sees
+        workspace-wide memories and its own project's.
+      tags: [context]
+      responses:
+        "200":
+          description: The context.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/WorkspaceContext" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateContext
+      x-outflare-access: { scope: context.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Edit the company context
+      description: |
+        Scope: context.manage, not available to project tokens. Send only
+        the fields to change; a real change bumps `version`. Send the
+        `version` you read to avoid overwriting someone else's edit: if the
+        context changed since, the update fails with 409 `context_changed`.
+        Offer, audience, market and ideal customer belong on projects, not
+        here.
+      tags: [context]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CompanyContextInput" }
+      responses:
+        "200":
+          description: The company context.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CompanyContext" }
+        "400": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/memories:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listMemories
+      x-outflare-access: { scope: workspace.read, project_tokens: true }
+      summary: List memories
+      description: |
+        Scope: workspace.read. Short lasting facts, preferences and
+        decisions agents and people saved, pinned first, then the most
+        recently changed. Search with `q` before asking the person
+        something they may have said before.
+      tags: [context]
+      parameters:
+        - { name: q, in: query, description: Words the memory contains., schema: { type: string } }
+        - { name: kind, in: query, schema: { type: string, enum: [preference, decision, fact, feedback] } }
+        - { name: project_id, in: query, description: "A project's id, or none for workspace-wide memories.", schema: { type: string } }
+        - { name: pinned, in: query, schema: { type: boolean } }
+        - { name: limit, in: query, description: 1 to 200. Default 50., schema: { type: integer, minimum: 1, maximum: 200 } }
+        - { name: offset, in: query, schema: { type: integer, minimum: 0 } }
+        - { $ref: "#/components/parameters/Cursor" }
+      responses:
+        "200":
+          description: Memories.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, total, next_offset, next_cursor]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/Memory" } }
+                  total: { type: integer }
+                  next_offset: { type: [integer, "null"] }
+                  next_cursor: { type: [string, "null"] }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createMemory
+      x-outflare-access: { scope: context.manage, project_tokens: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Remember something
+      description: |
+        Scope: context.manage. Save one lasting fact, preference or decision
+        in a sentence, such as "Never mention pricing in a first email".
+        Never a transcript. Saving the same text again keeps one memory. A
+        call made inside a mission records the mission. A project token
+        saves into its own project. A workspace keeps at most 1000.
+      tags: [context]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/MemoryInput"
+                - required: [text]
+      responses:
+        "201":
+          description: The memory.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Memory" }
+        "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/memories/{id}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    patch:
+      operationId: updateMemory
+      x-outflare-access: { scope: context.manage, project_tokens: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Change a memory
+      description: "Scope: context.manage. Correct its text, change its kind, pin it, or move it to a project (null for the whole workspace)."
+      tags: [context]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/MemoryInput" }
+      responses:
+        "200":
+          description: The memory.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Memory" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+    delete:
+      operationId: deleteMemory
+      x-outflare-access: { scope: context.manage, project_tokens: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Forget a memory
+      description: "Scope: context.manage. For a memory that is wrong or out of date."
+      tags: [context]
+      responses:
+        "204": { description: Forgotten. }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/status:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: getStatus
+      x-outflare-access: { scope: workspace.read }
+      summary: What is blocked, and what to do about it
+      description: |
+        Scope: workspace.read. Everything stopping the workspace, from one
+        call: mailboxes that can't sign in or aren't ready, domains with
+        critical problems, paused sending servers, broken connections,
+        mission changes waiting for a person, paused missions, sequences
+        short of mailboxes, plans awaiting approval, unread replies and a
+        company context still to fill. Each blocker names the MCP tool and
+        dashboard page that resolve it and whether an agent or a person must
+        act. Worst first. `setup` is the getting-started checklist.
+      tags: [context]
+      responses:
+        "200":
+          description: The status.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/WorkspaceStatus" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/projects:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
@@ -8122,6 +8568,18 @@ webhooks:
             schema: { $ref: "#/components/schemas/WebhookEvent" }
       responses:
         "200": { description: Any 2xx answer means received; anything else is retried. }
+  workspace.updated:
+    post:
+      operationId: webhook_workspace_updated
+      summary: "The workspace was renamed or its slug (its name in URLs) changed. data has the new and previous values."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
   webhook.test:
     post:
       operationId: webhook_webhook_test
@@ -8145,6 +8603,13 @@ components:
       in: cookie
       name: outflare_session
   parameters:
+    Cursor:
+      name: cursor
+      in: query
+      description: |
+        next_cursor from the previous page, unchanged. Every paged list takes it, so one loop pages them all:
+        call, then call again with cursor=next_cursor until next_cursor is null. Cursors are opaque; don't build them.
+      schema: { type: string }
     IdempotencyKey:
       name: Idempotency-Key
       in: header
@@ -8163,7 +8628,8 @@ components:
       name: ws
       in: path
       required: true
-      schema: { type: string, format: uuid }
+      description: The workspace ID, or its slug (its name in web app URLs). IDs never change; a slug can, so store IDs.
+      schema: { type: string }
     Domain:
       name: domain
       in: path
@@ -8208,6 +8674,45 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/MissionHeld" }
   schemas:
+    ErrorCode:
+      type: object
+      required: [code, statuses, description, retry]
+      properties:
+        code: { type: string, example: idempotency_in_progress }
+        statuses: { type: array, items: { type: integer }, example: [409] }
+        description: { type: string }
+        retry: { type: boolean, description: True when the same request may succeed later (after Retry-After where given). }
+    Job:
+      type: object
+      required: [id, kind, status, attempts, max_attempts, error, run_at, created_at, updated_at]
+      properties:
+        id: { type: string, example: job_1042 }
+        kind: { type: string, example: analytics.sync }
+        status:
+          type: string
+          enum: [queued, running, succeeded, failed]
+          description: queued also covers a job waiting to retry after a failed attempt (see attempts and error).
+        attempts: { type: integer }
+        max_attempts: { type: integer }
+        error: { type: [string, "null"], description: The last attempt's error, if it failed. }
+        run_at: { type: string, format: date-time, description: When the job runs next (or ran). }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    QueuedJob:
+      type: object
+      required: [queued, job]
+      description: Work was queued as a job. Follow it with GET job.url (also in the Location header).
+      properties:
+        queued: { type: boolean, enum: [true] }
+        job:
+          type: object
+          required: [id, url]
+          properties:
+            id: { type: string, example: job_1042 }
+            url: { type: string, example: /v1/workspaces/acme/jobs/job_1042 }
+    NextCursor:
+      type: [string, "null"]
+      description: Pass as cursor to get the next page; null on the last page.
     WebhookEventType:
       type: object
       required: [type, category, description]
@@ -8301,7 +8806,7 @@ components:
       required: [id, type, created_at, workspace_id, actor, target, request_id, data]
       properties:
         id: { type: string, description: "Unique per event, and the webhook-id header. Use it to ignore repeats.", example: evt_48213 }
-        type: { type: string, enum: [lead.replied, lead.unsubscribed, inbox.replied, inbox.updated, lead.bounced, mailbox.auto_paused, lead.created, lead.updated, lead.deleted, leads.imported, suppressions.added, suppression.removed, lead_list.created, lead_list.leads_added, lead_list.run_started, lead_list.build_done, lead_list.build_failed, lead_list.refresh_done, lead_list.refresh_failed, lead_list.enrich_done, lead_list.enrich_failed, import.done, import.failed, sequence.created, sequence.updated, sequence.activated, sequence.paused, sequence.archived, sequence.deleted, sequence.steps_updated, sequence.leads_enrolled, enrollment.stopped, mailbox.imported, mailbox.updated, mailbox.paused, mailbox.resumed, mailbox.stage_changed, mailbox.deleted, domain.added, domain.paused, domain.resumed, domain.removed, meeting.created, meeting.updated, meeting.deleted, deal.created, deal.updated, deal.deleted, spend.recorded, integration.connected, integration.updated, integration.disconnected, connect_request.created, project.created, project.updated, project.deleted, mission.created, mission.updated, mission.submitted, mission.approved, mission.paused, mission.resumed, mission.stopped, mission.completed, mission.action_held, mission.action_approved, mission.action_rejected, infra.plan_created, infra.plan_approved, infra.ordered, infra.order_failed, infra.domains_bought, infra.mailbox_joined, infra.plan_warming, infra.plan_ready, infra.plan_cancelled, webhook.test] }
+        type: { type: string, enum: [lead.replied, lead.unsubscribed, inbox.replied, inbox.updated, lead.bounced, mailbox.auto_paused, lead.created, lead.updated, lead.deleted, leads.imported, suppressions.added, suppression.removed, lead_list.created, lead_list.leads_added, lead_list.run_started, lead_list.build_done, lead_list.build_failed, lead_list.refresh_done, lead_list.refresh_failed, lead_list.enrich_done, lead_list.enrich_failed, import.done, import.failed, sequence.created, sequence.updated, sequence.activated, sequence.paused, sequence.archived, sequence.deleted, sequence.steps_updated, sequence.leads_enrolled, enrollment.stopped, mailbox.imported, mailbox.updated, mailbox.paused, mailbox.resumed, mailbox.stage_changed, mailbox.deleted, domain.added, domain.paused, domain.resumed, domain.removed, meeting.created, meeting.updated, meeting.deleted, deal.created, deal.updated, deal.deleted, spend.recorded, integration.connected, integration.updated, integration.disconnected, connect_request.created, project.created, project.updated, project.deleted, mission.created, mission.updated, mission.submitted, mission.approved, mission.paused, mission.resumed, mission.stopped, mission.completed, mission.action_held, mission.action_approved, mission.action_rejected, infra.plan_created, infra.plan_approved, infra.ordered, infra.order_failed, infra.domains_bought, infra.mailbox_joined, infra.plan_warming, infra.plan_ready, infra.plan_cancelled, workspace.updated, webhook.test] }
         created_at: { type: string, format: date-time }
         workspace_id: { type: string, format: uuid }
         actor: { $ref: "#/components/schemas/WebhookRef" }
@@ -8619,7 +9124,7 @@ components:
         help: { type: string }
     Connector:
       type: object
-      required: [id, name, category, summary, description, website, docs_url, auth, fields, capabilities, status, configured, connected]
+      required: [id, name, category, summary, description, website, docs_url, auth, auth_methods, auth_options, fields, capabilities, status, configured, connected, logo_url, logo_dark_url]
       properties:
         id: { type: string, example: zerobounce }
         name: { type: string }
@@ -8629,8 +9134,17 @@ components:
         website: { type: string }
         docs_url: { type: string }
         key_url: { type: string, description: Where to find the API key. }
-        auth: { type: string, enum: [api_key, oauth2, none] }
-        fields: { type: array, items: { $ref: "#/components/schemas/ConnectorField" } }
+        auth: { $ref: "#/components/schemas/ConnectorAuthMethod" }
+        auth_methods:
+          type: array
+          items: { $ref: "#/components/schemas/ConnectorAuthMethod" }
+          example: [oauth2, api_key]
+          description: "Every way to connect, recommended first. When both are listed, the person chooses: sign in (oauth2, GET .../integrations/oauth/{connector}/authorize) or paste the fields (api_key, POST .../integrations)."
+        auth_options:
+          type: array
+          items: { $ref: "#/components/schemas/ConnectorAuthOption" }
+          description: Each way to connect and whether it works on this server. The first available one is marked recommended.
+        fields: { type: array, items: { $ref: "#/components/schemas/ConnectorField" }, description: What the api_key method asks for. Empty when the connector only signs in with OAuth. }
         oauth:
           type: object
           properties:
@@ -8643,8 +9157,22 @@ components:
           type: array
           items: { type: string }
           description: Other connectors the same sign-in connects too, when the person grants them (one Google sign-in connects Google Analytics and Search Console).
-        configured: { type: boolean, description: Can be connected on this server now. }
+        configured: { type: boolean, description: "Can be connected on this server now, in at least one way." }
         connected: { type: integer, description: Accounts the workspace connected (0 in the public catalog). }
+        logo_url: { type: string, format: uri, description: "The company's logo as a square SVG for light backgrounds, or a monogram when there is none. Public and cacheable." }
+        logo_dark_url: { type: string, format: uri, description: The same logo for dark backgrounds. }
+    ConnectorAuthMethod:
+      type: string
+      enum: [api_key, oauth2, none]
+      description: "oauth2: sign in on the provider's consent screen. api_key: paste the connector's fields. none: built in."
+    ConnectorAuthOption:
+      type: object
+      required: [method, available, recommended]
+      properties:
+        method: { $ref: "#/components/schemas/ConnectorAuthMethod" }
+        available: { type: boolean, description: "False when this server cannot use the method yet, e.g. OAuth without an app configured." }
+        recommended: { type: boolean }
+        reason: { type: string, description: "Why it is not available and what the server's owner can set, e.g. CONNECTOR_CALENDLY_CLIENT_ID and CONNECTOR_CALENDLY_CLIENT_SECRET." }
     ConnectorAccount:
       type: object
       properties:
@@ -8693,10 +9221,11 @@ components:
             allOf:
               - { $ref: "#/components/schemas/ReportMetrics" }
               - type: object
-                required: [key, label]
+                required: [key, name, label]
                 properties:
-                  key: { type: string }
-                  label: { type: string }
+                  key: { type: string, description: "The day, week start, step number, or the sequence or mailbox id." }
+                  name: { type: string, description: "What to show: the sequence name, mailbox address, \"Step 2\"." }
+                  label: { type: string, deprecated: true, description: The same as name; use name. }
     HealthSignal:
       type: object
       required: [key, level, title, detail]
@@ -8860,10 +9389,11 @@ components:
         url: { type: string, description: The one-time link. Only in the answer to POST. }
     Integration:
       type: object
-      required: [id, connector, connector_name, category, capabilities, name, status, account, config, last_checked_at, last_error, created_at, updated_at]
+      required: [id, connector, auth_method, connector_name, category, capabilities, name, status, account, config, last_checked_at, last_error, created_at, updated_at]
       properties:
         id: { type: string, format: uuid }
         connector: { type: string }
+        auth_method: { type: string, enum: [api_key, oauth2], description: How it was connected. Pasting new credentials with PATCH switches a signed-in connection to api_key. }
         connector_name: { type: string }
         category: { $ref: "#/components/schemas/ConnectorCategory" }
         capabilities: { type: array, items: { type: string } }
@@ -9582,14 +10112,14 @@ components:
       enum: [owner, admin, operator, viewer]
     Scope:
       type: string
-      enum: [workspace.read, members.read, members.manage, tokens.manage, audit.read, mailboxes.read, mailboxes.manage, leads.read, leads.manage, suppressions.manage, sequences.read, sequences.manage, inbox.read, inbox.manage, integrations.read, integrations.manage, outcomes.read, outcomes.manage, projects.read, projects.manage, infrastructure.read, infrastructure.manage, infrastructure.approve, analytics.read, missions.read, missions.run, missions.approve, webhooks.read, webhooks.manage]
+      enum: [workspace.read, workspace.manage, context.manage, members.read, members.manage, tokens.manage, audit.read, mailboxes.read, mailboxes.manage, leads.read, leads.manage, suppressions.manage, sequences.read, sequences.manage, inbox.read, inbox.manage, integrations.read, integrations.manage, outcomes.read, outcomes.manage, projects.read, projects.manage, infrastructure.read, infrastructure.manage, infrastructure.approve, analytics.read, missions.read, missions.run, missions.approve, webhooks.read, webhooks.manage]
     Workspace:
       type: object
       required: [id, name, slug]
       properties:
         id: { type: string, format: uuid }
         name: { type: string }
-        slug: { type: string }
+        slug: { type: string, description: "The workspace's name in web app URLs (https://app.outflare.ai/{slug}/overview). Works in place of id in API paths.", example: acme }
         role: { $ref: "#/components/schemas/Role" }
         agency_id: { type: [string, "null"], format: uuid, description: Set when the workspace is an agency client. }
         brand:
@@ -10360,6 +10890,125 @@ components:
         sent_24h: { type: integer, description: Cold sends from its sequences in the last 24 hours. }
         created_at: { type: string, format: date-time }
         updated_at: { type: string, format: date-time }
+    CompanyContext:
+      type: object
+      required: [company, website, about, goals, voice, rules, notes, version, updated_at, updated_by, missing, ask_for_missing]
+      properties:
+        company: { type: string, description: The company's name. }
+        website: { type: string, description: "Its main site, such as acme.com." }
+        about: { type: string, description: What the company does, in a few sentences. }
+        goals: { type: string, description: "What the person wants from Outflare, such as 20 demos a month from US fintech." }
+        voice: { type: string, description: "How emails should sound: tone, length, sign-off." }
+        rules: { type: string, description: Things never to do. }
+        notes: { type: string, description: "Everything else, in Markdown: proof points, competitors, past results." }
+        version: { type: integer, description: Bumped on every real change. }
+        updated_at: { type: [string, "null"], format: date-time }
+        updated_by: { type: [string, "null"], description: Who changed it last. }
+        missing:
+          type: array
+          items: { type: string, enum: [company, about, goals, voice] }
+          description: Onboarding fields still empty.
+        ask_for_missing: { type: boolean, description: "Whether to ask the person for the missing fields: false once they are filled or a person said not to ask." }
+    CompanyContextInput:
+      type: object
+      properties:
+        company: { type: string, maxLength: 200 }
+        website: { type: string, maxLength: 253 }
+        about: { type: string, maxLength: 4000 }
+        goals: { type: string, maxLength: 4000 }
+        voice: { type: string, maxLength: 4000 }
+        rules: { type: string, maxLength: 4000 }
+        notes: { type: string, maxLength: 100000 }
+        version: { type: integer, description: The version you read; the edit fails with 409 context_changed if the context changed since. }
+        onboarding_dismissed: { type: boolean, description: True stops agents asking for the missing fields; false asks again. }
+    WorkspaceContext:
+      type: object
+      required: [context, memories, memory_count, projects, markdown]
+      properties:
+        context: { $ref: "#/components/schemas/CompanyContext" }
+        memories: { type: array, items: { $ref: "#/components/schemas/Memory" }, description: Pinned memories first, then the 30 most recent. }
+        memory_count: { type: integer, description: Every memory the caller can see; search the rest with GET .../memories?q=. }
+        projects:
+          type: array
+          items:
+            type: object
+            required: [id, name, status, brief_version, has_brief]
+            properties:
+              id: { type: string, format: uuid }
+              name: { type: string }
+              status: { type: string, enum: [active, paused, archived] }
+              brief_version: { type: integer }
+              has_brief: { type: boolean }
+        markdown: { type: string, description: The company context and memories as one Markdown document, ready to put in a prompt. }
+    Memory:
+      type: object
+      required: [id, kind, text, project_id, pinned, created_by, created_by_id, mission_id, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        kind: { type: string, enum: [preference, decision, fact, feedback] }
+        text: { type: string }
+        project_id: { type: [string, "null"], format: uuid, description: Null when it is true for the whole workspace. }
+        pinned: { type: boolean, description: Pinned memories come back with every context read. }
+        created_by: { type: [string, "null"], description: Who saved it. }
+        created_by_id: { type: [string, "null"], format: uuid }
+        mission_id: { type: [string, "null"], format: uuid, description: The mission it was saved in. }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    MemoryInput:
+      type: object
+      properties:
+        text: { type: string, minLength: 1, maxLength: 500, description: One lasting fact, preference or decision. }
+        kind: { type: string, enum: [preference, decision, fact, feedback], description: Defaults to fact. }
+        project_id: { type: [string, "null"], format: uuid, description: The project it is about; null for the whole workspace. }
+        pinned: { type: boolean, description: Pin what every conversation should know. Defaults to false. }
+    WorkspaceStatus:
+      type: object
+      required: [summary, can_send, setup, blockers, checked_at]
+      properties:
+        summary: { type: string, description: One sentence to repeat to the person. }
+        can_send: { type: boolean, description: Whether at least one mailbox can send cold email today from a healthy domain. }
+        setup:
+          type: array
+          items:
+            type: object
+            required: [step, title, done]
+            properties:
+              step: { type: string, enum: [context, mailboxes, ready, leads, sequence, live] }
+              title: { type: string }
+              done: { type: boolean }
+        blockers:
+          type: array
+          items:
+            type: object
+            required: [code, severity, area, title, detail, count, items, fix]
+            properties:
+              code:
+                type: string
+                description: Stable; new codes may be added.
+                enum: [no_mailboxes, none_ready, mailbox_error, domain_critical, server_paused, connection_broken, connection_requested, approval_waiting, mission_paused, allocation_short, infra_plan_waiting, unread_replies, context_missing]
+              severity: { type: string, enum: [critical, warning, info] }
+              area: { type: string, enum: [mailboxes, domains, servers, connectors, missions, sequences, infrastructure, inbox, context] }
+              title: { type: string }
+              detail: { type: string, description: What it means and how to fix it. }
+              count: { type: integer }
+              items:
+                type: array
+                description: Up to five of the affected things.
+                items:
+                  type: object
+                  required: [id, name]
+                  properties:
+                    id: { type: string }
+                    name: { type: string }
+                    reason: { type: string }
+              fix:
+                type: object
+                required: [tool, page, who]
+                properties:
+                  tool: { type: string, description: The MCP tool to call first. }
+                  page: { type: string, description: The dashboard page that resolves it. }
+                  who: { type: string, enum: [agent, person], description: "agent: an agent with the scopes can resolve it. person: it needs a person (a sign-in, a payment, an approval)." }
+        checked_at: { type: string, format: date-time }
     ProjectInput:
       type: object
       properties:
@@ -10806,7 +11455,7 @@ components:
         last_sync_error: { type: [string, "null"] }
     SupplierMailboxList:
       type: object
-      required: [integration, sync, synced, counts, total, mailboxes]
+      required: [integration, sync, synced, counts, total, mailboxes, next_offset, next_cursor]
       properties:
         integration: { type: object, additionalProperties: true, description: "The integration, as GET /v1/workspaces/{ws}/integrations/{id} returns it." }
         sync: { $ref: "#/components/schemas/SupplierSync" }
@@ -10822,6 +11471,8 @@ components:
             connected_to: { type: object, additionalProperties: { type: integer } }
         total: { type: integer, description: How many match the filters. }
         mailboxes: { type: array, items: { $ref: "#/components/schemas/SupplierMailbox" } }
+        next_offset: { type: [integer, "null"] }
+        next_cursor: { $ref: "#/components/schemas/NextCursor" }
     SupplierImportResult:
       type: object
       required: [queued, waiting, not_found]
@@ -10858,6 +11509,10 @@ components:
               example: /v1/openapi.yaml
         capabilities:
           type: array
+          description: |
+            Features this server has. Extensions add their own; `email_verification_required` means signed-in people
+            whose email isn't confirmed can use only their account and sign-in endpoints until they open the
+            confirmation link.
           items:
             type: string
         oauth_providers:
@@ -10913,11 +11568,17 @@ components:
           properties:
             code:
               type: string
+              description: Stable and machine-readable. GET /v1/error-codes lists every code; new ones may be added.
               example: unavailable
             message:
               type: string
+              description: For people. It may change; branch on code and status instead.
             request_id:
               type: string
+            param:
+              type: string
+              description: The request field a 400 is about, when there is one (for example url or events).
+              example: url
     LifecycleStage:
       type: string
       enum: [warming, ready, resting, retired]

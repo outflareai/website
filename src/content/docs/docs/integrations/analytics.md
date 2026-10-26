@@ -11,7 +11,7 @@ Outflare reads the analytics tools already on your website, so a person, a scrip
 
 ## Connect
 
-Open **Connectors** and pick the **Analytics** category, or go straight to the **Analytics** page and click **Choose a tool**. Google tools connect with a read-only Google sign-in, and one sign-in connects both Google Analytics and Search Console. PostHog Cloud connects with a PostHog sign-in; the rest take an API key. An agent can ask for a connection with `request_connection`: you get a one-time link to paste the key into or sign in from, so the key never passes through the chat.
+Open **Connectors** and pick the **Analytics** category, or go straight to the **Analytics** page and click **Choose a tool**. Google tools connect with a read-only Google sign-in, and one sign-in connects both Google Analytics and Search Console. They also take a service account key. PostHog and Cloudflare offer a sign-in or a key, and you choose. The rest take an API key. An agent can ask for a connection with `request_connection`: you get a one-time link to paste the key into or sign in from, so the key never passes through the chat.
 
 When a connection can read several sites (GA4 properties, Search Console properties, PostHog projects), the Analytics page asks which one to read. Your choice becomes the connection's default, for agents too.
 
@@ -19,18 +19,17 @@ When a connection can read several sites (GA4 properties, Search Console propert
 
 | Provider | Connect with | Reports |
 | --- | --- | --- |
-| Google Analytics 4 (`google_analytics`) | Sign in with Google (read-only) | traffic, pages, sources, events (key events count as conversions) |
-| Google Search Console (`google_search_console`) | Sign in with Google (read-only) | traffic (clicks, impressions), pages, search_queries |
+| Google Analytics 4 (`google_analytics`) | Sign in with Google (read-only), or a service account key | traffic, pages, sources, events (key events count as conversions) |
+| Google Search Console (`google_search_console`) | Sign in with Google (read-only), or a service account key | traffic (clicks, impressions), pages, search_queries |
 | Bing Webmaster Tools (`bing_webmaster`) | API key | traffic, pages, search_queries |
-| PostHog (`posthog_cloud`) | Sign in with PostHog, US or EU Cloud (read-only) | traffic, pages, sources, events |
-| PostHog with an API key (`posthog`) | Personal API key, cloud or self-hosted | traffic, pages, sources, events |
+| PostHog (`posthog`) | Sign in with PostHog, US or EU Cloud (read-only), or a personal API key (cloud or self-hosted) | traffic, pages, sources, events |
 | Plausible (`plausible`) | Stats API key and site domain, cloud or self-hosted | traffic, pages, sources, events (goals) |
 | Fathom (`fathom`) | API key | traffic, pages, sources, events |
 | Matomo (`matomo`) | Address and auth token | traffic, pages, sources, events (plus goal conversions) |
 | Umami (`umami`) | Cloud API key, or a self-hosted address and login | traffic, pages, sources, events |
 | Mixpanel (`mixpanel`) | Service account and project id | traffic (from the page view event), pages, sources, events |
 | Amplitude (`amplitude`) | API key and secret key | traffic (active users, page views), pages, events |
-| Cloudflare Web Analytics (`cloudflare_web_analytics`) | API token and account id | traffic (page views, visits), pages, sources |
+| Cloudflare Web Analytics (`cloudflare_web_analytics`) | Sign in with Cloudflare, or an API token and account id | traffic (page views, visits), pages, sources |
 | Simple Analytics (`simple_analytics`) | Domain, plus API key for private sites | traffic, pages, sources |
 | Microsoft Clarity (`microsoft_clarity`) | API token | traffic and pages for the last three days only, plus rage and dead clicks |
 | Vercel Web Analytics (`vercel_analytics`) | Access token, plus team id for team projects | traffic, pages, sources, events (custom events); production traffic only, and the project needs Web Analytics turned on |
@@ -147,11 +146,11 @@ The **Analytics** page starts with your websites: each domain with every tool's 
 ## PostHog sign-in on your own server
 
 PostHog reads Outflare's sign-in details from a document your server hosts at
-`$PUBLIC_URL/v1/integrations/oauth/clients/posthog_cloud.json`. That URL is
+`$PUBLIC_URL/v1/integrations/oauth/clients/posthog.json`. That URL is
 the client id, so there is no app to register with PostHog and no secret to
 set. PostHog has to fetch the document, so the sign-in only works when
-`PUBLIC_URL` is a public https address. On `localhost`, use the API key
-connector instead. Outflare works out whether the account is on US or EU
+`PUBLIC_URL` is a public https address. On `localhost`, choose the API key
+instead. Outflare works out whether the account is on US or EU
 Cloud by itself.
 
 ## Google Analytics and Search Console on your own server
@@ -160,6 +159,13 @@ Both use the server's Google OAuth client (`GOOGLE_OAUTH_CLIENT_ID` and
 `GOOGLE_OAUTH_CLIENT_SECRET`, the same one used for Google sign-in and Gmail
 mailboxes). `CONNECTOR_GOOGLE_ANALYTICS_CLIENT_ID` and friends override it
 per connector.
+
+No Google client on the server? Connect either tool with a service account
+key instead. In Google Cloud, go to IAM & Admin, Service accounts, create
+one, add a JSON key, and paste the whole file. Then give the service
+account's email read access: add it as a Viewer in Google Analytics, or as a
+Restricted user in Search Console. Outflare stores only the key, encrypted,
+and signs in with it when needed.
 
 Each Google connector asks for the Analytics and the Search Console scope
 together. When the person grants both, Outflare connects the other tool too,
