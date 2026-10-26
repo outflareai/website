@@ -130,13 +130,17 @@ const quickstart = [
 				your website, search and campaigns, and let your AI agents do the work through one API.
 			</p>
 			<div class="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-				<a href={app.signUp} class="btn btn-primary btn-lg w-full sm:w-auto">
+				<a href={app.url} data-signed-in data-track="dashboard_click" class="btn btn-primary btn-lg w-full sm:w-auto">
+					Open your dashboard
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"></path></svg>
+				</a>
+				<a href={app.signUp} data-signed-out class="btn btn-primary btn-lg w-full sm:w-auto">
 					Sign up free
 					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"></path></svg>
 				</a>
 				<a href={repo.url} class="btn btn-outline btn-lg w-full sm:w-auto">Self-host on GitHub</a>
 			</div>
-			<p class="mt-4 text-sm text-muted-foreground">Hosted Outflare is free during early access. Have an account? <a href={app.signIn} class="hit font-medium text-foreground underline-offset-4 hover:underline">Sign in</a></p>
+			<p data-signed-out class="mt-4 text-sm text-muted-foreground">Hosted Outflare is free during early access. Have an account? <a href={app.signIn} class="hit font-medium text-foreground underline-offset-4 hover:underline">Sign in</a></p>
 			<ul class="mt-6 flex flex-wrap justify-center gap-x-5 gap-y-2 font-mono text-xs text-muted-foreground">
 				{['AGPL-3.0', '82 connectors', 'MCP server', 'OpenAPI 3.1', 'Bring your own AI key'].map((t) => <li class="flex items-center gap-1.5"><svg class="size-3.5 text-brand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>{t}</li>)}
 			</ul>
@@ -361,15 +365,21 @@ const quickstart = [
 			<h2 class="text-3xl font-semibold tracking-tighter text-balance sm:text-5xl">Use it hosted, or run it yourself.</h2>
 			<p class="mx-auto mt-4 max-w-xl text-muted-foreground sm:text-lg">Sign up and connect your first tools in a few minutes, free while we're in early access. Or run it yourself: two containers and one settings file.</p>
 			<div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-				<a href={app.signUp} class="btn btn-primary btn-lg">Sign up free</a>
+				<a href={app.url} data-signed-in data-track="dashboard_click" class="btn btn-primary btn-lg">Open your dashboard</a>
+				<a href={app.signUp} data-signed-out class="btn btn-primary btn-lg">Sign up free</a>
 				<a href={repo.url} class="btn btn-outline btn-lg">Self-host on GitHub</a>
-				<a href={app.signIn} class="btn btn-ghost btn-lg">Sign in</a>
+				<a href={app.signIn} data-signed-out class="btn btn-ghost btn-lg">Sign in</a>
 			</div>
 			<p class="mt-4 text-sm text-muted-foreground">Questions, or want help setting it up? <a href={`mailto:${site.email}`} class="hit font-medium text-foreground underline-offset-4 hover:underline">Get in touch</a></p>
 			<p class="mt-6 font-mono text-xs text-muted-foreground"><span class="select-none">$ </span>docker compose -f deploy/docker-compose.yml up -d</p>
 		</div>
 	</section>
 </Marketing>
+
+<style is:global>
+	/* Hide the signed-in links until the header's check says so (the same rule as SignedIn.astro). */
+	html[data-signed-in] [data-signed-out], html:not([data-signed-in]) [data-signed-in] { display: none !important; }
+</style>
 
 <script>
 	// Tabs: product screenshots and code examples.
