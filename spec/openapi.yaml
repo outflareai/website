@@ -5476,6 +5476,95 @@ paths:
                   links_in: { type: array, items: { $ref: "#/components/schemas/CrawlLink" }, description: "The pages linking here: url is the linking page." }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/crawls/{crawl}/issues:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: crawl, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: listCrawlIssues
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: List what a crawl's audit found
+      description: "Scope: seo.read. One entry per rule broken, errors first and then by how many pages, each with what it means, how to fix it, and the URL templates (like /blog/*) its pages come from, so a problem on many pages made from one template reads as one fix. Worked out when the crawl ends; empty before."
+      tags: [seo]
+      parameters:
+        - { name: severity, in: query, schema: { type: string, enum: [error, warning, notice] } }
+      responses:
+        "200":
+          description: Issues, worst first.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, crawl]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/CrawlIssue" } }
+                  crawl: { $ref: "#/components/schemas/Crawl" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/crawls/{crawl}/issues/{rule}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: crawl, in: path, required: true, schema: { type: string, format: uuid } }
+      - { name: rule, in: path, required: true, schema: { type: string }, example: title_missing }
+    get:
+      operationId: getCrawlIssue
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: List the pages with one issue
+      description: "Scope: seo.read. The rule, and every page of the crawl that breaks it, with a short detail (the broken link's target, the duplicate's URL, the title's length)."
+      tags: [seo]
+      parameters:
+        - { name: template, in: query, description: "Only pages of this URL template, like /blog/*.", schema: { type: string } }
+        - { name: after, in: query, description: "An id from next_after.", schema: { type: string } }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 1000, default: 100 } }
+      responses:
+        "200":
+          description: The rule and its pages.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [rule, data, next_after, next_cursor]
+                properties:
+                  rule: { $ref: "#/components/schemas/SEORule" }
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, page_id, url, template, detail, http_status]
+                      properties:
+                        id: { type: string }
+                        page_id: { type: string, description: "The page, for GET .../crawls/{crawl}/pages/{page}." }
+                        url: { type: string }
+                        template: { type: string, example: /blog/* }
+                        detail: { type: string, example: "72 characters" }
+                        http_status: { type: [integer, "null"] }
+                  next_after: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/seo-rules:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listSEORules
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: List the audit's rules
+      description: "Scope: seo.read. Every check a site audit makes, with its severity, what it means and how to fix it. Rule ids never change."
+      tags: [seo]
+      responses:
+        "200":
+          description: Rules.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/SEORule" } }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/integrations:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
@@ -11979,7 +12068,7 @@ components:
         updated_at: { type: string, format: date-time }
     Crawl:
       type: object
-      required: [id, site_id, host, status, trigger, reason, error_code, max_pages, delay_ms, obey_robots, pages_fetched, pages_blocked, pages_failed, pages_found, pages_fallback, pages_firewalled, fallback_hint, bytes, created_at, started_at, finished_at]
+      required: [id, site_id, host, status, trigger, reason, error_code, max_pages, delay_ms, obey_robots, pages_fetched, pages_blocked, pages_failed, pages_found, pages_fallback, pages_firewalled, fallback_hint, health_score, issues, bytes, created_at, started_at, finished_at]
       properties:
         id: { type: string, format: uuid }
         site_id: { type: string, format: uuid }
@@ -12004,6 +12093,15 @@ components:
           type: string
           enum: ["", verify_site, connect_geonode]
           description: "What would let the next crawl read firewalled pages: prove you own the site, or connect Geonode with your own key. Outflare never reads them with keys of its own. Empty when nothing is needed."
+        health_score: { type: [integer, "null"], minimum: 0, maximum: 100, description: "The share of the crawl's pages (HTML or broken) with no error-level issue. null until the crawl has finished." }
+        issues:
+          type: object
+          description: How many issues the audit found, by severity; GET .../issues lists them.
+          required: [errors, warnings, notices]
+          properties:
+            errors: { type: integer }
+            warnings: { type: integer }
+            notices: { type: integer }
         bytes: { type: integer }
         created_at: { type: string, format: date-time }
         started_at: { type: [string, "null"], format: date-time }
@@ -12052,6 +12150,32 @@ components:
         content_hash: { type: [string, "null"], description: "The same for pages with the same words: duplicates." }
         viewport: { type: boolean, description: Whether the page has a viewport meta tag (mobile friendly). }
         fetched_via: { type: [string, "null"], example: geonode, description: "The connector that read the page because the site's firewall or a bot challenge blocked OutflareBot, or the page was only an empty JavaScript app shell; null when OutflareBot read it itself." }
+    SEORule:
+      type: object
+      required: [id, severity, category, title, why, fix]
+      properties:
+        id: { type: string, example: title_missing }
+        severity: { type: string, enum: [error, warning, notice] }
+        category: { type: string, enum: [indexability, links, content, metadata, performance] }
+        title: { type: string, example: Missing title }
+        why: { type: string, description: Why it matters, in plain words. }
+        fix: { type: string, description: How to fix it. }
+    CrawlIssue:
+      allOf:
+        - { $ref: "#/components/schemas/SEORule" }
+        - type: object
+          required: [pages, templates]
+          properties:
+            pages: { type: integer, description: Pages that break the rule. }
+            templates:
+              type: array
+              description: "The pages by URL template, most first."
+              items:
+                type: object
+                required: [template, pages]
+                properties:
+                  template: { type: string, example: /blog/* }
+                  pages: { type: integer }
     CrawlLink:
       type: object
       required: [url, anchor, internal, nofollow, http_status]
