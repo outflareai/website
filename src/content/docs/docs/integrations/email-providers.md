@@ -2,7 +2,7 @@
 title: Email providers
 description: Connect Amazon SES, Postmark or Resend to send lifecycle email from your own account, with step-by-step guides and a prompt your AI agent can follow.
 sidebar:
-  order: 6
+  order: 7
 ---
 
 <span class="pill shipped">Shipped</span>

@@ -9,7 +9,7 @@ sidebar:
 
 Outflare reads your own websites with its crawler, [OutflareBot](/bot/), and records every page it finds: its HTTP status, where redirects lead, which pages ask not to be indexed, and which pages your robots.txt keeps crawlers away from. It needs no connector or API key. SEO tools like [DataForSEO and Ahrefs](/docs/integrations/seo/) add what others see of your site, and are separate.
 
-In the app, open **SEO** in the sidebar. **Site audits** lists your sites with their health and latest crawl, and opens each one's issues, ownership proof, crawl history and settings. **Fixes** is the fixes list below. **Keywords** shows what Google shows each page for and how it indexed them ([see what each page ranks for](/docs/guides/keywords/)). **Rankings & backlinks** is the [SEO tools](/docs/integrations/seo/) page.
+In the app, open **SEO** in the sidebar. **Site audits** lists your sites with their health and latest crawl, and opens each one's issues, ownership proof, crawl history and settings. **Fixes** is the fixes list below. **Keywords** shows what Google shows each page for and how it indexed them ([see what each page ranks for](/docs/guides/keywords/)). **Rankings & backlinks** is the [SEO tools](/docs/integrations/seo/) page, and **Backlinks** [tracks the links to your sites](/docs/guides/backlinks/).
 
 ## Add a site
 
@@ -46,19 +46,19 @@ Each page the crawl found is one of:
 
 Each page also shows how it was found (from the start page, a link, a sitemap or a redirect), the page that led there, and whether it asks not to be indexed or followed.
 
-For each HTML page, Outflare also keeps what an audit checks: the title, meta description, canonical, h1, language and hreflang, the structured data types, the word count, images without alt text, the viewport tag, and a fingerprint that matches pages with the same words. It never stores the page's text. It also keeps every link on the page, with its anchor text, so you can see a page's links out with the status each one returned (a 404 is a broken link) and the pages that link to it. A page in your sitemap that nothing links to is an orphan. A meta refresh counts as a redirect, and links marked `nofollow`, `ugc` or `sponsored` are not followed.
+For each HTML page, Outflare also keeps what an audit checks: the title, meta description, canonical, h1, language and hreflang, the structured data types, the word count, images without alt text, the viewport tag, the Open Graph title and image that link previews use, how many scripts, styles and images a secure page loads over plain http, and a fingerprint that matches pages with the same words. It never stores the page's text. It also keeps every link on the page, with its anchor text, so you can see a page's links out with the status each one returned (a 404 is a broken link) and the pages that link to it. A page in your sitemap that nothing links to is an orphan. A meta refresh counts as a redirect, and links marked `nofollow`, `ugc` or `sponsored` are not followed.
 
 ## The audit
 
-When a crawl ends, Outflare checks every page against 31 rules and gives the crawl a **health score** from 0 to 100: the share of its pages with no error. Each issue says why it matters and how to fix it.
+When a crawl ends, Outflare checks every page against 61 rules and gives the crawl a **health score** from 0 to 100: the share of its pages with no error. Each issue says why it matters and how to fix it.
 
 Issues are grouped by **URL template**, the path with the parts that change between sibling pages replaced by `*`, such as `/blog/*`. So 38 blog posts with no meta description show as one fix to one template, not 38 problems.
 
 | Kind | What the rules find |
 | --- | --- |
-| Errors | Broken pages and server errors, links to broken pages, a canonical that points to a broken page, a missing title |
-| Warnings | Redirect chains, several canonicals, noindex or robots-blocked pages in the sitemap, content only JavaScript adds, duplicate or extra titles, missing meta descriptions and h1s, thin and duplicate content, no viewport tag, orphan pages |
-| Notices | Links to redirects, canonicals pointing elsewhere, noindex pages, titles and descriptions too long or short, duplicate descriptions, extra h1s, images without alt text, no language, deep, slow or large pages |
+| Errors | Broken pages and server errors, links to broken pages, redirect loops and redirects that end on a broken page, a canonical that points to a broken page, a missing title |
+| Warnings | Redirect chains, several canonicals or one that points to a noindex page, sitemaps that list noindex, blocked, redirecting, broken or non-canonical pages, invalid, broken or unconfirmed hreflang, content only JavaScript adds, duplicate or extra titles, missing meta descriptions, empty or missing h1s, thin and duplicate content, no viewport tag, orphan pages, pages not on HTTPS, insecure resources on secure pages, links to http pages |
+| Notices | Links to redirects, temporary redirects, canonicals missing or pointing elsewhere, noindex and nofollow pages, nofollow on internal links, links without text, pages with no links out, too many links or only one link in, hreflang without the page itself, long, capitalised, underscored or parameter URLs, titles and descriptions too long or short, duplicate descriptions, extra h1s, no structured data, no Open Graph tags or share image, images without alt text, no language, deep, slow or large pages |
 
 Duplicates count only among pages meant to be indexed: a page marked `noindex`, or whose canonical points elsewhere, is a declared copy. [The engine docs](https://github.com/outflareai/outflare/blob/main/docs/crawler.md#the-audit) list every rule id.
 
@@ -70,6 +70,16 @@ Each audit's issues go on the workspace's **fixes list**: one list of work for e
 - The next complete crawl checks a fix marked done. If the issue is gone, the crawl confirms it. If it is still there, or comes back later, the fix opens again.
 - Fixes follow their site's brand, so a brand filter shows that brand's work.
 - On the **Fixes** page, the list starts on what is still to do. Filter by status, severity or site, and open a fix to see why it matters, how to fix it and the pages it covers.
+
+### Hand a fix to your coding agent
+
+A fix can go straight to the coding agent that works on your site's code, such as Claude Code, Cursor or Codex, and come back checked:
+
+1. Open the fix and choose **Copy prompt**. The prompt says what is wrong, why it matters, how to fix it and which pages it covers, and how to report back. Paste it into your agent in the site's repository.
+2. When the change is live, choose **It's live, check it**. Outflare marks the fix done and crawls the site again.
+3. If the issue is gone, the crawl confirms the fix. If it is still there, the fix opens again.
+
+An agent can run the whole loop itself: `get_fix_prompt` to read the work, then `verify_fix` with a note such as the pull request link once the change is out. That needs a token with `seo.manage`. [Webhooks](/docs/api/webhooks/) tell your systems each step: `fix.found`, `fix.updated`, `fix.verify_requested`, `fix.confirmed` and `fix.reopened`.
 
 ## Pages your firewall blocks, and pages built by JavaScript
 
@@ -100,8 +110,11 @@ curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/workspaces/$W
 curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/workspaces/$WS/fixes?subject_id=$SITE&status=open"
 curl -X PATCH -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
   -d '{"status": "in_progress", "assignee_id": "me"}' https://app.outflare.ai/v1/workspaces/$WS/fixes/$FIX
+curl -H "Authorization: Bearer $TOKEN" https://app.outflare.ai/v1/workspaces/$WS/fixes/$FIX/prompt
+curl -X POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"note": "Fixed the blog template"}' https://app.outflare.ai/v1/workspaces/$WS/fixes/$FIX/verify
 ```
 
-Reading needs the `seo.read` scope; adding sites, checking ownership and crawling needs `seo.manage`. Agents use the MCP tools `add_seo_site`, `verify_seo_site`, `start_crawl`, `get_crawl`, `list_crawl_pages`, `get_crawl_page`, `list_crawl_issues`, `get_crawl_issue`, `list_fixes` and `update_fix` (see [MCP](/docs/agents/mcp/)).
+Reading needs the `seo.read` scope; adding sites, checking ownership and crawling needs `seo.manage`. Agents use the MCP tools `add_seo_site`, `verify_seo_site`, `start_crawl`, `get_crawl`, `list_crawl_pages`, `get_crawl_page`, `list_crawl_issues`, `get_crawl_issue`, `list_fixes`, `update_fix`, `get_fix_prompt` and `verify_fix` (see [MCP](/docs/agents/mcp/)).
 
 On a self-hosted server, OutflareBot only visits public sites. Set `OUTFLARE_CRAWL_ALLOW_PRIVATE=true` to audit an intranet or a site in development.
