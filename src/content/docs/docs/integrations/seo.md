@@ -45,6 +45,8 @@ estimate from search rankings, not your real visits; real visits come from
 the [analytics connectors](/docs/integrations/analytics/). Country defaults to the US; set
 another two-letter country per connection or per call.
 
+DataForSEO also reads Google's live results for one keyword, which is how [rank tracking](/docs/guides/keywords/#track-your-rankings) checks where your pages rank: about $0.02 for the top 100, within the same budget.
+
 ## Cost and budget
 
 - **DataForSEO** reports the exact cost of every call in dollars. An
