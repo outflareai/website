@@ -9,7 +9,7 @@ sidebar:
 
 Outflare reads your own websites with its crawler, [OutflareBot](/bot/), and records every page it finds: its HTTP status, where redirects lead, which pages ask not to be indexed, and which pages your robots.txt keeps crawlers away from. It needs no connector or API key. SEO tools like [DataForSEO and Ahrefs](/docs/integrations/seo/) add what others see of your site, and are separate.
 
-In the app, open **SEO** in the sidebar. **Site audits** lists your sites with their health and latest crawl, and opens each one's issues, ownership proof, crawl history and settings. **Fixes** is the fixes list below. **Keywords** shows what Google shows each page for and how it indexed them ([see what each page ranks for](/docs/guides/keywords/)). **Rankings & backlinks** is the [SEO tools](/docs/integrations/seo/) page.
+In the app, open **SEO** in the sidebar. **Site audits** lists your sites with their health and latest crawl, and opens each one's issues, ownership proof, crawl history and settings. **Fixes** is the fixes list below. **Keywords** shows what Google shows each page for and how it indexed them ([see what each page ranks for](/docs/guides/keywords/)). **Rankings & backlinks** is the [SEO tools](/docs/integrations/seo/) page, and **Backlinks** [tracks the links to your sites](/docs/guides/backlinks/).
 
 ## Add a site
 
