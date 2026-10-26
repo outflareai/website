@@ -1353,8 +1353,8 @@ paths:
       operationId: updateAPITokenLimits
       x-outflare-access: { scope: tokens.manage }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
-      summary: Change a token's sending and allocation limits
-      description: "Scope: tokens.manage. A token cannot change its own limits, or grant looser ones than it has. Scopes are fixed; issue a new token to change them."
+      summary: Change a token's name, permissions or limits
+      description: "Scope: tokens.manage. Only the fields sent change. A token cannot change itself, add a scope it lacks, or grant looser limits than it has; taking a scope away is always allowed. A connected app's token is changed with updateAgentApp instead (400)."
       tags: [access]
       requestBody:
         required: true
@@ -1381,6 +1381,157 @@ paths:
       responses:
         "204": { description: Revoked. }
         "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/agent-apps:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listAgentApps
+      x-outflare-access: { scope: workspace.read }
+      summary: List AI apps connected with OAuth
+      description: "Scope: workspace.read. Apps such as Claude, ChatGPT or Cursor that a person connected to the hosted MCP server (`/mcp`) by signing in. Members see the apps they connected; people with tokens.manage see everyone's. Each app runs on an API token, which listAPITokens leaves out."
+      tags: [access]
+      responses:
+        "200":
+          description: Connected apps, newest first.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/AgentApp" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/agent-apps/{id}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    patch:
+      operationId: updateAgentApp
+      x-outflare-access: { scope: workspace.read }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Change what a connected AI app may do
+      description: "Scope: workspace.read for an app you connected, tokens.manage for anyone's; people only, never a token, so an app can't change its own access. The app keeps reading what the person who connected it can read; `scopes` lists the changes it may make, from the app's `available_scopes`. Takes effect on the app's next call, with no need to connect again."
+      tags: [access]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [scopes]
+              properties:
+                scopes: { type: array, items: { $ref: "#/components/schemas/Scope" }, description: "The write scopes to allow. Empty is read only." }
+      responses:
+        "200":
+          description: The app.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AgentApp" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+    delete:
+      operationId: disconnectAgentApp
+      x-outflare-access: { scope: workspace.read }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Disconnect an AI app
+      description: "Scope: workspace.read for an app you connected, tokens.manage for anyone's. Revokes the app's token and refresh token at once; the app has to be connected again."
+      tags: [access]
+      responses:
+        "204": { description: Disconnected. }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/agent-apps/authorize:
+    get:
+      operationId: getAgentAuthorization
+      x-outflare-access: { signed_in: true }
+      summary: What an AI app asks to connect to
+      description: For the consent screen at `/oauth/authorize`. Names the app that registered `client_id`, where it sends the person back to, whether that is an app Outflare recognises, and the workspaces the person can connect it to with what it may do in each.
+      tags: [access]
+      parameters:
+        - { name: client_id, in: query, required: true, schema: { type: string } }
+        - { name: redirect_uri, in: query, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: The app and the person's workspaces.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [client, app, redirect_host, resource, workspaces]
+                properties:
+                  client:
+                    type: object
+                    required: [id, name, uri]
+                    properties:
+                      id: { type: string }
+                      name: { type: string, description: The name the app registered with. Anyone can register any name, so trust app and redirect_host over it. }
+                      uri: { type: string }
+                  app: { $ref: "#/components/schemas/AgentAppKind" }
+                  redirect_host: { type: string, description: Where the person is sent back to after approving. }
+                  resource: { type: string, description: The MCP server the app gets access to. }
+                  workspaces:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, slug, name, role, full_scopes, read_scopes, can_spend]
+                      properties:
+                        id: { type: string, format: uuid }
+                        slug: { type: string }
+                        name: { type: string }
+                        role: { type: string }
+                        full_scopes: { type: array, items: { $ref: "#/components/schemas/Scope" }, description: "What access full gives: everything the role allows except managing members, tokens and the workspace, approving missions, removing suppressions, managing webhooks and spending money." }
+                        read_scopes: { type: array, items: { $ref: "#/components/schemas/Scope" } }
+                        can_spend: { type: boolean, description: The role may approve spending (infrastructure.approve), so allow_spending can add it. }
+                        brands:
+                          description: Set when the person is kept to some brands there; the app is then kept to the one they pick (send it as brand). Null for every brand.
+                          type: [array, "null"]
+                          items:
+                            type: object
+                            required: [id, handle, name]
+                            properties:
+                              id: { type: string, format: uuid }
+                              handle: { type: string }
+                              name: { type: string }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: approveAgentAuthorization
+      x-outflare-access: { signed_in: true }
+      summary: Approve or decline an AI app
+      description: The consent screen's answer. Approving issues a ten-minute, single-use authorization code bound to the PKCE challenge; the app swaps it at `POST /oauth/token` for an access token (an API token that lasts an hour) and a refresh token. Either way, send the browser to `redirect_url`.
+      tags: [access]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [client_id, redirect_uri, approve]
+              properties:
+                client_id: { type: string }
+                redirect_uri: { type: string }
+                state: { type: string }
+                code_challenge: { type: string }
+                code_challenge_method: { type: string, enum: [S256] }
+                workspace_id: { type: string, description: The workspace's id or slug. }
+                access: { type: string, enum: [full, read], description: "full or read, unless scopes is set." }
+                allow_spending: { type: boolean, description: "Also let the app approve spending money on domains and mailboxes (infrastructure.approve). Off by default." }
+                scopes:
+                  type: array
+                  items: { type: string }
+                  description: "The exact write scopes to give the app, from the workspace's full_scopes plus infrastructure.approve when can_spend. The role's read scopes are always included. When set, access and allow_spending are ignored."
+                brand: { type: string, description: "For a person kept to some brands: the brand (id or handle) the app is kept to. Required for them, ignored for everyone else." }
+                approve: { type: boolean, description: False declines; the app hears access_denied. }
+      responses:
+        "200":
+          description: Where to send the browser.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [redirect_url]
+                properties:
+                  redirect_url: { type: string }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/audit-events:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
@@ -4843,6 +4994,284 @@ paths:
         "422": { $ref: "#/components/responses/Error" }
         "503": { $ref: "#/components/responses/Error" }
         "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/seo-sites:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+    get:
+      operationId: listSEOSites
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: List SEO sites
+      description: "Scope: seo.read. The websites this workspace audits, each with its ownership proof, crawl settings, limits and latest crawl."
+      tags: [seo]
+      parameters:
+        - { $ref: "#/components/parameters/Brand" }
+      responses:
+        "200":
+          description: Sites, by host.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/SEOSite" } }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createSEOSite
+      x-outflare-access: { scope: seo.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Add a site to audit
+      description: |
+        Scope: seo.manage. Adds a website for OutflareBot to crawl. The site
+        belongs to the brand whose domains include its host unless
+        `brand_id` says otherwise. Until you prove you own it (POST
+        .../verify, with one of the proofs in `verification`), a crawl reads
+        at most 100 pages, waits at least 2 seconds between requests and
+        always obeys robots.txt. A proved site may crawl up to 10,000 pages,
+        as fast as one request every 250 ms, and may turn `obey_robots` off.
+      tags: [seo]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [url]
+              properties:
+                url: { type: string, example: "https://www.example.com/", description: "The site's address. A path makes the crawl start there." }
+                brand_id: { type: [string, "null"], description: "A brand's id or handle; null shares the site with every brand." }
+                max_pages: { type: integer, minimum: 1, maximum: 10000, default: 100 }
+                crawl_delay_ms: { type: integer, minimum: 250, maximum: 60000, default: 2000, description: "The pause between requests. robots.txt's Crawl-delay can lengthen it." }
+                schedule: { type: string, enum: ["off", daily, weekly], default: "off" }
+      responses:
+        "201":
+          description: The site.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SEOSite" }
+        "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/seo-sites/{site}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: site, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getSEOSite
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: Read an SEO site
+      description: "Scope: seo.read."
+      tags: [seo]
+      responses:
+        "200":
+          description: The site.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SEOSite" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateSEOSite
+      x-outflare-access: { scope: seo.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Change an SEO site's settings
+      description: "Scope: seo.manage. Send only what changes, within the site's `limits`. `obey_robots: false` audits pages your own robots.txt hides from crawlers, and is only for a site you have proved you own. A crawl already running keeps the settings it started with."
+      tags: [seo]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                brand_id: { type: [string, "null"] }
+                max_pages: { type: integer, minimum: 1, maximum: 10000 }
+                crawl_delay_ms: { type: integer, minimum: 250, maximum: 60000 }
+                obey_robots: { type: boolean }
+                schedule: { type: string, enum: ["off", daily, weekly] }
+                status: { type: string, enum: [active, paused] }
+      responses:
+        "200":
+          description: The site.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SEOSite" }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+    delete:
+      operationId: deleteSEOSite
+      x-outflare-access: { scope: seo.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Remove an SEO site
+      description: "Scope: seo.manage. Its crawls and the pages they found go with it; a crawl running now stops."
+      tags: [seo]
+      responses:
+        "204": { description: Removed. }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/seo-sites/{site}/verify:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: site, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: verifySEOSite
+      x-outflare-access: { scope: seo.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Check that you own a site
+      description: |
+        Scope: seo.manage. Looks now for any one of the site's proofs (see
+        `verification`): a DNS TXT record, a meta tag in the start page's
+        head, or a file on the site. Found, the site is verified and its
+        limits rise. Not found answers 409 `verification_failed`, whose
+        message lists the proofs. Outflare checks a verified site again
+        every 30 days and lowers its limits if the proof is gone. A test
+        workspace's sites pass without a check.
+      tags: [seo]
+      responses:
+        "200":
+          description: The verified site.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SEOSite" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/seo-sites/{site}/crawls:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: site, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: startCrawl
+      x-outflare-access: { scope: seo.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Crawl a site now
+      description: |
+        Scope: seo.manage. Queues a crawl by OutflareBot (outflare.ai/bot/),
+        which reads robots.txt and the sitemaps, then the site's pages one
+        at a time, and slows down when the site asks. Poll GET
+        .../crawls/{crawl} until status is done, stopped or failed, then read
+        its pages. One crawl per site at a time: 409 `crawl_running` while
+        one runs. 409 `crawl_opted_out` when the site's owner asked this
+        server not to crawl it. A test workspace crawls a simulated site.
+      tags: [seo]
+      responses:
+        "202":
+          description: "The queued crawl. Inside a mission, a MissionHeld answer when the call was held for approval or dry-run instead."
+          content:
+            application/json:
+              schema: { oneOf: [{ $ref: "#/components/schemas/Crawl" }, { $ref: "#/components/schemas/MissionHeld" }] }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/crawls:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+    get:
+      operationId: listCrawls
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: List crawls, newest first
+      description: "Scope: seo.read."
+      tags: [seo]
+      parameters:
+        - { name: site, in: query, description: "Only this site's crawls.", schema: { type: string, format: uuid } }
+        - { name: before, in: query, description: "A crawl id from next_before.", schema: { type: string, format: uuid } }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
+      responses:
+        "200":
+          description: Crawls.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, next_before, next_cursor]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/Crawl" } }
+                  next_before: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/crawls/{crawl}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: crawl, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getCrawl
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: Read a crawl
+      description: "Scope: seo.read. Its status and counts so far; poll it while status is queued or running."
+      tags: [seo]
+      responses:
+        "200":
+          description: The crawl.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Crawl" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/crawls/{crawl}/stop:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: crawl, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: stopCrawl
+      x-outflare-access: { scope: seo.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Stop a crawl
+      description: "Scope: seo.manage. Pages already read are kept; those still queued are marked skipped. 409 `conflict` when it already ended."
+      tags: [seo]
+      responses:
+        "200":
+          description: The stopped crawl.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Crawl" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/crawls/{crawl}/pages:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: crawl, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: listCrawlPages
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: List the pages a crawl found
+      description: "Scope: seo.read. Every URL the crawl found, in the order found, with what fetching it gave: the HTTP status, where a redirect led, noindex and nofollow, and why a page was blocked (robots.txt), failed or skipped."
+      tags: [seo]
+      parameters:
+        - { name: status, in: query, schema: { type: string, enum: [queued, fetched, blocked, failed, skipped] } }
+        - { name: after, in: query, description: "A page id from next_after.", schema: { type: string } }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 1000, default: 100 } }
+      responses:
+        "200":
+          description: Pages.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, next_after, next_cursor]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/CrawlPage" } }
+                  next_after: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/integrations:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
@@ -10050,7 +10479,10 @@ components:
         name: { type: string }
         status: { type: string, enum: [connected, error], description: "error: the service refused the credentials; see last_error." }
         account: { $ref: "#/components/schemas/ConnectorAccount" }
-        config: { type: object, additionalProperties: true }
+        config:
+          type: object
+          additionalProperties: true
+          description: "Settings for this connection, never secret. warmup_tags (a sequencer with control.warmup): the tags it puts in its warm-up mail, at most 20 of 4 to 100 characters. The inbox leaves out received mail whose subject or body holds one, without reading or moving it."
         last_checked_at: { type: [string, "null"], format: date-time }
         last_error: { type: [string, "null"] }
         created_at: { type: string, format: date-time }
@@ -10377,6 +10809,89 @@ components:
         cached: { type: boolean, description: A kept answer under a day old; it cost nothing. }
         fetched_at: { type: string, format: date-time }
         budget: { $ref: "#/components/schemas/SEOBudget" }
+    SEOSite:
+      type: object
+      required: [id, brand_id, host, start_url, status, schedule, max_pages, crawl_delay_ms, obey_robots, verified, verified_at, verify_method, verify_checked_at, verification, limits, last_crawl, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        brand_id: { type: [string, "null"], format: uuid, description: The brand the site belongs to; null is shared by every brand. }
+        host: { type: string, example: www.example.com }
+        start_url: { type: string, example: "https://www.example.com/" }
+        status: { type: string, enum: [active, paused] }
+        schedule: { type: string, enum: ["off", daily, weekly], description: How often Outflare crawls the site by itself. }
+        max_pages: { type: integer }
+        crawl_delay_ms: { type: integer }
+        obey_robots: { type: boolean, description: "false audits pages the site's robots.txt hides; only for a verified site." }
+        verified: { type: boolean, description: Whether this workspace has proved it owns the site. }
+        verified_at: { type: [string, "null"], format: date-time }
+        verify_method: { type: [string, "null"], enum: [dns, meta, file, test, null] }
+        verify_checked_at: { type: [string, "null"], format: date-time }
+        verification:
+          type: object
+          description: "The three ways to prove you own the site; any one is enough."
+          required: [dns_name, dns_value, meta_tag, file_url, file_body]
+          properties:
+            dns_name: { type: string, example: example.com, description: Where the TXT record goes. }
+            dns_value: { type: string, example: outflare-site-verification=4f1c2a9e }
+            meta_tag: { type: string, example: '<meta name="outflare-site-verification" content="4f1c2a9e">', description: Goes in the head of the start page. }
+            file_url: { type: string, example: "https://www.example.com/.well-known/outflare-site-verification.txt" }
+            file_body: { type: string, example: 4f1c2a9e }
+        limits:
+          type: object
+          description: What this site's settings may be, which proving ownership raises.
+          required: [max_pages, min_crawl_delay_ms, may_ignore_robots]
+          properties:
+            max_pages: { type: integer, example: 100 }
+            min_crawl_delay_ms: { type: integer, example: 2000 }
+            may_ignore_robots: { type: boolean }
+        last_crawl: { oneOf: [{ $ref: "#/components/schemas/Crawl" }, { type: "null" }] }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    Crawl:
+      type: object
+      required: [id, site_id, host, status, trigger, reason, error_code, max_pages, delay_ms, obey_robots, pages_fetched, pages_blocked, pages_failed, pages_found, bytes, created_at, started_at, finished_at]
+      properties:
+        id: { type: string, format: uuid }
+        site_id: { type: string, format: uuid }
+        host: { type: string, example: www.example.com }
+        status: { type: string, enum: [queued, running, done, stopped, failed] }
+        trigger: { type: string, enum: [manual, schedule] }
+        reason:
+          type: [string, "null"]
+          description: "Why it ended: done (every page found was read), limit (max_pages reached), stopped, opted_out, robots_unreachable (robots.txt answered 5xx or not at all, so nothing may be read), site_errors (ten errors in a row) or error."
+          example: done
+        error_code: { type: [string, "null"], example: site_errors }
+        max_pages: { type: integer, description: The limits this crawl keeps, fixed when it started. }
+        delay_ms: { type: integer, description: The pause between requests now; it doubles when the site asks the crawler to slow down. }
+        obey_robots: { type: boolean }
+        pages_fetched: { type: integer }
+        pages_blocked: { type: integer, description: Pages robots.txt kept the crawler away from. }
+        pages_failed: { type: integer }
+        pages_found: { type: integer, description: "Every URL found, read or not." }
+        bytes: { type: integer }
+        created_at: { type: string, format: date-time }
+        started_at: { type: [string, "null"], format: date-time }
+        finished_at: { type: [string, "null"], format: date-time }
+    CrawlPage:
+      type: object
+      required: [id, url, depth, source, found_on, status, reason, http_status, content_type, bytes, duration_ms, redirect_to, noindex, nofollow, links_out, fetched_at]
+      properties:
+        id: { type: string, example: "1042" }
+        url: { type: string, example: "https://www.example.com/pricing" }
+        depth: { type: integer, description: Clicks from the start page; sitemap pages count as 1. }
+        source: { type: string, enum: [start, link, sitemap, redirect] }
+        found_on: { type: [string, "null"], description: The page or sitemap that led here. }
+        status: { type: string, enum: [queued, fetched, blocked, failed, skipped] }
+        reason: { type: [string, "null"], description: "robots (blocked by robots.txt), network, private_address, server_error, truncated (over 5 MB, cut off), or why a page was skipped (limit, stopped)." }
+        http_status: { type: [integer, "null"], example: 200 }
+        content_type: { type: [string, "null"], example: text/html }
+        bytes: { type: integer }
+        duration_ms: { type: integer }
+        redirect_to: { type: [string, "null"], description: "Where a 3xx answer pointed; on the same site it is a page of its own." }
+        noindex: { type: boolean }
+        nofollow: { type: boolean, description: "The page asked crawlers not to follow its links, so its links were not queued." }
+        links_out: { type: integer }
+        fetched_at: { type: [string, "null"], format: date-time }
     SEOSource:
       type: object
       required: [id, name, connector, connector_name, status, last_error, account, reports, country, sync, domains_set, domains, budget]
@@ -10834,7 +11349,7 @@ components:
       enum: [owner, admin, operator, viewer]
     Scope:
       type: string
-      enum: [workspace.read, workspace.manage, context.manage, members.read, members.manage, tokens.manage, audit.read, mailboxes.read, mailboxes.manage, leads.read, leads.manage, suppressions.manage, sequences.read, sequences.manage, inbox.read, inbox.manage, integrations.read, integrations.manage, outcomes.read, outcomes.manage, projects.read, projects.manage, infrastructure.read, infrastructure.manage, infrastructure.approve, analytics.read, missions.read, missions.run, missions.approve, webhooks.read, webhooks.manage]
+      enum: [workspace.read, workspace.manage, context.manage, members.read, members.manage, tokens.manage, audit.read, mailboxes.read, mailboxes.manage, leads.read, leads.manage, suppressions.manage, sequences.read, sequences.manage, inbox.read, inbox.manage, integrations.read, integrations.manage, outcomes.read, outcomes.manage, projects.read, projects.manage, infrastructure.read, infrastructure.manage, infrastructure.approve, analytics.read, missions.read, missions.run, missions.approve, seo.read, seo.manage, webhooks.read, webhooks.manage]
     Workspace:
       type: object
       required: [id, name, slug, test]
@@ -10923,6 +11438,25 @@ components:
         created_at: { type: string, format: date-time }
         expires_at: { type: string, format: date-time }
         brand_ids: { type: array, items: { type: string, format: uuid }, description: "The brands they will work on; empty for every brand." }
+    AgentAppKind:
+      type: string
+      enum: [claude, chatgpt, cursor, vscode, local, unknown]
+      description: The app, told from where it sends people back to (not from the name it registered with). local is an app on the person's computer (a loopback address); unknown is any other site.
+    AgentApp:
+      type: object
+      required: [id, token_id, name, app, uri, scopes, available_scopes, user_id, user_name, created_at, last_used_at]
+      properties:
+        id: { type: string, format: uuid }
+        token_id: { type: string, format: uuid, description: The API token the app runs on. }
+        name: { type: string, description: The name the app registered with. }
+        app: { $ref: "#/components/schemas/AgentAppKind" }
+        uri: { type: string }
+        scopes: { type: array, items: { $ref: "#/components/schemas/Scope" } }
+        available_scopes: { type: array, items: { $ref: "#/components/schemas/Scope" }, description: "The write scopes the app could be given: what the role of the person who connected it allows, less what apps never get." }
+        user_id: { type: string, format: uuid, description: Who connected it. }
+        user_name: { type: string }
+        created_at: { type: string, format: date-time }
+        last_used_at: { type: [string, "null"], format: date-time }
     APIToken:
       type: object
       properties:
@@ -10944,6 +11478,8 @@ components:
     APITokenLimits:
       type: object
       properties:
+        name: { type: string, description: "A new name. It shows in the audit log next to everything the token does." }
+        scopes: { type: array, minItems: 1, items: { $ref: "#/components/schemas/Scope" }, description: "Replaces the token's scopes. Takes effect on its next request." }
         daily_send_budget: { type: [integer, "null"], minimum: 1, maximum: 1000000 }
         max_priority: { type: [string, "null"], enum: [low, normal, high, null] }
         may_take_mailboxes: { type: boolean }
@@ -11049,6 +11585,7 @@ components:
               status: { type: string, enum: [ok, paused, error, disconnected] }
               status_reason: { type: [string, "null"] }
               daily_limit: { type: [integer, "null"] }
+              warmup_enabled: { type: boolean, description: "Whether that sequencer's own warm-up is on for it, whoever runs warm-up in Outflare." }
               warmup_score: { type: [integer, "null"] }
               campaigns: { type: integer, description: Live campaigns it is on there. }
               observed_at: { type: string, format: date-time }
@@ -11057,7 +11594,7 @@ components:
     MailboxWarmup:
       type: object
       description: Warm-up settings and the last 7 days of results.
-      required: [enabled, daily_target, reply_rate, started_at, today_target, sent_7d, inbox_7d, spam_7d, missing_7d, failed_7d, last_error, waiting_on, inbox_rate]
+      required: [enabled, daily_target, reply_rate, started_at, today_target, sent_7d, inbox_7d, spam_7d, missing_7d, failed_7d, last_error, provider, platform, waiting_on, inbox_rate]
       properties:
         enabled: { type: boolean }
         daily_target: { type: integer, minimum: 1, maximum: 100, description: Warm-up emails a day once fully ramped up. }
@@ -11070,18 +11607,32 @@ components:
         missing_7d: { type: integer, description: Not found within two days. }
         failed_7d: { type: integer, description: Warm-up sends the mailbox's SMTP server refused. }
         last_error: { type: [string, "null"], description: Why the latest warm-up send failed; null once a send succeeds again. }
+        provider: { type: string, description: "Who runs the warm-up: outflare, or the id of the connected sequencer (integration) that runs it with its own warm-up. A mailbox a sequencer already warms up when it is first synced, and that Outflare isn't warming up, takes that sequencer as its provider." }
+        platform:
+          type: [object, "null"]
+          description: The sequencer's own view of its warm-up, as of its last sync; null when Outflare runs it.
+          required: [integration_id, name, enabled, score, observed_at]
+          properties:
+            integration_id: { type: string, format: uuid }
+            name: { type: string }
+            enabled: { type: boolean, description: Whether the sequencer shows its warm-up on for this mailbox. }
+            score: { type: [integer, "null"], description: "The sequencer's warm-up score, 0 to 100." }
+            observed_at: { type: [string, "null"], format: date-time }
         waiting_on:
           type: [string, "null"]
-          enum: [another_mailbox, connection, paused, null]
-          description: "Why a mailbox with warm-up on sends nothing: another_mailbox when no other mailbox in the workspace has warm-up on, connection when it is not connected or Outflare has no login for it, paused when the mailbox is paused. Null while it can send."
+          enum: [another_mailbox, connection, paused, platform, null]
+          description: "Why a mailbox with warm-up on sends nothing: another_mailbox when no other mailbox in the workspace has warm-up on, connection when it is not connected or Outflare has no login for it, paused when the mailbox is paused, platform until the sequencer running it shows its warm-up on. Null while it can send."
         inbox_rate: { type: [number, "null"], minimum: 0, maximum: 1, description: "inbox_7d over all placed messages; null until any are placed." }
     WarmupSettings:
       type: object
       description: Unset fields are left as they are.
       properties:
         enabled: { type: boolean }
-        daily_target: { type: integer, minimum: 1, maximum: 100 }
-        reply_rate: { type: integer, minimum: 0, maximum: 100 }
+        daily_target: { type: integer, minimum: 1, maximum: 100, description: Outflare's warm-up only. }
+        reply_rate: { type: integer, minimum: 0, maximum: 100, description: Outflare's warm-up only. }
+        provider:
+          type: string
+          description: "Who runs the warm-up: outflare, or the id of a connected sequencer with the control.warmup capability (EmailBison, Instantly, Smartlead), which then runs it with its own warm-up. The mailboxes must be in that sequencer's account. On the bulk endpoint without mailbox_ids or pool_id, it applies to every mailbox that sequencer has."
     WarmupDay:
       type: object
       required: [date, sent, inbox, spam, missing, replies]
@@ -12399,6 +12950,10 @@ components:
             confirmation link.
           items:
             type: string
+        mcp_url:
+          type: string
+          description: The hosted MCP server's address, when this server runs one (OUTFLARE_MCP_SERVER). AI apps connect with this URL and sign in with OAuth. Missing when the MCP server has to run on the person's computer.
+          example: https://app.outflare.ai/mcp
         oauth_providers:
           type: array
           description: Providers whose consent screen is configured on this server (GOOGLE_OAUTH_CLIENT_ID, MICROSOFT_OAUTH_CLIENT_ID).
