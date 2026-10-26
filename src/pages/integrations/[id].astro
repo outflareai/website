@@ -1,0 +1,134 @@
+---
+import Marketing from '../../layouts/Marketing.astro';
+import IntegrationLogo from '../../components/IntegrationLogo.astro';
+import { app } from '../../data/project';
+import { capabilityText, categoryOf, integrations, signIn, type Integration } from '../../data/integrations';
+
+export function getStaticPaths() {
+	return integrations.map((i) => ({ params: { id: i.id }, props: { i } }));
+}
+
+const { i } = Astro.props as { i: Integration };
+const cat = categoryOf(i.category);
+const planned = i.status === 'planned';
+const does = (i.capabilities ?? []).map(capabilityText).filter(Boolean);
+const methods = i.auth_methods ?? [];
+const related = integrations.filter((o) => o.category === i.category && o.id !== i.id && o.status === 'available').slice(0, 6);
+const host = (u: string) => new URL(u).hostname.replace(/^www\./, '');
+---
+
+<Marketing title={`${i.name} integration · Outflare`} description={`${planned ? 'Coming to Outflare' : 'Connect'} ${i.name}${i.summary ? `: ${i.summary.replace(/\.$/, '')}` : ''}.`}>
+	<section class="border-b">
+		<div class="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
+			<nav aria-label="Breadcrumb" class="text-sm text-muted-foreground">
+				<a href="/integrations/" class="touch inline-flex items-center hover:text-foreground">Integrations</a>
+				<span aria-hidden="true" class="px-1.5">/</span>
+				<a href={`/integrations/#${cat.id}`} class="touch inline-flex items-center hover:text-foreground">{cat.label}</a>
+			</nav>
+			<div class="mt-6 flex items-start gap-5">
+				<span class="flex size-16 shrink-0 items-center justify-center rounded-xl border bg-background sm:size-20">
+					<IntegrationLogo integration={i} size={44} class="size-9 sm:size-11" />
+				</span>
+				<div class="min-w-0">
+					<div class="flex flex-wrap items-center gap-2">
+						<h1 class="text-3xl font-semibold tracking-tighter sm:text-4xl">{i.name}</h1>
+						{planned ? <span class="badge badge-next">Planned</span> : <span class="badge badge-live">Available</span>}
+					</div>
+					{i.summary && <p class="sub mt-2">{i.summary}</p>}
+				</div>
+			</div>
+			<div class="mt-8 flex flex-wrap gap-3">
+				{
+					planned ? (
+						<a href={`mailto:hello@outflare.ai?subject=${encodeURIComponent(`${i.name} integration`)}`} class="btn btn-primary btn-lg">Ask for it sooner</a>
+					) : (
+						<a href={app.signUp} class="btn btn-primary btn-lg">Connect {i.name}</a>
+					)
+				}
+				<a href={cat.docs} class="btn btn-outline btn-lg">Read the docs</a>
+			</div>
+		</div>
+	</section>
+
+	<div class="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1fr_18rem]">
+		<div class="space-y-10">
+			{
+				(i.description || does.length > 0) && (
+					<section>
+						<h2 class="text-xl font-semibold tracking-tight">{planned ? 'What it will do' : 'What it does'}</h2>
+						{i.description && <p class="mt-3 max-w-2xl text-muted-foreground">{i.description}</p>}
+						{does.length > 0 && (
+							<ul class="mt-4 space-y-2">
+								{does.map((d) => (
+									<li class="flex gap-2.5 text-sm">
+										<svg class="mt-0.5 size-4 shrink-0 text-brand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
+										{d}
+									</li>
+								))}
+							</ul>
+						)}
+					</section>
+				)
+			}
+			{
+				!planned && (
+					<section>
+						<h2 class="text-xl font-semibold tracking-tight">How to connect</h2>
+						<ol class="mt-4 space-y-3 text-sm text-muted-foreground">
+							<li class="flex gap-3"><span class="font-mono text-foreground">1</span><span>In Outflare, open <span class="text-foreground">Connectors</span> and pick {i.name}.</span></li>
+							<li class="flex gap-3">
+								<span class="font-mono text-foreground">2</span>
+								<span>
+									{methods.includes('oauth2') && methods.includes('api_key')
+										? `Sign in with ${i.name} (recommended), or paste an API key if you prefer.`
+										: methods.includes('oauth2')
+											? `Sign in with ${i.name} and approve access.`
+											: methods.includes('api_key')
+												? `Paste your ${i.name} API key. It is encrypted and never shown again.`
+												: 'Nothing to paste: it works as soon as you turn it on.'}
+								</span>
+							</li>
+							<li class="flex gap-3"><span class="font-mono text-foreground">3</span><span>Or ask your agent to connect it. It sends you a one-time link, so the key never passes through the chat.</span></li>
+						</ol>
+					</section>
+				)
+			}
+			{
+				related.length > 0 && (
+					<section>
+						<h2 class="text-xl font-semibold tracking-tight">More {cat.label.toLowerCase()} integrations</h2>
+						<ul class="mt-4 grid gap-3 sm:grid-cols-2">
+							{related.map((o) => (
+								<li>
+									<a href={`/integrations/${o.id}/`} data-track="integration_open" data-track-label={o.id} class="card flex items-center gap-3 p-3 transition-colors hover:border-foreground/25">
+										<span class="flex size-9 shrink-0 items-center justify-center rounded-lg border bg-background">
+											<IntegrationLogo integration={o} size={20} class="size-5" />
+										</span>
+										<span class="text-sm font-medium">{o.name}</span>
+									</a>
+								</li>
+							))}
+						</ul>
+					</section>
+				)
+			}
+		</div>
+
+		<aside class="card h-fit divide-y text-sm">
+			<dl class="divide-y">
+				<div class="px-4 py-3"><dt class="text-xs text-muted-foreground">Category</dt><dd class="mt-0.5 font-medium">{cat.label}</dd></div>
+				<div class="px-4 py-3"><dt class="text-xs text-muted-foreground">Connects with</dt><dd class="mt-0.5 font-medium">{signIn(i)}</dd></div>
+				{i.pricing && <div class="px-4 py-3"><dt class="text-xs text-muted-foreground">Pricing</dt><dd class="mt-0.5 font-medium">{i.pricing}</dd></div>}
+			</dl>
+			{
+				(i.website || i.docs_url) && (
+					<div class="flex flex-col px-2 py-2">
+						{i.website && <a href={i.website} rel="noopener" data-track="integration_vendor_click" data-track-label="website" class="touch inline-flex items-center rounded-md px-2 text-muted-foreground hover:text-foreground">{host(i.website)} ↗</a>}
+						{i.docs_url && <a href={i.docs_url} rel="noopener" data-track="integration_vendor_click" data-track-label="api_docs" class="touch inline-flex items-center rounded-md px-2 text-muted-foreground hover:text-foreground">{i.name} API docs ↗</a>}
+					</div>
+				)
+			}
+		</aside>
+	</div>
+	<p class="mx-auto max-w-6xl px-4 pb-10 text-xs text-muted-foreground sm:px-6">{i.name} and its logo are trademarks of their owner, used here to name the integration. Their use doesn't mean {i.name} endorses Outflare.</p>
+</Marketing>

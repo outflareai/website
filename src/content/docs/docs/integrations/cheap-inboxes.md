@@ -25,7 +25,7 @@ curl -X POST localhost:8080/v1/workspaces/$WS/integrations \
 
 ## Import
 
-Choose **Import all**, or tick mailboxes and choose **Import selected**. For each one, Outflare reads its password from Cheap Inboxes and runs the same SMTP, IMAP and DNS checks as a [CSV import](/docs/guides/import-mailboxes/). Mailboxes that Cheap Inboxes is still setting up wait, and are imported as soon as they are active.
+Turn on **Bring in mailboxes automatically** and every mailbox comes in, with new ones following as soon as they are ready. Or leave it off, tick mailboxes and choose **Bring in selected**. For each one, Outflare reads its password from Cheap Inboxes and runs the same SMTP, IMAP and DNS checks as a [CSV import](/docs/guides/import-mailboxes/). Mailboxes that Cheap Inboxes is still setting up wait, and are imported as soon as they are active.
 
 ```sh
 # Everything that is active, plus anything still being set up once it is ready
@@ -65,7 +65,7 @@ Cheap Inboxes knows when a mailbox is also connected to EmailBison, Instantly, S
 
 Outflare re-reads the account every 15 minutes. If your instance's `PUBLIC_URL` is an https address, it also subscribes to Cheap Inboxes webhooks, so new and changed mailboxes show up within seconds. Webhooks are signed, and checked against the secret Cheap Inboxes gave when they were created.
 
-- New mailboxes appear as `available`, or are imported straight away with **Import automatically** on.
+- New mailboxes appear as `available`, or are imported straight away with **Bring in mailboxes automatically** on. **More settings** holds Google app passwords, the daily sending limit for new mailboxes and push.
 - Mailboxes cancelled at Cheap Inboxes are paused in Outflare, so nothing sends from them, with the reason "Cancelled at the supplier".
 - Disconnecting the account removes the webhook. Imported mailboxes stay.
 
@@ -83,7 +83,9 @@ curl -X PATCH localhost:8080/v1/workspaces/$WS/integrations/$INTEGRATION/mailbox
 
 <span class="pill building">Built, not yet tested live</span> Cheap Inboxes pushes mailboxes straight into the sequencers it supports, and it supports a self-hosted EmailBison. Outflare answers the part of the EmailBison API used for that, and sets the connection up for you:
 
-1. On the Cheap Inboxes connection page in Outflare, choose **Turn on push**. Outflare adds itself in Cheap Inboxes as an EmailBison connection, with an API token that can only read and add mailboxes. It takes a few seconds.
+Most accounts don't need this: Outflare already brings mailboxes in itself. Push is the other way round, and sits under **More settings**.
+
+1. On the Cheap Inboxes connection page in Outflare, open **More settings** and choose **Turn on push**. Outflare adds itself in Cheap Inboxes as an EmailBison connection, with an API token that can only read and add mailboxes. It takes a few seconds.
 2. Select mailboxes in the table and choose **Push selected**, or choose **Push** to have Cheap Inboxes send every active mailbox that isn't in Outflare yet. Try one mailbox first. If a mailbox is also connected to another sequencer, Cheap Inboxes may move it to Outflare there.
 
 Or with the API (turning push on also needs `integrations.manage`):

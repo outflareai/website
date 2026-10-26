@@ -2,6 +2,14 @@
 
 Instructions for coding agents (and humans) working on outflare.ai, the marketing site and docs for **Outflare**. Use only that name: never any other product name, and the domain is always `outflare.ai` (no `www`). The engine's own rules are in [`outflareai/outflare` AGENTS.md](https://github.com/outflareai/outflare/blob/main/AGENTS.md); this file adds what is specific to the site.
 
+## Bring your own keys (hard rule, no exceptions)
+
+All third-party APIs are on an account basis. Outflare never gives access to its own API keys for connectors, AI or any other third-party service: everybody adds their own. No exceptions. The engine enforces it in code and CI ([engine AGENTS.md](https://github.com/outflareai/outflare/blob/main/AGENTS.md), "Bring your own keys"); on this site:
+
+- **Never promise or describe an Outflare-provided key.** No free credits, included AI, trial keys, "works out of the box with our key", or a shared Geonode, Anthropic, OpenAI or data provider account, on any page, plan or comparison table, for Cloud or self-hosting.
+- **Docs for a feature that calls a third-party API say whose account it runs on:** the workspace connects its own key or signs in to its own account, and the feature stays off until it does. Link the connector's page.
+- **The site's own services are not workspace features.** GTM, GA4, PostHog, Cloudflare and the `deployed` check run outflare.ai itself; they stay as they are under "Secrets and security" and the costs registry.
+
 ## Events: every action and every error (hard rule)
 
 Every action a visitor takes that tells us something (a sign-up, sign-in, GitHub or contact click, a button that matters) is an event, and every script error is one too. A change that adds a call to action or a script without its event is not done.
@@ -33,7 +41,7 @@ This repository is public. Everything in it is readable by anyone, forever: ever
 - **Never commit a secret.** That means API keys, tokens (ours or a provider's, including `DEPLOY_CHECK_TOKEN`), passwords, private keys, and `.env` files. Secrets live only in Railway variables, GitHub Actions secrets, or the owner's password manager. The build reads them from Cloudflare Pages environment variables.
 - **Never put a secret anywhere else people can see it either.** Not in a commit message, PR body, issue, comment, chat message, log line, screenshot, error message or docs example. Never ask anyone to paste one in chat.
 - **Fakes must look fake.** Test fixtures and docs use values like `oft_test_not_a_real_token` and `sk-test-not-a-real-key`, never a real-looking provider key. Docs examples use obviously fake values too.
-- **No customer or internal data.** No real email addresses, names, domains, mailbox contents, lead lists, Geonode data, production logs or database dumps. Use `example.com`, Acme and Northpeak. Screenshots use the demo workspace. Hosted-only details (staff emails, Railway ids, internal hostnames) never appear on the site.
+- **No customer or internal data.** No real email addresses, names, domains, mailbox contents, lead lists, Geonode data, production logs or database dumps. Use `example.com`, Acme and Northpeak. The one exception: Geonode and its brand Repocket (names, `geonode.com`, `repocket.com`) are the allowed example of a company with several brands, as in the Brands docs and tests. That covers the names only, never Geonode's real data, people, addresses or numbers; everything else uses the fictional names. Screenshots use the demo workspace. Hosted-only details (staff emails, Railway ids, internal hostnames) never appear on the site.
 - **Check before you push.** Run `gitleaks git --no-banner --log-opts=origin/main..HEAD .` (or the Security workflow on your pull request). GitHub push protection blocks known key formats. Never bypass push protection or a gitleaks finding to get a push through.
 - **False positives** go in `.gitleaksignore` as the exact fingerprint, only after a person has confirmed the value is fake, with the reason in the pull request. Never widen `.gitleaks.toml` to silence a rule.
 - **If a secret leaks, revoke it first.** Rotate it at the provider straight away, update the Cloudflare Pages or Railway variable, and tell Jack. Only then clean up the history. Never "fix" a leak by deleting the commit or ignoring the finding.

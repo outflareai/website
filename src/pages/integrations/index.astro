@@ -1,0 +1,127 @@
+---
+import Marketing from '../../layouts/Marketing.astro';
+import IntegrationLogo from '../../components/IntegrationLogo.astro';
+import { app } from '../../data/project';
+import { categories, categoryOf, integrations, signIn } from '../../data/integrations';
+
+const available = integrations.filter((i) => i.status === 'available');
+const used = [...new Set(integrations.map((i) => i.category))];
+const groups = [...categories.map((c) => c.id).filter((id) => used.includes(id)), ...used.filter((id) => !categories.some((c) => c.id === id))].map((id) => ({
+	...categoryOf(id),
+	items: integrations.filter((i) => i.category === id).sort((a, b) => (a.status === b.status ? a.name.localeCompare(b.name) : a.status === 'available' ? -1 : 1)),
+}));
+---
+
+<Marketing title="Integrations · Outflare" description={`Connect Outflare to ${available.length} tools today: email verification, lead data, sequencers, website analytics, SEO, calendars, CRM and AI models. Sign in or paste an API key, or let your agent ask for it.`}>
+	<section class="relative border-b">
+		<div class="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
+			<p class="eyebrow">Integrations</p>
+			<h1 class="mt-3 text-4xl font-semibold tracking-tighter text-balance sm:text-5xl">Connect the tools you already use</h1>
+			<p class="sub">Outflare is the brain; these are the tools it reaches out to. {available.length} work today and more are on the way. Nothing has to be connected to start: verification falls back to free built-in checks and mailboxes connect over SMTP and IMAP.</p>
+			<div class="mt-8 flex flex-wrap gap-3">
+				<a href={app.signUp} class="btn btn-primary btn-lg">Sign up free</a>
+				<a href="/docs/integrations/connectors/" class="btn btn-outline btn-lg">How connecting works</a>
+			</div>
+
+			<div class="mt-12 flex flex-col gap-3 sm:flex-row sm:items-center">
+				<label class="relative block w-full sm:max-w-xs">
+					<span class="sr-only">Search integrations</span>
+					<svg class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+					<input type="search" data-search placeholder="Search integrations" autocomplete="off" class="touch h-10 w-full rounded-md border bg-background pr-3 pl-9 text-sm shadow-xs outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring dark:bg-input/30" />
+				</label>
+				<div class="flex gap-1.5 overflow-x-auto pb-1 sm:pb-0" role="group" aria-label="Filter by category">
+					<button type="button" class="btn btn-sm btn-ghost shrink-0 aria-pressed:bg-accent aria-pressed:text-foreground" data-filter="" aria-pressed="true" data-track="integrations_filter" data-track-label="all">All</button>
+					{groups.map((g) => <button type="button" class="btn btn-sm btn-ghost shrink-0 aria-pressed:bg-accent aria-pressed:text-foreground" data-filter={g.id} aria-pressed="false" data-track="integrations_filter" data-track-label={g.id}>{g.label}</button>)}
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<div class="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
+		{
+			groups.map((g) => (
+				<section id={g.id} class="scroll-mt-20 pt-14" data-group={g.id}>
+					<div class="flex flex-wrap items-end justify-between gap-2">
+						<div>
+							<h2 class="text-xl font-semibold tracking-tight">{g.label}</h2>
+							{g.blurb && <p class="mt-1 text-sm text-muted-foreground">{g.blurb}</p>}
+						</div>
+						<a href={g.docs} class="touch inline-flex items-center text-sm text-muted-foreground hover:text-foreground">Docs →</a>
+					</div>
+					<ul class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+						{g.items.map((i) => (
+							<li data-item data-name={`${i.name} ${i.summary ?? ''}`.toLowerCase()}>
+								<a href={`/integrations/${i.id}/`} data-track="integration_open" data-track-label={i.id} class="card group flex h-full items-start gap-3.5 p-4 transition-colors hover:border-foreground/25">
+									<span class="flex size-11 shrink-0 items-center justify-center rounded-lg border bg-background">
+										<IntegrationLogo integration={i} size={26} class="size-[26px]" />
+									</span>
+									<span class="min-w-0">
+										<span class="flex flex-wrap items-center gap-2">
+											<span class="font-medium">{i.name}</span>
+											{i.status === 'planned' ? <span class="badge badge-muted">Planned</span> : <span class="text-xs text-muted-foreground">{signIn(i)}</span>}
+										</span>
+										{i.summary && <span class="mt-1 line-clamp-2 block text-sm text-muted-foreground">{i.summary}</span>}
+									</span>
+								</a>
+							</li>
+						))}
+					</ul>
+				</section>
+			))
+		}
+		<p data-empty hidden class="pt-14 text-sm text-muted-foreground">No integration matches that. <a href="mailto:hello@outflare.ai" class="font-medium text-foreground underline underline-offset-4">Tell us what you use</a> and we'll look at adding it.</p>
+
+		<section class="card mt-16 flex flex-col items-start gap-4 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
+			<div>
+				<h2 class="text-xl font-semibold tracking-tight">Missing a tool?</h2>
+				<p class="mt-1 text-sm text-muted-foreground">Every connector is open source. Ask for one, or add it yourself in a few files.</p>
+			</div>
+			<div class="flex flex-wrap gap-3">
+				<a href="mailto:hello@outflare.ai" class="btn btn-outline">Ask for an integration</a>
+				<a href="/docs/project/contributing/" class="btn btn-ghost">Build one</a>
+			</div>
+		</section>
+	</div>
+
+	<script>
+		const search = document.querySelector<HTMLInputElement>('[data-search]')!;
+		const buttons = [...document.querySelectorAll<HTMLButtonElement>('[data-filter]')];
+		const groups = [...document.querySelectorAll<HTMLElement>('[data-group]')];
+		const empty = document.querySelector<HTMLElement>('[data-empty]')!;
+		let category = '';
+		let searched = false;
+
+		function apply() {
+			const q = search.value.trim().toLowerCase();
+			let shown = 0;
+			for (const g of groups) {
+				let inGroup = 0;
+				for (const li of g.querySelectorAll<HTMLElement>('[data-item]')) {
+					const hit = (!category || g.dataset.group === category) && (!q || li.dataset.name!.includes(q));
+					li.hidden = !hit;
+					if (hit) inGroup++;
+				}
+				g.hidden = inGroup === 0;
+				shown += inGroup;
+			}
+			empty.hidden = shown > 0;
+			return shown;
+		}
+
+		for (const b of buttons) {
+			b.addEventListener('click', () => {
+				category = b.dataset.filter!;
+				for (const o of buttons) o.setAttribute('aria-pressed', String(o === b));
+				apply();
+			});
+		}
+		// One event the first time someone searches; never the words typed.
+		search.addEventListener('input', () => {
+			apply();
+			if (!searched && search.value.trim()) {
+				searched = true;
+				(window as any).outflareTrack?.('integrations_search', { page: location.pathname });
+			}
+		});
+	</script>
+</Marketing>
