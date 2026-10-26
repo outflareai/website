@@ -15,7 +15,7 @@ Each brand has its own website (its point of truth), its own context for agents,
 
 ## Add a brand
 
-Open **Settings → Brands → Add a brand** and give its name, website and where it ships (web, iOS, Android, TV and so on). Add its other domains on its page, such as an app or help site. A workspace without brands works exactly as before.
+Open **Settings → Brands → Add a brand** and give its name, website and where it ships (web, iOS, Android, TV and so on). Add its other domains on its page, such as an app or help site. A workspace without brands works exactly as before. Anyone but a viewer can add a brand, and so can an API token or connected AI app that can make changes (the `context.manage` scope); only the workspace's own name and URL need `workspace.manage`.
 
 Also on its page, under **Links**, add everywhere else the brand lives: its App Store and Google Play listings, TV app stores, the Chrome Web Store, Steam, socials and docs. Paste the address and Outflare works out what it is (apps.apple.com is the App Store); add a label such as "Fire TV" where it helps. Agents read the links with the brand's context.
 
