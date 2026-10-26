@@ -7783,6 +7783,603 @@ paths:
         "404": { $ref: "#/components/responses/Error" }
         "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/catalog:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: getCatalog
+      x-outflare-access: { scope: customers.read, brand_limited: true }
+      summary: Read the catalog
+      description: |
+        Scope: customers.read. Everything a workspace's customer records can hold: record types (person and account
+        built in, plus the workspace's own such as deal), their fields, the shared option lists and the product events
+        it has defined. It is the one definition of each fact for every feature (the customer data platform, the CRM,
+        imports, list filters, enrichment, merge tags), so read it before writing records.
+      tags: [catalog]
+      parameters:
+        - { name: archived, in: query, description: true includes archived types, fields and options., schema: { type: boolean, default: false } }
+      responses:
+        "200":
+          description: The catalog.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Catalog" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/catalog/types:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listRecordTypes
+      x-outflare-access: { scope: customers.read, brand_limited: true }
+      summary: List record types
+      description: "Scope: customers.read. Built-in types first, then the workspace's own, with their fields."
+      tags: [catalog]
+      parameters:
+        - { name: archived, in: query, schema: { type: boolean, default: false } }
+      responses:
+        "200":
+          description: Record types.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/RecordType" } }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createRecordType
+      x-outflare-access: { scope: catalog.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Add a record type
+      description: |
+        Scope: catalog.manage. A kind of record the workspace tracks beyond people and companies, such as deal,
+        subscription or partner. The key comes from the name unless given and never changes. Then add its fields.
+      tags: [catalog]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/RecordTypeInput"
+                - required: [name]
+      responses:
+        "201":
+          description: The record type.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/RecordType" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/catalog/types/{type}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { $ref: "#/components/parameters/RecordTypeKey" }
+    get:
+      operationId: getRecordType
+      x-outflare-access: { scope: customers.read, brand_limited: true }
+      summary: Read a record type
+      description: "Scope: customers.read. The type and all its fields, archived ones included."
+      tags: [catalog]
+      responses:
+        "200":
+          description: The record type.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/RecordType" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateRecordType
+      x-outflare-access: { scope: catalog.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Rename or archive a record type
+      description: "Scope: catalog.manage. Built-in types never change. Archived types keep their records but take no new ones."
+      tags: [catalog]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/RecordTypeInput" }
+      responses:
+        "200":
+          description: The record type.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/RecordType" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/catalog/types/{type}/fields:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { $ref: "#/components/parameters/RecordTypeKey" }
+    post:
+      operationId: createField
+      x-outflare-access: { scope: catalog.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Add a field
+      description: |
+        Scope: catalog.manage. One definition of a fact that every feature shares. Check the type's fields first so the
+        same fact is never added twice. select and status take an option_set (built in, or one from POST
+        .../catalog/option-sets); record_reference takes a target_type. A field's key, value type, option list,
+        multiple and target never change.
+      tags: [catalog]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/FieldInput"
+                - required: [label, value_type]
+      responses:
+        "201":
+          description: The field.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Field" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/catalog/types/{type}/fields/{field}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { $ref: "#/components/parameters/RecordTypeKey" }
+      - { name: field, in: path, required: true, description: The field's key., schema: { type: string } }
+    patch:
+      operationId: updateField
+      x-outflare-access: { scope: catalog.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Change or archive a field
+      description: "Scope: catalog.manage. Label, description, write policy, precedence, sensitivity, filterable and archived. Built-in fields never change."
+      tags: [catalog]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/FieldInput" }
+      responses:
+        "200":
+          description: The field.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Field" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/catalog/option-sets:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listOptionSets
+      x-outflare-access: { scope: customers.read, brand_limited: true }
+      summary: List option lists
+      description: "Scope: customers.read. The choices select and status fields share: country, industry, company_size, seniority and lifecycle_stage built in, then the workspace's own."
+      tags: [catalog]
+      responses:
+        "200":
+          description: Option lists.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/OptionSet" } }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createOptionSet
+      x-outflare-access: { scope: catalog.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Add an option list
+      description: "Scope: catalog.manage. Such as deal stages or partner tiers, for any number of fields to share."
+      tags: [catalog]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/OptionSetInput"
+                - required: [name, options]
+      responses:
+        "201":
+          description: The option list.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/OptionSet" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/catalog/option-sets/{set}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: set, in: path, required: true, description: The option list's key., schema: { type: string } }
+    patch:
+      operationId: updateOptionSet
+      x-outflare-access: { scope: catalog.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Change an option list
+      description: |
+        Scope: catalog.manage. options replaces the list's order and labels. Keys never go away: an option left out is
+        archived, so records that use it keep their meaning. Built-in lists never change.
+      tags: [catalog]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/OptionSetInput" }
+      responses:
+        "200":
+          description: The option list.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/OptionSet" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/catalog/events:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listEventDefinitions
+      x-outflare-access: { scope: customers.read, brand_limited: true }
+      summary: List product event definitions
+      description: |
+        Scope: customers.read. The events the workspace's product sends, such as product.activated. Names seen at ingest
+        that nobody defined arrive quarantined; only approved events drive segments, rules and journeys.
+      tags: [catalog]
+      parameters:
+        - { name: status, in: query, schema: { type: string, enum: [quarantined, approved, deprecated] } }
+      responses:
+        "200":
+          description: Event definitions by name.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/EventDefinition" } }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createEventDefinition
+      x-outflare-access: { scope: catalog.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Define a product event
+      description: "Scope: catalog.manage. Names are lowercase words joined by dots, such as product.activated."
+      tags: [catalog]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/EventDefinitionInput"
+                - required: [name]
+      responses:
+        "201":
+          description: The event definition.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/EventDefinition" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/catalog/events/{event}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: event, in: path, required: true, description: The event's name., schema: { type: string } }
+    patch:
+      operationId: updateEventDefinition
+      x-outflare-access: { scope: catalog.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Change, approve or deprecate an event definition
+      description: "Scope: catalog.manage. The name never changes."
+      tags: [catalog]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/EventDefinitionInput" }
+      responses:
+        "200":
+          description: The event definition.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/EventDefinition" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/records:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listRecords
+      x-outflare-access: { scope: customers.read, brand_limited: true }
+      summary: List customer records
+      description: |
+        Scope: customers.read. People, companies and the workspace's own record types, newest first. Merged records
+        are left out. q matches the name or any active identity, such as part of an email.
+      tags: [records]
+      parameters:
+        - { name: type, in: query, description: "A record type's key: person, account or the workspace's own.", schema: { type: string } }
+        - { name: q, in: query, schema: { type: string } }
+        - { name: origin, in: query, schema: { $ref: "#/components/schemas/RecordOrigin" } }
+        - { name: archived, in: query, description: Default false., schema: { type: string, enum: ["false", "true", all] } }
+        - { $ref: "#/components/parameters/Brand" }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
+        - { name: before, in: query, schema: { type: string, format: uuid } }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
+      responses:
+        "200":
+          description: Records.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, next_before, next_cursor]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/Record" } }
+                  next_before: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createRecord
+      x-outflare-access: { scope: customers.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Add a customer record
+      description: |
+        Scope: customers.manage. Attributes are checked against the type's fields in the catalog; an unknown key is
+        refused, so add the field first. Identities say who the record is: email and phone count only when verified
+        (default false), and the workspace's own ids, payment customers and domains are trusted as sent. A verified
+        identity another record already holds is refused with identity_taken; look it up with GET .../records/lookup.
+        A person with no name takes first_name and last_name.
+      tags: [records]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/RecordInput"
+                - required: [type]
+      responses:
+        "201":
+          description: The record.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Record" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/records/lookup:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: lookupRecords
+      x-outflare-access: { scope: customers.read, brand_limited: true }
+      summary: Find records by identity
+      description: |
+        Scope: customers.read. The records an email, phone, user id or other identity points at. owner is the one
+        record holding it verified; the others hold it unverified, such as a sign-up that never confirmed its email.
+      tags: [records]
+      parameters:
+        - { name: namespace, in: query, required: true, schema: { type: string, example: email } }
+        - { name: value, in: query, required: true, schema: { type: string, example: ada@example.com } }
+        - { $ref: "#/components/parameters/Brand" }
+      responses:
+        "200":
+          description: Matching records, the owner first.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, owner]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/Record" } }
+                  owner: { type: [string, "null"], format: uuid }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/records/{record}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { $ref: "#/components/parameters/RecordID" }
+    get:
+      operationId: getRecord
+      x-outflare-access: { scope: customers.read, brand_limited: true }
+      summary: Read a customer record
+      description: "Scope: customers.read. With its active identities."
+      tags: [records]
+      responses:
+        "200":
+          description: The record.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Record" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateRecord
+      x-outflare-access: { scope: customers.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Change or archive a customer record
+      description: |
+        Scope: customers.manage. attributes merges: a key set to null clears it, keys left out stay. Each value keeps
+        the source that set it, and a write from a lower-precedence source (by default manual, then first_party,
+        crm_sync, enrichment) leaves it as it is and lists it in skipped. Send version to refuse the change with
+        record_changed if someone else changed the record since you read it.
+      tags: [records]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/RecordInput" }
+      responses:
+        "200":
+          description: The record.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Record" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/records/{record}/history:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { $ref: "#/components/parameters/RecordID" }
+    get:
+      operationId: getRecordHistory
+      x-outflare-access: { scope: customers.read, brand_limited: true }
+      summary: A record's change history
+      description: "Scope: customers.read. Every change to its name and attributes, newest first, with who made it and from which source."
+      tags: [records]
+      parameters:
+        - { name: field, in: query, description: Only this field's changes (name for the record's name)., schema: { type: string } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
+        - { name: before, in: query, schema: { type: integer } }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
+      responses:
+        "200":
+          description: Changes.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, next_before, next_cursor]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/AttributeChange" } }
+                  next_before: { type: [integer, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/records/{record}/identities:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { $ref: "#/components/parameters/RecordID" }
+    get:
+      operationId: listRecordIdentities
+      x-outflare-access: { scope: customers.read, brand_limited: true }
+      summary: A record's identities
+      description: "Scope: customers.read. Active ones, and with closed=true the closed ones too, such as an email the person changed."
+      tags: [records]
+      parameters:
+        - { name: closed, in: query, schema: { type: boolean, default: false } }
+      responses:
+        "200":
+          description: Identities, active first.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/RecordIdentity" } }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: addRecordIdentity
+      x-outflare-access: { scope: customers.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Add, verify or change an identity
+      description: |
+        Scope: customers.manage. Adds an identity, or updates the record's own copy of it: sending verified: true for
+        an email the record holds unverified verifies it (200). When a person changes their email, send the new one
+        with replaces set to the old identity's id: the old one is closed as changed and kept in the history. A
+        verified value another record holds is refused with identity_taken, never moved or merged.
+      tags: [records]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/RecordIdentityInput" }
+      responses:
+        "200":
+          description: The identity the record already had, now verified or updated.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/RecordIdentity" }
+        "201":
+          description: The new identity.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/RecordIdentity" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/records/{record}/identities/{identity}/close:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { $ref: "#/components/parameters/RecordID" }
+      - { name: identity, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: closeRecordIdentity
+      x-outflare-access: { scope: customers.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Remove an identity
+      description: "Scope: customers.manage. It stops pointing at the record and stays in its history as removed."
+      tags: [records]
+      responses:
+        "200":
+          description: The closed identity.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/RecordIdentity" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/records/{record}/relationships:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { $ref: "#/components/parameters/RecordID" }
+    get:
+      operationId: listRecordRelationships
+      x-outflare-access: { scope: customers.read, brand_limited: true }
+      summary: A record's links
+      description: "Scope: customers.read. Links both ways, including record reference fields' values (field_key set). ended=true includes ended links."
+      tags: [records]
+      parameters:
+        - { name: ended, in: query, schema: { type: boolean, default: false } }
+      responses:
+        "200":
+          description: Links, active first.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/RecordRelationship" } }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: addRecordRelationship
+      x-outflare-access: { scope: customers.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Link two records
+      description: "Scope: customers.manage. A typed link from this record, such as partner_of. Record reference fields (companies) are set through attributes instead."
+      tags: [records]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [to, kind]
+              properties:
+                to: { type: string, format: uuid }
+                kind: { type: string, pattern: "^[a-z][a-z0-9_]{1,62}$", example: partner_of }
+                properties: { type: object, additionalProperties: true }
+      responses:
+        "201":
+          description: The link.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/RecordRelationship" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/records/{record}/relationships/{relationship}/end:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { $ref: "#/components/parameters/RecordID" }
+      - { name: relationship, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: endRecordRelationship
+      x-outflare-access: { scope: customers.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: End a link
+      description: "Scope: customers.manage. It is kept with its end time."
+      tags: [records]
+      responses:
+        "200":
+          description: The ended link.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/RecordRelationship" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/brands:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
@@ -10109,6 +10706,17 @@ components:
       required: true
       description: The brand's id or handle.
       schema: { type: string }
+    RecordTypeKey:
+      name: type
+      in: path
+      required: true
+      description: "The record type's key: person, account or the workspace's own."
+      schema: { type: string }
+    RecordID:
+      name: record
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
     Cursor:
       name: cursor
       in: query
@@ -12063,7 +12671,7 @@ components:
       enum: [owner, admin, operator, viewer]
     Scope:
       type: string
-      enum: [workspace.read, workspace.manage, context.manage, members.read, members.manage, tokens.manage, audit.read, mailboxes.read, mailboxes.manage, leads.read, leads.manage, suppressions.manage, sequences.read, sequences.manage, inbox.read, inbox.manage, integrations.read, integrations.manage, outcomes.read, outcomes.manage, projects.read, projects.manage, infrastructure.read, infrastructure.manage, infrastructure.approve, analytics.read, missions.read, missions.run, missions.approve, seo.read, seo.manage, webhooks.read, webhooks.manage]
+      enum: [workspace.read, workspace.manage, context.manage, members.read, members.manage, tokens.manage, audit.read, mailboxes.read, mailboxes.manage, leads.read, leads.manage, suppressions.manage, sequences.read, sequences.manage, inbox.read, inbox.manage, integrations.read, integrations.manage, outcomes.read, outcomes.manage, projects.read, projects.manage, infrastructure.read, infrastructure.manage, infrastructure.approve, analytics.read, missions.read, missions.run, missions.approve, seo.read, seo.manage, webhooks.read, webhooks.manage, customers.read, customers.manage, catalog.manage]
     Workspace:
       type: object
       required: [id, name, slug, test]
@@ -13029,6 +13637,253 @@ components:
                   page: { type: string, description: The dashboard page that resolves it. }
                   who: { type: string, enum: [agent, person], description: "agent: an agent with the scopes can resolve it. person: it needs a person (a sign-in, a payment, an approval)." }
         checked_at: { type: string, format: date-time }
+    Catalog:
+      type: object
+      required: [types, option_sets, events]
+      properties:
+        types: { type: array, items: { $ref: "#/components/schemas/RecordType" } }
+        option_sets: { type: array, items: { $ref: "#/components/schemas/OptionSet" } }
+        events: { type: array, items: { $ref: "#/components/schemas/EventDefinition" } }
+    RecordType:
+      type: object
+      required: [key, name, plural, description, builtin, archived, fields]
+      properties:
+        key: { type: string, example: deal, description: Never changes. }
+        name: { type: string, example: Deal }
+        plural: { type: string, example: Deals }
+        description: { type: string }
+        builtin: { type: boolean, description: "person and account: every workspace has them and they never change." }
+        archived: { type: boolean }
+        fields: { type: array, items: { $ref: "#/components/schemas/Field" } }
+    RecordTypeInput:
+      type: object
+      additionalProperties: false
+      properties:
+        key: { type: string, pattern: "^[a-z][a-z0-9_]{1,39}$", description: Only when adding. Default from the name. }
+        name: { type: string, maxLength: 60 }
+        plural: { type: string, maxLength: 60, description: Default the name plus s. }
+        description: { type: string, maxLength: 1000 }
+        archived: { type: boolean, description: Only when changing. }
+    FieldValueType:
+      type: string
+      enum: [text, number, currency, date, timestamp, checkbox, select, status, rating, email, phone, url, location, record_reference, actor_reference]
+      description: |
+        How values are written: text and number as JSON; currency {"amount_minor": 1999, "currency": "USD"}; date
+        2026-10-26; timestamp RFC 3339; checkbox true or false; select and status an option key; rating 0 to 5; email,
+        phone (international format) and url as text; location {"city", "region", "country", ...}; record_reference a
+        record id; actor_reference a member's user id. A multiple field takes a list.
+    Field:
+      type: object
+      required: [key, label, description, value_type, option_set, multiple, target_type, write_policy, precedence, sensitivity, filterable, builtin, archived]
+      properties:
+        key: { type: string, example: deal_stage }
+        label: { type: string }
+        description: { type: string }
+        value_type: { $ref: "#/components/schemas/FieldValueType" }
+        option_set: { type: [string, "null"], description: select and status. }
+        multiple: { type: boolean }
+        target_type: { type: [string, "null"], description: "record_reference: the record type it points at." }
+        write_policy:
+          type: string
+          enum: [source_owned, platform_owned, manual_override_allowed, computed]
+          description: |
+            source_owned: only its source system writes it (not manual). platform_owned: people and agents in
+            Outflare. manual_override_allowed: a source, and people may override. computed: Outflare works it out.
+        precedence: { type: array, items: { type: string }, description: "Which source wins when two disagree, first wins. Default manual, first_party, crm_sync, enrichment." }
+        sensitivity: { type: string, enum: [public, internal, confidential, restricted] }
+        filterable: { type: boolean, description: Shown as a filter and sortable column. }
+        builtin: { type: boolean }
+        archived: { type: boolean }
+    FieldInput:
+      type: object
+      additionalProperties: false
+      properties:
+        key: { type: string, pattern: "^[a-z][a-z0-9_]{1,62}$", description: Only when adding. Default from the label. }
+        label: { type: string, maxLength: 80 }
+        description: { type: string, maxLength: 1000 }
+        value_type: { $ref: "#/components/schemas/FieldValueType" }
+        option_set: { type: string }
+        multiple: { type: boolean }
+        target_type: { type: string }
+        write_policy: { type: string, enum: [source_owned, platform_owned, manual_override_allowed, computed] }
+        precedence: { type: array, items: { type: string, enum: [manual, first_party, crm_sync, enrichment, import] } }
+        sensitivity: { type: string, enum: [public, internal, confidential, restricted] }
+        filterable: { type: boolean }
+        archived: { type: boolean, description: Only when changing. }
+    CatalogOption:
+      type: object
+      required: [key, label, archived]
+      properties:
+        key: { type: string, example: won }
+        label: { type: string, example: Won }
+        archived: { type: boolean }
+    OptionSet:
+      type: object
+      required: [key, name, builtin, options]
+      properties:
+        key: { type: string, example: deal_stage }
+        name: { type: string }
+        builtin: { type: boolean }
+        options: { type: array, items: { $ref: "#/components/schemas/CatalogOption" } }
+    OptionSetInput:
+      type: object
+      additionalProperties: false
+      properties:
+        key: { type: string, pattern: "^[a-z][a-z0-9_]{1,39}$", description: Only when adding. Default from the name. }
+        name: { type: string }
+        options:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [key, label]
+            properties:
+              key: { type: string }
+              label: { type: string }
+              archived: { type: boolean }
+    EventDefinition:
+      type: object
+      required: [name, label, description, properties, status, sensitivity, first_seen_at, last_seen_at, seen_count, created_at, updated_at]
+      properties:
+        name: { type: string, example: product.activated }
+        label: { type: string }
+        description: { type: string }
+        properties:
+          type: array
+          items: { $ref: "#/components/schemas/EventProperty" }
+        status: { type: string, enum: [quarantined, approved, deprecated] }
+        sensitivity: { type: string, enum: [public, internal, confidential, restricted] }
+        first_seen_at: { type: [string, "null"], format: date-time }
+        last_seen_at: { type: [string, "null"], format: date-time }
+        seen_count: { type: integer }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    EventProperty:
+      type: object
+      required: [key, value_type, description]
+      properties:
+        key: { type: string }
+        value_type: { $ref: "#/components/schemas/FieldValueType" }
+        description: { type: string }
+    EventDefinitionInput:
+      type: object
+      additionalProperties: false
+      properties:
+        name: { type: string, description: Only when adding. }
+        label: { type: string, maxLength: 80 }
+        description: { type: string, maxLength: 1000 }
+        properties:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [key, value_type]
+            properties:
+              key: { type: string }
+              value_type: { $ref: "#/components/schemas/FieldValueType" }
+              description: { type: string }
+        status: { type: string, enum: [quarantined, approved, deprecated] }
+        sensitivity: { type: string, enum: [public, internal, confidential, restricted] }
+    RecordOrigin:
+      type: string
+      enum: [first_party, prospect, crm_sync, import, manual]
+      description: |
+        Where the record came from: first_party (the workspace's own product, billing or forms), prospect (lead lists
+        and data providers), crm_sync, import or manual. Lifecycle mail never relies on it: consent does.
+    Record:
+      type: object
+      required: [id, type, name, brand_id, origin, attributes, attribute_sources, identities, version, merged_into, archived, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        type: { type: string, example: person }
+        name: { type: string, example: Ada Lovelace }
+        brand_id: { type: [string, "null"], format: uuid, description: Null for a record every brand shares. }
+        origin: { $ref: "#/components/schemas/RecordOrigin" }
+        attributes: { type: object, additionalProperties: true, description: "Values by field key, as the catalog defines them." }
+        attribute_sources: { type: object, additionalProperties: { type: string }, description: Which source set each value. }
+        identities: { type: array, items: { $ref: "#/components/schemas/RecordIdentity" }, description: Active identities. }
+        version: { type: integer, description: Goes up on every change. }
+        merged_into: { type: [string, "null"], format: uuid }
+        archived: { type: boolean }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+        skipped:
+          type: array
+          description: "On a write: fields left as they were because a higher-precedence source set them."
+          items:
+            type: object
+            required: [field, kept_source]
+            properties:
+              field: { type: string }
+              kept_source: { type: string }
+    RecordInput:
+      type: object
+      additionalProperties: false
+      properties:
+        type: { type: string, description: Only when adding. person, account or a type from the catalog. }
+        name: { type: string, maxLength: 500 }
+        brand_id: { type: [string, "null"], description: "A brand's id or handle, or null for a record every brand shares." }
+        origin: { $ref: "#/components/schemas/RecordOrigin" }
+        source: { type: string, enum: [manual, first_party, crm_sync, enrichment, import], description: "Who these values come from, for precedence. Default manual." }
+        attributes: { type: object, additionalProperties: true }
+        identities: { type: array, maxItems: 50, items: { $ref: "#/components/schemas/RecordIdentityInput" }, description: Only when adding. }
+        version: { type: integer, description: Only when changing. The version you read. }
+        archived: { type: boolean, description: Only when changing. }
+    RecordIdentity:
+      type: object
+      required: [id, namespace, value, verified, verified_at, properties, source, valid_from, valid_to, closed_reason]
+      properties:
+        id: { type: string, format: uuid }
+        namespace: { type: string, example: email, description: "email, phone, device_token, user_id, anonymous_id, domain, outflare.lead, or a source's own such as stripe.customer." }
+        value: { type: string, example: ada@example.com, description: "Normalized: emails and domains lowercase, phones in E.164." }
+        verified: { type: boolean, description: Only a verified identity claims its value. }
+        verified_at: { type: [string, "null"], format: date-time }
+        properties: { type: object, additionalProperties: true }
+        source: { type: string }
+        valid_from: { type: string, format: date-time }
+        valid_to: { type: [string, "null"], format: date-time }
+        closed_reason: { type: [string, "null"], enum: [changed, merged, removed, claimed, null] }
+    RecordIdentityInput:
+      type: object
+      additionalProperties: false
+      required: [namespace, value]
+      properties:
+        namespace: { type: string, example: email }
+        value: { type: string, example: ada@example.com }
+        verified: { type: boolean, description: "Default false for email and phone, true for everything else." }
+        properties: { type: object, additionalProperties: true, description: "device_token needs platform: ios, android or web." }
+        source: { type: string, maxLength: 60, description: "Who said so: api (the default), import, manual or a connector's id." }
+        replaces: { type: string, format: uuid, description: "The identity of the same namespace this one replaces, such as the old email." }
+    AttributeChange:
+      type: object
+      required: [id, field, old_value, new_value, source, actor_id, request_id, changed_at]
+      properties:
+        id: { type: integer }
+        field: { type: string }
+        old_value: {}
+        new_value: {}
+        source: { type: string }
+        actor_id: { type: [string, "null"], format: uuid }
+        request_id: { type: string }
+        changed_at: { type: string, format: date-time }
+    RecordRelationship:
+      type: object
+      required: [id, kind, field_key, direction, record, properties, valid_from, valid_to]
+      properties:
+        id: { type: string, format: uuid }
+        kind: { type: string, example: partner_of }
+        field_key: { type: [string, "null"], description: Set when the link is a record reference field's value. }
+        direction: { type: string, enum: [outgoing, incoming] }
+        record:
+          type: object
+          required: [id, type, name]
+          properties:
+            id: { type: string, format: uuid }
+            type: { type: string }
+            name: { type: string }
+        properties: { type: object, additionalProperties: true }
+        valid_from: { type: string, format: date-time }
+        valid_to: { type: [string, "null"], format: date-time }
     Brand:
       type: object
       required: [id, name, handle, website, domains, platforms, links, status, context_version, counts, created_at, updated_at]
