@@ -189,7 +189,7 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `get_analytics_changes`, `get_analytics_catalog` | Start here: what changed on each website (headlines, period on period, movers, unusual days, SEO moves, gaps) and what each website can be asked. See [Analytics for agents](/docs/agents/analytics/) | |
 | `get_analytics_overview`, `query_analytics_history`, `compare_analytics_tools` | Stored analytics history: every website across tools, history by day, tool or page/query, and one website's tools day by day | |
 | `sync_analytics` | Copy analytics tools' latest numbers into Outflare now | Yes |
-| `list_analytics_sites`, `set_analytics_site` | The sites or properties a connected analytics account can read, which one Outflare reports on, and its domain | Yes |
+| `list_analytics_sites`, `set_analytics_site`, `update_analytics_site` | The sites or properties a connected analytics account can read, the default for live reports, and each site's domain and whether it syncs | Yes |
 | `list_seo`, `get_seo_history` | DataForSEO and Ahrefs connections with their budget left, and stored weekly SEO snapshots (keywords with their previous position); free | |
 | `get_seo_report` | A live SEO report for any domain: overview, keywords, backlinks, competitors or audit. Costs money within the connection's monthly budget (*provider*) | Yes |
 | `update_seo_settings`, `sync_seo` | An SEO connection's domains, country, monthly budget and weekly snapshots; take a snapshot now (*provider*) | Yes |
