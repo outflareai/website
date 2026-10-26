@@ -13,7 +13,7 @@ There are two ways in. The MCP server is the quickest one for Claude, ChatGPT, C
 
 ## The MCP server <span class="pill shipped">Shipped</span>
 
-[`@outflare/mcp`](https://github.com/outflareai/outflare/tree/main/mcp) is an [MCP](https://modelcontextprotocol.io) server that gives an agent 274 tools over the API (3 more in agency mode): run [missions](/docs/agents/missions/) toward a goal with approvals, read and update the brief of the project it works on, check sending domains and mailbox warm-up, import leads, check them against the suppression list, build, preview and start sequences, see and change which mailboxes each sequence sends from, and read and answer replies.
+[`@outflare/mcp`](https://github.com/outflareai/outflare/tree/main/mcp) is an [MCP](https://modelcontextprotocol.io) server that gives an agent 277 tools over the API (3 more in agency mode): run [missions](/docs/agents/missions/) toward a goal with approvals, read and update the brief of the project it works on, check sending domains and mailbox warm-up, import leads, check them against the suppression list, build, preview and start sequences, see and change which mailboxes each sequence sends from, and read and answer replies.
 
 It calls the same API with a scoped token, so:
 
@@ -199,7 +199,6 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `get_analytics_overview`, `query_analytics_history`, `compare_analytics_tools` | Stored analytics history: every website across tools, history by day, tool or page/query, and one website's tools day by day | |
 | `sync_analytics` | Copy analytics tools' latest numbers into Outflare now | Yes |
 | `list_analytics_sites`, `set_analytics_site`, `update_analytics_site` | The sites or properties a connected analytics account can read, the default for live reports, and each site's domain and whether it syncs | Yes |
-| `get_seo_overview` | Is each brand growing in search: weekly branded search, visitors, domain rating and links with up, down or flat trends, plus site health and open fixes; free | |
 | `list_seo`, `get_seo_history` | DataForSEO and Ahrefs connections with their budget left, and stored weekly SEO snapshots (keywords with their previous position); free | |
 | `get_seo_report` | A live SEO report for any domain: overview, keywords, backlinks, competitors or audit. Costs money within the connection's monthly budget (*provider*) | Yes |
 | `update_seo_settings`, `sync_seo` | An SEO connection's domains, country, monthly budget and weekly snapshots; take a snapshot now (*provider*) | Yes |

@@ -8821,6 +8821,153 @@ paths:
               schema: { $ref: "#/components/schemas/RecordRelationship" }
         "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/records/{record}/timeline:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { $ref: "#/components/parameters/RecordID" }
+    get:
+      operationId: getRecordTimeline
+      x-outflare-access: { scope: customers.read, brand_limited: true }
+      summary: A record's timeline
+      description: |
+        Scope: customers.read. Everything that happened to a person or company, newest first: their product events
+        (and, for a company, the group calls that named it), changes to their attributes, identities added and closed,
+        and consent given or withdrawn.
+      tags: [records]
+      parameters:
+        - { name: kinds, in: query, description: "Comma-separated: event, attribute_change, identity, consent. Default all.", schema: { type: string } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
+        - { name: before, in: query, schema: { type: string } }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
+      responses:
+        "200":
+          description: The timeline.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, next_before, next_cursor]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/TimelineItem" } }
+                  next_before: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/records/{record}/consents:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { $ref: "#/components/parameters/RecordID" }
+    get:
+      operationId: listRecordConsents
+      x-outflare-access: { scope: customers.read, brand_limited: true }
+      summary: A person's consents
+      description: |
+        Scope: customers.read. The current consent for each channel, topic and purpose the person was asked about: the
+        latest grant or withdrawal. history=true lists every one, newest first. A topic's own row wins over the whole
+        channel's, except a later withdrawal from the whole channel.
+      tags: [records]
+      parameters:
+        - { name: history, in: query, schema: { type: string, enum: ["true", "false"] } }
+      responses:
+        "200":
+          description: Consents.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/Consent" } }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: recordConsent
+      x-outflare-access: { scope: customers.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Record consent
+      description: |
+        Scope: customers.manage. Records that a person granted or withdrew consent, with where and what proves it.
+        Nothing is overwritten: the latest one counts, and the rest stay as the history. Lifecycle email sends
+        marketing only to people whose current email consent is granted.
+      tags: [records]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ConsentInput" }
+      responses:
+        "201":
+          description: The consent.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Consent" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/customer-events:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listCustomerEvents
+      x-outflare-access: { scope: customers.read, brand_limited: true }
+      summary: List product events
+      description: "Scope: customers.read. Product events, newest first. matched=false lists anonymous visitors' events not yet linked to a person."
+      tags: [records]
+      parameters:
+        - { name: name, in: query, description: "A catalog name, such as order_completed or page.viewed.", schema: { type: string } }
+        - { name: kind, in: query, schema: { type: string, enum: [track, identify, page, screen, group, alias] } }
+        - { name: user_id, in: query, schema: { type: string } }
+        - { name: anonymous_id, in: query, schema: { type: string } }
+        - { name: matched, in: query, schema: { type: string, enum: ["true", "false", all] } }
+        - { name: since, in: query, schema: { type: string, format: date-time } }
+        - { $ref: "#/components/parameters/Brand" }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
+        - { name: before, in: query, schema: { type: string } }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
+      responses:
+        "200":
+          description: Events.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, next_before, next_cursor]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/CustomerEvent" } }
+                  next_before: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: trackCustomerEvents
+      x-outflare-access: { scope: customers.manage, brand_limited: true }
+      summary: Send product events
+      description: |
+        Scope: customers.manage. Sends what people do in your product, in Segment's format: one event, or
+        {"batch": [...]} with up to 500 (5 MB). type is track, identify, page, screen, group or alias; camelCase
+        (userId, anonymousId, messageId) and snake_case both work, so a product already sending to Segment or
+        RudderStack can point here as is. Send it from your servers: the token can change customer records.
+
+        Each event is matched to a person: by userId (a new userId makes a new person, origin first_party), then by a
+        verified email in identify's traits (traits.email_verified true), then by anonymousId. An anonymous visitor's
+        events wait unmatched and join the person when an identify links their anonymousId. Two userIds are never
+        merged and an unverified email never matches anyone. identify's traits that match a person field in the
+        catalog (firstName is first_name) are written with source first_party; the rest are kept on the event and
+        listed in ignored_traits. group makes or finds the company by groupId and adds it to the person's companies.
+
+        A retry with the same messageId is stored once. Each event is accepted, duplicate or rejected on its own, and
+        a new track name enters the catalog quarantined until someone approves it.
+      tags: [records]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CustomerEventsInput" }
+      responses:
+        "200":
+          description: What happened to each event.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CustomerEventsResult" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/brands:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
@@ -15700,6 +15847,123 @@ components:
         properties: { type: object, additionalProperties: true }
         valid_from: { type: string, format: date-time }
         valid_to: { type: [string, "null"], format: date-time }
+    CustomerEventMessage:
+      type: object
+      additionalProperties: true
+      description: |
+        One event in Segment's format. camelCase and snake_case names both work. An event that is not valid is rejected
+        on its own in the results, so the rest of the batch still counts.
+      properties:
+        type: { type: string, example: track, description: "track, identify, page, screen, group or alias." }
+        userId: { type: [string, number], description: Your product's own id for the person. }
+        anonymousId: { type: string, description: The visitor's device or browser id before they sign in. }
+        event: { type: string, example: Order Completed, description: "track: what happened. Stored as order_completed." }
+        name: { type: string, description: "page and screen: the page's name." }
+        properties: { type: object, additionalProperties: true, description: Under 32 KB. }
+        traits:
+          type: object
+          additionalProperties: true
+          description: |
+            identify: who the person is; group: the company. email (with email_verified true once they proved it) and
+            phone become identities; keys that match a field in the catalog are written; the rest are kept on the event.
+        context: { type: object, additionalProperties: true, description: Under 8 KB. }
+        groupId: { type: string, description: "group: your product's own id for the company." }
+        previousId: { type: string, description: "alias: the id the person had before." }
+        messageId: { type: string, description: Your id for the event, so a retry is stored once. }
+        timestamp: { type: string, format: date-time, description: When it happened. Default now; at most 25 months ago. }
+    CustomerEventsInput:
+      type: object
+      additionalProperties: true
+      description: One event, or a batch.
+      properties:
+        batch: { type: array, minItems: 1, maxItems: 500, items: { $ref: "#/components/schemas/CustomerEventMessage" } }
+        context: { type: object, additionalProperties: true, description: "batch: context every event in it shares." }
+        source: { type: string, example: segment, description: "A label for where the events came from. Default api." }
+        brand_id: { type: [string, "null"], description: "The brand new records belong to: a brand's id or handle. Default shared by every brand." }
+        type: { type: string, enum: [track, identify, page, screen, group, alias] }
+    CustomerEventsResult:
+      type: object
+      required: [accepted, duplicate, rejected, results]
+      properties:
+        accepted: { type: integer }
+        duplicate: { type: integer }
+        rejected: { type: integer }
+        results:
+          type: array
+          items:
+            type: object
+            required: [index, status, event_id, record_id]
+            properties:
+              index: { type: integer, description: The event's place in the batch. }
+              status: { type: string, enum: [accepted, duplicate, rejected] }
+              event_id: { type: [string, "null"], format: uuid }
+              record_id: { type: [string, "null"], format: uuid, description: The person it was matched to; null for an anonymous visitor. }
+              name: { type: string, description: Its catalog name. }
+              ignored_traits: { type: array, items: { type: string }, description: Traits with no matching field, or a value the field refused. Add the field to keep them. }
+              warnings: { type: array, items: { type: string } }
+              error:
+                type: object
+                required: [code, message]
+                properties:
+                  code: { type: string }
+                  message: { type: string }
+    CustomerEvent:
+      type: object
+      required: [id, record_id, account_id, brand_id, kind, name, raw_name, user_id, anonymous_id, properties, traits, context, source, message_id, occurred_at, received_at]
+      properties:
+        id: { type: string, format: uuid }
+        record_id: { type: [string, "null"], format: uuid, description: The person; null until an anonymous visitor is identified. }
+        account_id: { type: [string, "null"], format: uuid, description: "group: the company." }
+        brand_id: { type: [string, "null"], format: uuid }
+        kind: { type: string, enum: [track, identify, page, screen, group, alias] }
+        name: { type: string, example: order_completed }
+        raw_name: { type: string, example: Order Completed }
+        user_id: { type: [string, "null"] }
+        anonymous_id: { type: [string, "null"] }
+        properties: { type: object, additionalProperties: true }
+        traits: { type: object, additionalProperties: true }
+        context: { type: object, additionalProperties: true }
+        source: { type: string }
+        message_id: { type: [string, "null"] }
+        occurred_at: { type: string, format: date-time }
+        received_at: { type: string, format: date-time }
+    TimelineItem:
+      type: object
+      required: [kind, id, at, title, detail, source]
+      properties:
+        kind: { type: string, enum: [event, attribute_change, identity, consent] }
+        id: { type: string }
+        at: { type: string, format: date-time }
+        title: { type: string, description: "The event's name, the field that changed, the identity's namespace or the consent's channel." }
+        detail: { type: object, additionalProperties: true }
+        source: { type: string }
+    Consent:
+      type: object
+      required: [id, record_id, channel, topic, purpose, status, source, evidence, occurred_at, created_by, created_at]
+      properties:
+        id: { type: string, format: uuid }
+        record_id: { type: string, format: uuid }
+        channel: { type: string, enum: [email, sms, push, whatsapp, in_app] }
+        topic: { type: string, description: "A subscription topic's key, or empty for the whole channel." }
+        purpose: { type: string, example: marketing }
+        status: { type: string, enum: [granted, withdrawn] }
+        source: { type: string, example: signup_form }
+        evidence: { type: object, additionalProperties: true }
+        occurred_at: { type: string, format: date-time }
+        created_by: { type: [string, "null"], format: uuid }
+        created_at: { type: string, format: date-time }
+    ConsentInput:
+      type: object
+      additionalProperties: false
+      required: [channel, status]
+      properties:
+        channel: { type: string, enum: [email, sms, push, whatsapp, in_app] }
+        topic: { type: string, description: "A subscription topic's key, such as product_updates. Empty for the whole channel." }
+        purpose: { type: string, description: Default marketing. }
+        status: { type: string, enum: [granted, withdrawn] }
+        source: { type: string, example: signup_form, description: "Where it was given or taken back: signup_form, preference_center, unsubscribe_link, import. Default api." }
+        evidence: { type: object, additionalProperties: true, description: "What proves it, such as the form and the wording's version. Under 4 KB." }
+        occurred_at: { type: string, format: date-time, description: Default now. }
     Brand:
       type: object
       required: [id, name, handle, website, domains, platforms, links, status, context_version, counts, created_at, updated_at]
