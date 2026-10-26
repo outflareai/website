@@ -9075,13 +9075,14 @@ paths:
                   merged_from: { type: string, format: uuid }
                   moved:
                     type: object
-                    required: [identities, attributes, relationships, events, consents]
+                    required: [identities, attributes, relationships, events, consents, subscriptions]
                     properties:
                       identities: { type: integer }
                       attributes: { type: integer }
                       relationships: { type: integer }
                       events: { type: integer }
                       consents: { type: integer }
+                      subscriptions: { type: integer, description: Subscriptions from payment connections. }
         "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/records/{record}/timeline:
@@ -13920,13 +13921,14 @@ components:
         totals:
           type: object
           description: What the sync has written since the connection was made.
-          required: [customers, subscriptions, payments, refunds, records_created]
+          required: [customers, subscriptions, payments, refunds, records_created, id_conflicts]
           properties:
             customers: { type: integer, description: Customers read and matched to a person. }
             subscriptions: { type: integer, description: Subscription states stored. }
             payments: { type: integer, description: payment.succeeded events added. }
             refunds: { type: integer, description: payment.refunded events added. }
             records_created: { type: integer, description: People created for customers nobody matched. }
+            id_conflicts: { type: integer, description: "Customer ids (such as a user id in the customer's metadata) that another person already holds. Each is added unverified and the two people are listed in Duplicates." }
         last_run_at: { type: [string, "null"], format: date-time }
         last_success_at: { type: [string, "null"], format: date-time }
         last_error: { type: [string, "null"], description: Why the last run failed, if it did. It is tried again on the next run. }
