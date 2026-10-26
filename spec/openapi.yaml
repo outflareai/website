@@ -3926,10 +3926,16 @@ paths:
         - { name: lead_id, in: query, schema: { type: string, format: uuid } }
         - { name: sequence_id, in: query, schema: { type: string, format: uuid } }
         - { name: status, in: query, description: "open: not done and not snoozed. Default all.", schema: { type: string, enum: [open, snoozed, done, all] } }
-        - { name: category, in: query, description: "A category, or none for replies nobody has sorted yet.", schema: { type: string, enum: [interested, meeting_booked, question, referral, not_now, not_interested, wrong_person, out_of_office, unsubscribe, none] } }
+        - { name: category, in: query, description: "A category, several separated by commas, or none for replies nobody has labelled yet.", schema: { type: string }, example: "interested,question" }
+        - { name: group, in: query, description: "hot (interested, meeting_booked, question), later (referral, not_now, objection), closed (not_interested, wrong_person, unsubscribe, complaint) or automatic (out_of_office, auto_reply); several separated by commas.", schema: { type: string }, example: hot }
+        - { name: source, in: query, description: "Where replies came from: mailbox (Outflare's own mailboxes) or a sequencer's connector id; several separated by commas.", schema: { type: string }, example: "mailbox,emailbison" }
+        - { name: needs_review, in: query, description: "true: replies whose label is unsure, or an unsure opt-out that was acted on.", schema: { type: boolean } }
+        - { name: project_id, in: query, description: The project of the reply's sequence or mailbox., schema: { type: string, format: uuid } }
+        - { name: min_confidence, in: query, description: Only replies labelled at least this surely (0 to 1)., schema: { type: number, minimum: 0, maximum: 1 } }
         - { name: assigned_to, in: query, description: "me (signed-in person only), none, or a user id.", schema: { type: string } }
-        - { name: label, in: query, schema: { type: string } }
-        - { name: q, in: query, description: Search sender and subject., schema: { type: string } }
+        - { name: tag, in: query, description: "A tag, or several separated by commas for replies with any of them.", schema: { type: string } }
+        - { name: label, in: query, deprecated: true, description: The older name for tag., schema: { type: string } }
+        - { name: q, in: query, description: Search sender, subject and text., schema: { type: string } }
         - { $ref: "#/components/parameters/Brand" }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
         - { name: before, in: query, description: "next_before from the previous page.", schema: { type: string, format: date-time } }
@@ -3985,8 +3991,10 @@ paths:
       summary: Triage a message
       description: |
         Scope: inbox.manage. Send only the fields to change. Mark it read,
-        sort it into a category, assign it to a member, snooze it, mark it
-        done or set its labels. Changes other than read are audited.
+        label it, assign it to a member, snooze it, mark it done, set its
+        tags (labels) or settle a review. Changes other than read are
+        audited; a new category also records inbox.classified, and settles
+        needs_review unless you send it.
       tags: [inbox]
       requestBody:
         required: true
@@ -3997,11 +4005,12 @@ paths:
               minProperties: 1
               properties:
                 read: { type: boolean }
-                category: { type: [string, "null"], enum: [interested, meeting_booked, question, referral, not_now, not_interested, wrong_person, out_of_office, unsubscribe, null] }
+                category: { type: [string, "null"], enum: [interested, meeting_booked, question, referral, not_now, objection, not_interested, wrong_person, unsubscribe, complaint, out_of_office, auto_reply, null] }
+                needs_review: { type: boolean, description: false once a person has checked the label. }
                 assigned_to: { type: [string, "null"], format: uuid, description: A workspace member's user id, or null to unassign. }
                 snoozed_until: { type: [string, "null"], format: date-time, description: Must be in the future; null wakes it now. }
                 done: { type: boolean }
-                labels: { type: array, maxItems: 20, items: { type: string, minLength: 1, maxLength: 40 }, description: Replaces the labels. Lower-cased. }
+                labels: { type: array, maxItems: 20, items: { type: string, minLength: 1, maxLength: 40 }, description: "Replaces the tags. Lower-cased; a new name joins the workspace's tag list." }
       responses:
         "200":
           description: The message.
@@ -4010,6 +4019,186 @@ paths:
               schema: { $ref: "#/components/schemas/InboundMessage" }
         "404": { $ref: "#/components/responses/Error" }
         "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/inbox-tags:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listInboxTags
+      x-outflare-access: { scope: inbox.read }
+      summary: List the workspace's inbox tags
+      description: Scope inbox.read. Every tag with its colour and how many replies have it, by name.
+      tags: [inbox]
+      responses:
+        "200":
+          description: Tags.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/InboxTag" } }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createInboxTag
+      x-outflare-access: { scope: inbox.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Add an inbox tag
+      description: Scope inbox.manage. Tags also appear when a reply is given a new one. 409 if the name exists; at most 200.
+      tags: [inbox]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [name]
+              properties:
+                name: { type: string, minLength: 1, maxLength: 40, example: pricing }
+                color: { type: string, enum: [gray, red, orange, amber, green, teal, blue, violet, pink], description: Default gray. }
+      responses:
+        "201":
+          description: The tag.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/InboxTag" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/inbox-tags/{id}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    patch:
+      operationId: updateInboxTag
+      x-outflare-access: { scope: inbox.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Rename or recolour an inbox tag
+      description: Scope inbox.manage. A rename changes the tag on every reply that has it.
+      tags: [inbox]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              minProperties: 1
+              properties:
+                name: { type: string, minLength: 1, maxLength: 40 }
+                color: { type: string, enum: [gray, red, orange, amber, green, teal, blue, violet, pink] }
+      responses:
+        "200":
+          description: The tag.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/InboxTag" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    delete:
+      operationId: deleteInboxTag
+      x-outflare-access: { scope: inbox.manage }
+      summary: Delete an inbox tag
+      description: Scope inbox.manage. Removes it from the list and from every reply.
+      tags: [inbox]
+      responses:
+        "204": { description: Deleted. }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/inbox-views:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listInboxViews
+      x-outflare-access: { scope: inbox.read }
+      summary: List saved inbox views
+      description: Scope inbox.read. Views shared with the workspace, and your own.
+      tags: [inbox]
+      responses:
+        "200":
+          description: Views, in order.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/InboxView" } }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createInboxView
+      x-outflare-access: { scope: inbox.read }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Save an inbox view
+      description: |
+        Scope inbox.read. Saves a set of inbox filters under a name. A
+        view is yours alone unless shared is true; API tokens save shared
+        views. At most 100 per workspace.
+      tags: [inbox]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [name]
+              properties:
+                name: { type: string, minLength: 1, maxLength: 60, example: My hot replies }
+                filters: { type: object, additionalProperties: true, example: { group: hot, status: open, assigned_to: me } }
+                shared: { type: boolean, description: Default false. }
+                position: { type: integer }
+      responses:
+        "201":
+          description: The view.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/InboxView" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/inbox-views/{id}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    patch:
+      operationId: updateInboxView
+      x-outflare-access: { scope: inbox.read }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Change a saved inbox view
+      tags: [inbox]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              minProperties: 1
+              properties:
+                name: { type: string, minLength: 1, maxLength: 60 }
+                filters: { type: object, additionalProperties: true }
+                position: { type: integer }
+      responses:
+        "200":
+          description: The view.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/InboxView" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    delete:
+      operationId: deleteInboxView
+      x-outflare-access: { scope: inbox.read }
+      summary: Delete a saved inbox view
+      tags: [inbox]
+      responses:
+        "204": { description: Deleted. }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/inbox/{id}/reply:
     parameters:
@@ -5893,7 +6082,8 @@ paths:
       description: |
         Scope: integrations.manage. For connectors whose `auth_methods`
         include `oauth2`. Redirects to the service's sign-in page;
-        afterwards the browser lands on the workspace's Connectors page.
+        afterwards the browser lands on the workspace's Connectors page, or
+        on its Get started page with `return=get-started`.
         Answers `not_configured` when this server has no OAuth app for the
         connector; the catalog's `auth_options` says so ahead of time.
         With `format=json` it returns the link instead, for an agent to hand
@@ -5902,6 +6092,7 @@ paths:
       parameters:
         - { name: name, in: query, schema: { type: string } }
         - { name: format, in: query, schema: { type: string, enum: [json] } }
+        - { name: return, in: query, description: "The app page to land on afterwards. Default: Connectors.", schema: { type: string, enum: [get-started] } }
       responses:
         "200":
           description: The sign-in link (format=json).
@@ -7608,6 +7799,59 @@ paths:
               schema: { $ref: "#/components/schemas/CompanyContext" }
         "400": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/onboarding:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: getOnboarding
+      x-outflare-access: { scope: workspace.read }
+      summary: Read the getting-started steps
+      description: |
+        Scope: workspace.read. The steps a new workspace is walked through,
+        aimed at a first result: add its website (a brand), pick what to do
+        first (`goal`), connect an AI (its own model key, or an AI app over
+        MCP), connect the tools that goal needs and start a first mission.
+        Inviting the team comes after, on Home (`walkthrough: false`). Each
+        step is `done` when the workspace already has it, however it was
+        added, and `skipped` when a person left it for later. None is
+        required. `page` is where a person does the step
+        and `tool` the MCP tool an agent can use (empty when it needs a
+        person). `show` says whether the app opens the walk-through by
+        itself.
+      tags: [context]
+      responses:
+        "200":
+          description: The steps.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Onboarding" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateOnboarding
+      x-outflare-access: { scope: workspace.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Pick a goal, skip steps or close the walk-through
+      description: |
+        Scope: workspace.manage. `goal` records what to do first, which
+        picks the tools and the first mission suggested. `skip` leaves
+        steps for later and `unskip` brings them back; `dismissed: true` closes the walk-through so the
+        app stops opening it, and `false` opens it again. Skipping never
+        turns anything off: a skipped step still counts as done once the
+        workspace has it.
+      tags: [context]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/OnboardingInput" }
+      responses:
+        "200":
+          description: The steps.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Onboarding" }
+        "400": { $ref: "#/components/responses/Error" }
         "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/memories:
@@ -10485,6 +10729,18 @@ webhooks:
             schema: { $ref: "#/components/schemas/WebhookEvent" }
       responses:
         "200": { description: Any 2xx answer means received; anything else is retried. }
+  inbox.classified:
+    post:
+      operationId: webhook_inbox_classified
+      summary: "A reply got a label, or a different one, from the rules, the AI, a person or an agent. data has category, group, confidence, category_source, source and the ids; endpoints with categories hear only those labels."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
   lead.bounced:
     post:
       operationId: webhook_lead_bounced
@@ -11802,7 +12058,7 @@ components:
         description: { type: string }
     WebhookEndpoint:
       type: object
-      required: [id, url, description, events, enabled, disabled_reason, failing_since, last_success_at, created_at, updated_at]
+      required: [id, url, description, events, categories, enabled, disabled_reason, failing_since, last_success_at, created_at, updated_at]
       properties:
         id: { type: string, format: uuid }
         url: { type: string, format: uri }
@@ -11811,6 +12067,10 @@ components:
           type: array
           items: { type: string }
           description: 'Event types, category wildcards ("lead.*") or "*".'
+        categories:
+          type: array
+          items: { type: string }
+          description: Reply labels this endpoint hears about; empty for every label. Events without a label are always sent.
         enabled: { type: boolean }
         disabled_reason:
           type: [string, "null"]
@@ -11847,6 +12107,12 @@ components:
           items: { type: string }
           description: 'Event types (GET /v1/webhook-events), category wildcards such as "lead.*", or "*" for all. Default ["*"].'
           example: [lead.replied, lead.bounced, mailbox.auto_paused]
+        categories:
+          type: array
+          maxItems: 20
+          items: { type: string }
+          description: "Only replies with these labels: categories (interested, ...) or groups (hot, later, closed, automatic), stored as labels. Empty for all."
+          example: [hot]
         brand: { type: [string, "null"], description: "A brand's id or handle: send only events about that brand's records. Null or left out for every brand's.", example: repocket }
         enabled: { type: boolean, description: Default true. }
     WebhookUpdate:
@@ -11856,6 +12122,12 @@ components:
         url: { type: string, format: uri, maxLength: 2048 }
         description: { type: string, maxLength: 200 }
         events: { type: array, minItems: 1, maxItems: 100, items: { type: string } }
+        categories:
+          type: array
+          maxItems: 20
+          items: { type: string }
+          description: "Only replies with these labels: categories (interested, ...) or groups (hot, later, closed, automatic), stored as labels. Empty for all."
+          example: [hot]
         enabled: { type: boolean }
         brand: { type: [string, "null"], description: "A brand's id or handle for only its events, or null for every brand's." }
     WebhookDeliveryStatus:
@@ -11889,7 +12161,7 @@ components:
       required: [id, type, created_at, workspace_id, actor, target, request_id, data]
       properties:
         id: { type: string, description: "Unique per event, and the webhook-id header. Use it to ignore repeats.", example: evt_48213 }
-        type: { type: string, enum: [lead.replied, lead.unsubscribed, inbox.replied, inbox.updated, lead.bounced, mailbox.auto_paused, lead.created, lead.updated, lead.deleted, leads.imported, suppressions.added, suppression.removed, lead_list.created, lead_list.leads_added, lead_list.run_started, lead_list.build_done, lead_list.build_failed, lead_list.refresh_done, lead_list.refresh_failed, lead_list.enrich_done, lead_list.enrich_failed, import.done, import.failed, sequence.created, sequence.updated, sequence.activated, sequence.paused, sequence.archived, sequence.deleted, sequence.steps_updated, sequence.leads_enrolled, enrollment.stopped, mailbox.imported, mailbox.updated, mailbox.paused, mailbox.resumed, mailbox.stage_changed, mailbox.deleted, domain.added, domain.paused, domain.resumed, domain.removed, email.queued, email.sent, email.delivered, email.bounced, email.complained, email.failed, email.suppressed, email.cancelled, email.unsubscribed, email_domain.verified, email_domain.verification_failed, email_provider.events_failed, email_template.published, meeting.created, meeting.updated, meeting.deleted, deal.created, deal.updated, deal.deleted, spend.recorded, integration.connected, integration.updated, integration.disconnected, connect_request.created, project.created, project.updated, project.deleted, mission.created, mission.updated, mission.submitted, mission.approved, mission.paused, mission.resumed, mission.stopped, mission.completed, mission.action_held, mission.action_approved, mission.action_rejected, infra.plan_created, infra.plan_approved, infra.ordered, infra.order_failed, infra.domains_bought, infra.mailbox_joined, infra.plan_warming, infra.plan_ready, infra.plan_cancelled, workspace.updated, webhook.test] }
+        type: { type: string, enum: [lead.replied, lead.unsubscribed, inbox.replied, inbox.updated, inbox.classified, lead.bounced, mailbox.auto_paused, lead.created, lead.updated, lead.deleted, leads.imported, suppressions.added, suppression.removed, lead_list.created, lead_list.leads_added, lead_list.run_started, lead_list.build_done, lead_list.build_failed, lead_list.refresh_done, lead_list.refresh_failed, lead_list.enrich_done, lead_list.enrich_failed, import.done, import.failed, sequence.created, sequence.updated, sequence.activated, sequence.paused, sequence.archived, sequence.deleted, sequence.steps_updated, sequence.leads_enrolled, enrollment.stopped, mailbox.imported, mailbox.updated, mailbox.paused, mailbox.resumed, mailbox.stage_changed, mailbox.deleted, domain.added, domain.paused, domain.resumed, domain.removed, email.queued, email.sent, email.delivered, email.bounced, email.complained, email.failed, email.suppressed, email.cancelled, email.unsubscribed, email_domain.verified, email_domain.verification_failed, email_provider.events_failed, email_template.published, meeting.created, meeting.updated, meeting.deleted, deal.created, deal.updated, deal.deleted, spend.recorded, integration.connected, integration.updated, integration.disconnected, connect_request.created, project.created, project.updated, project.deleted, mission.created, mission.updated, mission.submitted, mission.approved, mission.paused, mission.resumed, mission.stopped, mission.completed, mission.action_held, mission.action_approved, mission.action_rejected, infra.plan_created, infra.plan_approved, infra.ordered, infra.order_failed, infra.domains_bought, infra.mailbox_joined, infra.plan_warming, infra.plan_ready, infra.plan_cancelled, workspace.updated, webhook.test] }
         created_at: { type: string, format: date-time }
         workspace_id: { type: string, format: uuid }
         actor: { $ref: "#/components/schemas/WebhookRef" }
@@ -14768,6 +15040,62 @@ components:
           items: { type: string, enum: [company, about, goals, voice] }
           description: Onboarding fields still empty.
         ask_for_missing: { type: boolean, description: "Whether to ask the person for the missing fields: false once they are filled or a person said not to ask." }
+    OnboardingStepId:
+      type: string
+      enum: [brand, goal, ai, connect, mission, team]
+    OnboardingGoal:
+      type: string
+      description: "What a workspace wants to do first: find and email new customers (outreach), grow search traffic (search), report on what works (reports) or nurture existing customers (nurture)."
+      enum: [outreach, search, reports, nurture]
+    OnboardingStep:
+      type: object
+      required: [id, title, detail, done, skipped, walkthrough, page, tool]
+      properties:
+        id: { $ref: "#/components/schemas/OnboardingStepId" }
+        title: { type: string }
+        detail: { type: string }
+        done: { type: boolean, description: The workspace already has it, however it was added. }
+        skipped: { type: boolean, description: A person left it for later. A done step is never skipped. }
+        walkthrough: { type: boolean, description: "Part of the full-page walk-through; false for steps left to Home's checklist, such as inviting the team." }
+        page: { type: string, description: "The dashboard page that does the step, such as /acme/brands." }
+        tool: { type: string, description: The MCP tool an agent can use for it; empty when a person must. }
+    Onboarding:
+      type: object
+      required: [steps, done, total, next_step, complete, goal, dismissed, dismissed_at, show]
+      properties:
+        steps:
+          type: array
+          items: { $ref: "#/components/schemas/OnboardingStep" }
+        done: { type: integer }
+        total: { type: integer }
+        next_step:
+          description: The first step neither done nor skipped; null when none is left.
+          oneOf:
+            - { $ref: "#/components/schemas/OnboardingStepId" }
+            - { type: "null" }
+        complete: { type: boolean, description: Every step is done or skipped. }
+        goal:
+          description: What the workspace picked to do first; null until it picks.
+          oneOf:
+            - { $ref: "#/components/schemas/OnboardingGoal" }
+            - { type: "null" }
+        dismissed: { type: boolean, description: A person closed the walk-through. }
+        dismissed_at: { type: [string, "null"], format: date-time }
+        show: { type: boolean, description: "Whether the app opens the walk-through by itself: nothing done or skipped yet and nobody closed it." }
+    OnboardingInput:
+      type: object
+      additionalProperties: false
+      properties:
+        skip:
+          type: array
+          items: { $ref: "#/components/schemas/OnboardingStepId" }
+          description: Steps to leave for later.
+        unskip:
+          type: array
+          items: { $ref: "#/components/schemas/OnboardingStepId" }
+          description: Skipped steps to bring back.
+        goal: { $ref: "#/components/schemas/OnboardingGoal" }
+        dismissed: { type: boolean, description: True closes the walk-through; false opens it again. }
     CompanyContextInput:
       type: object
       properties:
@@ -15580,7 +15908,7 @@ components:
         sent_at: { type: [string, "null"], format: date-time }
     InboundMessage:
       type: object
-      required: [id, mailbox_id, mailbox_email, from, from_name, to, subject, body, kind, opt_out, read, lead_id, lead_name, company, sequence_id, sequence_name, received_at, category, category_source, assigned_to, assignee_name, snoozed_until, done, labels]
+      required: [id, mailbox_id, mailbox_email, from, from_name, to, subject, body, kind, opt_out, read, lead_id, lead_name, company, sequence_id, sequence_name, received_at, category, category_source, assigned_to, assignee_name, snoozed_until, done, labels, source, integration_id, category_confidence, category_reason, details, needs_review, classified_at, project_id, brand_id, group]
       properties:
         id: { type: string, format: uuid }
         mailbox_id: { type: string, format: uuid }
@@ -15604,17 +15932,51 @@ components:
         received_at: { type: string, format: date-time }
         category:
           type: [string, "null"]
-          enum: [interested, meeting_booked, question, referral, not_now, not_interested, wrong_person, out_of_office, unsubscribe, null]
-          description: What the reply means. Set on arrival by built-in rules when they can tell, otherwise null until a person or agent sorts it.
+          enum: [interested, meeting_booked, question, referral, not_now, objection, not_interested, wrong_person, unsubscribe, complaint, out_of_office, auto_reply, null]
+          description: What the reply means. Set on arrival by built-in rules when they can tell, otherwise null until a person, agent or the AI labels it.
         category_source:
           type: [string, "null"]
-          enum: [rules, human, api_token, null]
-          description: "Who set the category: the built-in rules, a person, or an API token (an agent or integration)."
+          enum: [rules, ai, human, api_token, agent, system, null]
+          description: "Who set the category: the built-in rules, the AI, a person, an API token, or an agent running a mission."
         assigned_to: { type: [string, "null"], format: uuid, description: The member handling it. }
         assignee_name: { type: [string, "null"] }
         snoozed_until: { type: [string, "null"], format: date-time, description: Hidden from the open inbox until then. }
         done: { type: boolean, description: Handled. Hidden from the open inbox; a new reply from the lead arrives as a new open message. }
-        labels: { type: array, items: { type: string } }
+        labels: { type: array, items: { type: string }, description: "Tags (GET .../inbox-tags lists them with colours)." }
+        source: { type: string, description: "mailbox for Outflare's own mailboxes, else the connector id of the sequencer the reply was read from.", example: mailbox }
+        integration_id: { type: [string, "null"], format: uuid, description: The sequencer connection it was read from. }
+        category_confidence: { type: [number, "null"], minimum: 0, maximum: 1, description: How sure whoever labelled it was. Rules and people are 1. }
+        category_reason: { type: [string, "null"], description: "Why it got its label, in a few words (an objection's reason, say)." }
+        details: { type: object, additionalProperties: true, description: "Details read from the reply: a return date, a referred contact." }
+        needs_review: { type: boolean, description: The label is unsure, or an unsure opt-out was acted on; a person should check. }
+        classified_at: { type: [string, "null"], format: date-time }
+        project_id: { type: [string, "null"], format: uuid, description: The project of its sequence or mailbox. }
+        brand_id: { type: [string, "null"], format: uuid, description: The brand of its sequence or mailbox. }
+        group: { type: [string, "null"], enum: [hot, later, closed, automatic, null], description: The category's group. }
+    InboxTag:
+      type: object
+      required: [id, name, color, replies, created_at]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string, description: Lower-case; the name stored on replies. }
+        color: { type: string, enum: [gray, red, orange, amber, green, teal, blue, violet, pink] }
+        replies: { type: integer, description: Replies with this tag. }
+        created_at: { type: string, format: date-time }
+    InboxView:
+      type: object
+      required: [id, name, shared, filters, position, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        shared: { type: boolean, description: Seen by the whole workspace; otherwise only by the person who saved it. }
+        filters:
+          type: object
+          additionalProperties: { type: string }
+          description: "Query parameters for GET .../inbox: status, kind, category, group, source, tag, assigned_to, mailbox_id, sequence_id, project_id, brand, unread, needs_review, min_confidence, q."
+          example: { group: hot, status: open, assigned_to: me }
+        position: { type: integer }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
     ThreadEntry:
       type: object
       required: [id, direction, from, to, subject, body, status, at]
