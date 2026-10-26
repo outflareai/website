@@ -178,6 +178,7 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `list_integrations` | Connected accounts with status, the account found at sign-in and the last error; never the credentials | |
 | `verify_emails` | Verify addresses, a lead list or every lead without a fresh result, with the connected verification service | Yes, *provider* |
 | `list_verifications`, `verification_summary` | Verification results, and how many leads are verified, stale or unchecked | |
+| `classify_email` | What kind of email domain an address or domain is (free, private, alias, throwaway, school, government, unknown), with the evidence and a suggested sign-up action | |
 | `get_verification_settings`, `update_verification_settings` | Which service verifies and what happens to each result | Yes |
 | `get_mailbox_health`, `update_mailbox_health_settings` | Every mailbox graded worst first with the fix, and when mailboxes pause automatically | Yes |
 | `preview_import`, `start_import`, `get_import` | Bring campaigns, leads and sending accounts over from Instantly or Smartlead: look first, import, check progress | Yes |

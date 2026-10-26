@@ -7,7 +7,7 @@ sidebar:
 
 <span class="pill shipped">Shipped</span>
 
-Every lead's address is checked before its first email, and undeliverable addresses are never emailed. With nothing connected, Outflare runs free built-in checks (syntax, mail servers, throwaway domains and role addresses). [Connect](/docs/integrations/connectors/) ZeroBounce, NeverBounce, MillionVerifier, Bouncer, Reoon, Emailable, DeBounce or Hunter for a full mailbox check.
+Every lead's address is checked before its first email, and undeliverable addresses are never emailed. With nothing connected, Outflare runs free built-in checks (syntax, mail servers, about 13,000 throwaway domains from the [email classifier](/docs/guides/email-classification/), and role addresses). [Connect](/docs/integrations/connectors/) ZeroBounce, NeverBounce, MillionVerifier, Bouncer, Reoon, Emailable, DeBounce or Hunter for a full mailbox check.
 
 ## Results
 
