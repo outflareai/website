@@ -5,13 +5,19 @@ sidebar:
   order: 8
 ---
 
-<span class="pill shipped">Shipped</span> IMAP sync, one inbox across all mailboxes, stop on reply, opt-out and bounce handling, labelling replies by what they mean in four groups, assigning, snoozing, coloured tags, saved views, label webhooks and replying from the inbox. <span class="pill">Next</span> Replies from EmailBison, then other sequencers, and AI labelling with your own AI key.
+<span class="pill shipped">Shipped</span> IMAP sync, one inbox across all mailboxes, stop on reply, opt-out and bounce handling, labelling replies by what they mean in four groups, assigning, snoozing, coloured tags, saved views, label webhooks, replying from the inbox, and replies from EmailBison. <span class="pill">Next</span> Other sequencers, and AI labelling with your own AI key.
 
 ## How mail arrives
 
 Every active mailbox is checked over IMAP every two minutes, so replies arrive without forwarding rules. To check one now, use **Check mail** on the Mailboxes page or call `POST /v1/workspaces/{ws}/mailboxes/{id}/sync`. The mailbox shows `last_synced_at`, and `sync_error` if the last check failed.
 
 Only the INBOX folder is read, and only new mail: the first sync of a mailbox reads the last day, so connecting an inbox you have used before does not import its history. Messages are never changed on the server; they are not even marked as read.
+
+### Replies from EmailBison
+
+Connect an EmailBison account under Connectors and the replies its campaigns get come into the same inbox, marked with their source (`source: emailbison`, filter with `?source=emailbison`). They are read with each 5-minute sync of the account, or now with `POST /v1/workspaces/{ws}/platforms/{id}/sync`, which says how many `replies` it brought in. The first read goes back three days. Nothing is changed in EmailBison: replies are not marked as read there.
+
+They are handled like mail read over IMAP: labelled by the same rules, opt-outs and complaints added to the suppression list, and the lead's sequences stopped when Outflare holds the lead. Mail between your own mailboxes, and mail carrying the warm-up tag you set for the account, is left out.
 
 ## Matching and what happens next
 
@@ -110,6 +116,8 @@ curl -X POST https://outflare.example.com/v1/workspaces/$WS/inbox/$ID/reply \
 ```
 
 The reply goes from the mailbox the message arrived at, in the same thread (`Re:` subject, `In-Reply-To` and `References`), so it lands where the lead expects. It passes [the policy check](/docs/concepts/policy-check/)'s recipient step: replying to someone who opted out or bounced returns `409`. The mailbox must be active. A reply you write by hand is not held to a sequence's sending window or the mailbox's pacing, but it does count towards the mailbox's daily limit.
+
+A reply that came from EmailBison is answered through EmailBison, from the sender email it arrived at and in the same thread, after the same recipient check.
 
 ## Scopes
 
