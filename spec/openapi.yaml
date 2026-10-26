@@ -5529,6 +5529,7 @@ paths:
                 monthly_budget: { type: [number, "null"], minimum: 0, description: "Per calendar month (UTC): US dollars for DataForSEO, API units for Ahrefs." }
                 sync: { type: string, enum: [weekly, "off"] }
                 link_rows: { type: [integer, "null"], minimum: 1, maximum: 1000, description: "Links each weekly read asks for per SEO site, strongest linking domains first; null is the default, 200." }
+                gap_rows: { type: [integer, "null"], minimum: 0, maximum: 500, description: "Keywords and linking domains each weekly read takes of up to 5 tracked competitors a site, for the gaps; 0 turns that off, null is the default, 50." }
       responses:
         "200":
           description: The connection with its new settings.
@@ -5585,7 +5586,7 @@ paths:
       x-outflare-access: { scope: integrations.manage }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Take an SEO snapshot now
-      description: "Scope: integrations.manage. Stores the overview and top 50 keywords of every domain the connection follows, within its budget (this also runs weekly). Costs about $0.04 a domain on DataForSEO or 1,200 API units on Ahrefs. A connection that reads single links also reads the links to every active SEO site (`link_rows` each, live and lost in the last 90 days) into GET .../backlinks: about $0.03 a site on DataForSEO, or 50 to 200 API units on Ahrefs. It also asks which domains compete with each SEO site (10 suggestions, about $0.01 or 110 API units) and takes an overview of each tracked competitor, at most 10 a site, priced like a domain's (GET .../seo-competitors)."
+      description: "Scope: integrations.manage. Stores the overview and top 50 keywords of every domain the connection follows, within its budget (this also runs weekly). Costs about $0.04 a domain on DataForSEO or 1,200 API units on Ahrefs. A connection that reads single links also reads the links to every active SEO site (`link_rows` each, live and lost in the last 90 days) into GET .../backlinks: about $0.03 a site on DataForSEO, or 50 to 200 API units on Ahrefs. It also asks which domains compete with each SEO site (10 suggestions, about $0.01 or 110 API units) and takes an overview of each tracked competitor, at most 10 a site, priced like a domain's (GET .../seo-competitors). For up to 5 of them it also reads `gap_rows` keywords and linking domains (about $0.04 a competitor on DataForSEO, or about 1,600 API units on Ahrefs at the default 50) for GET .../seo-competitors/gaps."
       tags: [seo]
       responses:
         "200":
@@ -5621,12 +5622,13 @@ paths:
                     description: "Each SEO site's competitors read: suggestions stored, tracked competitors' numbers taken, and the events they made."
                     items:
                       type: object
-                      required: [site_id, host, suggested, checked, events, cost, error]
+                      required: [site_id, host, suggested, checked, gaps, events, cost, error]
                       properties:
                         site_id: { type: string, format: uuid }
                         host: { type: string }
                         suggested: { type: integer }
                         checked: { type: integer }
+                        gaps: { type: integer, description: Tracked competitors whose keywords and linking domains were read for gaps. }
                         events: { type: integer }
                         cost: { type: number }
                         error: { type: [string, "null"] }
@@ -6465,6 +6467,57 @@ paths:
                   data: { type: array, items: { $ref: "#/components/schemas/SEOCompetitorEvent" } }
                   next_offset: { type: [integer, "null"] }
                   next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/seo-competitors/gaps:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: getSEOCompetitorGaps
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: Find keywords and links competitors have that you don't
+      description: |
+        Scope: seo.read. From the latest keywords and linking domains the
+        weekly snapshot read of up to 5 tracked competitors a site (`gap_rows`
+        each). `keywords`: keywords a competitor ranks in the top 20 for that
+        are not among your site's keywords the connection reads (`missing`)
+        or where you rank 3 places or more below (`behind`), most competitors
+        and searches first. `links`: domains linking to competitors that
+        don't link to you among the links Outflare read, most competitors and
+        strongest first. Both compare against what your own connections
+        read, so a gap can be a keyword or link outside what was read.
+        Reads only what is stored, so it costs nothing.
+      tags: [seo]
+      parameters:
+        - { name: site_id, in: query, required: true, schema: { type: string, format: uuid } }
+        - { name: kind, in: query, schema: { type: string, enum: [keywords, links], default: keywords } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
+        - { name: offset, in: query, schema: { type: integer, minimum: 0 } }
+        - { $ref: "#/components/parameters/Fields" }
+        - { $ref: "#/components/parameters/Cursor" }
+      responses:
+        "200":
+          description: The gaps.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [site_id, kind, competitors, data, total, next_offset, next_cursor]
+                properties:
+                  next_offset: { type: [integer, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+                  site_id: { type: string, format: uuid }
+                  kind: { type: string, enum: [keywords, links] }
+                  competitors: { type: array, items: { type: string }, description: Tracked competitors whose keywords or linking domains were read. }
+                  total: { type: integer }
+                  your_keywords: { type: integer, description: "keywords: how many of your site's keywords were compared." }
+                  your_domains: { type: integer, description: "links: how many domains link to you live." }
+                  data:
+                    type: array
+                    items:
+                      oneOf:
+                        - { $ref: "#/components/schemas/SEOKeywordGap" }
+                        - { $ref: "#/components/schemas/SEOLinkGap" }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
@@ -20175,6 +20228,37 @@ components:
             metrics: { $ref: "#/components/schemas/SEOMetrics" }
         created_at: { type: string, format: date-time }
         updated_at: { type: string, format: date-time }
+    SEOKeywordGap:
+      type: object
+      required: [keyword, volume, kind, best_position, competitors, you]
+      properties:
+        keyword: { type: string }
+        volume: { type: [number, "null"], description: Monthly searches. }
+        kind: { type: string, enum: [missing, behind] }
+        best_position: { type: [number, "null"] }
+        competitors:
+          type: array
+          items: { $ref: "#/components/schemas/SEOGapRank" }
+        you:
+          description: Where your site ranks, for behind.
+          oneOf:
+            - { $ref: "#/components/schemas/SEOGapRank" }
+            - { type: "null" }
+    SEOGapRank:
+      type: object
+      required: [host, position, url, traffic]
+      properties:
+        host: { type: string }
+        position: { type: [number, "null"] }
+        url: { type: string }
+        traffic: { type: [number, "null"] }
+    SEOLinkGap:
+      type: object
+      required: [domain, rating, competitors]
+      properties:
+        domain: { type: string }
+        rating: { type: [number, "null"], description: "The linking domain's strength, 0 to 100." }
+        competitors: { type: array, items: { type: string } }
     SEOCompetitorEventKind:
       type: string
       enum: [pages_added, pages_removed, title_changed, description_changed, rating_changed, traffic_changed, keywords_changed, links_changed]
@@ -20199,7 +20283,7 @@ components:
         at: { type: string, format: date-time }
     SEOSource:
       type: object
-      required: [id, name, connector, connector_name, status, last_error, account, reports, country, sync, link_rows, domains_set, domains, budget]
+      required: [id, name, connector, connector_name, status, last_error, account, reports, country, sync, link_rows, gap_rows, domains_set, domains, budget]
       properties:
         id: { type: string, format: uuid }
         name: { type: string }
@@ -20212,6 +20296,7 @@ components:
         country: { type: string }
         sync: { type: string, enum: [weekly, "off"] }
         link_rows: { type: integer, description: "Links the weekly read asks for per SEO site (default 200); 0 for a connection that does not read links." }
+        gap_rows: { type: integer, description: "Keywords and linking domains the weekly read takes of each of up to 5 tracked competitors a site (default 50); 0 is off." }
         domains_set: { type: boolean, description: "false: the domains follow the analytics tools." }
         domains:
           type: array
