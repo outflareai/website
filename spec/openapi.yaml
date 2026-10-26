@@ -1490,8 +1490,12 @@ paths:
                 code_challenge: { type: string }
                 code_challenge_method: { type: string, enum: [S256] }
                 workspace_id: { type: string, description: The workspace's id or slug. }
-                access: { type: string, enum: [full, read] }
+                access: { type: string, enum: [full, read], description: "full or read, unless scopes is set." }
                 allow_spending: { type: boolean, description: "Also let the app approve spending money on domains and mailboxes (infrastructure.approve). Off by default." }
+                scopes:
+                  type: array
+                  items: { type: string }
+                  description: "The exact write scopes to give the app, from the workspace's full_scopes plus infrastructure.approve when can_spend. The role's read scopes are always included. When set, access and allow_spending are ignored."
                 brand: { type: string, description: "For a person kept to some brands: the brand (id or handle) the app is kept to. Required for them, ignored for everyone else." }
                 approve: { type: boolean, description: False declines; the app hears access_denied. }
       responses:
@@ -4966,6 +4970,284 @@ paths:
         "422": { $ref: "#/components/responses/Error" }
         "503": { $ref: "#/components/responses/Error" }
         "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/seo-sites:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+    get:
+      operationId: listSEOSites
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: List SEO sites
+      description: "Scope: seo.read. The websites this workspace audits, each with its ownership proof, crawl settings, limits and latest crawl."
+      tags: [seo]
+      parameters:
+        - { $ref: "#/components/parameters/Brand" }
+      responses:
+        "200":
+          description: Sites, by host.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/SEOSite" } }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createSEOSite
+      x-outflare-access: { scope: seo.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Add a site to audit
+      description: |
+        Scope: seo.manage. Adds a website for OutflareBot to crawl. The site
+        belongs to the brand whose domains include its host unless
+        `brand_id` says otherwise. Until you prove you own it (POST
+        .../verify, with one of the proofs in `verification`), a crawl reads
+        at most 100 pages, waits at least 2 seconds between requests and
+        always obeys robots.txt. A proved site may crawl up to 10,000 pages,
+        as fast as one request every 250 ms, and may turn `obey_robots` off.
+      tags: [seo]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [url]
+              properties:
+                url: { type: string, example: "https://www.example.com/", description: "The site's address. A path makes the crawl start there." }
+                brand_id: { type: [string, "null"], description: "A brand's id or handle; null shares the site with every brand." }
+                max_pages: { type: integer, minimum: 1, maximum: 10000, default: 100 }
+                crawl_delay_ms: { type: integer, minimum: 250, maximum: 60000, default: 2000, description: "The pause between requests. robots.txt's Crawl-delay can lengthen it." }
+                schedule: { type: string, enum: ["off", daily, weekly], default: "off" }
+      responses:
+        "201":
+          description: The site.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SEOSite" }
+        "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/seo-sites/{site}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: site, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getSEOSite
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: Read an SEO site
+      description: "Scope: seo.read."
+      tags: [seo]
+      responses:
+        "200":
+          description: The site.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SEOSite" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateSEOSite
+      x-outflare-access: { scope: seo.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Change an SEO site's settings
+      description: "Scope: seo.manage. Send only what changes, within the site's `limits`. `obey_robots: false` audits pages your own robots.txt hides from crawlers, and is only for a site you have proved you own. A crawl already running keeps the settings it started with."
+      tags: [seo]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                brand_id: { type: [string, "null"] }
+                max_pages: { type: integer, minimum: 1, maximum: 10000 }
+                crawl_delay_ms: { type: integer, minimum: 250, maximum: 60000 }
+                obey_robots: { type: boolean }
+                schedule: { type: string, enum: ["off", daily, weekly] }
+                status: { type: string, enum: [active, paused] }
+      responses:
+        "200":
+          description: The site.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SEOSite" }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+    delete:
+      operationId: deleteSEOSite
+      x-outflare-access: { scope: seo.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Remove an SEO site
+      description: "Scope: seo.manage. Its crawls and the pages they found go with it; a crawl running now stops."
+      tags: [seo]
+      responses:
+        "204": { description: Removed. }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/seo-sites/{site}/verify:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: site, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: verifySEOSite
+      x-outflare-access: { scope: seo.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Check that you own a site
+      description: |
+        Scope: seo.manage. Looks now for any one of the site's proofs (see
+        `verification`): a DNS TXT record, a meta tag in the start page's
+        head, or a file on the site. Found, the site is verified and its
+        limits rise. Not found answers 409 `verification_failed`, whose
+        message lists the proofs. Outflare checks a verified site again
+        every 30 days and lowers its limits if the proof is gone. A test
+        workspace's sites pass without a check.
+      tags: [seo]
+      responses:
+        "200":
+          description: The verified site.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SEOSite" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/seo-sites/{site}/crawls:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: site, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: startCrawl
+      x-outflare-access: { scope: seo.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Crawl a site now
+      description: |
+        Scope: seo.manage. Queues a crawl by OutflareBot (outflare.ai/bot/),
+        which reads robots.txt and the sitemaps, then the site's pages one
+        at a time, and slows down when the site asks. Poll GET
+        .../crawls/{crawl} until status is done, stopped or failed, then read
+        its pages. One crawl per site at a time: 409 `crawl_running` while
+        one runs. 409 `crawl_opted_out` when the site's owner asked this
+        server not to crawl it. A test workspace crawls a simulated site.
+      tags: [seo]
+      responses:
+        "202":
+          description: "The queued crawl. Inside a mission, a MissionHeld answer when the call was held for approval or dry-run instead."
+          content:
+            application/json:
+              schema: { oneOf: [{ $ref: "#/components/schemas/Crawl" }, { $ref: "#/components/schemas/MissionHeld" }] }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/crawls:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+    get:
+      operationId: listCrawls
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: List crawls, newest first
+      description: "Scope: seo.read."
+      tags: [seo]
+      parameters:
+        - { name: site, in: query, description: "Only this site's crawls.", schema: { type: string, format: uuid } }
+        - { name: before, in: query, description: "A crawl id from next_before.", schema: { type: string, format: uuid } }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
+      responses:
+        "200":
+          description: Crawls.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, next_before, next_cursor]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/Crawl" } }
+                  next_before: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/crawls/{crawl}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: crawl, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getCrawl
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: Read a crawl
+      description: "Scope: seo.read. Its status and counts so far; poll it while status is queued or running."
+      tags: [seo]
+      responses:
+        "200":
+          description: The crawl.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Crawl" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/crawls/{crawl}/stop:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: crawl, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: stopCrawl
+      x-outflare-access: { scope: seo.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Stop a crawl
+      description: "Scope: seo.manage. Pages already read are kept; those still queued are marked skipped. 409 `conflict` when it already ended."
+      tags: [seo]
+      responses:
+        "200":
+          description: The stopped crawl.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Crawl" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/crawls/{crawl}/pages:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: crawl, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: listCrawlPages
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: List the pages a crawl found
+      description: "Scope: seo.read. Every URL the crawl found, in the order found, with what fetching it gave: the HTTP status, where a redirect led, noindex and nofollow, and why a page was blocked (robots.txt), failed or skipped."
+      tags: [seo]
+      parameters:
+        - { name: status, in: query, schema: { type: string, enum: [queued, fetched, blocked, failed, skipped] } }
+        - { name: after, in: query, description: "A page id from next_after.", schema: { type: string } }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 1000, default: 100 } }
+      responses:
+        "200":
+          description: Pages.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, next_after, next_cursor]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/CrawlPage" } }
+                  next_after: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/integrations:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
@@ -10500,6 +10782,89 @@ components:
         cached: { type: boolean, description: A kept answer under a day old; it cost nothing. }
         fetched_at: { type: string, format: date-time }
         budget: { $ref: "#/components/schemas/SEOBudget" }
+    SEOSite:
+      type: object
+      required: [id, brand_id, host, start_url, status, schedule, max_pages, crawl_delay_ms, obey_robots, verified, verified_at, verify_method, verify_checked_at, verification, limits, last_crawl, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        brand_id: { type: [string, "null"], format: uuid, description: The brand the site belongs to; null is shared by every brand. }
+        host: { type: string, example: www.example.com }
+        start_url: { type: string, example: "https://www.example.com/" }
+        status: { type: string, enum: [active, paused] }
+        schedule: { type: string, enum: ["off", daily, weekly], description: How often Outflare crawls the site by itself. }
+        max_pages: { type: integer }
+        crawl_delay_ms: { type: integer }
+        obey_robots: { type: boolean, description: "false audits pages the site's robots.txt hides; only for a verified site." }
+        verified: { type: boolean, description: Whether this workspace has proved it owns the site. }
+        verified_at: { type: [string, "null"], format: date-time }
+        verify_method: { type: [string, "null"], enum: [dns, meta, file, test, null] }
+        verify_checked_at: { type: [string, "null"], format: date-time }
+        verification:
+          type: object
+          description: "The three ways to prove you own the site; any one is enough."
+          required: [dns_name, dns_value, meta_tag, file_url, file_body]
+          properties:
+            dns_name: { type: string, example: example.com, description: Where the TXT record goes. }
+            dns_value: { type: string, example: outflare-site-verification=4f1c2a9e }
+            meta_tag: { type: string, example: '<meta name="outflare-site-verification" content="4f1c2a9e">', description: Goes in the head of the start page. }
+            file_url: { type: string, example: "https://www.example.com/.well-known/outflare-site-verification.txt" }
+            file_body: { type: string, example: 4f1c2a9e }
+        limits:
+          type: object
+          description: What this site's settings may be, which proving ownership raises.
+          required: [max_pages, min_crawl_delay_ms, may_ignore_robots]
+          properties:
+            max_pages: { type: integer, example: 100 }
+            min_crawl_delay_ms: { type: integer, example: 2000 }
+            may_ignore_robots: { type: boolean }
+        last_crawl: { oneOf: [{ $ref: "#/components/schemas/Crawl" }, { type: "null" }] }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    Crawl:
+      type: object
+      required: [id, site_id, host, status, trigger, reason, error_code, max_pages, delay_ms, obey_robots, pages_fetched, pages_blocked, pages_failed, pages_found, bytes, created_at, started_at, finished_at]
+      properties:
+        id: { type: string, format: uuid }
+        site_id: { type: string, format: uuid }
+        host: { type: string, example: www.example.com }
+        status: { type: string, enum: [queued, running, done, stopped, failed] }
+        trigger: { type: string, enum: [manual, schedule] }
+        reason:
+          type: [string, "null"]
+          description: "Why it ended: done (every page found was read), limit (max_pages reached), stopped, opted_out, robots_unreachable (robots.txt answered 5xx or not at all, so nothing may be read), site_errors (ten errors in a row) or error."
+          example: done
+        error_code: { type: [string, "null"], example: site_errors }
+        max_pages: { type: integer, description: The limits this crawl keeps, fixed when it started. }
+        delay_ms: { type: integer, description: The pause between requests now; it doubles when the site asks the crawler to slow down. }
+        obey_robots: { type: boolean }
+        pages_fetched: { type: integer }
+        pages_blocked: { type: integer, description: Pages robots.txt kept the crawler away from. }
+        pages_failed: { type: integer }
+        pages_found: { type: integer, description: "Every URL found, read or not." }
+        bytes: { type: integer }
+        created_at: { type: string, format: date-time }
+        started_at: { type: [string, "null"], format: date-time }
+        finished_at: { type: [string, "null"], format: date-time }
+    CrawlPage:
+      type: object
+      required: [id, url, depth, source, found_on, status, reason, http_status, content_type, bytes, duration_ms, redirect_to, noindex, nofollow, links_out, fetched_at]
+      properties:
+        id: { type: string, example: "1042" }
+        url: { type: string, example: "https://www.example.com/pricing" }
+        depth: { type: integer, description: Clicks from the start page; sitemap pages count as 1. }
+        source: { type: string, enum: [start, link, sitemap, redirect] }
+        found_on: { type: [string, "null"], description: The page or sitemap that led here. }
+        status: { type: string, enum: [queued, fetched, blocked, failed, skipped] }
+        reason: { type: [string, "null"], description: "robots (blocked by robots.txt), network, private_address, server_error, truncated (over 5 MB, cut off), or why a page was skipped (limit, stopped)." }
+        http_status: { type: [integer, "null"], example: 200 }
+        content_type: { type: [string, "null"], example: text/html }
+        bytes: { type: integer }
+        duration_ms: { type: integer }
+        redirect_to: { type: [string, "null"], description: "Where a 3xx answer pointed; on the same site it is a page of its own." }
+        noindex: { type: boolean }
+        nofollow: { type: boolean, description: "The page asked crawlers not to follow its links, so its links were not queued." }
+        links_out: { type: integer }
+        fetched_at: { type: [string, "null"], format: date-time }
     SEOSource:
       type: object
       required: [id, name, connector, connector_name, status, last_error, account, reports, country, sync, domains_set, domains, budget]
@@ -10957,7 +11322,7 @@ components:
       enum: [owner, admin, operator, viewer]
     Scope:
       type: string
-      enum: [workspace.read, workspace.manage, context.manage, members.read, members.manage, tokens.manage, audit.read, mailboxes.read, mailboxes.manage, leads.read, leads.manage, suppressions.manage, sequences.read, sequences.manage, inbox.read, inbox.manage, integrations.read, integrations.manage, outcomes.read, outcomes.manage, projects.read, projects.manage, infrastructure.read, infrastructure.manage, infrastructure.approve, analytics.read, missions.read, missions.run, missions.approve, webhooks.read, webhooks.manage]
+      enum: [workspace.read, workspace.manage, context.manage, members.read, members.manage, tokens.manage, audit.read, mailboxes.read, mailboxes.manage, leads.read, leads.manage, suppressions.manage, sequences.read, sequences.manage, inbox.read, inbox.manage, integrations.read, integrations.manage, outcomes.read, outcomes.manage, projects.read, projects.manage, infrastructure.read, infrastructure.manage, infrastructure.approve, analytics.read, missions.read, missions.run, missions.approve, seo.read, seo.manage, webhooks.read, webhooks.manage]
     Workspace:
       type: object
       required: [id, name, slug, test]
