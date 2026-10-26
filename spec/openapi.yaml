@@ -4654,7 +4654,7 @@ paths:
       operationId: listAnalyticsSites
       x-outflare-access: { scope: analytics.read }
       summary: List the sites a connection can read
-      description: "Scope: analytics.read. GA4 properties, Search Console properties, PostHog projects, Fathom or Umami sites, and so on. Pass an id as `site` on reports, or make it the default."
+      description: "Scope: analytics.read. GA4 properties, Search Console properties, PostHog projects, Fathom or Umami sites, and so on, each with the domain it counts under and whether the sync stores it. Every site syncs unless switched off, up to 20 per connection. Pass an id as `site` on reports, or make it the default."
       tags: [analytics]
       parameters:
         - { $ref: "#/components/parameters/AnalyticsFresh" }
@@ -4667,10 +4667,42 @@ paths:
                 type: object
                 required: [data, site]
                 properties:
-                  data: { type: array, items: { $ref: "#/components/schemas/AnalyticsSite" } }
+                  data: { type: array, items: { $ref: "#/components/schemas/AnalyticsSitePlan" } }
                   site: { type: string, description: The default site; empty when none is set. }
         "404": { $ref: "#/components/responses/Error" }
         "422": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/analytics/{id}/sites/{site}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid }, description: The integration id. }
+      - { name: site, in: path, required: true, schema: { type: string }, description: "The site's id from GET .../sites, URL-encoded (Search Console ids contain `:` and `/`)." }
+    patch:
+      operationId: updateAnalyticsSite
+      x-outflare-access: { scope: integrations.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Switch a site on or off, or set its domain
+      description: "Scope: integrations.manage. Switching a site off stops its sync and deletes what was stored for it, so totals by domain stop counting it. Switching one on starts its 90-day backfill now. The domain lines the site up with other tools for the same website; an empty string goes back to the tool's own."
+      tags: [analytics]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sync: { type: boolean }
+                domain: { type: string, example: example.com }
+      responses:
+        "200":
+          description: The site as it is now.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AnalyticsSitePlan" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "422": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/analytics/{id}/site:
     parameters:
@@ -10478,6 +10510,15 @@ components:
         id: { type: string, example: "123456789" }
         name: { type: string, example: "acme.com (Acme)" }
         url: { type: string }
+    AnalyticsSitePlan:
+      allOf:
+        - { $ref: "#/components/schemas/AnalyticsSite" }
+        - type: object
+          required: [host, domain, sync]
+          properties:
+            host: { type: string, example: example.com, description: "The domain the site counts under in the overview, compare and history; empty when unknown." }
+            domain: { type: string, description: "The domain someone set for this site, overriding the tool's own; empty when none is set." }
+            sync: { type: boolean, description: Whether the sync stores this site. }
     AnalyticsMetrics:
       type: object
       description: Every field is optional. A missing field means the provider does not measure it; zero means it measured none.
@@ -10541,7 +10582,7 @@ components:
         name: { type: string }
         connector: { type: string }
         site: { type: string }
-        host: { type: string, description: "The website's domain; empty when the tool shows none. Set it with PUT .../analytics/{id}/site." }
+        host: { type: string, description: "The website's domain; empty when the tool shows none. Set it with PATCH .../analytics/{id}/sites/{site}." }
         first_day: { type: [string, "null"], format: date }
         last_day: { type: [string, "null"], format: date }
         last_run_at: { type: [string, "null"], format: date-time }
