@@ -78,8 +78,8 @@ Analytics page, `GET /seo/history` and the overview read, so looking is free.
   10,000-unit budget covers about two domains; raise it for more. A
   snapshot stops when the budget runs out.
 - Turn it off with `"sync": "off"`, or take one now with
-  `POST /seo/$ID/sync` or "Snapshot now" on the Analytics page.
-- Each website on the Analytics page shows its latest SEO figures next to
+  `POST /seo/$ID/sync` or "Snapshot now" on the SEO page.
+- Each website on the Website analytics page shows its latest SEO figures next to
   its analytics, and keyword rows show how far each position moved since the
   snapshot before. `GET /analytics/overview` includes the same figures under
   `seo` for each website.

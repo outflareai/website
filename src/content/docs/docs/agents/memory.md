@@ -58,7 +58,7 @@ Outflare's own mission agent reads the same context and pinned memories every tu
 | Unread replies | The agent triages them |
 | Company details still missing | The agent asks you once |
 
-Each blocker names the tool an agent calls next, the dashboard page that fixes it, and whether the agent or a person has to act. The Overview page shows the same list.
+Each blocker names the tool an agent calls next, the dashboard page that fixes it, and whether the agent or a person has to act. The Home page shows the same list.
 
 When a call fails, the agent gets the error code and a plain next step (for example, which scope to add to its token), so it fixes the cause or tells you exactly what to do instead of retrying blindly.
 

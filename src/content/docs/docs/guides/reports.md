@@ -7,7 +7,7 @@ sidebar:
 
 <span class="pill shipped">Shipped</span>
 
-The Reports page, `GET /v1/workspaces/{ws}/reports` and the MCP tool `get_report` all answer the same question: what was sent, and what happened to it.
+The Sending reports page, `GET /v1/workspaces/{ws}/reports` and the MCP tool `get_report` all answer the same question: what was sent, and what happened to it.
 
 - **Period:** any range up to 400 days. The last 30 days by default.
 - **Group by:** `day`, `week`, `sequence`, `step`, `mailbox` or `domain`.

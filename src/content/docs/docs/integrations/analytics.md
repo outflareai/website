@@ -13,7 +13,7 @@ Outflare reads the analytics tools already on your website, so a person, a scrip
 
 Open **Connectors** and pick the **Analytics** category, or go straight to the **Analytics** page and click **Choose a tool**. Google tools connect with a read-only Google sign-in, and one sign-in connects both Google Analytics and Search Console. They also take a service account key. PostHog and Cloudflare offer a sign-in or a key, and you choose. The rest take an API key. An agent can ask for a connection with `request_connection`: you get a one-time link to paste the key into or sign in from, so the key never passes through the chat.
 
-When a connection can read several sites (GA4 properties, Search Console properties, PostHog projects), the Analytics page asks which one to read. Your choice becomes the connection's default, for agents too.
+When a connection can read several sites (GA4 properties, Search Console properties, PostHog projects), the Website analytics page asks which one to read. Your choice becomes the connection's default, for agents too.
 
 ## Providers
 
