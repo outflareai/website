@@ -15,3 +15,7 @@ Every action a visitor takes that tells us something (a sign-up, sign-in, GitHub
 ## Docs
 
 Docs describe what Outflare does today; see "Keeping the docs honest" in the README. An engine change that adds a feature gets a matching docs change here.
+
+## Costs registry (hard rule)
+
+Every third-party service Outflare runs on or pays for, including the ones this site uses (Cloudflare Pages, Web Analytics, Google Tag Manager and GA4, PostHog, the domain), is listed in the costs registry in the private Cloud repository (`internal/costs/registry.go`), which feeds the staff Costs tab. Whenever we sign up for, create or change a third-party service for the site, such as a new analytics tool, form provider, font service, plan or domain, update the registry in the same change. Never buy, upgrade or change a plan to do it; that is the owner's call.
