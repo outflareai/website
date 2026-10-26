@@ -2,6 +2,7 @@
 import '../styles/marketing.css';
 import { app, repo, site } from '../data/project';
 import Analytics from '../components/Analytics.astro';
+import Logo from '../components/Logo.astro';
 
 interface Props {
 	title: string;
@@ -9,6 +10,7 @@ interface Props {
 }
 const { title, description } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = '/brand/social/outflare-social-1200x630.png';
 
 const nav = [
 	{ href: '/docs/', label: 'Docs' },
@@ -47,6 +49,7 @@ const footer = [
 			['Contact', `mailto:${site.email}`],
 			['Issues', repo.issues],
 			['Usage stats', '/stats/'],
+			['Brand', '/brand/'],
 			['Licensing', '/docs/project/license/'],
 			['Contributing', '/docs/project/contributing/'],
 			['Security', '/docs/project/security/'],
@@ -65,14 +68,22 @@ const footer = [
 		<title>{title}</title>
 		<meta name="description" content={description} />
 		<link rel="canonical" href={canonical} />
+		<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
 		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+		<link rel="manifest" href="/site.webmanifest" />
+		<meta name="theme-color" content="#0a0a0a" />
 		<link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt" />
 		<meta property="og:type" content="website" />
 		<meta property="og:title" content={title} />
 		<meta property="og:description" content={description} />
 		<meta property="og:url" content={canonical} />
-		<meta property="og:image" content={new URL('/og.png', Astro.site)} />
+		<meta property="og:image" content={new URL(ogImage, Astro.site)} />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta property="og:image:alt" content="Outflare: the open-source GTM platform for humans and agents" />
 		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:image" content={new URL(ogImage, Astro.site)} />
 		<meta name="color-scheme" content="dark light" />
 		<script is:inline>
 			// Dark by default, like the app and the docs. Shares the docs' saved choice.
@@ -84,11 +95,12 @@ const footer = [
 		<a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-foreground">Skip to content</a>
 		<header class="sticky top-0 z-40 border-b border-border/60 bg-background/75 backdrop-blur-lg supports-[backdrop-filter]:bg-background/60">
 			<div class="mx-auto flex h-14 max-w-6xl items-center gap-6 border-border/70 px-4 sm:px-6 lg:border-x">
-				<a href="/" class="touch flex items-center gap-2 text-[15px] font-semibold tracking-tight" aria-label="Outflare home">
-					<span aria-hidden="true" class="flex size-6 items-center justify-center rounded-md bg-neutral-900 font-mono text-[11px] font-bold text-white dark:bg-white dark:text-neutral-950">&gt;_</span>
-					Outflare
+				<div class="flex items-center gap-2.5">
+					<a href="/" class="touch flex items-center text-foreground" aria-label="Outflare home">
+						<Logo class="h-6 w-auto" />
+					</a>
 					<span class="badge badge-muted hidden sm:inline-flex">alpha</span>
-				</a>
+				</div>
 				<nav class="hidden items-center gap-1 md:flex" aria-label="Main">
 					{nav.map((l) => <a href={l.href} class="rounded-md px-2.5 py-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground">{l.label}</a>)}
 				</nav>
@@ -121,9 +133,8 @@ const footer = [
 		<footer class="border-t">
 			<div class="mx-auto grid max-w-6xl gap-10 border-border/70 px-4 py-14 max-md:grid-cols-2 sm:px-6 md:grid-cols-[1.4fr_repeat(3,1fr)] lg:border-x">
 				<div class="max-md:col-span-2">
-					<a href="/" class="touch inline-flex items-center gap-2 font-semibold tracking-tight">
-						<span aria-hidden="true" class="flex size-6 items-center justify-center rounded-md bg-neutral-900 font-mono text-[11px] font-bold text-white dark:bg-white dark:text-neutral-950">&gt;_</span>
-						Outflare
+					<a href="/" class="touch inline-flex items-center text-foreground" aria-label="Outflare home">
+						<Logo class="h-6 w-auto" />
 					</a>
 					<p class="mt-3 max-w-xs text-sm text-muted-foreground">Open-source cold email infrastructure for people and their agents.</p>
 				</div>

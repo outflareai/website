@@ -88,7 +88,10 @@ const phKey = /^phc_[A-Za-z0-9_-]{10,80}$/.test(posthogKey) ? posthogKey : '';
 			var name = linkEvent(a);
 			if (!name) return;
 			var where = a.closest('header') ? 'header' : a.closest('footer') ? 'footer' : a.closest('nav, aside') ? 'nav' : 'page';
-			window.outflareTrack(name, { location: where, page: location.pathname });
+			var props = { location: where, page: location.pathname };
+			// data-track-label adds a fixed label, such as which file was downloaded.
+			if (a.dataset.trackLabel) props.label = a.dataset.trackLabel;
+			window.outflareTrack(name, props);
 		}, true);
 		window.addEventListener('error', function (e) {
 			window.outflareTrack('site_error', { page: location.pathname, message: String(e.message || '').slice(0, 200) });

@@ -1,0 +1,309 @@
+---
+import Marketing from '../layouts/Marketing.astro';
+import Logo from '../components/Logo.astro';
+import { site } from '../data/project';
+
+// Every file here is in public/brand/, copied as-is from the approved brand kit.
+const b = '/brand';
+
+type Asset = { name: string; note: string; dark: boolean; variant: 'lockup' | 'mark' | 'wordmark'; svg: string; png: string };
+const logos: Asset[] = [
+	{ name: 'Logo', note: 'For dark backgrounds', dark: true, variant: 'lockup', svg: `${b}/svg/outflare-lockup-white.svg`, png: `${b}/png/outflare-lockup-white-2560.png` },
+	{ name: 'Logo', note: 'For light backgrounds', dark: false, variant: 'lockup', svg: `${b}/svg/outflare-lockup-black.svg`, png: `${b}/png/outflare-lockup-black-2560.png` },
+	{ name: 'Mark', note: 'For dark backgrounds', dark: true, variant: 'mark', svg: `${b}/svg/outflare-mark-white.svg`, png: `${b}/png/outflare-mark-white-1024.png` },
+	{ name: 'Mark', note: 'For light backgrounds', dark: false, variant: 'mark', svg: `${b}/svg/outflare-mark-black.svg`, png: `${b}/png/outflare-mark-black-1024.png` },
+	{ name: 'Name', note: 'For dark backgrounds', dark: true, variant: 'wordmark', svg: `${b}/svg/outflare-wordmark-white.svg`, png: `${b}/png/outflare-wordmark-white-2560.png` },
+	{ name: 'Name', note: 'For light backgrounds', dark: false, variant: 'wordmark', svg: `${b}/svg/outflare-wordmark-black.svg`, png: `${b}/png/outflare-wordmark-black-2560.png` },
+];
+const label = (url: string) => url.split('/').pop()!.replace(/^outflare-/, '').replace(/\.(\w+)$/, '-$1');
+
+const icons = [
+	{ name: 'Favicon', note: '.ico with 16, 32 and 48 px', href: `${b}/icons/favicon.ico` },
+	{ name: 'Favicon', note: 'SVG', href: `${b}/icons/favicon.svg` },
+	{ name: 'Apple touch icon', note: '180 × 180 PNG', href: `${b}/icons/apple-touch-icon.png` },
+	{ name: 'App icon', note: '512 × 512 PNG', href: `${b}/icons/icon-512.png` },
+	{ name: 'Avatar, dark', note: '1024 × 1024 PNG', href: `${b}/icons/outflare-avatar-dark-1024.png` },
+	{ name: 'Avatar, light', note: '1024 × 1024 PNG', href: `${b}/icons/outflare-avatar-light-1024.png` },
+];
+
+const colors = [
+	{ id: 'black', name: 'Black', hex: '#000000', use: 'The logo on light backgrounds.', swatch: 'bg-[#000000]', ring: true },
+	{ id: 'white', name: 'White', hex: '#FFFFFF', use: 'The logo on dark backgrounds.', swatch: 'bg-[#FFFFFF]', ring: true },
+	{ id: 'night', name: 'Night', hex: '#0A0A0A', use: 'Dark backgrounds, icon tiles and social images.', swatch: 'bg-[#0A0A0A]', ring: true },
+	{ id: 'green', name: 'Signal green', hex: '#35C26D', use: 'Interface accent only (live, success). Never in the logo.', swatch: 'bg-[#35C26D]', ring: false },
+];
+
+const donts = [
+	{ id: 'stretch', text: 'Stretch or squash it', style: 'transform: scaleX(1.45) scaleY(0.8);' },
+	{ id: 'rotate', text: 'Rotate or flip it', style: 'transform: rotate(-12deg);' },
+	{ id: 'recolor', text: 'Recolour it, in whole or in part', style: 'color: #35C26D;' },
+	{ id: 'effects', text: 'Add shadows, glows or gradients', style: 'filter: drop-shadow(0 0 6px #a855f7) drop-shadow(0 3px 0 #f97316);' },
+	{ id: 'contrast', text: 'Place it on a low-contrast background', style: 'color: #3f3f46;' },
+	{ id: 'retype', text: 'Retype the name in a font', style: '' },
+];
+
+const kitSize = '450 KB';
+---
+
+<Marketing title="Brand · Outflare" description="The Outflare logo, mark, app icons and colours, with downloads in SVG and PNG for light and dark backgrounds, and the rules for using them.">
+	<!-- Hero -->
+	<section class="relative border-b">
+		<div class="mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-[1fr_1.1fr]">
+			<div>
+				<p class="eyebrow">Brand</p>
+				<h1 class="mt-3 text-4xl font-semibold tracking-tighter text-balance sm:text-5xl">The Outflare brand</h1>
+				<p class="sub">Our logo, icons and colours, ready to download, and the few rules for using them. Writing about Outflare or adding us to an integrations page? Start here.</p>
+				<div class="mt-8 flex flex-wrap gap-3">
+					<a href={`${b}/outflare-brand-kit.zip`} download class="btn btn-primary btn-lg" data-track="brand_kit_download" data-track-label="zip">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"/><path d="m7 10 5 5 5-5"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>
+						Download the brand kit
+					</a>
+					<a href={`mailto:${site.email}`} class="btn btn-outline btn-lg">Ask us a question</a>
+				</div>
+				<p class="mt-3 text-xs text-muted-foreground">ZIP, {kitSize}: every logo in SVG, PNG and WebP, app icons, avatars and the social image.</p>
+			</div>
+			<div class="card relative flex aspect-[16/9] items-center justify-center overflow-hidden">
+				<div class="grid-bg absolute inset-0 [--grid-mask:radial-gradient(ellipse_75%_70%_at_50%_50%,#000_30%,transparent_100%)]" aria-hidden="true"></div>
+				<Logo class="relative h-auto w-[68%] text-foreground" label="Outflare" />
+			</div>
+		</div>
+	</section>
+
+	<!-- Logo -->
+	<section id="logo" class="mx-auto max-w-6xl scroll-mt-20 px-4 py-20 sm:px-6">
+		<p class="eyebrow"><span class="text-foreground">01</span> / Logo</p>
+		<h2 class="h2 mt-3">Logo, mark and name</h2>
+		<p class="sub">Use the full logo wherever it fits. Use the mark alone in small or square spaces, such as avatars and app icons. Use SVG on the web and PNG where SVG isn't accepted.</p>
+		<ul class="mt-10 grid gap-4 md:grid-cols-2">
+			{
+				logos.map((a) => (
+					<li class="card overflow-hidden">
+						<div class:list={['flex aspect-[2/1] items-center justify-center', a.dark ? 'bg-[#0A0A0A]' : 'bg-white border-b']}>
+							<img src={a.svg} alt={`Outflare ${a.name.toLowerCase()}, ${a.dark ? 'white' : 'black'}`} class:list={[a.variant === 'mark' ? 'h-[40%] w-auto' : a.variant === 'wordmark' ? 'h-auto w-[52%]' : 'h-auto w-[62%]']} loading="lazy" />
+						</div>
+						<div class="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+							<div>
+								<p class="text-sm font-medium">{a.name}</p>
+								<p class="text-xs text-muted-foreground">{a.note}</p>
+							</div>
+							<div class="flex gap-2">
+								<a href={a.svg} download class="btn btn-outline btn-sm" data-track="brand_asset_download" data-track-label={label(a.svg)}>SVG</a>
+								<a href={a.png} download class="btn btn-outline btn-sm" data-track="brand_asset_download" data-track-label={label(a.png)}>PNG</a>
+							</div>
+						</div>
+					</li>
+				))
+			}
+		</ul>
+		<p class="mt-4 text-sm text-muted-foreground">Building a web page? The <a href={`${b}/svg/outflare-lockup-currentcolor.svg`} download class="font-medium text-foreground underline underline-offset-4" data-track="brand_asset_download" data-track-label="lockup-currentcolor-svg">currentColor SVG</a> takes the colour of the text around it, so one file works in light and dark themes when inlined.</p>
+	</section>
+
+	<!-- Icons -->
+	<section id="icons" class="border-t">
+		<div class="mx-auto max-w-6xl scroll-mt-20 px-4 py-20 sm:px-6">
+			<p class="eyebrow"><span class="text-foreground">02</span> / Icons</p>
+			<h2 class="h2 mt-3">App icons and avatars</h2>
+			<p class="sub">The mark on a square Night tile. Use the avatars for profile pictures on GitHub, X, LinkedIn and Slack. The 16 px favicon is redrawn on the pixel grid so it stays sharp.</p>
+			<div class="mt-10 grid gap-4 lg:grid-cols-[1.2fr_1fr]">
+				<div class="card flex flex-wrap items-end justify-center gap-8 p-8">
+					<figure class="flex flex-col items-center gap-3">
+						<img src={`${b}/icons/outflare-avatar-dark-512.png`} alt="Outflare avatar, white mark on dark" width="128" height="128" class="size-32 rounded-xl" loading="lazy" />
+						<figcaption class="text-xs text-muted-foreground">Avatar, dark</figcaption>
+					</figure>
+					<figure class="flex flex-col items-center gap-3">
+						<img src={`${b}/icons/outflare-avatar-light-512.png`} alt="Outflare avatar, black mark on white" width="128" height="128" class="size-32 rounded-xl border" loading="lazy" />
+						<figcaption class="text-xs text-muted-foreground">Avatar, light</figcaption>
+					</figure>
+					<div class="flex items-end gap-5">
+						{[[48, 'favicon-48.png'], [32, 'favicon-32.png'], [16, 'favicon-16.png']].map(([s, f]) => (
+							<figure class="flex flex-col items-center gap-3">
+								<img src={`${b}/icons/${f}`} alt="" width={s} height={s} style={`width:${s}px;height:${s}px;image-rendering:pixelated`} loading="lazy" />
+								<figcaption class="font-mono text-[11px] text-muted-foreground">{s}px</figcaption>
+							</figure>
+						))}
+					</div>
+				</div>
+				<ul class="card divide-y">
+					{
+						icons.map((i) => (
+							<li class="flex items-center justify-between gap-3 px-4 py-2.5">
+								<div class="min-w-0">
+									<p class="text-sm font-medium">{i.name}</p>
+									<p class="text-xs text-muted-foreground">{i.note}</p>
+								</div>
+								<a href={i.href} download class="btn btn-ghost btn-sm shrink-0" data-track="brand_asset_download" data-track-label={label(i.href)} aria-label={`Download ${i.name.toLowerCase()} (${i.note})`}>
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"/><path d="m7 10 5 5 5-5"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>
+									Download
+								</a>
+							</li>
+						))
+					}
+				</ul>
+			</div>
+		</div>
+	</section>
+
+	<!-- Clear space and size -->
+	<section id="clear-space" class="border-t">
+		<div class="mx-auto max-w-6xl scroll-mt-20 px-4 py-20 sm:px-6">
+			<p class="eyebrow"><span class="text-foreground">03</span> / Space and size</p>
+			<h2 class="h2 mt-3">Clear space and minimum size</h2>
+			<p class="sub">Give the logo room. Keep other text, edges and graphics at least a quarter of the mark's height away on every side.</p>
+			<div class="mt-10 grid gap-4 lg:grid-cols-[1.4fr_1fr]">
+				<figure class="card flex flex-col items-center justify-center gap-6 p-6 sm:p-10">
+					<div class="relative max-w-full">
+						<!-- x = mark height (h-16 → about 60px of mark); x/4 of padding on every side. -->
+						<div class="relative border border-dashed border-brand/70 bg-brand/5 p-[15px] max-sm:p-[9px]">
+							<Logo class="block h-16 w-auto text-foreground max-sm:h-10" />
+							<span class="absolute -top-px left-1/2 h-[15px] w-px -translate-x-1/2 bg-brand max-sm:h-[9px]" aria-hidden="true"></span>
+							<span class="absolute top-1/2 -left-px h-px w-[15px] -translate-y-1/2 bg-brand max-sm:w-[9px]" aria-hidden="true"></span>
+						</div>
+						<span class="absolute -top-6 left-1/2 -translate-x-1/2 font-mono text-[11px] text-brand-strong dark:text-brand">¼x</span>
+						<span class="absolute top-1/2 -left-7 -translate-y-1/2 font-mono text-[11px] text-brand-strong dark:text-brand">¼x</span>
+					</div>
+					<figcaption class="text-center text-sm text-muted-foreground"><span class="font-mono text-foreground">x</span> is the height of the mark. The dashed box is the closest anything else may come.</figcaption>
+				</figure>
+				<div class="card flex flex-col divide-y">
+					<div class="flex flex-1 flex-col justify-center gap-4 p-6">
+						<Logo class="h-[22px] w-[110px] text-foreground" />
+						<div>
+							<p class="text-sm font-medium">110 px wide, at the smallest</p>
+							<p class="text-sm text-muted-foreground">Shown at that size here. Our site header uses 120 px.</p>
+						</div>
+					</div>
+					<div class="flex flex-1 flex-col justify-center gap-4 p-6">
+						<Logo variant="mark" class="h-5 w-auto text-foreground" />
+						<div>
+							<p class="text-sm font-medium">Smaller than that? Use the mark</p>
+							<p class="text-sm text-muted-foreground">The mark works down to 16 px. Don't shrink the name until it can't be read.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- Colour -->
+	<section id="colour" class="border-t">
+		<div class="mx-auto max-w-6xl scroll-mt-20 px-4 py-20 sm:px-6">
+			<p class="eyebrow"><span class="text-foreground">04</span> / Colour</p>
+			<h2 class="h2 mt-3">Black and white, on purpose</h2>
+			<p class="sub">The logo is only ever black or white, whichever contrasts most with what's behind it. Green belongs to the interface, not the logo. Click a colour to copy it.</p>
+			<ul class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+				{
+					colors.map((c) => (
+						<li>
+							<button type="button" class="card group w-full overflow-hidden text-left transition-colors hover:border-foreground/25 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring" data-copy={c.hex} data-track="brand_color_copy" data-track-label={c.id}>
+								<span class:list={['block h-28 border-b', c.swatch]} aria-hidden="true"></span>
+								<span class="flex items-start justify-between gap-2 p-4">
+									<span>
+										<span class="block text-sm font-medium">{c.name}</span>
+										<span class="mt-0.5 block font-mono text-xs text-muted-foreground">{c.hex}</span>
+										<span class="mt-2 block text-xs text-muted-foreground">{c.use}</span>
+									</span>
+									<span class="shrink-0 font-mono text-[11px] text-muted-foreground group-hover:text-foreground" data-copy-label>Copy</span>
+								</span>
+							</button>
+						</li>
+					))
+				}
+			</ul>
+		</div>
+	</section>
+
+	<!-- Name and type -->
+	<section id="name" class="border-t">
+		<div class="mx-auto max-w-6xl scroll-mt-20 px-4 py-20 sm:px-6">
+			<p class="eyebrow"><span class="text-foreground">05</span> / Name and type</p>
+			<h2 class="h2 mt-3">How to write Outflare</h2>
+			<div class="mt-10 grid gap-4 md:grid-cols-2">
+				<div class="card p-6">
+					<p class="text-sm font-medium">In text: <span class="text-foreground">Outflare</span></p>
+					<p class="mt-2 text-sm text-muted-foreground">One word with a capital O, in any sentence, title or link. Never "OutFlare", "Out Flare" or "OUTFLARE". The website is <span class="font-mono text-foreground">outflare.ai</span>, with no www.</p>
+					<p class="mt-4 text-sm font-medium">In the logo: <span class="text-foreground">outflare</span></p>
+					<p class="mt-2 text-sm text-muted-foreground">The lowercase name in the logo is drawn, not typed. Always use the files above rather than setting it in a font.</p>
+				</div>
+				<div class="card flex flex-col justify-between gap-6 p-6">
+					<div>
+						<p class="text-sm font-medium">Typeface: Geist</p>
+						<p class="mt-2 text-sm text-muted-foreground">Our site and app use <a href="https://vercel.com/font" class="font-medium text-foreground underline underline-offset-4">Geist</a> and Geist Mono, free under the SIL Open Font License. Use them next to the logo when you can.</p>
+					</div>
+					<p class="flex items-baseline gap-4 text-foreground"><span class="text-5xl font-semibold tracking-tighter">Aa</span><span class="font-mono text-2xl text-muted-foreground">Aa 01</span></p>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- Usage -->
+	<section id="usage" class="border-t">
+		<div class="mx-auto max-w-6xl scroll-mt-20 px-4 py-20 sm:px-6">
+			<p class="eyebrow"><span class="text-foreground">06</span> / Usage</p>
+			<h2 class="h2 mt-3">Please don't</h2>
+			<p class="sub">Keep the logo exactly as it comes. Change its size, never its shape, colours or proportions.</p>
+			<ul class="mt-10 grid grid-cols-2 gap-4 lg:grid-cols-3">
+				{
+					donts.map((d) => (
+						<li class="card overflow-hidden">
+							<div class:list={['flex aspect-[16/9] items-center justify-center overflow-hidden', d.id === 'contrast' ? 'bg-[#27272a]' : 'bg-muted/40']}>
+								{d.id === 'retype' ? (
+									<span class="font-serif text-2xl font-bold text-foreground italic sm:text-3xl" aria-hidden="true">Outflare</span>
+								) : (
+									<span style={d.style} class="block w-[60%] text-foreground">
+										<Logo class="h-auto w-full" />
+									</span>
+								)}
+							</div>
+							<p class="flex items-start gap-2 border-t px-4 py-3 text-sm">
+								<svg class="mt-0.5 size-4 shrink-0 text-destructive" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12" /></svg>
+								<span><span class="sr-only">Don't: </span>{d.text}</span>
+							</p>
+						</li>
+					))
+				}
+			</ul>
+		</div>
+	</section>
+
+	<!-- Social -->
+	<section id="social" class="border-t">
+		<div class="mx-auto grid max-w-6xl items-center gap-10 px-4 py-20 sm:px-6 lg:grid-cols-[1fr_1.3fr]">
+			<div>
+				<p class="eyebrow"><span class="text-foreground">07</span> / Social</p>
+				<h2 class="h2 mt-3">Link preview</h2>
+				<p class="sub">The image people see when outflare.ai is shared. Use it for posts, listings and directory pages that ask for a 1200 × 630 cover.</p>
+				<div class="mt-6 flex flex-wrap gap-2">
+					<a href={`${b}/social/outflare-social-1200x630.png`} download class="btn btn-outline btn-sm" data-track="brand_asset_download" data-track-label="social-1200x630-png">PNG</a>
+					<a href={`${b}/social/outflare-social-1200x630.jpg`} download class="btn btn-outline btn-sm" data-track="brand_asset_download" data-track-label="social-1200x630-jpg">JPG</a>
+					<a href={`${b}/social/outflare-social-1200x630.svg`} download class="btn btn-outline btn-sm" data-track="brand_asset_download" data-track-label="social-1200x630-svg">SVG</a>
+				</div>
+			</div>
+			<img src={`${b}/social/outflare-social-1200x630.webp`} alt="Outflare social image: the logo and the line 'The open-source GTM platform for humans and agents' on a dark background" width="1200" height="630" class="w-full rounded-xl border" loading="lazy" />
+		</div>
+	</section>
+
+	<!-- Ask -->
+	<section class="border-t bg-muted/30">
+		<div class="mx-auto flex max-w-6xl flex-col items-start justify-between gap-4 px-4 py-12 sm:flex-row sm:items-center sm:px-6">
+			<div>
+				<h2 class="text-xl font-semibold tracking-tight">Need a format that isn't here?</h2>
+				<p class="mt-1 text-sm text-muted-foreground">Email us and we'll send it, or check a use of the logo with us first.</p>
+			</div>
+			<a href={`mailto:${site.email}`} class="btn btn-outline">{site.email}</a>
+		</div>
+	</section>
+
+	<script>
+		document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach((b) =>
+			b.addEventListener('click', async () => {
+				const out = b.querySelector('[data-copy-label]');
+				try {
+					await navigator.clipboard.writeText(b.dataset.copy || '');
+					if (out) out.textContent = 'Copied';
+				} catch {
+					if (out) out.textContent = b.dataset.copy || '';
+				}
+				setTimeout(() => out && (out.textContent = 'Copy'), 1600);
+			}),
+		);
+	</script>
+</Marketing>
