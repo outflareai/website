@@ -17,7 +17,9 @@ Each workspace has a short name for its URL, made from its name when it is creat
 
 Changing the URL doesn't break links: the old one keeps leading to the workspace until another workspace takes it. Links from before workspace URLs existed (`/w/<workspace id>/...`) still work and switch to the new address.
 
-Sequences, projects, lead lists, missions, sending servers and infrastructure plans get readable URLs too, made from their names: `/geonode/sequences/q3-founders`, `/geonode/projects/fintech-au`. Two with the same name become `q3-founders` and `q3-founders-2`. Renaming one gives it a new URL, and its old URL still opens it, so shared links keep working.
+Sequences, projects, lead lists, missions, sending servers, infrastructure plans, API tokens and webhooks get readable URLs too, made from their names: `/geonode/sequences/q3-founders`, `/geonode/projects/fintech-au`. Two with the same name become `q3-founders` and `q3-founders-2`. Renaming one gives it a new URL, and its old URL still opens it, so shared links keep working.
+
+A connection's URL is named after what it connects, not what you called it: `/geonode/connectors/posthog`, and `posthog-2` for a second PostHog account. The same URL opens the dialog to connect PostHog when nothing is connected yet, so you can share one link for "connect PostHog" or "our PostHog".
 
 ## Roles
 
