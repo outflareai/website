@@ -73,6 +73,7 @@ export default defineConfig({
 						{ label: 'Overview', link: '/docs/api/' },
 						{ label: 'Authentication', link: '/docs/api/authentication/' },
 						{ label: 'Webhooks', link: '/docs/api/webhooks/' },
+						{ label: 'Logs', link: '/docs/api/logs/' },
 						{ label: 'Endpoint reference', link: '/docs/api/reference/' },
 					],
 				},
