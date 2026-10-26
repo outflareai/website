@@ -11,9 +11,9 @@ Outflare reads the analytics tools already on your website, so a person, a scrip
 
 ## Connect
 
-Open **Connectors** and pick the **Analytics** category, or go straight to the **Analytics** page and click **Choose a tool**. Google tools connect with a read-only Google sign-in, and one sign-in connects both Google Analytics and Search Console. They also take a service account key. PostHog and Cloudflare offer a sign-in or a key, and you choose. The rest take an API key. An agent can ask for a connection with `request_connection`: you get a one-time link to paste the key into or sign in from, so the key never passes through the chat.
+Open **Connectors** and pick the **Analytics** category, or go straight to **Analytics → Website analytics** and click **Choose a tool**. Google tools connect with a read-only Google sign-in, and one sign-in connects both Google Analytics and Search Console. They also take a service account key. PostHog and Cloudflare offer a sign-in or a key, and you choose. The rest take an API key. An agent can ask for a connection with `request_connection`: you get a one-time link to paste the key into or sign in from, so the key never passes through the chat.
 
-One sign-in often sees many sites (every GA4 property, Search Console property or PostHog project the login can open). Every one of them syncs unless you switch it off, up to 20 per connection. The Analytics page lists them with a sync switch and a domain field for each.
+One sign-in often sees many sites (every GA4 property, Search Console property or PostHog project the login can open). Every one of them syncs unless you switch it off, up to 20 per connection. The Website analytics page lists them with a sync switch and a domain field for each.
 
 ## Providers
 
@@ -118,7 +118,7 @@ only, because its API allows ten calls a day and three days of history.
 - **Websites line up by domain.** Each site gets a domain
   (`example.com`, without `www.`), taken from the site's address. Google
   Analytics properties and Vercel projects do not show one, so set it on the
-  Analytics page or with `PATCH .../analytics/$ID/sites/$SITE` and `"domain"`. Stored
+  Website analytics page or with `PATCH .../analytics/$ID/sites/$SITE` and `"domain"`. Stored
   history moves with it.
 
 Reading history never calls a provider, so it is fast and free:
@@ -149,7 +149,7 @@ the range. Syncing needs `integrations.manage`; reading needs
 
 ## In the app
 
-The **Analytics** page starts with your websites: each domain with every tool's stored visitors, page views and search clicks side by side, search clicks added up across Google and Bing, when each tool last synced, and **Sync now**. **Compare tools day by day** draws one line per tool for that website. A tool whose site has no domain gets a field to add one. When a tool can read several sites, **N sites in {tool}** opens the list: switch each site's sync on or off and set its domain. Below that, one tool at a time, live: headline numbers, a chart per day, and tabs for pages, sources, search queries and events. Pick the period (7, 28 or 90 days, or 12 months); the refresh button asks the provider again instead of using the cached answer.
+The **Analytics** page starts with your websites: each domain with every tool's stored visitors, page views and search clicks side by side, search clicks added up across Google and Bing, when each tool last synced, and **Sync now**. **Compare tools day by day** draws one line per tool for that website. A tool whose site has no domain gets a field to add one. When a tool can read several sites, **N sites in {tool}** opens the list: switch each site's sync on or off, set its domain and, when the workspace has [brands](/docs/guides/brands/), pick the brand it reports for. A site follows the brand that owns its domain unless you pick another brand or share it across all brands (`PUT .../analytics/$ID/site-brand` with `{"site", "brand"}`; `brand` is a handle, `none` or `auto`). Below that, one tool at a time, live: headline numbers, a chart per day, and tabs for pages, sources, search queries and events. Pick the period (7, 28 or 90 days, or 12 months); the refresh button asks the provider again instead of using the cached answer.
 
 ## PostHog sign-in on your own server
 

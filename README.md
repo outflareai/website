@@ -21,14 +21,11 @@ npm run preview    # serve dist/
 
 Canonical URLs, the sitemap and `llms.txt` use `https://outflare.ai` (no `www`). Set `SITE_URL` only to build for another address, such as a preview.
 
-`PUBLIC_STATS_URL` points the [usage stats page](src/pages/stats.astro) at Outflare Cloud's public endpoint (`https://<cloud host>/v1/cloud/stats/public`). Visitors' browsers read it directly, so the page stays current without a rebuild. Without it, `/stats/` says there are no numbers yet.
-
 ## Where things are
 
 | Path | What |
 | --- | --- |
 | `src/pages/index.astro` | Marketing home page |
-| `src/pages/stats.astro` | Public usage stats (`/stats/`), read live from Outflare Cloud |
 | `src/content/docs/docs/` | Docs pages in Markdown and MDX, served under `/docs/` |
 | `src/pages/docs/api/reference.astro` | Endpoint reference, generated from `spec/openapi.yaml` |
 | `src/data/project.ts` | The site URL, contact email, GitHub repo links, and roadmap and feature status |
@@ -75,6 +72,7 @@ When the main repo changes:
 1. Refresh the API contract: `npm run sync-spec` (from `main`), or `npm run sync-spec -- <branch>`, or `OUTFLARE_DIR=../outflare npm run sync-spec` from a local checkout.
 2. Update `src/data/project.ts` when a roadmap step ships, and remove the **Planned** label from its docs page.
 3. Check install and configuration pages against `README.md`, `deploy/` and `engine/internal/config` in the main repo.
+4. Merge only once app.outflare.ai runs the change. Put `Needs outflareai/outflare#NN` (or `outflareai/cloud#NN`) in the pull request's description; the `deployed` check (`scripts/check-deployed.mjs`) stays red until that pull request is merged and in the version production reports at `/v1/meta`, and until production serves the same `spec/openapi.yaml`. Re-run it after the deploy. It reads the private repositories with the `DEPLOY_CHECK_TOKEN` secret.
 
 ## License
 

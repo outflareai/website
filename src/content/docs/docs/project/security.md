@@ -16,7 +16,12 @@ Do **not** open a public issue. Report it privately with the **Report a vulnerab
 - **Workspaces are isolated.** Every query is filtered by workspace, and a workspace you cannot see returns `404`.
 - **Least privilege.** API tokens carry explicit scopes that cannot exceed their creator's.
 - **Everything is audited**, in the same transaction as the change.
-- **Sign-in is rate limited**: ten failed attempts for one email lock it for 15 minutes.
+- **Sign-in is rate limited**: ten failed attempts for one email, or 100 from one network, in 15 minutes are refused. Accepting an invite with an existing account's password counts toward the same limits. The counts are kept in Postgres, so a restart or deploy doesn't reset them.
+- **Account emails are rate limited**: one person gets at most one confirmation or reset link a minute, five an hour and ten a day, and one network at most 20 requests in 15 minutes. A reset request answers the same whether or not the address has an account, even when it is held back.
+- **Sign-up doesn't reveal who has an account.** On the hosted app, a password sign-up makes the account only when the emailed link is opened, and answers the same whether or not the address is taken (the owner gets a note with a reset link instead). A link opened in a different browser asks for a new password, so whoever typed the address can't choose it.
+- **The secret key can be rotated** without losing stored credentials. See [Rotating the secret key](/docs/self-hosting/configuration/#rotating-the-secret-key).
+- **Unconfirmed addresses don't keep access.** When someone signs in with Google to an account whose email nobody had confirmed, the password, passkeys, sessions and API tokens set up before it are removed, so nobody can sign up with another person's address and wait.
+- **Keys stay out of errors.** Services that take an API key in the URL never have it repeated in an integration's error, the API or the logs.
 
 ## Running it safely
 
