@@ -81,18 +81,26 @@ curl -X PATCH localhost:8080/v1/workspaces/$WS/integrations/$INTEGRATION/mailbox
 
 ## Let Cheap Inboxes push mailboxes in
 
-<span class="pill building">Built, not yet tested live</span> Cheap Inboxes can push mailboxes straight into a sequencer, and it supports a self-hosted EmailBison. Outflare answers the part of the EmailBison API used for that, so you can add Outflare in Cheap Inboxes as if it were EmailBison:
+<span class="pill building">Built, not yet tested live</span> Cheap Inboxes pushes mailboxes straight into the sequencers it supports, and it supports a self-hosted EmailBison. Outflare answers the part of the EmailBison API used for that, and sets the connection up for you:
 
-1. In Outflare, open **API tokens** and make a token with `mailboxes.read` and `mailboxes.manage`.
-2. In Cheap Inboxes, add a sequencer connection, choose **EmailBison**, and set:
-   - **Base URL:** `https://<your Outflare host>/emailbison/<workspace id>`
-   - **API key:** the Outflare token
+1. On the Cheap Inboxes connection page in Outflare, choose **Turn on push**. Outflare adds itself in Cheap Inboxes as an EmailBison connection, with an API token that can only read and add mailboxes. It takes a few seconds.
+2. Select mailboxes in the table and choose **Push selected**, or choose **Push** to have Cheap Inboxes send every active mailbox that isn't in Outflare yet. Try one mailbox first. If a mailbox is also connected to another sequencer, Cheap Inboxes may move it to Outflare there.
 
-The Cheap Inboxes connection page in Outflare shows the base URL to copy under **Let Cheap Inboxes push mailboxes in**.
+Or with the API (turning push on also needs `integrations.manage`):
 
-Pushed mailboxes go through the same SMTP, IMAP and DNS checks as any import. If Cheap Inboxes removes one, it is paused in Outflare, never deleted. Your instance has to be reachable from the internet.
+```sh
+curl -X PATCH localhost:8080/v1/workspaces/$WS/integrations/$INTEGRATION/mailbox-sync \
+  -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" -d '{"push":true}'
+# when push.state is "on":
+curl -X POST localhost:8080/v1/workspaces/$WS/integrations/$INTEGRATION/mailboxes/push \
+  -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" -d '{"all":true}'
+```
 
-This was built from EmailBison's public API and hasn't been tested against a live Cheap Inboxes push yet. Every call is logged with its field names (never the values), so if Cheap Inboxes asks for something Outflare doesn't answer yet, you can see exactly what:
+You can also add it in Cheap Inboxes yourself: add a sequencer connection, choose **EmailBison**, set the base URL to `https://<your Outflare host>/emailbison/<workspace id>` and the API key to an Outflare token with `mailboxes.read` and `mailboxes.manage`.
+
+Pushed mailboxes go through the same SMTP, IMAP and DNS checks as any import. If Cheap Inboxes removes one, it is paused in Outflare, never deleted. **Turn off** revokes the token and removes the connection in Cheap Inboxes; mailboxes already pushed stay. Cheap Inboxes also asks for a sequencer login. Outflare has no sequencer screen to sign in to, so it sends your email and a random password it never keeps. Your instance has to be reachable from the internet (`PUBLIC_URL` set to its https address).
+
+This was built from EmailBison's and Cheap Inboxes' public APIs and hasn't been tested against a live Cheap Inboxes push yet. Every call is logged with its field names (never the values), so if Cheap Inboxes asks for something Outflare doesn't answer yet, you can see exactly what:
 
 ```sh
 curl localhost:8080/v1/workspaces/$WS/emailbison-compat/calls -H "Authorization: Bearer $OUTFLARE_TOKEN"
@@ -113,7 +121,7 @@ With Cheap Inboxes connected, an [infrastructure plan](/docs/guides/infrastructu
 
 ## For agents
 
-The MCP server has `list_supplier_mailboxes`, `import_supplier_mailboxes`, `sync_supplier_mailboxes` and `update_supplier_sync`. A typical run: list the account's connectors, list its mailboxes, import all, then check back on the ones in `app_password` or `failed`.
+The MCP server has `list_supplier_mailboxes`, `import_supplier_mailboxes`, `push_supplier_mailboxes`, `sync_supplier_mailboxes` and `update_supplier_sync`. A typical run: list the account's connectors, list its mailboxes, import all, then check back on the ones in `app_password` or `failed`.
 
 ## Other suppliers
 
