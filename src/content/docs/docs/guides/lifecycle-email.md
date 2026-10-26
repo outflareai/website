@@ -83,6 +83,8 @@ Viewing an email in Outflare never counts as an open.
 
 Select any address on an email, or search Sent emails by recipient, to see everything that address was sent: how many emails were delivered, bounced, opened and clicked, whether the address is suppressed and why, the lead with that address, and every event, newest first.
 
+People with a [customer record](/docs/guides/customer-records/) also get each email on their record's timeline, beside what they did in your product and what they agreed to: sent, delivered, bounced, marked as spam, not sent (with why), and the first open and click. Sending to an address never creates a record, and test sends stay off it.
+
 ## Statuses
 
 | Status | Meaning |
