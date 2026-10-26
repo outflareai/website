@@ -36,9 +36,24 @@ You can also send `subject` and `html` directly, without a template. Send the sa
 ## What keeps you safe
 
 - **Suppression.** Every recipient passes your suppression list first. A hard bounce or a spam complaint adds the address on its own, and the email page says so.
-- **Transactional or lifecycle.** Transactional email (receipts, resets, codes) still reaches people who unsubscribed from updates, because they need it. Lifecycle email (onboarding, tips) carries a one-click unsubscribe link and skips anyone who used it.
+- **Transactional or lifecycle.** Transactional email (receipts, resets, codes) still reaches people who unsubscribed from updates, because they need it. Lifecycle email (onboarding, tips) carries a one-click unsubscribe link and skips anyone who used it, or who left the email's [topic](#topics-and-the-preference-page).
 - **Verified domains only.** The `from` address must be on a domain verified with the provider.
 - **Agents ask first.** Emails that Outflare's built-in agent wants to send wait for a person to approve them.
+
+## Topics and the preference page
+
+Topics are what people can choose to get from you, such as product updates, tips or a newsletter. Add them under **Lifecycle → Topics**, then pick one on each lifecycle template. Your app can also name one on a send with `"topic": "product_updates"`. Receipts and other transactional email never have a topic, because people asked for them.
+
+Each topic is one of two kinds:
+
+- **Everyone, until they leave.** For email people expect from you.
+- **Only people who opt in.** For extras such as a beta program. It goes only to people who joined.
+
+The unsubscribe link in a lifecycle email opens a preference page with your workspace's name on it. One button leaves the email's topic, a box per topic lets people choose what they get, and one more turns off all marketing email. A mail app's own unsubscribe button leaves just the email's topic. An email with no topic works as before: unsubscribing stops all lifecycle email to that address. Receipts and password resets still go either way.
+
+What people choose is saved on their [customer record](/docs/guides/customer-records/) as a consent, so the CRM and the API see the same answer. Your app can record consent itself, for example from your own settings page, with `POST /v1/workspaces/{ws}/records/{record}/consents` (channel `email`, the topic's key, purpose `marketing`). When someone is skipped, the email shows `suppressed` and why, such as "unsubscribed from Product updates".
+
+A topic's key never changes, because consents point at it. Archive a topic to stop new sends naming it.
 
 ## Sent emails
 
@@ -68,6 +83,8 @@ Viewing an email in Outflare never counts as an open.
 
 Select any address on an email, or search Sent emails by recipient, to see everything that address was sent: how many emails were delivered, bounced, opened and clicked, whether the address is suppressed and why, the lead with that address, and every event, newest first.
 
+People with a [customer record](/docs/guides/customer-records/) also get each email on their record's timeline, beside what they did in your product and what they agreed to: sent, delivered, bounced, marked as spam, not sent (with why), and the first open and click. Sending to an address never creates a record, and test sends stay off it.
+
 ## Statuses
 
 | Status | Meaning |
@@ -77,13 +94,13 @@ Select any address on an email, or search Sent emails by recipient, to see every
 | `delivered` | The receiving server took it |
 | `delayed` | The receiving server asked to try later |
 | `bounced`, `complained` | It bounced, or was marked as spam |
-| `suppressed` | Not sent: the address is on your suppression list |
+| `suppressed` | Not sent: the address is on your suppression list, or left the email's topic |
 | `failed`, `cancelled` | The provider refused it, or you cancelled it |
 
 ## For agents and integrations
 
-- **MCP tools:** `send_email`, `list_emails`, `get_email`, `get_email_recipient`, `cancel_email`, `get_email_overview`, plus tools for providers, domains and templates.
-- **Webhook events:** `email.delivered`, `email.bounced`, `email.complained`, `email.unsubscribed`, `email.opened`, `email.clicked` and the rest of the `lifecycle_email` category.
+- **MCP tools:** `send_email`, `list_emails`, `list_email_topics`, `create_email_topic`, `update_email_topic`, `get_email`, `get_email_recipient`, `cancel_email`, `get_email_overview`, plus tools for providers, domains and templates.
+- **Webhook events:** `email.delivered`, `email.bounced`, `email.complained`, `email.unsubscribed`, `email.preferences_changed`, `email.opened`, `email.clicked` and the rest of the `lifecycle_email` category.
 - **Scopes:** `emails.read` to read, `emails.send` to send, `emails.manage` to change providers, domains and templates.
 
 SMS and push will join later as more channels, using the same templates, sends and events.
