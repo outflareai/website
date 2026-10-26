@@ -46,7 +46,7 @@ When you approve a mission, choose who carries it out.
 
 1. **The mission is created**, by Claude from your goal or by your agent. It starts as a draft or waiting for approval. Nothing it changes in a draft runs: every write is a dry run.
 2. **It reads the brief and rehearses.** `GET /v1/workspaces/{ws}/missions/{id}` returns the mission, the project brief, the limits, progress, open requests and your latest notes.
-3. **It asks for the tools it needs.** If it needs an email verifier or a data provider that isn't connected, it posts a connect request. You connect it (paste the key or sign in) and mark it done.
+3. **It asks for the tools it needs.** If it needs an email verifier or a data provider that isn't connected, it posts a connect request. You connect it (paste the key or sign in), or press **Send a link** to get a one-time link for whoever holds the key; they don't need an Outflare account. The request closes by itself once the tool is connected, and Outflare's agent carries on straight away. If the tool is already connected, the request is refused with `already_connected`, so an agent never asks twice.
 4. **It submits its plan.** You approve it and choose how its changes run.
 5. **It works**, posting progress and questions. Your messages reach it at its next check-in.
 6. **It finishes** with a report. Its sequences are paused.
@@ -135,7 +135,7 @@ Give the agent the **Mission agent** preset when you create its token: the outre
 | `GET .../missions/{id}/actions`, `.../actions/{action}` | Held and dry-run changes |
 | `POST .../actions/{action}/approve`, `/reject` | Decide on a change |
 | `GET`, `POST .../missions/{id}/updates` | Notes, questions, instructions and connect requests |
-| `POST .../updates/{update}/resolve` | Close a connect request |
+| `POST .../updates/{update}/resolve` | Close a connect request you've decided not to connect (it closes by itself once connected) |
 | `GET /v1/workspaces/{ws}/mission-actions` | Every change waiting for approval |
 
 See the [endpoint reference](/docs/api/reference/) for the fields.

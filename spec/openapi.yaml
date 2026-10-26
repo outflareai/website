@@ -5825,7 +5825,11 @@ paths:
       description: |
         Scope: missions.run. kind connect_request asks a person to connect
         a tool the agent needs (they paste the key or sign in with OAuth);
-        give connector as the connector id.
+        give connector as the connector id. The request closes by itself,
+        with a note in the mission, once the workspace has a working
+        connection to that connector; Outflare's agent then takes a turn
+        straight away. A connector that is already connected answers 409
+        `already_connected`: use the connection instead.
       tags: [missions]
       requestBody:
         required: true
