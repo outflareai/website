@@ -5535,6 +5535,7 @@ paths:
       description: |
         Scope: missions.read. What an agent reads before it acts: the
         mission, the project brief (and whether it changed since approval),
+        what Outflare knows about the company (context and pinned memories),
         limits, progress, open connect requests and the latest notes.
       tags: [missions]
       responses:
@@ -5547,6 +5548,12 @@ paths:
                 properties:
                   mission: { $ref: "#/components/schemas/Mission" }
                   brief: { oneOf: [{ $ref: "#/components/schemas/MissionBrief" }, { type: "null" }] }
+                  company:
+                    type: object
+                    properties:
+                      context: { $ref: "#/components/schemas/CompanyContext" }
+                      memories: { type: array, items: { $ref: "#/components/schemas/Memory" }, description: Pinned memories. }
+                      markdown: { type: string }
                   updates: { type: array, items: { $ref: "#/components/schemas/MissionUpdate" } }
                   open_connect_requests: { type: array, items: { $ref: "#/components/schemas/MissionUpdate" } }
                   how_to_act:
@@ -6256,6 +6263,182 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/Report" }
         "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/context:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: getContext
+      x-outflare-access: { scope: workspace.read, project_tokens: true }
+      summary: Read what Outflare knows about the company
+      description: |
+        Scope: workspace.read. What an agent reads at the start of every
+        conversation, so the person never has to repeat themselves: the
+        company context (who they are, goals, voice, rules), pinned and
+        recent memories, and the projects whose briefs hold each motion's
+        offer and audience. `context.missing` lists the onboarding fields
+        still empty; when `context.ask_for_missing` is true, ask the person
+        for them once and save the answers with PATCH. A project token sees
+        workspace-wide memories and its own project's.
+      tags: [context]
+      responses:
+        "200":
+          description: The context.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/WorkspaceContext" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateContext
+      x-outflare-access: { scope: context.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Edit the company context
+      description: |
+        Scope: context.manage, not available to project tokens. Send only
+        the fields to change; a real change bumps `version`. Send the
+        `version` you read to avoid overwriting someone else's edit: if the
+        context changed since, the update fails with 409 `context_changed`.
+        Offer, audience, market and ideal customer belong on projects, not
+        here.
+      tags: [context]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CompanyContextInput" }
+      responses:
+        "200":
+          description: The company context.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CompanyContext" }
+        "400": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/memories:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listMemories
+      x-outflare-access: { scope: workspace.read, project_tokens: true }
+      summary: List memories
+      description: |
+        Scope: workspace.read. Short lasting facts, preferences and
+        decisions agents and people saved, pinned first, then the most
+        recently changed. Search with `q` before asking the person
+        something they may have said before.
+      tags: [context]
+      parameters:
+        - { name: q, in: query, description: Words the memory contains., schema: { type: string } }
+        - { name: kind, in: query, schema: { type: string, enum: [preference, decision, fact, feedback] } }
+        - { name: project_id, in: query, description: "A project's id, or none for workspace-wide memories.", schema: { type: string } }
+        - { name: pinned, in: query, schema: { type: boolean } }
+        - { name: limit, in: query, description: 1 to 200. Default 50., schema: { type: integer, minimum: 1, maximum: 200 } }
+        - { name: offset, in: query, schema: { type: integer, minimum: 0 } }
+        - { $ref: "#/components/parameters/Cursor" }
+      responses:
+        "200":
+          description: Memories.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, total, next_offset, next_cursor]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/Memory" } }
+                  total: { type: integer }
+                  next_offset: { type: [integer, "null"] }
+                  next_cursor: { type: [string, "null"] }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createMemory
+      x-outflare-access: { scope: context.manage, project_tokens: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Remember something
+      description: |
+        Scope: context.manage. Save one lasting fact, preference or decision
+        in a sentence, such as "Never mention pricing in a first email".
+        Never a transcript. Saving the same text again keeps one memory. A
+        call made inside a mission records the mission. A project token
+        saves into its own project. A workspace keeps at most 1000.
+      tags: [context]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/MemoryInput"
+                - required: [text]
+      responses:
+        "201":
+          description: The memory.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Memory" }
+        "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/memories/{id}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    patch:
+      operationId: updateMemory
+      x-outflare-access: { scope: context.manage, project_tokens: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Change a memory
+      description: "Scope: context.manage. Correct its text, change its kind, pin it, or move it to a project (null for the whole workspace)."
+      tags: [context]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/MemoryInput" }
+      responses:
+        "200":
+          description: The memory.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Memory" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+    delete:
+      operationId: deleteMemory
+      x-outflare-access: { scope: context.manage, project_tokens: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Forget a memory
+      description: "Scope: context.manage. For a memory that is wrong or out of date."
+      tags: [context]
+      responses:
+        "204": { description: Forgotten. }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/status:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: getStatus
+      x-outflare-access: { scope: workspace.read }
+      summary: What is blocked, and what to do about it
+      description: |
+        Scope: workspace.read. Everything stopping the workspace, from one
+        call: mailboxes that can't sign in or aren't ready, domains with
+        critical problems, paused sending servers, broken connections,
+        mission changes waiting for a person, paused missions, sequences
+        short of mailboxes, plans awaiting approval, unread replies and a
+        company context still to fill. Each blocker names the MCP tool and
+        dashboard page that resolve it and whether an agent or a person must
+        act. Worst first. `setup` is the getting-started checklist.
+      tags: [context]
+      responses:
+        "200":
+          description: The status.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/WorkspaceStatus" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/projects:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
@@ -9936,7 +10119,7 @@ components:
       enum: [owner, admin, operator, viewer]
     Scope:
       type: string
-      enum: [workspace.read, workspace.manage, members.read, members.manage, tokens.manage, audit.read, mailboxes.read, mailboxes.manage, leads.read, leads.manage, suppressions.manage, sequences.read, sequences.manage, inbox.read, inbox.manage, integrations.read, integrations.manage, outcomes.read, outcomes.manage, projects.read, projects.manage, infrastructure.read, infrastructure.manage, infrastructure.approve, analytics.read, missions.read, missions.run, missions.approve, webhooks.read, webhooks.manage]
+      enum: [workspace.read, workspace.manage, context.manage, members.read, members.manage, tokens.manage, audit.read, mailboxes.read, mailboxes.manage, leads.read, leads.manage, suppressions.manage, sequences.read, sequences.manage, inbox.read, inbox.manage, integrations.read, integrations.manage, outcomes.read, outcomes.manage, projects.read, projects.manage, infrastructure.read, infrastructure.manage, infrastructure.approve, analytics.read, missions.read, missions.run, missions.approve, webhooks.read, webhooks.manage]
     Workspace:
       type: object
       required: [id, name, slug]
@@ -10153,7 +10336,7 @@ components:
     MailboxWarmup:
       type: object
       description: Warm-up settings and the last 7 days of results.
-      required: [enabled, daily_target, reply_rate, started_at, today_target, sent_7d, inbox_7d, spam_7d, missing_7d, inbox_rate]
+      required: [enabled, daily_target, reply_rate, started_at, today_target, sent_7d, inbox_7d, spam_7d, missing_7d, failed_7d, last_error, waiting_on, inbox_rate]
       properties:
         enabled: { type: boolean }
         daily_target: { type: integer, minimum: 1, maximum: 100, description: Warm-up emails a day once fully ramped up. }
@@ -10164,6 +10347,12 @@ components:
         inbox_7d: { type: integer, description: Sent warm-up mail found in the recipient's inbox. }
         spam_7d: { type: integer, description: Found in spam, and moved to the inbox. }
         missing_7d: { type: integer, description: Not found within two days. }
+        failed_7d: { type: integer, description: Warm-up sends the mailbox's SMTP server refused. }
+        last_error: { type: [string, "null"], description: Why the latest warm-up send failed; null once a send succeeds again. }
+        waiting_on:
+          type: [string, "null"]
+          enum: [another_mailbox, connection, paused, null]
+          description: "Why a mailbox with warm-up on sends nothing: another_mailbox when no other mailbox in the workspace has warm-up on, connection when it is not connected or Outflare has no login for it, paused when the mailbox is paused. Null while it can send."
         inbox_rate: { type: [number, "null"], minimum: 0, maximum: 1, description: "inbox_7d over all placed messages; null until any are placed." }
     WarmupSettings:
       type: object
@@ -10708,6 +10897,125 @@ components:
         sent_24h: { type: integer, description: Cold sends from its sequences in the last 24 hours. }
         created_at: { type: string, format: date-time }
         updated_at: { type: string, format: date-time }
+    CompanyContext:
+      type: object
+      required: [company, website, about, goals, voice, rules, notes, version, updated_at, updated_by, missing, ask_for_missing]
+      properties:
+        company: { type: string, description: The company's name. }
+        website: { type: string, description: "Its main site, such as acme.com." }
+        about: { type: string, description: What the company does, in a few sentences. }
+        goals: { type: string, description: "What the person wants from Outflare, such as 20 demos a month from US fintech." }
+        voice: { type: string, description: "How emails should sound: tone, length, sign-off." }
+        rules: { type: string, description: Things never to do. }
+        notes: { type: string, description: "Everything else, in Markdown: proof points, competitors, past results." }
+        version: { type: integer, description: Bumped on every real change. }
+        updated_at: { type: [string, "null"], format: date-time }
+        updated_by: { type: [string, "null"], description: Who changed it last. }
+        missing:
+          type: array
+          items: { type: string, enum: [company, about, goals, voice] }
+          description: Onboarding fields still empty.
+        ask_for_missing: { type: boolean, description: "Whether to ask the person for the missing fields: false once they are filled or a person said not to ask." }
+    CompanyContextInput:
+      type: object
+      properties:
+        company: { type: string, maxLength: 200 }
+        website: { type: string, maxLength: 253 }
+        about: { type: string, maxLength: 4000 }
+        goals: { type: string, maxLength: 4000 }
+        voice: { type: string, maxLength: 4000 }
+        rules: { type: string, maxLength: 4000 }
+        notes: { type: string, maxLength: 100000 }
+        version: { type: integer, description: The version you read; the edit fails with 409 context_changed if the context changed since. }
+        onboarding_dismissed: { type: boolean, description: True stops agents asking for the missing fields; false asks again. }
+    WorkspaceContext:
+      type: object
+      required: [context, memories, memory_count, projects, markdown]
+      properties:
+        context: { $ref: "#/components/schemas/CompanyContext" }
+        memories: { type: array, items: { $ref: "#/components/schemas/Memory" }, description: Pinned memories first, then the 30 most recent. }
+        memory_count: { type: integer, description: Every memory the caller can see; search the rest with GET .../memories?q=. }
+        projects:
+          type: array
+          items:
+            type: object
+            required: [id, name, status, brief_version, has_brief]
+            properties:
+              id: { type: string, format: uuid }
+              name: { type: string }
+              status: { type: string, enum: [active, paused, archived] }
+              brief_version: { type: integer }
+              has_brief: { type: boolean }
+        markdown: { type: string, description: The company context and memories as one Markdown document, ready to put in a prompt. }
+    Memory:
+      type: object
+      required: [id, kind, text, project_id, pinned, created_by, created_by_id, mission_id, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        kind: { type: string, enum: [preference, decision, fact, feedback] }
+        text: { type: string }
+        project_id: { type: [string, "null"], format: uuid, description: Null when it is true for the whole workspace. }
+        pinned: { type: boolean, description: Pinned memories come back with every context read. }
+        created_by: { type: [string, "null"], description: Who saved it. }
+        created_by_id: { type: [string, "null"], format: uuid }
+        mission_id: { type: [string, "null"], format: uuid, description: The mission it was saved in. }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    MemoryInput:
+      type: object
+      properties:
+        text: { type: string, minLength: 1, maxLength: 500, description: One lasting fact, preference or decision. }
+        kind: { type: string, enum: [preference, decision, fact, feedback], description: Defaults to fact. }
+        project_id: { type: [string, "null"], format: uuid, description: The project it is about; null for the whole workspace. }
+        pinned: { type: boolean, description: Pin what every conversation should know. Defaults to false. }
+    WorkspaceStatus:
+      type: object
+      required: [summary, can_send, setup, blockers, checked_at]
+      properties:
+        summary: { type: string, description: One sentence to repeat to the person. }
+        can_send: { type: boolean, description: Whether at least one mailbox can send cold email today from a healthy domain. }
+        setup:
+          type: array
+          items:
+            type: object
+            required: [step, title, done]
+            properties:
+              step: { type: string, enum: [context, mailboxes, ready, leads, sequence, live] }
+              title: { type: string }
+              done: { type: boolean }
+        blockers:
+          type: array
+          items:
+            type: object
+            required: [code, severity, area, title, detail, count, items, fix]
+            properties:
+              code:
+                type: string
+                description: Stable; new codes may be added.
+                enum: [no_mailboxes, none_ready, mailbox_error, domain_critical, server_paused, connection_broken, connection_requested, approval_waiting, mission_paused, allocation_short, infra_plan_waiting, unread_replies, context_missing]
+              severity: { type: string, enum: [critical, warning, info] }
+              area: { type: string, enum: [mailboxes, domains, servers, connectors, missions, sequences, infrastructure, inbox, context] }
+              title: { type: string }
+              detail: { type: string, description: What it means and how to fix it. }
+              count: { type: integer }
+              items:
+                type: array
+                description: Up to five of the affected things.
+                items:
+                  type: object
+                  required: [id, name]
+                  properties:
+                    id: { type: string }
+                    name: { type: string }
+                    reason: { type: string }
+              fix:
+                type: object
+                required: [tool, page, who]
+                properties:
+                  tool: { type: string, description: The MCP tool to call first. }
+                  page: { type: string, description: The dashboard page that resolves it. }
+                  who: { type: string, enum: [agent, person], description: "agent: an agent with the scopes can resolve it. person: it needs a person (a sign-in, a payment, an approval)." }
+        checked_at: { type: string, format: date-time }
     ProjectInput:
       type: object
       properties:
