@@ -97,7 +97,7 @@ export const milestones: Milestone[] = [
 		step: 9,
 		title: 'MCP server for agents',
 		status: 'shipped',
-		summary: 'Claude, Cursor and other MCP clients run a workspace through 240 tools over the API, held to the token\'s scopes and the send policy.',
+		summary: 'Claude, Cursor and other MCP clients run a workspace through 262 tools over the API, held to the token\'s scopes and the send policy.',
 		docs: '/docs/agents/mcp/',
 	},
 	{
@@ -211,6 +211,13 @@ export const milestones: Milestone[] = [
 		status: 'shipped',
 		summary: 'One call says what changed on each website: headlines with their tool and dates, period on period, top movers, unusual days, SEO moves and the connector that fills each gap; a catalog of what can be asked, MCP prompts and compact answers.',
 		docs: '/docs/agents/analytics/',
+	},
+	{
+		step: 26,
+		title: 'Lifecycle email',
+		status: 'shipped',
+		summary: 'Receipts, password resets and onboarding email from your own Amazon SES, Postmark or Resend account: setup guides with a prompt your AI agent can follow, verified sending domains, versioned templates with live preview, delivery events and automatic suppression.',
+		docs: '/docs/guides/lifecycle-email/',
 	},
 	{
 		step: null,

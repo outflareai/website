@@ -5565,6 +5565,79 @@ paths:
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/SEORule" } }
         default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/fixes:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+    get:
+      operationId: listFixes
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: List the fixes list
+      description: "Scope: seo.read (the list holds site audits' fixes so far). One list of work for the whole workspace, shared by people and agents: in progress first, then open, worst and biggest first. Each fix has a source (what found it), a subject (what it is about) and a rule with why it matters and how to fix it. Site audits (source seo_audit) keep one fix per rule and URL template of a site: each finished crawl recounts the pages, a fix the next complete crawl no longer finds is done, confirmed by that crawl, and one that comes back opens again."
+      tags: [fixes]
+      parameters:
+        - { name: source, in: query, schema: { type: string, enum: [seo_audit] } }
+        - { name: subject_id, in: query, description: "One subject's fixes, such as an SEO site's id.", schema: { type: string, format: uuid } }
+        - { name: status, in: query, schema: { type: string, enum: [open, in_progress, done, ignored] } }
+        - { name: severity, in: query, schema: { type: string, enum: [error, warning, notice] } }
+        - { $ref: "#/components/parameters/Brand" }
+      responses:
+        "200":
+          description: Fixes (up to 1,000).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/Fix" } }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/fixes/{fix}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: fix, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getFix
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: Read one fix
+      description: "Scope: seo.read. For a site audit's fix, GET .../crawls/{last_found_by}/issues/{rule}?template={group} lists its pages."
+      tags: [fixes]
+      responses:
+        "200":
+          description: The fix.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Fix" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateFix
+      x-outflare-access: { scope: seo.manage, brand_limited: true }
+      summary: Take, finish or ignore a fix
+      description: "Scope: seo.manage. Send only what changes. Marking a fix done stays until its source checks again (for a site audit, the next complete crawl): if the issue is still there, it opens again."
+      tags: [fixes]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status: { type: string, enum: [open, in_progress, done, ignored] }
+                assignee_id: { type: [string, "null"], description: "A member's or an agent's actor id, me for the caller, or null for nobody." }
+                note: { type: string, maxLength: 2000 }
+      responses:
+        "200":
+          description: The fix.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Fix" }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/integrations:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
@@ -9754,6 +9827,615 @@ paths:
               schema: { oneOf: [{ $ref: "#/components/schemas/Queued" }, { $ref: "#/components/schemas/MissionHeld" }] }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/email-overview:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: getEmailOverview
+      x-outflare-access: { scope: emails.read }
+      summary: How far lifecycle email setup has got, and 30 days of sending
+      description: |
+        Scope: emails.read. `setup` answers the Get started checklist: a
+        provider connected, delivery events working, a domain verified, a
+        test sent and a real email sent. `daily` is the last 30 days (UTC),
+        test emails left out.
+      tags: [emails]
+      responses:
+        "200":
+          description: The overview.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/EmailOverview" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/email-provider-guides:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listEmailProviderGuides
+      x-outflare-access: { scope: emails.read }
+      summary: Step-by-step setup guides for each email provider, with a prompt for your AI agent
+      description: |
+        Scope: emails.read. One guide per provider (Amazon SES, Postmark,
+        Resend): what to have ready, each step and who does it, new-account
+        limits, and `agent_prompt`, a prompt to give your own AI agent so it
+        does the clicking. Every prompt tells the agent to leave creating the
+        secret key to you, and to never ask for it in the chat.
+      tags: [emails]
+      parameters:
+        - { name: domain, in: query, description: "The domain you will send from, written into the steps and prompts.", schema: { type: string } }
+      responses:
+        "200":
+          description: The guides, in the order to offer them.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/EmailProviderGuide" } }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/email-providers:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listEmailProviders
+      x-outflare-access: { scope: emails.read }
+      summary: List email providers
+      description: |
+        Scope: emails.read. An email provider is a connected Amazon SES,
+        Postmark or Resend integration: connect one with `POST
+        .../integrations` and it appears here, with delivery events being set
+        up on its own. The default provider sends when a send names none.
+      tags: [emails]
+      responses:
+        "200":
+          description: Providers, the default first.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/EmailProvider" } }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/email-providers/{id}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getEmailProvider
+      x-outflare-access: { scope: emails.read }
+      summary: Get an email provider
+      description: "Scope: emails.read."
+      tags: [emails]
+      responses:
+        "200":
+          description: The provider.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/EmailProvider" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateEmailProvider
+      x-outflare-access: { scope: emails.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Pause or resume a provider, make it the default, or set what it sends
+      description: |
+        Scope: emails.manage. A paused provider keeps its emails queued
+        until it is resumed (or fails them after about a day). Disconnect
+        the integration to remove a provider.
+      tags: [emails]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status: { type: string, enum: [active, paused] }
+                is_default: { type: boolean, enum: [true] }
+                purposes: { type: array, minItems: 1, items: { type: string, enum: [transactional, lifecycle] } }
+                brand_id: { type: [string, "null"], format: uuid }
+      responses:
+        "200":
+          description: The updated provider.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/EmailProvider" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/email-providers/{id}/events:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: setUpEmailProviderEvents
+      x-outflare-access: { scope: emails.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Set up delivery events with the provider again
+      description: "Scope: emails.manage. Runs in the background; poll the provider's `events_status`. Use it after fixing the key's permissions."
+      tags: [emails]
+      responses:
+        "202":
+          description: "Queued. Inside a mission, a MissionHeld answer when the call was held for approval or dry-run instead."
+          content:
+            application/json:
+              schema: { oneOf: [{ $ref: "#/components/schemas/Queued" }, { $ref: "#/components/schemas/MissionHeld" }] }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/email-providers/{id}/callback:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getEmailProviderCallback
+      x-outflare-access: { scope: emails.manage }
+      summary: The URL the provider sends delivery events to
+      description: |
+        Scope: emails.manage. For connecting events by hand, when
+        `events_status` is manual: add this URL as a webhook in the
+        provider. Keep it private: it lets anyone post events.
+      tags: [emails]
+      responses:
+        "200":
+          description: The callback URL.
+          content:
+            application/json:
+              schema: { type: object, required: [url], properties: { url: { type: string, format: uri } } }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/email-providers/{id}/signing-secret:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    put:
+      operationId: setEmailProviderSigningSecret
+      x-outflare-access: { scope: emails.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Save the webhook signing secret you copied from the provider
+      description: "Scope: emails.manage. Only for events connected by hand (Resend's whsec_... secret). It is stored sealed and never shown again."
+      tags: [emails]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, required: [secret], properties: { secret: { type: string, minLength: 1, maxLength: 500 } } }
+      responses:
+        "200":
+          description: The provider.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/EmailProvider" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/email-provider-domains:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listEmailProviderDomains
+      x-outflare-access: { scope: emails.read }
+      summary: List sending domains for lifecycle email
+      description: "Scope: emails.read. Not the cold-email sending domains under /domains: these are registered with an email provider."
+      tags: [emails]
+      parameters:
+        - { name: provider_id, in: query, schema: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: Domains, by name.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/EmailDomain" } }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: addEmailProviderDomain
+      x-outflare-access: { scope: emails.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Add a sending domain to an email provider
+      description: |
+        Scope: emails.manage. Registers the domain with the provider in the
+        background (`provider_id`, or the default provider), then lists the
+        DNS records to add in `records`. Outflare checks them in public DNS
+        and asks the provider every minute for the first 15 minutes, then
+        less often, for three days. Emails can only be sent from a verified
+        domain or its subdomains.
+      tags: [emails]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [domain]
+              properties:
+                domain: { type: string, description: "Such as example.com or mail.example.com." }
+                provider_id: { type: string, format: uuid }
+                brand_id: { type: string, format: uuid }
+      responses:
+        "201":
+          description: The domain, pending until verified.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/EmailDomain" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/email-provider-domains/{id}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getEmailProviderDomain
+      x-outflare-access: { scope: emails.read }
+      summary: Get a sending domain and its DNS records
+      description: "Scope: emails.read. Each record says whether public DNS has it yet, and what is there instead when it differs."
+      tags: [emails]
+      responses:
+        "200":
+          description: The domain.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/EmailDomain" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    delete:
+      operationId: deleteEmailProviderDomain
+      x-outflare-access: { scope: emails.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Remove a sending domain from Outflare
+      description: "Scope: emails.manage. It stays in the provider's account; emails from it are refused until it is added again."
+      tags: [emails]
+      responses:
+        "204": { description: Removed. }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/email-provider-domains/{id}/check:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: checkEmailProviderDomain
+      x-outflare-access: { scope: emails.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Check a sending domain's DNS records now
+      description: "Scope: emails.manage. Runs in the background within seconds; poll the domain for a new `checked_at`."
+      tags: [emails]
+      responses:
+        "202":
+          description: "Queued. Inside a mission, a MissionHeld answer when the call was held for approval or dry-run instead."
+          content:
+            application/json:
+              schema: { oneOf: [{ $ref: "#/components/schemas/Queued" }, { $ref: "#/components/schemas/MissionHeld" }] }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/email-templates:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listEmailTemplates
+      x-outflare-access: { scope: emails.read }
+      summary: List email templates
+      description: "Scope: emails.read."
+      tags: [emails]
+      parameters:
+        - { name: status, in: query, schema: { type: string, enum: [active, archived] } }
+      responses:
+        "200":
+          description: Templates, by name.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/EmailTemplate" } }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createEmailTemplate
+      x-outflare-access: { scope: emails.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Create an email template
+      description: |
+        Scope: emails.manage. Content uses `{{name}}`, `{{name|fallback}}`,
+        `{{user.plan}}`, `{{{raw_html}}}` and `{{#if name}}...{{else}}...{{/if}}`
+        (also `#unless`); nothing else runs. `{{unsubscribe_url}}` and
+        `{{email_id}}` are filled by Outflare. Variables the content uses but
+        does not list are added. The handle defaults to one made from the
+        name; sends name a template by handle or id. Sends use the published
+        version, so pass `publish: true` or publish later.
+      tags: [emails]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/EmailTemplateInput" }
+      responses:
+        "201":
+          description: The template.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/EmailTemplate" }
+        "400": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/email-templates/preview:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    post:
+      operationId: previewEmailTemplate
+      x-outflare-access: { scope: emails.read }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Fill content with sample data, without saving or sending
+      description: |
+        Scope: emails.read. With no `data`, each variable's `example` is
+        used. `missing` lists required variables with no value; `unknown`
+        lists variables the content uses but does not declare.
+      tags: [emails]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                subject: { type: string }
+                html: { type: string }
+                text: { type: string }
+                variables: { type: array, items: { $ref: "#/components/schemas/EmailTemplateVariable" } }
+                data: { type: object, additionalProperties: true }
+      responses:
+        "200":
+          description: The filled-in content.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/EmailPreview" }
+        "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/email-templates/{id}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, description: The template's id or handle., schema: { type: string } }
+    get:
+      operationId: getEmailTemplate
+      x-outflare-access: { scope: emails.read }
+      summary: Get an email template (the draft)
+      description: "Scope: emails.read. `unpublished_changes` is true when the draft differs from the published version."
+      tags: [emails]
+      responses:
+        "200":
+          description: The template.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/EmailTemplate" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateEmailTemplate
+      x-outflare-access: { scope: emails.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Change a template's draft, archive or restore it, or publish
+      description: "Scope: emails.manage. Edits change the draft only; sends keep using the published version until you publish (here with `publish: true`, or POST .../publish)."
+      tags: [emails]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/EmailTemplateInput" }
+      responses:
+        "200":
+          description: The template.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/EmailTemplate" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+    delete:
+      operationId: deleteEmailTemplate
+      x-outflare-access: { scope: emails.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Delete a template and its versions
+      description: "Scope: emails.manage. Emails already sent keep their content. To stop using one but keep it, archive it instead."
+      tags: [emails]
+      responses:
+        "204": { description: Deleted. }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/email-templates/{id}/publish:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, description: The template's id or handle., schema: { type: string } }
+    post:
+      operationId: publishEmailTemplate
+      x-outflare-access: { scope: emails.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Publish the draft as the next version
+      description: "Scope: emails.manage. New sends use it at once. A send can still pin an older `version`."
+      tags: [emails]
+      requestBody:
+        content:
+          application/json:
+            schema: { type: object, properties: { note: { type: string, maxLength: 500, description: What changed. } } }
+      responses:
+        "200":
+          description: The template.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/EmailTemplate" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/email-templates/{id}/versions:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, description: The template's id or handle., schema: { type: string } }
+    get:
+      operationId: listEmailTemplateVersions
+      x-outflare-access: { scope: emails.read }
+      summary: List a template's published versions
+      description: "Scope: emails.read. Newest first, up to 100."
+      tags: [emails]
+      responses:
+        "200":
+          description: Versions.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/EmailTemplateVersion" } }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/emails:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listEmails
+      x-outflare-access: { scope: emails.read }
+      summary: List lifecycle and transactional emails, newest first
+      description: "Scope: emails.read. Page with cursor."
+      tags: [emails]
+      parameters:
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
+        - { name: before, in: query, description: An email id; emails older than it., schema: { type: string, format: uuid } }
+        - { name: status, in: query, schema: { $ref: "#/components/schemas/EmailStatus" } }
+        - { name: purpose, in: query, schema: { type: string, enum: [transactional, lifecycle] } }
+        - { name: template, in: query, description: A template id or handle., schema: { type: string } }
+        - { name: provider_id, in: query, schema: { type: string, format: uuid } }
+        - { name: to, in: query, description: Emails to this address., schema: { type: string } }
+        - { name: test, in: query, schema: { type: boolean } }
+      responses:
+        "200":
+          description: A page of emails.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, next_before, next_cursor]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/Email" } }
+                  next_before: { type: [string, "null"], format: uuid }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: sendEmail
+      x-outflare-access: { scope: emails.send }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Send a transactional or lifecycle email
+      description: |
+        Scope: emails.send. Queues one email through the workspace's email
+        provider (`provider_id`, or the default) and answers at once; it
+        goes out within seconds on its own queue. Name a `template` (id or
+        handle) with `data` for its variables, or send `subject` with
+        `html` and/or `text` (which may use variables too). `from` must be
+        on a verified sending domain; a template's sender is the default.
+        Every recipient is checked against the suppression list when it is
+        sent; transactional email still reaches people who unsubscribed
+        from marketing, lifecycle email does not, and always carries a
+        one-click unsubscribe link. Send an Idempotency-Key so a retry never
+        sends twice. Cold outreach does not belong here: use sequences.
+      tags: [emails]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SendEmailInput" }
+      responses:
+        "202":
+          description: "Queued. Inside a mission, a MissionHeld answer when the call was held for approval or dry-run instead."
+          content:
+            application/json:
+              schema: { oneOf: [{ $ref: "#/components/schemas/Email" }, { $ref: "#/components/schemas/MissionHeld" }] }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "422": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/emails/{id}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getEmail
+      x-outflare-access: { scope: emails.read }
+      summary: Get an email with its content and delivery timeline
+      description: "Scope: emails.read. `events` is the timeline: queued, sent, delivered, bounced, opened and so on."
+      tags: [emails]
+      responses:
+        "200":
+          description: The email.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Email" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/emails/{id}/cancel:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: cancelEmail
+      x-outflare-access: { scope: emails.send }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Cancel a queued or scheduled email
+      description: "Scope: emails.send. 409 email_not_cancellable once it has been handed to the provider."
+      tags: [emails]
+      responses:
+        "200":
+          description: The cancelled email.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Email" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/email-events/{provider}/{token}:
+    parameters:
+      - { name: provider, in: path, required: true, schema: { type: string, format: uuid } }
+      - { name: token, in: path, required: true, schema: { type: string } }
+    post:
+      operationId: receiveEmailEvents
+      security: []
+      summary: Delivery events from an email provider
+      description: |
+        Where Amazon SES (through SNS), Postmark and Resend send deliveries,
+        bounces and complaints. Outflare registers it with the provider on
+        its own; the token is the secret. SNS and Resend signatures are
+        checked too.
+      tags: [emails]
+      requestBody:
+        content:
+          application/json:
+            schema: { type: object, additionalProperties: true }
+          text/plain:
+            schema: { type: string }
+      responses:
+        "200":
+          description: Received.
+          content:
+            application/json:
+              schema: { type: object, required: [received], properties: { received: { type: integer, description: New events applied. } } }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
 webhooks:
   lead.replied:
     post:
@@ -10251,6 +10933,162 @@ webhooks:
     post:
       operationId: webhook_domain_removed
       summary: "A sending domain was removed."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  email.queued:
+    post:
+      operationId: webhook_email_queued
+      summary: "A lifecycle or transactional email was queued."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  email.sent:
+    post:
+      operationId: webhook_email_sent
+      summary: "The email provider accepted an email."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  email.delivered:
+    post:
+      operationId: webhook_email_delivered
+      summary: "The receiving mail server accepted an email."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  email.bounced:
+    post:
+      operationId: webhook_email_bounced
+      summary: "An email bounced permanently and the address was suppressed."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  email.complained:
+    post:
+      operationId: webhook_email_complained
+      summary: "A recipient marked an email as spam and the address was suppressed."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  email.failed:
+    post:
+      operationId: webhook_email_failed
+      summary: "An email could not be sent."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  email.suppressed:
+    post:
+      operationId: webhook_email_suppressed
+      summary: "An email was not sent because every recipient is suppressed, or the provider refused the address."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  email.cancelled:
+    post:
+      operationId: webhook_email_cancelled
+      summary: "A queued or scheduled email was cancelled."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  email.unsubscribed:
+    post:
+      operationId: webhook_email_unsubscribed
+      summary: "A recipient used a lifecycle email's unsubscribe link and was suppressed."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  email_domain.verified:
+    post:
+      operationId: webhook_email_domain_verified
+      summary: "A sending domain was verified by its email provider."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  email_domain.verification_failed:
+    post:
+      operationId: webhook_email_domain_verification_failed
+      summary: "A sending domain was still not verified after three days of checks."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  email_provider.events_failed:
+    post:
+      operationId: webhook_email_provider_events_failed
+      summary: "Outflare could not set up delivery events with an email provider."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  email_template.published:
+    post:
+      operationId: webhook_email_template_published
+      summary: "A template's draft was published as a new version."
       tags: [webhooks]
       requestBody:
         required: true
@@ -11051,7 +11889,7 @@ components:
       required: [id, type, created_at, workspace_id, actor, target, request_id, data]
       properties:
         id: { type: string, description: "Unique per event, and the webhook-id header. Use it to ignore repeats.", example: evt_48213 }
-        type: { type: string, enum: [lead.replied, lead.unsubscribed, inbox.replied, inbox.updated, lead.bounced, mailbox.auto_paused, lead.created, lead.updated, lead.deleted, leads.imported, suppressions.added, suppression.removed, lead_list.created, lead_list.leads_added, lead_list.run_started, lead_list.build_done, lead_list.build_failed, lead_list.refresh_done, lead_list.refresh_failed, lead_list.enrich_done, lead_list.enrich_failed, import.done, import.failed, sequence.created, sequence.updated, sequence.activated, sequence.paused, sequence.archived, sequence.deleted, sequence.steps_updated, sequence.leads_enrolled, enrollment.stopped, mailbox.imported, mailbox.updated, mailbox.paused, mailbox.resumed, mailbox.stage_changed, mailbox.deleted, domain.added, domain.paused, domain.resumed, domain.removed, meeting.created, meeting.updated, meeting.deleted, deal.created, deal.updated, deal.deleted, spend.recorded, integration.connected, integration.updated, integration.disconnected, connect_request.created, project.created, project.updated, project.deleted, mission.created, mission.updated, mission.submitted, mission.approved, mission.paused, mission.resumed, mission.stopped, mission.completed, mission.action_held, mission.action_approved, mission.action_rejected, infra.plan_created, infra.plan_approved, infra.ordered, infra.order_failed, infra.domains_bought, infra.mailbox_joined, infra.plan_warming, infra.plan_ready, infra.plan_cancelled, workspace.updated, webhook.test] }
+        type: { type: string, enum: [lead.replied, lead.unsubscribed, inbox.replied, inbox.updated, lead.bounced, mailbox.auto_paused, lead.created, lead.updated, lead.deleted, leads.imported, suppressions.added, suppression.removed, lead_list.created, lead_list.leads_added, lead_list.run_started, lead_list.build_done, lead_list.build_failed, lead_list.refresh_done, lead_list.refresh_failed, lead_list.enrich_done, lead_list.enrich_failed, import.done, import.failed, sequence.created, sequence.updated, sequence.activated, sequence.paused, sequence.archived, sequence.deleted, sequence.steps_updated, sequence.leads_enrolled, enrollment.stopped, mailbox.imported, mailbox.updated, mailbox.paused, mailbox.resumed, mailbox.stage_changed, mailbox.deleted, domain.added, domain.paused, domain.resumed, domain.removed, email.queued, email.sent, email.delivered, email.bounced, email.complained, email.failed, email.suppressed, email.cancelled, email.unsubscribed, email_domain.verified, email_domain.verification_failed, email_provider.events_failed, email_template.published, meeting.created, meeting.updated, meeting.deleted, deal.created, deal.updated, deal.deleted, spend.recorded, integration.connected, integration.updated, integration.disconnected, connect_request.created, project.created, project.updated, project.deleted, mission.created, mission.updated, mission.submitted, mission.approved, mission.paused, mission.resumed, mission.stopped, mission.completed, mission.action_held, mission.action_approved, mission.action_rejected, infra.plan_created, infra.plan_approved, infra.ordered, infra.order_failed, infra.domains_bought, infra.mailbox_joined, infra.plan_warming, infra.plan_ready, infra.plan_cancelled, workspace.updated, webhook.test] }
         created_at: { type: string, format: date-time }
         workspace_id: { type: string, format: uuid }
         actor: { $ref: "#/components/schemas/WebhookRef" }
@@ -11328,6 +12166,262 @@ components:
         result: { description: The response when it ran. }
         request_id: { type: [string, "null"] }
         created_at: { type: string, format: date-time }
+    EmailCounts:
+      type: object
+      required: [queued, sent, delivered, bounced, complained, failed, suppressed]
+      properties:
+        queued: { type: integer }
+        sent: { type: integer, description: "Handed to the provider, including those delivered or bounced since." }
+        delivered: { type: integer }
+        bounced: { type: integer }
+        complained: { type: integer }
+        failed: { type: integer }
+        suppressed: { type: integer }
+    EmailOverview:
+      type: object
+      required: [setup, totals_30d, daily]
+      properties:
+        setup:
+          type: object
+          required: [providers, events_active, domains, domains_verified, templates, test_sent, sent]
+          properties:
+            providers: { type: integer }
+            events_active: { type: boolean, description: At least one provider's delivery events are coming in. }
+            domains: { type: integer }
+            domains_verified: { type: integer }
+            templates: { type: integer }
+            test_sent: { type: boolean }
+            sent: { type: boolean, description: A real (not test) email has been sent. }
+        totals_30d: { $ref: "#/components/schemas/EmailCounts" }
+        daily:
+          type: array
+          items:
+            allOf:
+              - { $ref: "#/components/schemas/EmailCounts" }
+              - { type: object, required: [date], properties: { date: { type: string, format: date } } }
+    EmailProviderGuide:
+      type: object
+      required: [connector, name, minutes, summary, needs, steps, limits, agent_prompt]
+      properties:
+        connector: { type: string, enum: [amazon_ses, postmark, resend] }
+        name: { type: string }
+        minutes: { type: integer, description: Roughly how long it takes. }
+        summary: { type: string }
+        needs: { type: array, items: { type: string } }
+        steps:
+          type: array
+          items:
+            type: object
+            required: [title, body, who]
+            properties:
+              title: { type: string }
+              body: { type: string }
+              who: { type: string, enum: [you, outflare], description: "you: in the provider's console. outflare: happens on its own once connected." }
+              link: { type: string }
+              link_label: { type: string }
+              code: { type: string, description: "Something to copy, such as an IAM policy." }
+              code_label: { type: string }
+        limits: { type: string, description: New-account limits and how to lift them. }
+        agent_prompt: { type: string, description: A prompt for your own AI agent to do the setup. It never asks for keys in the chat. }
+    EmailProvider:
+      type: object
+      required: [id, integration_id, connector, name, brand_id, channel, status, purposes, is_default, events_status, events_error, last_event_at, connection, connection_error, account, domains, domains_verified, sent_30d, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        integration_id: { type: string, format: uuid }
+        connector: { type: string, description: "amazon_ses, postmark or resend." }
+        name: { type: string, description: The integration's name. }
+        brand_id: { type: [string, "null"], format: uuid }
+        channel: { type: string, enum: [email, sms, push, whatsapp] }
+        status: { type: string, enum: [active, paused] }
+        purposes: { type: array, items: { type: string, enum: [transactional, lifecycle] } }
+        is_default: { type: boolean }
+        events_status:
+          type: string
+          enum: [not_set_up, setting_up, active, manual, failed]
+          description: "Delivery events coming back. manual: add the callback URL in the provider yourself (GET .../callback); failed: events_error says why."
+        events_error: { type: [string, "null"] }
+        last_event_at: { type: [string, "null"], format: date-time }
+        connection: { type: string, enum: [connected, error], description: Whether the provider accepts the key. }
+        connection_error: { type: [string, "null"] }
+        account:
+          type: object
+          additionalProperties: { type: string }
+          description: "What the provider says about the account, such as SES's mode (sandbox or production), daily_quota and region."
+        domains: { type: integer }
+        domains_verified: { type: integer }
+        sent_30d: { type: integer }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    EmailDomainRecord:
+      type: object
+      required: [purpose, type, name, value, required, status]
+      properties:
+        purpose: { type: string, enum: [dkim, spf, return_path, dmarc, verification, mx] }
+        type: { type: string, enum: [TXT, CNAME, MX] }
+        name: { type: string, description: The full record name. }
+        value: { type: string }
+        priority: { type: integer, description: MX only. }
+        required: { type: boolean, description: "Needed before the domain sends. DMARC is recommended, not required." }
+        status: { type: string, enum: [pending, verified, missing, mismatch] }
+        found: { type: string, description: "What public DNS has instead, when it differs." }
+    EmailDomain:
+      type: object
+      required: [id, provider_id, connector, brand_id, domain, status, status_reason, records, checked_at, verified_at, created_at]
+      properties:
+        id: { type: string, format: uuid }
+        provider_id: { type: string, format: uuid }
+        connector: { type: string }
+        brand_id: { type: [string, "null"], format: uuid }
+        domain: { type: string }
+        status: { type: string, enum: [pending, verified, failed] }
+        status_reason: { type: [string, "null"] }
+        records: { type: array, items: { $ref: "#/components/schemas/EmailDomainRecord" }, description: "Empty until the provider has registered the domain, within seconds." }
+        checked_at: { type: [string, "null"], format: date-time }
+        verified_at: { type: [string, "null"], format: date-time }
+        created_at: { type: string, format: date-time }
+    EmailTemplateVariable:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string, pattern: "^[A-Za-z_][A-Za-z0-9_]{0,63}$" }
+        required: { type: boolean, description: A send without it is refused with 422 template_variables_missing. }
+        default: { type: string, description: Used when a send leaves it out. }
+        example: { type: string, description: Shown in previews. }
+    EmailTemplateInput:
+      type: object
+      properties:
+        handle: { type: string, pattern: "^[a-z0-9][a-z0-9_-]{0,62}$" }
+        name: { type: string, maxLength: 200, description: Required when creating. }
+        brand_id: { type: [string, "null"], format: uuid }
+        purpose: { type: string, enum: [transactional, lifecycle] }
+        status: { type: string, enum: [active, archived] }
+        from: { type: string, description: "Default sender, such as Acme <billing@acme.example>." }
+        reply_to: { type: string }
+        subject: { type: string, maxLength: 998 }
+        html: { type: string }
+        text: { type: string, description: The plain-text part; made from the HTML when empty. }
+        variables: { type: array, maxItems: 100, items: { $ref: "#/components/schemas/EmailTemplateVariable" } }
+        publish: { type: boolean, description: Publish the result as the next version. }
+        note: { type: string, maxLength: 500, description: "With publish: what changed." }
+    EmailTemplate:
+      type: object
+      required: [id, handle, name, brand_id, channel, purpose, status, from, reply_to, subject, html, text, variables, published_version, unpublished_changes, sent_30d, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        handle: { type: string }
+        name: { type: string }
+        brand_id: { type: [string, "null"], format: uuid }
+        channel: { type: string, enum: [email, sms, push, whatsapp] }
+        purpose: { type: string, enum: [transactional, lifecycle] }
+        status: { type: string, enum: [active, archived] }
+        from: { type: string }
+        reply_to: { type: string }
+        subject: { type: string }
+        html: { type: string }
+        text: { type: string }
+        variables: { type: array, items: { $ref: "#/components/schemas/EmailTemplateVariable" } }
+        published_version: { type: [integer, "null"] }
+        unpublished_changes: { type: boolean }
+        sent_30d: { type: integer }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    EmailTemplateVersion:
+      type: object
+      required: [version, from, reply_to, subject, html, text, variables, note, published_by, published_at]
+      properties:
+        version: { type: integer }
+        from: { type: string }
+        reply_to: { type: string }
+        subject: { type: string }
+        html: { type: string }
+        text: { type: string }
+        variables: { type: array, items: { $ref: "#/components/schemas/EmailTemplateVariable" } }
+        note: { type: string }
+        published_by: { type: [string, "null"], description: Who published it. }
+        published_at: { type: string, format: date-time }
+    EmailPreview:
+      type: object
+      required: [subject, html, text, missing, unknown]
+      properties:
+        subject: { type: string }
+        html: { type: string }
+        text: { type: string }
+        missing: { type: array, items: { type: string } }
+        unknown: { type: array, items: { type: string } }
+    EmailStatus:
+      type: string
+      enum: [queued, scheduled, sending, sent, delivered, delayed, bounced, complained, suppressed, failed, cancelled]
+    AddressList:
+      oneOf:
+        - { type: string }
+        - { type: array, items: { type: string } }
+    SendEmailInput:
+      type: object
+      required: [to]
+      properties:
+        to: { $ref: "#/components/schemas/AddressList" }
+        cc: { $ref: "#/components/schemas/AddressList" }
+        bcc: { $ref: "#/components/schemas/AddressList" }
+        reply_to: { $ref: "#/components/schemas/AddressList" }
+        from: { type: string, description: "On a verified sending domain, such as Acme <billing@acme.example>. Defaults to the template's sender." }
+        template: { type: string, description: A template's handle or id. }
+        version: { type: integer, description: A published version to use instead of the latest. }
+        draft: { type: boolean, description: "Use the template's draft, for test sends before publishing." }
+        data: { type: object, additionalProperties: true, description: The template's variables. }
+        subject: { type: string, maxLength: 998 }
+        html: { type: string }
+        text: { type: string }
+        purpose: { type: string, enum: [transactional, lifecycle], description: "Defaults to the template's, else transactional." }
+        provider_id: { type: string, format: uuid }
+        brand_id: { type: string, format: uuid }
+        tags: { type: array, maxItems: 10, items: { type: string, minLength: 1, maxLength: 64 } }
+        metadata: { type: object, additionalProperties: true, description: "Your own ids, up to 8 KB." }
+        send_at: { type: string, format: date-time, description: "Send later, within 30 days." }
+        test: { type: boolean, description: "Marks a test send, kept out of the overview's numbers." }
+    EmailEvent:
+      type: object
+      required: [type, recipient, detail, occurred_at]
+      properties:
+        type: { type: string, description: "queued, scheduled, sent, delivered, delayed, bounced, complained, opened, clicked, suppressed, retrying, failed, cancelled or unsubscribed." }
+        recipient: { type: [string, "null"] }
+        detail: { type: [string, "null"] }
+        occurred_at: { type: string, format: date-time }
+    Email:
+      type: object
+      required: [id, provider_id, connector, brand_id, channel, purpose, status, status_reason, bounce_type, from, to, cc, bcc, reply_to, subject, template_id, template_handle, template_version, tags, metadata, test, provider_message_id, send_at, sent_at, delivered_at, attempts, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        provider_id: { type: [string, "null"], format: uuid }
+        connector: { type: [string, "null"] }
+        brand_id: { type: [string, "null"], format: uuid }
+        channel: { type: string, enum: [email, sms, push, whatsapp] }
+        purpose: { type: string, enum: [transactional, lifecycle] }
+        status: { $ref: "#/components/schemas/EmailStatus" }
+        status_reason: { type: [string, "null"] }
+        bounce_type: { type: [string, "null"], enum: [hard, soft, null] }
+        from: { type: string }
+        to: { type: array, items: { type: string } }
+        cc: { type: array, items: { type: string } }
+        bcc: { type: array, items: { type: string } }
+        reply_to: { type: array, items: { type: string } }
+        subject: { type: string }
+        template_id: { type: [string, "null"], format: uuid }
+        template_handle: { type: [string, "null"] }
+        template_version: { type: [integer, "null"] }
+        tags: { type: array, items: { type: string } }
+        metadata: { type: object, additionalProperties: true }
+        test: { type: boolean }
+        provider_message_id: { type: [string, "null"] }
+        send_at: { type: [string, "null"], format: date-time }
+        sent_at: { type: [string, "null"], format: date-time }
+        delivered_at: { type: [string, "null"], format: date-time }
+        attempts: { type: integer }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+        html: { type: string, description: "Only on GET .../emails/{id}." }
+        text: { type: string, description: "Only on GET .../emails/{id}." }
+        events: { type: array, items: { $ref: "#/components/schemas/EmailEvent" }, description: "Only on GET .../emails/{id}." }
     Queued:
       type: object
       description: The work was queued and runs in the background.
@@ -11358,7 +12452,7 @@ components:
         created_at: { type: string, format: date-time }
     ConnectorCategory:
       type: string
-      enum: [email_verification, sequencer, mailbox_provider, dns, crm, data, signals, analytics, seo, calendar, registrar, warehouse, notification, model, custom]
+      enum: [email_verification, email_sending, sequencer, mailbox_provider, dns, crm, data, signals, analytics, seo, calendar, registrar, warehouse, notification, model, custom]
     ConnectorField:
       type: object
       required: [name, label, secret, optional]
@@ -12176,6 +13270,41 @@ components:
                 properties:
                   template: { type: string, example: /blog/* }
                   pages: { type: integer }
+    Fix:
+      type: object
+      required: [id, source, subject, brand_id, rule, group, status, assignee, note, count, unit, found_by, last_found_by, confirmed_by, fixed_at, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        source: { type: string, enum: [seo_audit], description: "What found it: seo_audit is a site audit's crawl issues." }
+        subject:
+          type: object
+          required: [type, id]
+          description: What it is about.
+          properties:
+            type: { type: string, enum: [seo_site] }
+            id: { type: string, format: uuid }
+        brand_id: { type: [string, "null"], format: uuid, description: "The subject's brand; null is shared." }
+        rule: { $ref: "#/components/schemas/SEORule" }
+        group: { type: string, example: /blog/*, description: "What the source groups by: for a site audit, the URL template whose pages break the rule." }
+        status: { type: string, enum: [open, in_progress, done, ignored] }
+        assignee:
+          oneOf:
+            - type: object
+              required: [id, name, type]
+              properties:
+                id: { type: string, format: uuid }
+                name: { type: string }
+                type: { type: string, example: human }
+            - { type: "null" }
+        note: { type: string }
+        count: { type: integer, description: "How much is left in the latest run that found it, in unit; 0 once a run confirms it fixed." }
+        unit: { type: string, example: pages }
+        found_by: { type: [string, "null"], format: uuid, description: "The source's first run that found it: for a site audit, a crawl." }
+        last_found_by: { type: [string, "null"], format: uuid }
+        confirmed_by: { type: [string, "null"], format: uuid, description: The complete run that no longer found it. }
+        fixed_at: { type: [string, "null"], format: date-time }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
     CrawlLink:
       type: object
       required: [url, anchor, internal, nofollow, http_status]
@@ -12795,7 +13924,7 @@ components:
       enum: [owner, admin, operator, viewer]
     Scope:
       type: string
-      enum: [workspace.read, workspace.manage, context.manage, members.read, members.manage, tokens.manage, audit.read, mailboxes.read, mailboxes.manage, leads.read, leads.manage, suppressions.manage, sequences.read, sequences.manage, inbox.read, inbox.manage, integrations.read, integrations.manage, outcomes.read, outcomes.manage, projects.read, projects.manage, infrastructure.read, infrastructure.manage, infrastructure.approve, analytics.read, missions.read, missions.run, missions.approve, seo.read, seo.manage, webhooks.read, webhooks.manage, customers.read, customers.manage, catalog.manage]
+      enum: [workspace.read, workspace.manage, context.manage, members.read, members.manage, tokens.manage, audit.read, mailboxes.read, mailboxes.manage, leads.read, leads.manage, suppressions.manage, sequences.read, sequences.manage, inbox.read, inbox.manage, integrations.read, integrations.manage, outcomes.read, outcomes.manage, projects.read, projects.manage, infrastructure.read, infrastructure.manage, infrastructure.approve, analytics.read, missions.read, missions.run, missions.approve, seo.read, seo.manage, webhooks.read, webhooks.manage, emails.read, emails.send, emails.manage, customers.read, customers.manage, catalog.manage]
     Workspace:
       type: object
       required: [id, name, slug, test]
