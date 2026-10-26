@@ -5774,6 +5774,150 @@ paths:
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/seo-sites/{site}/search:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: site, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getSiteSearch
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: Read a site's search performance by page and query
+      description: |
+        Scope: seo.read. Clicks, impressions, click-through rate and average
+        position from Google Search Console, for each page of the site, each
+        query, or each page and query together. The analytics sync stores
+        them from the workspace's own Search Console sign-in: 90 days at
+        first, then back to 16 months a few weeks at a time, so nothing here
+        calls Google. `source` is the property the numbers come from (a
+        domain property first), or null when no Search Console property
+        covers the site; connect Google Search Console to fill it. Dates
+        default to the 28 days ending on the newest day Search Console has
+        sent, usually two or three days ago.
+      tags: [seo]
+      parameters:
+        - { name: group, in: query, schema: { type: string, enum: [page, query, page_query], default: page } }
+        - { name: from, in: query, schema: { type: string, format: date } }
+        - { name: to, in: query, schema: { type: string, format: date } }
+        - { name: page, in: query, description: "Only this page (its full URL).", schema: { type: string } }
+        - { name: keyword, in: query, description: "Only this query, as people typed it.", schema: { type: string } }
+        - { name: contains, in: query, description: "Only pages or queries that contain this text.", schema: { type: string } }
+        - { name: sort, in: query, schema: { type: string, enum: [clicks, impressions, ctr, position], default: clicks } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 1000, default: 100 } }
+      responses:
+        "200":
+          description: Rows, best first, and the totals of every row that matches.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [source, from, to, group, data, totals]
+                properties:
+                  source: { oneOf: [{ $ref: "#/components/schemas/SearchSource" }, { type: "null" }] }
+                  from: { type: string, format: date }
+                  to: { type: string, format: date }
+                  group: { type: string, enum: [page, query, page_query] }
+                  data: { type: array, items: { $ref: "#/components/schemas/SearchRow" } }
+                  totals: { $ref: "#/components/schemas/SearchRow" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/seo-sites/{site}/search/history:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: site, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getSiteSearchHistory
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: Read a site's search performance day by day
+      description: "Scope: seo.read. One point a day for the whole site, one page (`page`) or one query (`keyword`), or both, from what the sync stored. Same dates and source as GET .../search."
+      tags: [seo]
+      parameters:
+        - { name: from, in: query, schema: { type: string, format: date } }
+        - { name: to, in: query, schema: { type: string, format: date } }
+        - { name: page, in: query, schema: { type: string } }
+        - { name: keyword, in: query, description: "Only this query.", schema: { type: string } }
+      responses:
+        "200":
+          description: Days, oldest first.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [source, from, to, data]
+                properties:
+                  source: { oneOf: [{ $ref: "#/components/schemas/SearchSource" }, { type: "null" }] }
+                  from: { type: string, format: date }
+                  to: { type: string, format: date }
+                  data: { type: array, items: { $ref: "#/components/schemas/SearchDay" } }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/seo-sites/{site}/indexing:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: site, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getSiteIndexing
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: Read how Google indexed a site's pages
+      description: |
+        Scope: seo.read. What Search Console's URL Inspection says about the
+        site's pages: indexed or not and why, the canonical Google chose
+        against the page's own, when Google last crawled it, and when the
+        verdict last changed. Each sync inspects up to 100 pages a property
+        (the pages OutflareBot crawled and the pages Google showed, never
+        inspected first, then most shown), and inspects each again after 7
+        days, within Google's limit of about 2,000 a day.
+      tags: [seo]
+      parameters:
+        - { name: state, in: query, schema: { type: string, enum: [indexed, not_indexed, canonical_differs, changed] }, description: "changed is a verdict that changed in the last 7 days." }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 1000, default: 200 } }
+      responses:
+        "200":
+          description: Pages not indexed first.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [source, summary, data]
+                properties:
+                  source: { oneOf: [{ $ref: "#/components/schemas/SearchSource" }, { type: "null" }] }
+                  summary:
+                    type: object
+                    required: [inspected, indexed, not_indexed, canonical_differs, changed]
+                    properties:
+                      inspected: { type: integer }
+                      indexed: { type: integer }
+                      not_indexed: { type: integer }
+                      canonical_differs: { type: integer }
+                      changed: { type: integer }
+                  data: { type: array, items: { $ref: "#/components/schemas/URLInspection" } }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/seo-sites/{site}/sitemaps:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: site, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getSiteSitemaps
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: Read the sitemaps Google knows for a site
+      description: "Scope: seo.read. Each sitemap submitted to Search Console for the site: when it was submitted and last read, its errors and warnings, and how many of its URLs are indexed. Read once a day."
+      tags: [seo]
+      responses:
+        "200":
+          description: Sitemaps, those with errors first.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [source, data]
+                properties:
+                  source: { oneOf: [{ $ref: "#/components/schemas/SearchSource" }, { type: "null" }] }
+                  data: { type: array, items: { $ref: "#/components/schemas/SearchSitemap" } }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/seo-rules:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
@@ -14498,6 +14642,74 @@ components:
         cached: { type: boolean, description: A kept answer under a day old; it cost nothing. }
         fetched_at: { type: string, format: date-time }
         budget: { $ref: "#/components/schemas/SEOBudget" }
+    SearchSource:
+      type: object
+      description: The Search Console property a site's search numbers come from.
+      required: [integration_id, property, host, oldest_day, newest_day, last_run_at, last_error]
+      properties:
+        integration_id: { type: string, format: uuid }
+        property: { type: string, description: "https://example.com/ or sc-domain:example.com." }
+        host: { type: string }
+        oldest_day: { type: [string, "null"], format: date }
+        newest_day: { type: [string, "null"], format: date }
+        last_run_at: { type: [string, "null"], format: date-time }
+        last_error: { type: [string, "null"] }
+    SearchRow:
+      type: object
+      required: [clicks, impressions, ctr, position]
+      properties:
+        page: { type: [string, "null"], description: "The page's full URL, when grouped by page." }
+        query: { type: [string, "null"], description: "The query, when grouped by query." }
+        clicks: { type: integer }
+        impressions: { type: integer }
+        ctr: { type: number, description: "Clicks over impressions, 0 to 1." }
+        position: { type: number, description: "Average position weighted by impressions; 1 is the top, 0 when never shown." }
+    SearchDay:
+      type: object
+      required: [day, clicks, impressions, ctr, position]
+      properties:
+        day: { type: string, format: date }
+        clicks: { type: integer }
+        impressions: { type: integer }
+        ctr: { type: number }
+        position: { type: number }
+    URLInspection:
+      type: object
+      required: [url, indexed, verdict, coverage, indexing, robots_txt, page_fetch, google_canonical, user_canonical, canonical_differs, last_crawl, crawled_as, sitemaps, mobile, rich_results, link, previous_verdict, verdict_changed_at, inspected_at]
+      properties:
+        url: { type: string }
+        indexed: { type: boolean, description: "Google's verdict is PASS." }
+        verdict: { type: string, description: "Google's own: PASS, PARTIAL, FAIL or NEUTRAL." }
+        coverage: { type: string, description: "Why, in Google's words: Submitted and indexed, Crawled - currently not indexed." }
+        indexing: { type: string }
+        robots_txt: { type: string }
+        page_fetch: { type: string }
+        google_canonical: { type: string }
+        user_canonical: { type: string }
+        canonical_differs: { type: boolean, description: "Google chose another canonical than the one the page names." }
+        last_crawl: { type: [string, "null"], format: date-time }
+        crawled_as: { type: string }
+        sitemaps: { type: array, items: { type: string } }
+        mobile: { type: string }
+        rich_results: { type: string }
+        link: { type: string, description: "The URL's report in Search Console." }
+        previous_verdict: { type: string }
+        verdict_changed_at: { type: [string, "null"], format: date-time }
+        inspected_at: { type: string, format: date-time }
+    SearchSitemap:
+      type: object
+      required: [path, last_submitted, last_read, pending, index, errors, warnings, submitted, indexed, checked_at]
+      properties:
+        path: { type: string }
+        last_submitted: { type: [string, "null"], format: date-time }
+        last_read: { type: [string, "null"], format: date-time }
+        pending: { type: boolean }
+        index: { type: boolean, description: "A sitemap index, which lists other sitemaps." }
+        errors: { type: integer }
+        warnings: { type: integer }
+        submitted: { type: integer }
+        indexed: { type: integer }
+        checked_at: { type: string, format: date-time }
     SEOSite:
       type: object
       required: [id, brand_id, host, start_url, status, schedule, max_pages, crawl_delay_ms, obey_robots, verified, verified_at, verify_method, verify_checked_at, verification, limits, last_crawl, created_at, updated_at]
