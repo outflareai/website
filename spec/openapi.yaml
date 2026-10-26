@@ -147,7 +147,7 @@ paths:
                                   id: { type: string, format: uuid }
                                   slug: { type: string, example: acme }
                                   name: { type: string, example: Acme Outbound }
-                                  test: { type: boolean, description: A test workspace, where nothing reaches the outside world. }
+                                  test: { type: boolean, description: "A test workspace, where nothing reaches the outside world." }
                           agency_id: { type: [string, "null"], format: uuid }
                           project_id: { type: [string, "null"], format: uuid }
                           brand_id: { type: [string, "null"], format: uuid, description: "Set for a brand token: it sees that brand's records and the shared ones, and changes only that brand's." }
@@ -356,7 +356,7 @@ paths:
               properties:
                 email: { type: string }
       responses:
-        "202": { description: Sent, if the email has an account. }
+        "202": { description: "Sent, if the email has an account." }
         "400": { $ref: "#/components/responses/Error" }
         "429": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
@@ -787,7 +787,7 @@ paths:
               properties:
                 name: { type: string, maxLength: 100 }
                 brand_name: { type: string, maxLength: 60 }
-                logo_url: { type: string, description: An https URL, or empty to clear. }
+                logo_url: { type: string, description: "An https URL, or empty to clear." }
                 accent_color: { type: string, pattern: "^(#[0-9a-fA-F]{6})?$" }
                 support_email: { type: string }
       responses:
@@ -1468,7 +1468,7 @@ paths:
                     required: [id, name, uri]
                     properties:
                       id: { type: string }
-                      name: { type: string, description: The name the app registered with. Anyone can register any name, so trust app and redirect_host over it. }
+                      name: { type: string, description: "The name the app registered with. Anyone can register any name, so trust app and redirect_host over it." }
                       uri: { type: string }
                   app: { $ref: "#/components/schemas/AgentAppKind" }
                   redirect_host: { type: string, description: Where the person is sent back to after approving. }
@@ -1485,7 +1485,7 @@ paths:
                         role: { type: string }
                         full_scopes: { type: array, items: { $ref: "#/components/schemas/Scope" }, description: "What access full gives: everything the role allows except managing members, tokens and the workspace, approving missions, removing suppressions, managing webhooks and spending money." }
                         read_scopes: { type: array, items: { $ref: "#/components/schemas/Scope" } }
-                        can_spend: { type: boolean, description: The role may approve spending (infrastructure.approve), so allow_spending can add it. }
+                        can_spend: { type: boolean, description: "The role may approve spending (infrastructure.approve), so allow_spending can add it." }
                         brands:
                           description: Set when the person is kept to some brands there; the app is then kept to the one they pick (send it as brand). Null for every brand.
                           type: [array, "null"]
@@ -3939,7 +3939,7 @@ paths:
         - { name: assigned_to, in: query, description: "me (signed-in person only), none, or a user id.", schema: { type: string } }
         - { name: tag, in: query, description: "A tag, or several separated by commas for replies with any of them.", schema: { type: string } }
         - { name: label, in: query, deprecated: true, description: The older name for tag., schema: { type: string } }
-        - { name: q, in: query, description: Search sender, subject and text., schema: { type: string } }
+        - { name: q, in: query, description: "Search sender, subject and text.", schema: { type: string } }
         - { $ref: "#/components/parameters/Brand" }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
         - { name: before, in: query, description: "next_before from the previous page.", schema: { type: string, format: date-time } }
@@ -4011,7 +4011,7 @@ paths:
                 read: { type: boolean }
                 category: { type: [string, "null"], enum: [interested, meeting_booked, question, referral, not_now, objection, not_interested, wrong_person, unsubscribe, complaint, out_of_office, auto_reply, null] }
                 needs_review: { type: boolean, description: false once a person has checked the label. }
-                assigned_to: { type: [string, "null"], format: uuid, description: A workspace member's user id, or null to unassign. }
+                assigned_to: { type: [string, "null"], format: uuid, description: "A workspace member's user id, or null to unassign." }
                 snoozed_until: { type: [string, "null"], format: date-time, description: Must be in the future; null wakes it now. }
                 done: { type: boolean }
                 labels: { type: array, maxItems: 20, items: { type: string, minLength: 1, maxLength: 40 }, description: "Replaces the tags. Lower-cased; a new name joins the workspace's tag list." }
@@ -7211,7 +7211,7 @@ paths:
       tags: [missions]
       parameters:
         - { name: writes, in: query, schema: { type: boolean }, description: Only writes. }
-        - { name: before, in: query, schema: { type: integer }, description: A call id, for the next page. }
+        - { name: before, in: query, schema: { type: integer }, description: "A call id, for the next page." }
         - { $ref: "#/components/parameters/Cursor" }
         - { $ref: "#/components/parameters/Fields" }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
@@ -7283,7 +7283,7 @@ paths:
       requestBody:
         content: { application/json: { schema: { type: object, properties: { note: { type: string } } } } }
       responses:
-        "200": { description: The action, executed or failed., content: { application/json: { schema: { $ref: "#/components/schemas/MissionAction" } } } }
+        "200": { description: "The action, executed or failed.", content: { application/json: { schema: { $ref: "#/components/schemas/MissionAction" } } } }
         "403": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
@@ -7609,6 +7609,87 @@ paths:
         "429": { $ref: "#/components/responses/Error" }
         "502": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/integrations/{id}/crm-imports:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: startCRMImport
+      x-outflare-access: { scope: catalog.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Import another CRM into customer records, once
+      description: |
+        Scope: catalog.manage and customers.manage. Copies the connected CRM
+        (Attio) into customer records in the background; read it with GET
+        /crm-imports/{import}. People become person records, Companies account
+        records, and Deals and custom objects record types of their own. Each
+        field becomes a catalog field (an existing one when it holds the same
+        kind of value), select and status choices become option lists, and
+        emails, phones and domains become identities. Emails and phones come in
+        unverified. Values are CRM data (source crm_sync), so they never
+        overwrite what someone typed in Outflare or what your own product sent.
+        A person whose email, or a company whose domain, a record here already
+        holds verified is filled in instead of duplicated. Every record keeps
+        its CRM id as an identity (such as attio.record), so running the import
+        again updates the same records. Lists, notes and tasks are not imported
+        yet. Nothing changes in the CRM.
+      tags: [imports]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                objects: { type: array, maxItems: 100, items: { type: string }, description: "Only these objects, by slug from the preview, such as people or deals. Default every object." }
+      responses:
+        "202":
+          description: "Queued. Inside a mission, a MissionHeld answer when the call was held for approval or dry-run instead."
+          content:
+            application/json:
+              schema: { oneOf: [{ $ref: "#/components/schemas/CRMImport" }, { $ref: "#/components/schemas/MissionHeld" }] }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/crm-imports:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+    get:
+      operationId: listCRMImports
+      x-outflare-access: { scope: customers.read }
+      summary: List CRM imports
+      description: "Scope: customers.read. The 50 newest."
+      tags: [imports]
+      responses:
+        "200":
+          description: CRM imports, newest first.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/CRMImport" } }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/crm-imports/{import}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: import, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getCRMImport
+      x-outflare-access: { scope: customers.read }
+      summary: Get a CRM import
+      description: "Scope: customers.read. Its status, and once it runs, what it did: records seen, created, matched to records already here, updated and unchanged for each object; the record types, fields and option lists it added; members matched by email; placeholders for records another record points at that the CRM did not return; and values it left out, with why."
+      tags: [imports]
+      responses:
+        "200":
+          description: The import.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CRMImport" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/integrations/{id}/imports:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
@@ -7699,7 +7780,7 @@ paths:
       tags: [mailboxes]
       parameters:
         - { name: level, in: query, schema: { type: string, enum: [ok, warning, critical, paused] } }
-        - { name: mailbox_id, in: query, schema: { type: string }, description: One or more ids, comma separated. }
+        - { name: mailbox_id, in: query, schema: { type: string }, description: "One or more ids, comma separated." }
       responses:
         "200":
           description: Health by mailbox.
@@ -8241,7 +8322,7 @@ paths:
         imports, list filters, enrichment, merge tags), so read it before writing records.
       tags: [catalog]
       parameters:
-        - { name: archived, in: query, description: true includes archived types, fields and options., schema: { type: boolean, default: false } }
+        - { name: archived, in: query, description: "true includes archived types, fields and options.", schema: { type: boolean, default: false } }
       responses:
         "200":
           description: The catalog.
@@ -9730,8 +9811,9 @@ paths:
                 properties:
                   mailboxes: { type: integer }
                   campaigns: { type: integer, description: Live campaigns linked to sequences. }
-                  accepted: { type: integer, description: Changes made in the platform, accepted as manual ones. }
+                  accepted: { type: integer, description: "Changes made in the platform, accepted as manual ones." }
                   confirmed: { type: integer, description: Attaches the platform now shows. }
+                  replies: { type: integer, description: New replies brought into the inbox, for a platform that reports them. }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         "502": { $ref: "#/components/responses/Error" }
@@ -12240,7 +12322,7 @@ components:
           description: queued also covers a job waiting to retry after a failed attempt (see attempts and error).
         attempts: { type: integer }
         max_attempts: { type: integer }
-        error: { type: [string, "null"], description: The last attempt's error, if it failed. }
+        error: { type: [string, "null"], description: "The last attempt's error, if it failed." }
         run_at: { type: string, format: date-time, description: When the job runs next (or ran). }
         created_at: { type: string, format: date-time }
         updated_at: { type: string, format: date-time }
@@ -12255,7 +12337,7 @@ components:
         level: { type: string, enum: [info, warning, error], description: "info: worked. warning: refused (4xx). error: broke (5xx)." }
         method: { type: string, example: POST }
         route: { type: string, example: "POST /v1/workspaces/{ws}/leads" }
-        operation: { type: string, example: createLead, description: The operationId in this document, or the route when it has none. }
+        operation: { type: string, example: createLead, description: "The operationId in this document, or the route when it has none." }
         path: { type: string, example: /v1/workspaces/acme/leads }
         query_keys: { type: array, items: { type: string }, description: "The query parameters' names, never their values." }
         status: { type: integer, example: 201 }
@@ -12263,7 +12345,7 @@ components:
         error_code: { type: [string, "null"], example: null, description: "The error's code from GET /v1/error-codes, for a refused or failed call." }
         error_param: { type: [string, "null"], example: null, description: "The field an invalid request named, such as email (never its value), or the scope a forbidden call was missing, such as leads.manage." }
         surface: { type: string, enum: [web, api, mcp, cli, sdk, mission] }
-        client: { type: [string, "null"], description: The Outflare-Client header, such as mcp/0.1.0. }
+        client: { type: [string, "null"], description: "The Outflare-Client header, such as mcp/0.1.0." }
         mcp_tool: { type: [string, "null"], example: create_lead }
         agent: { type: [string, "null"], description: "The agent's app, such as claude-desktop." }
         user_agent: { type: [string, "null"] }
@@ -12272,7 +12354,7 @@ components:
         actor_type: { type: [string, "null"], example: api_token }
         actor_name: { type: [string, "null"], description: The person's or token's name. }
         token_id: { type: [string, "null"] }
-        brand_id: { type: [string, "null"], description: The brand the call was about, when it named one. }
+        brand_id: { type: [string, "null"], description: "The brand the call was about, when it named one." }
         project_id: { type: [string, "null"] }
     QueuedJob:
       type: object
@@ -12545,7 +12627,7 @@ components:
         mode: { $ref: "#/components/schemas/MissionMode" }
         token_id: { type: [string, "null"], format: uuid, description: The only token that may act in the mission. }
         max_sends: { type: [integer, "null"], minimum: 1 }
-        max_spend_cents: { type: [integer, "null"], minimum: 0, description: US cents, from the spend ledger. }
+        max_spend_cents: { type: [integer, "null"], minimum: 0, description: "US cents, from the spend ledger." }
         ends_at: { type: [string, "null"], format: date-time, description: The mission ends itself at this time. }
     Mission:
       type: object
@@ -12666,7 +12748,7 @@ components:
         method: { type: string }
         path: { type: string }
         query: { type: string }
-        body: { description: The request body, as JSON when it was JSON. }
+        body: { description: "The request body, as JSON when it was JSON." }
         reason: { type: string }
         summary: { type: string, example: Create sequence }
         status: { type: string, enum: [simulated, pending, executed, failed, rejected, canceled] }
@@ -12907,14 +12989,14 @@ components:
       required: [kind, ref, request_id, surface, token_id, token_name, mission_id, actor_id, actor_name]
       properties:
         kind: { type: string, enum: [api, test, event, journey, broadcast, system] }
-        ref: { type: [string, "null"], description: The event, journey step or broadcast behind it. }
+        ref: { type: [string, "null"], description: "The event, journey step or broadcast behind it." }
         request_id: { type: [string, "null"], description: The API call that queued it. }
         surface: { type: [string, "null"], description: "web, api, mcp, cli, sdk or mission." }
         token_id: { type: [string, "null"], format: uuid, description: The API token the call used. }
         token_name: { type: [string, "null"] }
         mission_id: { type: [string, "null"], format: uuid }
         actor_id: { type: [string, "null"], format: uuid }
-        actor_name: { type: [string, "null"], description: The person, token or agent that asked for it. }
+        actor_name: { type: [string, "null"], description: "The person, token or agent that asked for it." }
     EmailRecipient:
       type: object
       required: [address, counts, first_sent_at, last_sent_at, suppressed, lead_id, events, next_before]
@@ -12941,7 +13023,7 @@ components:
             reason: { type: string }
             source: { type: string }
             created_at: { type: string, format: date-time }
-        lead_id: { type: [string, "null"], format: uuid, description: The lead with this address, if there is one. }
+        lead_id: { type: [string, "null"], format: uuid, description: "The lead with this address, if there is one." }
         events:
           type: array
           items:
@@ -13105,7 +13187,7 @@ components:
         id: { type: string }
         name: { type: string }
         email: { type: string }
-        credits: { type: number, description: Credits or quota left, when the service reports it. }
+        credits: { type: number, description: "Credits or quota left, when the service reports it." }
         details: { type: object, additionalProperties: { type: string } }
     ReportMetrics:
       type: object
@@ -13130,7 +13212,7 @@ components:
         bounce_rate: { type: [number, "null"] }
         opt_out_rate: { type: [number, "null"] }
         inbox_placement: { type: [number, "null"] }
-        clicks: { type: integer, description: Tracked link clicks, leaving out likely link scanners. Zero unless click tracking is on. }
+        clicks: { type: integer, description: "Tracked link clicks, leaving out likely link scanners. Zero unless click tracking is on." }
         clicked_leads: { type: integer }
         click_rate: { type: [number, "null"], description: Percent of contacted leads who clicked. }
     Report:
@@ -13291,6 +13373,10 @@ components:
         slug: { type: string }
         title: { type: string }
         type: { type: string, description: "The CRM's own type name, such as text, status, record-reference or actor-reference." }
+        kind:
+          type: string
+          enum: [text, number, checkbox, currency, date, timestamp, rating, select, status, email, phone, domain, reference, member, location, name, unsupported]
+          description: "What the field holds, whatever the CRM calls it. unsupported fields are worked out by the CRM (such as last interaction) and are not imported."
         system: { type: boolean, description: "Built into the CRM rather than added by the workspace." }
         multiple: { type: boolean }
         unique: { type: boolean }
@@ -13298,6 +13384,55 @@ components:
         options: { type: array, items: { type: string }, description: "Select options or pipeline stages, in order." }
         target: { type: array, items: { type: string }, description: "Objects a record reference points at." }
         filled: { type: integer, description: "How many of the counted records or entries have a value." }
+    CRMImport:
+      type: object
+      required: [id, integration_id, connector, status, objects, summary, error, created_at, started_at, finished_at]
+      properties:
+        id: { type: string, format: uuid }
+        integration_id: { type: string, format: uuid }
+        connector: { type: string, description: "The connector id, such as attio." }
+        status: { type: string, enum: [queued, running, done, failed] }
+        objects: { type: array, items: { type: string }, description: "The objects asked for; empty means every object." }
+        summary:
+          type: object
+          required: [objects, catalog, members, placeholders, warnings, more_warnings]
+          properties:
+            objects:
+              type: array
+              items:
+                type: object
+                required: [object, name, record_type, seen, created, matched, updated, unchanged]
+                properties:
+                  object: { type: string, description: "The CRM object's slug." }
+                  name: { type: string }
+                  record_type: { type: string, description: "The record type its records became." }
+                  seen: { type: integer }
+                  created: { type: integer }
+                  matched: { type: integer, description: "Records already here (by verified email or domain) that the import filled in." }
+                  updated: { type: integer, description: "Records an earlier import added that changed." }
+                  unchanged: { type: integer }
+            catalog:
+              type: object
+              required: [types_created, fields_created, fields_reused, option_sets_created, fields_skipped]
+              properties:
+                types_created: { type: array, items: { type: string } }
+                fields_created: { type: array, items: { type: string }, description: "type.field keys." }
+                fields_reused: { type: array, items: { type: string }, description: "Existing fields the CRM's values went into." }
+                option_sets_created: { type: array, items: { type: string } }
+                fields_skipped: { type: array, items: { type: string }, description: "CRM fields left out, each with why." }
+            members:
+              type: object
+              required: [total, matched]
+              properties:
+                total: { type: integer }
+                matched: { type: integer, description: "CRM members matched to members here by email; owner and other member fields use them." }
+            placeholders: { type: integer, description: "Empty records added for records another record points at that the CRM did not return. Importing that object fills them in." }
+            warnings: { type: array, items: { type: string }, description: "Values left out, with why. At most 100." }
+            more_warnings: { type: integer }
+        error: { type: [string, "null"] }
+        created_at: { type: string, format: date-time }
+        started_at: { type: [string, "null"], format: date-time }
+        finished_at: { type: [string, "null"], format: date-time }
     ImportRun:
       type: object
       required: [id, integration_id, connector, options, status, summary, error, created_at, started_at, finished_at]
@@ -13455,7 +13590,7 @@ components:
         to: { type: string, format: date, description: "Clarity only covers the last three days, so its range may differ from the one asked for." }
         totals: { $ref: "#/components/schemas/AnalyticsMetrics" }
         series: { type: array, items: { $ref: "#/components/schemas/AnalyticsPoint" }, description: The traffic report's days. }
-        rows: { type: array, items: { $ref: "#/components/schemas/AnalyticsRow" }, description: A breakdown report's rows, biggest first. }
+        rows: { type: array, items: { $ref: "#/components/schemas/AnalyticsRow" }, description: "A breakdown report's rows, biggest first." }
         notes: { type: array, items: { type: string } }
         integration_id: { type: string, format: uuid }
         connector: { type: string }
@@ -13526,7 +13661,7 @@ components:
       required: [host, headline, tools]
       properties:
         host: { type: string, description: "The domain; empty for tools whose site shows none." }
-        headline: { type: array, items: { type: string }, description: Plain sentences, each naming its tool and dates. }
+        headline: { type: array, items: { type: string }, description: "Plain sentences, each naming its tool and dates." }
         tools:
           type: array
           items:
@@ -13539,7 +13674,7 @@ components:
               now: { $ref: "#/components/schemas/AnalyticsWindow" }
               before: { $ref: "#/components/schemas/AnalyticsWindow" }
               metrics: { type: array, items: { $ref: "#/components/schemas/AnalyticsChange" } }
-        search: { type: array, description: Clicks and impressions added up across search consoles, when there are several., items: { $ref: "#/components/schemas/AnalyticsChange" } }
+        search: { type: array, description: "Clicks and impressions added up across search consoles, when there are several.", items: { $ref: "#/components/schemas/AnalyticsChange" } }
         movers:
           type: array
           items:
@@ -13661,7 +13796,7 @@ components:
         organic_keywords: { type: number, description: Keywords ranking in the top 100. }
         top3: { type: number, description: Keywords ranking in the top 3. }
         organic_traffic: { type: number, description: The provider's estimate of monthly visits from search. }
-        traffic_value: { type: number, description: What that traffic would cost in ads, in US dollars. }
+        traffic_value: { type: number, description: "What that traffic would cost in ads, in US dollars." }
         position: { type: number, description: "A keyword's position; 1 is the top. For a competitor, its average position." }
         volume: { type: number, description: Monthly searches. }
         traffic: { type: number, description: Estimated monthly visits from this keyword. }
@@ -13759,7 +13894,7 @@ components:
           description: "Why it ended: done (every page found was read), limit (max_pages reached), stopped, opted_out, robots_unreachable (robots.txt answered 5xx or not at all, so nothing may be read), site_errors (ten errors in a row) or error."
           example: done
         error_code: { type: [string, "null"], example: site_errors }
-        max_pages: { type: integer, description: The limits this crawl keeps, fixed when it started. }
+        max_pages: { type: integer, description: "The limits this crawl keeps, fixed when it started." }
         delay_ms: { type: integer, description: The pause between requests now; it doubles when the site asks the crawler to slow down. }
         obey_robots: { type: boolean }
         pages_fetched: { type: integer }
@@ -13803,14 +13938,14 @@ components:
         redirect_to: { type: [string, "null"], description: "Where a 3xx answer pointed; on the same site it is a page of its own." }
         noindex: { type: boolean }
         nofollow: { type: boolean, description: "The page asked crawlers not to follow its links, so its links were not queued." }
-        links_out: { type: integer, description: Links on the page, to the site and elsewhere. }
+        links_out: { type: integer, description: "Links on the page, to the site and elsewhere." }
         links_in: { type: integer, description: "Pages of the site that link here, counted when the crawl ends. 0 on a page found only in a sitemap is an orphan." }
         fetched_at: { type: [string, "null"], format: date-time }
         x_robots_tag: { type: [string, "null"], description: "The X-Robots-Tag header, which can also say noindex or nofollow." }
-        title: { type: [string, "null"], description: The first <title>, spaces tidied. }
+        title: { type: [string, "null"], description: "The first <title>, spaces tidied." }
         title_count: { type: integer, description: "<title> tags on the page; more than one is a problem." }
         meta_description: { type: [string, "null"] }
-        canonical: { type: [string, "null"], description: The first rel=canonical link, made absolute. }
+        canonical: { type: [string, "null"], description: "The first rel=canonical link, made absolute." }
         canonical_count: { type: integer }
         h1: { type: array, items: { type: string }, description: The page's h1 headings (up to 10). }
         lang: { type: [string, "null"], example: en-AU, description: The html element's lang. }
@@ -13837,7 +13972,7 @@ components:
         severity: { type: string, enum: [error, warning, notice] }
         category: { type: string, enum: [indexability, links, content, metadata, performance] }
         title: { type: string, example: Missing title }
-        why: { type: string, description: Why it matters, in plain words. }
+        why: { type: string, description: "Why it matters, in plain words." }
         fix: { type: string, description: How to fix it. }
     CrawlIssue:
       allOf:
@@ -13897,7 +14032,7 @@ components:
         url: { type: string }
         anchor: { type: string, description: "The link's text, or an image's alt text." }
         internal: { type: boolean, description: On the site (its host or its www. twin). }
-        nofollow: { type: boolean, description: rel nofollow, ugc or sponsored. }
+        nofollow: { type: boolean, description: "rel nofollow, ugc or sponsored." }
         http_status: { type: [integer, "null"], description: "The status this crawl got from the page; null when it did not read it." }
     SEOSource:
       type: object
@@ -14289,7 +14424,7 @@ components:
               source: { type: string, description: Always research. }
               signal: { type: string }
               detail: { type: string }
-        note: { type: string, maxLength: 200, description: The model's one-line reason, for a person reading the record. }
+        note: { type: string, maxLength: 200, description: "The model's one-line reason, for a person reading the record." }
         model: { type: string, example: claude-haiku-5-5 }
         researched_at: { type: string, format: date-time }
     ClassificationEffective:
@@ -14368,7 +14503,7 @@ components:
         starts_at: { type: string, format: date-time }
         sequence_id: { type: string, format: uuid }
         project_id: { type: string, format: uuid }
-        mission_id: { type: string, description: An id, or empty to clear. }
+        mission_id: { type: string, description: "An id, or empty to clear." }
         unattributed: { type: boolean, description: Not from outreach; pins that. }
     Deal:
       type: object
@@ -14452,7 +14587,7 @@ components:
         source: { type: string, enum: [auto, manual, import] }
         ref: { type: [string, "null"] }
         note: { type: string }
-        actor_id: { type: [string, "null"], format: uuid, description: The person, token or agent that caused it. }
+        actor_id: { type: [string, "null"], format: uuid, description: "The person, token or agent that caused it." }
         created_at: { type: string, format: date-time }
     NewSpend:
       type: object
@@ -14634,8 +14769,8 @@ components:
         sent_7d: { type: integer }
         replies_7d: { type: integer }
         bounced_7d: { type: integer }
-        bounce_rate_7d: { type: [number, "null"], description: Percent of sends that bounced, last 7 days. }
-        reply_rate_7d: { type: [number, "null"], description: Percent of sends that got a reply, last 7 days. }
+        bounce_rate_7d: { type: [number, "null"], description: "Percent of sends that bounced, last 7 days." }
+        reply_rate_7d: { type: [number, "null"], description: "Percent of sends that got a reply, last 7 days." }
         open_replies: { type: integer, description: Replies not done or snoozed. }
         created_at: { type: string, format: date-time }
     AgencyToken:
@@ -14837,7 +14972,7 @@ components:
         today_target: { type: integer, deprecated: true, description: Outflare's own warm-up only; always 0. }
         sent_7d: { type: integer, deprecated: true }
         inbox_7d: { type: integer, deprecated: true, description: Sent warm-up mail found in the recipient's inbox. }
-        spam_7d: { type: integer, deprecated: true, description: Found in spam, and moved to the inbox. }
+        spam_7d: { type: integer, deprecated: true, description: "Found in spam, and moved to the inbox." }
         missing_7d: { type: integer, deprecated: true, description: Not found within two days. }
         failed_7d: { type: integer, deprecated: true, description: Warm-up sends the mailbox's SMTP server refused. }
         last_error: { type: [string, "null"], deprecated: true, description: Why the latest warm-up send failed. }
@@ -14969,7 +15104,7 @@ components:
             error: { type: integer }
             paused: { type: integer }
             verifying: { type: integer }
-        daily_capacity: { type: integer, description: Sum of the daily limits of active mailboxes, held to the domain cap. 0 while paused. }
+        daily_capacity: { type: integer, description: "Sum of the daily limits of active mailboxes, held to the domain cap. 0 while paused." }
         sent_24h: { type: integer }
         sent_7d: { type: integer }
         replies_7d: { type: integer, description: Replies from people to the domain's mailboxes. }
@@ -15062,7 +15197,7 @@ components:
             paused: { type: integer }
             verifying: { type: integer }
         domains: { type: array, items: { type: string }, description: Domains of its mailboxes. }
-        daily_capacity: { type: integer, description: Sum of the daily limits of active mailboxes, held to the server cap. 0 while paused. }
+        daily_capacity: { type: integer, description: "Sum of the daily limits of active mailboxes, held to the server cap. 0 while paused." }
         sent_24h: { type: integer }
         sent_7d: { type: integer }
         replies_7d: { type: integer }
@@ -15387,11 +15522,11 @@ components:
         status: { type: string, enum: [active, paused, archived], description: "paused: none of its sequences send. archived: paused and hidden from the default list." }
         brand_id: { type: [string, "null"], format: uuid, description: "The brand the project markets, or null when it is not one brand's. Everything in the project has its brand." }
         offer: { type: string, description: What is sold. }
-        audience: { type: string, description: Who buys it, in words. }
-        market: { type: string, description: Where, and in which language. }
+        audience: { type: string, description: "Who buys it, in words." }
+        market: { type: string, description: "Where, and in which language." }
         brief: { type: string, description: "Everything else, in Markdown: messaging, proof, objections, words to avoid." }
         icp: { $ref: "#/components/schemas/ICP" }
-        brief_version: { type: integer, description: Bumped on every change to offer, audience, market, brief or icp. }
+        brief_version: { type: integer, description: "Bumped on every change to offer, audience, market, brief or icp." }
         brief_updated_at: { type: string, format: date-time }
         daily_send_limit: { type: [integer, "null"], description: "Most cold sends from all of the project's sequences together in any 24 hours. Null is no project limit." }
         counts:
@@ -15412,7 +15547,7 @@ components:
       properties:
         company: { type: string, description: The company's name. }
         website: { type: string, description: "Its main site, such as acme.com." }
-        about: { type: string, description: What the company does, in a few sentences. }
+        about: { type: string, description: "What the company does, in a few sentences." }
         goals: { type: string, description: "What the person wants from Outflare, such as 20 demos a month from US fintech." }
         voice: { type: string, description: "How emails should sound: tone, length, sign-off." }
         rules: { type: string, description: Things never to do. }
@@ -15440,7 +15575,7 @@ components:
         id: { $ref: "#/components/schemas/OnboardingStepId" }
         title: { type: string }
         detail: { type: string }
-        done: { type: boolean, description: The workspace already has it, however it was added. }
+        done: { type: boolean, description: "The workspace already has it, however it was added." }
         skipped: { type: boolean, description: A person left it for later. A done step is never skipped. }
         walkthrough: { type: boolean, description: "Part of the full-page walk-through; false for steps left to Home's checklist, such as inviting the team." }
         page: { type: string, description: "The dashboard page that does the step, such as /acme/brands." }
@@ -15518,7 +15653,7 @@ components:
               website: { type: string }
               platforms: { type: array, items: { type: string } }
               summary: { type: string, description: The first line of the brand's about. }
-        memories: { type: array, items: { $ref: "#/components/schemas/Memory" }, description: Pinned memories first, then the 30 most recent. }
+        memories: { type: array, items: { $ref: "#/components/schemas/Memory" }, description: "Pinned memories first, then the 30 most recent." }
         memory_count: { type: integer, description: "Every memory the caller can see; search the rest with GET .../memories?q=." }
         projects:
           type: array
@@ -15532,7 +15667,7 @@ components:
               brand_id: { type: [string, "null"], format: uuid }
               brief_version: { type: integer }
               has_brief: { type: boolean }
-        markdown: { type: string, description: The company context and memories as one Markdown document, ready to put in a prompt. }
+        markdown: { type: string, description: "The company context and memories as one Markdown document, ready to put in a prompt." }
     Memory:
       type: object
       required: [id, kind, text, project_id, brand_id, pinned, created_by, created_by_id, mission_id, created_at, updated_at]
@@ -15551,7 +15686,7 @@ components:
     MemoryInput:
       type: object
       properties:
-        text: { type: string, minLength: 1, maxLength: 500, description: One lasting fact, preference or decision. }
+        text: { type: string, minLength: 1, maxLength: 500, description: "One lasting fact, preference or decision." }
         kind: { type: string, enum: [preference, decision, fact, feedback], description: Defaults to fact. }
         project_id: { type: [string, "null"], format: uuid, description: The project it is about; null for the whole workspace. }
         brand_id: { type: [string, "null"], description: "The brand it is true for: a brand's id or handle. Null with no project: true for the whole company. Ignored with project_id, whose brand it takes." }
@@ -15580,9 +15715,9 @@ components:
               code:
                 type: string
                 description: Stable; new codes may be added.
-                enum: [no_mailboxes, none_ready, mailbox_error, domain_critical, server_paused, connection_broken, connection_requested, approval_waiting, mission_paused, allocation_short, infra_plan_waiting, unread_replies, context_missing]
+                enum: [no_mailboxes, none_ready, mailbox_error, domain_critical, server_paused, connection_broken, connection_requested, approval_waiting, mission_paused, allocation_short, infra_plan_waiting, unread_replies, context_missing, analytics_site_unmapped, brand_without_analytics]
               severity: { type: string, enum: [critical, warning, info] }
-              area: { type: string, enum: [mailboxes, domains, servers, connectors, missions, sequences, infrastructure, inbox, context] }
+              area: { type: string, enum: [mailboxes, domains, servers, connectors, missions, sequences, infrastructure, inbox, context, analytics] }
               title: { type: string }
               detail: { type: string, description: What it means and how to fix it. }
               count: { type: integer }
@@ -15787,7 +15922,7 @@ components:
       type: object
       additionalProperties: false
       properties:
-        type: { type: string, description: Only when adding. person, account or a type from the catalog. }
+        type: { type: string, description: "Only when adding. person, account or a type from the catalog." }
         name: { type: string, maxLength: 500 }
         brand_id: { type: [string, "null"], description: "A brand's id or handle, or null for a record every brand shares." }
         origin: { $ref: "#/components/schemas/RecordOrigin" }
@@ -15975,7 +16110,7 @@ components:
         id: { type: string, format: uuid }
         name: { type: string, example: Repocket }
         handle: { type: string, example: repocket, description: "Short name for URLs and API calls (?brand=repocket). Unique in the workspace." }
-        website: { type: string, example: repocket.com, description: The brand's main website, its point of truth. }
+        website: { type: string, example: repocket.com, description: "The brand's main website, its point of truth." }
         domains: { type: array, items: { type: string }, description: "Every domain that belongs to the brand, the website first. Analytics and SEO reports for these domains are the brand's." }
         platforms: { type: array, items: { type: string, enum: [web, ios, android, tv, desktop, console, extension, api] } }
         links: { type: array, items: { $ref: "#/components/schemas/BrandLink" }, description: "Where else the brand lives: app store listings, socials, docs." }
@@ -16106,7 +16241,7 @@ components:
         market: { type: string }
         icp: { $ref: "#/components/schemas/ICP" }
         brief: { type: string }
-        markdown: { type: string, description: Everything above as one Markdown document, ready to put in a prompt. }
+        markdown: { type: string, description: "Everything above as one Markdown document, ready to put in a prompt." }
     ProjectMembers:
       type: object
       properties:
@@ -16145,7 +16280,7 @@ components:
         id: { type: string, format: uuid }
         name: { type: string, description: "The name recipients see, e.g. Ana Smith." }
         kind: { type: string, enum: [person, persona, shared] }
-        user_id: { type: [string, "null"], format: uuid, description: The workspace member this sender is, for kind person. }
+        user_id: { type: [string, "null"], format: uuid, description: "The workspace member this sender is, for kind person." }
         status: { type: string, enum: [active, retired] }
         team_ids: { type: array, items: { type: string, format: uuid }, description: Empty for a shared sender any team may use. }
         mailboxes: { type: integer }
@@ -16246,7 +16381,7 @@ components:
         mailboxes: { type: integer }
         campaigns: { type: integer }
         unconfirmed: { type: integer, description: Attaches the platform does not show yet. }
-        conflicts: { type: integer, description: Mailboxes on more than one campaign, or on a campaign they are not allocated to. }
+        conflicts: { type: integer, description: "Mailboxes on more than one campaign, or on a campaign they are not allocated to." }
     CampaignLink:
       type: object
       description: A platform campaign a sequence runs as. The platform owns its status, steps and leads; Outflare decides its mailboxes.
@@ -16287,7 +16422,7 @@ components:
         priority: { type: string, enum: [low, normal, high], description: "Higher priority may take mailboxes from lower, down to their min_daily. An API token cannot go above its max_priority." }
         target_daily: { type: [integer, "null"], minimum: 1, description: "Sends a day to allocate mailboxes for. Null uses daily_new_limit times the number of steps; with neither, no mailboxes are allocated automatically." }
         min_daily: { type: [integer, "null"], minimum: 1, description: Capacity a higher-priority sequence may never take below. }
-        allocation_mode: { type: [string, "null"], enum: [suggest, automatic, null], description: Null follows the team, then the workspace. }
+        allocation_mode: { type: [string, "null"], enum: [suggest, automatic, null], description: "Null follows the team, then the workspace." }
         preferred_sender_ids: { type: array, items: { type: string, format: uuid }, description: Senders to use first. Replaces the list when sent. }
     StepInput:
       type: object
@@ -16364,7 +16499,7 @@ components:
         id: { type: string, format: uuid }
         domain: { type: string, example: links.acme.com }
         status: { type: string, enum: [pending, verified, failed], description: "pending until the CNAME is first seen; failed when a verified domain stops pointing here." }
-        error: { type: string, description: What to fix, when not verified. }
+        error: { type: string, description: "What to fix, when not verified." }
         target: { type: string, description: The host the CNAME record must point to. }
         last_checked_at: { type: [string, "null"], format: date-time }
         verified_at: { type: [string, "null"], format: date-time }
@@ -16406,7 +16541,7 @@ components:
         body: { type: string }
         message_id: { type: string, description: The Message-ID header. }
         status: { type: string, enum: [sending, sent, failed, blocked, unknown] }
-        error: { type: [string, "null"], description: SMTP error, or the policy reason for a blocked message. }
+        error: { type: [string, "null"], description: "SMTP error, or the policy reason for a blocked message." }
         created_at: { type: string, format: date-time }
         sent_at: { type: [string, "null"], format: date-time }
     InboundMessage:
@@ -16451,7 +16586,7 @@ components:
         category_confidence: { type: [number, "null"], minimum: 0, maximum: 1, description: How sure whoever labelled it was. Rules and people are 1. }
         category_reason: { type: [string, "null"], description: "Why it got its label, in a few words (an objection's reason, say)." }
         details: { type: object, additionalProperties: true, description: "Details read from the reply: a return date, a referred contact." }
-        needs_review: { type: boolean, description: The label is unsure, or an unsure opt-out was acted on; a person should check. }
+        needs_review: { type: boolean, description: "The label is unsure, or an unsure opt-out was acted on; a person should check." }
         classified_at: { type: [string, "null"], format: date-time }
         project_id: { type: [string, "null"], format: uuid, description: The project of its sequence or mailbox. }
         brand_id: { type: [string, "null"], format: uuid, description: The brand of its sequence or mailbox. }
@@ -16517,7 +16652,7 @@ components:
             need_attention: { type: integer, description: Domains whose health is warning or critical. }
         sent_24h: { type: integer }
         sent_7d: { type: integer }
-        replies_7d: { type: integer, description: Replies from people, not auto-replies or bounces. }
+        replies_7d: { type: integer, description: "Replies from people, not auto-replies or bounces." }
         bounces_7d: { type: integer }
         unread_replies: { type: integer, description: "Unread replies not yet marked done." }
         active_sequences: { type: integer }
@@ -16545,7 +16680,7 @@ components:
             for the supplier to make a Google app password. imported.
             failed: see import_error.
         import_error: { type: [string, "null"] }
-        mailbox_id: { type: [string, "null"], format: uuid, description: The Outflare mailbox, once imported. }
+        mailbox_id: { type: [string, "null"], format: uuid, description: "The Outflare mailbox, once imported." }
         mailbox_status: { type: [string, "null"], description: "The Outflare mailbox's status: verifying, active, paused or error." }
         imported_at: { type: [string, "null"], format: date-time }
         updated_at: { type: string, format: date-time }
@@ -16746,7 +16881,7 @@ components:
       required: [setup_by, ready_on]
       properties:
         setup_by: { type: string, format: date-time, description: Buying and DNS done by this date. }
-        ready_on: { type: string, format: date-time, description: The earliest every mailbox can be ready, if warm-up goes well. }
+        ready_on: { type: string, format: date-time, description: "The earliest every mailbox can be ready, if warm-up goes well." }
     InfraPlanInput:
       type: object
       properties:
@@ -16759,7 +16894,7 @@ components:
         provider: { type: string, enum: [google, microsoft] }
         domain_count: { type: integer, minimum: 1, maximum: 200 }
         mailboxes_per_domain: { type: integer, minimum: 1, maximum: 10 }
-        brand: { type: string, maxLength: 60, description: Domain names are made from it, e.g. getacme.com, acmehq.com. }
+        brand: { type: string, maxLength: 60, description: "Domain names are made from it, e.g. getacme.com, acmehq.com." }
         personas: { type: array, items: { $ref: "#/components/schemas/InfraPersona" }, maxItems: 20 }
         domains: { type: array, items: { type: string }, description: Domain names you chose. The rest are suggested from brand. }
         ready_by: { type: [string, "null"], format: date }
@@ -16797,7 +16932,7 @@ components:
       properties:
         id: { type: string, format: uuid }
         kind: { type: string, enum: [domain, mailbox] }
-        name: { type: string, description: The domain, or the mailbox's address. }
+        name: { type: string, description: "The domain, or the mailbox's address." }
         domain: { type: string }
         owned: { type: boolean, description: The workspace already had this domain. }
         first_name: { type: string }
@@ -16806,7 +16941,7 @@ components:
           type: string
           enum: [planned, buying, dns, connecting, done, failed, cancelled]
           description: "The build: planned, buying (ordered, or waiting for you to buy), dns (waiting for SPF, DKIM and DMARC), connecting (waiting for the mailbox), done."
-        detail: { type: string, description: What is left to do, in plain words. }
+        detail: { type: string, description: "What is left to do, in plain words." }
         available: { type: [boolean, "null"], description: The supplier's answer to the quote. }
         price_cents: { type: [integer, "null"], format: int64 }
         mailbox_id: { type: [string, "null"], format: uuid }
@@ -16827,7 +16962,7 @@ components:
         provider: { type: string, enum: [google, microsoft] }
         domain_count: { type: integer, minimum: 1, maximum: 200 }
         mailboxes_per_domain: { type: integer, minimum: 1, maximum: 10 }
-        brand: { type: string, maxLength: 60, description: Domain names are made from it, e.g. getacme.com, acmehq.com. }
+        brand: { type: string, maxLength: 60, description: "Domain names are made from it, e.g. getacme.com, acmehq.com." }
         personas: { type: array, items: { $ref: "#/components/schemas/InfraPersona" }, maxItems: 20 }
         ready_by: { type: [string, "null"], format: date }
         warmup_days: { type: integer, minimum: 7, maximum: 60 }
@@ -16859,7 +16994,7 @@ components:
           required: [domains, mailboxes]
           properties:
             domains: { type: object, additionalProperties: { type: integer } }
-            mailboxes: { type: object, additionalProperties: { type: integer }, description: Build stage until connected, then lifecycle stage. }
+            mailboxes: { type: object, additionalProperties: { type: integer }, description: "Build stage until connected, then lifecycle stage." }
         items: { type: array, items: { $ref: "#/components/schemas/InfraPlanItem" }, description: Only on GET of one plan. }
         created_by: { type: [string, "null"], format: uuid }
         approved_by: { type: [string, "null"], format: uuid }
