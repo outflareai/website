@@ -8668,6 +8668,79 @@ paths:
               schema: { $ref: "#/components/schemas/Record" }
         "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/records/duplicates:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listRecordDuplicates
+      x-outflare-access: { scope: customers.read, brand_limited: true }
+      summary: List possible duplicates
+      description: |
+        Scope: customers.read. Pairs of records that may be the same human, because they share an email or phone,
+        newest first, with both records. open pairs can be merged (POST .../records/{record}/merge), linked or
+        dismissed; blocked pairs both have their own user id, so they are two accounts in your product and can only be
+        linked or dismissed. Default status open and blocked.
+      tags: [records]
+      parameters:
+        - { name: status, in: query, description: "Comma-separated: open, blocked, merged, linked, dismissed; or all.", schema: { type: string } }
+        - { name: type, in: query, description: "A record type's key, such as person.", schema: { type: string } }
+        - { name: record, in: query, description: Only pairs with this record., schema: { type: string, format: uuid } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
+        - { name: before, in: query, schema: { type: string } }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
+      responses:
+        "200":
+          description: Pairs.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, next_before, next_cursor]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/RecordDuplicate" } }
+                  next_before: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/records/duplicates/{candidate}/dismiss:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: candidate, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: dismissRecordDuplicate
+      x-outflare-access: { scope: customers.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Not the same human
+      description: "Scope: customers.manage. The pair is not asked about again."
+      tags: [records]
+      responses:
+        "200":
+          description: The pair.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/RecordDuplicate" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/records/duplicates/{candidate}/link:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: candidate, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: linkRecordDuplicate
+      x-outflare-access: { scope: customers.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: The same human, kept apart
+      description: |
+        Scope: customers.manage. Links the two records as the same human (a same_human link) without merging them, such
+        as one person with two accounts in your product.
+      tags: [records]
+      responses:
+        "200":
+          description: The pair.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/RecordDuplicate" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/records/lookup:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
@@ -8906,6 +8979,55 @@ paths:
               schema: { $ref: "#/components/schemas/RecordRelationship" }
         "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/records/{record}/merge:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { $ref: "#/components/parameters/RecordID" }
+    post:
+      operationId: mergeRecords
+      x-outflare-access: { scope: customers.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Merge a duplicate into this record
+      description: |
+        Scope: customers.manage. Merges from into this record, which is kept. from's identities, links, product events
+        and consents move here; its attributes fill in what this record lacks, or replace a value a lower-precedence
+        source set, and lists such as companies are joined. from is kept, archived, with merged_into set, so its
+        history and old links still lead here. Records of different types, or two records with their own user ids
+        (two accounts in your product), are refused with merge_refused: link those instead.
+      tags: [records]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [from]
+              properties:
+                from: { type: string, format: uuid, description: The record merged into this one. }
+                version: { type: integer, description: "This record's version, as read." }
+      responses:
+        "200":
+          description: The record kept.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [record, merged_from, moved]
+                properties:
+                  record: { $ref: "#/components/schemas/Record" }
+                  merged_from: { type: string, format: uuid }
+                  moved:
+                    type: object
+                    required: [identities, attributes, relationships, events, consents]
+                    properties:
+                      identities: { type: integer }
+                      attributes: { type: integer }
+                      relationships: { type: integer }
+                      events: { type: integer }
+                      consents: { type: integer }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/records/{record}/timeline:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
@@ -9031,7 +9153,9 @@ paths:
         RudderStack can point here as is. Send it from your servers: the token can change customer records.
 
         Each event is matched to a person: by userId (a new userId makes a new person, origin first_party), then by a
-        verified email in identify's traits (traits.email_verified true), then by anonymousId. An anonymous visitor's
+        verified email in identify's traits (traits.email_verified true), then by anonymousId. When someone proves an
+        email that a record without its own user id holds (an import, a CRM sync), that record is merged into them and
+        listed in merged; one with another user id is listed as a possible duplicate instead. An anonymous visitor's
         events wait unmatched and join the person when an identify links their anonymousId. Two userIds are never
         merged and an unverified email never matches anyone. identify's traits that match a person field in the
         catalog (firstName is first_name) are written with source first_party; the rest are kept on the event and
@@ -16171,6 +16295,7 @@ components:
               record_id: { type: [string, "null"], format: uuid, description: The person it was matched to; null for an anonymous visitor. }
               name: { type: string, description: Its catalog name. }
               ignored_traits: { type: array, items: { type: string }, description: Traits with no matching field, or a value the field refused. Add the field to keep them. }
+              merged: { type: array, items: { type: string, format: uuid }, description: "Records merged into this person because they proved they own an email those records held and those records had no user id of their own." }
               warnings: { type: array, items: { type: string } }
               error:
                 type: object
@@ -16198,6 +16323,20 @@ components:
         message_id: { type: [string, "null"] }
         occurred_at: { type: string, format: date-time }
         received_at: { type: string, format: date-time }
+    RecordDuplicate:
+      type: object
+      required: [id, record_type, reason, evidence, status, mergeable, records, decided_by, decided_at, created_at]
+      properties:
+        id: { type: string, format: uuid }
+        record_type: { type: string }
+        reason: { type: string, example: email, description: The kind of identity they share. }
+        evidence: { type: object, additionalProperties: true, description: "namespace, and verified: whether either holds it verified." }
+        status: { type: string, enum: [open, blocked, merged, linked, dismissed] }
+        mergeable: { type: boolean }
+        records: { type: array, items: { $ref: "#/components/schemas/Record" } }
+        decided_by: { type: [string, "null"], format: uuid }
+        decided_at: { type: [string, "null"], format: date-time }
+        created_at: { type: string, format: date-time }
     TimelineItem:
       type: object
       required: [kind, id, at, title, detail, source]
