@@ -36,14 +36,14 @@ On a Team or Enterprise plan, an owner adds the connector once under **Organizat
 
 ## ChatGPT
 
-Needs a plan with developer mode (Plus, Pro, Business, Enterprise or Edu).
+Set up on chatgpt.com.
 
-1. In ChatGPT, open **Settings → Apps & Connectors → Advanced settings** and turn on **Developer mode**.
-2. Back in **Apps & Connectors**, choose **Create**. Name it **Outflare**, paste `https://app.outflare.ai/mcp` as the MCP server URL and pick **OAuth**.
-3. ChatGPT sends you to Outflare: pick the workspace and approve.
-4. In a chat, choose **+ → Developer mode**, turn on Outflare and ask it something.
+1. In ChatGPT, open **Plugins**, click **+** and choose **Add custom MCP server**.
+2. Name it **Outflare**, paste `https://app.outflare.ai/mcp` as the **Server URL** and choose **OAuth** for authentication.
+3. Click **I understand and want to continue**, then **Create**. Install the Outflare plugin: ChatGPT sends you to Outflare to pick the workspace and approve.
+4. In a new chat, type **@**, pick **Outflare** and ask it something.
 
-ChatGPT moves these menus around from time to time. If a name doesn't match, look for Connectors or Apps.
+On a Business, Enterprise or Edu workspace, an admin first allows **Create plugins with MCPs** under **Workspace settings → Permissions & roles**. ChatGPT renames these menus from time to time; if one doesn't match, look for Plugins or Apps.
 
 ## Claude Code
 
@@ -85,12 +85,13 @@ An app that can't sign in can send an [API token](/docs/api/authentication/) ins
 
 ## What you approve
 
-When an app connects, Outflare shows who is asking and lets you choose:
+When an app connects, Outflare shows who is asking, the workspace it will work in (pick one if you are in more than one) and a switch for each thing it may do. Everything starts on except spending:
 
-- **The workspace** it works in, if you are in more than one.
-- **Run my marketing**: everything your role allows, such as importing leads, building lists, writing and starting sequences, answering replies, planning mailboxes and running [missions](/docs/agents/missions/).
-- **Read only**: it sees everything and changes nothing. Viewers can only give read-only access.
-- **Spending**: off unless you tick it. Left off, every purchase of domains or mailboxes waits for you to approve it in Outflare.
+- **See your workspace**: always on. It reads leads, sequences, replies, mailboxes and results.
+- **Company context and memories**, **Leads and lists**, **Sequences and projects**, **Replies**, **Mailboxes, domains and connectors** and **Missions**: turn off anything you don't want it to change. **Read only** turns them all off at once.
+- **Spend money**: off unless you switch it on. Left off, every purchase of domains or mailboxes waits for you to approve it in Outflare.
+
+You only see the switches your role allows; viewers can only give read access.
 
 Whatever you choose, a connected app can never invite or remove people, change the workspace, create API tokens, manage webhooks, edit the suppression list or approve its own missions. Every email still goes through the [policy check](/docs/concepts/policy-check/), and every change is in the audit log under the app's name.
 

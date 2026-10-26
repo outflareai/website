@@ -1490,8 +1490,12 @@ paths:
                 code_challenge: { type: string }
                 code_challenge_method: { type: string, enum: [S256] }
                 workspace_id: { type: string, description: The workspace's id or slug. }
-                access: { type: string, enum: [full, read] }
+                access: { type: string, enum: [full, read], description: "full or read, unless scopes is set." }
                 allow_spending: { type: boolean, description: "Also let the app approve spending money on domains and mailboxes (infrastructure.approve). Off by default." }
+                scopes:
+                  type: array
+                  items: { type: string }
+                  description: "The exact write scopes to give the app, from the workspace's full_scopes plus infrastructure.approve when can_spend. The role's read scopes are always included. When set, access and allow_spending are ignored."
                 brand: { type: string, description: "For a person kept to some brands: the brand (id or handle) the app is kept to. Required for them, ignored for everyone else." }
                 approve: { type: boolean, description: False declines; the app hears access_denied. }
       responses:
