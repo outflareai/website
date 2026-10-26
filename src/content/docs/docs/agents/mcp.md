@@ -38,7 +38,7 @@ Then configure it:
     - A reporting agent needs `workspace.read`, `mailboxes.read`, `leads.read`, `sequences.read` and `inbox.read`.
     - An agent that runs outreach also needs `leads.manage`, `sequences.manage` and `inbox.manage`, and `mailboxes.manage` to pause domains or change their limits.
     - To keep an agent inside one motion, create the token **for a project** (the project's page has a button for this) and add `projects.read`, plus `projects.manage` if it may edit the brief. It sees only that project and its records. See [Projects](/docs/guides/projects/#agents-and-project-tokens).
-    - To let it run [missions](/docs/agents/missions/), add `missions.read` and `missions.run` (the **Mission agent** preset). Never give it `missions.approve`.
+    - To let it run [missions](/docs/agents/missions/), add `missions.read` and `missions.run` (set **Missions** to **Change**). Never give it `missions.approve`.
     - For an outreach agent, also set its **sending limits**: a daily send budget across all the sequences it creates, the highest priority it may give a sequence, and whether it may take mailboxes from other sequences (off by default). See [Mailbox allocation](/docs/guides/mailbox-allocation/#agents).
 2. Add the server to your client. The token already says which workspace it belongs to.
 
