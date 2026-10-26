@@ -5,7 +5,7 @@ sidebar:
   order: 13
 ---
 
-<span class="pill shipped">Shipped</span> Sites, ownership checks and crawls, through the API and agents. The SEO pages in the app, the audit rules, the health score and the fixes list come next.
+<span class="pill shipped">Shipped</span> Sites, ownership checks, crawls and the audit, through the API and agents. The SEO pages in the app and the fixes list come next.
 
 Outflare reads your own websites with its crawler, [OutflareBot](/bot/), and records every page it finds: its HTTP status, where redirects lead, which pages ask not to be indexed, and which pages your robots.txt keeps crawlers away from. It needs no connector or API key. SEO tools like [DataForSEO and Ahrefs](/docs/integrations/seo/) add what others see of your site, and are separate.
 
@@ -46,6 +46,20 @@ Each page also shows how it was found (from the start page, a link, a sitemap or
 
 For each HTML page, Outflare also keeps what an audit checks: the title, meta description, canonical, h1, language and hreflang, the structured data types, the word count, images without alt text, the viewport tag, and a fingerprint that matches pages with the same words. It never stores the page's text. It also keeps every link on the page, with its anchor text, so you can see a page's links out with the status each one returned (a 404 is a broken link) and the pages that link to it. A page in your sitemap that nothing links to is an orphan. A meta refresh counts as a redirect, and links marked `nofollow`, `ugc` or `sponsored` are not followed.
 
+## The audit
+
+When a crawl ends, Outflare checks every page against 31 rules and gives the crawl a **health score** from 0 to 100: the share of its pages with no error. Each issue says why it matters and how to fix it.
+
+Issues are grouped by **URL template**, the path with the parts that change between sibling pages replaced by `*`, such as `/blog/*`. So 38 blog posts with no meta description show as one fix to one template, not 38 problems.
+
+| Kind | What the rules find |
+| --- | --- |
+| Errors | Broken pages and server errors, links to broken pages, a canonical that points to a broken page, a missing title |
+| Warnings | Redirect chains, several canonicals, noindex or robots-blocked pages in the sitemap, content only JavaScript adds, duplicate or extra titles, missing meta descriptions and h1s, thin and duplicate content, no viewport tag, orphan pages |
+| Notices | Links to redirects, canonicals pointing elsewhere, noindex pages, titles and descriptions too long or short, duplicate descriptions, extra h1s, images without alt text, no language, deep, slow or large pages |
+
+Duplicates count only among pages meant to be indexed: a page marked `noindex`, or whose canonical points elsewhere, is a declared copy. [The engine docs](https://github.com/outflareai/outflare/blob/main/docs/crawler.md#the-audit) list every rule id.
+
 ## Pages your firewall blocks, and pages built by JavaScript
 
 Two kinds of page can't be read as served. A firewall or bot protection (Cloudflare, Akamai, DataDome and the like) can answer OutflareBot with a `403` or a challenge page instead of your page. And some sites send an almost empty page and build it in the browser with JavaScript (React, Vue, Angular and the like), so read as served it has no title, words or links.
@@ -70,8 +84,10 @@ curl -X POST -H "Authorization: Bearer $TOKEN" https://app.outflare.ai/v1/worksp
 curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/workspaces/$WS/crawls/$CRAWL/pages?status=blocked"
 curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/workspaces/$WS/crawls/$CRAWL/pages?http_status=404"
 curl -H "Authorization: Bearer $TOKEN" https://app.outflare.ai/v1/workspaces/$WS/crawls/$CRAWL/pages/$PAGE
+curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/workspaces/$WS/crawls/$CRAWL/issues?severity=error"
+curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/workspaces/$WS/crawls/$CRAWL/issues/link_broken?template=/blog/*"
 ```
 
-Reading needs the `seo.read` scope; adding sites, checking ownership and crawling needs `seo.manage`. Agents use the MCP tools `add_seo_site`, `verify_seo_site`, `start_crawl`, `get_crawl`, `list_crawl_pages` and `get_crawl_page` (see [MCP](/docs/agents/mcp/)).
+Reading needs the `seo.read` scope; adding sites, checking ownership and crawling needs `seo.manage`. Agents use the MCP tools `add_seo_site`, `verify_seo_site`, `start_crawl`, `get_crawl`, `list_crawl_pages`, `get_crawl_page`, `list_crawl_issues` and `get_crawl_issue` (see [MCP](/docs/agents/mcp/)).
 
 On a self-hosted server, OutflareBot only visits public sites. Set `OUTFLARE_CRAWL_ALLOW_PRIVATE=true` to audit an intranet or a site in development.
