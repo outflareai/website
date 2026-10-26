@@ -27,7 +27,7 @@ Write the email once as a [template](/docs/guides/email-templates/), then send i
 curl -X POST "https://app.outflare.ai/v1/workspaces/$WS/emails" \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" \
   -H "Idempotency-Key: $(uuidgen)" \
-  -d '{"to": "ana@customer.com", "from": "Acme <billing@acme.com>",
+  -d '{"to": "ana@customer.example", "from": "Acme <billing@acme.example>",
        "template": "password-reset", "data": {"reset_url": "https://app.acme.com/r/abc"}}'
 ```
 
