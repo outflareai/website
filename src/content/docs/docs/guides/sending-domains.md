@@ -5,7 +5,7 @@ sidebar:
   order: 3
 ---
 
-<span class="pill shipped">Shipped</span> Domain list and detail pages, daily DNS and blocklist checks, issues with fixes, per-domain sending stats, and pausing and daily caps enforced by the policy check. Inbox placement from [warm-up](/docs/guides/warmup/) is summed per domain; reputation data from the mailbox providers themselves comes later.
+<span class="pill shipped">Shipped</span> Domain list and detail pages, daily DNS and blocklist checks, issues with fixes, per-domain sending stats, and pausing and daily caps enforced by the policy check. Reputation data from the mailbox providers themselves comes later.
 
 Cold email is won or lost per domain. Mailbox providers judge a domain on its authentication records, its blocklist standing and how its mail is received, so a single broken record or a bad list can hurt every mailbox on it. The **Domains** tab in the web app puts all of that in one place.
 

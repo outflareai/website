@@ -11,7 +11,6 @@ Every mailbox is graded **ok**, **warning** or **critical** (or **paused**) from
 
 - **Sign-in and inbox sync errors**, translated into plain words. For example "535 5.7.8" becomes "app password rejected", and a disabled account says it is suspended.
 - **Send failures** and **bounce rate**.
-- **Warm-up inbox placement**: how much warm-up mail lands in inbox, spam or nowhere.
 - **The domain's setup**: SPF, DKIM, DMARC and blocklists, from [sending domains](/docs/guides/sending-domains/).
 - **New mailboxes sending without warm-up.**
 

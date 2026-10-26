@@ -32,8 +32,10 @@ Not every task needs the strongest model. Under **Model for each task** you can 
 | **Planning** | Drafting a mission from your goal | The main model |
 | **Agent turns** | Outflare's agent starting a mission, answering you, acting on your decisions, or carrying on after you resume it | The main model |
 | **Routine check-ins** | Looking in on a running mission when nothing new came from you | The provider's cheaper model, when it costs less: Claude Sonnet 5.5 under Claude Opus 5.5 |
+| **Reply labelling** | Labelling replies to your outreach that the built-in rules can't place: interested, not now, out of office and so on | The provider's cheapest model: Claude Haiku 5.5 |
+| **Domain research** | Reading an unknown email domain's homepage to classify it | The provider's cheapest model: Claude Haiku 5.5 |
 
-Each list shows what the model costs, in US$ per million input/output tokens, and every call is priced at its own model's price. A choice belongs to the provider it was made for: switch provider and the tasks go back to their defaults.
+The cheaper defaults are Claude's; with another provider every task uses the main model until you pick one. Each list shows what the model costs, in US$ per million input/output tokens, and every call is priced at its own model's price. A choice belongs to the provider it was made for: switch provider and the tasks go back to their defaults.
 
 ![A model for each task: Sonnet for planning, Opus for agent turns, Haiku for routine check-ins](/screens/ai-model-tasks.png)
 
@@ -63,7 +65,7 @@ Outflare's agent reads text written by people outside your workspace: email repl
 | Endpoint | MCP tool | What |
 | --- | --- | --- |
 | `GET /v1/workspaces/{ws}/ai-settings` | `get_ai_settings` | The model in use, the connected providers, this month's spend and what's missing |
-| `PUT /v1/workspaces/{ws}/ai-settings` | `update_ai_settings` | Choose the connection and model, a model per task (`task_models`: `plan`, `turn`, `check_in`), prices and the monthly limit |
+| `PUT /v1/workspaces/{ws}/ai-settings` | `update_ai_settings` | Choose the connection and model, a model per task (`task_models`: `plan`, `turn`, `check_in`, `reply_labelling`, `classify_domain`), prices and the monthly limit |
 | `GET /v1/workspaces/{ws}/integrations/{id}/models` | `list_ai_models` | The models a connection's key can use |
 
 ```sh

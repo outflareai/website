@@ -97,7 +97,7 @@ export const milestones: Milestone[] = [
 		step: 9,
 		title: 'MCP server for agents',
 		status: 'shipped',
-		summary: 'Claude, Cursor and other MCP clients run a workspace through 48 tools over the API, held to the token\'s scopes and the send policy.',
+		summary: 'Claude, Cursor and other MCP clients run a workspace through 284 tools over the API, held to the token\'s scopes and the send policy.',
 		docs: '/docs/agents/mcp/',
 	},
 	{
@@ -111,7 +111,7 @@ export const milestones: Milestone[] = [
 		step: 11,
 		title: 'Warm-up',
 		status: 'shipped',
-		summary: 'Mailboxes warm each other up with a daily ramp, spam rescue and replies, and every mailbox and domain gets an inbox placement score.',
+		summary: 'Turn warm-up on in your connected EmailBison, Instantly or Smartlead account, and see each mailbox\'s warm-up score.',
 		docs: '/docs/guides/warmup/',
 	},
 	{
@@ -211,6 +211,13 @@ export const milestones: Milestone[] = [
 		status: 'shipped',
 		summary: 'One call says what changed on each website: headlines with their tool and dates, period on period, top movers, unusual days, SEO moves and the connector that fills each gap; a catalog of what can be asked, MCP prompts and compact answers.',
 		docs: '/docs/agents/analytics/',
+	},
+	{
+		step: 26,
+		title: 'Lifecycle email',
+		status: 'shipped',
+		summary: 'Receipts, password resets and onboarding email from your own Amazon SES, Postmark or Resend account: setup guides with a prompt your AI agent can follow, verified sending domains, versioned templates with live preview, delivery events and automatic suppression.',
+		docs: '/docs/guides/lifecycle-email/',
 	},
 	{
 		step: null,

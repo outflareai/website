@@ -84,11 +84,35 @@ SEO page, `GET /seo/history` and the overview read, so looking is free.
   snapshot before. `GET /analytics/overview` includes the same figures under
   `seo` for each website.
 
+## Is each brand growing?
+
+The **SEO overview** page, first in the SEO module, answers that for each
+[brand](/docs/guides/brands/) from what is already stored, so it is free.
+Each brand gets four answers, the last four whole weeks against the four
+before, each marked Growing, Falling or Steady (within 3%):
+
+- **Branded search:** clicks on searches that name the brand: its name, its
+  handle or its domains' names, such as "repocket" for repocket.com. It needs
+  Google Search Console connected on your own account.
+  Consoles hide rare searches, so this is a floor, not a total.
+- **Visitors**, from your analytics tools (GA4, Plausible and the like), and
+  search clicks. A website two tools both measure is counted once.
+- **Domain rating** and **referring domains and backlinks**, from the weekly
+  snapshots above. Ahrefs DR is used when Ahrefs is connected.
+
+Below them are the brand's audited sites with their [health score](/docs/guides/site-audits/)
+and its open fixes. Websites no brand claims show as shared. Pick a brand in
+the brand switcher to see only that one. An answer reads "Not enough data"
+until its tool has synced eight weeks, or two snapshots four weeks apart.
+
 ## API
 
 ```sh
 # SEO connections, their domains, budget and snapshot status
 curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/seo"
+
+# Is each brand growing in search: free
+curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/seo/overview?brand=repocket&weeks=12"
 
 # Stored snapshots: free, never calls the provider
 curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/seo/history?report=overview&host=example.com"
@@ -113,6 +137,9 @@ Reading needs `analytics.read`; settings and snapshots need
 
 ## MCP
 
+- `get_seo_overview`: each brand's search growth (branded search, visitors,
+  domain rating, links) with its trends, site health and open fixes. Free;
+  start here when asked how SEO is going.
 - `list_seo`: connections, domains, budget left and snapshot status.
 - `get_seo_history`: stored snapshots, with each keyword's previous position.
   Use this first; it is free.

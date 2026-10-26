@@ -22,6 +22,9 @@ Outflare remembers the business, not the conversation.
 
 Chat transcripts are never stored. When you tell an agent something lasting, it saves it as a one-line memory and tells you, so you can correct it. Memories are notes for agents, never permissions: your limits, token scopes and the send policy still decide what runs.
 
+
+If you market several brands from one workspace, each [brand](/docs/guides/brands/) adds its own context and memories on top of the company's. Agents ask for a brand with `get_context` and `brand`, and read only that brand's memories plus the company's.
+
 ## The Company page
 
 Settings → **Company** shows everything Outflare knows. Edit the context, and pin, correct or forget any memory, including ones agents saved. Each memory says who saved it and whether it came from a mission.
@@ -80,4 +83,4 @@ curl -X POST "$OUTFLARE_URL/v1/workspaces/$WS/memories" -H "Authorization: Beare
 outflare get-status
 ```
 
-Reading needs the `workspace.read` scope. Editing the context and memories needs `context.manage`, which the **Outreach agent** and **Mission agent** token presets include. An edit sent with an old `version` fails with `409 context_changed`, so a person and an agent never overwrite each other.
+Reading needs the `workspace.read` scope. Editing the context and memories needs `context.manage`, which **Can make changes** on a token includes. An edit sent with an old `version` fails with `409 context_changed`, so a person and an agent never overwrite each other.

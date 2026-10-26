@@ -120,7 +120,7 @@ The mission page shows what the agent is doing now: whether changes run, wait or
 
 The [MCP server](/docs/agents/mcp/) has a tool for each step: `plan_mission` (from a goal), `create_mission`, `use_mission` (from then on every call carries the mission), `get_mission`, `request_connector`, `submit_mission_plan`, `post_mission_update`, `get_mission_action`, `pause_mission`, `stop_mission` and `complete_mission`, plus `approve_mission`, `resume_mission` and `decide_mission_action` for approver tokens. Set `OUTFLARE_MISSION` to start the server inside a mission.
 
-Give the agent the **Mission agent** preset when you create its token: the outreach scopes plus `missions.read` and `missions.run`.
+When you create the agent's token, choose **Can make changes**: it includes `missions.read` and `missions.run`, never `missions.approve`.
 
 ## API
 

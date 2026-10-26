@@ -15,7 +15,7 @@ curl -X POST https://outflare.example.com/v1/workspaces/$WS/webhooks \
   -d '{"url": "https://example.com/hooks/outflare", "events": ["lead.replied", "lead.bounced", "mailbox.auto_paused"]}'
 ```
 
-The answer includes the endpoint's signing secret (`whsec_...`). Keep it with your receiver; `GET .../webhooks/{id}/secret` shows it again. Then send a test event and see how your receiver answered:
+To hear about some reply labels only, add `categories` with labels or groups, such as `["hot"]` for interested, meeting booked and question; events about replies with other labels are then not sent to it, and other events are unaffected. The answer includes the endpoint's signing secret (`whsec_...`). Keep it with your receiver; `GET .../webhooks/{id}/secret` shows it again. Then send a test event and see how your receiver answered:
 
 ```sh
 curl -X POST https://outflare.example.com/v1/workspaces/$WS/webhooks/$HOOK/test -H "Authorization: Bearer $OUTFLARE_TOKEN"
@@ -113,6 +113,7 @@ Every type is also in the API document, under `webhooks:` and in the `WebhookEve
 | `lead.unsubscribed` | A lead opted out (unsubscribe link, header or a reply asking to stop) and was suppressed. |
 | `inbox.replied` | Someone in the workspace (or an agent) replied to an inbound message. |
 | `inbox.updated` | An inbound message was marked read or its category changed. |
+| `inbox.classified` | A reply got a label, or a different one, from the rules, the AI, a person or an agent. data has `category`, `group`, `previous_category`, `category_source`, `confidence`, `needs_review`, `source` and the ids. Endpoints with `categories` hear only those labels. |
 
 ### Deliverability
 

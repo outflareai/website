@@ -33,6 +33,8 @@ Rules that keep tokens safe to hand to automation:
 - A token holds only the scopes it was given, and never more than the person who created it has. Any scope in an area includes reading it, so `leads.manage` can list leads too; it cannot read mailboxes.
 - `GET /v1/whoami` tells a token its workspace (ID, slug and name), project, scopes and expiry, so a script holding only a token can find everything else.
 - Actions taken with a token are recorded in the audit log under the token's name.
+- Rename a token or change its scopes with `PATCH /v1/workspaces/{ws}/api-tokens/{id}` (`name`, `scopes`). Adding a scope needs the caller to have it; taking one away is always allowed; a token can't change itself.
+- A `403` for a missing scope says how to get it, with a link to the token (or, for a connected AI app, to its switches).
 - Revoke a token with `DELETE /v1/workspaces/{ws}/api-tokens/{id}`. List active tokens, with when each was last used, with `GET /v1/workspaces/{ws}/api-tokens`.
 
 See [Workspaces and access](/docs/guides/workspaces-and-access/#api-tokens) for the list of scopes.

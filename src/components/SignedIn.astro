@@ -1,0 +1,16 @@
+---
+// Shows "Dashboard" in place of Sign in and Sign up to people signed in to
+// app.outflare.ai. The app keeps a cookie on outflare.ai while someone is
+// signed in, outflare_signed_in=1 (the engine's OUTFLARE_SIGNED_IN_COOKIE_DOMAIN).
+// It says only that: the session itself is an HttpOnly cookie that only
+// app.outflare.ai gets, and this page never calls the app. Mark elements
+// data-signed-out (shown by default, and without scripts) or data-signed-in.
+// Runs in <head> so the right links show from the first paint.
+---
+
+<script is:inline>
+	try { if (/(?:^|;\s*)outflare_signed_in=1(?:;|$)/.test(document.cookie)) document.documentElement.dataset.signedIn = ''; } catch {}
+</script>
+<style is:global>
+	html[data-signed-in] [data-signed-out], html:not([data-signed-in]) [data-signed-in] { display: none !important; }
+</style>

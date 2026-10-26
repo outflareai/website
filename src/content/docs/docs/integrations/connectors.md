@@ -9,6 +9,8 @@ sidebar:
 
 Outflare is the brain of your outbound. Connectors are how it reaches everything else. **Nothing has to be connected to run:** add mailboxes directly (IMAP/SMTP, CSV, or Google and Microsoft sign-in), import leads from a CSV, and addresses are checked with free built-in checks. Connectors add to that.
 
+**Every connection is your own account.** Outflare never lends its own API keys for connectors or AI models, on Outflare Cloud or anywhere else: you add your own key, or sign in to your own account, for each service a feature uses. A feature that needs a service you haven't connected stays off until you connect it.
+
 ## What can be connected
 
 Ready to connect today:
@@ -48,6 +50,7 @@ If the server has no OAuth app for a provider, the dialog says so and asks for t
 | Google Calendar | Google | |
 | Outlook Calendar | Microsoft | |
 | HubSpot | HubSpot | Private app token |
+| Attio | Attio | Access token |
 | PostHog | PostHog Cloud, no app to register | Personal API key (also self-hosted) |
 | Calendly | Calendly | Personal access token |
 | Apollo | Apollo | Master API key |
@@ -72,6 +75,7 @@ Signing in needs an app registered with the provider. Self-hosters set `CONNECTO
 | Provider | Register the app at | Variables |
 | --- | --- | --- |
 | HubSpot | developers.hubspot.com, Apps, Create app | `CONNECTOR_HUBSPOT_CLIENT_ID`, `_CLIENT_SECRET` |
+| Attio | build.attio.com, create an app with read access (scopes are set on the app) | `CONNECTOR_ATTIO_CLIENT_ID`, `_CLIENT_SECRET` |
 | Calendly | developer.calendly.com, scopes `users:read` and `scheduled_events:read` | `CONNECTOR_CALENDLY_CLIENT_ID`, `_CLIENT_SECRET` |
 | Apollo | Apollo, Settings, Integrations, API, OAuth registration | `CONNECTOR_APOLLO_CLIENT_ID`, `_CLIENT_SECRET` |
 | Ahrefs | Ahrefs, Account settings, Ahrefs Connect (Ahrefs approves production access) | `CONNECTOR_AHREFS_CLIENT_ID`, `_CLIENT_SECRET` |

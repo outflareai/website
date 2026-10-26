@@ -1,18 +1,21 @@
 ---
 import Marketing from '../layouts/Marketing.astro';
-import { app, milestones, statusLabel, repo, site } from '../data/project';
+import { app, repo, site } from '../data/project';
+import { modules, moduleStatusLabel } from '../data/modules';
 
-const shipped = milestones.filter((m) => m.status === 'shipped').length;
-const v1 = milestones.filter((m) => m.step !== null).length;
+const liveModules = modules.filter((m) => m.status === 'live').length;
 
-// Real screenshots of the web app (outflare web/), taken with demo data.
+// Real screenshots of the web app (outflare web/), taken from a local demo
+// workspace where every name and domain is fictional (.example).
 const shots = [
-	{ id: 'overview', label: 'Overview', alt: 'Overview: sends in the last day and week, reply and bounce rates, mailbox health and outreach totals' },
-	{ id: 'inbox-item', label: 'Inbox', alt: 'Inbox: replies from every mailbox, with one conversation open and a reply box sending from the same mailbox' },
-	{ id: 'sequences-item', label: 'Sequences', alt: 'A sequence: leads being emailed, sends, replies and opt-outs, and its steps with template variables' },
-	{ id: 'mailboxes', label: 'Mailboxes', alt: 'Mailboxes: 18 inboxes with status, warm-up inbox placement, daily warm-up volume and daily limits' },
-	{ id: 'domains', label: 'Domains', alt: 'Domains: each sending domain with health, SPF, DKIM and DMARC, active mailboxes, sends, bounces, replies and inbox placement' },
+	{ id: 'analytics', label: 'Analytics', alt: 'Website analytics: visitors, page views, visits, search clicks and impressions for one website from Google Analytics, Search Console and PostHog, with an Ahrefs SEO line' },
+	{ id: 'seo', label: 'SEO', alt: 'SEO: an Ahrefs connection with its monthly budget, and the keywords the site ranks for with position, change, searches and estimated visits' },
+	{ id: 'missions', label: 'Missions', alt: 'Missions: a box to start a mission from a goal, counts of running missions and plans to approve, and a list of missions with their status and goal' },
+	{ id: 'inbox-item', label: 'Inbox', alt: 'Inbox: conversations sorted by meaning, with one open and a reply box sending from the same address' },
+	{ id: 'connectors', label: 'Connectors', alt: 'Connectors: Ahrefs, Apollo, Google Analytics, Google Calendar, Google Search Console and HubSpot, each connected' },
 ];
+
+const worksWith = ['Google Analytics', 'Search Console', 'HubSpot', 'Ahrefs', 'PostHog', 'Google Workspace', 'Microsoft 365', 'Claude', 'ChatGPT', 'Cursor'];
 
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 // Tiny highlighter for the hand-written snippets below: //, # comments,
@@ -38,16 +41,12 @@ const snippets = [
 		id: 'mcp',
 		label: 'Claude (MCP)',
 		file: 'terminal',
-		code: `# Give Claude Code a workspace, held to the token's scopes
-$ claude mcp add outflare \\
-    -e OUTFLARE_URL=https://outflare.example.com \\
-    -e OUTFLARE_TOKEN=oft_... \\
-    -e OUTFLARE_WORKSPACE=<workspace id> \\
-    -- node ./outflare/mcp/dist/index.js
+		code: `# Connect Claude Code to your workspace: one URL, then approve in the browser
+$ claude mcp add --transport http outflare https://app.outflare.ai/mcp
 
 # Then just ask
-> Which mailboxes are under 90% inbox placement?
-> Import leads.csv and preview step 1 for 3 leads.`,
+> What changed on our website this week, and why?
+> Which keywords did we lose, and which pages do they point to?`,
 	},
 	{
 		id: 'ts',
@@ -56,39 +55,36 @@ $ claude mcp add outflare \\
 		code: `import { createClient } from '@outflare/sdk';
 
 const gtm = createClient({
-  baseUrl: 'https://outflare.example.com',
-  token: process.env.OUTFLARE_TOKEN, // mailboxes.read
+  baseUrl: 'https://app.outflare.ai',
+  token: process.env.OUTFLARE_TOKEN, // analytics.read
 });
 
-// Which mailboxes need attention?
-const { data } = await gtm.GET('/v1/workspaces/{ws}/mailboxes', {
-  params: { path: { ws }, query: { status: 'error' } },
+// What moved on each website?
+const { data } = await gtm.GET('/v1/workspaces/{ws}/analytics/changes', {
+  params: { path: { ws } },
 });
 
-for (const m of data.data) console.log(m.email, m.status_reason);`,
+for (const w of data.websites) console.log(w.host, w.headline.join(' '));`,
 	},
 	{
 		id: 'curl',
 		label: 'curl',
 		file: 'terminal',
-		code: `# Import 200 reseller inboxes in one call
-$ curl -X POST "$GTM/v1/workspaces/$WS/mailboxes/import" \\
-    -H "Authorization: Bearer $OUTFLARE_TOKEN" \\
-    -H "Content-Type: text/csv" --data-binary @inboxes.csv
-
-{"created": 200, "updated": 0, "errors": []}`,
+		code: `# Every keyword a site ranks for, with the change since last week
+$ curl "$GTM/v1/workspaces/$WS/seo/history?report=keywords" \\
+    -H "Authorization: Bearer $OUTFLARE_TOKEN"`,
 	},
 ];
 
 const endpoints = [
-	{ m: 'POST', path: '/mailboxes/import', id: 'importMailboxes', what: 'Bulk import inboxes from CSV' },
-	{ m: 'GET', path: '/mailboxes', id: 'listMailboxes', what: 'Status, warm-up and limits' },
+	{ m: 'GET', path: '/analytics/overview', id: 'getAnalyticsOverview', what: 'Every website, every tool' },
+	{ m: 'GET', path: '/analytics/changes', id: 'getAnalyticsChanges', what: 'What changed, and where' },
+	{ m: 'GET', path: '/seo/history', id: 'getSEOHistory', what: 'Rankings, backlinks, audits' },
+	{ m: 'POST', path: '/missions', id: 'createMission', what: 'Give an agent a goal' },
+	{ m: 'GET', path: '/integrations', id: 'listIntegrations', what: 'Connected tools' },
+	{ m: 'GET', path: '/inbox', id: 'listInbox', what: 'Every conversation' },
 	{ m: 'POST', path: '/leads/import', id: 'importLeads', what: 'Import up to 100,000 leads' },
-	{ m: 'POST', path: '/sequences', id: 'createSequence', what: 'Create a sequence' },
-	{ m: 'POST', path: '/sequences/{id}/preview', id: 'previewSequence', what: 'Render steps for real leads' },
-	{ m: 'POST', path: '/sequences/{id}/enrollments', id: 'enrollLeads', what: 'Add leads or a list' },
-	{ m: 'GET', path: '/inbox', id: 'listInbox', what: 'Replies across every mailbox' },
-	{ m: 'POST', path: '/inbox/{id}/reply', id: 'replyToInboundMessage', what: 'Reply in the same thread' },
+	{ m: 'POST', path: '/sequences', id: 'createSequence', what: 'Create an email campaign' },
 ];
 const methodColor: Record<string, string> = {
 	GET: 'text-sky-700 dark:text-sky-400 border-sky-500/30 bg-sky-500/10',
@@ -96,47 +92,57 @@ const methodColor: Record<string, string> = {
 	PUT: 'text-amber-700 dark:text-amber-400 border-amber-500/30 bg-amber-500/10',
 };
 
+const moduleTag: Record<string, string> = { live: 'badge-live', building: 'badge-next', planned: 'badge-muted' };
+
+const principles = [
+	{ title: 'Connect what you already use', body: 'Sign in once with OAuth or paste a key, and Outflare reads from your analytics, search, CRM, calendar and data tools. No connector is required to start.' },
+	{ title: 'Ask, or hand over a goal', body: 'Ask a question from Claude, ChatGPT or Cursor, or give an agent a mission. It reads your company and brand context first, so you never explain twice.' },
+	{ title: 'Stay in control', body: 'Agents work through scoped tokens, within send and spend limits, and wait for your approval where you choose. Every action is logged under who did it.' },
+];
+
 const quickstart = [
 	{ n: '01', title: 'Clone', code: 'git clone https://github.com/outflareai/outflare\ncd outflare' },
 	{ n: '02', title: 'Configure', code: 'cp deploy/.env.example deploy/.env\necho "OUTFLARE_SECRET_KEY=$(openssl rand -base64 32)" >> deploy/.env' },
 	{ n: '03', title: 'Run', code: 'docker compose -f deploy/docker-compose.yml up -d\n# open http://localhost:8080' },
 ];
 
-const warmup = [62, 70, 74, 79, 83, 86, 88, 90, 91, 93, 94, 94, 95, 95];
 
-const roadmapTag: Record<string, string> = { shipped: 'badge-live', building: 'badge-next', planned: 'badge-muted', later: 'badge-muted' };
 ---
 
 <Marketing
-	title="Outflare: the open-source cold email engine for people and agents"
-	description="A cold email sequencer you can use hosted or run yourself, built for bulk reseller inboxes. Connect hundreds of mailboxes in one upload, warm them up, send through one policy check, and give your agents the same API as your team."
+	title="Outflare: the open-source GTM platform for people and agents"
+	description="One open-source workspace for your go-to-market: connect your analytics, search, CRM and email tools, see what's working, and let your AI agents do the work through one API. Hosted or self-hosted."
 >
 	<!-- Hero -->
 	<section class="relative overflow-hidden">
 		<div class="grid-bg pointer-events-none absolute inset-0" aria-hidden="true"></div>
 		<div class="relative mx-auto max-w-6xl px-4 pt-16 pb-10 text-center sm:px-6 sm:pt-24">
-			<a href="/docs/project/roadmap/" class="hit group inline-flex items-center gap-2 rounded-full border bg-background/80 py-1 pr-3 pl-1 text-xs text-muted-foreground shadow-xs backdrop-blur transition-colors hover:text-foreground">
+			<a href="#modules" class="hit group inline-flex items-center gap-2 rounded-full border bg-background/80 py-1 pr-3 pl-1 text-xs text-muted-foreground shadow-xs backdrop-blur transition-colors hover:text-foreground">
 				<span class="badge badge-live rounded-full">Open source</span>
-				{shipped} of {v1} v1 steps shipped
+				{liveModules} modules live, more on the way
 				<span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">→</span>
 			</a>
 			<h1 class="mx-auto mt-6 max-w-4xl bg-gradient-to-b from-foreground to-foreground/65 bg-clip-text pb-1 text-4xl font-semibold tracking-tighter text-balance text-transparent sm:text-6xl sm:leading-[1.05]">
-				The cold email engine your agents can run.
+				The GTM platform your agents can run.
 			</h1>
 			<p class="mx-auto mt-5 max-w-2xl text-base text-pretty text-muted-foreground sm:text-lg">
-				Connect hundreds of Google Workspace and Microsoft 365 inboxes in one upload, warm them up, run sequences and
-				answer replies. Every send passes one policy check, and everything in the app is in the API.
+				Outflare brings your go-to-market into one workspace. Connect the tools you already use, see what's working across
+				your website, search and campaigns, and let your AI agents do the work through one API.
 			</p>
 			<div class="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-				<a href={app.signUp} class="btn btn-primary btn-lg w-full sm:w-auto">
+				<a href={app.url} data-signed-in data-track="dashboard_click" class="btn btn-primary btn-lg w-full sm:w-auto">
+					Open your dashboard
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"></path></svg>
+				</a>
+				<a href={app.signUp} data-signed-out class="btn btn-primary btn-lg w-full sm:w-auto">
 					Sign up free
 					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"></path></svg>
 				</a>
 				<a href={repo.url} class="btn btn-outline btn-lg w-full sm:w-auto">Self-host on GitHub</a>
 			</div>
-			<p class="mt-4 text-sm text-muted-foreground">Hosted Outflare is free during early access. Have an account? <a href={app.signIn} class="hit font-medium text-foreground underline-offset-4 hover:underline">Sign in</a></p>
+			<p data-signed-out class="mt-4 text-sm text-muted-foreground">Hosted Outflare is free during early access. Have an account? <a href={app.signIn} class="hit font-medium text-foreground underline-offset-4 hover:underline">Sign in</a></p>
 			<ul class="mt-6 flex flex-wrap justify-center gap-x-5 gap-y-2 font-mono text-xs text-muted-foreground">
-				{['AGPL-3.0', 'Go + Postgres', 'OpenAPI 3.1', 'MCP server', 'No per-mailbox fees'].map((t) => <li class="flex items-center gap-1.5"><svg class="size-3.5 text-brand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>{t}</li>)}
+				{['AGPL-3.0', '82 connectors', 'MCP server', 'OpenAPI 3.1', 'Bring your own AI key'].map((t) => <li class="flex items-center gap-1.5"><svg class="size-3.5 text-brand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>{t}</li>)}
 			</ul>
 		</div>
 
@@ -160,7 +166,7 @@ const roadmapTag: Record<string, string> = { shipped: 'badge-live', building: 'b
 						<span class="size-2.5 rounded-full bg-neutral-300 dark:bg-neutral-700"></span>
 						<span class="size-2.5 rounded-full bg-neutral-300 dark:bg-neutral-700"></span>
 						<span class="size-2.5 rounded-full bg-neutral-300 dark:bg-neutral-700"></span>
-						<span class="mx-auto rounded-md bg-muted px-3 py-0.5 font-mono text-[11px] text-muted-foreground">outflare.yourcompany.com</span>
+						<span class="mx-auto rounded-md bg-muted px-3 py-0.5 font-mono text-[11px] text-muted-foreground">app.outflare.ai</span>
 						<span class="w-12"></span>
 					</div>
 					{
@@ -173,189 +179,57 @@ const roadmapTag: Record<string, string> = { shipped: 'badge-live', building: 'b
 					}
 				</div>
 			</div>
-			<p class="mt-4 text-center text-xs text-muted-foreground">The real app, running on demo data. Every screen is also an API endpoint.</p>
+			<p class="mt-4 text-center text-xs text-muted-foreground">The real app, on a demo workspace. Every screen is also an API endpoint.</p>
 		</div>
 	</section>
 
 	<!-- Works with -->
 	<section class="border-y bg-muted/30">
-		<div class="mx-auto flex max-w-6xl flex-col items-center gap-4 px-4 py-8 sm:flex-row sm:justify-between sm:px-6">
-			<p class="text-sm text-muted-foreground">Works with the inboxes and agents you already use</p>
-			<ul class="flex flex-wrap items-center justify-center gap-x-7 gap-y-2 text-sm font-medium text-foreground/70">
-				<li>Google Workspace</li>
-				<li>Microsoft 365</li>
-				<li>Any SMTP + IMAP</li>
-				<li>Claude</li>
-				<li>Cursor</li>
-				<li>Any MCP client</li>
+		<div class="mx-auto flex max-w-6xl flex-col items-center gap-4 px-4 py-8 sm:px-6 lg:flex-row lg:justify-between">
+			<p class="shrink-0 text-sm text-muted-foreground">Works with the tools and agents you already use</p>
+			<ul class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm font-medium text-foreground/70">
+				{worksWith.map((t) => <li>{t}</li>)}
+				<li><a href="/docs/integrations/connectors/" class="hit text-muted-foreground underline-offset-4 hover:text-foreground hover:underline">and 70 more</a></li>
 			</ul>
 		</div>
 	</section>
 
-	<!-- Bento -->
-	<section class="mx-auto max-w-6xl px-4 py-24 sm:px-6">
-		<p class="eyebrow"><span class="text-foreground">01</span> / Product</p>
-		<h2 class="h2 mt-3 max-w-3xl">Everything a sending team needs. One binary and a Postgres.</h2>
-		<p class="sub">Built for teams running hundreds of reseller inboxes, and for the agents working alongside them.</p>
-
-		<div class="mt-12 grid grid-cols-1 gap-4 md:grid-cols-6 [&>*]:min-w-0">
-			<!-- Bulk import -->
-			<a href="/docs/guides/import-mailboxes/" class="card group flex flex-col overflow-hidden transition-colors hover:border-foreground/20 md:col-span-4">
-				<div class="p-6 pb-0">
-					<span class="mb-4 flex size-8 items-center justify-center rounded-md border bg-muted/60 text-muted-foreground"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg></span>
-					<h3 class="font-semibold">Connect 200 inboxes in one upload</h3>
-					<p class="mt-1.5 text-sm text-muted-foreground">Drop the CSV your reseller sends. Google and Microsoft are detected, SMTP and IMAP sign-in is checked, and passwords are encrypted at rest.</p>
-				</div>
-				<div class="mt-6 flex-1 border-t bg-muted/30 p-4">
-					<div class="flex items-center justify-between rounded-lg border border-dashed bg-background px-3 py-2 text-sm">
-						<span class="font-mono text-xs">inboxes.csv <span class="text-muted-foreground">· 200 rows</span></span>
-						<span class="badge badge-live">200 created · 0 errors</span>
-					</div>
-					<table class="mt-3 w-full table-fixed text-left text-[13px] [&_td:first-child]:truncate">
-						<thead><tr class="font-mono text-[11px] tracking-wide text-muted-foreground uppercase"><th class="w-[44%] py-1.5 font-medium">Mailbox</th><th class="py-1.5 font-medium">Status</th><th class="hidden py-1.5 font-medium sm:table-cell">Warm-up</th><th class="py-1.5 text-right font-medium">Limit</th></tr></thead>
-						<tbody class="divide-y">
-							{
-								[['alex@trynorthwind.com', '96%', 40], ['sam@trynorthwind.com', '94%', 40], ['jordan@northwindhq.com', '95%', 50], ['riley@getnorthwind.io', '93%', 30]].map(([m, w, l]) => (
-									<tr><td class="py-1.5 font-mono text-xs">{m}</td><td><span class="badge badge-live">Sending</span></td><td class="hidden sm:table-cell"><span class="badge badge-live">{w} inbox</span></td><td class="text-right tabular-nums">{l}/day</td></tr>
-								))
-							}
-						</tbody>
-					</table>
-				</div>
-			</a>
-
-			<!-- Policy check -->
-			<a href="/docs/concepts/policy-check/" class="card flex flex-col p-6 transition-colors hover:border-foreground/20 md:col-span-2">
-				<span class="mb-4 flex size-8 items-center justify-center rounded-md border bg-muted/60 text-muted-foreground"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg></span>
-				<h3 class="font-semibold">One policy check on every send</h3>
-				<p class="mt-1.5 text-sm text-muted-foreground">Run by the engine right before SMTP. No sequence, script or agent can send around it.</p>
-				<ul class="mt-5 space-y-2 text-[13px]">
-					{['Suppression list', 'Unsubscribes and bounces', 'Mailbox and domain daily limits', 'Sending window'].map((c) => (
-						<li class="flex items-center gap-2"><svg class="size-4 text-brand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>{c}</li>
-					))}
-					<li class="flex items-start gap-2 rounded-md border border-destructive/30 bg-destructive/10 px-2 py-1.5 text-destructive"><svg class="mt-0.5 size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="m5.6 5.6 12.8 12.8"></path></svg><span><b class="font-medium">Blocked:</b> dana@acme.com is on the suppression list</span></li>
-				</ul>
-			</a>
-
-			<!-- Domains -->
-			<a href="/docs/guides/sending-domains/" class="card flex flex-col p-6 transition-colors hover:border-foreground/20 md:col-span-2">
-				<span class="mb-4 flex size-8 items-center justify-center rounded-md border bg-muted/60 text-muted-foreground"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg></span>
-				<h3 class="font-semibold">Domain health, checked daily</h3>
-				<p class="mt-1.5 text-sm text-muted-foreground">SPF, DKIM, DMARC, MX and blocklists for every sending domain, with the exact record to fix.</p>
-				<ul class="mt-5 space-y-2.5">
-					{[['trynorthwind.com', ['SPF', 'DKIM', 'DMARC'], ''], ['northwindhq.com', ['SPF', 'DKIM', 'DMARC'], ''], ['getnorthwind.io', ['SPF', 'DKIM'], 'DMARC']].map(([d, ok, warn]) => (
-						<li class="flex flex-wrap items-center justify-between gap-2">
-							<span class="font-mono text-xs">{d}</span>
-							<span class="flex gap-1">
-								{(ok as string[]).map((r) => <span class="badge badge-live">✓ {r}</span>)}
-								{warn && <span class="badge badge-next">! {warn}</span>}
-							</span>
-						</li>
-					))}
-				</ul>
-			</a>
-
-			<!-- Warm-up -->
-			<a href="/docs/guides/warmup/" class="card flex flex-col p-6 transition-colors hover:border-foreground/20 md:col-span-2">
-				<span class="mb-4 flex size-8 items-center justify-center rounded-md border bg-muted/60 text-muted-foreground"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg></span>
-				<div class="flex items-start justify-between gap-4">
-					<div>
-						<h3 class="font-semibold">Built-in warm-up</h3>
-						<p class="mt-1.5 text-sm text-muted-foreground">Your mailboxes warm each other up on a daily ramp, with spam rescue.</p>
-					</div>
-					<div class="text-right">
-						<div class="text-2xl font-semibold tracking-tight text-brand-strong tabular-nums dark:text-brand">95%</div>
-						<div class="font-mono text-[10px] tracking-wide whitespace-nowrap text-muted-foreground uppercase">inbox · 7d</div>
-					</div>
-				</div>
-				<div class="mt-auto flex h-24 items-end gap-1 pt-6" role="img" aria-label="Inbox placement rising from 62% to 95% over 14 days">
-					{warmup.map((v) => <span class="flex-1 rounded-sm bg-brand/70" style={`height:${v}%`}></span>)}
-				</div>
-			</a>
-
-			<!-- Inbox -->
-			<a href="/docs/guides/inbox/" class="card flex flex-col p-6 transition-colors hover:border-foreground/20 md:col-span-2">
-				<span class="mb-4 flex size-8 items-center justify-center rounded-md border bg-muted/60 text-muted-foreground"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg></span>
-				<h3 class="font-semibold">Every reply in one inbox</h3>
-				<p class="mt-1.5 text-sm text-muted-foreground">Replies stop the sequence. Opt-outs are suppressed. Answer from the same mailbox and thread.</p>
-				<ul class="mt-5 divide-y rounded-lg border text-[13px]">
-					<li class="flex items-center gap-2 px-3 py-2"><span class="size-1.5 rounded-full bg-brand"></span><b class="font-medium whitespace-nowrap">Zoe Okafor</b><span class="truncate text-muted-foreground">Does it work with our Google inboxes?</span></li>
-					<li class="flex items-center gap-2 px-3 py-2"><span class="size-1.5 rounded-full bg-brand"></span><b class="font-medium whitespace-nowrap">Theo Haddad</b><span class="truncate text-muted-foreground">Yes, keen to chat this week.</span></li>
-					<li class="flex items-center gap-2 px-3 py-2"><span class="size-1.5"></span><span>Owen Patel</span><span class="badge badge-next ml-auto">Asked to be removed</span></li>
-				</ul>
-			</a>
-
-			<!-- Audit -->
-			<a href="/docs/guides/workspaces-and-access/#audit-log" class="card flex flex-col p-6 transition-colors hover:border-foreground/20 md:col-span-3">
-				<span class="mb-4 flex size-8 items-center justify-center rounded-md border bg-muted/60 text-muted-foreground"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4"/><path d="m21 2-9.6 9.6"/><circle cx="7.5" cy="15.5" r="5.5"/></svg></span>
-				<h3 class="font-semibold">Scoped tokens, everything audited</h3>
-				<p class="mt-1.5 text-sm text-muted-foreground">Tokens are bound to one workspace and never outrank the person who made them. Every change is logged under who did it.</p>
-				<ul class="mt-5 space-y-1.5 font-mono text-xs">
-					<li class="flex gap-3"><span class="text-muted-foreground">12:04</span><span class="badge badge-muted">token: sdr-agent</span><span>sequence.started</span></li>
-					<li class="flex gap-3"><span class="text-muted-foreground">11:58</span><span class="badge badge-muted">token: sdr-agent</span><span>leads.imported <span class="text-muted-foreground">240 rows</span></span></li>
-					<li class="flex gap-3"><span class="text-muted-foreground">11:41</span><span class="badge badge-muted">maya@northwind.dev</span><span>mailbox.paused</span></li>
-				</ul>
-			</a>
-
-			<!-- Preview -->
-			<a href="/docs/guides/sequences/" class="card flex flex-col p-6 transition-colors hover:border-foreground/20 md:col-span-3">
-				<span class="mb-4 flex size-8 items-center justify-center rounded-md border bg-muted/60 text-muted-foreground"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg></span>
-				<h3 class="font-semibold">Preview every email before it sends</h3>
-				<p class="mt-1.5 text-sm text-muted-foreground">Steps are rendered for real leads, and a lead missing a variable with no fallback is held back, not sent.</p>
-				<div class="mt-5 grid gap-2 font-mono text-xs sm:grid-cols-2">
-					<div class="rounded-lg border bg-muted/40 p-3"><span class="text-muted-foreground">template</span><br />Hi <span class="text-violet-600 dark:text-violet-400">{'{{first_name}}'}</span>, saw <span class="text-violet-600 dark:text-violet-400">{'{{company}}'}</span> just raised.</div>
-					<div class="rounded-lg border bg-muted/40 p-3"><span class="text-muted-foreground">zoe.okafor@vercel.com</span><br />Hi <span class="text-brand-strong dark:text-brand">Zoe</span>, saw <span class="text-brand-strong dark:text-brand">Vercel</span> just raised.</div>
-				</div>
-				<p class="mt-2 flex items-center gap-2 text-xs"><span class="badge badge-next">3 leads held</span><span class="text-muted-foreground">missing <code class="font-mono">company</code></span></p>
-			</a>
-		</div>
-	</section>
-
-	<!-- Quickstart -->
-	<section class="border-t">
-		<div class="mx-auto max-w-6xl px-4 py-24 sm:px-6">
-			<div class="flex flex-wrap items-end justify-between gap-6">
-				<div>
-					<p class="eyebrow"><span class="text-foreground">02</span> / Quickstart</p>
-					<h2 class="h2 mt-3">Running on your machine in three commands.</h2>
-					<p class="sub">Docker Compose starts the engine and Postgres. The web app, API and OpenAPI spec are all on port 8080.</p>
-				</div>
-				<a href="/docs/quickstart/" class="btn btn-outline">Full quickstart →</a>
-			</div>
-			<ol class="mt-10 grid gap-3">
-				{
-					quickstart.map((q) => (
-						<li class="card grid min-w-0 overflow-hidden md:grid-cols-[12rem_1fr]">
-							<div class="flex items-center justify-between border-b px-4 py-2.5 md:flex-col md:items-start md:justify-center md:gap-2 md:border-r md:border-b-0">
-								<span class="flex items-center gap-2 text-sm font-medium"><span class="font-mono text-xs text-muted-foreground">{q.n}</span>{q.title}</span>
-								<button type="button" data-copy={q.code.split('\n').filter((l) => !l.startsWith('#')).join('\n')} class="btn btn-ghost h-7 gap-1 px-2 text-xs md:-ml-2" aria-label={`Copy the ${q.title.toLowerCase()} commands`}>
-									<svg data-icon="copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-									<svg data-icon="done" class="hidden text-brand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>
-									Copy
-								</button>
-							</div>
-							<pre class="code-panel bg-muted/30 text-xs md:py-5"><code set:html={hl(q.code.split('\n').map((l) => (l.startsWith('#') ? l : '$ ' + l)).join('\n'))} /></pre>
-						</li>
-					))
-				}
-			</ol>
-		</div>
+	<!-- Modules -->
+	<section id="modules" class="mx-auto max-w-6xl scroll-mt-20 px-4 py-24 sm:px-6">
+		<p class="eyebrow"><span class="text-foreground">01</span> / Modules</p>
+		<h2 class="h2 mt-3 max-w-3xl">One workspace for your whole go-to-market.</h2>
+		<p class="sub">Each module shares the same connectors, context, people and API, so a new one works with everything you've already set up. Use one, or all of them.</p>
+		<ul class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+			{
+				modules.map((m) => (
+					<li class={`card relative flex flex-col p-6 ${m.docs ? 'transition-colors has-[a:hover]:border-foreground/20' : ''}`}>
+						<div class="mb-4 flex items-center justify-between gap-2">
+							<span class="flex size-8 items-center justify-center rounded-md border bg-muted/60 text-muted-foreground"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={m.icon} /></span>
+							<span class={`badge ${moduleTag[m.status]}`}>{moduleStatusLabel[m.status]}</span>
+						</div>
+						{m.docs ? <a href={m.docs} class="font-semibold after:absolute after:inset-0 after:content-[''] hover:underline">{m.name}</a> : <h3 class="font-semibold">{m.name}</h3>}
+						<p class="mt-1.5 text-sm text-muted-foreground">{m.summary}</p>
+					</li>
+				))
+			}
+		</ul>
+		<a href="/docs/project/roadmap/" class="hit mt-8 inline-block text-sm font-medium underline-offset-4 hover:underline">See the roadmap →</a>
 	</section>
 
 	<!-- Agents -->
 	<section class="border-y bg-muted/30">
 		<div class="mx-auto grid max-w-6xl items-center gap-12 px-4 pt-24 pb-12 sm:px-6 lg:grid-cols-[1fr_1.15fr]">
 			<div>
-				<p class="eyebrow"><span class="text-foreground">03</span> / API and agents</p>
+				<p class="eyebrow"><span class="text-foreground">02</span> / API and agents</p>
 				<h2 class="h2 mt-3">Your agents get a real API, not a browser.</h2>
 				<p class="sub">The web app has no private endpoints. Whatever it does, your scripts and agents can do through the same documented API, with limits they can't talk their way past.</p>
 				<dl class="mt-8 grid gap-5 sm:grid-cols-2">
-					<div><dt class="font-medium">MCP server</dt><dd class="mt-1 text-sm text-muted-foreground">185 tools for Claude, Cursor and any MCP client, with a read-only mode.</dd></div>
+					<div><dt class="font-medium">Connect your AI</dt><dd class="mt-1 text-sm text-muted-foreground">One URL for Claude, ChatGPT, Cursor and any MCP app, with 284 tools. Sign in, approve, then just ask.</dd></div>
 					<div><dt class="font-medium">OpenAPI 3.1</dt><dd class="mt-1 text-sm text-muted-foreground">One contract, served by every instance at <code class="text-xs">/v1/openapi.yaml</code>.</dd></div>
 					<div><dt class="font-medium">Typed SDK</dt><dd class="mt-1 text-sm text-muted-foreground">An Apache-2.0 TypeScript client generated from the contract.</dd></div>
 					<div><dt class="font-medium">Attributed</dt><dd class="mt-1 text-sm text-muted-foreground">Every action lands in the audit log under the token's name.</dd></div>
 				</dl>
-				<a href="/docs/agents/mcp/" class="btn btn-outline mt-8">Connect an agent →</a>
+				<a href="/docs/agents/connect/" class="btn btn-outline mt-8">Connect your AI →</a>
 			</div>
 			<div class="card overflow-hidden shadow-xl shadow-black/5 dark:shadow-black/40">
 				<div class="flex items-center gap-1 border-b px-2 py-1.5" role="tablist" aria-label="Code examples">
@@ -395,27 +269,52 @@ const roadmapTag: Record<string, string> = { shipped: 'badge-live', building: 'b
 		</div>
 	</section>
 
-	<!-- Send path -->
+	<!-- How it works -->
 	<section class="mx-auto max-w-6xl px-4 py-24 sm:px-6">
-		<p class="eyebrow"><span class="text-foreground">04</span> / Send path</p>
-		<h2 class="h2 mt-3 max-w-3xl">Every email goes through the same gate.</h2>
-		<p class="sub">Whether a sequence, a person or an agent asked for it, the engine checks the send right before SMTP, and records why when it blocks one.</p>
-		<div class="mt-12 grid items-center gap-4 md:grid-cols-[1fr_auto_1.1fr_auto_1fr]" role="img" aria-label="Sequences, inbox replies, scripts and agents send through the policy check, then rotate across a mailbox pool to SMTP">
-			<div class="grid gap-2">
-				{['Sequences', 'Inbox replies', 'Scripts and SDK', 'Agents over MCP'].map((n) => <div class="card px-4 py-2.5 text-sm">{n}</div>)}
+		<p class="eyebrow"><span class="text-foreground">03</span> / How it works</p>
+		<h2 class="h2 mt-3 max-w-3xl">Outflare is the brain. Your tools stay where they are.</h2>
+		<p class="sub">Outflare reads from the tools you already pay for, keeps the history in one place, and gives people and agents the same view and the same controls.</p>
+		<ol class="mt-12 grid gap-4 md:grid-cols-3">
+			{
+				principles.map((p, i) => (
+					<li class="card p-6">
+						<span class="font-mono text-xs text-muted-foreground">0{i + 1}</span>
+						<h3 class="mt-3 font-semibold">{p.title}</h3>
+						<p class="mt-1.5 text-sm text-muted-foreground">{p.body}</p>
+					</li>
+				))
+			}
+		</ol>
+	</section>
+
+	<!-- Quickstart -->
+	<section class="border-t">
+		<div class="mx-auto max-w-6xl px-4 py-24 sm:px-6">
+			<div class="flex flex-wrap items-end justify-between gap-6">
+				<div>
+					<p class="eyebrow"><span class="text-foreground">04</span> / Quickstart</p>
+					<h2 class="h2 mt-3">Running on your machine in three commands.</h2>
+					<p class="sub">Docker Compose starts the engine and Postgres. The web app, API and OpenAPI spec are all on port 8080.</p>
+				</div>
+				<a href="/docs/quickstart/" class="btn btn-outline">Full quickstart →</a>
 			</div>
-			<div class="mx-auto h-6 w-px bg-border md:h-px md:w-10" aria-hidden="true"></div>
-			<div class="card border-brand/40 p-5 ring-4 ring-brand/10">
-				<div class="flex items-center justify-between"><b class="font-semibold">Policy check</b><span class="badge badge-live">every send</span></div>
-				<ul class="mt-3 grid gap-1.5 text-sm text-muted-foreground">
-					{['Suppression list', 'Unsubscribes and bounces', 'Mailbox and domain limits', 'Sending window', 'Workspace rules'].map((c) => <li class="flex items-center gap-2"><span class="size-1 rounded-full bg-brand"></span>{c}</li>)}
-				</ul>
-			</div>
-			<div class="mx-auto h-6 w-px bg-border md:h-px md:w-10" aria-hidden="true"></div>
-			<div class="grid gap-2">
-				<div class="card px-4 py-2.5 text-sm">Mailbox pool <span class="block text-xs text-muted-foreground">rotates across inboxes, same sender per lead</span></div>
-				<div class="card px-4 py-2.5 text-sm">SMTP <span class="block text-xs text-muted-foreground">Google · Microsoft · any provider</span></div>
-			</div>
+			<ol class="mt-10 grid gap-3">
+				{
+					quickstart.map((q) => (
+						<li class="card grid min-w-0 overflow-hidden md:grid-cols-[12rem_1fr]">
+							<div class="flex items-center justify-between border-b px-4 py-2.5 md:flex-col md:items-start md:justify-center md:gap-2 md:border-r md:border-b-0">
+								<span class="flex items-center gap-2 text-sm font-medium"><span class="font-mono text-xs text-muted-foreground">{q.n}</span>{q.title}</span>
+								<button type="button" data-copy={q.code.split('\n').filter((l) => !l.startsWith('#')).join('\n')} class="btn btn-ghost h-7 gap-1 px-2 text-xs md:-ml-2" aria-label={`Copy the ${q.title.toLowerCase()} commands`}>
+									<svg data-icon="copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+									<svg data-icon="done" class="hidden text-brand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>
+									Copy
+								</button>
+							</div>
+							<pre class="code-panel bg-muted/30 text-xs md:py-5"><code set:html={hl(q.code.split('\n').map((l) => (l.startsWith('#') ? l : '$ ' + l)).join('\n'))} /></pre>
+						</li>
+					))
+				}
+			</ol>
 		</div>
 	</section>
 
@@ -423,12 +322,12 @@ const roadmapTag: Record<string, string> = { shipped: 'badge-live', building: 'b
 	<section class="border-t">
 		<div class="mx-auto max-w-6xl px-4 py-24 sm:px-6">
 			<p class="eyebrow"><span class="text-foreground">05</span> / Open source</p>
-			<h2 class="h2 mt-3 max-w-3xl">The tool that holds your mailboxes should be one you can read.</h2>
+			<h2 class="h2 mt-3 max-w-3xl">The platform that holds your customer data should be one you can read.</h2>
 			<div class="mt-12 grid gap-10 lg:grid-cols-[1fr_1.2fr]">
 				<dl class="grid content-start gap-6 sm:grid-cols-2">
-					<div><dt class="font-medium">You own the data</dt><dd class="mt-1 text-sm text-muted-foreground">Mailboxes, leads, every send and every reply live in your Postgres.</dd></div>
-					<div><dt class="font-medium">You can read the send path</dt><dd class="mt-1 text-sm text-muted-foreground">Deliverability and compliance depend on what the sender does. Here the code is public.</dd></div>
-					<div><dt class="font-medium">No pricing page to outgrow</dt><dd class="mt-1 text-sm text-muted-foreground">Your hundredth inbox costs what the inbox costs.</dd></div>
+					<div><dt class="font-medium">You own the data</dt><dd class="mt-1 text-sm text-muted-foreground">Analytics history, leads, conversations and every action live in your Postgres.</dd></div>
+					<div><dt class="font-medium">Your AI, your key</dt><dd class="mt-1 text-sm text-muted-foreground">Agents run on your own model key, so you choose the model and see what it costs.</dd></div>
+					<div><dt class="font-medium">No pricing page to outgrow</dt><dd class="mt-1 text-sm text-muted-foreground">Free to self-host, and free hosted while we're in early access.</dd></div>
 					<div><dt class="font-medium">Build on it freely</dt><dd class="mt-1 text-sm text-muted-foreground">The SDK is Apache-2.0, so integrations carry no copyleft.</dd></div>
 				</dl>
 				<div class="card overflow-x-auto">
@@ -436,16 +335,16 @@ const roadmapTag: Record<string, string> = { shipped: 'badge-live', building: 'b
 						<thead>
 							<tr class="border-b font-mono text-[11px] tracking-wide text-muted-foreground uppercase">
 								<th class="px-4 py-3 font-medium"><span class="sr-only">Compare</span></th>
-								<th class="px-4 py-3 font-medium">Typical hosted sequencer</th>
+								<th class="px-4 py-3 font-medium">A typical GTM stack</th>
 								<th class="px-4 py-3 font-medium text-foreground">Outflare</th>
 							</tr>
 						</thead>
 						<tbody class="divide-y">
 							{[
-								['Your data lives in', "The vendor's database", 'Your Postgres'],
-								['Pricing', 'Per seat, mailbox or contact', 'Free to self-host, free hosted in early access'],
-								['Send logic', 'Closed', 'Open source, one policy check'],
-								['API', 'Varies by plan', 'Everything, OpenAPI 3.1'],
+								['Your data lives in', 'A dozen vendor databases', 'Your Postgres'],
+								['Reporting', 'One dashboard per tool', 'Every tool side by side'],
+								['Pricing', 'Per seat, contact or tool', 'Free to self-host, free hosted in early access'],
+								['API', 'Varies by vendor and plan', 'Everything, OpenAPI 3.1'],
 								['Agent access', 'One key per account', 'Scoped, audited tokens + MCP'],
 								['If you outgrow it', 'Export and migrate', 'Fork it'],
 							].map(([k, a, b]) => (
@@ -459,53 +358,28 @@ const roadmapTag: Record<string, string> = { shipped: 'badge-live', building: 'b
 		</div>
 	</section>
 
-	<!-- Roadmap -->
-	<section class="border-t bg-muted/30">
-		<div class="mx-auto max-w-6xl px-4 py-24 sm:px-6">
-			<div class="flex flex-wrap items-end justify-between gap-6">
-				<div>
-					<p class="eyebrow"><span class="text-foreground">06</span> / Roadmap</p>
-					<h2 class="h2 mt-3">What works today, and what's next.</h2>
-					<p class="sub">Each step ships as its own pull request. Planned features are marked as planned, everywhere.</p>
-				</div>
-				<div class="w-full max-w-xs">
-					<div class="flex justify-between text-sm"><span class="text-muted-foreground">v1 progress</span><span class="font-medium tabular-nums">{shipped} / {v1}</span></div>
-					<div class="mt-2 h-2 overflow-hidden rounded-full bg-border"><div class="h-full rounded-full bg-brand" style={`width:${Math.round((shipped / v1) * 100)}%`}></div></div>
-				</div>
-			</div>
-			<ol class="mt-10 grid gap-px overflow-hidden rounded-xl border bg-border sm:grid-cols-2 lg:grid-cols-3">
-				{
-					milestones.map((m) => (
-						<li class={`relative bg-background p-5 ${m.docs ? 'transition-colors has-[a:hover]:bg-muted/40' : ''}`}>
-							<div class="flex items-center justify-between gap-2">
-								<span class="font-mono text-xs text-muted-foreground">{m.step ? `Step ${m.step}` : 'After v1'}</span>
-								<span class={`badge ${roadmapTag[m.status]}`}>{statusLabel[m.status]}</span>
-							</div>
-							{m.docs ? <a href={m.docs} class="mt-2 block font-medium after:absolute after:inset-0 after:content-[''] hover:underline">{m.title}</a> : <p class="mt-2 font-medium">{m.title}</p>}
-							<p class="mt-1 text-sm text-muted-foreground">{m.summary}</p>
-						</li>
-					))
-				}
-			</ol>
-		</div>
-	</section>
-
 	<!-- Final CTA -->
 	<section class="relative overflow-hidden border-t">
 		<div class="grid-bg pointer-events-none absolute inset-0" style="--grid-mask: radial-gradient(ellipse 60% 90% at 50% 100%, #000 30%, transparent 100%)" aria-hidden="true"></div>
 		<div class="relative mx-auto max-w-3xl px-4 py-24 text-center sm:px-6">
 			<h2 class="text-3xl font-semibold tracking-tighter text-balance sm:text-5xl">Use it hosted, or run it yourself.</h2>
-			<p class="mx-auto mt-4 max-w-xl text-muted-foreground sm:text-lg">Sign up and connect your first mailboxes in a few minutes, free while we're in early access. Or run it yourself: two containers and one settings file.</p>
+			<p class="mx-auto mt-4 max-w-xl text-muted-foreground sm:text-lg">Sign up and connect your first tools in a few minutes, free while we're in early access. Or run it yourself: two containers and one settings file.</p>
 			<div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-				<a href={app.signUp} class="btn btn-primary btn-lg">Sign up free</a>
+				<a href={app.url} data-signed-in data-track="dashboard_click" class="btn btn-primary btn-lg">Open your dashboard</a>
+				<a href={app.signUp} data-signed-out class="btn btn-primary btn-lg">Sign up free</a>
 				<a href={repo.url} class="btn btn-outline btn-lg">Self-host on GitHub</a>
-				<a href={app.signIn} class="btn btn-ghost btn-lg">Sign in</a>
+				<a href={app.signIn} data-signed-out class="btn btn-ghost btn-lg">Sign in</a>
 			</div>
 			<p class="mt-4 text-sm text-muted-foreground">Questions, or want help setting it up? <a href={`mailto:${site.email}`} class="hit font-medium text-foreground underline-offset-4 hover:underline">Get in touch</a></p>
 			<p class="mt-6 font-mono text-xs text-muted-foreground"><span class="select-none">$ </span>docker compose -f deploy/docker-compose.yml up -d</p>
 		</div>
 	</section>
 </Marketing>
+
+<style is:global>
+	/* Hide the signed-in links until the header's check says so (the same rule as SignedIn.astro). */
+	html[data-signed-in] [data-signed-out], html:not([data-signed-in]) [data-signed-in] { display: none !important; }
+</style>
 
 <script>
 	// Tabs: product screenshots and code examples.
