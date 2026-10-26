@@ -1,11 +1,11 @@
 ---
 title: See what each page ranks for
-description: The Keywords page shows what Google shows each page of your site for, the keyword each page targets, where you rank on Google, pages that compete for one search, and how Google indexed your pages, from your own Search Console.
+description: The Keywords page shows what Google shows each page of your site for, the keyword each page targets, where you rank on Google, which pages bring conversions, pages that compete for one search, and how Google indexed your pages, from your own Search Console.
 sidebar:
   order: 14
 ---
 
-<span class="pill shipped">Shipped</span> Search Console by page and query, keyword targets, rank tracking, internal links, cannibalisation, indexing and sitemaps, in the app, through the API and for agents.
+<span class="pill shipped">Shipped</span> Search Console by page and query, keyword targets, rank tracking, conversions by page, internal links, cannibalisation, indexing and sitemaps, in the app, through the API and for agents.
 
 The **Keywords** page in the SEO module shows what Google shows each page of your site for and how often people click, for up to 16 months, with how Google indexed each page and the sitemaps it read. It works for the sites you [audit](/docs/guides/site-audits/), from your own [Google Search Console](/docs/integrations/analytics/) sign-in. Outflare only reads, and opening the page never calls Google: the sync stores the numbers every six hours.
 
@@ -23,6 +23,7 @@ Your site's numbers come from the Search Console property that covers it: a doma
 - **Queries:** the same by query. Open a query to see which of your pages Google shows for it. Two pages sharing one query's impressions is often a sign they compete.
 - **Targets:** the keyword each page should rank for (see below).
 - **Rankings:** where your site ranks on Google for the keywords you track (see below).
+- **Conversions:** the visits that start on each page and how many convert, from your own PostHog (see below).
 - **Internal links:** pages about a target keyword that don't link to its page yet (see below).
 - **Cannibalisation:** searches where Google shows more than one of your pages and splits the clicks (see below).
 - **Indexing:** what Google's URL Inspection says about your pages: indexed or not, Google's reason (for example "Crawled - currently not indexed"), the canonical Google chose when it differs from the page's own, and when Google last crawled it. Each sync inspects up to 100 pages, starting with the pages OutflareBot crawled and the pages Google shows, and checks each again after a week, within Google's daily limit. When a page's verdict changes, you see what it was before.
@@ -43,6 +44,12 @@ Search Console gives an average position over every search a page was shown for.
 Checks read Google's top 100 results through your own [DataForSEO](/docs/integrations/seo/) connection, never an account of Outflare's, so rank tracking stays off until you connect one. A check costs about $0.02 on your DataForSEO account. It counts towards the connection's monthly budget and stops when the budget is spent, and every check is recorded in [Outcomes](/docs/guides/outcomes/) with its cost.
 
 Each keyword shows its position and how it moved since the check before, its best position, and the page that ranks. When a page other than the keyword's target ranks, you see the target beside it. The history keeps every check with the top 10 results, so you can see who outranks you.
+
+## Which pages bring conversions
+
+Search Console tells you which pages people find, not which pages bring people who sign up or buy. Connect your own [PostHog](/docs/integrations/analytics/) and **Conversions** shows, for each page, the visits that started on it and how many went on to a conversion, overall and from search engines, beside its Search Console clicks, position and target keyword. Pages with plenty of search visits and no conversions need a better offer; pages that convert well deserve more search traffic.
+
+Type the PostHog events that count as a conversion (for example `signed_up, purchase`) and press **Save events**. Until you do, the tab shows visits only. A visit counts under the page it started on, and as a search visit when it came from a search engine's results. Each sync makes one query on your PostHog project: the last 90 days the first time, and whenever you change the events, then the last three days again.
 
 ## Internal links worth adding
 
@@ -73,9 +80,11 @@ curl -X POST -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/works
 # Track keywords (and every target keyword), then read where they rank
 curl -X POST -H "Authorization: Bearer $TOKEN" -d '{"keywords": ["proxy pricing"], "from_targets": true}' "https://app.outflare.ai/v1/workspaces/$WS/seo-sites/$SITE/rankings"
 curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/workspaces/$WS/seo-sites/$SITE/rankings"
+# Conversions by landing page, most conversions from search first
+curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/workspaces/$WS/seo-sites/$SITE/conversions?sort=search_conversions"
 # Internal links worth adding, and searches your pages compete for
 curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/workspaces/$WS/seo-sites/$SITE/internal-links"
 curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/workspaces/$WS/seo-sites/$SITE/cannibalisation"
 ```
 
-Each answer has `source`, the property the numbers come from, or `null` when no Search Console property covers the site. Reading needs the `seo.read` scope, and setting targets or tracking keywords `seo.manage`. Agents use the MCP tools `get_site_search`, `get_site_search_history`, `get_site_indexing`, `get_site_sitemaps`, `list_page_targets`, `set_page_target`, `accept_page_targets`, `track_keywords`, `list_rankings`, `get_rank_history`, `get_site_internal_links` and `get_site_cannibalisation`, for example: "Which pages get many impressions but few clicks, and what would you change on them?" or "Accept the suggested target keywords and fix the pages whose titles miss them."
+Each answer has `source`, the property the numbers come from, or `null` when no Search Console property covers the site. Reading needs the `seo.read` scope, and setting targets or tracking keywords `seo.manage`. Agents use the MCP tools `get_site_search`, `get_site_search_history`, `get_site_indexing`, `get_site_sitemaps`, `list_page_targets`, `set_page_target`, `accept_page_targets`, `track_keywords`, `list_rankings`, `get_rank_history`, `get_site_conversions`, `get_site_internal_links` and `get_site_cannibalisation`, for example: "Which pages get many impressions but few clicks, and what would you change on them?" or "Accept the suggested target keywords and fix the pages whose titles miss them."

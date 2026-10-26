@@ -15,6 +15,8 @@ Open **Connectors** and pick the **Analytics** category, or go straight to **Ana
 
 One sign-in often sees many sites (every GA4 property, Search Console property or PostHog project the login can open). Every one of them syncs unless you switch it off, up to 20 per connection. The Website analytics page lists them with a sync switch and a domain field for each.
 
+PostHog projects also count, for the SEO module, the visits that start on each page and how many go on to the events you choose as conversions. See [which pages bring conversions](/docs/guides/keywords/#which-pages-bring-conversions).
+
 ## Providers
 
 | Provider | Connect with | Reports |
