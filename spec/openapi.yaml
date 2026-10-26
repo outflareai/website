@@ -5324,6 +5324,7 @@ paths:
                 country: { type: string, example: US, description: Two-letter code for keywords and traffic. }
                 monthly_budget: { type: [number, "null"], minimum: 0, description: "Per calendar month (UTC): US dollars for DataForSEO, API units for Ahrefs." }
                 sync: { type: string, enum: [weekly, "off"] }
+                link_rows: { type: [integer, "null"], minimum: 1, maximum: 1000, description: "Links each weekly read asks for per SEO site, strongest linking domains first; null is the default, 200." }
       responses:
         "200":
           description: The connection with its new settings.
@@ -5356,6 +5357,7 @@ paths:
         - { name: target, in: query, schema: { type: string }, example: example.com, description: "A domain. Default: the connection's only domain." }
         - { name: country, in: query, schema: { type: string }, example: US }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 1000, default: 50 } }
+        - { name: since, in: query, schema: { type: string, format: date }, description: "The links report only: also list links lost on or after this date." }
         - { name: fresh, in: query, schema: { type: boolean } }
       responses:
         "200":
@@ -5379,7 +5381,7 @@ paths:
       x-outflare-access: { scope: integrations.manage }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Take an SEO snapshot now
-      description: "Scope: integrations.manage. Stores the overview and top 50 keywords of every domain the connection follows, within its budget (this also runs weekly). Costs about $0.04 a domain on DataForSEO or 1,200 API units on Ahrefs."
+      description: "Scope: integrations.manage. Stores the overview and top 50 keywords of every domain the connection follows, within its budget (this also runs weekly). Costs about $0.04 a domain on DataForSEO or 1,200 API units on Ahrefs. A connection that reads single links also reads the links to every active SEO site (`link_rows` each, live and lost in the last 90 days) into GET .../backlinks: about $0.03 a site on DataForSEO, or 50 to 200 API units on Ahrefs."
       tags: [seo]
       responses:
         "200":
@@ -5388,12 +5390,28 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [domains, rows, cost, unit]
+                required: [domains, rows, cost, unit, links]
                 properties:
                   domains: { type: array, items: { type: string } }
                   rows: { type: integer }
                   cost: { type: number }
                   unit: { type: string, enum: [USD, API unit] }
+                  links:
+                    type: array
+                    description: Each SEO site's links read.
+                    items:
+                      type: object
+                      required: [id, site_id, host, links_seen, new, lost, regained, cost, error]
+                      properties:
+                        id: { type: string, format: uuid }
+                        site_id: { type: string, format: uuid }
+                        host: { type: string }
+                        links_seen: { type: integer }
+                        new: { type: integer }
+                        lost: { type: integer }
+                        regained: { type: integer }
+                        cost: { type: number }
+                        error: { type: [string, "null"] }
         "400": { $ref: "#/components/responses/Error" }
         "402": { $ref: "#/components/responses/Error" }
         "422": { $ref: "#/components/responses/Error" }
@@ -5918,6 +5936,108 @@ paths:
                   data: { type: array, items: { $ref: "#/components/schemas/SearchSitemap" } }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/backlinks:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listBacklinks
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: List backlinks
+      description: |
+        Scope: seo.read. The links other sites have to the workspace's SEO
+        sites, merged from every SEO connection that reads links (Ahrefs,
+        DataForSEO): one row per link, with each provider's own view in
+        `providers`. A link is live while any provider still finds it.
+        Reads only what the weekly snapshot stored, so it costs nothing.
+      tags: [seo]
+      parameters:
+        - { $ref: "#/components/parameters/Brand" }
+        - { name: site_id, in: query, schema: { type: string, format: uuid } }
+        - { name: status, in: query, schema: { type: string, enum: [live, lost] } }
+        - { name: nofollow, in: query, schema: { type: boolean } }
+        - { name: q, in: query, schema: { type: string }, description: "Part of the linking domain, URL or anchor." }
+        - { name: order, in: query, schema: { type: string, enum: [rating, newest, lost], default: rating } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
+        - { name: offset, in: query, schema: { type: integer, minimum: 0 } }
+        - { $ref: "#/components/parameters/Fields" }
+        - { $ref: "#/components/parameters/Cursor" }
+      responses:
+        "200":
+          description: Backlinks.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, total, next_offset, next_cursor]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/Backlink" } }
+                  total: { type: integer }
+                  next_offset: { type: [integer, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/backlinks/events:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listBacklinkEvents
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: List links gained, lost and regained
+      description: |
+        Scope: seo.read. The feed of what happened to the sites' links,
+        newest first: `new` when a provider first finds a link, `lost` when
+        no provider still does, `regained` when one finds it again. Events
+        are never changed afterwards. A site's first read is a baseline:
+        only links first found or lost in the 30 days before it become
+        events.
+      tags: [seo]
+      parameters:
+        - { $ref: "#/components/parameters/Brand" }
+        - { name: site_id, in: query, schema: { type: string, format: uuid } }
+        - { name: kind, in: query, schema: { type: string, enum: [new, lost, regained] } }
+        - { name: days, in: query, schema: { type: integer, minimum: 1, maximum: 730, default: 90 } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
+        - { name: offset, in: query, schema: { type: integer, minimum: 0 } }
+        - { $ref: "#/components/parameters/Fields" }
+        - { $ref: "#/components/parameters/Cursor" }
+      responses:
+        "200":
+          description: Events.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, next_offset, next_cursor]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/BacklinkEvent" } }
+                  next_offset: { type: [integer, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/backlinks/summary:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: getBacklinksSummary
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: Summarise each site's backlinks
+      description: "Scope: seo.read. Per SEO site: live and lost links, referring domains, followed links, links gained, lost and regained in the last 30 days and in each of the last 12 weeks, and each provider's latest read."
+      tags: [seo]
+      parameters:
+        - { $ref: "#/components/parameters/Brand" }
+        - { name: site_id, in: query, schema: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: One entry per site.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/BacklinkSiteSummary" } }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/seo-rules:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
@@ -6063,6 +6183,185 @@ paths:
         "403": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/integrations/{id}/deploy-options:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: listDeployOptions
+      x-outflare-access: { scope: integrations.read }
+      summary: List what a code or deploy connection can watch
+      description: "Scope: integrations.read. The repositories (GitHub) or projects (Vercel) the connection can see, with the domains each serves when the provider knows them, and the deploy target already watching it. Reads the provider live; it is free."
+      tags: [deploys]
+      responses:
+        "200":
+          description: What it can watch.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/DeployOption" } }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "422": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/deploy-targets:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listDeployTargets
+      x-outflare-access: { scope: integrations.read, brand_limited: true }
+      summary: List watched repositories and projects
+      description: "Scope: integrations.read. Each target is checked for new production deploys every five minutes."
+      tags: [deploys]
+      parameters:
+        - { name: site_id, in: query, description: "Only the targets serving this SEO site.", schema: { type: string, format: uuid } }
+        - { $ref: "#/components/parameters/Brand" }
+      responses:
+        "200":
+          description: Deploy targets.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/DeployTarget" } }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createDeployTarget
+      x-outflare-access: { scope: integrations.manage, brand_limited: true }
+      summary: Watch a repository or project for deploys
+      description: "Scope: integrations.manage. target is an id from GET .../integrations/{id}/deploy-options. Without site_id, the SEO site whose host matches one of the target's domains is picked when there is one. The first check runs straight away and looks back seven days. Each production deploy that goes live is recorded as deploy.detected, and features that wait for a change to go live act on it."
+      tags: [deploys]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [integration_id, target]
+              properties:
+                integration_id: { type: string, format: uuid, description: "A GitHub or Vercel connection." }
+                target: { type: string, maxLength: 200, example: acme/website, description: "owner/name on GitHub, the project id on Vercel." }
+                site_id: { type: [string, "null"], format: uuid, description: "The SEO site it serves." }
+      responses:
+        "201":
+          description: The target.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DeployTarget" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "422": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/deploy-targets/{target}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: target, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getDeployTarget
+      x-outflare-access: { scope: integrations.read, brand_limited: true }
+      summary: Read a deploy target
+      description: "Scope: integrations.read."
+      tags: [deploys]
+      responses:
+        "200":
+          description: The target.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DeployTarget" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateDeployTarget
+      x-outflare-access: { scope: integrations.manage, brand_limited: true }
+      summary: Change a deploy target's site, or pause it
+      description: "Scope: integrations.manage. Send only what changes. A paused target is not checked."
+      tags: [deploys]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                site_id: { type: [string, "null"], format: uuid }
+                status: { type: string, enum: [active, paused] }
+      responses:
+        "200":
+          description: The target.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DeployTarget" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    delete:
+      operationId: deleteDeployTarget
+      x-outflare-access: { scope: integrations.manage, brand_limited: true }
+      summary: Stop watching a repository or project
+      description: "Scope: integrations.manage. Its recorded deploys are removed too."
+      tags: [deploys]
+      responses:
+        "204": { description: Stopped watching. }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/deploy-targets/{target}/check:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: target, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: checkDeployTarget
+      x-outflare-access: { scope: integrations.manage, brand_limited: true }
+      summary: Check a target for deploys now
+      description: "Scope: integrations.manage. Queues a check instead of waiting up to five minutes, for example right after a fix shipped."
+      tags: [deploys]
+      responses:
+        "202":
+          description: "Queued, or held for approval in a mission."
+          content:
+            application/json:
+              schema: { oneOf: [{ $ref: "#/components/schemas/Queued" }, { $ref: "#/components/schemas/MissionHeld" }] }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/deploys:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listDeploys
+      x-outflare-access: { scope: integrations.read, brand_limited: true }
+      summary: List production deploys
+      description: "Scope: integrations.read. The newest 100, newest first. Each is a production deploy of a watched target: when the website changed."
+      tags: [deploys]
+      parameters:
+        - { name: target_id, in: query, schema: { type: string, format: uuid } }
+        - { name: site_id, in: query, schema: { type: string, format: uuid } }
+        - { name: state, in: query, schema: { type: string, enum: [ready, failed, building] } }
+        - { $ref: "#/components/parameters/Brand" }
+      responses:
+        "200":
+          description: Deploys (up to 100).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/Deploy" } }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/integrations:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
@@ -11413,6 +11712,264 @@ paths:
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/journeys:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listJourneys
+      x-outflare-access: { scope: emails.read }
+      summary: List journeys, newest first
+      description: "Scope: emails.read. The latest 200; archived journeys only with status=archived."
+      tags: [emails]
+      parameters:
+        - { name: status, in: query, schema: { $ref: "#/components/schemas/JourneyStatus" } }
+      responses:
+        "200":
+          description: Journeys.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/Journey" } }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createJourney
+      x-outflare-access: { scope: emails.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Create a journey
+      description: |
+        Scope: emails.manage. A draft if-this-then-that flow for people on customer records: a customer event (trigger
+        kind event) or a manual add starts a run, which goes through the steps from the first: send a lifecycle email,
+        wait, branch on conditions, exit. Activate it to start.
+      tags: [emails]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/JourneyInput" }
+      responses:
+        "201":
+          description: The journey.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Journey" }
+        "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/journeys/{id}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getJourney
+      x-outflare-access: { scope: emails.read }
+      summary: Get a journey with what each step did
+      description: "Scope: emails.read."
+      tags: [emails]
+      responses:
+        "200":
+          description: The journey.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Journey" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateJourney
+      x-outflare-access: { scope: emails.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Change a journey
+      description: |
+        Scope: emails.manage. A draft or paused journey changes freely; an active one only its name and description, so
+        pause it first. Runs on a step that was removed exit when they move on.
+      tags: [emails]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/JourneyInput" }
+      responses:
+        "200":
+          description: The journey.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Journey" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/journeys/{id}/activate:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: activateJourney
+      x-outflare-access: { scope: emails.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Activate a draft or paused journey
+      description: |
+        Scope: emails.manage. Checks it has steps and that every email step's template is a published lifecycle
+        template. A paused journey's runs move on from where they stopped.
+      tags: [emails]
+      responses:
+        "200":
+          description: The journey, active.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Journey" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/journeys/{id}/pause:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: pauseJourney
+      x-outflare-access: { scope: emails.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Pause an active journey
+      description: "Scope: emails.manage. No one new starts and runs stop where they are until it is activated again."
+      tags: [emails]
+      responses:
+        "200":
+          description: The journey, paused.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Journey" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/journeys/{id}/archive:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: archiveJourney
+      x-outflare-access: { scope: emails.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Archive a journey
+      description: "Scope: emails.manage. Stops it for good and ends its active runs."
+      tags: [emails]
+      responses:
+        "200":
+          description: The journey, archived.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Journey" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/journeys/{id}/runs:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: listJourneyRuns
+      x-outflare-access: { scope: emails.read }
+      summary: The people in a journey, newest first
+      description: "Scope: emails.read. Page with cursor=next_cursor."
+      tags: [emails]
+      parameters:
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
+        - { name: status, in: query, schema: { $ref: "#/components/schemas/JourneyRunStatus" } }
+        - { name: record, in: query, description: Only this person's runs., schema: { type: string, format: uuid } }
+        - { name: after, in: query, description: A run id; the runs after it., schema: { type: string, format: uuid } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
+      responses:
+        "200":
+          description: A page of runs.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, next_after, next_cursor]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/JourneyRun" } }
+                  next_after: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: addJourneyRun
+      x-outflare-access: { scope: emails.send }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Add a person to an active journey
+      description: |
+        Scope: emails.send. Starts a run for a person on a customer record, with data its emails can use as event.*.
+        The trigger's conditions don't apply; its entry rule does (409 with why, such as already in the journey).
+      tags: [emails]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [record_id]
+              properties:
+                record_id: { type: string, format: uuid }
+                data: { type: object, additionalProperties: true }
+      responses:
+        "201":
+          description: The run.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/JourneyRun" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/journeys/{id}/runs/{run}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      - { name: run, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getJourneyRun
+      x-outflare-access: { scope: emails.read }
+      summary: Get a run with what each step did
+      description: "Scope: emails.read."
+      tags: [emails]
+      responses:
+        "200":
+          description: The run.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/JourneyRun" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/journeys/{id}/runs/{run}/exit:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      - { name: run, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: exitJourneyRun
+      x-outflare-access: { scope: emails.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Take a person out of a journey
+      description: "Scope: emails.manage. Ends an active run; nothing more is sent."
+      tags: [emails]
+      responses:
+        "200":
+          description: The run, exited.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/JourneyRun" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/emails:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
@@ -12421,6 +12978,30 @@ webhooks:
             schema: { $ref: "#/components/schemas/WebhookEvent" }
       responses:
         "200": { description: Any 2xx answer means received; anything else is retried. }
+  deploy.detected:
+    post:
+      operationId: webhook_deploy_detected
+      summary: "A watched repository or project went live in production."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  deploy.failed:
+    post:
+      operationId: webhook_deploy_failed
+      summary: "A production deploy of a watched repository or project failed."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
   project.created:
     post:
       operationId: webhook_project_created
@@ -13157,7 +13738,7 @@ components:
       required: [id, type, created_at, workspace_id, actor, target, request_id, data]
       properties:
         id: { type: string, description: "Unique per event, and the webhook-id header. Use it to ignore repeats.", example: evt_48213 }
-        type: { type: string, enum: [lead.replied, lead.unsubscribed, inbox.replied, inbox.updated, inbox.classified, lead.bounced, mailbox.auto_paused, lead.created, lead.updated, lead.deleted, leads.imported, suppressions.added, suppression.removed, lead_list.created, lead_list.leads_added, lead_list.run_started, lead_list.build_done, lead_list.build_failed, lead_list.refresh_done, lead_list.refresh_failed, lead_list.enrich_done, lead_list.enrich_failed, import.done, import.failed, sequence.created, sequence.updated, sequence.activated, sequence.paused, sequence.archived, sequence.deleted, sequence.steps_updated, sequence.leads_enrolled, enrollment.stopped, mailbox.imported, mailbox.updated, mailbox.paused, mailbox.resumed, mailbox.stage_changed, mailbox.deleted, domain.added, domain.paused, domain.resumed, domain.removed, email.queued, email.sent, email.delivered, email.bounced, email.complained, email.failed, email.suppressed, email.cancelled, email.unsubscribed, email.opened, email.clicked, email.preferences_changed, email_domain.verified, email_domain.verification_failed, email_provider.events_failed, email_template.published, meeting.created, meeting.updated, meeting.deleted, deal.created, deal.updated, deal.deleted, spend.recorded, integration.connected, integration.updated, integration.disconnected, connect_request.created, project.created, project.updated, project.deleted, mission.created, mission.updated, mission.submitted, mission.approved, mission.paused, mission.resumed, mission.stopped, mission.completed, mission.action_held, mission.action_approved, mission.action_rejected, infra.plan_created, infra.plan_approved, infra.ordered, infra.order_failed, infra.domains_bought, infra.mailbox_joined, infra.plan_warming, infra.plan_ready, infra.plan_cancelled, fix.found, fix.updated, fix.verify_requested, fix.confirmed, fix.reopened, workspace.updated, webhook.test] }
+        type: { type: string, enum: [lead.replied, lead.unsubscribed, inbox.replied, inbox.updated, inbox.classified, lead.bounced, mailbox.auto_paused, lead.created, lead.updated, lead.deleted, leads.imported, suppressions.added, suppression.removed, lead_list.created, lead_list.leads_added, lead_list.run_started, lead_list.build_done, lead_list.build_failed, lead_list.refresh_done, lead_list.refresh_failed, lead_list.enrich_done, lead_list.enrich_failed, import.done, import.failed, sequence.created, sequence.updated, sequence.activated, sequence.paused, sequence.archived, sequence.deleted, sequence.steps_updated, sequence.leads_enrolled, enrollment.stopped, mailbox.imported, mailbox.updated, mailbox.paused, mailbox.resumed, mailbox.stage_changed, mailbox.deleted, domain.added, domain.paused, domain.resumed, domain.removed, email.queued, email.sent, email.delivered, email.bounced, email.complained, email.failed, email.suppressed, email.cancelled, email.unsubscribed, email.opened, email.clicked, email.preferences_changed, email_domain.verified, email_domain.verification_failed, email_provider.events_failed, email_template.published, meeting.created, meeting.updated, meeting.deleted, deal.created, deal.updated, deal.deleted, spend.recorded, integration.connected, integration.updated, integration.disconnected, connect_request.created, deploy.detected, deploy.failed, project.created, project.updated, project.deleted, mission.created, mission.updated, mission.submitted, mission.approved, mission.paused, mission.resumed, mission.stopped, mission.completed, mission.action_held, mission.action_approved, mission.action_rejected, infra.plan_created, infra.plan_approved, infra.ordered, infra.order_failed, infra.domains_bought, infra.mailbox_joined, infra.plan_warming, infra.plan_ready, infra.plan_cancelled, fix.found, fix.updated, fix.verify_requested, fix.confirmed, fix.reopened, workspace.updated, webhook.test] }
         created_at: { type: string, format: date-time }
         workspace_id: { type: string, format: uuid }
         actor: { $ref: "#/components/schemas/WebhookRef" }
@@ -13669,6 +14250,119 @@ components:
         status: { oneOf: [{ $ref: "#/components/schemas/EmailStatus" }, { type: "null" }] }
         skipped: { type: [string, "null"], description: Why this person did not get it. }
         created_at: { type: string, format: date-time }
+    JourneyStatus: { type: string, enum: [draft, active, paused, archived] }
+    JourneyRunStatus: { type: string, enum: [active, completed, exited, failed] }
+    JourneyCondition:
+      type: object
+      required: [op]
+      description: |
+        One test. Set one of attribute (a field on the person's customer record), property (a property of the event
+        that started the run), event (whether they did this event since the run started) or email with step (whether
+        the email from that step was delivered, opened or clicked). event and email use exists or not_exists.
+      properties:
+        attribute: { type: string }
+        property: { type: string }
+        event: { type: string }
+        email: { type: string, enum: [delivered, opened, clicked] }
+        step: { type: string, description: The email step an email condition is about. }
+        op: { type: string, enum: [eq, neq, gt, lt, contains, exists, not_exists] }
+        value: { description: "What eq, neq, gt, lt and contains compare with." }
+    JourneyStep:
+      type: object
+      required: [id, kind]
+      properties:
+        id: { type: string, pattern: "^[a-z0-9][a-z0-9_-]{0,39}$" }
+        kind: { type: string, enum: [email, wait, branch, exit] }
+        name: { type: string, maxLength: 100 }
+        template: { type: string, description: "email: a lifecycle template's handle or id." }
+        wait_seconds: { type: integer, minimum: 60, maximum: 7776000, description: "wait: how long." }
+        conditions: { type: array, maxItems: 20, items: { $ref: "#/components/schemas/JourneyCondition" }, description: "branch: the tests." }
+        match: { type: string, enum: [all, any], description: "branch: all (the default) or any must hold." }
+        then: { type: string, description: "branch: the step when they hold; empty ends the run." }
+        else: { type: string, description: "branch: the step when they don't; empty ends the run." }
+        next: { type: string, description: "email and wait: the step after; empty ends the run as completed." }
+    JourneyTrigger:
+      type: object
+      required: [kind]
+      properties:
+        kind: { type: string, enum: [event, manual] }
+        event: { type: [string, "null"], description: "event: the customer event that starts a run, such as signed_up." }
+        filter: { type: array, maxItems: 20, items: { $ref: "#/components/schemas/JourneyCondition" }, description: "Attribute and property conditions the person and event must meet." }
+    JourneyInput:
+      type: object
+      properties:
+        name: { type: string, maxLength: 200 }
+        description: { type: string, maxLength: 2000 }
+        brand_id: { type: [string, "null"], format: uuid, description: "Only people of this brand." }
+        trigger: { $ref: "#/components/schemas/JourneyTrigger" }
+        entry: { type: string, enum: [once, again], description: "once: a person goes through it once ever. again: again after they finish." }
+        goal_event: { type: [string, "null"], description: "Doing this event ends their run: they reached the goal." }
+        steps: { type: array, maxItems: 100, items: { $ref: "#/components/schemas/JourneyStep" }, description: The first step starts. }
+    Journey:
+      type: object
+      required: [id, name, description, status, brand_id, trigger, entry, goal_event, steps, version, activated_at, stats, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        description: { type: string }
+        status: { $ref: "#/components/schemas/JourneyStatus" }
+        brand_id: { type: [string, "null"], format: uuid }
+        trigger:
+          type: object
+          required: [kind, event, filter]
+          properties:
+            kind: { type: string, enum: [event, manual] }
+            event: { type: [string, "null"] }
+            filter: { type: array, items: { $ref: "#/components/schemas/JourneyCondition" } }
+        entry: { type: string, enum: [once, again] }
+        goal_event: { type: [string, "null"] }
+        steps: { type: array, items: { $ref: "#/components/schemas/JourneyStep" } }
+        version: { type: integer, description: Goes up each time the steps change. }
+        activated_at: { type: [string, "null"], format: date-time }
+        stats:
+          type: object
+          required: [entered, active, completed, exited, failed]
+          properties:
+            entered: { type: integer }
+            active: { type: integer }
+            completed: { type: integer }
+            exited: { type: integer }
+            failed: { type: integer }
+        step_stats:
+          type: object
+          description: "Only on a single journey: by step id, how many runs had each outcome (sent, skipped, waited, yes, no, failed)."
+          additionalProperties: { type: object, additionalProperties: { type: integer } }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    JourneyRun:
+      type: object
+      required: [id, journey_id, record_id, name, status, step, next_at, exit_reason, steps_taken, context, entered_at, finished_at]
+      properties:
+        id: { type: string, format: uuid }
+        journey_id: { type: string, format: uuid }
+        record_id: { type: string, format: uuid }
+        name: { type: string }
+        status: { $ref: "#/components/schemas/JourneyRunStatus" }
+        step: { type: [string, "null"], description: The step it is on. }
+        next_at: { type: [string, "null"], format: date-time, description: When a wait ends. }
+        exit_reason: { type: [string, "null"], description: "goal, exit_step, manual, archived, step_removed, email_failed." }
+        steps_taken: { type: integer }
+        context: { type: object, additionalProperties: true, description: "The event's properties, or the data it was added with; emails see it as event.*." }
+        entered_at: { type: string, format: date-time }
+        finished_at: { type: [string, "null"], format: date-time }
+        history:
+          type: array
+          description: Only on a single run.
+          items:
+            type: object
+            required: [step, kind, outcome, email_id, detail, at]
+            properties:
+              step: { type: string }
+              kind: { type: string, enum: [email, wait, branch, exit] }
+              outcome: { type: string }
+              email_id: { type: [string, "null"], format: uuid }
+              detail: { type: [string, "null"] }
+              at: { type: string, format: date-time }
     EmailTopicInput:
       type: object
       properties:
@@ -13919,7 +14613,7 @@ components:
         created_at: { type: string, format: date-time }
     ConnectorCategory:
       type: string
-      enum: [email_verification, email_sending, sequencer, mailbox_provider, dns, crm, data, signals, analytics, seo, calendar, registrar, warehouse, notification, model, custom]
+      enum: [email_verification, email_sending, sequencer, mailbox_provider, dns, crm, data, signals, analytics, seo, code, calendar, registrar, warehouse, notification, model, custom]
     ConnectorField:
       type: object
       required: [name, label, secret, optional]
@@ -14585,7 +15279,8 @@ components:
         seo: { type: array, items: { $ref: "#/components/schemas/SEOLatest" }, description: "Each SEO connection's latest snapshot of the domain." }
     SEOReportName:
       type: string
-      enum: [overview, keywords, backlinks, competitors, audit]
+      enum: [overview, keywords, backlinks, links, competitors, audit]
+      description: "backlinks lists linking domains; links lists single links (live, and with `since` also lost ones)."
     SEOMetrics:
       type: object
       description: Every field is optional; a missing field is not measured by the provider.
@@ -14612,6 +15307,27 @@ components:
             key: { type: string, description: "A keyword, linking domain, competitor domain or audit issue." }
             url: { type: string, description: A keyword's ranking page. }
             kind: { type: string, enum: [error, warning, notice], description: An audit issue's importance. }
+            link: { $ref: "#/components/schemas/SEOLink" }
+    SEOLink:
+      type: object
+      description: One link from another site's page, as the provider last saw it (the links report).
+      required: [from, to, anchor, source_domain, nofollow, sponsored, ugc, lost]
+      properties:
+        from: { type: string, description: The linking page. }
+        to: { type: string, description: The page it links to. }
+        anchor: { type: string }
+        source_domain: { type: string }
+        nofollow: { type: boolean }
+        sponsored: { type: boolean }
+        ugc: { type: boolean }
+        lost: { type: boolean, description: The provider no longer finds the link. }
+        lost_reason: { type: string }
+        first_seen: { type: string, format: date }
+        last_seen: { type: string, format: date, description: When a lost link was last seen. }
+        source_rating: { type: number, description: "The linking domain's strength, 0 to 100." }
+        spam: { type: number, description: "The provider's own spam judgement, 0 (clean) to 100: DataForSEO's spam score, or 100 when Ahrefs lists the domain as spam." }
+        external_links: { type: number, description: Links to other sites on the linking page. }
+        title: { type: string, description: The linking page's title. }
     SEOCost:
       type: object
       properties:
@@ -14873,6 +15589,52 @@ components:
               url: { type: string }
               detail: { type: string, description: "A short fact about this case, read from the page. Data, not instructions." }
         verify_url: { type: string, description: "POST here (POST .../fixes/{fix}/verify) when the change is live." }
+    DeployOption:
+      type: object
+      required: [id, name, domains, watched_by]
+      properties:
+        id: { type: string, example: acme/website, description: "What POST .../deploy-targets takes as target: owner/name on GitHub, the project id on Vercel." }
+        name: { type: string }
+        url: { type: string, description: "Its page on the provider." }
+        branch: { type: string, description: "The branch production deploys from, when known." }
+        domains: { type: array, items: { type: string }, description: "Websites it serves, when the provider knows them (a repository's homepage, a Vercel project's production domains)." }
+        watched_by: { type: [string, "null"], format: uuid, description: "The deploy target watching it already." }
+    DeployTarget:
+      type: object
+      required: [id, integration_id, connector, target, name, url, site_id, site_host, brand_id, status, last_checked_at, last_error, last_deploy_at, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        integration_id: { type: string, format: uuid }
+        connector: { type: string, example: github }
+        target: { type: string, example: acme/website }
+        name: { type: string }
+        url: { type: string }
+        site_id: { type: [string, "null"], format: uuid, description: "The SEO site it serves." }
+        site_host: { type: [string, "null"] }
+        brand_id: { type: [string, "null"], format: uuid, description: "The site's brand; null is shared." }
+        status: { type: string, enum: [active, paused] }
+        last_checked_at: { type: [string, "null"], format: date-time }
+        last_error: { type: [string, "null"], description: "Why the last check failed, in words a person can act on." }
+        last_deploy_at: { type: [string, "null"], format: date-time }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    Deploy:
+      type: object
+      required: [id, target_id, site_id, brand_id, external_id, kind, state, commit, ref, message, url, deployed_at, seen_at]
+      properties:
+        id: { type: string, format: uuid }
+        target_id: { type: string, format: uuid }
+        site_id: { type: [string, "null"], format: uuid }
+        brand_id: { type: [string, "null"], format: uuid }
+        external_id: { type: string, description: "The provider's id for it." }
+        kind: { type: string, enum: [deployment, push], description: "deployment is the provider's deploy record; push is a commit to the default branch of a repository that records no deployments." }
+        state: { type: string, enum: [ready, failed, building] }
+        commit: { type: string }
+        ref: { type: string }
+        message: { type: string, description: "The commit's first line." }
+        url: { type: string, description: "Where to see it on the provider." }
+        deployed_at: { type: string, format: date-time, description: "When it went live (ready), or was created." }
+        seen_at: { type: string, format: date-time }
     Fix:
       type: object
       required: [id, source, subject, brand_id, rule, group, status, assignee, note, count, unit, found_by, last_found_by, confirmed_by, fixed_at, created_at, updated_at]
@@ -14917,9 +15679,113 @@ components:
         internal: { type: boolean, description: On the site (its host or its www. twin). }
         nofollow: { type: boolean, description: "rel nofollow, ugc or sponsored." }
         http_status: { type: [integer, "null"], description: "The status this crawl got from the page; null when it did not read it." }
+    Backlink:
+      type: object
+      required: [id, site_id, brand_id, source_url, target_url, source_domain, anchor, nofollow, sponsored, ugc, status, source_rating, first_seen_at, lost_at, regained_at, checked_at, providers]
+      properties:
+        id: { type: string, format: uuid }
+        site_id: { type: string, format: uuid }
+        brand_id: { type: [string, "null"], format: uuid }
+        source_url: { type: string, description: The linking page. }
+        target_url: { type: string, description: The site's page it links to. }
+        source_domain: { type: string, description: "The linking site's host, without www." }
+        anchor: { type: string }
+        nofollow: { type: boolean }
+        sponsored: { type: boolean }
+        ugc: { type: boolean }
+        status: { type: string, enum: [live, lost], description: live while any provider still finds it. }
+        source_rating: { type: [number, "null"], description: "The linking domain's strength, 0 to 100: Ahrefs DR when Ahrefs saw the link, else DataForSEO's rank." }
+        first_seen_at: { type: [string, "null"], format: date-time, description: The earliest date a provider found it. }
+        lost_at: { type: [string, "null"], format: date-time }
+        regained_at: { type: [string, "null"], format: date-time }
+        checked_at: { type: string, format: date-time, description: The last time a provider reported it. }
+        providers:
+          type: object
+          description: Each provider's latest view, by connector id.
+          additionalProperties:
+            type: object
+            required: [status, run_id, checked_at]
+            properties:
+              status: { type: string, enum: [live, lost] }
+              first_seen: { type: string, format: date }
+              last_seen: { type: string, format: date }
+              lost_reason: { type: string }
+              source_rating: { type: number }
+              spam: { type: number, description: "The provider's own spam judgement, 0 to 100." }
+              external_links: { type: number }
+              title: { type: string }
+              run_id: { type: string, format: uuid }
+              checked_at: { type: string, format: date-time }
+    BacklinkEvent:
+      type: object
+      required: [id, site_id, kind, at, connector, source_rating, reason, backlink]
+      properties:
+        id: { type: string }
+        site_id: { type: string, format: uuid }
+        kind: { type: string, enum: [new, lost, regained] }
+        at: { type: string, format: date-time, description: "When it happened, by the provider's dates where it gives them." }
+        connector: { type: string, description: The provider whose read found the change. }
+        source_rating: { type: [number, "null"] }
+        reason: { type: string, description: "Why a lost link was lost, when the provider says (removedfromhtml, notfound, ...)." }
+        backlink:
+          type: object
+          required: [id, source_url, target_url, source_domain, anchor, nofollow, status]
+          properties:
+            id: { type: string, format: uuid }
+            source_url: { type: string }
+            target_url: { type: string }
+            source_domain: { type: string }
+            anchor: { type: string }
+            nofollow: { type: boolean }
+            status: { type: string, enum: [live, lost], description: The link's state now. }
+    BacklinkCounts:
+      type: object
+      required: [new, lost, regained]
+      properties:
+        new: { type: integer }
+        lost: { type: integer }
+        regained: { type: integer }
+    BacklinkSiteSummary:
+      type: object
+      required: [site, live, lost, referring_domains, followed, last_30_days, weeks, providers]
+      properties:
+        site:
+          type: object
+          required: [id, host, brand_id]
+          properties:
+            id: { type: string, format: uuid }
+            host: { type: string }
+            brand_id: { type: [string, "null"], format: uuid }
+        live: { type: integer }
+        lost: { type: integer }
+        referring_domains: { type: integer, description: Distinct domains with a live link. }
+        followed: { type: integer, description: Live links without nofollow. }
+        last_30_days: { $ref: "#/components/schemas/BacklinkCounts" }
+        weeks:
+          type: array
+          items:
+            allOf:
+              - $ref: "#/components/schemas/BacklinkCounts"
+              - type: object
+                required: [week]
+                properties:
+                  week: { type: string, format: date, description: The Monday the week starts. }
+        providers:
+          type: array
+          items:
+            type: object
+            required: [connector, integration_id, last_run_at, status, error, links_seen, finished_at]
+            properties:
+              connector: { type: string }
+              integration_id: { type: [string, "null"], format: uuid }
+              last_run_at: { type: string, format: date-time }
+              status: { type: string, enum: [running, done, failed] }
+              error: { type: [string, "null"] }
+              links_seen: { type: integer }
+              finished_at: { type: [string, "null"], format: date-time }
     SEOSource:
       type: object
-      required: [id, name, connector, connector_name, status, last_error, account, reports, country, sync, domains_set, domains, budget]
+      required: [id, name, connector, connector_name, status, last_error, account, reports, country, sync, link_rows, domains_set, domains, budget]
       properties:
         id: { type: string, format: uuid }
         name: { type: string }
@@ -14931,6 +15797,7 @@ components:
         reports: { type: array, items: { $ref: "#/components/schemas/SEOReportName" } }
         country: { type: string }
         sync: { type: string, enum: [weekly, "off"] }
+        link_rows: { type: integer, description: "Links the weekly read asks for per SEO site (default 200); 0 for a connection that does not read links." }
         domains_set: { type: boolean, description: "false: the domains follow the analytics tools." }
         domains:
           type: array
@@ -15692,7 +16559,7 @@ components:
         replies_7d: { type: integer }
         bounced_7d: { type: integer }
         bounce_rate_7d: { type: [number, "null"], description: "Percent of sends that bounced, last 7 days." }
-        reply_rate_7d: { type: [number, "null"], description: "Percent of sends that got a reply, last 7 days." }
+        reply_rate_7d: { type: [number, "null"], description: "Percent of leads emailed in the last 7 days who replied." }
         open_replies: { type: integer, description: Replies not done or snoozed. }
         created_at: { type: string, format: date-time }
     AgencyToken:
@@ -15990,7 +16857,7 @@ components:
         created_at: { type: string, format: date-time }
     SendingDomain:
       type: object
-      required: [domain, status, daily_limit, notes, source, health, issues, mx_provider, mx_hosts, spf, spf_record, dkim, dkim_selector, dmarc, dmarc_record, dmarc_policy, blocklists, checked_at, mailboxes, mailbox_counts, daily_capacity, sent_24h, sent_7d, replies_7d, bounces_7d, warmup, created_at, updated_at]
+      required: [domain, status, daily_limit, notes, source, health, issues, mx_provider, mx_hosts, spf, spf_record, dkim, dkim_selector, dmarc, dmarc_record, dmarc_policy, blocklists, checked_at, mailboxes, mailbox_counts, daily_capacity, sent_24h, sent_7d, replies_7d, contacted_leads_7d, replied_leads_7d, bounces_7d, warmup, created_at, updated_at]
       properties:
         domain: { type: string, example: acme.com }
         status: { type: string, enum: [active, paused], description: "paused: no sequence or test sends from the domain's mailboxes." }
@@ -16030,13 +16897,15 @@ components:
         sent_24h: { type: integer }
         sent_7d: { type: integer }
         replies_7d: { type: integer, description: Replies from people to the domain's mailboxes. }
+        contacted_leads_7d: { type: integer, description: "Leads emailed from the domain in the last 7 days." }
+        replied_leads_7d: { type: integer, description: "Of those, leads who replied. The reply rate is replied_leads_7d / contacted_leads_7d." }
         bounces_7d: { type: integer }
         warmup:
           type: object
           description: Warm-up across the domain's mailboxes, last 7 days.
           required: [warming, placed_7d, inbox_7d, inbox_rate]
           properties:
-            warming: { type: integer, description: Active mailboxes with warm-up on. }
+            warming: { type: integer, description: "Mailboxes in the warm-up stage (lifecycle_stage warming), the same count Mailboxes and Infrastructure show." }
             placed_7d: { type: integer, description: Warm-up emails whose landing place is known. }
             inbox_7d: { type: integer }
             inbox_rate: { type: [number, "null"], minimum: 0, maximum: 1 }
@@ -16080,7 +16949,7 @@ components:
             value: { type: string, example: "v=DMARC1; p=none" }
     SendingServer:
       type: object
-      required: [id, host, name, ips, ips_source, status, paused_by, status_reason, pause_on_listing, daily_limit, notes, health, issues, blocklists, checked_at, mailboxes, mailbox_counts, domains, daily_capacity, sent_24h, sent_7d, replies_7d, bounces_7d, created_at, updated_at]
+      required: [id, host, name, ips, ips_source, status, paused_by, status_reason, pause_on_listing, daily_limit, notes, health, issues, blocklists, checked_at, mailboxes, mailbox_counts, domains, daily_capacity, sent_24h, sent_7d, replies_7d, contacted_leads_7d, replied_leads_7d, bounces_7d, created_at, updated_at]
       properties:
         id: { type: string, format: uuid }
         host: { type: string, example: smtp.mailreef-box.example, description: The SMTP host its mailboxes sign in to. }
@@ -16123,6 +16992,8 @@ components:
         sent_24h: { type: integer }
         sent_7d: { type: integer }
         replies_7d: { type: integer }
+        contacted_leads_7d: { type: integer, description: "Leads emailed through the server in the last 7 days." }
+        replied_leads_7d: { type: integer, description: "Of those, leads who replied. The reply rate is replied_leads_7d / contacted_leads_7d." }
         bounces_7d: { type: integer }
         created_at: { type: string, format: date-time }
         updated_at: { type: string, format: date-time }
@@ -17425,7 +18296,7 @@ components:
           items: { $ref: "#/components/schemas/Step" }
         stats:
           type: object
-          description: Enrollments by status, plus `sent` (messages delivered) and `clicked` (leads who clicked a tracked link, leaving out likely link scanners).
+          description: Enrollments by status, plus `sent` (messages delivered), `contacted` (leads emailed at least once; the reply rate is `replied` / `contacted`) and `clicked` (leads who clicked a tracked link, leaving out likely link scanners).
           additionalProperties: { type: integer }
         created_at: { type: string, format: date-time }
         updated_at: { type: string, format: date-time }
@@ -17566,7 +18437,7 @@ components:
         at: { type: string, format: date-time }
     WorkspaceStats:
       type: object
-      required: [mailboxes, domains, warmup_inbox_rate, sent_24h, sent_7d, replies_7d, bounces_7d, unread_replies, active_sequences, active_enrollments, leads]
+      required: [mailboxes, domains, warmup_inbox_rate, sent_24h, sent_7d, replies_7d, contacted_leads_7d, replied_leads_7d, bounces_7d, unread_replies, active_sequences, active_enrollments, leads]
       properties:
         mailboxes:
           type: object
@@ -17578,7 +18449,7 @@ components:
             paused: { type: integer }
             verifying: { type: integer }
             daily_capacity: { type: integer, description: "Most emails that can go out in 24 hours: active mailboxes' daily limits, held to each domain's cap, with paused domains at 0." }
-            warming: { type: integer, description: Active mailboxes with warm-up on. }
+            warming: { type: integer, description: "Mailboxes in the warm-up stage (lifecycle_stage warming), the same count Mailboxes and Infrastructure show." }
         warmup_inbox_rate: { type: [number, "null"], description: "Share of the last 7 days' placed warm-up mail that reached the inbox." }
         domains:
           type: object
@@ -17590,6 +18461,8 @@ components:
         sent_24h: { type: integer }
         sent_7d: { type: integer }
         replies_7d: { type: integer, description: "Replies from people, not auto-replies or bounces." }
+        contacted_leads_7d: { type: integer, description: "Leads emailed at least once in the last 7 days." }
+        replied_leads_7d: { type: integer, description: "Leads who replied in the last 7 days. The reply rate is replied_leads_7d / contacted_leads_7d, as on Reports." }
         bounces_7d: { type: integer }
         unread_replies: { type: integer, description: "Unread replies not yet marked done." }
         active_sequences: { type: integer }
