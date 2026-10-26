@@ -2,6 +2,14 @@
 
 Instructions for coding agents (and humans) working on outflare.ai, the marketing site and docs for **Outflare**. Use only that name: never any other product name, and the domain is always `outflare.ai` (no `www`). The engine's own rules are in [`outflareai/outflare` AGENTS.md](https://github.com/outflareai/outflare/blob/main/AGENTS.md); this file adds what is specific to the site.
 
+## Bring your own keys (hard rule, no exceptions)
+
+All third-party APIs are on an account basis. Outflare never gives access to its own API keys for connectors, AI or any other third-party service: everybody adds their own. No exceptions. The engine enforces it in code and CI ([engine AGENTS.md](https://github.com/outflareai/outflare/blob/main/AGENTS.md), "Bring your own keys"); on this site:
+
+- **Never promise or describe an Outflare-provided key.** No free credits, included AI, trial keys, "works out of the box with our key", or a shared Geonode, Anthropic, OpenAI or data provider account, on any page, plan or comparison table, for Cloud or self-hosting.
+- **Docs for a feature that calls a third-party API say whose account it runs on:** the workspace connects its own key or signs in to its own account, and the feature stays off until it does. Link the connector's page.
+- **The site's own services are not workspace features.** GTM, GA4, PostHog, Cloudflare and the `deployed` check run outflare.ai itself; they stay as they are under "Secrets and security" and the costs registry.
+
 ## Events: every action and every error (hard rule)
 
 Every action a visitor takes that tells us something (a sign-up, sign-in, GitHub or contact click, a button that matters) is an event, and every script error is one too. A change that adds a call to action or a script without its event is not done.
