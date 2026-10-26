@@ -5381,7 +5381,7 @@ paths:
       x-outflare-access: { scope: integrations.manage }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Take an SEO snapshot now
-      description: "Scope: integrations.manage. Stores the overview and top 50 keywords of every domain the connection follows, within its budget (this also runs weekly). Costs about $0.04 a domain on DataForSEO or 1,200 API units on Ahrefs. A connection that reads single links also reads the links to every active SEO site (`link_rows` each, live and lost in the last 90 days) into GET .../backlinks: about $0.03 a site on DataForSEO, or 50 to 200 API units on Ahrefs."
+      description: "Scope: integrations.manage. Stores the overview and top 50 keywords of every domain the connection follows, within its budget (this also runs weekly). Costs about $0.04 a domain on DataForSEO or 1,200 API units on Ahrefs. A connection that reads single links also reads the links to every active SEO site (`link_rows` each, live and lost in the last 90 days) into GET .../backlinks: about $0.03 a site on DataForSEO, or 50 to 200 API units on Ahrefs. It also asks which domains compete with each SEO site (10 suggestions, about $0.01 or 110 API units) and takes an overview of each tracked competitor, at most 10 a site, priced like a domain's (GET .../seo-competitors)."
       tags: [seo]
       responses:
         "200":
@@ -5390,7 +5390,7 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [domains, rows, cost, unit, links]
+                required: [domains, rows, cost, unit, links, competitors]
                 properties:
                   domains: { type: array, items: { type: string } }
                   rows: { type: integer }
@@ -5410,6 +5410,20 @@ paths:
                         new: { type: integer }
                         lost: { type: integer }
                         regained: { type: integer }
+                        cost: { type: number }
+                        error: { type: [string, "null"] }
+                  competitors:
+                    type: array
+                    description: "Each SEO site's competitors read: suggestions stored, tracked competitors' numbers taken, and the events they made."
+                    items:
+                      type: object
+                      required: [site_id, host, suggested, checked, events, cost, error]
+                      properties:
+                        site_id: { type: string, format: uuid }
+                        host: { type: string }
+                        suggested: { type: integer }
+                        checked: { type: integer }
+                        events: { type: integer }
                         cost: { type: number }
                         error: { type: [string, "null"] }
         "400": { $ref: "#/components/responses/Error" }
@@ -6037,6 +6051,190 @@ paths:
                   data: { type: array, items: { $ref: "#/components/schemas/BacklinkSiteSummary" } }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/seo-competitors:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listSEOCompetitors
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: List SEO competitors
+      description: |
+        Scope: seo.read. The sites each SEO site competes with in search:
+        `suggested` by an SEO connection (domains ranking for the same
+        keywords, read each week), `tracked`, or `dismissed`. Tracked ones
+        first. `numbers` is the latest overview any of the workspace's SEO
+        connections took of the competitor's domain (tracked competitors
+        get one each week); `title`, `description` and `pages` come from
+        OutflareBot's weekly light look at its robots.txt, sitemaps and
+        home page. Reads only what is stored, so it costs nothing.
+      tags: [seo]
+      parameters:
+        - { $ref: "#/components/parameters/Brand" }
+        - { name: site_id, in: query, schema: { type: string, format: uuid } }
+        - { name: status, in: query, schema: { type: string, enum: [suggested, tracked, dismissed] } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
+        - { name: offset, in: query, schema: { type: integer, minimum: 0 } }
+        - { $ref: "#/components/parameters/Fields" }
+        - { $ref: "#/components/parameters/Cursor" }
+      responses:
+        "200":
+          description: Competitors.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, total, next_offset, next_cursor]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/SEOCompetitor" } }
+                  total: { type: integer }
+                  next_offset: { type: [integer, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: addSEOCompetitor
+      x-outflare-access: { scope: seo.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Track a competitor
+      description: |
+        Scope: seo.manage. Tracks a domain as one of a site's competitors
+        (a suggestion or dismissed one becomes tracked), at most 20 a site,
+        and queues OutflareBot's first light look at it. Its numbers come
+        with the connection's next weekly snapshot (or POST .../seo/{id}/sync).
+        `host` may be a URL; it is kept as the domain without www.
+      tags: [seo]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [site_id, host]
+              properties:
+                site_id: { type: string, format: uuid }
+                host: { type: string, maxLength: 300, examples: [rival.example] }
+      responses:
+        "201":
+          description: The competitor.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SEOCompetitor" }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/seo-competitors/events:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listSEOCompetitorEvents
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: List what changed at competitors
+      description: |
+        Scope: seo.read. The competitor feed, newest first. From
+        OutflareBot's look: `pages_added` and `pages_removed` (pages their
+        sitemaps list, with a count and up to 10 URLs), `title_changed` and
+        `description_changed` (the home page). From an SEO connection
+        (`connector`): `rating_changed` (domain rating, by a point or more),
+        `traffic_changed` and `keywords_changed` (by a tenth or more) and
+        `links_changed` (referring domains, by a twentieth or more), with
+        `before` and `after`. The first look and first snapshot are a
+        baseline. Events are never changed afterwards.
+      tags: [seo]
+      parameters:
+        - { $ref: "#/components/parameters/Brand" }
+        - { name: site_id, in: query, schema: { type: string, format: uuid } }
+        - { name: competitor_id, in: query, schema: { type: string, format: uuid } }
+        - { name: kind, in: query, schema: { $ref: "#/components/schemas/SEOCompetitorEventKind" } }
+        - { name: days, in: query, schema: { type: integer, minimum: 1, maximum: 730, default: 90 } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
+        - { name: offset, in: query, schema: { type: integer, minimum: 0 } }
+        - { $ref: "#/components/parameters/Fields" }
+        - { $ref: "#/components/parameters/Cursor" }
+      responses:
+        "200":
+          description: Events.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, next_offset, next_cursor]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/SEOCompetitorEvent" } }
+                  next_offset: { type: [integer, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/seo-competitors/{competitor}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: competitor, in: path, required: true, schema: { type: string, format: uuid } }
+    patch:
+      operationId: updateSEOCompetitor
+      x-outflare-access: { scope: seo.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Track or dismiss a competitor
+      description: "Scope: seo.manage. `tracked` starts the weekly look and numbers (at most 20 a site); `dismissed` stops them and keeps a suggestion from coming back."
+      tags: [seo]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status: { type: string, enum: [tracked, dismissed] }
+      responses:
+        "200":
+          description: The competitor.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SEOCompetitor" }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+    delete:
+      operationId: removeSEOCompetitor
+      x-outflare-access: { scope: seo.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Remove a competitor
+      description: "Scope: seo.manage. Its pages and events go with it. A connection may suggest it again; dismiss it to keep it away."
+      tags: [seo]
+      responses:
+        "204": { description: Removed. }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/seo-competitors/{competitor}/check:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: competitor, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: checkSEOCompetitor
+      x-outflare-access: { scope: seo.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Look at a competitor's site now
+      description: "Scope: seo.manage. Queues OutflareBot's light look at a tracked competitor (robots.txt, its sitemaps and its home page, obeying robots.txt), at most once an hour. It costs nothing; numbers come from the SEO connections' weekly snapshot."
+      tags: [seo]
+      responses:
+        "202":
+          description: "Queued. Inside a mission, a MissionHeld answer when the call was held for approval or dry-run instead."
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - { $ref: "#/components/schemas/Queued" }
+                  - { $ref: "#/components/schemas/MissionHeld" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/seo-rules:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
@@ -15783,6 +15981,55 @@ components:
               error: { type: [string, "null"] }
               links_seen: { type: integer }
               finished_at: { type: [string, "null"], format: date-time }
+    SEOCompetitor:
+      type: object
+      required: [id, site_id, brand_id, host, status, source, common_keywords, record_id, title, description, pages, checked_at, check_error, numbers, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        site_id: { type: string, format: uuid }
+        brand_id: { type: [string, "null"], description: "The site's brand." }
+        host: { type: string, description: "The competitor's domain, without www." }
+        status: { type: string, enum: [suggested, tracked, dismissed] }
+        source: { type: string, description: "manual, or the connector that suggested it." }
+        common_keywords: { type: [number, "null"], description: "Keywords it shares with the site, by the suggesting connection." }
+        record_id: { type: [string, "null"], description: "The customer record with this domain, when the workspace has one." }
+        title: { type: string, description: "Its home page's title, from the latest look." }
+        description: { type: string }
+        pages: { type: integer, description: "Pages its sitemaps list." }
+        checked_at: { type: [string, "null"], format: date-time, description: "OutflareBot's latest look." }
+        check_error: { type: [string, "null"], description: "Why the latest look failed, such as robots.txt not allowing OutflareBot." }
+        numbers:
+          type: [object, "null"]
+          description: The latest overview an SEO connection took of its domain.
+          required: [connector, day, metrics]
+          properties:
+            connector: { type: string }
+            day: { type: string, format: date }
+            metrics: { $ref: "#/components/schemas/SEOMetrics" }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    SEOCompetitorEventKind:
+      type: string
+      enum: [pages_added, pages_removed, title_changed, description_changed, rating_changed, traffic_changed, keywords_changed, links_changed]
+    SEOCompetitorEvent:
+      type: object
+      required: [id, site_id, competitor_id, host, kind, connector, data, at]
+      properties:
+        id: { type: string }
+        site_id: { type: string, format: uuid }
+        competitor_id: { type: string, format: uuid }
+        host: { type: string }
+        kind: { $ref: "#/components/schemas/SEOCompetitorEventKind" }
+        connector: { type: string, description: "The SEO connection whose numbers moved; empty for OutflareBot's look." }
+        data:
+          type: object
+          description: "Pages: count and up to 10 urls. The rest: before and after."
+          properties:
+            count: { type: integer }
+            urls: { type: array, items: { type: string } }
+            before: { type: [number, string] }
+            after: { type: [number, string] }
+        at: { type: string, format: date-time }
     SEOSource:
       type: object
       required: [id, name, connector, connector_name, status, last_error, account, reports, country, sync, link_rows, domains_set, domains, budget]
