@@ -14,7 +14,9 @@ info:
 
     Every operation says who may call it in `x-outflare-access`: `scope`
     (the API token scope it needs in the workspace) and `project_tokens`
-    (whether a project token may call it), `agency_role` and
+    (whether a project token may call it), `brand_limited` (whether a
+    caller kept to some brands, a brand token or an operator or viewer
+    with brands, may call it; elsewhere it gets 403), `agency_role` and
     `agency_tokens` for agency endpoints, or `signed_in` for endpoints
     only a signed-in person can use, `authenticated` for any session or
     token. Operations without it are public.
@@ -148,6 +150,17 @@ paths:
                                   test: { type: boolean, description: A test workspace, where nothing reaches the outside world. }
                           agency_id: { type: [string, "null"], format: uuid }
                           project_id: { type: [string, "null"], format: uuid }
+                          brand_id: { type: [string, "null"], format: uuid, description: "Set for a brand token: it sees that brand's records and the shared ones, and changes only that brand's." }
+                          brand:
+                            description: A brand token's brand; null otherwise.
+                            oneOf:
+                              - type: "null"
+                              - type: object
+                                required: [id, handle, name]
+                                properties:
+                                  id: { type: string, format: uuid }
+                                  handle: { type: string, example: repocket }
+                                  name: { type: string, example: Repocket }
                           scopes: { type: array, items: { type: string }, description: "As granted. Any scope in an area includes reading it: leads.manage can also list leads." }
                           expires_at: { type: [string, "null"], format: date-time }
                   user:
@@ -1030,7 +1043,7 @@ paths:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: getWorkspace
-      x-outflare-access: { scope: workspace.read }
+      x-outflare-access: { scope: workspace.read, brand_limited: true }
       summary: Get a workspace
       description: "Scope: workspace.read"
       tags: [access]
@@ -1111,7 +1124,7 @@ paths:
       - { name: ref, in: path, required: true, description: The item's ID, or any slug it has had., schema: { type: string } }
     get:
       operationId: getItemLink
-      x-outflare-access: { scope: workspace.read }
+      x-outflare-access: { scope: workspace.read, brand_limited: true }
       summary: Find an item by the slug in its web app URL
       description: |
         Scope: workspace.read, plus the item's own read scope (sequences.read, projects.read, leads.read for lists,
@@ -1140,7 +1153,7 @@ paths:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listMembers
-      x-outflare-access: { scope: members.read }
+      x-outflare-access: { scope: members.read, brand_limited: true }
       summary: List members
       description: "Scope: members.read"
       tags: [access]
@@ -1164,8 +1177,12 @@ paths:
       operationId: updateMember
       x-outflare-access: { scope: members.manage }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
-      summary: Change a member's role
-      description: "Scope: members.manage. Nobody can act above their own role; only owners can grant or change owner; the last owner cannot be demoted."
+      summary: Change a member's role or brands
+      description: |
+        Scope: members.manage. Nobody can act above their own role; only owners can grant or change owner; the last owner
+        cannot be demoted. Send `role`, `brand_ids` or both. `brand_ids` keeps an operator or viewer to some brands: they
+        see those brands' records and the shared ones, change only their brands', and get 403 on endpoints that need every
+        brand. Owners and admins always work on every brand, so making someone one clears their brands.
       tags: [access]
       requestBody:
         required: true
@@ -1173,11 +1190,21 @@ paths:
           application/json:
             schema:
               type: object
-              required: [role]
               properties:
                 role: { $ref: "#/components/schemas/Role" }
+                brand_ids: { type: array, maxItems: 100, items: { type: string }, description: "Brand ids or handles; empty for every brand." }
       responses:
-        "200": { description: Updated. }
+        "200":
+          description: Updated.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [user_id, role, brand_ids]
+                properties:
+                  user_id: { type: string, format: uuid }
+                  role: { $ref: "#/components/schemas/Role" }
+                  brand_ids: { type: array, items: { type: string, format: uuid } }
         "403": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
         "202": { $ref: "#/components/responses/MissionHeld" }
@@ -1231,6 +1258,7 @@ paths:
               properties:
                 email: { type: string, format: email }
                 role: { type: string, enum: [admin, operator, viewer] }
+                brand_ids: { type: array, maxItems: 100, items: { type: string }, description: "Brand ids or handles an operator or viewer will work on; empty or absent for every brand." }
       responses:
         "201":
           description: Created.
@@ -1304,6 +1332,7 @@ paths:
                 may_take_mailboxes: { type: boolean }
                 default_team_id: { type: [string, "null"], format: uuid }
                 project_id: { type: [string, "null"], format: uuid, description: "Binds the token to one project: it sees and changes only that project's records, and endpoints that are not project-aware refuse it. Fixed for the token's life." }
+                brand: { type: [string, "null"], description: "Binds the token to one brand, by id or handle: it sees that brand's records and the shared ones, changes only that brand's, and endpoints that need every brand refuse it. Fixed for the token's life; not with project_id.", example: repocket }
       responses:
         "201":
           description: Created.
@@ -1430,6 +1459,16 @@ paths:
                         full_scopes: { type: array, items: { $ref: "#/components/schemas/Scope" }, description: "What access full gives: everything the role allows except managing members, tokens and the workspace, approving missions, removing suppressions, managing webhooks and spending money." }
                         read_scopes: { type: array, items: { $ref: "#/components/schemas/Scope" } }
                         can_spend: { type: boolean, description: The role may approve spending (infrastructure.approve), so allow_spending can add it. }
+                        brands:
+                          description: Set when the person is kept to some brands there; the app is then kept to the one they pick (send it as brand). Null for every brand.
+                          type: [array, "null"]
+                          items:
+                            type: object
+                            required: [id, handle, name]
+                            properties:
+                              id: { type: string, format: uuid }
+                              handle: { type: string }
+                              name: { type: string }
         default: { $ref: "#/components/responses/Error" }
     post:
       operationId: approveAgentAuthorization
@@ -1453,6 +1492,7 @@ paths:
                 workspace_id: { type: string, description: The workspace's id or slug. }
                 access: { type: string, enum: [full, read] }
                 allow_spending: { type: boolean, description: "Also let the app approve spending money on domains and mailboxes (infrastructure.approve). Off by default." }
+                brand: { type: string, description: "For a person kept to some brands: the brand (id or handle) the app is kept to. Required for them, ignored for everyone else." }
                 approve: { type: boolean, description: False declines; the app hears access_denied. }
       responses:
         "200":
@@ -1809,7 +1849,7 @@ paths:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listMailboxes
-      x-outflare-access: { scope: mailboxes.read, project_tokens: true }
+      x-outflare-access: { scope: mailboxes.read, project_tokens: true, brand_limited: true }
       summary: List mailboxes
       description: "Scope: mailboxes.read. Credentials are never returned."
       tags: [mailboxes]
@@ -1909,7 +1949,7 @@ paths:
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: getMailbox
-      x-outflare-access: { scope: mailboxes.read, project_tokens: true }
+      x-outflare-access: { scope: mailboxes.read, project_tokens: true, brand_limited: true }
       summary: Get a mailbox
       description: "Scope: mailboxes.read"
       tags: [mailboxes]
@@ -2052,7 +2092,7 @@ paths:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listMailboxPools
-      x-outflare-access: { scope: mailboxes.read }
+      x-outflare-access: { scope: mailboxes.read, brand_limited: true }
       summary: List mailbox pools
       description: "Scope: mailboxes.read"
       tags: [mailboxes]
@@ -2114,7 +2154,7 @@ paths:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listSendingDomains
-      x-outflare-access: { scope: mailboxes.read, project_tokens: true }
+      x-outflare-access: { scope: mailboxes.read, project_tokens: true, brand_limited: true }
       summary: List sending domains with health, settings and sending stats
       description: |
         Scope: mailboxes.read. Every domain your mailboxes send from, plus
@@ -2190,7 +2230,7 @@ paths:
       - { $ref: "#/components/parameters/Domain" }
     get:
       operationId: getSendingDomain
-      x-outflare-access: { scope: mailboxes.read, project_tokens: true }
+      x-outflare-access: { scope: mailboxes.read, project_tokens: true, brand_limited: true }
       summary: Get a domain, with daily sends, replies and bounces for 14 days
       description: "Scope: mailboxes.read. List the domain's mailboxes with `GET /mailboxes?domain=`."
       tags: [domains]
@@ -2412,7 +2452,7 @@ paths:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listTrackingDomains
-      x-outflare-access: { scope: mailboxes.read }
+      x-outflare-access: { scope: mailboxes.read, brand_limited: true }
       summary: List tracking domains
       description: |
         Scope: mailboxes.read. Optional. Once a domain is verified, the
@@ -2500,7 +2540,7 @@ paths:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listLeads
-      x-outflare-access: { scope: leads.read }
+      x-outflare-access: { scope: leads.read, brand_limited: true }
       summary: List and search leads, ordered by email
       description: "Scope: leads.read"
       tags: [leads]
@@ -2531,7 +2571,7 @@ paths:
         default: { $ref: "#/components/responses/Error" }
     post:
       operationId: upsertLead
-      x-outflare-access: { scope: leads.manage }
+      x-outflare-access: { scope: leads.manage, brand_limited: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Add a lead, or update the lead with this email
       description: "Scope: leads.manage. Empty fields keep stored values; custom fields are merged."
@@ -2559,7 +2599,7 @@ paths:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     post:
       operationId: importLeads
-      x-outflare-access: { scope: leads.manage }
+      x-outflare-access: { scope: leads.manage, brand_limited: true }
       summary: Bulk import leads from CSV
       description: |
         Scope: leads.manage. Send the CSV file as the body (up to 50 MB and
@@ -2600,7 +2640,7 @@ paths:
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: getLead
-      x-outflare-access: { scope: leads.read }
+      x-outflare-access: { scope: leads.read, brand_limited: true }
       summary: Get a lead
       description: "Scope: leads.read"
       tags: [leads]
@@ -2666,7 +2706,7 @@ paths:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listLeadLists
-      x-outflare-access: { scope: leads.read, project_tokens: true }
+      x-outflare-access: { scope: leads.read, project_tokens: true, brand_limited: true }
       summary: List lead lists, with each list's latest run
       description: "Scope: leads.read. A project token sees only its project's lists."
       tags: [lists]
@@ -2689,7 +2729,7 @@ paths:
         default: { $ref: "#/components/responses/Error" }
     post:
       operationId: createLeadList
-      x-outflare-access: { scope: leads.manage, project_tokens: true }
+      x-outflare-access: { scope: leads.manage, project_tokens: true, brand_limited: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Create a lead list, optionally built from a data provider search
       description: >-
@@ -2723,7 +2763,7 @@ paths:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     post:
       operationId: previewLeadList
-      x-outflare-access: { scope: leads.manage, project_tokens: true }
+      x-outflare-access: { scope: leads.manage, project_tokens: true, brand_limited: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Preview a search before building a list from it
       description: >-
@@ -2757,7 +2797,7 @@ paths:
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: getLeadList
-      x-outflare-access: { scope: leads.read, project_tokens: true }
+      x-outflare-access: { scope: leads.read, project_tokens: true, brand_limited: true }
       summary: Get a lead list and its latest run
       description: "Scope: leads.read"
       tags: [lists]
@@ -2771,7 +2811,7 @@ paths:
         default: { $ref: "#/components/responses/Error" }
     patch:
       operationId: updateLeadList
-      x-outflare-access: { scope: leads.manage, project_tokens: true }
+      x-outflare-access: { scope: leads.manage, project_tokens: true, brand_limited: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Change a list's settings
       description: "Scope: leads.manage. Absent fields keep their value; filters are replaced as a whole."
@@ -2793,7 +2833,7 @@ paths:
         default: { $ref: "#/components/responses/Error" }
     delete:
       operationId: deleteLeadList
-      x-outflare-access: { scope: leads.manage, project_tokens: true }
+      x-outflare-access: { scope: leads.manage, project_tokens: true, brand_limited: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Delete a list. Its leads stay.
       description: "Scope: leads.manage"
@@ -2809,7 +2849,7 @@ paths:
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: listLeadListMembers
-      x-outflare-access: { scope: leads.read, project_tokens: true }
+      x-outflare-access: { scope: leads.read, project_tokens: true, brand_limited: true }
       summary: List a list's leads with their ICP fit scores
       description: "Scope: leads.read. Sorted by score, best first, unless sort says otherwise."
       tags: [lists]
@@ -2844,7 +2884,7 @@ paths:
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: addLeadsToList
-      x-outflare-access: { scope: leads.manage, project_tokens: true }
+      x-outflare-access: { scope: leads.manage, project_tokens: true, brand_limited: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Add leads to a list
       description: "Scope: leads.manage. Ids of leads outside the workspace are ignored."
@@ -2881,7 +2921,7 @@ paths:
       - { name: lead, in: path, required: true, schema: { type: string, format: uuid } }
     delete:
       operationId: removeLeadFromList
-      x-outflare-access: { scope: leads.manage, project_tokens: true }
+      x-outflare-access: { scope: leads.manage, project_tokens: true, brand_limited: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Remove a lead from a list
       description: "Scope: leads.manage"
@@ -2897,7 +2937,7 @@ paths:
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: listListRuns
-      x-outflare-access: { scope: leads.read, project_tokens: true }
+      x-outflare-access: { scope: leads.read, project_tokens: true, brand_limited: true }
       summary: List a list's runs, newest first
       description: "Scope: leads.read"
       tags: [lists]
@@ -2917,7 +2957,7 @@ paths:
         default: { $ref: "#/components/responses/Error" }
     post:
       operationId: startListRun
-      x-outflare-access: { scope: leads.manage, project_tokens: true }
+      x-outflare-access: { scope: leads.manage, project_tokens: true, brand_limited: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Build, refresh or enrich a list
       description: >-
@@ -2953,7 +2993,7 @@ paths:
       - { name: run, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: getListRun
-      x-outflare-access: { scope: leads.read, project_tokens: true }
+      x-outflare-access: { scope: leads.read, project_tokens: true, brand_limited: true }
       summary: Get a run's progress or result
       description: "Scope: leads.read"
       tags: [lists]
@@ -2971,7 +3011,7 @@ paths:
       - { name: run, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: cancelListRun
-      x-outflare-access: { scope: leads.manage, project_tokens: true }
+      x-outflare-access: { scope: leads.manage, project_tokens: true, brand_limited: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Stop a queued or running run. Leads already added stay.
       description: "Scope: leads.manage"
@@ -2990,7 +3030,7 @@ paths:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listDataProviders
-      x-outflare-access: { scope: leads.read, project_tokens: true }
+      x-outflare-access: { scope: leads.read, project_tokens: true, brand_limited: true }
       summary: Data providers that can search for people, find emails or enrich
       description: >-
         Scope: leads.read. Every data connector, available or planned, with the
@@ -3052,7 +3092,7 @@ paths:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listSuppressions
-      x-outflare-access: { scope: leads.read }
+      x-outflare-access: { scope: leads.read, brand_limited: true }
       summary: List the suppression list, ordered by value
       description: "Scope: leads.read"
       tags: [suppression]
@@ -3082,7 +3122,7 @@ paths:
         default: { $ref: "#/components/responses/Error" }
     post:
       operationId: addSuppressions
-      x-outflare-access: { scope: leads.manage }
+      x-outflare-access: { scope: leads.manage, brand_limited: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Add emails or domains to the suppression list
       description: |
@@ -3145,7 +3185,7 @@ paths:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     post:
       operationId: checkRecipients
-      x-outflare-access: { scope: leads.read }
+      x-outflare-access: { scope: leads.read, brand_limited: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Ask the send policy whether addresses may be emailed
       description: |
@@ -3226,7 +3266,7 @@ paths:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listSequences
-      x-outflare-access: { scope: sequences.read, project_tokens: true }
+      x-outflare-access: { scope: sequences.read, project_tokens: true, brand_limited: true }
       summary: List sequences (archived ones are left out)
       description: "Scope: sequences.read"
       tags: [sequences]
@@ -3248,7 +3288,7 @@ paths:
         default: { $ref: "#/components/responses/Error" }
     post:
       operationId: createSequence
-      x-outflare-access: { scope: sequences.manage, project_tokens: true }
+      x-outflare-access: { scope: sequences.manage, project_tokens: true, brand_limited: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Create a sequence
       description: |
@@ -3287,7 +3327,7 @@ paths:
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: getSequence
-      x-outflare-access: { scope: sequences.read, project_tokens: true }
+      x-outflare-access: { scope: sequences.read, project_tokens: true, brand_limited: true }
       summary: Get a sequence
       description: "Scope: sequences.read"
       tags: [sequences]
@@ -3301,7 +3341,7 @@ paths:
         default: { $ref: "#/components/responses/Error" }
     patch:
       operationId: updateSequence
-      x-outflare-access: { scope: sequences.manage, project_tokens: true }
+      x-outflare-access: { scope: sequences.manage, project_tokens: true, brand_limited: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Change a sequence's settings, or activate, pause or archive it
       description: |
@@ -3334,7 +3374,7 @@ paths:
         default: { $ref: "#/components/responses/Error" }
     delete:
       operationId: deleteSequence
-      x-outflare-access: { scope: sequences.manage, project_tokens: true }
+      x-outflare-access: { scope: sequences.manage, project_tokens: true, brand_limited: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Delete a sequence that is not active
       description: "Scope: sequences.manage. Sent messages are kept in the message log."
@@ -3351,7 +3391,7 @@ paths:
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     put:
       operationId: replaceSequenceSteps
-      x-outflare-access: { scope: sequences.manage, project_tokens: true }
+      x-outflare-access: { scope: sequences.manage, project_tokens: true, brand_limited: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Replace a sequence's steps
       description: |
@@ -3388,7 +3428,7 @@ paths:
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: previewSequence
-      x-outflare-access: { scope: sequences.read, project_tokens: true }
+      x-outflare-access: { scope: sequences.read, project_tokens: true, brand_limited: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Render every step for one lead
       description: |
@@ -3436,7 +3476,7 @@ paths:
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: listEnrollments
-      x-outflare-access: { scope: sequences.read, project_tokens: true }
+      x-outflare-access: { scope: sequences.read, project_tokens: true, brand_limited: true }
       summary: List the leads in a sequence, ordered by email
       description: "Scope: sequences.read"
       tags: [sequences]
@@ -3463,7 +3503,7 @@ paths:
         default: { $ref: "#/components/responses/Error" }
     post:
       operationId: enrollLeads
-      x-outflare-access: { scope: sequences.manage, project_tokens: true }
+      x-outflare-access: { scope: sequences.manage, project_tokens: true, brand_limited: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Add leads to a sequence
       description: |
@@ -3511,7 +3551,7 @@ paths:
       - { name: eid, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: stopEnrollment
-      x-outflare-access: { scope: sequences.manage, project_tokens: true }
+      x-outflare-access: { scope: sequences.manage, project_tokens: true, brand_limited: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Stop sending to one lead in a sequence
       description: "Scope: sequences.manage"
@@ -3667,7 +3707,7 @@ paths:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listInbox
-      x-outflare-access: { scope: inbox.read }
+      x-outflare-access: { scope: inbox.read, brand_limited: true }
       summary: List received mail, newest first
       description: |
         Scope: inbox.read. By default only replies and auto-replies from
@@ -3685,6 +3725,7 @@ paths:
         - { name: assigned_to, in: query, description: "me (signed-in person only), none, or a user id.", schema: { type: string } }
         - { name: label, in: query, schema: { type: string } }
         - { name: q, in: query, description: Search sender and subject., schema: { type: string } }
+        - { $ref: "#/components/parameters/Brand" }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
         - { name: before, in: query, description: "next_before from the previous page.", schema: { type: string, format: date-time } }
         - { $ref: "#/components/parameters/Cursor" }
@@ -3711,7 +3752,7 @@ paths:
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: getInboundMessage
-      x-outflare-access: { scope: inbox.read }
+      x-outflare-access: { scope: inbox.read, brand_limited: true }
       summary: Get a received message and its conversation
       description: |
         Scope: inbox.read. `thread` holds everything sent to and received
@@ -3734,7 +3775,7 @@ paths:
         default: { $ref: "#/components/responses/Error" }
     patch:
       operationId: updateInboundMessage
-      x-outflare-access: { scope: inbox.manage }
+      x-outflare-access: { scope: inbox.manage, brand_limited: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Triage a message
       description: |
@@ -3771,7 +3812,7 @@ paths:
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: replyToInboundMessage
-      x-outflare-access: { scope: inbox.manage }
+      x-outflare-access: { scope: inbox.manage, brand_limited: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Reply from the mailbox the message arrived at, in the same thread
       description: |
@@ -4089,6 +4130,48 @@ paths:
         "401": { $ref: "#/components/responses/Error" }
         "403": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/integrations/{id}/mailboxes/push:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: pushSupplierMailboxes
+      x-outflare-access: { scope: mailboxes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Ask the supplier to push mailboxes in
+      description: |
+        Scope: mailboxes.manage. Needs push on (push.state is on). The
+        supplier sends the mailboxes through the EmailBison-compatible API,
+        where they are imported and checked like any other. With all, every
+        active mailbox not yet in Outflare. The counts land in
+        push.last_result.
+      tags: [mailboxes]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                external_ids: { type: array, maxItems: 5000, items: { type: string }, description: "The supplier's mailbox ids." }
+                all: { type: boolean }
+      responses:
+        "202":
+          description: "Queued. Inside a mission, a MissionHeld answer when the call was held for approval or dry-run instead."
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: object
+                    required: [queued, mailboxes]
+                    properties:
+                      queued: { type: boolean, enum: [true] }
+                      mailboxes: { type: integer, description: How many will be pushed. }
+                  - { $ref: "#/components/schemas/MissionHeld" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/integrations/{id}/mailbox-sync:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
@@ -4124,6 +4207,7 @@ paths:
                 auto_import: { type: boolean }
                 app_passwords: { type: boolean, description: Ask the supplier for Google app passwords before importing Google mailboxes. On by default. }
                 daily_limit: { type: [integer, "null"], minimum: 1, maximum: 500, description: "Daily cap for imported mailboxes. Null uses the supplier's cap." }
+                push: { type: boolean, description: "Let the supplier push mailboxes in (see SupplierPush). Turning it on also needs integrations.manage. Connecting runs in the background: follow push.state." }
       responses:
         "200":
           description: Settings.
@@ -4132,6 +4216,9 @@ paths:
               schema: { $ref: "#/components/schemas/SupplierSync" }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "422": { $ref: "#/components/responses/Error" }
         "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
   /v1/integrations/{id}/webhook:
@@ -4156,9 +4243,10 @@ paths:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: getWorkspaceStats
-      x-outflare-access: { scope: workspace.read }
+      x-outflare-access: { scope: workspace.read, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/Brand" }]
       summary: Workspace overview
-      description: "Scope: workspace.read. Mailbox health, sending and reply counts, in one call. Windows are rolling (last 24 hours, last 7 days)."
+      description: "Scope: workspace.read. Mailbox health, sending and reply counts, in one call. Windows are rolling (last 24 hours, last 7 days). With a brand, everything but leads (which every brand shares) counts that brand's mailboxes and sequences; mail counts by its mailbox."
       tags: [access]
       responses:
         "200":
@@ -4214,7 +4302,7 @@ paths:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listConnectors
-      x-outflare-access: { scope: integrations.read }
+      x-outflare-access: { scope: integrations.read, brand_limited: true }
       summary: The catalog, with how many accounts the workspace connected to each
       description: "Scope: integrations.read."
       tags: [connectors]
@@ -4295,7 +4383,7 @@ paths:
       - { $ref: "#/components/parameters/Workspace" }
     get:
       operationId: getAnalyticsHistory
-      x-outflare-access: { scope: analytics.read }
+      x-outflare-access: { scope: analytics.read, brand_limited: true }
       summary: Query stored analytics history
       description: |
         Scope: analytics.read. Reads what the sync stored, without calling the tools.
@@ -4335,7 +4423,7 @@ paths:
       - { $ref: "#/components/parameters/Workspace" }
     get:
       operationId: getAnalyticsOverview
-      x-outflare-access: { scope: analytics.read }
+      x-outflare-access: { scope: analytics.read, brand_limited: true }
       summary: Every website across every tool
       description: "Scope: analytics.read. Stored traffic totals per website (by domain), with each tool side by side, search clicks added up across search consoles, and every connection's sync status."
       tags: [analytics]
@@ -4427,7 +4515,7 @@ paths:
       - { $ref: "#/components/parameters/Workspace" }
     get:
       operationId: compareAnalyticsTools
-      x-outflare-access: { scope: analytics.read }
+      x-outflare-access: { scope: analytics.read, brand_limited: true }
       summary: Compare tools for one website, day by day
       description: "Scope: analytics.read. Each tool's stored daily traffic for one domain."
       tags: [analytics]
@@ -4629,7 +4717,7 @@ paths:
       - { $ref: "#/components/parameters/Workspace" }
     get:
       operationId: listAnalyticsSiteBrands
-      x-outflare-access: { scope: analytics.read }
+      x-outflare-access: { scope: analytics.read, brand_limited: true }
       summary: Which brand each analytics site reports for
       description: |
         Scope: analytics.read. Every site with stored history or a brand
@@ -4883,7 +4971,7 @@ paths:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listIntegrations
-      x-outflare-access: { scope: integrations.read }
+      x-outflare-access: { scope: integrations.read, brand_limited: true }
       summary: List connected accounts
       description: "Scope: integrations.read. Credentials are never returned."
       tags: [connectors]
@@ -4948,7 +5036,7 @@ paths:
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: getIntegration
-      x-outflare-access: { scope: integrations.read }
+      x-outflare-access: { scope: integrations.read, brand_limited: true }
       summary: Get a connected account
       description: "Scope: integrations.read."
       tags: [connectors]
@@ -5018,6 +5106,98 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/Integration" }
         "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/integrations/{id}/models:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: listIntegrationModels
+      x-outflare-access: { scope: integrations.manage }
+      summary: List the models an AI model connection can use
+      description: |
+        Scope: integrations.manage. For a Claude, OpenAI, Gemini or Mistral
+        connection: the chat models its key can use, asked of the provider
+        live (costs nothing). `price` is set where Outflare knows the list
+        price; for the rest, enter it with your choice in `PUT /ai-settings`.
+      tags: [connectors]
+      responses:
+        "200":
+          description: The models.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, default_model]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, name, price]
+                      properties:
+                        id: { type: string, example: claude-opus-5-5 }
+                        name: { type: string }
+                        price: { oneOf: [{ $ref: "#/components/schemas/AIPrice" }, { type: "null" }] }
+                  default_model: { type: [string, "null"], description: The model used when none is chosen; null when the provider has none. }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/ai-settings:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: getAISettings
+      x-outflare-access: { scope: integrations.read }
+      summary: Which AI model plans missions and runs Outflare's agent
+      description: |
+        Scope: integrations.read. The chosen connection and model, its
+        price, the monthly AI limit and this month's AI spend, the model in
+        use now (`active`), and `problem` when something must be done
+        first. Keys are never shown.
+      tags: [connectors]
+      responses:
+        "200":
+          description: The settings.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AISettings" }
+        default: { $ref: "#/components/responses/Error" }
+    put:
+      operationId: updateAISettings
+      x-outflare-access: { scope: integrations.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Choose the AI model and the monthly AI limit
+      description: |
+        Scope: integrations.manage. Replaces the settings. `integration_id`
+        null uses the first connected AI model (Claude, OpenAI, Gemini,
+        Mistral) with its default model. `model` empty uses the provider's
+        default; OpenAI, Gemini and Mistral have none, so name one from
+        `GET /integrations/{id}/models`. Prices are required for models
+        Outflare doesn't know the price of, so spend limits can be kept.
+        `monthly_limit_cents` caps every AI call in the workspace each
+        calendar month (UTC); null means no workspace limit. The default is
+        5000 (US$50).
+      tags: [connectors]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                integration_id: { type: [string, "null"], format: uuid }
+                model: { type: string, maxLength: 200 }
+                input_cents_per_million: { type: [number, "null"], exclusiveMinimum: 0, maximum: 10000000 }
+                output_cents_per_million: { type: [number, "null"], exclusiveMinimum: 0, maximum: 10000000 }
+                monthly_limit_cents: { type: [integer, "null"], minimum: 0, maximum: 10000000 }
+      responses:
+        "200":
+          description: Saved.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AISettings" }
+        "400": { $ref: "#/components/responses/Error" }
         "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/integrations/oauth/{connector}/authorize:
@@ -5812,17 +5992,20 @@ paths:
       summary: Plan a mission from a goal
       description: |
         Scope: missions.run. Type a goal in plain words ("book 10 meetings
-        with fintech CFOs in Australia by 30 November") and Claude drafts
-        the mission: a measurable goal, steps, instructions for the agent,
+        with fintech CFOs in Australia by 30 November") and the workspace's
+        AI model drafts the mission: a measurable goal, steps, instructions for the agent,
         limits sized to your mailboxes, and the connectors it needs. The
         draft is saved as a mission in status draft, with a connect request
         for each missing connector and any questions for you. Nothing runs
         until a person approves it.
 
-        Uses the workspace's Claude connection (connect it under Connectors
-        with your own API key). Without one the call fails with 409
-        `connector_needed`. Claude is sent the goal, the project brief and a
-        summary of the workspace, never lead lists or email addresses.
+        Uses the model chosen in `GET /ai-settings`: Claude, OpenAI, Gemini or
+        Mistral, connected under Connectors with your own API key. Without
+        one the call fails with 409 `connector_needed`; with a provider but
+        no model or price chosen, 409 `ai_model_needed`; past the
+        workspace's monthly AI limit, 409 `ai_budget_reached`. The model is
+        sent the goal, the project brief and a summary of the workspace,
+        never lead lists, email addresses or keys.
       tags: [missions]
       requestBody:
         required: true
@@ -5932,13 +6115,21 @@ paths:
         approved against.
 
         `runner: builtin` hands the mission to Outflare's own agent, which
-        runs it in turns with the workspace's Claude key. It gets a token of
+        runs it in turns with the workspace's AI model (`GET /ai-settings`).
+        It gets a token of
         its own (operator scopes, never more than yours, never
         missions.approve) and goes through the same gate as any agent, so
         the mode still decides whether its writes run, wait for you or are
         dry runs. A turn runs at once, whenever a person writes to the
         mission or decides on a held change, and when the agent asks to look
-        again. Answers 409 `connector_needed` until Claude is connected.
+        again. Answers 409 `connector_needed` until an AI model is connected,
+        or `ai_model_needed` until its model and price are chosen.
+
+        Outflare's agent treats everything it reads from outside (email
+        replies, lead fields, web pages) as data. Even in `autonomous` mode,
+        its replies to emails, test sends, and changes to mailboxes, sending
+        servers, senders, sign-ins, webhooks, suppressions, integrations,
+        tokens and the company context wait for a person.
       tags: [missions]
       requestBody:
         content:
@@ -6588,7 +6779,7 @@ paths:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: getContext
-      x-outflare-access: { scope: workspace.read, project_tokens: true }
+      x-outflare-access: { scope: workspace.read, project_tokens: true, brand_limited: true }
       summary: Read what Outflare knows about the company
       description: |
         Scope: workspace.read. What an agent reads at the start of every
@@ -6641,7 +6832,7 @@ paths:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listMemories
-      x-outflare-access: { scope: workspace.read, project_tokens: true }
+      x-outflare-access: { scope: workspace.read, project_tokens: true, brand_limited: true }
       summary: List memories
       description: |
         Scope: workspace.read. Short lasting facts, preferences and
@@ -6676,7 +6867,7 @@ paths:
         default: { $ref: "#/components/responses/Error" }
     post:
       operationId: createMemory
-      x-outflare-access: { scope: context.manage, project_tokens: true }
+      x-outflare-access: { scope: context.manage, project_tokens: true, brand_limited: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Remember something
       description: |
@@ -6709,7 +6900,7 @@ paths:
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     patch:
       operationId: updateMemory
-      x-outflare-access: { scope: context.manage, project_tokens: true }
+      x-outflare-access: { scope: context.manage, project_tokens: true, brand_limited: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Change a memory
       description: "Scope: context.manage. Correct its text, change its kind, pin it, or move it to a project (null for the whole workspace)."
@@ -6731,7 +6922,7 @@ paths:
         default: { $ref: "#/components/responses/Error" }
     delete:
       operationId: deleteMemory
-      x-outflare-access: { scope: context.manage, project_tokens: true }
+      x-outflare-access: { scope: context.manage, project_tokens: true, brand_limited: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Forget a memory
       description: "Scope: context.manage. For a memory that is wrong or out of date."
@@ -6768,7 +6959,7 @@ paths:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listProjects
-      x-outflare-access: { scope: projects.read, project_tokens: true }
+      x-outflare-access: { scope: projects.read, project_tokens: true, brand_limited: true }
       summary: List projects
       description: |
         Scope: projects.read. A project is one go-to-market motion: an offer
@@ -6795,7 +6986,7 @@ paths:
         default: { $ref: "#/components/responses/Error" }
     post:
       operationId: createProject
-      x-outflare-access: { scope: projects.manage }
+      x-outflare-access: { scope: projects.manage, brand_limited: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Create a project
       description: "Scope: projects.manage, not available to project tokens. Names are unique in the workspace, ignoring case."
@@ -6823,7 +7014,7 @@ paths:
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: getProject
-      x-outflare-access: { scope: projects.read, project_tokens: true }
+      x-outflare-access: { scope: projects.read, project_tokens: true, brand_limited: true }
       summary: Get a project
       description: "Scope: projects.read."
       tags: [projects]
@@ -6837,7 +7028,7 @@ paths:
         default: { $ref: "#/components/responses/Error" }
     patch:
       operationId: updateProject
-      x-outflare-access: { scope: projects.manage, project_tokens: true }
+      x-outflare-access: { scope: projects.manage, project_tokens: true, brand_limited: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Edit a project's brief, status or daily send limit
       description: |
@@ -6887,7 +7078,7 @@ paths:
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: getProjectBrief
-      x-outflare-access: { scope: projects.read, project_tokens: true }
+      x-outflare-access: { scope: projects.read, project_tokens: true, brand_limited: true }
       summary: Read a project's brief
       description: |
         Scope: projects.read. What an agent should read before writing copy,
@@ -6976,7 +7167,7 @@ paths:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listBrands
-      x-outflare-access: { scope: workspace.read }
+      x-outflare-access: { scope: workspace.read, brand_limited: true }
       summary: List brands
       description: |
         Scope: workspace.read. The businesses this company markets, each
@@ -7031,7 +7222,7 @@ paths:
       - { $ref: "#/components/parameters/BrandRef" }
     get:
       operationId: getBrand
-      x-outflare-access: { scope: workspace.read }
+      x-outflare-access: { scope: workspace.read, brand_limited: true }
       summary: Read a brand
       description: "Scope: workspace.read."
       tags: [brands]
@@ -7045,7 +7236,7 @@ paths:
         default: { $ref: "#/components/responses/Error" }
     patch:
       operationId: updateBrand
-      x-outflare-access: { scope: workspace.manage }
+      x-outflare-access: { scope: workspace.manage, brand_limited: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Change or archive a brand
       description: "Scope: workspace.manage. Send only the fields to change. Brands are archived, not deleted: status archived hides it from pickers and keeps its records."
@@ -7071,7 +7262,7 @@ paths:
       - { $ref: "#/components/parameters/BrandRef" }
     get:
       operationId: getBrandContext
-      x-outflare-access: { scope: workspace.read }
+      x-outflare-access: { scope: workspace.read, brand_limited: true }
       summary: Read a brand's context
       description: |
         Scope: workspace.read. What is true for this brand only. Agents
@@ -7088,7 +7279,7 @@ paths:
         default: { $ref: "#/components/responses/Error" }
     patch:
       operationId: updateBrandContext
-      x-outflare-access: { scope: context.manage }
+      x-outflare-access: { scope: context.manage, brand_limited: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Edit a brand's context
       description: |
@@ -7186,7 +7377,7 @@ paths:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listTeams
-      x-outflare-access: { scope: members.read }
+      x-outflare-access: { scope: members.read, brand_limited: true }
       summary: List teams
       description: "Scope: members.read. Teams own sequences and senders. A workspace with no teams shares every mailbox."
       tags: [allocation]
@@ -7263,7 +7454,7 @@ paths:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listSenders
-      x-outflare-access: { scope: mailboxes.read }
+      x-outflare-access: { scope: mailboxes.read, brand_limited: true }
       summary: List senders
       description: |
         Scope: mailboxes.read. A sender is who mailboxes send as: a person, a
@@ -10379,6 +10570,69 @@ components:
     VerificationStatus:
       type: string
       enum: [deliverable, undeliverable, risky, unknown]
+    AIPrice:
+      type: object
+      description: US cents per million tokens.
+      required: [input_cents_per_million, output_cents_per_million]
+      properties:
+        input_cents_per_million: { type: number, example: 400 }
+        output_cents_per_million: { type: number, example: 2000 }
+    AISettings:
+      type: object
+      required: [integration_id, model, input_cents_per_million, output_cents_per_million, monthly_limit_cents, spent_this_month_cents, active, problem, providers, updated_at]
+      properties:
+        integration_id: { type: [string, "null"], format: uuid, description: The chosen connection; null uses the first connected AI model. }
+        model: { type: string, description: The chosen model; empty uses the provider's default. }
+        input_cents_per_million: { type: [number, "null"] }
+        output_cents_per_million: { type: [number, "null"] }
+        monthly_limit_cents: { type: [integer, "null"], description: Most AI calls may cost in a calendar month (UTC); null is no limit. }
+        spent_this_month_cents: { type: integer }
+        active:
+          description: The model in use now; null when none can be.
+          oneOf:
+            - type: "null"
+            - type: object
+              required: [provider, provider_name, integration_id, model, price, price_source]
+              properties:
+                provider: { type: string, enum: [claude, openai, gemini, mistral] }
+                provider_name: { type: string }
+                integration_id: { type: string, format: uuid }
+                model: { type: string }
+                price: { $ref: "#/components/schemas/AIPrice" }
+                price_source: { type: string, enum: [list, workspace, ""], description: "list: Outflare knows the price. workspace: entered with the choice. Empty: unknown, so the model can't run yet." }
+        problem:
+          description: What must be done before missions can be planned or run; null when nothing.
+          oneOf:
+            - type: "null"
+            - type: object
+              required: [code, message]
+              properties:
+                code: { type: string, enum: [connector_needed, ai_model_needed] }
+                message: { type: string }
+        providers:
+          type: array
+          items:
+            type: object
+            required: [connector, name, default_model, key_url, pricing_url, connections, known_prices]
+            properties:
+              connector: { type: string, enum: [claude, openai, gemini, mistral] }
+              name: { type: string }
+              default_model: { type: [string, "null"] }
+              key_url: { type: string, format: uri }
+              pricing_url: { type: string, format: uri }
+              connections:
+                type: array
+                items:
+                  type: object
+                  required: [id, name]
+                  properties:
+                    id: { type: string, format: uuid }
+                    name: { type: string }
+              known_prices:
+                type: object
+                description: List prices Outflare knows, by model id.
+                additionalProperties: { $ref: "#/components/schemas/AIPrice" }
+        updated_at: { type: [string, "null"], format: date-time }
     VerificationSettings:
       type: object
       required: [integration_id, provider, verify_on_import, verify_before_send, block_risky, block_catch_all, block_unknown, max_age_days]
@@ -10713,6 +10967,7 @@ components:
         test: { type: boolean, description: "A test workspace (the sandbox): mailboxes are simulated and nothing is delivered, verified for real or bought." }
         slug: { type: string, description: "The workspace's name in web app URLs (https://app.outflare.ai/{slug}/overview). Works in place of id in API paths.", example: acme }
         role: { $ref: "#/components/schemas/Role" }
+        brand_ids: { type: array, items: { type: string, format: uuid }, description: "The brands you are kept to; empty for every brand." }
         agency_id: { type: [string, "null"], format: uuid, description: Set when the workspace is an agency client. }
         brand:
           description: The agency's white label for a client workspace; null otherwise.
@@ -10781,6 +11036,7 @@ components:
         name: { type: string }
         role: { $ref: "#/components/schemas/Role" }
         created_at: { type: string, format: date-time }
+        brand_ids: { type: array, items: { type: string, format: uuid }, description: "The brands an operator or viewer works on; empty for every brand." }
     Invite:
       type: object
       properties:
@@ -10789,6 +11045,7 @@ components:
         role: { $ref: "#/components/schemas/Role" }
         created_at: { type: string, format: date-time }
         expires_at: { type: string, format: date-time }
+        brand_ids: { type: array, items: { type: string, format: uuid }, description: "The brands they will work on; empty for every brand." }
     AgentAppKind:
       type: string
       enum: [claude, chatgpt, cursor, vscode, local, unknown]
@@ -10820,6 +11077,7 @@ components:
         expires_at: { type: [string, "null"], format: date-time }
         last_used_at: { type: [string, "null"], format: date-time }
         project_id: { type: [string, "null"], format: uuid, description: "The project this token is bound to, or null for the whole workspace." }
+        brand_id: { type: [string, "null"], format: uuid, description: "The brand this token is bound to, or null." }
         daily_send_budget: { type: [integer, "null"], description: Most emails a day across sequences this token started. Null is no budget. }
         max_priority: { type: [string, "null"], enum: [low, normal, high, null], description: Highest sequence priority this token may set. }
         may_take_mailboxes: { type: boolean, description: "Whether its sequences may take mailboxes from lower-priority sequences without the owner's approval. Off by default." }
@@ -12185,7 +12443,7 @@ components:
         updated_at: { type: string, format: date-time }
     SupplierSync:
       type: object
-      required: [integration_id, auto_import, app_passwords, daily_limit, webhook, last_synced_at, last_sync_error]
+      required: [integration_id, auto_import, app_passwords, daily_limit, webhook, last_synced_at, last_sync_error, push]
       properties:
         integration_id: { type: string, format: uuid }
         auto_import: { type: boolean }
@@ -12194,6 +12452,32 @@ components:
         webhook: { type: boolean, description: "The supplier pushes changes; otherwise they arrive with the 15-minute sync." }
         last_synced_at: { type: [string, "null"], format: date-time }
         last_sync_error: { type: [string, "null"] }
+        push: { $ref: "#/components/schemas/SupplierPush" }
+    SupplierPush:
+      type: object
+      description: |
+        Push: the supplier sends mailboxes into Outflare itself, through the
+        EmailBison-compatible API, the way it sends them to a sequencer.
+        Turning it on (PATCH .../mailbox-sync {"push": true}) makes an API
+        token with mailboxes.read and mailboxes.manage and adds Outflare at
+        the supplier as a self-hosted EmailBison. Turning it off revokes the
+        token and removes the connection there; mailboxes already pushed
+        stay.
+      required: [available, state, base_url, connected_at, last_pushed_at, last_result, error]
+      properties:
+        available: { type: boolean, description: "The supplier supports push and this server has a public https address (PUBLIC_URL)." }
+        state: { type: string, enum: [off, connecting, on, failed] }
+        base_url: { type: [string, "null"], description: "The EmailBison-compatible address the supplier is given: PUBLIC_URL/emailbison/{ws}. Null when push is not available." }
+        connected_at: { type: [string, "null"], format: date-time }
+        last_pushed_at: { type: [string, "null"], format: date-time }
+        last_result:
+          type: [object, "null"]
+          required: [synced, failed, skipped]
+          properties:
+            synced: { type: integer }
+            failed: { type: integer }
+            skipped: { type: integer }
+        error: { type: [string, "null"], description: "Why connecting or the last push failed, as the supplier said." }
     SupplierMailboxList:
       type: object
       required: [integration, sync, synced, counts, total, mailboxes, next_offset, next_cursor]
