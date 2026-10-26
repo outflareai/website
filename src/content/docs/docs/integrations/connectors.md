@@ -27,6 +27,7 @@ By category, including what is planned:
 | CRMs and calendars | HubSpot, Salesforce, Pipedrive, Attio, Google Calendar, Outlook, Calendly, Cal.com |
 | Website analytics | [Google Analytics, Search Console, Bing Webmaster Tools, PostHog, Plausible, Fathom, Matomo, Umami, Mixpanel, Amplitude, Cloudflare, Simple Analytics, Clarity, Vercel](/docs/integrations/analytics/) |
 | SEO | [DataForSEO, Ahrefs](/docs/integrations/seo/), paid per call within a monthly budget |
+| Ad platforms | [Google Ads, Meta Ads, Microsoft Advertising, Reddit Ads, X Ads, LinkedIn Ads](/docs/integrations/paid-media/), read only, with your own ad accounts |
 | DNS and registrars | Cloudflare, Namecheap, GoDaddy, Route 53 |
 | AI models | [Claude, OpenAI, Gemini, Mistral](/docs/agents/ai-models/), for planning and running missions with your own key |
 | Custom | Any HTTP API or MCP server you register |
