@@ -10813,6 +10813,90 @@ paths:
                   data: { type: array, items: { $ref: "#/components/schemas/EmailTemplateVersion" } }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/email-topics:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listEmailTopics
+      x-outflare-access: { scope: emails.read }
+      summary: List email topics
+      description: "Scope: emails.read. Topics are what people can choose to get, such as product updates; who chose what is a consent on their customer record."
+      tags: [emails]
+      parameters:
+        - { name: status, in: query, schema: { type: string, enum: [active, archived] } }
+      responses:
+        "200":
+          description: Topics, by name.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/EmailTopic" } }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createEmailTopic
+      x-outflare-access: { scope: emails.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Create an email topic
+      description: "Scope: emails.manage. Put lifecycle templates in it (topic on the template), or name it on a send."
+      tags: [emails]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/EmailTopicInput" }
+      responses:
+        "201":
+          description: The topic.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/EmailTopic" }
+        "400": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/email-topics/{id}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, description: The topic's id or key., schema: { type: string } }
+    get:
+      operationId: getEmailTopic
+      x-outflare-access: { scope: emails.read }
+      summary: Get an email topic
+      description: "Scope: emails.read."
+      tags: [emails]
+      responses:
+        "200":
+          description: The topic.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/EmailTopic" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateEmailTopic
+      x-outflare-access: { scope: emails.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Rename, describe, archive or restore an email topic
+      description: "Scope: emails.manage. The key can't change. Archiving stops new sends naming it; templates keep it until you change them."
+      tags: [emails]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/EmailTopicInput" }
+      responses:
+        "200":
+          description: The topic.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/EmailTopic" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/emails:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
@@ -10834,6 +10918,7 @@ paths:
         - { name: test, in: query, schema: { type: boolean } }
         - { name: trigger, in: query, schema: { type: string, enum: [api, test, event, journey, broadcast, system] } }
         - { name: request_id, in: query, description: Emails queued by this API call., schema: { type: string } }
+        - { name: topic, in: query, description: "Emails in this topic, by key or id.", schema: { type: string } }
       responses:
         "200":
           description: A page of emails.
@@ -11619,6 +11704,18 @@ webhooks:
     post:
       operationId: webhook_email_clicked
       summary: "A link in an email was clicked for the first time: a tracked link (track_clicks), or the provider reported it."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  email.preferences_changed:
+    post:
+      operationId: webhook_email_preferences_changed
+      summary: "Someone changed their topics or turned off all marketing email on the preference page behind an email's unsubscribe link. The choices are consents on their customer record."
       tags: [webhooks]
       requestBody:
         required: true
@@ -12483,7 +12580,7 @@ components:
       required: [id, type, created_at, workspace_id, actor, target, request_id, data]
       properties:
         id: { type: string, description: "Unique per event, and the webhook-id header. Use it to ignore repeats.", example: evt_48213 }
-        type: { type: string, enum: [lead.replied, lead.unsubscribed, inbox.replied, inbox.updated, inbox.classified, lead.bounced, mailbox.auto_paused, lead.created, lead.updated, lead.deleted, leads.imported, suppressions.added, suppression.removed, lead_list.created, lead_list.leads_added, lead_list.run_started, lead_list.build_done, lead_list.build_failed, lead_list.refresh_done, lead_list.refresh_failed, lead_list.enrich_done, lead_list.enrich_failed, import.done, import.failed, sequence.created, sequence.updated, sequence.activated, sequence.paused, sequence.archived, sequence.deleted, sequence.steps_updated, sequence.leads_enrolled, enrollment.stopped, mailbox.imported, mailbox.updated, mailbox.paused, mailbox.resumed, mailbox.stage_changed, mailbox.deleted, domain.added, domain.paused, domain.resumed, domain.removed, email.queued, email.sent, email.delivered, email.bounced, email.complained, email.failed, email.suppressed, email.cancelled, email.unsubscribed, email.opened, email.clicked, email_domain.verified, email_domain.verification_failed, email_provider.events_failed, email_template.published, meeting.created, meeting.updated, meeting.deleted, deal.created, deal.updated, deal.deleted, spend.recorded, integration.connected, integration.updated, integration.disconnected, connect_request.created, project.created, project.updated, project.deleted, mission.created, mission.updated, mission.submitted, mission.approved, mission.paused, mission.resumed, mission.stopped, mission.completed, mission.action_held, mission.action_approved, mission.action_rejected, infra.plan_created, infra.plan_approved, infra.ordered, infra.order_failed, infra.domains_bought, infra.mailbox_joined, infra.plan_warming, infra.plan_ready, infra.plan_cancelled, workspace.updated, webhook.test] }
+        type: { type: string, enum: [lead.replied, lead.unsubscribed, inbox.replied, inbox.updated, inbox.classified, lead.bounced, mailbox.auto_paused, lead.created, lead.updated, lead.deleted, leads.imported, suppressions.added, suppression.removed, lead_list.created, lead_list.leads_added, lead_list.run_started, lead_list.build_done, lead_list.build_failed, lead_list.refresh_done, lead_list.refresh_failed, lead_list.enrich_done, lead_list.enrich_failed, import.done, import.failed, sequence.created, sequence.updated, sequence.activated, sequence.paused, sequence.archived, sequence.deleted, sequence.steps_updated, sequence.leads_enrolled, enrollment.stopped, mailbox.imported, mailbox.updated, mailbox.paused, mailbox.resumed, mailbox.stage_changed, mailbox.deleted, domain.added, domain.paused, domain.resumed, domain.removed, email.queued, email.sent, email.delivered, email.bounced, email.complained, email.failed, email.suppressed, email.cancelled, email.unsubscribed, email.opened, email.clicked, email.preferences_changed, email_domain.verified, email_domain.verification_failed, email_provider.events_failed, email_template.published, meeting.created, meeting.updated, meeting.deleted, deal.created, deal.updated, deal.deleted, spend.recorded, integration.connected, integration.updated, integration.disconnected, connect_request.created, project.created, project.updated, project.deleted, mission.created, mission.updated, mission.submitted, mission.approved, mission.paused, mission.resumed, mission.stopped, mission.completed, mission.action_held, mission.action_approved, mission.action_rejected, infra.plan_created, infra.plan_approved, infra.ordered, infra.order_failed, infra.domains_bought, infra.mailbox_joined, infra.plan_warming, infra.plan_ready, infra.plan_cancelled, workspace.updated, webhook.test] }
         created_at: { type: string, format: date-time }
         workspace_id: { type: string, format: uuid }
         actor: { $ref: "#/components/schemas/WebhookRef" }
@@ -12882,6 +12979,37 @@ components:
         required: { type: boolean, description: A send without it is refused with 422 template_variables_missing. }
         default: { type: string, description: Used when a send leaves it out. }
         example: { type: string, description: Shown in previews. }
+    EmailTopicRef:
+      type: object
+      required: [id, key, name]
+      properties:
+        id: { type: string, format: uuid }
+        key: { type: string }
+        name: { type: string }
+    EmailTopic:
+      type: object
+      required: [id, key, name, description, subscribed_by_default, visibility, status, templates, sent_30d, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        key: { type: string, description: "What consents on customer records point at (channel email, topic = key). It never changes." }
+        name: { type: string, description: What people see on the preference page. }
+        description: { type: string }
+        subscribed_by_default: { type: boolean, description: "true: everyone gets it until they unsubscribe. false: only people who opted in." }
+        visibility: { type: string, enum: [public, private], description: "public topics are listed on the preference page; private ones only to people who get them." }
+        status: { type: string, enum: [active, archived] }
+        templates: { type: integer, description: Active templates in this topic. }
+        sent_30d: { type: integer, description: "Emails in this topic in the last 30 days, not counting tests." }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    EmailTopicInput:
+      type: object
+      properties:
+        key: { type: string, pattern: "^[a-z0-9][a-z0-9_]{0,62}$", description: "Made from the name when left out. It can't change later." }
+        name: { type: string, maxLength: 100, description: Required when creating. }
+        description: { type: string, maxLength: 500 }
+        subscribed_by_default: { type: boolean, description: Default true. }
+        visibility: { type: string, enum: [public, private], description: Default public. }
+        status: { type: string, enum: [active, archived], description: "Updates only: archive a topic to stop new sends to it." }
     EmailTemplateInput:
       type: object
       properties:
@@ -12898,11 +13026,12 @@ components:
         variables: { type: array, maxItems: 100, items: { $ref: "#/components/schemas/EmailTemplateVariable" } }
         track_opens: { type: boolean, description: "Count opens with a one-pixel image. Off by default. A setting, not content: it applies at once, without a publish." }
         track_clicks: { type: boolean, description: "Send links through tracked click links. Off by default. Applies at once, without a publish." }
+        topic: { type: [string, "null"], description: "Lifecycle templates only: the topic's key or id, or null for none. Sends then skip people who unsubscribed from it, or never opted in to an opt-in topic. Applies at once, without a publish." }
         publish: { type: boolean, description: Publish the result as the next version. }
         note: { type: string, maxLength: 500, description: "With publish: what changed." }
     EmailTemplate:
       type: object
-      required: [id, handle, name, brand_id, channel, purpose, status, from, reply_to, subject, html, text, variables, track_opens, track_clicks, published_version, unpublished_changes, sent_30d, created_at, updated_at]
+      required: [id, handle, name, brand_id, channel, purpose, status, from, reply_to, subject, html, text, variables, track_opens, track_clicks, topic, published_version, unpublished_changes, sent_30d, created_at, updated_at]
       properties:
         id: { type: string, format: uuid }
         handle: { type: string }
@@ -12919,6 +13048,7 @@ components:
         variables: { type: array, items: { $ref: "#/components/schemas/EmailTemplateVariable" } }
         track_opens: { type: boolean }
         track_clicks: { type: boolean }
+        topic: { oneOf: [{ $ref: "#/components/schemas/EmailTopicRef" }, { type: "null" }] }
         published_version: { type: [integer, "null"] }
         unpublished_changes: { type: boolean }
         sent_30d: { type: integer }
@@ -12971,6 +13101,7 @@ components:
         html: { type: string }
         text: { type: string }
         purpose: { type: string, enum: [transactional, lifecycle], description: "Defaults to the template's, else transactional." }
+        topic: { type: string, description: "Lifecycle email only: a topic's key or id, instead of the template's. People who unsubscribed from it, or never opted in to an opt-in topic, are skipped (suppressed)." }
         provider_id: { type: string, format: uuid }
         brand_id: { type: string, format: uuid }
         tags: { type: array, maxItems: 10, items: { type: string, minLength: 1, maxLength: 64 } }
@@ -13043,13 +13174,13 @@ components:
       type: object
       required: [type, recipient, detail, occurred_at]
       properties:
-        type: { type: string, description: "queued, scheduled, sent, delivered, delayed, bounced, complained, opened, clicked, opened_automatic, clicked_automatic (a mail scanner or privacy proxy, not counted), suppressed, retrying, failed, cancelled or unsubscribed." }
+        type: { type: string, description: "queued, scheduled, sent, delivered, delayed, bounced, complained, opened, clicked, opened_automatic, clicked_automatic (a mail scanner or privacy proxy, not counted), suppressed, retrying, failed, cancelled, unsubscribed or preferences_changed." }
         recipient: { type: [string, "null"] }
         detail: { type: [string, "null"] }
         occurred_at: { type: string, format: date-time }
     Email:
       type: object
-      required: [id, provider_id, connector, brand_id, channel, purpose, status, status_reason, bounce_type, from, to, cc, bcc, reply_to, subject, template_id, template_handle, template_version, tags, metadata, test, provider_message_id, send_at, sent_at, delivered_at, attempts, trigger, track_opens, track_clicks, opens, clicks, opened_at, clicked_at, created_at, updated_at]
+      required: [id, provider_id, connector, brand_id, channel, purpose, status, status_reason, bounce_type, from, to, cc, bcc, reply_to, subject, template_id, template_handle, template_version, topic, tags, metadata, test, provider_message_id, send_at, sent_at, delivered_at, attempts, trigger, track_opens, track_clicks, opens, clicks, opened_at, clicked_at, created_at, updated_at]
       properties:
         id: { type: string, format: uuid }
         provider_id: { type: [string, "null"], format: uuid }
@@ -13080,6 +13211,7 @@ components:
         trigger: { $ref: "#/components/schemas/EmailTrigger" }
         track_opens: { type: boolean }
         track_clicks: { type: boolean }
+        topic: { oneOf: [{ $ref: "#/components/schemas/EmailTopicRef" }, { type: "null" }] }
         opens: { type: integer, description: "Opens counted, scanner and proxy loads left out. Opens are a rough signal: some mail apps load images for privacy, others block them." }
         clicks: { type: integer }
         opened_at: { type: [string, "null"], format: date-time }
