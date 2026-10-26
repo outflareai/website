@@ -1,3 +1,5 @@
+<a href="https://outflare.ai"><picture><source media="(prefers-color-scheme: dark)" srcset="https://outflare.ai/brand/svg/outflare-lockup-white.svg"><img src="https://outflare.ai/brand/svg/outflare-lockup-black.svg" alt="Outflare" width="140" height="28"></picture></a>
+
 # Outflare website
 
 **Live at [outflare.ai](https://outflare.ai)** · [Docs](https://outflare.ai/docs/) · [Engine repo](https://github.com/outflareai/outflare) · [hello@outflare.ai](mailto:hello@outflare.ai)
@@ -62,7 +64,7 @@ Analytics are off unless the build sets their IDs, so forks and local builds sen
 
 Cloudflare Web Analytics needs no code: enable it under the Pages project's Metrics tab and Pages injects it. The tags themselves live in `src/components/Analytics.astro`, used by both the marketing layout and the docs head.
 
-With either tag on, clicks on sign-up (`sign_up_click`), sign-in (`sign_in_click`), GitHub (`github_click`) and contact (`contact_click`) links, and script errors (`site_error`), are sent to GA4 and PostHog by one helper, `window.outflareTrack`. In GA4, mark `sign_up_click` as a key event once it arrives. [`AGENTS.md`](AGENTS.md) has the rule for new events.
+With either tag on, clicks on sign-up (`sign_up_click`), sign-in (`sign_in_click`), GitHub (`github_click`) and contact (`contact_click`) links, brand page downloads (`brand_kit_download`, `brand_asset_download`) and colour copies (`brand_color_copy`), and script errors (`site_error`), are sent to GA4 and PostHog by one helper, `window.outflareTrack`. In GA4, mark `sign_up_click` as a key event once it arrives. [`AGENTS.md`](AGENTS.md) has the rule for new events.
 
 ## Keeping the docs honest
 

@@ -1,0 +1,22 @@
+---
+// The Outflare logo, inlined so it takes the text colour and follows the
+// theme. The artwork is the brand kit's (public/brand/, shown on /brand/):
+// never retype, recolour in parts or redraw it.
+import lockup from '../../public/brand/svg/outflare-lockup-currentcolor.svg?raw';
+import mark from '../../public/brand/svg/outflare-mark-currentcolor.svg?raw';
+
+interface Props {
+	variant?: 'lockup' | 'mark';
+	class?: string;
+	// Leave the label off when the logo sits inside a link that names it.
+	label?: string;
+}
+const { variant = 'lockup', class: className = '', label } = Astro.props;
+const svg = (variant === 'mark' ? mark : lockup)
+	.replace(/<title>.*?<\/title>/, '')
+	.replace(/ width="\d+" height="\d+"/, '')
+	.replace(/ role="img" aria-label="Outflare"/, label ? ` role="img" aria-label="${label}"` : ' aria-hidden="true" focusable="false"')
+	.replace('<svg ', `<svg class="${className}" `);
+---
+
+<Fragment set:html={svg} />
