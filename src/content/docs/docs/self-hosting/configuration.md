@@ -11,6 +11,7 @@ The engine is configured only through environment variables. When you use the bu
 | --- | --- | --- | --- |
 | `DATABASE_URL` | yes | none | Postgres connection string, for example `postgres://outflare:secret@postgres:5432/outflare?sslmode=disable`. Compose builds it from `POSTGRES_PASSWORD`. |
 | `OUTFLARE_SECRET_KEY` | yes | none | Base64-encoded 32-byte key that encrypts mailbox passwords and provider keys at rest. Generate with `openssl rand -base64 32`. Back it up with the database. |
+| `OUTFLARE_SECRET_KEY_PREVIOUS` | no | none | Earlier secret keys, comma-separated, while you [rotate the key](#rotating-the-secret-key). Secrets are re-encrypted with the current key at start-up. |
 | `HTTP_ADDR` | no | `:8080` | Address the engine listens on inside the container. |
 | `PUBLIC_URL` | no | `http://localhost:8080` | External base URL. Used in links the engine generates, such as invites and the unsubscribe link in every email, and to decide whether session cookies are marked `Secure`. Set it to your public `https://` address before sending: recipients must be able to reach unsubscribe links. |
 | `WORKERS` | no | `32` | Number of job worker goroutines. |
@@ -40,7 +41,13 @@ Compose-only settings:
 
 ## Rotating the secret key
 
-There is no key rotation command yet. Changing `OUTFLARE_SECRET_KEY` makes existing stored mailbox credentials unreadable, so mailboxes would need to be imported again. Keep the key stable and backed up.
+To rotate the key:
+
+1. Generate a new key with `openssl rand -base64 32`.
+2. Set `OUTFLARE_SECRET_KEY_PREVIOUS` to the current key and `OUTFLARE_SECRET_KEY` to the new one.
+3. Restart. At start-up the engine re-encrypts every stored secret (mailbox passwords, connector and OAuth keys, webhook signing secrets) with the new key, and the log says how many.
+
+Keep the old key in `OUTFLARE_SECRET_KEY_PREVIOUS` as long as unsubscribe links in mail you already sent should keep working; once you remove it, those links stop verifying. You can list several old keys, comma-separated. Changing `OUTFLARE_SECRET_KEY` without listing the old one makes stored credentials unreadable, so keep both backed up.
 
 ## Product analytics
 
