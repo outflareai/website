@@ -1,0 +1,4 @@
+# Reviewed false positives (test fixtures and doc examples), one gitleaks
+# Fingerprint per line: commit:file:rule:line. Add a line only after checking
+# the value is fake. A real secret is revoked first, never ignored (AGENTS.md).
+de8437323b9f93a732a17be9900825ac6d00393e:src/content/docs/docs/api/index.md:generic-api-key:76
