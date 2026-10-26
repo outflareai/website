@@ -171,7 +171,8 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `decide_allocation_suggestion`, `undo_allocation_change` | Apply or decline a suggestion; undo a change | Yes |
 | `create_sender`, `confirm_mailbox_sender` | Add a sender and confirm which mailboxes send as it | Yes |
 | `resolve_orphaned_follow_ups` | Cancel, or hand to another mailbox, follow-ups whose mailbox is gone | Yes, sends |
-| `plan_mission` | Turn a goal in plain words into a mission waiting for approval; Claude drafts it with the workspace's own key (needs the Claude connector) | Yes |
+| `plan_mission` | Turn a goal in plain words into a mission waiting for approval, drafted by the workspace's [AI model](/docs/agents/ai-models/) with its own key | Yes |
+| `update_ai_settings` | Choose the AI model missions use, its price and the monthly AI limit | Yes |
 | `create_mission`, `update_mission`, `submit_mission_plan` | Start a mission (a draft, so changes are dry runs), edit it, send the plan for approval | Yes |
 | `post_mission_update`, `request_connector` | Progress and questions; ask a person to connect a tool | Yes |
 | `pause_mission`, `stop_mission`, `complete_mission` | Pause, end now, or finish with a report | Yes |
@@ -181,6 +182,7 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `get_oauth_link` | A sign-in link for an OAuth connector | |
 | `connect_integration`, `update_integration`, `test_integration`, `disconnect_integration` | Connect with credentials the agent already holds, rename or replace a key, sign in again, or remove an account | Yes |
 | `list_integrations` | Connected accounts with status, the account found at sign-in and the last error; never the credentials | |
+| `get_ai_settings`, `list_ai_models` | The AI model missions use with this month's AI spend, and the models a connected key can use | |
 | `verify_emails` | Verify addresses, a lead list or every lead without a fresh result, with the connected verification service | Yes, *provider* |
 | `list_verifications`, `verification_summary` | Verification results, and how many leads are verified, stale or unchecked | |
 | `classify_email` | What kind of email domain an address or domain is (free, private, alias, throwaway, school, government, unknown), with the evidence and a suggested sign-up action | |
