@@ -1,27 +1,29 @@
 ---
 title: Agents and MCP
-description: Connect Claude, Cursor or any MCP client to an Outflare workspace, held to a scoped API token and the send policy.
+description: The Outflare MCP server's tools, and how to run it on your own computer with an API token. To connect Claude, ChatGPT or Cursor, see Connect your AI.
 sidebar:
   order: 1
 ---
 
 Outflare is built so that an AI agent can do anything a person can, through the same API, with the same limits. Agents are a first-class client, not an afterthought bolted onto a UI.
 
-There are two ways in. The MCP server is the quickest one for Claude, Cursor and other MCP clients. Any other agent framework can use the API directly.
+There are two ways in. The MCP server is the quickest one for Claude, ChatGPT, Cursor and other MCP apps. Any other agent framework can use the API directly.
+
+**Just want to connect your AI?** Use the hosted server at `https://app.outflare.ai/mcp`: no install, you sign in and approve the app. [Connect your AI](/docs/agents/connect/) has the steps for each app.
 
 ## The MCP server <span class="pill shipped">Shipped</span>
 
-[`@outflare/mcp`](https://github.com/outflareai/outflare/tree/main/mcp) is an [MCP](https://modelcontextprotocol.io) server that gives an agent 185 tools over the API (3 more in agency mode): run [missions](/docs/agents/missions/) toward a goal with approvals, read and update the brief of the project it works on, check sending domains and mailbox warm-up, import leads, check them against the suppression list, build, preview and start sequences, see and change which mailboxes each sequence sends from, and read and answer replies.
+[`@outflare/mcp`](https://github.com/outflareai/outflare/tree/main/mcp) is an [MCP](https://modelcontextprotocol.io) server that gives an agent 210 tools over the API (3 more in agency mode): run [missions](/docs/agents/missions/) toward a goal with approvals, read and update the brief of the project it works on, check sending domains and mailbox warm-up, import leads, check them against the suppression list, build, preview and start sequences, see and change which mailboxes each sequence sends from, and read and answer replies.
 
-It calls the same API with a scoped API token, so:
+It calls the same API with a scoped token, so:
 
-- the agent can do only what the token's scopes allow;
+- the agent can do only what its token's scopes allow;
 - every email still goes through the [policy check](/docs/concepts/policy-check/), however the agent is prompted;
 - every change is in the audit log under the token's name.
 
-### Install
+### Run it on your computer
 
-The server is not on npm yet. Build it from the repository (Node 18 or later):
+The hosted server at `/mcp` is the easy way ([Connect your AI](/docs/agents/connect/)). Run the server yourself instead when your app only starts local servers, or to pin it to one project or mission. It is not on npm yet. Build it from the repository (Node 18 or later):
 
 ```sh
 git clone https://github.com/outflareai/outflare.git
@@ -30,13 +32,13 @@ pnpm install
 pnpm --filter @outflare/sdk build && pnpm --filter @outflare/mcp build
 ```
 
-### Configure
+Then configure it:
 
 1. In the web app, open **API tokens** and create a token for the agent:
     - A reporting agent needs `workspace.read`, `mailboxes.read`, `leads.read`, `sequences.read` and `inbox.read`.
     - An agent that runs outreach also needs `leads.manage`, `sequences.manage` and `inbox.manage`, and `mailboxes.manage` to pause domains or change their limits.
     - To keep an agent inside one motion, create the token **for a project** (the project's page has a button for this) and add `projects.read`, plus `projects.manage` if it may edit the brief. It sees only that project and its records. See [Projects](/docs/guides/projects/#agents-and-project-tokens).
-    - To let it run [missions](/docs/agents/missions/), add `missions.read` and `missions.run` (the **Mission agent** preset). Never give it `missions.approve`.
+    - To let it run [missions](/docs/agents/missions/), add `missions.read` and `missions.run` (set **Missions** to **Change**). Never give it `missions.approve`.
     - For an outreach agent, also set its **sending limits**: a daily send budget across all the sequences it creates, the highest priority it may give a sequence, and whether it may take mailboxes from other sequences (off by default). See [Mailbox allocation](/docs/guides/mailbox-allocation/#agents).
 2. Add the server to your client. The token already says which workspace it belongs to.
 
@@ -193,6 +195,9 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `list_seo`, `get_seo_history` | DataForSEO and Ahrefs connections with their budget left, and stored weekly SEO snapshots (keywords with their previous position); free | |
 | `get_seo_report` | A live SEO report for any domain: overview, keywords, backlinks, competitors or audit. Costs money within the connection's monthly budget (*provider*) | Yes |
 | `update_seo_settings`, `sync_seo` | An SEO connection's domains, country, monthly budget and weekly snapshots; take a snapshot now (*provider*) | Yes |
+| `list_seo_sites`, `add_seo_site`, `update_seo_site`, `delete_seo_site` | The websites OutflareBot audits: ownership, crawl settings and limits, latest crawl. See [Crawl and audit your sites](/docs/guides/site-audits/) | Yes |
+| `verify_seo_site`, `start_crawl`, `get_crawl`, `list_crawls`, `stop_crawl` | Check the DNS record, meta tag or file that proves ownership; crawl a site and follow the crawl | Yes |
+| `list_crawl_pages` | Every URL a crawl found: HTTP status, redirects, noindex, nofollow, robots.txt blocks | |
 | `list_clients`, `use_client`, `create_client` | Agency mode only (`OUTFLARE_AGENCY`): every client with this week's numbers, switch client, add a client | Yes |
 
 The tools that make email go out, the ones that can spend data provider credits (marked *provider*), and `approve_infra_plan`, which spends money, are marked as reaching the outside world in their MCP annotations, so clients that support it can ask you before running them.

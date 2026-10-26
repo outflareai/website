@@ -69,7 +69,9 @@ These emails go through Postmark, Resend or Cloudflare Email Service (`EMAIL_FRO
 
 ## API tokens
 
-Scripts, integrations and agents use API tokens instead of a person's session. A token:
+Scripts, integrations and agents use API tokens instead of a person's session. To connect Claude, ChatGPT or Cursor, use [Connect your AI](/docs/agents/connect/) instead: the app signs in, and its connection isn't listed under API tokens.
+
+Under **Settings → API tokens**, **New token** asks for a name, what it can do (**Read only**, **Can make changes**, or **Choose** to set each area to No, See or Change), anything riskier under **Also allow** (spending, approving missions, the suppression list, people, tokens, workspace settings), and when it expires (90 days unless you choose otherwise). Click a token later to rename it, change what it may do or its sending limits, or revoke it. A change applies on the token's next request. A token:
 
 - belongs to one workspace,
 - holds an explicit list of scopes, which can never exceed the scopes of the person who created it,
@@ -108,6 +110,8 @@ The scopes are:
 | `missions.read` | List missions and read their brief, calls, held changes and updates. |
 | `missions.run` | Create and change missions, submit a plan, post updates and connector requests, pause, stop and complete. What an agent needs. |
 | `missions.approve` | Approve a mission's plan, resume it, and approve or reject held changes. Never give this to the agent that runs the mission. |
+| `seo.read` | See [SEO sites](/docs/guides/site-audits/), their crawls and the pages they found. |
+| `seo.manage` | Add and change SEO sites, check that you own them, and start or stop crawls. Operators have it. |
 | `webhooks.read` | List [webhooks](/docs/api/webhooks/) and their deliveries. |
 | `webhooks.manage` | Add, change, test and remove webhooks, and see and rotate their signing secrets. Owners and admins only by default, since webhooks receive workspace data. |
 
