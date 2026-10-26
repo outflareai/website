@@ -108,6 +108,8 @@ The scopes are:
 | `missions.read` | List missions and read their brief, calls, held changes and updates. |
 | `missions.run` | Create and change missions, submit a plan, post updates and connector requests, pause, stop and complete. What an agent needs. |
 | `missions.approve` | Approve a mission's plan, resume it, and approve or reject held changes. Never give this to the agent that runs the mission. |
+| `seo.read` | See [SEO sites](/docs/guides/site-audits/), their crawls and the pages they found. |
+| `seo.manage` | Add and change SEO sites, check that you own them, and start or stop crawls. Operators have it. |
 | `webhooks.read` | List [webhooks](/docs/api/webhooks/) and their deliveries. |
 | `webhooks.manage` | Add, change, test and remove webhooks, and see and rotate their signing secrets. Owners and admins only by default, since webhooks receive workspace data. |
 
