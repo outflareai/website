@@ -5263,6 +5263,41 @@ paths:
                   data: { type: array, items: { $ref: "#/components/schemas/SEOHistoryRow" } }
         "400": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/seo/overview:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+    get:
+      operationId: getSEOOverview
+      x-outflare-access: { scope: analytics.read, brand_limited: true }
+      summary: Is each brand growing in search
+      description: |
+        Scope: analytics.read. One answer per brand, from what is already stored (analytics syncs, SEO snapshots,
+        site audits and the fixes list), so it calls and costs nothing. Each brand gets whole weeks (Monday to Sunday)
+        of branded search, search clicks and visitors, its SEO snapshots (domain rating, backlinks, referring domains),
+        and trends that compare the last 4 weeks with the 4 before. Branded search counts the search console queries
+        that contain one of the brand's `terms` (its name, handle and domain names); consoles hide rare queries, so it
+        is a floor. Websites no brand claims are a shared entry with `brand: null`. Site audits and open fixes need
+        seo.read as well.
+      tags: [seo]
+      parameters:
+        - { $ref: "#/components/parameters/Brand" }
+        - { name: weeks, in: query, schema: { type: integer, minimum: 8, maximum: 52, default: 12 } }
+      responses:
+        "200":
+          description: The overview.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [from, to, data, notes]
+                properties:
+                  from: { type: string, format: date }
+                  to: { type: string, format: date }
+                  data: { type: array, items: { $ref: "#/components/schemas/SEOOverviewBrand" } }
+                  notes: { type: array, items: { type: string } }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/seo/{id}/settings:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
@@ -10562,8 +10597,10 @@ paths:
         - { name: purpose, in: query, schema: { type: string, enum: [transactional, lifecycle] } }
         - { name: template, in: query, description: A template id or handle., schema: { type: string } }
         - { name: provider_id, in: query, schema: { type: string, format: uuid } }
-        - { name: to, in: query, description: Emails to this address., schema: { type: string } }
+        - { name: to, in: query, description: "Emails to this address (to, cc or bcc).", schema: { type: string } }
         - { name: test, in: query, schema: { type: boolean } }
+        - { name: trigger, in: query, schema: { type: string, enum: [api, test, event, journey, broadcast, system] } }
+        - { name: request_id, in: query, description: Emails queued by this API call., schema: { type: string } }
       responses:
         "200":
           description: A page of emails.
@@ -10593,8 +10630,11 @@ paths:
         Every recipient is checked against the suppression list when it is
         sent; transactional email still reaches people who unsubscribed
         from marketing, lifecycle email does not, and always carries a
-        one-click unsubscribe link. Send an Idempotency-Key so a retry never
-        sends twice. Cold outreach does not belong here: use sequences.
+        one-click unsubscribe link. Opens and clicks are tracked only when
+        the template or `track` turns them on. The email's `trigger` records
+        this call (its request_id is on the Logs page). Send an
+        Idempotency-Key so a retry never sends twice. Cold outreach does not
+        belong here: use sequences.
       tags: [emails]
       requestBody:
         required: true
@@ -10629,6 +10669,31 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/Email" }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/email-recipients/{address}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: address, in: path, required: true, schema: { type: string }, example: ana@example.com }
+    get:
+      operationId: getEmailRecipient
+      x-outflare-access: { scope: emails.read }
+      summary: Everything one address was sent, as a timeline
+      description: |
+        Scope: emails.read. Counts (test sends left out), whether the
+        address is suppressed, the lead it belongs to, and every event of
+        every email it was sent (to, cc or bcc), newest first. Page with
+        `before` (the `next_before` of the last page).
+      tags: [emails]
+      parameters:
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
+        - { name: before, in: query, schema: { type: string, format: date-time } }
+      responses:
+        "200":
+          description: The address's timeline.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/EmailRecipient" }
+        "400": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/emails/{id}/cancel:
     parameters:
@@ -11297,6 +11362,30 @@ webhooks:
     post:
       operationId: webhook_email_unsubscribed
       summary: "A recipient used a lifecycle email's unsubscribe link and was suppressed."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  email.opened:
+    post:
+      operationId: webhook_email_opened
+      summary: "An email was opened for the first time: its tracking pixel loaded (track_opens), or the provider reported it."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  email.clicked:
+    post:
+      operationId: webhook_email_clicked
+      summary: "A link in an email was clicked for the first time: a tracked link (track_clicks), or the provider reported it."
       tags: [webhooks]
       requestBody:
         required: true
@@ -12161,7 +12250,7 @@ components:
       required: [id, type, created_at, workspace_id, actor, target, request_id, data]
       properties:
         id: { type: string, description: "Unique per event, and the webhook-id header. Use it to ignore repeats.", example: evt_48213 }
-        type: { type: string, enum: [lead.replied, lead.unsubscribed, inbox.replied, inbox.updated, inbox.classified, lead.bounced, mailbox.auto_paused, lead.created, lead.updated, lead.deleted, leads.imported, suppressions.added, suppression.removed, lead_list.created, lead_list.leads_added, lead_list.run_started, lead_list.build_done, lead_list.build_failed, lead_list.refresh_done, lead_list.refresh_failed, lead_list.enrich_done, lead_list.enrich_failed, import.done, import.failed, sequence.created, sequence.updated, sequence.activated, sequence.paused, sequence.archived, sequence.deleted, sequence.steps_updated, sequence.leads_enrolled, enrollment.stopped, mailbox.imported, mailbox.updated, mailbox.paused, mailbox.resumed, mailbox.stage_changed, mailbox.deleted, domain.added, domain.paused, domain.resumed, domain.removed, email.queued, email.sent, email.delivered, email.bounced, email.complained, email.failed, email.suppressed, email.cancelled, email.unsubscribed, email_domain.verified, email_domain.verification_failed, email_provider.events_failed, email_template.published, meeting.created, meeting.updated, meeting.deleted, deal.created, deal.updated, deal.deleted, spend.recorded, integration.connected, integration.updated, integration.disconnected, connect_request.created, project.created, project.updated, project.deleted, mission.created, mission.updated, mission.submitted, mission.approved, mission.paused, mission.resumed, mission.stopped, mission.completed, mission.action_held, mission.action_approved, mission.action_rejected, infra.plan_created, infra.plan_approved, infra.ordered, infra.order_failed, infra.domains_bought, infra.mailbox_joined, infra.plan_warming, infra.plan_ready, infra.plan_cancelled, workspace.updated, webhook.test] }
+        type: { type: string, enum: [lead.replied, lead.unsubscribed, inbox.replied, inbox.updated, inbox.classified, lead.bounced, mailbox.auto_paused, lead.created, lead.updated, lead.deleted, leads.imported, suppressions.added, suppression.removed, lead_list.created, lead_list.leads_added, lead_list.run_started, lead_list.build_done, lead_list.build_failed, lead_list.refresh_done, lead_list.refresh_failed, lead_list.enrich_done, lead_list.enrich_failed, import.done, import.failed, sequence.created, sequence.updated, sequence.activated, sequence.paused, sequence.archived, sequence.deleted, sequence.steps_updated, sequence.leads_enrolled, enrollment.stopped, mailbox.imported, mailbox.updated, mailbox.paused, mailbox.resumed, mailbox.stage_changed, mailbox.deleted, domain.added, domain.paused, domain.resumed, domain.removed, email.queued, email.sent, email.delivered, email.bounced, email.complained, email.failed, email.suppressed, email.cancelled, email.unsubscribed, email.opened, email.clicked, email_domain.verified, email_domain.verification_failed, email_provider.events_failed, email_template.published, meeting.created, meeting.updated, meeting.deleted, deal.created, deal.updated, deal.deleted, spend.recorded, integration.connected, integration.updated, integration.disconnected, connect_request.created, project.created, project.updated, project.deleted, mission.created, mission.updated, mission.submitted, mission.approved, mission.paused, mission.resumed, mission.stopped, mission.completed, mission.action_held, mission.action_approved, mission.action_rejected, infra.plan_created, infra.plan_approved, infra.ordered, infra.order_failed, infra.domains_bought, infra.mailbox_joined, infra.plan_warming, infra.plan_ready, infra.plan_cancelled, workspace.updated, webhook.test] }
         created_at: { type: string, format: date-time }
         workspace_id: { type: string, format: uuid }
         actor: { $ref: "#/components/schemas/WebhookRef" }
@@ -12574,11 +12663,13 @@ components:
         html: { type: string }
         text: { type: string, description: The plain-text part; made from the HTML when empty. }
         variables: { type: array, maxItems: 100, items: { $ref: "#/components/schemas/EmailTemplateVariable" } }
+        track_opens: { type: boolean, description: "Count opens with a one-pixel image. Off by default. A setting, not content: it applies at once, without a publish." }
+        track_clicks: { type: boolean, description: "Send links through tracked click links. Off by default. Applies at once, without a publish." }
         publish: { type: boolean, description: Publish the result as the next version. }
         note: { type: string, maxLength: 500, description: "With publish: what changed." }
     EmailTemplate:
       type: object
-      required: [id, handle, name, brand_id, channel, purpose, status, from, reply_to, subject, html, text, variables, published_version, unpublished_changes, sent_30d, created_at, updated_at]
+      required: [id, handle, name, brand_id, channel, purpose, status, from, reply_to, subject, html, text, variables, track_opens, track_clicks, published_version, unpublished_changes, sent_30d, created_at, updated_at]
       properties:
         id: { type: string, format: uuid }
         handle: { type: string }
@@ -12593,6 +12684,8 @@ components:
         html: { type: string }
         text: { type: string }
         variables: { type: array, items: { $ref: "#/components/schemas/EmailTemplateVariable" } }
+        track_opens: { type: boolean }
+        track_clicks: { type: boolean }
         published_version: { type: [integer, "null"] }
         unpublished_changes: { type: boolean }
         sent_30d: { type: integer }
@@ -12651,17 +12744,79 @@ components:
         metadata: { type: object, additionalProperties: true, description: "Your own ids, up to 8 KB." }
         send_at: { type: string, format: date-time, description: "Send later, within 30 days." }
         test: { type: boolean, description: "Marks a test send, kept out of the overview's numbers." }
+        track:
+          type: object
+          description: "Turns open or click tracking on or off for this send; each defaults to the template's setting, else off."
+          properties:
+            opens: { type: boolean }
+            clicks: { type: boolean }
+    EmailTrigger:
+      type: object
+      description: "What sent the email: an API call (kind api, from the web app, the API, MCP, the CLI or a mission; request_id opens it on the Logs page), a test send, and in time an event, a journey or a broadcast (ref is its id)."
+      required: [kind, ref, request_id, surface, token_id, token_name, mission_id, actor_id, actor_name]
+      properties:
+        kind: { type: string, enum: [api, test, event, journey, broadcast, system] }
+        ref: { type: [string, "null"], description: The event, journey step or broadcast behind it. }
+        request_id: { type: [string, "null"], description: The API call that queued it. }
+        surface: { type: [string, "null"], description: "web, api, mcp, cli, sdk or mission." }
+        token_id: { type: [string, "null"], format: uuid, description: The API token the call used. }
+        token_name: { type: [string, "null"] }
+        mission_id: { type: [string, "null"], format: uuid }
+        actor_id: { type: [string, "null"], format: uuid }
+        actor_name: { type: [string, "null"], description: The person, token or agent that asked for it. }
+    EmailRecipient:
+      type: object
+      required: [address, counts, first_sent_at, last_sent_at, suppressed, lead_id, events, next_before]
+      properties:
+        address: { type: string }
+        counts:
+          type: object
+          description: Emails sent to the address, test sends left out.
+          required: [emails, delivered, bounced, complained, opened, clicked]
+          properties:
+            emails: { type: integer }
+            delivered: { type: integer }
+            bounced: { type: integer }
+            complained: { type: integer }
+            opened: { type: integer }
+            clicked: { type: integer }
+        first_sent_at: { type: [string, "null"], format: date-time }
+        last_sent_at: { type: [string, "null"], format: date-time }
+        suppressed:
+          type: [object, "null"]
+          description: Set when the address is on the suppression list.
+          required: [reason, source, created_at]
+          properties:
+            reason: { type: string }
+            source: { type: string }
+            created_at: { type: string, format: date-time }
+        lead_id: { type: [string, "null"], format: uuid, description: The lead with this address, if there is one. }
+        events:
+          type: array
+          items:
+            type: object
+            required: [email_id, subject, template_handle, purpose, trigger, type, detail, occurred_at]
+            properties:
+              email_id: { type: string, format: uuid }
+              subject: { type: string }
+              template_handle: { type: [string, "null"] }
+              purpose: { type: string, enum: [transactional, lifecycle] }
+              trigger: { type: string }
+              type: { type: string }
+              detail: { type: [string, "null"] }
+              occurred_at: { type: string, format: date-time }
+        next_before: { type: [string, "null"], format: date-time }
     EmailEvent:
       type: object
       required: [type, recipient, detail, occurred_at]
       properties:
-        type: { type: string, description: "queued, scheduled, sent, delivered, delayed, bounced, complained, opened, clicked, suppressed, retrying, failed, cancelled or unsubscribed." }
+        type: { type: string, description: "queued, scheduled, sent, delivered, delayed, bounced, complained, opened, clicked, opened_automatic, clicked_automatic (a mail scanner or privacy proxy, not counted), suppressed, retrying, failed, cancelled or unsubscribed." }
         recipient: { type: [string, "null"] }
         detail: { type: [string, "null"] }
         occurred_at: { type: string, format: date-time }
     Email:
       type: object
-      required: [id, provider_id, connector, brand_id, channel, purpose, status, status_reason, bounce_type, from, to, cc, bcc, reply_to, subject, template_id, template_handle, template_version, tags, metadata, test, provider_message_id, send_at, sent_at, delivered_at, attempts, created_at, updated_at]
+      required: [id, provider_id, connector, brand_id, channel, purpose, status, status_reason, bounce_type, from, to, cc, bcc, reply_to, subject, template_id, template_handle, template_version, tags, metadata, test, provider_message_id, send_at, sent_at, delivered_at, attempts, trigger, track_opens, track_clicks, opens, clicks, opened_at, clicked_at, created_at, updated_at]
       properties:
         id: { type: string, format: uuid }
         provider_id: { type: [string, "null"], format: uuid }
@@ -12689,6 +12844,13 @@ components:
         sent_at: { type: [string, "null"], format: date-time }
         delivered_at: { type: [string, "null"], format: date-time }
         attempts: { type: integer }
+        trigger: { $ref: "#/components/schemas/EmailTrigger" }
+        track_opens: { type: boolean }
+        track_clicks: { type: boolean }
+        opens: { type: integer, description: "Opens counted, scanner and proxy loads left out. Opens are a rough signal: some mail apps load images for privacy, others block them." }
+        clicks: { type: integer }
+        opened_at: { type: [string, "null"], format: date-time }
+        clicked_at: { type: [string, "null"], format: date-time }
         created_at: { type: string, format: date-time }
         updated_at: { type: string, format: date-time }
         html: { type: string, description: "Only on GET .../emails/{id}." }
@@ -13628,6 +13790,79 @@ components:
             url: { type: string }
             kind: { type: string }
             previous: { $ref: "#/components/schemas/SEOMetrics" }
+    SEOTrend:
+      type: object
+      required: [current, previous, change, direction]
+      properties:
+        current: { type: [number, "null"], description: "The last 4 weeks added up, or the latest snapshot." }
+        previous: { type: [number, "null"], description: "The 4 weeks before, or the last snapshot at least 4 weeks older." }
+        change: { type: [number, "null"], description: "(current - previous) / previous; 0.12 is 12% up." }
+        direction: { type: string, enum: [up, down, flat, unknown], description: "Within 3% is flat; unknown when either side has no data." }
+    SEOOverviewBrand:
+      type: object
+      required: [brand, terms, hosts, weeks, seo, trends, sites, open_fixes]
+      properties:
+        brand:
+          oneOf:
+            - type: object
+              required: [id, name, handle]
+              properties:
+                id: { type: string, format: uuid }
+                name: { type: string }
+                handle: { type: string }
+            - { type: "null" }
+          description: null for the websites no brand claims.
+        terms: { type: array, items: { type: string }, description: "What a search must contain to count as branded." }
+        hosts: { type: array, items: { type: string }, description: The brand's websites. }
+        weeks:
+          type: array
+          description: Oldest first; a null is not measured that week.
+          items:
+            type: object
+            required: [week, branded_clicks, branded_impressions, search_clicks, search_impressions, visitors, sessions]
+            properties:
+              week: { type: string, format: date, description: The week's Monday. }
+              branded_clicks: { type: [number, "null"] }
+              branded_impressions: { type: [number, "null"] }
+              search_clicks: { type: [number, "null"] }
+              search_impressions: { type: [number, "null"] }
+              visitors: { type: [number, "null"] }
+              sessions: { type: [number, "null"] }
+        seo:
+          type: array
+          description: "One row per snapshot day, oldest first: Ahrefs when it is connected, the main website's rating, links added up across the brand's websites."
+          items:
+            type: object
+            required: [day, connector, domain_rating, backlinks, referring_domains, organic_traffic]
+            properties:
+              day: { type: string, format: date }
+              connector: { type: string }
+              domain_rating: { type: [number, "null"] }
+              backlinks: { type: [number, "null"] }
+              referring_domains: { type: [number, "null"] }
+              organic_traffic: { type: [number, "null"] }
+        trends:
+          type: object
+          required: [branded_search, search_clicks, visitors, domain_rating, backlinks, referring_domains]
+          properties:
+            branded_search: { $ref: "#/components/schemas/SEOTrend" }
+            search_clicks: { $ref: "#/components/schemas/SEOTrend" }
+            visitors: { $ref: "#/components/schemas/SEOTrend" }
+            domain_rating: { $ref: "#/components/schemas/SEOTrend" }
+            backlinks: { $ref: "#/components/schemas/SEOTrend" }
+            referring_domains: { $ref: "#/components/schemas/SEOTrend" }
+        sites:
+          type: array
+          description: The brand's audited sites and their latest health score; empty without seo.read.
+          items:
+            type: object
+            required: [id, host, health_score, crawled_at]
+            properties:
+              id: { type: string, format: uuid }
+              host: { type: string }
+              health_score: { type: [integer, "null"] }
+              crawled_at: { type: [string, "null"], format: date-time }
+        open_fixes: { type: [integer, "null"], description: "Open and in-progress fixes; null without seo.read." }
     SEOLatest:
       allOf:
         - $ref: "#/components/schemas/SEOMetrics"
