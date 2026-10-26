@@ -46,6 +46,20 @@ Each page also shows how it was found (from the start page, a link, a sitemap or
 
 For each HTML page, Outflare also keeps what an audit checks: the title, meta description, canonical, h1, language and hreflang, the structured data types, the word count, images without alt text, the viewport tag, and a fingerprint that matches pages with the same words. It never stores the page's text. It also keeps every link on the page, with its anchor text, so you can see a page's links out with the status each one returned (a 404 is a broken link) and the pages that link to it. A page in your sitemap that nothing links to is an orphan. A meta refresh counts as a redirect, and links marked `nofollow`, `ugc` or `sponsored` are not followed.
 
+## Pages built by JavaScript
+
+Some sites send an almost empty page and build it in the browser with JavaScript (React, Vue, Angular and the like). Read as served, such a page has no title, words or links. When the server has a browser, OutflareBot loads those pages in it, lets their scripts run, and audits what the browser built. Each site's `render` setting says when:
+
+- **Auto** (the default): when the page as served looks like an empty app shell.
+- **Always**: every HTML page. Slower, because each page takes a few seconds.
+- **Never**: every page is read as served.
+
+A rendered page shows `rendered`, and `raw_word_count` keeps the words in the HTML as served. Far fewer words than the rendered `word_count` means crawlers that don't run JavaScript see little of the page. If rendering fails, the page is kept as served.
+
+The browser follows the same rules as the crawler. Each page gets a fresh profile with no cookies, loads no images, video or fonts, obeys robots.txt on your site, never submits a form, and gets at most 20 seconds and 150 requests. Every request it makes goes through the Outflare server, which only lets it reach public addresses.
+
+A site's `rendering_available` says whether its server can render. On a self-hosted server, set `OUTFLARE_CHROME_PATH` or `OUTFLARE_RENDER_URL` (see [Configuration](/docs/self-hosting/configuration/)).
+
 ## From the API or an agent
 
 ```sh
