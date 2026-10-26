@@ -76,6 +76,17 @@ curl "https://outflare.example.com/v1/workspaces/$WS/leads?limit=200&cursor=YWZ0
 
 Cursors are opaque: don't build or decode them. A cursor the API did not give out answers `400 invalid_cursor`. The CLI's `--all` and the MCP tools page this way for you. (Lists also answer the older `next_before`, `next_after` or `next_offset` beside `next_cursor`, and those parameters keep working.)
 
+### Choose the fields
+
+Add `fields` to any `GET` to get back only what you read. A list trims each item in `data` and keeps its paging fields; a single object trims itself. `id` always comes back.
+
+```sh
+curl "https://outflare.example.com/v1/workspaces/$WS/leads?fields=email,company" -H "Authorization: Bearer $OUTFLARE_TOKEN"
+# → { "data": [{ "id": "…", "email": "ana@acme.com", "company": "Acme" }], "next_cursor": null, … }
+```
+
+A name the items don't have answers `400 invalid_request` with `param: "fields"` and a message listing the fields they do have. The CLI takes `--fields email,company`, the Python SDK `fields=["email", "company"]`, and the MCP list tools a `fields` list, which keeps long answers small in an agent's context.
+
 Work that runs in the background answers `202`, always with a JSON body (`{"queued": true}` when there is nothing more to say). Inside a [mission](/docs/agents/missions/), a workspace write can also answer `202` with a `MissionHeld` body instead of running: a dry run, or held until a person approves it. Its `mission_action` tells you what to follow.
 
 ## Safe retries

@@ -17,7 +17,7 @@ export default defineConfig({
 			title: 'Outflare',
 			description:
 				'Open-source GTM infrastructure for humans and agents. Self-host a cold-email sequencer with bulk mailbox connection and a policy check on every send.',
-			logo: { light: './src/assets/logo-light.svg', dark: './src/assets/logo-dark.svg', replacesTitle: false },
+			logo: { light: './src/assets/logo-light.svg', dark: './src/assets/logo-dark.svg', alt: 'Outflare', replacesTitle: true },
 			favicon: '/favicon.svg',
 			social: [{ icon: 'github', label: 'GitHub', href: repo }],
 			customCss: [
@@ -44,6 +44,15 @@ export default defineConfig({
 			lastUpdated: true,
 			head: [
 				{ tag: 'link', attrs: { rel: 'alternate', type: 'text/plain', href: '/llms.txt', title: 'llms.txt' } },
+				{ tag: 'link', attrs: { rel: 'icon', href: '/favicon.ico', sizes: '16x16 32x32 48x48' } },
+				{ tag: 'link', attrs: { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' } },
+				{ tag: 'link', attrs: { rel: 'manifest', href: '/site.webmanifest' } },
+				{ tag: 'meta', attrs: { name: 'theme-color', content: '#0a0a0a' } },
+				{ tag: 'meta', attrs: { property: 'og:image', content: 'https://outflare.ai/brand/social/outflare-social-1200x630.png' } },
+				{ tag: 'meta', attrs: { property: 'og:image:width', content: '1200' } },
+				{ tag: 'meta', attrs: { property: 'og:image:height', content: '630' } },
+				{ tag: 'meta', attrs: { property: 'og:image:alt', content: 'Outflare: the open-source GTM platform for humans and agents' } },
+				{ tag: 'meta', attrs: { name: 'twitter:image', content: 'https://outflare.ai/brand/social/outflare-social-1200x630.png' } },
 			],
 			sidebar: [
 				{

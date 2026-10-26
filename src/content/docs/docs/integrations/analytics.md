@@ -13,7 +13,7 @@ Outflare reads the analytics tools already on your website, so a person, a scrip
 
 Open **Connectors** and pick the **Analytics** category, or go straight to the **Analytics** page and click **Choose a tool**. Google tools connect with a read-only Google sign-in, and one sign-in connects both Google Analytics and Search Console. They also take a service account key. PostHog and Cloudflare offer a sign-in or a key, and you choose. The rest take an API key. An agent can ask for a connection with `request_connection`: you get a one-time link to paste the key into or sign in from, so the key never passes through the chat.
 
-When a connection can read several sites (GA4 properties, Search Console properties, PostHog projects), the Website analytics page asks which one to read. Your choice becomes the connection's default, for agents too.
+One sign-in often sees many sites (every GA4 property, Search Console property or PostHog project the login can open). Every one of them syncs unless you switch it off, up to 20 per connection. The Website analytics page lists them with a sync switch and a domain field for each.
 
 ## Providers
 
@@ -64,13 +64,17 @@ curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/analytics/summary
 # Top 50 search queries from one connection
 curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/analytics/$ID/reports/search_queries?limit=50"
 
-# Which sites a connection can read, and pick the default
+# Which sites a connection can read, the domain each counts under, and whether it syncs
 curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/analytics/$ID/sites"
+# Pick the default site for live reports
 curl -X PUT -H "Authorization: Bearer $TOKEN" -d '{"site":"123456789"}' "$URL/v1/workspaces/$WS/analytics/$ID/site"
+# Give one site its domain, or switch it off (site ids are URL-encoded)
+curl -X PATCH -H "Authorization: Bearer $TOKEN" -d '{"domain":"example.com"}' "$URL/v1/workspaces/$WS/analytics/$ID/sites/123456789"
+curl -X PATCH -H "Authorization: Bearer $TOKEN" -d '{"sync":false}' "$URL/v1/workspaces/$WS/analytics/$ID/sites/sc-domain%3Aold.com"
 ```
 
 Reads need the `analytics.read` scope (owners, admins, operators and viewers
-have it). Setting the default site needs `integrations.manage`. Dates are
+have it). Changing sites needs `integrations.manage`. Dates are
 inclusive `YYYY-MM-DD`; the default range is the last 28 days. When a
 connection can read several sites and has no default, a report answers
 `400 pick_site` with how to choose one; with one site, it is used
@@ -81,7 +85,8 @@ hours for Clarity, which allows ten calls a day) so dashboards and agents do
 not spend the provider's rate limits. `fresh=true` asks again.
 
 Agents use the MCP tools `list_analytics`, `get_analytics_summary`,
-`get_analytics_report`, `list_analytics_sites` and `set_analytics_site` for
+`get_analytics_report`, `list_analytics_sites`, `set_analytics_site` and
+`update_analytics_site` for
 live answers, and `get_analytics_overview`, `query_analytics_history`,
 `compare_analytics_tools` and `sync_analytics` for stored history. To
 connect a tool, an agent finds it with `list_connectors` (category
@@ -92,7 +97,10 @@ signs in with Google on the link, never in the chat.
 
 Every six hours the engine copies each analytics connection's daily numbers
 into Postgres (`analytics_daily`), one row per site, report, day and key, in
-the same metrics as the live reports. Clarity syncs once a day and traffic
+the same metrics as the live reports. One sign-in often sees many sites, so
+every site syncs unless it is switched off, up to 20 per connection; past 20,
+sites sync once switched on. Switching a site off deletes what was stored for
+it. Clarity syncs once a day and traffic
 only, because its API allows ten calls a day and three days of history.
 
 - **First sync:** 90 days of traffic, and 7 days of pages, sources, search
@@ -107,10 +115,10 @@ only, because its API allows ten calls a day and three days of history.
   connection whose key stops working is marked in Connectors and skipped
   until it is fixed. Set `"sync_paused": true` in a connection's config to
   stop syncing it.
-- **Websites line up by domain.** Each connection's site gets a domain
+- **Websites line up by domain.** Each site gets a domain
   (`example.com`, without `www.`), taken from the site's address. Google
   Analytics properties and Vercel projects do not show one, so set it on the
-  Analytics page or with `PUT .../analytics/$ID/site` and `"domain"`. Stored
+  Analytics page or with `PATCH .../analytics/$ID/sites/$SITE` and `"domain"`. Stored
   history moves with it.
 
 Reading history never calls a provider, so it is fast and free:
@@ -141,7 +149,7 @@ the range. Syncing needs `integrations.manage`; reading needs
 
 ## In the app
 
-The **Analytics** page starts with your websites: each domain with every tool's stored visitors, page views and search clicks side by side, search clicks added up across Google and Bing, when each tool last synced, and **Sync now**. **Compare tools day by day** draws one line per tool for that website. A tool whose site has no domain gets a field to add one. Below that, one tool at a time, live: headline numbers, a chart per day, and tabs for pages, sources, search queries and events. Pick the period (7, 28 or 90 days, or 12 months); the refresh button asks the provider again instead of using the cached answer.
+The **Analytics** page starts with your websites: each domain with every tool's stored visitors, page views and search clicks side by side, search clicks added up across Google and Bing, when each tool last synced, and **Sync now**. **Compare tools day by day** draws one line per tool for that website. A tool whose site has no domain gets a field to add one. When a tool can read several sites, **N sites in {tool}** opens the list: switch each site's sync on or off and set its domain. Below that, one tool at a time, live: headline numbers, a chart per day, and tabs for pages, sources, search queries and events. Pick the period (7, 28 or 90 days, or 12 months); the refresh button asks the provider again instead of using the cached answer.
 
 ## PostHog sign-in on your own server
 
