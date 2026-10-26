@@ -47,6 +47,18 @@ The brand picker under the workspace name in the sidebar narrows every page to o
 
 Each site in your analytics tools, such as a GA4 property, a Search Console site or a PostHog project, counts as a brand's when its domain is one of the brand's domains. Subdomains count too, so app.repocket.com is Repocket's. For a site named after an app rather than a domain, pick its brand yourself (`PUT /v1/workspaces/{ws}/analytics/{id}/site-brand`), or mark it as shared.
 
+## Keep brands from emailing the same person
+
+Leads and the suppression list are shared, so one person is one lead, and an unsubscribe from any brand stops every brand. You can go further and keep two brands from cold emailing the same person close together. In **Settings → Brands**, turn on **Contacting the same person** and choose how many days to wait (1 to 365).
+
+With the rule on, a brand's sequence skips anyone another brand emailed within that many days. Their enrollment shows as blocked with the reason `other_brand:geonode`, naming the brand that got there first. The rule checks only first emails, so follow-ups already under way carry on, and sequences shared by every brand don't count. To check before you enroll, call `POST /recipients/check` with `brand`.
+
+## Reports by brand
+
+**Sending reports** and **Cost per meeting** follow the brand picked in the sidebar, and both can group by brand to compare them side by side. In the API, `GET /reports` and `GET /outcomes/report` take `group_by=brand` and `?brand=`. A send, reply or meeting counts for its sequence's brand. Spend tied only to a mailbox or domain counts for that mailbox's or domain's brand.
+
+The audit log and the events feed take `?brand=`, and every event and webhook payload carries `brand_id` when the changed record has a brand. A webhook can be kept to one brand: pick it under **Which brands** in Settings → Webhooks, or send `"brand": "repocket"` when you create it.
+
 ## Keep people and tokens to some brands
 
 Owners and admins always see every brand. An operator or viewer can be kept to some brands: in **Settings → Members**, pick their brands in the Brands column, or pick them on the invite. An API token can be kept to one brand: choose it under **Which brands** when you create the token (`"brand": "repocket"` in the API). An MCP connection is a token, so the same goes for an agent.
@@ -71,6 +83,8 @@ Changing someone's brands is in the audit log as `member.brands_changed`.
 | Move records in or out | `POST /brands/{brand}/add`, `/remove` | `add_to_brand`, `remove_from_brand` |
 | Keep a member to some brands | `PATCH /members/{user}` with `brand_ids` | (people only, in the app or API) |
 | A token for one brand | `POST /tokens` with `brand` | (in the app or API) |
+| The cross-brand contact rule | `GET`/`PATCH /brand-rules` | `get_brand_rules`, `set_brand_rules` |
+| Reports by brand | `GET /reports?group_by=brand`, `GET /outcomes/report?group_by=brand` | `get_report`, `get_outcomes_report` |
 | Analytics sites by brand | `GET /analytics/site-brands`, `PUT /analytics/{id}/site-brand` | `list_analytics_site_brands`, `set_analytics_site_brand` |
 
 `{brand}` is the brand's handle (such as `repocket`) or its id. List endpoints take `?brand=` with a handle or id, `none` for shared records, or `all`. Set `OUTFLARE_BRAND` on the MCP server to make one brand its default.
@@ -84,5 +98,4 @@ curl -X POST https://app.outflare.ai/v1/workspaces/$WS/brands \
 
 ## Coming next
 
-- A rule that stops two brands emailing the same person, and reports split by brand.
 - Drafting a brand's context by reading its website.
