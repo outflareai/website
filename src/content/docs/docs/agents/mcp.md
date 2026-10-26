@@ -13,7 +13,7 @@ There are two ways in. The MCP server is the quickest one for Claude, ChatGPT, C
 
 ## The MCP server <span class="pill shipped">Shipped</span>
 
-[`@outflare/mcp`](https://github.com/outflareai/outflare/tree/main/mcp) is an [MCP](https://modelcontextprotocol.io) server that gives an agent 214 tools over the API (3 more in agency mode): run [missions](/docs/agents/missions/) toward a goal with approvals, read and update the brief of the project it works on, check sending domains and mailbox warm-up, import leads, check them against the suppression list, build, preview and start sequences, see and change which mailboxes each sequence sends from, and read and answer replies.
+[`@outflare/mcp`](https://github.com/outflareai/outflare/tree/main/mcp) is an [MCP](https://modelcontextprotocol.io) server that gives an agent 235 tools over the API (3 more in agency mode): run [missions](/docs/agents/missions/) toward a goal with approvals, read and update the brief of the project it works on, check sending domains and mailbox warm-up, import leads, check them against the suppression list, build, preview and start sequences, see and change which mailboxes each sequence sends from, and read and answer replies.
 
 It calls the same API with a scoped token, so:
 
@@ -78,6 +78,11 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `get_status` | Everything stopping the workspace, worst first, with the tool that fixes each and who must act | |
 | `list_memories` | Search the preferences, decisions and facts people and agents saved | |
 | `update_context`, `remember`, `update_memory`, `forget` | Save the company context, remember something lasting, correct or forget a memory | Yes |
+| `get_catalog` | What customer records can hold: record types, fields, shared option lists and product events. See [Customer records](/docs/guides/customer-records/) | |
+| `list_records`, `get_record`, `lookup_record` | Find people, companies and other records by type, name or identity, and which record holds an email or id verified | |
+| `get_record_history`, `list_record_identities`, `list_record_links` | A record's changes, its emails, phones and ids, and its links | |
+| `create_record`, `update_record`, `add_record_identity`, `close_record_identity`, `link_records`, `end_record_link` | Add and change records, their identities and links | Yes |
+| `create_record_type`, `update_record_type`, `create_field`, `update_field`, `create_option_set`, `update_option_set`, `define_event`, `update_event_definition` | Change the shared catalog | Yes |
 | `list_projects` | Projects (one motion each: offer, ideal customer, market), with status, limits, what they own and sends | |
 | `get_project_brief` | A project's offer, audience, market, ideal customer filters and brief, plus all of it as Markdown for a prompt | |
 | `get_outcomes_report` | Cost per reply, meeting and won deal, for the workspace or by project or sequence, with what is estimated or unpriced | |
