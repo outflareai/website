@@ -213,6 +213,13 @@ export const milestones: Milestone[] = [
 		docs: '/docs/agents/analytics/',
 	},
 	{
+		step: 26,
+		title: 'Lifecycle email',
+		status: 'shipped',
+		summary: 'Receipts, password resets and onboarding email from your own Amazon SES, Postmark or Resend account: setup guides with a prompt your AI agent can follow, verified sending domains, versioned templates with live preview, delivery events and automatic suppression.',
+		docs: '/docs/guides/lifecycle-email/',
+	},
+	{
 		step: null,
 		title: 'CLI, more CRMs, provider marketplace, Cloud',
 		status: 'later',
