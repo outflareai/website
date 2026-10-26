@@ -211,7 +211,7 @@ const roadmapTag: Record<string, string> = { shipped: 'badge-live', building: 'b
 						<thead><tr class="font-mono text-[11px] tracking-wide text-muted-foreground uppercase"><th class="w-[44%] py-1.5 font-medium">Mailbox</th><th class="py-1.5 font-medium">Status</th><th class="hidden py-1.5 font-medium sm:table-cell">Warm-up</th><th class="py-1.5 text-right font-medium">Limit</th></tr></thead>
 						<tbody class="divide-y">
 							{
-								[['alex@trynorthwind.com', '96%', 40], ['sam@trynorthwind.com', '94%', 40], ['jordan@northwindhq.com', '95%', 50], ['riley@getnorthwind.io', '93%', 30]].map(([m, w, l]) => (
+								[['alex@trynorthpeak.example', '96%', 40], ['sam@trynorthpeak.example', '94%', 40], ['jordan@northpeak.example', '95%', 50], ['riley@northpeakmail.example', '93%', 30]].map(([m, w, l]) => (
 									<tr><td class="py-1.5 font-mono text-xs">{m}</td><td><span class="badge badge-live">Sending</span></td><td class="hidden sm:table-cell"><span class="badge badge-live">{w} inbox</span></td><td class="text-right tabular-nums">{l}/day</td></tr>
 								))
 							}
@@ -239,7 +239,7 @@ const roadmapTag: Record<string, string> = { shipped: 'badge-live', building: 'b
 				<h3 class="font-semibold">Domain health, checked daily</h3>
 				<p class="mt-1.5 text-sm text-muted-foreground">SPF, DKIM, DMARC, MX and blocklists for every sending domain, with the exact record to fix.</p>
 				<ul class="mt-5 space-y-2.5">
-					{[['trynorthwind.com', ['SPF', 'DKIM', 'DMARC'], ''], ['northwindhq.com', ['SPF', 'DKIM', 'DMARC'], ''], ['getnorthwind.io', ['SPF', 'DKIM'], 'DMARC']].map(([d, ok, warn]) => (
+					{[['trynorthpeak.example', ['SPF', 'DKIM', 'DMARC'], ''], ['northpeak.example', ['SPF', 'DKIM', 'DMARC'], ''], ['northpeakmail.example', ['SPF', 'DKIM'], 'DMARC']].map(([d, ok, warn]) => (
 						<li class="flex flex-wrap items-center justify-between gap-2">
 							<span class="font-mono text-xs">{d}</span>
 							<span class="flex gap-1">
@@ -289,7 +289,7 @@ const roadmapTag: Record<string, string> = { shipped: 'badge-live', building: 'b
 				<ul class="mt-5 space-y-1.5 font-mono text-xs">
 					<li class="flex gap-3"><span class="text-muted-foreground">12:04</span><span class="badge badge-muted">token: sdr-agent</span><span>sequence.started</span></li>
 					<li class="flex gap-3"><span class="text-muted-foreground">11:58</span><span class="badge badge-muted">token: sdr-agent</span><span>leads.imported <span class="text-muted-foreground">240 rows</span></span></li>
-					<li class="flex gap-3"><span class="text-muted-foreground">11:41</span><span class="badge badge-muted">maya@northwind.dev</span><span>mailbox.paused</span></li>
+					<li class="flex gap-3"><span class="text-muted-foreground">11:41</span><span class="badge badge-muted">maya@northpeak.example</span><span>mailbox.paused</span></li>
 				</ul>
 			</a>
 
