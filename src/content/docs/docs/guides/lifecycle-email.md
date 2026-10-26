@@ -55,6 +55,17 @@ What people choose is saved on their [customer record](/docs/guides/customer-rec
 
 A topic's key never changes, because consents point at it. Archive a topic to stop new sends naming it.
 
+## Broadcasts
+
+A broadcast sends one published lifecycle template to many people at once, such as a newsletter or a launch. Open **Lifecycle → Broadcasts**, press **New broadcast**, pick the template and its topic, and save the draft. Nothing goes out until you press **Send now**, or **Schedule** it for a time in the next 30 days.
+
+- **Who it goes to.** Everyone on your [customer records](/docs/guides/customer-records/) with a verified email address who may get the topic, or just the records you list (through the API). A draft shows how many people that is.
+- **Who is skipped.** People who left the topic or all marketing email, people who never joined an opt-in topic, and prospects from lead lists who never agreed to marketing email. Cold email goes through [sequences](/docs/guides/sequences/). The broadcast lists who was skipped and why.
+- **Each person gets their own copy.** Their fields fill the template, such as `{{person.first_name}}`, beside the data you set for everyone. The email carries the topic's unsubscribe link and passes the same checks as any send. Sending again never emails anyone twice.
+- **Results.** Delivered, opened, clicked, unsubscribed and bounced, as counts and rates. **See its emails** opens Sent emails filtered to it. Cancel stops a scheduled or sending broadcast; emails that haven't gone yet are cancelled.
+
+Your app or agent can do the same with `POST /v1/workspaces/{ws}/email-broadcasts` and `POST .../email-broadcasts/{id}/send`, or the MCP tools `create_email_broadcast` and `send_email_broadcast`.
+
 ## Sent emails
 
 **Sent emails** lists every email, newest first. You can filter by status, kind, recipient or test sends. Open one to see:
@@ -67,7 +78,7 @@ An email that is still queued or scheduled can be cancelled.
 
 ## What sent it
 
-Each email shows what sent it: a call from your app (and whether it came from the web app, the API, MCP, the CLI, an SDK or a mission), or a test send. The **Sent by** card names the API token, person or mission behind it and links to the exact call on the **Logs** page. Filter Sent emails by **Sent by** to see only API sends or only tests. Events, journeys and broadcasts will add their own triggers as they arrive.
+Each email shows what sent it: a call from your app (and whether it came from the web app, the API, MCP, the CLI, an SDK or a mission), or a test send. The **Sent by** card names the API token, person or mission behind it and links to the exact call on the **Logs** page. Filter Sent emails by **Sent by** to see only API sends, tests or broadcasts; an email from a broadcast links back to it.
 
 ## Opens and clicks
 
@@ -99,8 +110,8 @@ People with a [customer record](/docs/guides/customer-records/) also get each em
 
 ## For agents and integrations
 
-- **MCP tools:** `send_email`, `list_emails`, `list_email_topics`, `create_email_topic`, `update_email_topic`, `get_email`, `get_email_recipient`, `cancel_email`, `get_email_overview`, plus tools for providers, domains and templates.
+- **MCP tools:** `send_email`, `list_emails`, `list_email_topics`, `create_email_topic`, `update_email_topic`, `list_email_broadcasts`, `get_email_broadcast`, `create_email_broadcast`, `update_email_broadcast`, `send_email_broadcast`, `cancel_email_broadcast`, `get_email`, `get_email_recipient`, `cancel_email`, `get_email_overview`, plus tools for providers, domains and templates.
 - **Webhook events:** `email.delivered`, `email.bounced`, `email.complained`, `email.unsubscribed`, `email.preferences_changed`, `email.opened`, `email.clicked` and the rest of the `lifecycle_email` category.
-- **Scopes:** `emails.read` to read, `emails.send` to send, `emails.manage` to change providers, domains and templates.
+- **Scopes:** `emails.read` to read, `emails.send` to send emails and broadcasts, `emails.manage` to change providers, domains, templates and topics and to draft broadcasts.
 
 SMS and push will join later as more channels, using the same templates, sends and events.
