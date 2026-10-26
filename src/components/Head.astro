@@ -1,8 +1,11 @@
 ---
-// Starlight's head plus the site analytics, so the docs count like the home page.
+// Starlight's head plus the site analytics, so the docs count like the home page,
+// and the signed-in check, so the docs header shows Dashboard too.
 import Default from '@astrojs/starlight/components/Head.astro';
 import Analytics from './Analytics.astro';
+import SignedIn from './SignedIn.astro';
 ---
 
 <Default />
+<SignedIn />
 <Analytics />
