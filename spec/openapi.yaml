@@ -5324,6 +5324,7 @@ paths:
                 country: { type: string, example: US, description: Two-letter code for keywords and traffic. }
                 monthly_budget: { type: [number, "null"], minimum: 0, description: "Per calendar month (UTC): US dollars for DataForSEO, API units for Ahrefs." }
                 sync: { type: string, enum: [weekly, "off"] }
+                link_rows: { type: [integer, "null"], minimum: 1, maximum: 1000, description: "Links each weekly read asks for per SEO site, strongest linking domains first; null is the default, 200." }
       responses:
         "200":
           description: The connection with its new settings.
@@ -5356,6 +5357,7 @@ paths:
         - { name: target, in: query, schema: { type: string }, example: example.com, description: "A domain. Default: the connection's only domain." }
         - { name: country, in: query, schema: { type: string }, example: US }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 1000, default: 50 } }
+        - { name: since, in: query, schema: { type: string, format: date }, description: "The links report only: also list links lost on or after this date." }
         - { name: fresh, in: query, schema: { type: boolean } }
       responses:
         "200":
@@ -5379,7 +5381,7 @@ paths:
       x-outflare-access: { scope: integrations.manage }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Take an SEO snapshot now
-      description: "Scope: integrations.manage. Stores the overview and top 50 keywords of every domain the connection follows, within its budget (this also runs weekly). Costs about $0.04 a domain on DataForSEO or 1,200 API units on Ahrefs."
+      description: "Scope: integrations.manage. Stores the overview and top 50 keywords of every domain the connection follows, within its budget (this also runs weekly). Costs about $0.04 a domain on DataForSEO or 1,200 API units on Ahrefs. A connection that reads single links also reads the links to every active SEO site (`link_rows` each, live and lost in the last 90 days) into GET .../backlinks: about $0.03 a site on DataForSEO, or 50 to 200 API units on Ahrefs."
       tags: [seo]
       responses:
         "200":
@@ -5388,12 +5390,28 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [domains, rows, cost, unit]
+                required: [domains, rows, cost, unit, links]
                 properties:
                   domains: { type: array, items: { type: string } }
                   rows: { type: integer }
                   cost: { type: number }
                   unit: { type: string, enum: [USD, API unit] }
+                  links:
+                    type: array
+                    description: Each SEO site's links read.
+                    items:
+                      type: object
+                      required: [id, site_id, host, links_seen, new, lost, regained, cost, error]
+                      properties:
+                        id: { type: string, format: uuid }
+                        site_id: { type: string, format: uuid }
+                        host: { type: string }
+                        links_seen: { type: integer }
+                        new: { type: integer }
+                        lost: { type: integer }
+                        regained: { type: integer }
+                        cost: { type: number }
+                        error: { type: [string, "null"] }
         "400": { $ref: "#/components/responses/Error" }
         "402": { $ref: "#/components/responses/Error" }
         "422": { $ref: "#/components/responses/Error" }
@@ -5771,6 +5789,108 @@ paths:
                         http_status: { type: [integer, "null"] }
                   next_after: { type: [string, "null"] }
                   next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/backlinks:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listBacklinks
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: List backlinks
+      description: |
+        Scope: seo.read. The links other sites have to the workspace's SEO
+        sites, merged from every SEO connection that reads links (Ahrefs,
+        DataForSEO): one row per link, with each provider's own view in
+        `providers`. A link is live while any provider still finds it.
+        Reads only what the weekly snapshot stored, so it costs nothing.
+      tags: [seo]
+      parameters:
+        - { $ref: "#/components/parameters/Brand" }
+        - { name: site_id, in: query, schema: { type: string, format: uuid } }
+        - { name: status, in: query, schema: { type: string, enum: [live, lost] } }
+        - { name: nofollow, in: query, schema: { type: boolean } }
+        - { name: q, in: query, schema: { type: string }, description: "Part of the linking domain, URL or anchor." }
+        - { name: order, in: query, schema: { type: string, enum: [rating, newest, lost], default: rating } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
+        - { name: offset, in: query, schema: { type: integer, minimum: 0 } }
+        - { $ref: "#/components/parameters/Fields" }
+        - { $ref: "#/components/parameters/Cursor" }
+      responses:
+        "200":
+          description: Backlinks.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, total, next_offset, next_cursor]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/Backlink" } }
+                  total: { type: integer }
+                  next_offset: { type: [integer, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/backlinks/events:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listBacklinkEvents
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: List links gained, lost and regained
+      description: |
+        Scope: seo.read. The feed of what happened to the sites' links,
+        newest first: `new` when a provider first finds a link, `lost` when
+        no provider still does, `regained` when one finds it again. Events
+        are never changed afterwards. A site's first read is a baseline:
+        only links first found or lost in the 30 days before it become
+        events.
+      tags: [seo]
+      parameters:
+        - { $ref: "#/components/parameters/Brand" }
+        - { name: site_id, in: query, schema: { type: string, format: uuid } }
+        - { name: kind, in: query, schema: { type: string, enum: [new, lost, regained] } }
+        - { name: days, in: query, schema: { type: integer, minimum: 1, maximum: 730, default: 90 } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
+        - { name: offset, in: query, schema: { type: integer, minimum: 0 } }
+        - { $ref: "#/components/parameters/Fields" }
+        - { $ref: "#/components/parameters/Cursor" }
+      responses:
+        "200":
+          description: Events.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, next_offset, next_cursor]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/BacklinkEvent" } }
+                  next_offset: { type: [integer, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/backlinks/summary:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: getBacklinksSummary
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: Summarise each site's backlinks
+      description: "Scope: seo.read. Per SEO site: live and lost links, referring domains, followed links, links gained, lost and regained in the last 30 days and in each of the last 12 weeks, and each provider's latest read."
+      tags: [seo]
+      parameters:
+        - { $ref: "#/components/parameters/Brand" }
+        - { name: site_id, in: query, schema: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: One entry per site.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/BacklinkSiteSummary" } }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
@@ -14305,7 +14425,8 @@ components:
         seo: { type: array, items: { $ref: "#/components/schemas/SEOLatest" }, description: "Each SEO connection's latest snapshot of the domain." }
     SEOReportName:
       type: string
-      enum: [overview, keywords, backlinks, competitors, audit]
+      enum: [overview, keywords, backlinks, links, competitors, audit]
+      description: "backlinks lists linking domains; links lists single links (live, and with `since` also lost ones)."
     SEOMetrics:
       type: object
       description: Every field is optional; a missing field is not measured by the provider.
@@ -14332,6 +14453,27 @@ components:
             key: { type: string, description: "A keyword, linking domain, competitor domain or audit issue." }
             url: { type: string, description: A keyword's ranking page. }
             kind: { type: string, enum: [error, warning, notice], description: An audit issue's importance. }
+            link: { $ref: "#/components/schemas/SEOLink" }
+    SEOLink:
+      type: object
+      description: One link from another site's page, as the provider last saw it (the links report).
+      required: [from, to, anchor, source_domain, nofollow, sponsored, ugc, lost]
+      properties:
+        from: { type: string, description: The linking page. }
+        to: { type: string, description: The page it links to. }
+        anchor: { type: string }
+        source_domain: { type: string }
+        nofollow: { type: boolean }
+        sponsored: { type: boolean }
+        ugc: { type: boolean }
+        lost: { type: boolean, description: The provider no longer finds the link. }
+        lost_reason: { type: string }
+        first_seen: { type: string, format: date }
+        last_seen: { type: string, format: date, description: When a lost link was last seen. }
+        source_rating: { type: number, description: "The linking domain's strength, 0 to 100." }
+        spam: { type: number, description: "The provider's own spam judgement, 0 (clean) to 100: DataForSEO's spam score, or 100 when Ahrefs lists the domain as spam." }
+        external_links: { type: number, description: Links to other sites on the linking page. }
+        title: { type: string, description: The linking page's title. }
     SEOCost:
       type: object
       properties:
@@ -14554,9 +14696,113 @@ components:
         internal: { type: boolean, description: On the site (its host or its www. twin). }
         nofollow: { type: boolean, description: "rel nofollow, ugc or sponsored." }
         http_status: { type: [integer, "null"], description: "The status this crawl got from the page; null when it did not read it." }
+    Backlink:
+      type: object
+      required: [id, site_id, brand_id, source_url, target_url, source_domain, anchor, nofollow, sponsored, ugc, status, source_rating, first_seen_at, lost_at, regained_at, checked_at, providers]
+      properties:
+        id: { type: string, format: uuid }
+        site_id: { type: string, format: uuid }
+        brand_id: { type: [string, "null"], format: uuid }
+        source_url: { type: string, description: The linking page. }
+        target_url: { type: string, description: The site's page it links to. }
+        source_domain: { type: string, description: "The linking site's host, without www." }
+        anchor: { type: string }
+        nofollow: { type: boolean }
+        sponsored: { type: boolean }
+        ugc: { type: boolean }
+        status: { type: string, enum: [live, lost], description: live while any provider still finds it. }
+        source_rating: { type: [number, "null"], description: "The linking domain's strength, 0 to 100: Ahrefs DR when Ahrefs saw the link, else DataForSEO's rank." }
+        first_seen_at: { type: [string, "null"], format: date-time, description: The earliest date a provider found it. }
+        lost_at: { type: [string, "null"], format: date-time }
+        regained_at: { type: [string, "null"], format: date-time }
+        checked_at: { type: string, format: date-time, description: The last time a provider reported it. }
+        providers:
+          type: object
+          description: Each provider's latest view, by connector id.
+          additionalProperties:
+            type: object
+            required: [status, run_id, checked_at]
+            properties:
+              status: { type: string, enum: [live, lost] }
+              first_seen: { type: string, format: date }
+              last_seen: { type: string, format: date }
+              lost_reason: { type: string }
+              source_rating: { type: number }
+              spam: { type: number, description: "The provider's own spam judgement, 0 to 100." }
+              external_links: { type: number }
+              title: { type: string }
+              run_id: { type: string, format: uuid }
+              checked_at: { type: string, format: date-time }
+    BacklinkEvent:
+      type: object
+      required: [id, site_id, kind, at, connector, source_rating, reason, backlink]
+      properties:
+        id: { type: string }
+        site_id: { type: string, format: uuid }
+        kind: { type: string, enum: [new, lost, regained] }
+        at: { type: string, format: date-time, description: "When it happened, by the provider's dates where it gives them." }
+        connector: { type: string, description: The provider whose read found the change. }
+        source_rating: { type: [number, "null"] }
+        reason: { type: string, description: "Why a lost link was lost, when the provider says (removedfromhtml, notfound, ...)." }
+        backlink:
+          type: object
+          required: [id, source_url, target_url, source_domain, anchor, nofollow, status]
+          properties:
+            id: { type: string, format: uuid }
+            source_url: { type: string }
+            target_url: { type: string }
+            source_domain: { type: string }
+            anchor: { type: string }
+            nofollow: { type: boolean }
+            status: { type: string, enum: [live, lost], description: The link's state now. }
+    BacklinkCounts:
+      type: object
+      required: [new, lost, regained]
+      properties:
+        new: { type: integer }
+        lost: { type: integer }
+        regained: { type: integer }
+    BacklinkSiteSummary:
+      type: object
+      required: [site, live, lost, referring_domains, followed, last_30_days, weeks, providers]
+      properties:
+        site:
+          type: object
+          required: [id, host, brand_id]
+          properties:
+            id: { type: string, format: uuid }
+            host: { type: string }
+            brand_id: { type: [string, "null"], format: uuid }
+        live: { type: integer }
+        lost: { type: integer }
+        referring_domains: { type: integer, description: Distinct domains with a live link. }
+        followed: { type: integer, description: Live links without nofollow. }
+        last_30_days: { $ref: "#/components/schemas/BacklinkCounts" }
+        weeks:
+          type: array
+          items:
+            allOf:
+              - $ref: "#/components/schemas/BacklinkCounts"
+              - type: object
+                required: [week]
+                properties:
+                  week: { type: string, format: date, description: The Monday the week starts. }
+        providers:
+          type: array
+          items:
+            type: object
+            required: [connector, integration_id, last_run_at, status, error, links_seen, finished_at]
+            properties:
+              connector: { type: string }
+              integration_id: { type: [string, "null"], format: uuid }
+              last_run_at: { type: string, format: date-time }
+              status: { type: string, enum: [running, done, failed] }
+              error: { type: [string, "null"] }
+              links_seen: { type: integer }
+              finished_at: { type: [string, "null"], format: date-time }
     SEOSource:
       type: object
-      required: [id, name, connector, connector_name, status, last_error, account, reports, country, sync, domains_set, domains, budget]
+      required: [id, name, connector, connector_name, status, last_error, account, reports, country, sync, link_rows, domains_set, domains, budget]
       properties:
         id: { type: string, format: uuid }
         name: { type: string }
@@ -14568,6 +14814,7 @@ components:
         reports: { type: array, items: { $ref: "#/components/schemas/SEOReportName" } }
         country: { type: string }
         sync: { type: string, enum: [weekly, "off"] }
+        link_rows: { type: integer, description: "Links the weekly read asks for per SEO site (default 200); 0 for a connection that does not read links." }
         domains_set: { type: boolean, description: "false: the domains follow the analytics tools." }
         domains:
           type: array
