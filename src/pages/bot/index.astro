@@ -1,0 +1,94 @@
+---
+import Marketing from '../../layouts/Marketing.astro';
+import { bot, userAgents, ips } from '../../data/bot';
+
+const blockAll = `User-agent: ${bot.token}\nDisallow: /`;
+const slowDown = `User-agent: ${bot.token}\nCrawl-delay: 10`;
+const blockPart = `User-agent: ${bot.token}\nDisallow: /checkout/\nDisallow: /search`;
+---
+
+<Marketing title="OutflareBot · Outflare" description="OutflareBot is the crawler behind Outflare's SEO audits. How to recognise it, how it behaves, how to slow it down or block it, the addresses it crawls from, and how to reach us.">
+	<section class="relative border-b">
+		<div class="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
+			<p class="eyebrow">Crawler</p>
+			<h1 class="mt-3 text-4xl font-semibold tracking-tighter text-balance sm:text-5xl">OutflareBot</h1>
+			<p class="sub">The crawler behind Outflare's SEO audits. It says who it is, obeys robots.txt and slows down when your server asks it to.</p>
+		</div>
+	</section>
+
+	<div class="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+		<div class="legal">
+			{!bot.live && (
+				<p class="rounded-lg border bg-muted/30 p-4">
+					<strong>Not crawling yet.</strong> OutflareBot ships with Outflare's SEO module, which is being built. Until then no requests come from it, and its addresses appear below before it starts.
+				</p>
+			)}
+
+			<h2>What it is</h2>
+			<p>
+				Outflare is open-source software that runs marketing for people and their AI agents. Its SEO module audits websites: it reads pages to find broken links, missing titles, indexing problems and similar issues, then checks again once they are fixed. OutflareBot is the crawler that does that reading.
+			</p>
+			<ul>
+				<li><strong>Your own site, when you ask.</strong> Most visits come from a site's owner running an audit of their own site in Outflare, and from re-checks after a fix.</li>
+				<li><strong>Light checks of public pages.</strong> Someone may add your site as a competitor to compare against. Those visits are few, public pages only, and slower than an owner's audit.</li>
+				<li><strong>Not for AI training.</strong> Pages are read for the audit of the person who asked. They are not collected to train AI models or sold as a dataset.</li>
+			</ul>
+
+			<h2>How to recognise it</h2>
+			<p>Every request carries the token <code>{bot.token}</code> in its user agent, with a link to this page:</p>
+			<ul>
+				{userAgents.map((u) => (
+					<li><strong>{u.label}:</strong> <code class="break-all">{u.ua}</code></li>
+				))}
+			</ul>
+			<p>
+				Rendered pages come from headless Chrome, for sites whose content appears only after JavaScript runs. The Chrome version changes as we update it; the token does not. Anyone can copy a user agent, so to be sure a visit is really from Outflare Cloud, check its address against the list below.
+			</p>
+
+			<h2>How it behaves</h2>
+			<ul>
+				<li><strong>It obeys robots.txt.</strong> It follows rules for <code>{bot.token}</code>, or for <code>*</code> when there are none for it, and reads robots.txt again at least once a day.</li>
+				<li><strong>It goes slowly.</strong> One request at a time per site by default, with a pause between requests, and it honours <code>Crawl-delay</code>.</li>
+				<li><strong>It backs off when asked.</strong> A <code>429</code> or <code>503</code> response, a <code>Retry-After</code> header, or a run of errors or slow answers makes it slow down or stop for a while.</li>
+				<li><strong>It stays on public pages.</strong> It never signs in, fills in forms, solves CAPTCHAs or gets past a paywall. It follows links and reads your sitemap; it does not guess at hidden URLs.</li>
+				<li><strong>Owners decide for their own sites.</strong> A site's owner who has proved ownership in Outflare (with a DNS record, a meta tag or a file) can choose to audit pages their own robots.txt hides from crawlers. That choice is theirs alone and never applies to anyone else's site.</li>
+			</ul>
+
+			<h2>Slow it down or block it</h2>
+			<p>Add a rule to the robots.txt at the root of your site. Changes take effect the next time OutflareBot reads it, within a day.</p>
+			<p><strong>Block it everywhere:</strong></p>
+			<pre class="code-panel rounded-lg border bg-muted/30"><code>{blockAll}</code></pre>
+			<p><strong>Keep it out of some paths:</strong></p>
+			<pre class="code-panel rounded-lg border bg-muted/30"><code>{blockPart}</code></pre>
+			<p><strong>Slow it down</strong> (seconds between requests):</p>
+			<pre class="code-panel rounded-lg border bg-muted/30"><code>{slowDown}</code></pre>
+			<p>Would rather not touch robots.txt? Email us the site and we will stop crawling it from Outflare Cloud.</p>
+
+			<h2>Addresses it crawls from</h2>
+			<p>
+				Outflare Cloud crawls only from the addresses published in{' '}
+				<a href="/bot/ips.json" data-track="bot_ip_list_opened" data-track-label="ips_json">/bot/ips.json</a>, in the same format Google uses for Googlebot. We add an address there before a new server starts crawling from it.
+			</p>
+			{ips.prefixes.length === 0 ? (
+				<p>The list is empty for now, because OutflareBot is not crawling yet. Last updated {ips.updated}.</p>
+			) : (
+				<>
+					<ul>
+						{ips.prefixes.map((p) => (
+							<li><code>{p.ipv4Prefix ?? p.ipv6Prefix}</code></li>
+						))}
+					</ul>
+					<p>Last updated {ips.updated}.</p>
+				</>
+			)}
+			<p>
+				Outflare is open source, so people also run it on their own servers. Those copies identify as {bot.token} too, but crawl from their own addresses, which are not on this list. Your robots.txt rules apply to them in the same way.
+			</p>
+
+			<h2>Contact</h2>
+			<p>
+				Questions, a problem with how OutflareBot treats your site, or a request to stop crawling it: <a href={`mailto:${bot.email}`}>{bot.email}</a>. Include your site's address and, if you can, the time and URL of a request from your logs.
+			</p>
+		</div>
+	</div>
+</Marketing>
