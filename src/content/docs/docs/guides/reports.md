@@ -13,7 +13,7 @@ The Sending reports page, `GET /v1/workspaces/{ws}/reports` and the MCP tool `ge
 - **Group by:** `day`, `week`, `sequence`, `step`, `mailbox` or `domain`.
 - **Filter:** to one sequence, mailbox or domain with `sequence_id`, `mailbox_id` or `domain`.
 
-Every row and the totals have sends, new leads contacted, follow-ups, failures, blocked sends, bounces, replies, auto-replies, opt-outs, unsubscribes, link clicks (when [click tracking](/docs/guides/tracking-domains/) is on) and warm-up inbox placement. Reply, bounce, opt-out and click rates are worked out per lead contacted.
+Every row and the totals have sends, new leads contacted, follow-ups, failures, blocked sends, bounces, replies, auto-replies, opt-outs, unsubscribes, and link clicks (when [click tracking](/docs/guides/tracking-domains/) is on). Reply, bounce, opt-out and click rates are worked out per lead contacted.
 
 ```sh
 curl -H "Authorization: Bearer $OUTFLARE_TOKEN" \

@@ -5,9 +5,11 @@ sidebar:
   order: 1.5
 ---
 
-<span class="pill shipped">Shipped</span> Records, identities, links and the shared catalog, through the REST API and the MCP server. Product events, merges, segments and the customer pages come next.
+<span class="pill shipped">Shipped</span> Records, identities, links, the shared catalog, product events, timelines and consent, through the REST API and the MCP server. Merges, segments and the customer pages come next.
 
 Outflare keeps one record of each person and company your business knows, plus anything else you track, such as deals, subscriptions or partners. The customer data platform, the CRM and lifecycle email all use the same records, so nobody types the same detail twice and nothing ends up in a separate copy.
+
+Moving from Attio? [Import it once](/docs/guides/move-from-attio/) and its people, companies and deals become records here.
 
 ## The catalog
 
@@ -30,12 +32,34 @@ A record's identities say who it is: emails, phone numbers, push device tokens, 
 
 Only a **verified** email or phone counts. If someone signs up on your website with another person's email and never confirms it, they get their own record. They never take over the real person's record, and the address stays with its owner. When a person changes their email, the old one is kept in the history, and the new one is refused if another record already holds it verified. Nothing is merged without proof.
 
+## Product events
+
+Send what people do in your product to Outflare in Segment's format: `track`, `identify`, `page`, `screen`, `group` and `alias`. If your product already sends to Segment, RudderStack or a similar library, it can send the same calls to Outflare. Send them from your servers with an API token that can manage customers, one at a time or up to 500 per call.
+
+Each event is matched to a person:
+
+1. By your product's own **user id**. A user id Outflare hasn't seen makes a new person.
+2. Otherwise by an email the person **proved** they own (`email_verified: true` in identify's traits).
+3. Otherwise by the visitor's **anonymous id**. Visits before sign-up wait unmatched, then join the person as soon as an identify links the two.
+
+Two different user ids are never merged, and an email someone only typed in never matches anyone.
+
+Traits that match a field in the catalog fill in the record: `firstName` is first name, `title` is job title. The rest stay on the event, and the response lists them so you can add the fields you want. A `group` call finds or makes the company by its id and adds it to the person's companies. Send a `messageId` with each event so a retry is stored once. A new event name arrives quarantined, so it drives nothing until someone approves it in the catalog.
+
+## Timeline
+
+Every person and company has a timeline, newest first: their product events, changes to their details, emails and ids added or replaced, and consent given or taken back. Lifecycle email will add each email's delivery to it.
+
+## Consent
+
+Consent is recorded per person and channel (email, SMS, push, WhatsApp, in-app), optionally for one topic such as product updates, with where it was given and what proves it, such as the sign-up form and its wording. Nothing is overwritten: the latest grant or withdrawal counts, and the rest stay as the history. Withdrawing from a whole channel covers every topic on it. Lifecycle email sends marketing only to people whose email consent is granted. Where a record came from never counts as consent.
+
 ## Who can do what
 
 | Permission | Allows | Roles |
 | --- | --- | --- |
-| Read customers | See records, their identities, links and history, and the catalog | Everyone |
-| Manage customers | Add and change records, identities and links | Owners, admins and operators |
+| Read customers | See records, their identities, links, history, timeline and consent, product events, and the catalog | Everyone |
+| Manage customers | Add and change records, identities and links, send product events and record consent | Owners, admins and operators |
 | Manage catalog | Add and change record types, fields, option lists and events | Owners and admins |
 
 People and tokens kept to some brands see only their brands' records and the ones every brand shares.
@@ -51,4 +75,18 @@ curl -X POST https://app.outflare.ai/v1/workspaces/$WS/records \
                       {"namespace": "email", "value": "ada@example.com", "verified": true}]}'
 ```
 
-The full reference is under [API](/docs/api/), at `/v1/workspaces/{ws}/catalog` and `/v1/workspaces/{ws}/records`.
+Send product events the same way:
+
+```sh
+curl -X POST https://app.outflare.ai/v1/workspaces/$WS/customer-events \
+  -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" \
+  -d '{"batch": [
+        {"type": "identify", "userId": "u_123", "anonymousId": "a_9f2", "messageId": "m_1",
+         "traits": {"email": "ada@example.com", "email_verified": true, "firstName": "Ada"}},
+        {"type": "track", "userId": "u_123", "event": "Order Completed", "messageId": "m_2",
+         "properties": {"total": 42}}]}'
+```
+
+Agents use `track_customer_events`, `get_record_timeline`, `list_record_consents` and `record_consent`.
+
+The full reference is under [API](/docs/api/), at `/v1/workspaces/{ws}/catalog`, `/v1/workspaces/{ws}/records` and `/v1/workspaces/{ws}/customer-events`.

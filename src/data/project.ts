@@ -97,7 +97,7 @@ export const milestones: Milestone[] = [
 		step: 9,
 		title: 'MCP server for agents',
 		status: 'shipped',
-		summary: 'Claude, Cursor and other MCP clients run a workspace through 274 tools over the API, held to the token\'s scopes and the send policy.',
+		summary: 'Claude, Cursor and other MCP clients run a workspace through 281 tools over the API, held to the token\'s scopes and the send policy.',
 		docs: '/docs/agents/mcp/',
 	},
 	{
@@ -111,7 +111,7 @@ export const milestones: Milestone[] = [
 		step: 11,
 		title: 'Warm-up',
 		status: 'shipped',
-		summary: 'Mailboxes warm each other up with a daily ramp, spam rescue and replies, and every mailbox and domain gets an inbox placement score.',
+		summary: 'Turn warm-up on in your connected EmailBison, Instantly or Smartlead account, and see each mailbox\'s warm-up score.',
 		docs: '/docs/guides/warmup/',
 	},
 	{

@@ -24,7 +24,7 @@ Open **Infrastructure → New plan** and fill in:
 | Brand | Domain names are suggested from it: `getacme.com`, `acmehq.com`, `tryacme.com`, `.com` first. Names you already have in the workspace are skipped. |
 | Domains you want | Optional. Your own picks come first and the rest are suggested. A domain you already have here gets mailboxes added instead of being bought. |
 | Who the mailboxes send as | One or more people. Mailboxes are named after them, most natural first: `jane@`, `jane.doe@`, `j.doe@`. |
-| Warm-up and rest | 14 days of warm-up by default (7 to 60), the daily limit once ready, the inbox placement below which a mailbox rests (75%), and optionally retiring a mailbox that never recovers. |
+| Warm-up and rest | 14 days of warm-up by default (7 to 60), the daily limit once ready, the warm-up score below which a mailbox rests (75), and optionally retiring a mailbox that never recovers. |
 
 The preview updates as you type and saves nothing. It shows every domain and mailbox, when buying and DNS should be done, the earliest date every mailbox can be ready, how many cold emails a day they will send, and any warnings. Blocking warnings, such as no one to send as, must be fixed before the plan can be approved.
 
@@ -41,7 +41,7 @@ Approving a plan is the one step that spends money, so it needs the `infrastruct
 1. **Buy.** The domains and mailboxes are bought in your own accounts. Outflare never resells them: you pay your registrar and mailbox provider directly.
 2. **DNS.** The plan checks each domain every 10 minutes until its MX records point at the provider and it has SPF and DKIM. A domain waiting here says which record is missing, and its page under [Sending domains](/docs/guides/sending-domains/) shows the exact records to add.
 3. **Connect.** Each mailbox is linked as soon as one with its address is connected, whether by [Google or Microsoft sign-in](/docs/integrations/google-and-microsoft/), an [upload](/docs/guides/import-mailboxes/) or a supplier.
-4. **Warm up.** A linked mailbox starts **warming**, with [warm-up](/docs/guides/warmup/) on and the plan's daily limit set. The plan is done when every mailbox is ready.
+4. **Warm up.** A linked mailbox starts **warming**, with the plan's daily limit set. Turn its [warm-up](/docs/guides/warmup/) on in your connected sequencer. The plan is done when every mailbox is ready.
 
 ### Buy them yourself
 
@@ -57,9 +57,9 @@ Every mailbox has a stage, shown in its own column on the **Mailboxes** page and
 
 | Stage | Cold email | What happens |
 | --- | --- | --- |
-| Warming | No | Warm-up runs. It moves to **ready** once warm-up is done, at least 20 warm-up emails were placed in the last 7 days, and at least 85% of them reached the inbox. |
+| Warming | No | Warm-up runs in your connected sequencer. It moves to **ready** once the warm-up days are done and the sequencer's warm-up score is at least 85. |
 | Ready | Yes | Sends for its sequences. If its 7-day inbox placement falls below the plan's floor (75%), or its domain has a critical issue such as a blocklist, it **rests**. |
-| Resting | No | A 7-day break from cold email while warm-up continues. It comes back on its own when placement recovers; if not, the rest is extended 3 days at a time, and the plan can retire it after a number of days you choose. |
+| Resting | No | A 7-day break from cold email while warm-up continues. It comes back on its own when the warm-up score recovers; if not, the rest is extended 3 days at a time, and the plan can retire it after a number of days you choose. |
 | Retired | No | Out of use for good: paused, warm-up off. Its follow-ups are treated like those of a deleted mailbox, which you can cancel or hand to another one. |
 
 Only ready mailboxes send cold email. The [policy check](/docs/concepts/policy-check/) waits on any other (`mailbox_not_ready`), and [mailbox allocation](/docs/guides/mailbox-allocation/) skips them and says why, such as "mailbox is resting until Mon 2 Nov". Each move is in the audit log as `mailbox.stage_changed` with its reason.
