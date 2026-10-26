@@ -5055,6 +5055,15 @@ paths:
         `monthly_limit_cents` caps every AI call in the workspace each
         calendar month (UTC); null means no workspace limit. The default is
         5000 (US$50).
+
+        `domain_research` turns on research into unknown email domains: the
+        workspace's own page reader (connect Geonode) fetches the domain's
+        homepage and the model above reads it. It needs both connections,
+        spends the workspace's own money, and is off until asked for.
+        `domain_research_limit_cents` caps that research each calendar
+        month, 20000 (US$200) by default, and 0 stops it; the overall AI
+        limit still applies and research stops at whichever comes first.
+        Leaving either out keeps what is set.
       tags: [connectors]
       requestBody:
         required: true
@@ -5068,6 +5077,8 @@ paths:
                 input_cents_per_million: { type: [number, "null"], exclusiveMinimum: 0, maximum: 10000000 }
                 output_cents_per_million: { type: [number, "null"], exclusiveMinimum: 0, maximum: 10000000 }
                 monthly_limit_cents: { type: [integer, "null"], minimum: 0, maximum: 10000000 }
+                domain_research: { type: boolean, description: Omitted leaves it as it is. }
+                domain_research_limit_cents: { type: integer, minimum: 0, maximum: 10000000, description: Omitted leaves it as it is; 0 stops research. }
       responses:
         "200":
           description: Saved.
@@ -5281,6 +5292,15 @@ paths:
         `"unknown"`, and absence of evidence is `"unknown"`, never false.
         Nothing here says a mailbox exists or who owns it: use
         verifications for that.
+
+        An unknown domain is the long tail. A workspace that turns on
+        `domain_research` in its AI settings has it researched in the
+        background: its own page reader (Geonode) fetches the domain's
+        homepage and its own AI model reads the words, on the workspace's
+        own accounts. `analysis.status` is then `queued`, and a later call
+        answers `researched` with a `research` block. Research never
+        changes `global`; where the two disagree the global answer stands
+        and the action becomes `review`.
       tags: [classification]
       requestBody:
         required: true
@@ -10519,7 +10539,7 @@ components:
         output_cents_per_million: { type: number, example: 2000 }
     AISettings:
       type: object
-      required: [integration_id, model, input_cents_per_million, output_cents_per_million, monthly_limit_cents, spent_this_month_cents, active, problem, providers, updated_at]
+      required: [integration_id, model, input_cents_per_million, output_cents_per_million, monthly_limit_cents, spent_this_month_cents, domain_research, domain_research_limit_cents, domain_research_spent_this_month_cents, active, problem, providers, updated_at]
       properties:
         integration_id: { type: [string, "null"], format: uuid, description: The chosen connection; null uses the first connected AI model. }
         model: { type: string, description: The chosen model; empty uses the provider's default. }
@@ -10527,6 +10547,9 @@ components:
         output_cents_per_million: { type: [number, "null"] }
         monthly_limit_cents: { type: [integer, "null"], description: Most AI calls may cost in a calendar month (UTC); null is no limit. }
         spent_this_month_cents: { type: integer }
+        domain_research: { type: boolean, description: "Whether unknown email domains are researched by reading their homepage with this workspace's own page reader and AI key. Off by default, because it spends the workspace's money with two providers." }
+        domain_research_limit_cents: { type: [integer, "null"], description: "Most domain research may cost in a calendar month (UTC); the workspace's overall AI limit still applies and research stops at whichever comes first. 20000 (US$200) by default." }
+        domain_research_spent_this_month_cents: { type: integer }
         active:
           description: The model in use now; null when none can be.
           oneOf:
@@ -10632,12 +10655,22 @@ components:
         taxonomy_version: { type: string, example: "1.0" }
         intelligence_version: { type: string, description: The data snapshot that answered., example: 2026-10-26.1 }
         global: { $ref: "#/components/schemas/ClassificationAssessment" }
+        research: { $ref: "#/components/schemas/ClassificationResearch" }
         effective: { $ref: "#/components/schemas/ClassificationEffective" }
         analysis:
           type: object
           required: [status, provisional]
           properties:
-            status: { type: string, enum: [complete, not_queued], description: "not_queued: an unknown domain; research on unknown domains is not available yet." }
+            status:
+              type: string
+              enum: [complete, not_queued, queued, researched]
+              description: |
+                complete: nothing more to find out. not_queued: an unknown
+                domain, and this workspace has domain research off.
+                queued: research is running on the workspace's own page
+                reader and AI key; ask again shortly. researched: the
+                workspace's own research answered, and `research` says what
+                it found.
             provisional: { type: boolean, description: True while the domain is unknown. }
     ClassificationCategory:
       type: string
@@ -10705,6 +10738,48 @@ components:
               signal: { type: string, description: "reviewed_provider, listed_disposable, listed_disposable_outranked, institution_suffix, mx_provider, null_mx, no_mail_servers. More may be added." }
               detail: { type: string, description: "A fixed note, such as the list entry or MX provider matched." }
         last_checked_at: { type: [string, "null"], format: date-time, description: When DNS was last asked. }
+    ClassificationResearch:
+      type: [object, "null"]
+      description: |
+        What this workspace's own research made of the domain, when it has
+        researched it. Research reads the domain's homepage through the
+        workspace's own page reader (Geonode) and asks the workspace's own
+        AI model what the words mean, on the workspace's own accounts:
+        Outflare never supplies an API key. A verdict belongs to the
+        workspace that paid for it, is absent for every other workspace,
+        and never changes `global`, which stays Outflare's reviewed data.
+        Turn it on with `domain_research` under the workspace's AI settings.
+      required: [category, subcategory, confidence_status, signals, evidence, model, researched_at]
+      properties:
+        category: { $ref: "#/components/schemas/ClassificationCategory" }
+        subcategory: { $ref: "#/components/schemas/ClassificationSubcategory" }
+        confidence_status:
+          type: string
+          enum: [verified, corroborated, inferred, insufficient_evidence, conflicted]
+          description: "corroborated: research agrees with the global answer. conflicted: it disagrees, so the global answer stands and the action becomes review."
+        signals:
+          type: array
+          items: { type: string }
+          example: [site_offers_temporary_addresses]
+          description: |
+            What the homepage said, from a fixed list:
+            site_offers_temporary_addresses, site_offers_free_mailboxes,
+            site_offers_paid_mailboxes, site_offers_forwarding,
+            site_is_organisation, site_is_school_or_government,
+            site_is_parked, site_says_nothing_about_email,
+            site_could_not_be_read. More may be added.
+        evidence:
+          type: array
+          items:
+            type: object
+            required: [source, signal]
+            properties:
+              source: { type: string, description: Always research. }
+              signal: { type: string }
+              detail: { type: string }
+        note: { type: string, maxLength: 200, description: The model's one-line reason, for a person reading the record. }
+        model: { type: string, example: claude-haiku-5-5 }
+        researched_at: { type: string, format: date-time }
     ClassificationEffective:
       type: object
       required: [category, subcategory, override_applied, override_id, action, matched_policy_id]
@@ -10714,7 +10789,7 @@ components:
         override_applied: { type: boolean }
         override_id: { type: [string, "null"] }
         action: { type: string, enum: [allow, verify, review, block], description: Advice for a sign-up flow. }
-        matched_policy_id: { type: string, description: "The rule that chose the action: default_disposable, default_no_mail, default_unknown or default_allow until workspaces have their own.", example: default_allow }
+        matched_policy_id: { type: string, description: "The rule that chose the action: default_disposable, default_no_mail, default_unknown, default_allow, default_research_allow or default_research_unsettled (research disagreed with the global answer, or could not place the domain) until workspaces have their own.", example: default_allow }
     MeetingStatus:
       type: string
       enum: [booked, held, no_show, canceled]

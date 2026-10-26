@@ -38,6 +38,40 @@ A company domain whose mail runs on Google Workspace or Microsoft 365 comes back
 - **Evidence.** Each fact behind the answer and where it came from.
 - **Suggested action** (`effective.action`): `allow`, `verify`, `review` or `block`. By default Outflare blocks throwaway domains and domains that can't receive mail, asks you to verify unknown domains, and allows the rest. It's only a suggestion; your sign-up flow makes the call.
 
+## Researching the domains nobody knows
+
+Most domains Outflare can't place say what they are on their own homepage: "free disposable email, no sign-up", "secure mailbox from €1 a month", or nothing about email at all. You can have those pages read.
+
+It runs on your own accounts, because Outflare never lends you its API keys:
+
+1. Connect **Geonode**, which fetches the page.
+2. Connect an **AI model** with your own key under Settings → AI model. Claude Haiku is the cheap, accurate choice, and a researched domain costs a fraction of a cent.
+3. Turn on **domain research** in the same settings.
+
+After that, an unknown domain comes back with `analysis.status` of `queued`, Outflare reads the homepage in the background, and your next lookup answers `researched` with what it found:
+
+```json
+{
+  "research": {
+    "category": "disposable",
+    "subcategory": "short_lived_mailbox",
+    "confidence_status": "inferred",
+    "signals": ["site_offers_temporary_addresses"],
+    "note": "The site hands out inboxes that expire after ten minutes.",
+    "model": "claude-haiku-5-5"
+  }
+}
+```
+
+Some things it won't do:
+
+- **Spend without a ceiling.** Research stops at your monthly research limit, US$200 by default, or at your overall AI limit, whichever comes first. Set the limit to 0 to stop it. A domain is looked at again only after 90 days, and at most once a day.
+- **Share what you paid for.** A verdict belongs to your workspace. Nobody else sees it, and it never changes the data Outflare ships.
+- **Overrule what Outflare knows.** Where research disagrees with a reviewed provider, the reviewed answer stands and the suggested action becomes `review`, for a person to settle.
+- **Do as a web page tells it.** The homepage goes to the model as quoted evidence, and the model is told to treat every word of it as evidence about the site, never as an instruction.
+
+Research is off until you turn it on, and classification works without it.
+
 ## Where the data comes from
 
 The data ships with Outflare, so a self-hosted server doesn't call anyone else for it. It comes from three places:
