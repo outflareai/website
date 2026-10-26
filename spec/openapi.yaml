@@ -4762,6 +4762,98 @@ paths:
         "404": { $ref: "#/components/responses/Error" }
         "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/integrations/{id}/models:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: listIntegrationModels
+      x-outflare-access: { scope: integrations.manage }
+      summary: List the models an AI model connection can use
+      description: |
+        Scope: integrations.manage. For a Claude, OpenAI, Gemini or Mistral
+        connection: the chat models its key can use, asked of the provider
+        live (costs nothing). `price` is set where Outflare knows the list
+        price; for the rest, enter it with your choice in `PUT /ai-settings`.
+      tags: [connectors]
+      responses:
+        "200":
+          description: The models.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, default_model]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, name, price]
+                      properties:
+                        id: { type: string, example: claude-opus-5-5 }
+                        name: { type: string }
+                        price: { oneOf: [{ $ref: "#/components/schemas/AIPrice" }, { type: "null" }] }
+                  default_model: { type: [string, "null"], description: The model used when none is chosen; null when the provider has none. }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/ai-settings:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: getAISettings
+      x-outflare-access: { scope: integrations.read }
+      summary: Which AI model plans missions and runs Outflare's agent
+      description: |
+        Scope: integrations.read. The chosen connection and model, its
+        price, the monthly AI limit and this month's AI spend, the model in
+        use now (`active`), and `problem` when something must be done
+        first. Keys are never shown.
+      tags: [connectors]
+      responses:
+        "200":
+          description: The settings.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AISettings" }
+        default: { $ref: "#/components/responses/Error" }
+    put:
+      operationId: updateAISettings
+      x-outflare-access: { scope: integrations.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Choose the AI model and the monthly AI limit
+      description: |
+        Scope: integrations.manage. Replaces the settings. `integration_id`
+        null uses the first connected AI model (Claude, OpenAI, Gemini,
+        Mistral) with its default model. `model` empty uses the provider's
+        default; OpenAI, Gemini and Mistral have none, so name one from
+        `GET /integrations/{id}/models`. Prices are required for models
+        Outflare doesn't know the price of, so spend limits can be kept.
+        `monthly_limit_cents` caps every AI call in the workspace each
+        calendar month (UTC); null means no workspace limit. The default is
+        5000 (US$50).
+      tags: [connectors]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                integration_id: { type: [string, "null"], format: uuid }
+                model: { type: string, maxLength: 200 }
+                input_cents_per_million: { type: [number, "null"], exclusiveMinimum: 0, maximum: 10000000 }
+                output_cents_per_million: { type: [number, "null"], exclusiveMinimum: 0, maximum: 10000000 }
+                monthly_limit_cents: { type: [integer, "null"], minimum: 0, maximum: 10000000 }
+      responses:
+        "200":
+          description: Saved.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AISettings" }
+        "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/integrations/oauth/{connector}/authorize:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
@@ -5553,17 +5645,20 @@ paths:
       summary: Plan a mission from a goal
       description: |
         Scope: missions.run. Type a goal in plain words ("book 10 meetings
-        with fintech CFOs in Australia by 30 November") and Claude drafts
-        the mission: a measurable goal, steps, instructions for the agent,
+        with fintech CFOs in Australia by 30 November") and the workspace's
+        AI model drafts the mission: a measurable goal, steps, instructions for the agent,
         limits sized to your mailboxes, and the connectors it needs. The
         draft is saved as a mission in status draft, with a connect request
         for each missing connector and any questions for you. Nothing runs
         until a person approves it.
 
-        Uses the workspace's Claude connection (connect it under Connectors
-        with your own API key). Without one the call fails with 409
-        `connector_needed`. Claude is sent the goal, the project brief and a
-        summary of the workspace, never lead lists or email addresses.
+        Uses the model chosen in `GET /ai-settings`: Claude, OpenAI, Gemini or
+        Mistral, connected under Connectors with your own API key. Without
+        one the call fails with 409 `connector_needed`; with a provider but
+        no model or price chosen, 409 `ai_model_needed`; past the
+        workspace's monthly AI limit, 409 `ai_budget_reached`. The model is
+        sent the goal, the project brief and a summary of the workspace,
+        never lead lists, email addresses or keys.
       tags: [missions]
       requestBody:
         required: true
@@ -5673,13 +5768,21 @@ paths:
         approved against.
 
         `runner: builtin` hands the mission to Outflare's own agent, which
-        runs it in turns with the workspace's Claude key. It gets a token of
+        runs it in turns with the workspace's AI model (`GET /ai-settings`).
+        It gets a token of
         its own (operator scopes, never more than yours, never
         missions.approve) and goes through the same gate as any agent, so
         the mode still decides whether its writes run, wait for you or are
         dry runs. A turn runs at once, whenever a person writes to the
         mission or decides on a held change, and when the agent asks to look
-        again. Answers 409 `connector_needed` until Claude is connected.
+        again. Answers 409 `connector_needed` until an AI model is connected,
+        or `ai_model_needed` until its model and price are chosen.
+
+        Outflare's agent treats everything it reads from outside (email
+        replies, lead fields, web pages) as data. Even in `autonomous` mode,
+        its replies to emails, test sends, and changes to mailboxes, sending
+        servers, senders, sign-ins, webhooks, suppressions, integrations,
+        tokens and the company context wait for a person.
       tags: [missions]
       requestBody:
         content:
@@ -9894,6 +9997,69 @@ components:
     VerificationStatus:
       type: string
       enum: [deliverable, undeliverable, risky, unknown]
+    AIPrice:
+      type: object
+      description: US cents per million tokens.
+      required: [input_cents_per_million, output_cents_per_million]
+      properties:
+        input_cents_per_million: { type: number, example: 400 }
+        output_cents_per_million: { type: number, example: 2000 }
+    AISettings:
+      type: object
+      required: [integration_id, model, input_cents_per_million, output_cents_per_million, monthly_limit_cents, spent_this_month_cents, active, problem, providers, updated_at]
+      properties:
+        integration_id: { type: [string, "null"], format: uuid, description: The chosen connection; null uses the first connected AI model. }
+        model: { type: string, description: The chosen model; empty uses the provider's default. }
+        input_cents_per_million: { type: [number, "null"] }
+        output_cents_per_million: { type: [number, "null"] }
+        monthly_limit_cents: { type: [integer, "null"], description: Most AI calls may cost in a calendar month (UTC); null is no limit. }
+        spent_this_month_cents: { type: integer }
+        active:
+          description: The model in use now; null when none can be.
+          oneOf:
+            - type: "null"
+            - type: object
+              required: [provider, provider_name, integration_id, model, price, price_source]
+              properties:
+                provider: { type: string, enum: [claude, openai, gemini, mistral] }
+                provider_name: { type: string }
+                integration_id: { type: string, format: uuid }
+                model: { type: string }
+                price: { $ref: "#/components/schemas/AIPrice" }
+                price_source: { type: string, enum: [list, workspace, ""], description: "list: Outflare knows the price. workspace: entered with the choice. Empty: unknown, so the model can't run yet." }
+        problem:
+          description: What must be done before missions can be planned or run; null when nothing.
+          oneOf:
+            - type: "null"
+            - type: object
+              required: [code, message]
+              properties:
+                code: { type: string, enum: [connector_needed, ai_model_needed] }
+                message: { type: string }
+        providers:
+          type: array
+          items:
+            type: object
+            required: [connector, name, default_model, key_url, pricing_url, connections, known_prices]
+            properties:
+              connector: { type: string, enum: [claude, openai, gemini, mistral] }
+              name: { type: string }
+              default_model: { type: [string, "null"] }
+              key_url: { type: string, format: uri }
+              pricing_url: { type: string, format: uri }
+              connections:
+                type: array
+                items:
+                  type: object
+                  required: [id, name]
+                  properties:
+                    id: { type: string, format: uuid }
+                    name: { type: string }
+              known_prices:
+                type: object
+                description: List prices Outflare knows, by model id.
+                additionalProperties: { $ref: "#/components/schemas/AIPrice" }
+        updated_at: { type: [string, "null"], format: date-time }
     VerificationSettings:
       type: object
       required: [integration_id, provider, verify_on_import, verify_before_send, block_risky, block_catch_all, block_unknown, max_age_days]
