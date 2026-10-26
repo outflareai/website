@@ -118,15 +118,25 @@ paths:
                     oneOf:
                       - type: "null"
                       - type: object
-                        required: [id, name, kind, workspace_id, agency_id, project_id, scopes, expires_at]
+                        required: [id, name, kind, workspace_id, workspace, agency_id, project_id, scopes, expires_at]
                         properties:
                           id: { type: string, format: uuid }
                           name: { type: string }
                           kind: { type: string, enum: [workspace, agency] }
                           workspace_id: { type: [string, "null"], format: uuid }
+                          workspace:
+                            description: The token's workspace, with its slug and name; null for an agency token.
+                            oneOf:
+                              - type: "null"
+                              - type: object
+                                required: [id, slug, name]
+                                properties:
+                                  id: { type: string, format: uuid }
+                                  slug: { type: string, example: acme }
+                                  name: { type: string, example: Acme Outbound }
                           agency_id: { type: [string, "null"], format: uuid }
                           project_id: { type: [string, "null"], format: uuid }
-                          scopes: { type: array, items: { type: string } }
+                          scopes: { type: array, items: { type: string }, description: "As granted. Any scope in an area includes reading it: leads.manage can also list leads." }
                           expires_at: { type: [string, "null"], format: date-time }
                   user:
                     oneOf:
@@ -1331,6 +1341,7 @@ paths:
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
         - { name: before, in: query, schema: { type: integer } }
         - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
       responses:
         "200":
           description: Events.
@@ -1360,6 +1371,7 @@ paths:
       parameters:
         - { name: after, in: query, description: "An event id (evt_...) from next_after, or latest to start from now (no events, and next_after set to the newest).", schema: { type: string }, example: evt_48213 }
         - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
         - { name: types, in: query, description: 'Comma-separated event types or wildcards ("lead.*"). Default: every type.', schema: { type: string }, example: "lead.replied,mailbox.*" }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
       responses:
@@ -1394,6 +1406,7 @@ paths:
         - { name: kind, in: query, description: "A job kind, such as analytics.sync.", schema: { type: string } }
         - { name: before, in: query, description: "A job id (job_...) from next_before.", schema: { type: string } }
         - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
       responses:
         "200":
@@ -1613,6 +1626,7 @@ paths:
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
         - { name: before, in: query, schema: { type: integer } }
         - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
         - { name: status, in: query, schema: { $ref: "#/components/schemas/WebhookDeliveryStatus" } }
         - { name: event_type, in: query, schema: { type: string }, example: lead.replied }
       responses:
@@ -2360,6 +2374,7 @@ paths:
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
         - { name: after, in: query, description: "next_after from the previous page.", schema: { type: string } }
         - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
       responses:
         "200":
           description: Leads.
@@ -2666,6 +2681,7 @@ paths:
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
         - { name: offset, in: query, schema: { type: integer, minimum: 0, default: 0 } }
         - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
       responses:
         "200":
           description: Members.
@@ -2908,6 +2924,7 @@ paths:
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
         - { name: after, in: query, description: "next_after from the previous page.", schema: { type: string } }
         - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
       responses:
         "200":
           description: Entries.
@@ -3287,6 +3304,7 @@ paths:
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
         - { name: after, in: query, description: "next_after from the previous page.", schema: { type: string } }
         - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
       responses:
         "200":
           description: Enrollments.
@@ -3379,6 +3397,7 @@ paths:
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
         - { name: before, in: query, description: "next_before from the previous page.", schema: { type: string, format: date-time } }
         - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
       responses:
         "200":
           description: Messages.
@@ -3466,6 +3485,7 @@ paths:
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
         - { name: before, in: query, description: "next_before from the previous page.", schema: { type: string, format: date-time } }
         - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
       responses:
         "200":
           description: Messages.
@@ -3750,6 +3770,7 @@ paths:
       - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 1000, default: 100 } }
       - { name: offset, in: query, schema: { type: integer, minimum: 0, default: 0 } }
       - { $ref: "#/components/parameters/Cursor" }
+      - { $ref: "#/components/parameters/Fields" }
     get:
       operationId: listSupplierMailboxes
       x-outflare-access: { scope: mailboxes.read }
@@ -4988,6 +5009,7 @@ paths:
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
         - { name: before, in: query, schema: { type: string, format: date-time } }
         - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
       responses:
         "200":
           description: Meetings.
@@ -5103,6 +5125,7 @@ paths:
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
         - { name: before, in: query, schema: { type: string, format: date-time } }
         - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
       responses:
         "200":
           description: Deals.
@@ -5209,6 +5232,7 @@ paths:
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 1000, default: 100 } }
         - { name: before, in: query, schema: { type: string, format: date-time } }
         - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
       responses:
         "200":
           description: Entries.
@@ -5700,6 +5724,7 @@ paths:
         - { name: writes, in: query, schema: { type: boolean }, description: Only writes. }
         - { name: before, in: query, schema: { type: integer }, description: A call id, for the next page. }
         - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
       responses:
         "200":
@@ -5804,6 +5829,7 @@ paths:
         - { name: open_requests, in: query, schema: { type: boolean }, description: Only connect requests not yet resolved. }
         - { name: before, in: query, schema: { type: integer } }
         - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
       responses:
         "200":
@@ -6315,6 +6341,7 @@ paths:
         - { name: limit, in: query, description: 1 to 200. Default 50., schema: { type: integer, minimum: 1, maximum: 200 } }
         - { name: offset, in: query, schema: { type: integer, minimum: 0 } }
         - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
       responses:
         "200":
           description: Memories.
@@ -8610,6 +8637,15 @@ components:
         next_cursor from the previous page, unchanged. Every paged list takes it, so one loop pages them all:
         call, then call again with cursor=next_cursor until next_cursor is null. Cursors are opaque; don't build them.
       schema: { type: string }
+    Fields:
+      name: fields
+      in: query
+      description: |
+        Only these fields of each item, comma separated (fields=id,email,status); id always comes back.
+        Paging fields stay. A field the items don't have answers 400 naming the ones they do. Any GET takes it.
+      style: form
+      explode: false
+      schema: { type: array, items: { type: string, pattern: "^[a-z][a-z0-9_]*$" } }
     IdempotencyKey:
       name: Idempotency-Key
       in: header

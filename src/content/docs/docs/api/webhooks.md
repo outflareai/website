@@ -60,7 +60,7 @@ if (event.type === "lead.replied") {
 }
 ```
 
-Pass the raw body, before any JSON parsing. `verifyWebhook` rejects a delivery whose signature does not match or whose timestamp is more than five minutes away, which stops replays. By hand, the signature is `v1,` followed by the base64 HMAC-SHA256 of `{webhook-id}.{webhook-timestamp}.{body}`, keyed with the secret's base64 part after `whsec_`. The header can hold several signatures separated by spaces; accept the delivery if any one matches.
+Pass the raw body, before any JSON parsing. `verifyWebhook` rejects a delivery whose signature does not match or whose timestamp is more than five minutes away, which stops replays. The [Python SDK](/docs/sdk/python/) has the same check as `verify_webhook(body, headers, secret)`. By hand, the signature is `v1,` followed by the base64 HMAC-SHA256 of `{webhook-id}.{webhook-timestamp}.{body}`, keyed with the secret's base64 part after `whsec_`. The header can hold several signatures separated by spaces; accept the delivery if any one matches.
 
 ## Retries and failures
 

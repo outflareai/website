@@ -30,7 +30,8 @@ Rules that keep tokens safe to hand to automation:
 
 - A token is bound to one workspace. It cannot read any other workspace.
 - A token can also be bound to one [project](/docs/guides/projects/#agents-and-project-tokens) with `"project_id"`. It then sees only that project's records, and endpoints that can't yet keep it inside the project refuse it with a 403.
-- A token holds only the scopes it was given, and never more than the person who created it has.
+- A token holds only the scopes it was given, and never more than the person who created it has. Any scope in an area includes reading it, so `leads.manage` can list leads too; it cannot read mailboxes.
+- `GET /v1/whoami` tells a token its workspace (ID, slug and name), project, scopes and expiry, so a script holding only a token can find everything else.
 - Actions taken with a token are recorded in the audit log under the token's name.
 - Revoke a token with `DELETE /v1/workspaces/{ws}/api-tokens/{id}`. List active tokens, with when each was last used, with `GET /v1/workspaces/{ws}/api-tokens`.
 
