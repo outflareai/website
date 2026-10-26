@@ -3091,7 +3091,7 @@ paths:
         default: { $ref: "#/components/responses/Error" }
     post:
       operationId: createSequence
-      x-outflare-access: { scope: sequences.manage }
+      x-outflare-access: { scope: sequences.manage, project_tokens: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Create a sequence
       description: |
@@ -3099,6 +3099,7 @@ paths:
         nothing until its status is set to `active`. Defaults: UTC,
         Monday to Friday, 09:00 to 17:00, no daily cap on new leads, stop on
         reply.
+        A project token's sequences always belong to its project.
       tags: [sequences]
       requestBody:
         required: true
@@ -3143,7 +3144,7 @@ paths:
         default: { $ref: "#/components/responses/Error" }
     patch:
       operationId: updateSequence
-      x-outflare-access: { scope: sequences.manage }
+      x-outflare-access: { scope: sequences.manage, project_tokens: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Change a sequence's settings, or activate, pause or archive it
       description: |
@@ -3176,7 +3177,7 @@ paths:
         default: { $ref: "#/components/responses/Error" }
     delete:
       operationId: deleteSequence
-      x-outflare-access: { scope: sequences.manage }
+      x-outflare-access: { scope: sequences.manage, project_tokens: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Delete a sequence that is not active
       description: "Scope: sequences.manage. Sent messages are kept in the message log."
@@ -3193,7 +3194,7 @@ paths:
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     put:
       operationId: replaceSequenceSteps
-      x-outflare-access: { scope: sequences.manage }
+      x-outflare-access: { scope: sequences.manage, project_tokens: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Replace a sequence's steps
       description: |
@@ -3230,7 +3231,7 @@ paths:
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: previewSequence
-      x-outflare-access: { scope: sequences.read }
+      x-outflare-access: { scope: sequences.read, project_tokens: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Render every step for one lead
       description: |
@@ -3304,7 +3305,7 @@ paths:
         default: { $ref: "#/components/responses/Error" }
     post:
       operationId: enrollLeads
-      x-outflare-access: { scope: sequences.manage }
+      x-outflare-access: { scope: sequences.manage, project_tokens: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Add leads to a sequence
       description: |
@@ -3312,6 +3313,8 @@ paths:
         leads are skipped, and so are leads active in another sequence
         unless `skip_active_elsewhere` is false. Adding a lead twice does
         nothing.
+        A project token can only use `list_id` for one of its project's
+        lists, and `lead_ids` reach only leads on its project's lists.
       tags: [sequences]
       requestBody:
         required: true
@@ -3350,7 +3353,7 @@ paths:
       - { name: eid, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: stopEnrollment
-      x-outflare-access: { scope: sequences.manage }
+      x-outflare-access: { scope: sequences.manage, project_tokens: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Stop sending to one lead in a sequence
       description: "Scope: sequences.manage"
