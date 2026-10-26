@@ -1646,6 +1646,174 @@ paths:
               schema: { $ref: "#/components/schemas/Job" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/logs:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listLogs
+      x-outflare-access: { scope: audit.read, brand_limited: true }
+      summary: Request logs, newest first
+      description: |
+        Scope: audit.read. Every API call made in the workspace, from the web app, the API, MCP, the CLI or an agent's
+        mission, with its status, duration, error code and who made it. Only what describes the call is kept: never
+        bodies, query values, headers or keys. Logs are kept 30 days (OUTFLARE_LOG_RETENTION_DAYS on self-hosted servers).
+        Page back with before=next_before. To follow new calls as they happen, start with after=latest, then call again
+        with after=next_after every few seconds: those pages are oldest first and next_after is always set. A
+        brand-limited caller sees only calls about its brands.
+      tags: [system]
+      parameters:
+        - { $ref: "#/components/parameters/LogLevel" }
+        - { $ref: "#/components/parameters/LogStatus" }
+        - { $ref: "#/components/parameters/LogSurface" }
+        - { $ref: "#/components/parameters/LogMethod" }
+        - { $ref: "#/components/parameters/LogOperation" }
+        - { $ref: "#/components/parameters/LogErrorCode" }
+        - { $ref: "#/components/parameters/LogMCPTool" }
+        - { $ref: "#/components/parameters/LogRequestID" }
+        - { $ref: "#/components/parameters/LogActor" }
+        - { $ref: "#/components/parameters/LogToken" }
+        - { $ref: "#/components/parameters/LogMission" }
+        - { $ref: "#/components/parameters/LogProject" }
+        - { $ref: "#/components/parameters/Brand" }
+        - { $ref: "#/components/parameters/LogQuery" }
+        - { $ref: "#/components/parameters/LogSince" }
+        - { $ref: "#/components/parameters/LogUntil" }
+        - { name: before, in: query, description: "A log id (log_...) from next_before.", schema: { type: string }, example: log_48213 }
+        - { name: after, in: query, description: "A log id (log_...) from next_after, or latest to start following from now.", schema: { type: string }, example: latest }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
+      responses:
+        "200":
+          description: Calls.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, next_before, next_after, next_cursor]
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/LogEntry" }
+                  next_before: { type: [string, "null"], description: Pass as before for older calls; null at the end. }
+                  next_after: { type: [string, "null"], description: "Set when following (after=...): pass as after next time." }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/logs/export:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: exportLogs
+      x-outflare-access: { scope: audit.read, brand_limited: true }
+      summary: Export request logs
+      description: "Scope: audit.read. The calls matching the same filters as listing them, newest first, as CSV (default) or newline-delimited JSON. Up to 50,000 rows; narrow since and until for more."
+      tags: [system]
+      parameters:
+        - { name: format, in: query, schema: { type: string, enum: [csv, ndjson], default: csv } }
+        - { $ref: "#/components/parameters/LogLevel" }
+        - { $ref: "#/components/parameters/LogStatus" }
+        - { $ref: "#/components/parameters/LogSurface" }
+        - { $ref: "#/components/parameters/LogMethod" }
+        - { $ref: "#/components/parameters/LogOperation" }
+        - { $ref: "#/components/parameters/LogErrorCode" }
+        - { $ref: "#/components/parameters/LogMCPTool" }
+        - { $ref: "#/components/parameters/LogRequestID" }
+        - { $ref: "#/components/parameters/LogActor" }
+        - { $ref: "#/components/parameters/LogToken" }
+        - { $ref: "#/components/parameters/LogMission" }
+        - { $ref: "#/components/parameters/LogProject" }
+        - { $ref: "#/components/parameters/Brand" }
+        - { $ref: "#/components/parameters/LogQuery" }
+        - { $ref: "#/components/parameters/LogSince" }
+        - { $ref: "#/components/parameters/LogUntil" }
+      responses:
+        "200":
+          description: The file.
+          content:
+            text/csv: { schema: { type: string } }
+            application/x-ndjson: { schema: { type: string } }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/logs/histogram:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: getLogHistogram
+      x-outflare-access: { scope: audit.read, brand_limited: true }
+      summary: Count request logs over time
+      description: |
+        Scope: audit.read. Calls matching the same filters as listing them, counted by level in time buckets: 10 seconds for up to 20 minutes, a minute
+        for up to 90 minutes, 5 minutes up to 6 hours, an hour up to 3 days, a day beyond. since defaults to 24h.
+        Buckets with no calls are left out.
+      tags: [system]
+      parameters:
+        - { $ref: "#/components/parameters/LogLevel" }
+        - { $ref: "#/components/parameters/LogStatus" }
+        - { $ref: "#/components/parameters/LogSurface" }
+        - { $ref: "#/components/parameters/LogMethod" }
+        - { $ref: "#/components/parameters/LogOperation" }
+        - { $ref: "#/components/parameters/LogErrorCode" }
+        - { $ref: "#/components/parameters/LogMCPTool" }
+        - { $ref: "#/components/parameters/LogRequestID" }
+        - { $ref: "#/components/parameters/LogActor" }
+        - { $ref: "#/components/parameters/LogToken" }
+        - { $ref: "#/components/parameters/LogMission" }
+        - { $ref: "#/components/parameters/LogProject" }
+        - { $ref: "#/components/parameters/Brand" }
+        - { $ref: "#/components/parameters/LogQuery" }
+        - { $ref: "#/components/parameters/LogSince" }
+        - { $ref: "#/components/parameters/LogUntil" }
+      responses:
+        "200":
+          description: Counts.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [bucket_seconds, since, until, data]
+                properties:
+                  bucket_seconds: { type: integer, example: 3600 }
+                  since: { type: string, format: date-time }
+                  until: { type: string, format: date-time }
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [at, info, warning, error]
+                      properties:
+                        at: { type: string, format: date-time, description: Start of the bucket. }
+                        info: { type: integer, description: Calls that worked (status below 400). }
+                        warning: { type: integer, description: Calls refused (4xx). }
+                        error: { type: integer, description: Calls that broke (5xx). }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/logs/{id}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, description: "A log id (log_...) or the call's request id (the X-Request-Id header and request_id in errors).", schema: { type: string }, example: log_48213 }
+    get:
+      operationId: getLog
+      x-outflare-access: { scope: audit.read, brand_limited: true }
+      summary: Get one request log
+      description: "Scope: audit.read. One call and the audit log entries it wrote, so you can see what a call changed. Look up the request_id from an error to see the call that failed."
+      tags: [system]
+      responses:
+        "200":
+          description: The call.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [log, audit_events]
+                properties:
+                  log: { $ref: "#/components/schemas/LogEntry" }
+                  audit_events:
+                    type: array
+                    description: What the call changed, oldest first.
+                    items: { $ref: "#/components/schemas/AuditEvent" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/webhooks:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
@@ -9692,6 +9860,88 @@ components:
       in: query
       description: "Only records of this brand: its id or handle, none for records shared by every brand, or all (the default)."
       schema: { type: string }
+    LogLevel:
+      name: level
+      in: query
+      description: "info (worked), warning (refused, 4xx) or error (broke, 5xx); comma-separated for more than one."
+      schema: { type: string }
+      example: warning,error
+    LogStatus:
+      name: status
+      in: query
+      description: "Status codes (404) or classes (4xx), comma-separated."
+      schema: { type: string }
+      example: 4xx,500
+    LogSurface:
+      name: surface
+      in: query
+      description: "Where calls came from: web, api, mcp, cli, sdk or mission; comma-separated."
+      schema: { type: string }
+      example: mcp,mission
+    LogMethod:
+      name: method
+      in: query
+      description: HTTP methods, comma-separated.
+      schema: { type: string }
+      example: POST,DELETE
+    LogOperation:
+      name: operation
+      in: query
+      description: Operation ids from this document, comma-separated.
+      schema: { type: string }
+      example: createLead
+    LogErrorCode:
+      name: error_code
+      in: query
+      description: Error codes (GET /v1/error-codes), comma-separated.
+      schema: { type: string }
+      example: rate_limited
+    LogMCPTool:
+      name: mcp_tool
+      in: query
+      description: Only calls an MCP tool made.
+      schema: { type: string }
+      example: create_lead
+    LogRequestID:
+      name: request_id
+      in: query
+      schema: { type: string }
+    LogActor:
+      name: actor_id
+      in: query
+      description: Only calls by this actor (a person or token's actor_id).
+      schema: { type: string, format: uuid }
+    LogToken:
+      name: token_id
+      in: query
+      description: Only calls made with this API token.
+      schema: { type: string, format: uuid }
+    LogMission:
+      name: mission_id
+      in: query
+      description: Only calls made in this mission.
+      schema: { type: string, format: uuid }
+    LogProject:
+      name: project_id
+      in: query
+      description: Only calls about this project.
+      schema: { type: string, format: uuid }
+    LogQuery:
+      name: q
+      in: query
+      description: Text to find in the path, route, operation, error code, request id, MCP tool, agent or client.
+      schema: { type: string, maxLength: 200 }
+    LogSince:
+      name: since
+      in: query
+      description: "From this time: a timestamp (2026-10-26T09:00:00Z) or how long ago (15m, 24h, 7d)."
+      schema: { type: string }
+      example: 24h
+    LogUntil:
+      name: until
+      in: query
+      description: Before this time, in the same forms as since.
+      schema: { type: string }
     BrandRef:
       name: brand
       in: path
@@ -9802,6 +10052,36 @@ components:
         run_at: { type: string, format: date-time, description: When the job runs next (or ran). }
         created_at: { type: string, format: date-time }
         updated_at: { type: string, format: date-time }
+    LogEntry:
+      type: object
+      description: One API call. Only what describes the call is kept, never bodies, query values, headers or keys.
+      required: [id, request_id, created_at, level, method, route, operation, path, query_keys, status, duration_ms, error_code, error_param, surface, client, mcp_tool, agent, user_agent, mission_id, actor_id, actor_type, actor_name, token_id, brand_id, project_id]
+      properties:
+        id: { type: string, example: log_48213 }
+        request_id: { type: string, description: The X-Request-Id header and request_id in error bodies. }
+        created_at: { type: string, format: date-time }
+        level: { type: string, enum: [info, warning, error], description: "info: worked. warning: refused (4xx). error: broke (5xx)." }
+        method: { type: string, example: POST }
+        route: { type: string, example: "POST /v1/workspaces/{ws}/leads" }
+        operation: { type: string, example: createLead, description: The operationId in this document, or the route when it has none. }
+        path: { type: string, example: /v1/workspaces/acme/leads }
+        query_keys: { type: array, items: { type: string }, description: "The query parameters' names, never their values." }
+        status: { type: integer, example: 201 }
+        duration_ms: { type: integer }
+        error_code: { type: [string, "null"], example: null, description: "The error's code from GET /v1/error-codes, for a refused or failed call." }
+        error_param: { type: [string, "null"], example: null, description: "The field an invalid request named, such as email (never its value), or the scope a forbidden call was missing, such as leads.manage." }
+        surface: { type: string, enum: [web, api, mcp, cli, sdk, mission] }
+        client: { type: [string, "null"], description: The Outflare-Client header, such as mcp/0.1.0. }
+        mcp_tool: { type: [string, "null"], example: create_lead }
+        agent: { type: [string, "null"], description: "The agent's app, such as claude-desktop." }
+        user_agent: { type: [string, "null"] }
+        mission_id: { type: [string, "null"] }
+        actor_id: { type: [string, "null"] }
+        actor_type: { type: [string, "null"], example: api_token }
+        actor_name: { type: [string, "null"], description: The person's or token's name. }
+        token_id: { type: [string, "null"] }
+        brand_id: { type: [string, "null"], description: The brand the call was about, when it named one. }
+        project_id: { type: [string, "null"] }
     QueuedJob:
       type: object
       required: [queued, job]
