@@ -10329,7 +10329,7 @@ components:
     MailboxWarmup:
       type: object
       description: Warm-up settings and the last 7 days of results.
-      required: [enabled, daily_target, reply_rate, started_at, today_target, sent_7d, inbox_7d, spam_7d, missing_7d, inbox_rate]
+      required: [enabled, daily_target, reply_rate, started_at, today_target, sent_7d, inbox_7d, spam_7d, missing_7d, failed_7d, last_error, waiting_on, inbox_rate]
       properties:
         enabled: { type: boolean }
         daily_target: { type: integer, minimum: 1, maximum: 100, description: Warm-up emails a day once fully ramped up. }
@@ -10340,6 +10340,12 @@ components:
         inbox_7d: { type: integer, description: Sent warm-up mail found in the recipient's inbox. }
         spam_7d: { type: integer, description: Found in spam, and moved to the inbox. }
         missing_7d: { type: integer, description: Not found within two days. }
+        failed_7d: { type: integer, description: Warm-up sends the mailbox's SMTP server refused. }
+        last_error: { type: [string, "null"], description: Why the latest warm-up send failed; null once a send succeeds again. }
+        waiting_on:
+          type: [string, "null"]
+          enum: [another_mailbox, connection, paused, null]
+          description: "Why a mailbox with warm-up on sends nothing: another_mailbox when no other mailbox in the workspace has warm-up on, connection when it is not connected or Outflare has no login for it, paused when the mailbox is paused. Null while it can send."
         inbox_rate: { type: [number, "null"], minimum: 0, maximum: 1, description: "inbox_7d over all placed messages; null until any are placed." }
     WarmupSettings:
       type: object
