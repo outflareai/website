@@ -36,6 +36,27 @@ A mailbox with warm-up on that can't send says why in its **Warm-up** column, an
 | Not connected | `connection` | Reconnect the mailbox. Warm-up needs its SMTP and IMAP login, so mailboxes that only live in an outside sequencer can't warm up here. |
 | Paused | `paused` | Resume the mailbox. |
 | Sends failing | `null` | The mailbox's server refused the last warm-up email. Hover for the error, which is also `warmup.last_error`; `warmup.failed_7d` counts failures over 7 days. |
+| Turning on in EmailBison | `platform` | The sequencer that runs this mailbox's warm-up hasn't shown it on yet. It updates on the next sync, within 5 minutes. |
+
+## Warm up in your sequencer instead
+
+Already paying for warm-up in a sequencer? A mailbox that is also in an EmailBison, Instantly or Smartlead account [connected for mailbox allocation](/docs/guides/mailbox-allocation/) can warm up there instead of in Outflare.
+
+- **One mailbox:** its menu on **Mailboxes** has **Warm up with…**. Pick Outflare or the sequencer.
+- **All of an account's mailboxes:** the Mailboxes page shows a card for each connected sequencer that can run warm-up, with **Warm up all N in EmailBison** and **Use Outflare's warm-up instead**.
+- **Mailboxes Outflare has no login for** (they only live in the sequencer) warm up in the sequencer when you turn warm-up on.
+
+Outflare then leaves the mailbox out of its own warm-up and turns the sequencer's warm-up on or off whenever you turn it on or off here. The **Warm-up** column shows the sequencer's warm-up score. For a mailbox in an [infrastructure plan](/docs/guides/infrastructure/), that score stands in for inbox placement when deciding the mailbox is ready. Switching back to Outflare turns the sequencer's warm-up off.
+
+Over the API, send `provider` with the integration id. Without `mailbox_ids` or `pool_id`, it applies to every mailbox that account has:
+
+```sh
+curl -X POST https://outflare.example.com/v1/workspaces/$WS/mailboxes/warmup \
+  -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" \
+  -d '{"enabled": true, "provider": "'$EMAILBISON_INTEGRATION'"}'
+```
+
+`"provider": "outflare"` moves mailboxes back. Each mailbox's `warmup.provider` says who runs it, and `warmup.platform` holds the sequencer's view: `enabled`, `score` and when it was last read. Over MCP, `set_warmup` takes the same `provider`.
 
 ## Turn it on
 
