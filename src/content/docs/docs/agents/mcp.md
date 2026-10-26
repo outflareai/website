@@ -13,7 +13,7 @@ There are two ways in. The MCP server is the quickest one for Claude, ChatGPT, C
 
 ## The MCP server <span class="pill shipped">Shipped</span>
 
-[`@outflare/mcp`](https://github.com/outflareai/outflare/tree/main/mcp) is an [MCP](https://modelcontextprotocol.io) server that gives an agent 300 tools over the API (3 more in agency mode): run [missions](/docs/agents/missions/) toward a goal with approvals, read and update the brief of the project it works on, check sending domains and mailbox warm-up, import leads, check them against the suppression list, build, preview and start sequences, see and change which mailboxes each sequence sends from, and read and answer replies.
+[`@outflare/mcp`](https://github.com/outflareai/outflare/tree/main/mcp) is an [MCP](https://modelcontextprotocol.io) server that gives an agent 307 tools over the API (3 more in agency mode): run [missions](/docs/agents/missions/) toward a goal with approvals, read and update the brief of the project it works on, check sending domains and mailbox warm-up, import leads, check them against the suppression list, build, preview and start sequences, see and change which mailboxes each sequence sends from, and read and answer replies.
 
 It calls the same API with a scoped token, so:
 
@@ -209,6 +209,7 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `list_crawl_pages`, `get_crawl_page` | Every URL a crawl found: HTTP status, redirects, noindex, nofollow, robots.txt blocks, title, description, canonical, h1, hreflang, structured data, word count, links in and out | |
 | `list_crawl_issues`, `get_crawl_issue` | A crawl's audit: the rules its pages break, by URL template, with why and how to fix each, and the pages behind one rule | |
 | `list_fixes`, `update_fix` | The workspace's shared fixes list (site audits' fixes so far): take a fix, mark it done (the next crawl checks), ignore it, or leave a note | Yes |
+| `list_deploy_options`, `list_deploy_targets`, `add_deploy_target`, `update_deploy_target`, `remove_deploy_target`, `check_deploys`, `list_deploys` | Watch a [GitHub repository or Vercel project](/docs/integrations/deploys/) for production deploys, tied to the site it serves, and see when each website went live | Yes |
 | `get_fix_prompt`, `verify_fix` | Hand a fix to a coding agent as a prompt, then report it live so a fresh crawl confirms it or opens it again | Yes |
 | `list_clients`, `use_client`, `create_client` | Agency mode only (`OUTFLARE_AGENCY`): every client with this week's numbers, switch client, add a client | Yes |
 
