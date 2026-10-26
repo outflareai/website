@@ -216,7 +216,10 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `list_ai_cohorts`, `create_ai_cohort`, `update_ai_cohort`, `delete_ai_cohort` | Prompt cohorts: a brand's questions, other names, competitors, locale and schedule | Yes |
 | `list_ai_prompts`, `add_ai_prompts`, `update_ai_prompt`, `delete_ai_prompt` | The questions in a cohort | Yes |
 | `run_ai_prompts`, `list_ai_runs`, `get_ai_run`, `stop_ai_run` | Ask every model a cohort's questions now (costs money on your AI key), follow the run, stop it | Yes |
-| `list_ai_samples`, `get_ai_sample` | Each AI answer: model, text, brands named, pages cited | |
+| `list_ai_samples`, `get_ai_sample` | Each AI answer: model, text, brands named, pages cited, and which brand facts it agrees with or contradicts | |
+| `list_ai_facts`, `add_ai_fact`, `update_ai_fact`, `delete_ai_fact` | What is true about each brand, and how often AI answers agree with or contradict each fact | Yes |
+| `get_crawl_ai_access` | What a crawled site's robots.txt lets each AI search, user and training crawler read, and whether it has an llms.txt | |
+| `get_ai_bot_hits` | How often AI crawlers requested each site, per crawler and day, from your own Cloudflare request logs | |
 | `list_clients`, `use_client`, `create_client` | Agency mode only (`OUTFLARE_AGENCY`): every client with this week's numbers, switch client, add a client | Yes |
 
 The tools that make email go out, the ones that can spend data provider credits (marked *provider*), and `approve_infra_plan`, which spends money, are marked as reaching the outside world in their MCP annotations, so clients that support it can ask you before running them.
