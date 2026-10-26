@@ -17,6 +17,10 @@ Each brand has its own website (its point of truth), its own context for agents,
 
 Open **Settings → Brands → Add a brand** and give its name, website and where it ships (web, iOS, Android, TV and so on). Add its other domains on its page, such as an app or help site. A workspace without brands works exactly as before.
 
+Also on its page, under **Links**, add everywhere else the brand lives: its App Store and Google Play listings, TV app stores, the Chrome Web Store, Steam, socials and docs. Paste the address and Outflare works out what it is (apps.apple.com is the App Store); add a label such as "Fire TV" where it helps. Agents read the links with the brand's context.
+
+The Brands page shows brands as cards or as a table you can sort; it remembers which you picked.
+
 ## Tell agents about it
 
 Each brand's page has **About**: what it is, who it's for, goals, voice, rules and notes. Agents read it on top of the company's context:
@@ -48,7 +52,7 @@ Each site in your analytics tools, such as a GA4 property, a Search Console site
 | What | REST | MCP tool |
 | --- | --- | --- |
 | List brands | `GET /v1/workspaces/{ws}/brands` | `list_brands` |
-| Add or edit one | `POST /brands`, `PATCH /brands/{brand}` | `create_brand`, `update_brand` |
+| Add or edit one, including its links | `POST /brands`, `PATCH /brands/{brand}` | `create_brand`, `update_brand` |
 | A brand's own context | `GET`/`PATCH /brands/{brand}/context` | `get_brand_context`, `update_brand_context` |
 | Company and brand context together | `GET /context?brand=repocket` | `get_context` with `brand` |
 | Move records in or out | `POST /brands/{brand}/add`, `/remove` | `add_to_brand`, `remove_from_brand` |
@@ -59,7 +63,8 @@ Each site in your analytics tools, such as a GA4 property, a Search Console site
 ```sh
 curl -X POST https://app.outflare.ai/v1/workspaces/$WS/brands \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" \
-  -d '{"name": "Repocket", "website": "repocket.com", "platforms": ["web", "ios", "android"]}'
+  -d '{"name": "Repocket", "website": "repocket.com", "platforms": ["web", "ios", "android"],
+       "links": [{"url": "https://apps.apple.com/app/repocket/id1234567890"}, {"url": "https://www.amazon.com/dp/B0EXAMPLE", "kind": "tv_app", "label": "Fire TV"}]}'
 ```
 
 ## Coming next
