@@ -84,7 +84,7 @@ curl -X PATCH localhost:8080/v1/workspaces/$WS/integrations/$INTEGRATION/mailbox
 <span class="pill building">Built, not yet tested live</span> Cheap Inboxes pushes mailboxes straight into the sequencers it supports, and it supports a self-hosted EmailBison. Outflare answers the part of the EmailBison API used for that, and sets the connection up for you:
 
 1. On the Cheap Inboxes connection page in Outflare, choose **Turn on push**. Outflare adds itself in Cheap Inboxes as an EmailBison connection, with an API token that can only read and add mailboxes. It takes a few seconds.
-2. Choose **Push** to have Cheap Inboxes send every active mailbox that isn't in Outflare yet.
+2. Select mailboxes in the table and choose **Push selected**, or choose **Push** to have Cheap Inboxes send every active mailbox that isn't in Outflare yet. Try one mailbox first. If a mailbox is also connected to another sequencer, Cheap Inboxes may move it to Outflare there.
 
 Or with the API (turning push on also needs `integrations.manage`):
 
