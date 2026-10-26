@@ -9400,7 +9400,10 @@ components:
         name: { type: string }
         status: { type: string, enum: [connected, error], description: "error: the service refused the credentials; see last_error." }
         account: { $ref: "#/components/schemas/ConnectorAccount" }
-        config: { type: object, additionalProperties: true }
+        config:
+          type: object
+          additionalProperties: true
+          description: "Settings for this connection, never secret. warmup_tags (a sequencer with control.warmup): the tags it puts in its warm-up mail, at most 20 of 4 to 100 characters. The inbox leaves out received mail whose subject or body holds one, without reading or moving it."
         last_checked_at: { type: [string, "null"], format: date-time }
         last_error: { type: [string, "null"] }
         created_at: { type: string, format: date-time }

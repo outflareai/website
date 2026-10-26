@@ -17,7 +17,7 @@ When warm-up is on, your mailboxes email each other:
 
 1. **A slow ramp.** A mailbox sends 2 warm-up emails on its first day and 2 more each day after that, up to its daily target (20 by default). Sends are spread over the day.
 2. **Natural mail.** Each email is a short, plain note between colleagues, written fresh from varied parts. Nothing in it marks it as warm-up: the receiving mailbox recognises it by the Message-ID the engine recorded when it sent it.
-3. **Engagement.** About every 20 minutes the receiving mailbox looks for its warm-up mail in the inbox and the spam folder. It marks each message read, **moves it to the inbox if it landed in spam**, and answers some of them (30% by default) a few minutes to an hour and a half later, in the same thread.
+3. **Engagement.** About every 20 minutes the receiving mailbox looks for its warm-up mail in the inbox and the spam folder. It finds each one by its hidden Message-ID, so warm-up mail carries no visible tag that spam filters could learn. It marks each message read, stars about one in five, **moves it to the inbox if it landed in spam** (the same as clicking Not spam), and answers some of them (30% by default) a few minutes to an hour and a half later, in the same thread. Then it files the message in an **Outflare Warmup** folder (a label in Gmail), so warm-up mail stays out of your real inbox.
 4. **Placement.** Where each message landed is recorded: inbox, spam, or missing if it never arrived within two days.
 
 Warm-up mail never shows in your **Inbox**, doesn't count towards daily limits, and isn't in your sending stats. It only goes between the active mailboxes of one workspace, and never to an address on your suppression list.
@@ -47,6 +47,14 @@ Already paying for warm-up in a sequencer? A mailbox that is also in an EmailBis
 - **Mailboxes Outflare has no login for** (they only live in the sequencer) warm up in the sequencer when you turn warm-up on.
 
 **Already warming up there?** When Outflare first reads the account, a mailbox whose warm-up is already on in the sequencer, and that Outflare isn't warming up, is taken as warming up there. Nothing is switched. The **Warm-up** column shows **On in EmailBison** for sequencer warm-up that Outflare doesn't run, and **Also warming in EmailBison** for a mailbox that warms up in both places, which doubles its warm-up mail. Pick one for it. Over the API, each mailbox's `platforms[].warmup_enabled` says which sequencers have their own warm-up on.
+
+**Keep the sequencer's warm-up mail out of your Outflare inbox.** EmailBison, Instantly and Smartlead put a short code in each warm-up email so their own filters can find it. Paste that code on the sequencer's card on the **Mailboxes** page, under **warm-up tag**. Outflare's inbox then leaves out any mail whose subject or body holds it, without opening or moving it, so the sequencer still does its own engagement. Over the API, set `config.warmup_tags` on the integration (up to 20 tags of 4 to 100 characters):
+
+```bash
+curl -X PATCH https://app.outflare.ai/v1/workspaces/$WS/integrations/$INTEGRATION \
+  -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" \
+  -d '{"config": {"warmup_tags": ["XK7Q2Z9"]}}'
+```
 
 Outflare then leaves the mailbox out of its own warm-up and turns the sequencer's warm-up on or off whenever you turn it on or off here. The **Warm-up** column shows the sequencer's warm-up score. For a mailbox in an [infrastructure plan](/docs/guides/infrastructure/), that score stands in for inbox placement when deciding the mailbox is ready. Switching back to Outflare turns the sequencer's warm-up off.
 
