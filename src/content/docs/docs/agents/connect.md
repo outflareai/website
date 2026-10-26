@@ -81,14 +81,14 @@ VS Code asks you to sign in when the server starts. Then switch Copilot Chat to 
 
 Any app that connects to remote MCP servers can use the same URL: Windsurf, Codex, Gemini CLI, Goose, Zed and more. Apps that sign in with OAuth send you to Outflare to approve, and Outflare finds them on its own (it follows the MCP authorization spec, with dynamic client registration).
 
-An app that can't sign in can send an [API token](/docs/api/authentication/) instead, as the header `Authorization: Bearer oft_...`. Create one under **Settings → API tokens** with the **Outreach agent** or **Mission agent** preset.
+An app that can't sign in can send an [API token](/docs/api/authentication/) instead, as the header `Authorization: Bearer oft_...`. Create one under **Settings → API tokens** and choose **Can make changes** (or pick area by area).
 
 ## What you approve
 
 When an app connects, Outflare shows who is asking, the workspace it will work in (pick one if you are in more than one) and a switch for each thing it may do. Everything starts on except spending:
 
 - **See your workspace**: always on. It reads leads, sequences, replies, mailboxes and results.
-- **Company context and memories**, **Leads and lists**, **Sequences and projects**, **Replies**, **Mailboxes, domains and connectors** and **Missions**: turn off anything you don't want it to change. **Read only** turns them all off at once.
+- **Company context and memories**, **Leads and lists**, **Sequences and projects**, **Replies**, **Mailboxes, domains and connectors**, **SEO** and **Missions**: turn off anything you don't want it to change. **Read only** turns them all off at once.
 - **Spend money**: off unless you switch it on. Left off, every purchase of domains or mailboxes waits for you to approve it in Outflare.
 
 You only see the switches your role allows; viewers can only give read access.
@@ -97,9 +97,11 @@ Whatever you choose, a connected app can never invite or remove people, change t
 
 If Outflare doesn't recognise the app, the screen says so and shows where it will send you back. Only continue if you started connecting from there.
 
-## See and disconnect apps
+## Change or disconnect apps
 
-Connected apps are listed on the **Connect your AI** page with who connected them, what they may do and when they were last used. **Disconnect** cuts an app off at once. You can disconnect your own apps; owners and admins can disconnect anyone's. An app also loses access when the person who connected it leaves the workspace.
+Connected apps are listed on the **Connect your AI** page with who connected them, what they may do and when they were last used. Click one to see the same switches you approved and change them: each switch saves at once, and the app gets the change on its next request, with no need to connect again. If you turn on changes for an app that was read only, start a new chat in the app so it picks up the tools that make changes. **Disconnect** cuts an app off at once. You can change or disconnect your own apps; owners and admins can change or disconnect anyone's. Connecting the same app again takes you through the approval screen once more and replaces the old connection.
+
+When an app tries something it isn't allowed to do, Outflare tells it which switch is off and links to the app on this page, so it can send you straight there. An app also loses access when the person who connected it leaves the workspace.
 
 Under the hood each connection is a short-lived token that the app refreshes. Outflare stores only hashes of the tokens, and if a refresh token is ever used twice, it disconnects the app.
 
