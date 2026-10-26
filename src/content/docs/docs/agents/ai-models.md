@@ -7,7 +7,7 @@ sidebar:
 
 <span class="pill shipped">Shipped</span> Claude, OpenAI, Gemini and Mistral, a model picker, and a monthly AI limit.
 
-Outflare plans [missions](/docs/agents/missions/) from a goal and runs its own agent with an AI model you connect, using **your own API key**. Usage is billed by the provider, to your account. You don't need one to use Outflare: your own agent over [MCP](/docs/agents/mcp/) or the API needs no model here at all.
+Outflare plans [missions](/docs/agents/missions/) from a goal and runs its own agent with an AI model you connect, using **your own API key**. Usage is billed by the provider, to your account. Every workspace brings its own key: Outflare never supplies, pays for or shares one. You don't need one to use Outflare: your own agent over [MCP](/docs/agents/mcp/) or the API needs no model here at all.
 
 ## Pick a provider and a model
 
@@ -22,6 +22,20 @@ With no choice saved, Outflare uses the first connected provider in the order ab
 Outflare knows the list price of Claude models. For a model it doesn't know, enter the provider's price in US$ per million input and output tokens, from the pricing page linked in the form. Prices are needed so spend limits work.
 
 ![Choosing an OpenAI model and entering its price](/screens/ai-model-price.png)
+
+## A model for each task
+
+Not every task needs the strongest model. Under **Model for each task** you can pick a different model, on the same key, for:
+
+| Task | What it is | Default |
+| --- | --- | --- |
+| **Planning** | Drafting a mission from your goal | The main model |
+| **Agent turns** | Outflare's agent starting a mission, answering you, acting on your decisions, or carrying on after you resume it | The main model |
+| **Routine check-ins** | Looking in on a running mission when nothing new came from you | The provider's cheaper model, when it costs less: Claude Sonnet 5.5 under Claude Opus 5.5 |
+
+Each list shows what the model costs, in US$ per million input/output tokens, and every call is priced at its own model's price. A choice belongs to the provider it was made for: switch provider and the tasks go back to their defaults.
+
+![A model for each task: Sonnet for planning, Opus for agent turns, Haiku for routine check-ins](/screens/ai-model-tasks.png)
 
 ## Limit what AI can spend
 
@@ -49,7 +63,7 @@ Outflare's agent reads text written by people outside your workspace: email repl
 | Endpoint | MCP tool | What |
 | --- | --- | --- |
 | `GET /v1/workspaces/{ws}/ai-settings` | `get_ai_settings` | The model in use, the connected providers, this month's spend and what's missing |
-| `PUT /v1/workspaces/{ws}/ai-settings` | `update_ai_settings` | Choose the connection and model, set prices and the monthly limit |
+| `PUT /v1/workspaces/{ws}/ai-settings` | `update_ai_settings` | Choose the connection and model, a model per task (`task_models`: `plan`, `turn`, `check_in`), prices and the monthly limit |
 | `GET /v1/workspaces/{ws}/integrations/{id}/models` | `list_ai_models` | The models a connection's key can use |
 
 ```sh
