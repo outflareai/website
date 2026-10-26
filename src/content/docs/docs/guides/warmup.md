@@ -26,6 +26,17 @@ Warm-up mail never shows in your **Inbox**, doesn't count towards daily limits, 
 Mailboxes warm each other up, so turn warm-up on for at least two, ideally on different domains. Teams that buy reseller inboxes in bulk usually have plenty.
 :::
 
+### When nothing is being sent
+
+A mailbox with warm-up on that can't send says why in its **Warm-up** column, and the API returns the reason as `warmup.waiting_on`:
+
+| Shows | `waiting_on` | What to do |
+| --- | --- | --- |
+| Needs a second mailbox | `another_mailbox` | Turn warm-up on for another mailbox in the workspace. Sends start within a minute. |
+| Not connected | `connection` | Reconnect the mailbox. Warm-up needs its SMTP and IMAP login, so mailboxes that only live in an outside sequencer can't warm up here. |
+| Paused | `paused` | Resume the mailbox. |
+| Sends failing | `null` | The mailbox's server refused the last warm-up email. Hover for the error, which is also `warmup.last_error`; `warmup.failed_7d` counts failures over 7 days. |
+
 ## Turn it on
 
 In the web app, open **Mailboxes**. Until any mailbox is warming, the page offers **Warm up N mailboxes** for all of them. Afterwards, each mailbox's menu has **Turn on warm-up** and **Turn off warm-up**. Mailboxes that need attention are left out until they are fixed.
