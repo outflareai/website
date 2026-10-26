@@ -83,4 +83,4 @@ curl -X POST "$OUTFLARE_URL/v1/workspaces/$WS/memories" -H "Authorization: Beare
 outflare get-status
 ```
 
-Reading needs the `workspace.read` scope. Editing the context and memories needs `context.manage`, which the **Outreach agent** and **Mission agent** token presets include. An edit sent with an old `version` fails with `409 context_changed`, so a person and an agent never overwrite each other.
+Reading needs the `workspace.read` scope. Editing the context and memories needs `context.manage`, which **Can make changes** on a token includes. An edit sent with an old `version` fails with `409 context_changed`, so a person and an agent never overwrite each other.

@@ -9,6 +9,8 @@ sidebar:
 
 Outflare is the brain of your outbound. Connectors are how it reaches everything else. **Nothing has to be connected to run:** add mailboxes directly (IMAP/SMTP, CSV, or Google and Microsoft sign-in), import leads from a CSV, and addresses are checked with free built-in checks. Connectors add to that.
 
+**Every connection is your own account.** Outflare never lends its own API keys for connectors or AI models, on Outflare Cloud or anywhere else: you add your own key, or sign in to your own account, for each service a feature uses. A feature that needs a service you haven't connected stays off until you connect it.
+
 ## What can be connected
 
 Ready to connect today:
