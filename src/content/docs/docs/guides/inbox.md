@@ -5,7 +5,7 @@ sidebar:
   order: 8
 ---
 
-<span class="pill shipped">Shipped</span> IMAP sync, one inbox across all mailboxes, stop on reply, opt-out and bounce handling, labelling replies by what they mean in four groups, assigning, snoozing, coloured tags, saved views, label webhooks, replying from the inbox, and replies from EmailBison. <span class="pill">Next</span> Other sequencers, and AI labelling with your own AI key.
+<span class="pill shipped">Shipped</span> IMAP sync, one inbox across all mailboxes, stop on reply, opt-out and bounce handling, labelling replies by what they mean in four groups, assigning, snoozing, coloured tags, saved views, label webhooks, replying from the inbox, replies from EmailBison, and AI labelling with your own AI key. <span class="pill">Next</span> Other sequencers, and reply rules.
 
 ## How mail arrives
 
@@ -54,7 +54,20 @@ Each reply also gets a label for what it means. Labels come in four groups, so y
 | `closed` | `not_interested`, `wrong_person`, `unsubscribe`, `complaint` | Finished. Opt-outs and complaints are suppressed. |
 | `automatic` | `out_of_office`, `auto_reply` | Sent by a machine. |
 
-Built-in rules label the clear cases as they arrive and leave the rest unlabelled, so a person or an agent can read them and decide. Every reply says:
+Built-in rules label the clear cases as they arrive. What they can't place is left unlabelled, so a person or an agent can read it and decide, unless the workspace has connected its own AI model.
+
+### AI labelling with your own key
+
+Connect an AI model under Connectors (Claude, OpenAI, Gemini or Mistral, with your own API key) and choose it under **Settings → AI model**. Replies the rules leave unlabelled are then read by that model in the background. Outflare never uses a key of its own: without your connection, only the rules run.
+
+- **Sure (80% or more):** the AI labels the reply on its own. Automatic mail is marked done.
+- **Unsure:** the label is set and the reply is flagged `needs_review`, so a person checks it.
+- **Opt-outs:** a reply the AI reads as `unsubscribe` or `complaint` is suppressed whatever its confidence, and flagged when unsure. Change its label to anything else and the suppression is lifted in one step; the sequences it stopped stay stopped as replied.
+- **Details:** what the reply states, such as `return_date`, `referral_name`, `referral_email`, `meeting_time` or `objection`, goes in `details`, and why in `category_reason`.
+
+The model is told the reply is data, never instructions, and only the new text is sent, not the quoted thread. Each call is billed by your provider to your account and counts towards the workspace's monthly AI limit. A label a person or agent already set is never overwritten.
+
+Every reply says:
 
 - `category_source`: who labelled it, `rules`, `ai`, `human`, `api_token` or `agent`.
 - `category_confidence`: how sure they were, from 0 to 1. Rules and people are 1.
