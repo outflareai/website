@@ -11,7 +11,7 @@ There are two ways in. The MCP server is the quickest one for Claude, Cursor and
 
 ## The MCP server <span class="pill shipped">Shipped</span>
 
-[`@outflare/mcp`](https://github.com/outflareai/outflare/tree/main/mcp) is an [MCP](https://modelcontextprotocol.io) server that gives an agent 185 tools over the API (3 more in agency mode): run [missions](/docs/agents/missions/) toward a goal with approvals, read and update the brief of the project it works on, check sending domains and mailbox warm-up, import leads, check them against the suppression list, build, preview and start sequences, see and change which mailboxes each sequence sends from, and read and answer replies.
+[`@outflare/mcp`](https://github.com/outflareai/outflare/tree/main/mcp) is an [MCP](https://modelcontextprotocol.io) server that gives an agent 210 tools over the API (3 more in agency mode): run [missions](/docs/agents/missions/) toward a goal with approvals, read and update the brief of the project it works on, check sending domains and mailbox warm-up, import leads, check them against the suppression list, build, preview and start sequences, see and change which mailboxes each sequence sends from, and read and answer replies.
 
 It calls the same API with a scoped API token, so:
 
@@ -193,6 +193,9 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `list_seo`, `get_seo_history` | DataForSEO and Ahrefs connections with their budget left, and stored weekly SEO snapshots (keywords with their previous position); free | |
 | `get_seo_report` | A live SEO report for any domain: overview, keywords, backlinks, competitors or audit. Costs money within the connection's monthly budget (*provider*) | Yes |
 | `update_seo_settings`, `sync_seo` | An SEO connection's domains, country, monthly budget and weekly snapshots; take a snapshot now (*provider*) | Yes |
+| `list_seo_sites`, `add_seo_site`, `update_seo_site`, `delete_seo_site` | The websites OutflareBot audits: ownership, crawl settings and limits, latest crawl. See [Crawl and audit your sites](/docs/guides/site-audits/) | Yes |
+| `verify_seo_site`, `start_crawl`, `get_crawl`, `list_crawls`, `stop_crawl` | Check the DNS record, meta tag or file that proves ownership; crawl a site and follow the crawl | Yes |
+| `list_crawl_pages` | Every URL a crawl found: HTTP status, redirects, noindex, nofollow, robots.txt blocks | |
 | `list_clients`, `use_client`, `create_client` | Agency mode only (`OUTFLARE_AGENCY`): every client with this week's numbers, switch client, add a client | Yes |
 
 The tools that make email go out, the ones that can spend data provider credits (marked *provider*), and `approve_infra_plan`, which spends money, are marked as reaching the outside world in their MCP annotations, so clients that support it can ask you before running them.
