@@ -70,7 +70,7 @@ curl -X POST https://outflare.example.com/v1/workspaces/$WS/mailboxes/warmup \
 
 ## Turn it on
 
-In the web app, open **Mailboxes**. Until any mailbox is warming, the page offers **Warm up N mailboxes** for all of them. Afterwards, each mailbox's menu has **Turn on warm-up** and **Turn off warm-up**. Mailboxes that need attention are left out until they are fixed.
+In the web app, open **Sending → Warm-up** in the sidebar. It shows every mailbox's warm-up at once: how many are warming and still ramping up, inbox placement over the last 7 days, and which mailboxes are waiting on something. Until any mailbox is warming, the page offers **Warm up N mailboxes** for all of them; each mailbox has **Turn on** or **Turn off** and its 14-day **History**. The same switches are in each mailbox's menu on **Mailboxes**. Mailboxes that need attention are left out until they are fixed.
 
 Over the API, turn it on for chosen mailboxes, a whole pool, or every mailbox in the workspace:
 

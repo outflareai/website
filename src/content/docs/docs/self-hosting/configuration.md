@@ -11,6 +11,7 @@ The engine is configured only through environment variables. When you use the bu
 | --- | --- | --- | --- |
 | `DATABASE_URL` | yes | none | Postgres connection string, for example `postgres://outflare:secret@postgres:5432/outflare?sslmode=disable`. Compose builds it from `POSTGRES_PASSWORD`. |
 | `OUTFLARE_SECRET_KEY` | yes | none | Base64-encoded 32-byte key that encrypts mailbox passwords and provider keys at rest. Generate with `openssl rand -base64 32`. Back it up with the database. |
+| `OUTFLARE_SECRET_KEY_PREVIOUS` | no | none | Earlier secret keys, comma-separated, while you [rotate the key](#rotating-the-secret-key). Secrets are re-encrypted with the current key at start-up. |
 | `HTTP_ADDR` | no | `:8080` | Address the engine listens on inside the container. |
 | `PUBLIC_URL` | no | `http://localhost:8080` | External base URL. Used in links the engine generates, such as invites and the unsubscribe link in every email, and to decide whether session cookies are marked `Secure`. Set it to your public `https://` address before sending: recipients must be able to reach unsubscribe links. |
 | `WORKERS` | no | `32` | Number of job worker goroutines. |
@@ -25,6 +26,7 @@ The engine is configured only through environment variables. When you use the bu
 | `PASSKEYS` | no | `auto` | `auto` turns passkey sign-in on once `PUBLIC_URL` is `https://`. `on` also allows `http://localhost` for trying them out; `off` turns them off. Passkeys are tied to `PUBLIC_URL`, so set its final address first. |
 | `CLIENT_IP_HEADER` | no | none | Header your proxy puts the visitor's address in, such as `Fly-Client-IP` or `CF-Connecting-IP`. Rate limits use it. Only set it when every request comes through that proxy, or visitors could fake it. |
 | `WEBHOOKS_ALLOW_PRIVATE` | no | `false` | `true` lets [webhooks](/docs/api/webhooks/) go to private, loopback and plain-`http` addresses, for receivers on the same network as the server. Leave it off on a server anyone else can add webhooks to. |
+| `OUTFLARE_CRAWL_ALLOW_PRIVATE` | no | `false` | `true` lets [site audits](/docs/guides/site-audits/) crawl private addresses and other ports, to audit an intranet or a site in development. Leave it off on a server other people use. |
 | `OUTFLARE_TELEMETRY` | no | on | `off` stops the anonymous daily usage report and update check. See [Usage stats and update checks](/docs/self-hosting/telemetry/). |
 | `DO_NOT_TRACK` | no | none | `1` does the same as `OUTFLARE_TELEMETRY=off`. |
 | `OUTFLARE_POSTHOG_KEY` | no | none | Your own PostHog project key (`phc_...`). Turns on product analytics: the web app's usage through `/ingest/` on your server, and the server's own events (every action, API and MCP call, and error), with ids and error codes but never customer data. See [Product analytics](#product-analytics). |
@@ -40,7 +42,13 @@ Compose-only settings:
 
 ## Rotating the secret key
 
-There is no key rotation command yet. Changing `OUTFLARE_SECRET_KEY` makes existing stored mailbox credentials unreadable, so mailboxes would need to be imported again. Keep the key stable and backed up.
+To rotate the key:
+
+1. Generate a new key with `openssl rand -base64 32`.
+2. Set `OUTFLARE_SECRET_KEY_PREVIOUS` to the current key and `OUTFLARE_SECRET_KEY` to the new one.
+3. Restart. At start-up the engine re-encrypts every stored secret (mailbox passwords, connector and OAuth keys, webhook signing secrets) with the new key, and the log says how many.
+
+Keep the old key in `OUTFLARE_SECRET_KEY_PREVIOUS` as long as unsubscribe links in mail you already sent should keep working; once you remove it, those links stop verifying. You can list several old keys, comma-separated. Changing `OUTFLARE_SECRET_KEY` without listing the old one makes stored credentials unreadable, so keep both backed up.
 
 ## Product analytics
 
