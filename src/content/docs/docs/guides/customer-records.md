@@ -9,6 +9,8 @@ sidebar:
 
 Outflare keeps one record of each person and company your business knows, plus anything else you track, such as deals, subscriptions or partners. The customer data platform, the CRM and lifecycle email all use the same records, so nobody types the same detail twice and nothing ends up in a separate copy.
 
+Moving from Attio? [Import it once](/docs/guides/move-from-attio/) and its people, companies and deals become records here.
+
 ## The catalog
 
 The catalog lists everything a record can hold, and every feature uses the same definitions.
