@@ -28,7 +28,7 @@ The brief has three parts:
 | Part | What goes in it |
 | --- | --- |
 | Offer, audience, market | One line each, in words: what you sell, who to, and where (country, region, language). |
-| Ideal customer | Filters a data provider or agent can use: titles, seniority, industries, company size, locations and keywords. |
+| Ideal customer | Filters a data provider or agent can use: titles, seniority, industries, company size, locations and keywords. They are the project's [ideal customer profile](/docs/guides/ideal-customers/), so you can share one profile between projects. |
 | Written brief | Markdown, up to 100,000 characters: messaging, proof points, objections and how to answer them, words to avoid. |
 
 The list shows how complete each brief is, out of five: offer, audience, market, ideal customer and written brief.
