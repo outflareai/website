@@ -211,6 +211,7 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `list_fixes`, `update_fix` | The workspace's shared fixes list (site audits' fixes so far): take a fix, mark it done (the next crawl checks), ignore it, or leave a note | Yes |
 | `list_deploy_options`, `list_deploy_targets`, `add_deploy_target`, `update_deploy_target`, `remove_deploy_target`, `check_deploys`, `list_deploys` | Watch a [GitHub repository or Vercel project](/docs/integrations/deploys/) for production deploys, tied to the site it serves, and see when each website went live | Yes |
 | `get_fix_prompt`, `verify_fix` | Hand a fix to a coding agent as a prompt, then report it live so a fresh crawl confirms it or opens it again | Yes |
+| `get_digest_settings`, `update_digest_settings`, `list_digests`, `preview_digest`, `send_digest` | The workspace's [daily or weekly digest](/docs/guides/digests/): when it is made, who gets it by email through your own provider, past digests, a preview, and one made now | Yes |
 | `list_clients`, `use_client`, `create_client` | Agency mode only (`OUTFLARE_AGENCY`): every client with this week's numbers, switch client, add a client | Yes |
 
 The tools that make email go out, the ones that can spend data provider credits (marked *provider*), and `approve_infra_plan`, which spends money, are marked as reaching the outside world in their MCP annotations, so clients that support it can ask you before running them.
