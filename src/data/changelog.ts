@@ -71,6 +71,7 @@ export const areas: Record<string, string> = {
 	api: 'API, SDK, MCP and CLI',
 	workspace: 'Workspace and settings',
 	'self-hosting': 'Self-hosting',
+	general: 'Everything else',
 };
 
 const files = import.meta.glob<Day>('./changelog/*.json', { eager: true, import: 'default' });
