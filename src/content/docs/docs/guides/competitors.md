@@ -45,6 +45,15 @@ Every change is kept as an event under **Changes**:
 
 The first look and the first snapshot are a baseline, so changes show from the next week on.
 
+## Keyword and link gaps
+
+The weekly snapshot also reads the keywords and linking domains of the first five tracked competitors a site, 50 of each by default. Two tabs compare them with your own:
+
+- **Keyword gaps** lists keywords a competitor ranks in the top 20 for that you don't rank for (**Missing**), or rank 3 places or more below (**Behind**). The ones most competitors share and most people search come first.
+- **Link gaps** lists domains that link to your competitors but not to you, the ones linking to most competitors and strongest first.
+
+Gaps compare against what your own connection read for you, so a gap can be a keyword or link outside that read. Opening the tabs costs nothing. The weekly read counts against the connection's budget; set how many rows it reads with `gap_rows` on the connection's settings, or 0 to turn gaps off. Gaps are ideas for content and links: Outflare never contacts a site for you.
+
 ## API and agents
 
 ```sh
@@ -57,6 +66,9 @@ curl -X POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/jso
 
 # What changed in the last 30 days
 curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/seo-competitors/events?days=30"
+
+# Domains that link to competitors but not to you
+curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/seo-competitors/gaps?site_id=$SITE&kind=links"
 ```
 
-Reading needs the `seo.read` scope and changing needs `seo.manage`; a brand's token sees only its brand's sites. Agents use the MCP tools `list_seo_competitors`, `add_seo_competitor`, `update_seo_competitor`, `remove_seo_competitor`, `check_seo_competitor` and `list_competitor_events`, and can answer things like "what did our competitors publish this month?".
+Reading needs the `seo.read` scope and changing needs `seo.manage`; a brand's token sees only its brand's sites. Agents use the MCP tools `list_seo_competitors`, `add_seo_competitor`, `update_seo_competitor`, `remove_seo_competitor`, `check_seo_competitor`, `list_competitor_events` and `get_seo_competitor_gaps`, and can answer things like "what did our competitors publish this month?" or "which keywords are we missing?".

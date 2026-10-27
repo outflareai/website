@@ -162,4 +162,6 @@ Reading needs `analytics.read`; settings and snapshots need
   and tracked competitors with their numbers, and what changed at them. Free.
   `add_seo_competitor`, `update_seo_competitor`, `remove_seo_competitor` and
   `check_seo_competitor` track, dismiss, remove or look at one.
+- `get_seo_competitor_gaps`: keywords your tracked competitors rank for that
+  you don't, and domains that link to them but not to you. Free.
 - `get_analytics_overview` includes each website's latest SEO figures.
