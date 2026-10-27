@@ -30,6 +30,7 @@ export const categories: { id: string; label: string; blurb: string; docs: strin
 	{ id: 'mailbox_provider', label: 'Mailbox suppliers', blurb: 'Buy and connect sending mailboxes.', docs: '/docs/integrations/cheap-inboxes/' },
 	{ id: 'analytics', label: 'Website analytics', blurb: 'Traffic, pages, sources and search queries in one place.', docs: '/docs/integrations/analytics/' },
 	{ id: 'seo', label: 'SEO', blurb: 'Domain rating, backlinks, rankings and site audits.', docs: '/docs/integrations/seo/' },
+	{ id: 'payments', label: 'Payments', blurb: 'Who pays you, with their plan and revenue on each person.', docs: '/docs/guides/revenue-from-stripe/' },
 	{ id: 'calendar', label: 'Calendars', blurb: 'Meetings booked, tied back to the reply that won them.', docs: '/docs/integrations/calendars-and-hubspot/' },
 	{ id: 'crm', label: 'CRM', blurb: 'Replies, interested leads and meetings synced to your CRM.', docs: '/docs/integrations/calendars-and-hubspot/' },
 	{ id: 'dns', label: 'DNS', blurb: 'SPF, DKIM, DMARC and tracking records set for you.', docs: '/docs/integrations/connectors/' },
