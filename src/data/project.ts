@@ -97,7 +97,7 @@ export const milestones: Milestone[] = [
 		step: 9,
 		title: 'MCP server for agents',
 		status: 'shipped',
-		summary: 'Claude, Cursor and other MCP clients run a workspace through 376 tools over the API, held to the token\'s scopes and the send policy.',
+		summary: 'Claude, Cursor and other MCP clients run a workspace through 396 tools over the API, held to the token\'s scopes and the send policy.',
 		docs: '/docs/agents/mcp/',
 	},
 	{
