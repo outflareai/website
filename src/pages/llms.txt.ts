@@ -13,6 +13,7 @@ export async function GET({ site }: { site: URL }) {
 		'Source: https://github.com/outflareai/outflare',
 		'Hosted app (free during early access): https://app.outflare.ai (sign up at https://app.outflare.ai/signup)',
 		`API contract: ${new URL('/openapi.yaml', site).href}`,
+		`Changelog (daily, JSON): ${new URL('/changelog.json', site).href}`,
 		'',
 		'## Docs',
 		'',

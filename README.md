@@ -30,6 +30,8 @@ Canonical URLs, the sitemap and `llms.txt` use `https://outflare.ai` (no `www`).
 | `src/pages/docs/api/reference.astro` | Endpoint reference, generated from `spec/openapi.yaml` |
 | `src/data/project.ts` | The site URL, contact email, GitHub repo links, and roadmap and feature status |
 | `spec/openapi.yaml` | Copy of `api/openapi.yaml` from the main repo |
+| `src/data/changelog/` | The daily changelog, one JSON file per day (UTC), written by Outflare Cloud after each production deploy; shown at `/changelog/`, `/changelog.json` and `/changelog.xml` |
+| `changelog/` | The same days as Markdown, the record on GitHub. Generated: `node scripts/changelog.mjs render`; CI's `check` fails when it's out of step or a line looks private |
 | `src/pages/llms.txt.ts` | `/llms.txt`, an index of the docs for LLMs and agents |
 | `src/styles/marketing.css` | Home page styles: the web app's own Tailwind v4 theme and shadcn tokens (`outflare/web/src/index.css`), plus button, badge and card classes matching the app's components. Update both together. |
 | `src/styles/tokens.css` | The same tokens as plain CSS variables for the docs, which Starlight styles. |

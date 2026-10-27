@@ -15,7 +15,7 @@ Outflare doesn't send warm-up mail itself. Warm-up runs in a sequencer with its 
 
 1. **Add your mailboxes to the sequencer** in its own app.
 2. **Connect the sequencer** on **Connectors**, under Sequencers. Outflare reads its mailboxes every few minutes and matches them to yours by address ([mailbox allocation](/docs/guides/mailbox-allocation/) explains the connection).
-3. **Turn warm-up on.** Open **Sending → Warm-up** in the sidebar and choose **Warm up N mailboxes**, or **Turn on** for one. The same switch is in each mailbox's menu on **Mailboxes**, and the Mailboxes page has a card for each connected sequencer with **Warm up all N in EmailBison**.
+3. **Turn warm-up on.** Open **Deliverability → Warm-up** in the sidebar and choose **Warm up N mailboxes**, or **Turn on** for one. The same switch is in each mailbox's menu on **Mailboxes**, and the Mailboxes page has a card for each connected sequencer with **Warm up all N in EmailBison**.
 
 Plan on **two weeks** of warm-up before a new mailbox sends sequences, and leave it on afterwards to protect its reputation.
 
