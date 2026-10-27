@@ -11,7 +11,7 @@ Outflare plans [missions](/docs/agents/missions/) from a goal and runs its own a
 
 ## Pick a provider and a model
 
-1. Open **Connectors** and connect one of the AI providers with its API key: **Claude** (Anthropic), **OpenAI**, **Gemini** (Google AI Studio), **Mistral** or **OpenRouter** (one key for many vendors' models). The key is checked with the provider before it is saved.
+1. Open **Connectors** and connect one of the AI providers with its API key: **Claude** (Anthropic), **OpenAI**, **Gemini** (Google AI Studio), **Mistral** or **OpenRouter** (one key for many vendors' models). The key is checked with the provider before it is saved. OpenRouter also lets you sign in instead: you approve on OpenRouter's page and it makes a key on your own account for Outflare, so there's nothing to copy.
 2. Open **Settings**, **General**, and find **AI model**. Choose the provider and pick a model. The list comes live from the provider, with only the chat models your key can use.
 3. Save. The Missions page then says which model it uses, with a link to change it.
 
