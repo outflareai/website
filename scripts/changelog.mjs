@@ -52,6 +52,7 @@ function problemsIn(file, d) {
 	if (!['in-progress', 'final'].includes(d.status)) bad('status must be in-progress or final');
 	if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?Z$/.test(d.updated ?? '')) bad('updated must be an ISO time in UTC');
 	if (d.engine && !/^[0-9a-f]{7,40}$/.test(d.engine)) bad('engine must be a commit hash');
+	if (d.through && !/^[0-9a-f]{7}\+[0-9a-f]{7}$/.test(d.through)) bad('through must be a production version, <engine>+<cloud>');
 	if (d.selfHosted && !/^v\d+\.\d+\.\d+(-[\w.]+)?$/.test(d.selfHosted)) bad('selfHosted must be a version tag');
 	if (!Array.isArray(d.items) || d.items.length === 0) bad('a day needs at least one line');
 	for (const [n, i] of (d.items ?? []).entries()) {

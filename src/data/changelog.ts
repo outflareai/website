@@ -35,6 +35,9 @@ export interface Day {
 	updated: string;
 	// The engine commit production ran at the end of the day.
 	engine?: string;
+	// The production version (/v1/meta, <engine>+<cloud>) this day covers up to,
+	// so the next run knows where to carry on.
+	through?: string;
 	// Set only when known for certain, such as the first release.
 	selfHosted?: string;
 	items: Item[];
