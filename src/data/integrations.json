@@ -655,6 +655,23 @@
 		"dark_logo": true
 	},
 	{
+		"id": "stripe",
+		"name": "Stripe",
+		"category": "payments",
+		"summary": "See who pays you: customers, subscriptions, payments and refunds on each person's record.",
+		"description": "Reads your Stripe customers, subscriptions, payments and refunds, every few minutes. Each customer becomes a person with their plan, monthly revenue, lifetime revenue and billing status, and each payment is an event on their timeline, so the CRM, lifecycle email, missions and partners all use the same numbers. Read-only: Outflare never charges, refunds or changes anything in Stripe.",
+		"website": "https://stripe.com",
+		"docs_url": "https://docs.stripe.com/api",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"payments.read"
+		],
+		"status": "available",
+		"pricing": "Free: Stripe does not charge for API calls"
+	},
+	{
 		"id": "ahrefs",
 		"name": "Ahrefs",
 		"category": "seo",
