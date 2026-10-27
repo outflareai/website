@@ -2,7 +2,7 @@
 	"version": "2026.10.27",
 	"date": "2026-10-27",
 	"status": "in-progress",
-	"updated": "2026-10-27T21:17:13Z",
+	"updated": "2026-10-27T21:25:37Z",
 	"items": [
 		{
 			"kind": "fix",
@@ -717,7 +717,21 @@
 			"edition": "open-source",
 			"text": "Feature flags: turn something on for the visitors you pick, or split them between versions of a page to see which works better. Each visitor keeps their version, your website and servers agree on it, and pages don't flicker. Find them under Analytics → Feature flags.",
 			"at": "2026-10-27T21:00:07Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "deliverability",
+			"edition": "open-source",
+			"text": "Tracking domains can get their HTTPS certificate automatically on servers that support it, and each tracking domain now shows whether HTTPS is set up (`https_status`). Links only switch to a tracking domain once its certificate is ready.",
+			"at": "2026-10-27T21:25:37Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "AI spend limits can now warn without stopping. Under Settings → AI usage, untick Stop for the workspace's monthly AI limit or any tool's limit: owners and admins still get the 80% and 100% emails, but AI calls carry on. Every limit still stops calls by default.",
+			"at": "2026-10-27T21:25:37Z"
 		}
 	],
-	"through": "e1ec7ec+9e30ced"
+	"through": "8d0a4b8+648b31c"
 }
