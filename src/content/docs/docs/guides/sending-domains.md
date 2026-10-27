@@ -18,10 +18,10 @@ A domain is added on its own the first time you connect a mailbox on it. You can
 ```sh
 curl -X POST https://outflare.example.com/v1/workspaces/$WS/sending-domains \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" \
-  -d '{"domain": "acme.com"}'
+  -d '{"domain": "acme.example"}'
 ```
 
-`acme.com`, `@acme.com`, `https://acme.com/pricing` and `ana@acme.com` are all read as `acme.com`. A domain can be removed only once it has no mailboxes.
+`acme.example`, `@acme.example`, `https://acme.example/pricing` and `ana@acme.example` are all read as `acme.example`. A domain can be removed only once it has no mailboxes.
 
 ## What is checked
 
@@ -77,7 +77,7 @@ On a domain's page, or with `PATCH /v1/workspaces/{ws}/sending-domains/{domain}`
 | Limits on every mailbox | `mailbox_daily_limit`, `mailbox_min_gap_seconds` | Sets each mailbox's daily limit or minimum gap on the whole domain at once. |
 
 ```sh
-curl -X PATCH https://outflare.example.com/v1/workspaces/$WS/sending-domains/acme.com \
+curl -X PATCH https://outflare.example.com/v1/workspaces/$WS/sending-domains/acme.example \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" \
   -d '{"status": "paused", "daily_limit": 150}'
 ```

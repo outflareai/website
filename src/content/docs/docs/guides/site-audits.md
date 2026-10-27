@@ -27,7 +27,7 @@ Any site can be crawled lightly. Proving that you own a site lets you crawl it f
 
 Add any one of these, then ask Outflare to check (`POST .../verify`, or the `verify_seo_site` tool):
 
-- **A DNS record:** a TXT record on your domain (without `www.`) with the value `outflare-site-verification=` followed by your site's token.
+- **A DNS record:** a TXT record on your domain (without `www.`) with the value `outflare-site-verification=` followed by your site's token. The one-click button can [add it for you](/docs/guides/dns-records/).
 - **A meta tag** in the `<head>` of the start page: `<meta name="outflare-site-verification" content="your token">`.
 - **A file** at `/.well-known/outflare-site-verification.txt` holding the token.
 
@@ -65,6 +65,8 @@ Duplicates count only among pages meant to be indexed: a page marked `noindex`, 
 ## The fixes list
 
 Each audit's issues go on the workspace's **fixes list**: one list of work for everyone in the workspace and their agents, so nothing is tracked in two places. A site audit adds one fix per rule and URL template, such as "pages in /blog/* have no meta description", with how many pages are left.
+
+Other features add to the same list, such as [link opportunities](/docs/guides/backlinks/#link-opportunities-on-the-fixes-list) from your backlinks.
 
 - Take a fix, mark it in progress, done or ignored (when the issue is intended), and leave a note.
 - The next complete crawl checks a fix marked done. If the issue is gone, the crawl confirms it. If it is still there, or comes back later, the fix opens again.

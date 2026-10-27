@@ -9,8 +9,8 @@ sidebar:
 
 Connect your Stripe account and Outflare knows who pays you, how much and for what. Each customer becomes a person in your [customer records](/docs/guides/customer-records/), so the CRM, lifecycle email, missions and partners all read the same revenue. Outflare only reads: it never charges, refunds or changes anything in Stripe, and never touches money.
 
-1. In Stripe, open **Developers → API keys → Create restricted key**. Give it **Read** access to Customers, Charges, Events, Products, Prices and Subscriptions, and nothing else. It runs on your own Stripe account.
-2. [Connect](/docs/integrations/connectors/) Stripe on the Connectors page and paste the key. A test-mode key reads your test data, which is a good way to try it first.
+1. [Connect](/docs/integrations/connectors/) Stripe on the Connectors page and choose **Sign in with Stripe**. Approve read-only access on Stripe's page. It runs on your own Stripe account.
+2. Or use a key: in Stripe, open **Developers → API keys → Create restricted key**, give it **Read** access to Customers, Charges, Events, Products, Prices and Subscriptions, and nothing else, then paste it. A test-mode key reads your test data, which is a good way to try it first.
 
 The first sync reads everything you have in Stripe. After that, Outflare reads what changed every five minutes.
 

@@ -1,5 +1,108 @@
 [
 	{
+		"id": "google_ads",
+		"name": "Google Ads",
+		"category": "ads",
+		"summary": "Spend, clicks and conversions per campaign from your Google Ads accounts.",
+		"description": "Signs in with Google and reads every Google Ads account the sign-in can see, including accounts under a manager account. Google also asks for a developer token: create one in your own Google Ads manager account (Admin, API Center) and add it after signing in. Read-only: nothing changes in your accounts.",
+		"website": "https://ads.google.com",
+		"docs_url": "https://developers.google.com/google-ads/api/docs/start",
+		"auth_methods": [
+			"oauth2"
+		],
+		"capabilities": [
+			"ads.read"
+		],
+		"status": "available",
+		"pricing": "Free API; ad spend stays on your own account"
+	},
+	{
+		"id": "linkedin_ads",
+		"name": "LinkedIn Ads",
+		"category": "ads",
+		"summary": "Spend, impressions, clicks and conversions per campaign from your LinkedIn ad accounts.",
+		"description": "Signs in with LinkedIn and reads every ad account the member can see, with read-only access. Conversions are LinkedIn's website conversions as LinkedIn counts them.",
+		"website": "https://business.linkedin.com/marketing-solutions/ads",
+		"docs_url": "https://learn.microsoft.com/linkedin/marketing/integrations/ads-reporting/ads-reporting",
+		"auth_methods": [
+			"oauth2"
+		],
+		"capabilities": [
+			"ads.read"
+		],
+		"status": "available",
+		"pricing": "Free API; ad spend stays on your own account"
+	},
+	{
+		"id": "meta_ads",
+		"name": "Meta Ads",
+		"category": "ads",
+		"summary": "Spend, clicks and conversions per campaign from your Facebook and Instagram ad accounts.",
+		"description": "Reads every ad account a token can see, with read-only access. The simplest way: in your Meta Business Settings, Users, System users, create a system user, give it the ad accounts, and generate a token with the ads_read permission. Conversions are Meta's standard events (purchases, leads, registrations, trials, subscriptions).",
+		"website": "https://www.facebook.com/business/ads",
+		"docs_url": "https://developers.facebook.com/docs/marketing-api/insights",
+		"auth_methods": [
+			"api_key",
+			"oauth2"
+		],
+		"capabilities": [
+			"ads.read"
+		],
+		"status": "available",
+		"pricing": "Free API; ad spend stays on your own account"
+	},
+	{
+		"id": "microsoft_ads",
+		"name": "Microsoft Advertising",
+		"category": "ads",
+		"summary": "Spend, clicks and conversions per campaign from your Microsoft Advertising (Bing) accounts.",
+		"description": "Signs in with Microsoft and reads every Microsoft Advertising account the sign-in can see. Microsoft also asks for a developer token: get your own from the Microsoft Advertising developer portal (Account, Request token) and add it after signing in. Read-only.",
+		"website": "https://ads.microsoft.com",
+		"docs_url": "https://learn.microsoft.com/advertising/guides/get-started",
+		"auth_methods": [
+			"oauth2"
+		],
+		"capabilities": [
+			"ads.read"
+		],
+		"status": "available",
+		"pricing": "Free API; ad spend stays on your own account"
+	},
+	{
+		"id": "reddit_ads",
+		"name": "Reddit Ads",
+		"category": "ads",
+		"summary": "Spend, impressions and clicks per campaign from your Reddit ad accounts.",
+		"description": "Signs in with Reddit and reads every ad account of every business the account belongs to, with read-only access. Separate from organic Reddit, which posts and listens from your brand's own account.",
+		"website": "https://ads.reddit.com",
+		"docs_url": "https://ads-api.reddit.com/docs/v3/",
+		"auth_methods": [
+			"oauth2"
+		],
+		"capabilities": [
+			"ads.read"
+		],
+		"status": "available",
+		"pricing": "Free API; ad spend stays on your own account"
+	},
+	{
+		"id": "x_ads",
+		"name": "X Ads",
+		"category": "ads",
+		"summary": "Spend, impressions and clicks per campaign from your X ad accounts.",
+		"description": "Uses your own X developer app, once X has approved it for the Ads API (apply in the developer portal; approval can take a few weeks). Paste the app's API key and secret and the access token and secret of the account that runs your ads. Read-only.",
+		"website": "https://ads.x.com",
+		"docs_url": "https://developer.x.com/en/docs/x-ads-api",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"ads.read"
+		],
+		"status": "available",
+		"pricing": "Free API; ad spend stays on your own account"
+	},
+	{
 		"id": "amplitude",
 		"name": "Amplitude",
 		"category": "analytics",
@@ -46,7 +149,8 @@
 			"api_key"
 		],
 		"capabilities": [
-			"analytics.read"
+			"analytics.read",
+			"bot_logs.read"
 		],
 		"status": "available",
 		"pricing": "Free"
@@ -253,6 +357,7 @@
 		"website": "https://cal.com",
 		"docs_url": "https://cal.com/docs/api-reference/v2/bookings/get-all-bookings",
 		"auth_methods": [
+			"oauth2",
 			"api_key"
 		],
 		"capabilities": [
@@ -313,6 +418,62 @@
 		],
 		"status": "available",
 		"pricing": "Free"
+	},
+	{
+		"id": "github",
+		"name": "GitHub",
+		"category": "code",
+		"summary": "Know when your website's repository ships, so fixes are re-checked and experiments start on the real deploy.",
+		"description": "Reads your repositories' production deployments, or pushes to the default branch when a repository records no deployments. Outflare never pushes code, opens pull requests or changes settings through it.",
+		"website": "https://github.com",
+		"docs_url": "https://docs.github.com/en/rest/deployments/deployments",
+		"auth_methods": [
+			"oauth2",
+			"api_key"
+		],
+		"capabilities": [
+			"deploys.read"
+		],
+		"status": "available",
+		"pricing": "Works on every GitHub plan, including free",
+		"dark_logo": true
+	},
+	{
+		"id": "vercel",
+		"name": "Vercel",
+		"category": "code",
+		"summary": "Know when your website's Vercel project goes live, so fixes are re-checked and experiments start on the real deploy.",
+		"description": "Reads your projects' production deployments and the domains they serve. Outflare never deploys, promotes, rolls back or changes settings through it.",
+		"website": "https://vercel.com",
+		"docs_url": "https://vercel.com/docs/rest-api/reference/endpoints/deployments/list-deployments",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"deploys.read"
+		],
+		"status": "available",
+		"pricing": "Works on every Vercel plan, including Hobby",
+		"dark_logo": true
+	},
+	{
+		"id": "attio",
+		"name": "Attio",
+		"category": "crm",
+		"summary": "Bring your Attio CRM over: see every object, field and list it holds, then import it once.",
+		"description": "Reads your Attio workspace's objects (People, Companies, Deals and custom ones), their fields, lists and pipelines, and counts records, entries, notes and tasks, so you can see what moving over brings before anything is copied. Read-only: Outflare never changes anything in Attio.",
+		"website": "https://attio.com",
+		"docs_url": "https://docs.attio.com/rest-api/overview",
+		"auth_methods": [
+			"oauth2",
+			"api_key"
+		],
+		"capabilities": [
+			"import.crm"
+		],
+		"status": "available",
+		"pricing": "Works on every Attio plan, including Free",
+		"dark_logo": true
 	},
 	{
 		"id": "hubspot",
@@ -393,6 +554,25 @@
 		"pricing": "One credit per email found"
 	},
 	{
+		"id": "moltsets",
+		"name": "MoltSets",
+		"category": "data",
+		"summary": "Search B2B people and find valid work emails with your own MoltSets plan.",
+		"description": "Build lists from MoltSets people searches by title, seniority, industry, company size, country, company domain and keywords, and find work emails from a LinkedIn URL, an email, or a name with a company domain. Each email carries MoltSets' send-safety grade.",
+		"website": "https://moltsets.com",
+		"docs_url": "https://developer.moltsets.com/api-reference",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"data.search_people",
+			"data.enrich_person",
+			"data.find_email"
+		],
+		"status": "available",
+		"pricing": "Flat monthly plans with fair-use limits; a free tier of 1,000 tokens"
+	},
+	{
 		"id": "peopledatalabs",
 		"name": "People Data Labs",
 		"category": "data",
@@ -427,6 +607,76 @@
 		],
 		"status": "available",
 		"pricing": "One credit per email found"
+	},
+	{
+		"id": "cloudflare",
+		"name": "Cloudflare",
+		"category": "dns",
+		"summary": "Add the DNS records Outflare needs (site verification, sending and tracking domains) in one click.",
+		"description": "Outflare only adds records, each with the comment \"Added by Outflare\": it never changes or deletes one. With an API token, use the \"Edit zone DNS\" template, limited to the zones you want Outflare to write to.",
+		"website": "https://www.cloudflare.com",
+		"docs_url": "https://developers.cloudflare.com/api/resources/dns/subresources/records/",
+		"auth_methods": [
+			"oauth2",
+			"api_key"
+		],
+		"capabilities": [
+			"dns.write"
+		],
+		"status": "available",
+		"pricing": "Free"
+	},
+	{
+		"id": "amazon_ses",
+		"name": "Amazon SES",
+		"category": "email_sending",
+		"summary": "Send transactional and lifecycle email from your own AWS account, at about $0.10 per 1,000 emails.",
+		"description": "Outflare sends through your Amazon SES account with an IAM access key. It registers your domain with Easy DKIM and a custom MAIL FROM subdomain, and sets up a configuration set and an SNS topic so deliveries, bounces and complaints come back automatically. SES is for mail people asked for: never cold email.",
+		"website": "https://aws.amazon.com/ses/",
+		"docs_url": "https://docs.aws.amazon.com/ses/latest/dg/send-email-api.html",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"email.send"
+		],
+		"status": "available",
+		"pricing": "Pay AWS directly: about $0.10 per 1,000 emails"
+	},
+	{
+		"id": "postmark",
+		"name": "Postmark",
+		"category": "email_sending",
+		"summary": "Send transactional email through Postmark, known for fast, reliable delivery of receipts and password resets.",
+		"description": "Outflare sends through one of your Postmark servers and registers a webhook on it, so deliveries, bounces and spam complaints come back automatically. Add the account token too and Outflare also adds your sending domain with its DKIM and return-path records.",
+		"website": "https://postmarkapp.com",
+		"docs_url": "https://postmarkapp.com/developer/api/email-api",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"email.send"
+		],
+		"status": "available",
+		"pricing": "Pay Postmark directly; 100 test emails a month free"
+	},
+	{
+		"id": "resend",
+		"name": "Resend",
+		"category": "email_sending",
+		"summary": "Send transactional and lifecycle email through Resend, the developer-first email API.",
+		"description": "Outflare sends through your Resend account, adds your sending domain with its DKIM, SPF and MX records, and registers a signed webhook so deliveries, bounces and complaints come back automatically.",
+		"website": "https://resend.com",
+		"docs_url": "https://resend.com/docs/api-reference/emails/send-email",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"email.send"
+		],
+		"status": "available",
+		"pricing": "Pay Resend directly; 3,000 emails a month free",
+		"dark_logo": true
 	},
 	{
 		"id": "bouncer",
@@ -597,7 +847,8 @@
 			"api_key"
 		],
 		"capabilities": [
-			"plan"
+			"plan",
+			"llm.sample"
 		],
 		"status": "available",
 		"pricing": "Pay per token, billed by Claude"
@@ -614,7 +865,8 @@
 			"api_key"
 		],
 		"capabilities": [
-			"plan"
+			"plan",
+			"llm.sample"
 		],
 		"status": "available",
 		"pricing": "Pay per token, billed by Gemini"
@@ -631,7 +883,8 @@
 			"api_key"
 		],
 		"capabilities": [
-			"plan"
+			"plan",
+			"llm.sample"
 		],
 		"status": "available",
 		"pricing": "Pay per token, billed by Mistral"
@@ -648,10 +901,31 @@
 			"api_key"
 		],
 		"capabilities": [
-			"plan"
+			"plan",
+			"llm.sample"
 		],
 		"status": "available",
 		"pricing": "Pay per token, billed by OpenAI",
+		"dark_logo": true
+	},
+	{
+		"id": "openrouter",
+		"name": "OpenRouter",
+		"category": "model",
+		"summary": "Plan and run missions from a goal you type, with your own OpenRouter API key. Hundreds of models from many vendors (OpenAI, Google, Meta, xAI, Perplexity...) with one key; OpenRouter reports what each call cost.",
+		"description": "Outflare sends the model the goal, the project brief and a summary of the workspace (mailbox capacity, lead counts, campaigns, connectors) to plan, and the mission's progress and API answers while Outflare's agent runs it. Your key is encrypted, only ever sent to OpenRouter's own API, and never shown again, logged or given to the model. Usage is billed to your OpenRouter account; set a monthly limit under Settings → AI model.",
+		"website": "https://openrouter.ai/",
+		"docs_url": "https://openrouter.ai/docs/quickstart",
+		"auth_methods": [
+			"oauth2",
+			"api_key"
+		],
+		"capabilities": [
+			"plan",
+			"llm.sample"
+		],
+		"status": "available",
+		"pricing": "Pay per token, billed by OpenRouter",
 		"dark_logo": true
 	},
 	{
@@ -663,6 +937,7 @@
 		"website": "https://stripe.com",
 		"docs_url": "https://docs.stripe.com/api",
 		"auth_methods": [
+			"oauth2",
 			"api_key"
 		],
 		"capabilities": [
@@ -693,25 +968,46 @@
 		"id": "dataforseo",
 		"name": "DataForSEO",
 		"category": "seo",
-		"summary": "Keyword rankings, estimated search traffic, competitors and backlinks for any domain, paid per call.",
-		"description": "Uses DataForSEO Labs for rankings, traffic and competitors, and the Backlinks API for links (a separate DataForSEO subscription; without it the overview skips links). Every call's cost comes back from DataForSEO and is recorded in Outcomes; a monthly budget on the connection stops calls before they go over.",
+		"summary": "Keyword rankings, rank tracking, estimated search traffic, competitors and backlinks for any domain, paid per call.",
+		"description": "Uses DataForSEO Labs for rankings, traffic and competitors, the SERP API to track where your pages rank on Google, and the Backlinks API for links (a separate DataForSEO subscription; without it the overview skips links). Every call's cost comes back from DataForSEO and is recorded in Outcomes; a monthly budget on the connection stops calls before they go over.",
 		"website": "https://dataforseo.com",
 		"docs_url": "https://docs.dataforseo.com/v3/",
 		"auth_methods": [
 			"api_key"
 		],
 		"capabilities": [
-			"seo.read"
+			"seo.read",
+			"serp.read"
 		],
 		"status": "available",
 		"pricing": "Pay per call, about $0.01 to $0.05 a report"
+	},
+	{
+		"id": "geonode",
+		"name": "Geonode",
+		"category": "seo",
+		"summary": "Searches the web, finds your brands' social links, reads public X follower counts, and reads your own site's pages when a firewall blocks OutflareBot.",
+		"description": "Runs web searches for finding companies and pages, through Geonode's Search API. Reads each brand's homepage to suggest its social profiles and app store listings, and the public X profile in each brand's links once a day for its follower count. For sites you have proved you own, and only for pages robots.txt allows: when a page answers with a firewall block or a challenge, OutflareBot reads it through Geonode's Scraper API instead. Searches and pages cost Geonode tokens on your account.",
+		"website": "https://geonode.com",
+		"docs_url": "https://docs.geonode.com/docs/scraper-api",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"crawl.fetch",
+			"web.search",
+			"hooks.receive"
+		],
+		"status": "available",
+		"pricing": "Tokens per search and per page, on your Geonode plan",
+		"dark_logo": true
 	},
 	{
 		"id": "emailbison",
 		"name": "EmailBison",
 		"category": "sequencer",
 		"summary": "Let Outflare decide which sender emails each EmailBison campaign uses.",
-		"description": "Outflare reads your sender emails and campaigns every few minutes, adds and removes sender emails on campaigns as mailbox allocation decides, and accepts changes you make in EmailBison as manual ones.",
+		"description": "Outflare reads your sender emails and campaigns every few minutes, adds and removes sender emails on campaigns as mailbox allocation decides, and accepts changes you make in EmailBison as manual ones. Replies your campaigns get come into the Outflare inbox, labelled, and you can answer them there.",
 		"website": "https://emailbison.com",
 		"docs_url": "https://docs.emailbison.com",
 		"auth_methods": [
@@ -719,7 +1015,10 @@
 		],
 		"capabilities": [
 			"observe.mailboxes",
-			"control.mailboxes"
+			"control.mailboxes",
+			"control.warmup",
+			"replies.read",
+			"blocklist.sync"
 		],
 		"status": "available",
 		"dark_logo": true
@@ -740,7 +1039,9 @@
 			"import.leads",
 			"import.mailboxes",
 			"observe.mailboxes",
-			"control.mailboxes"
+			"control.mailboxes",
+			"control.warmup",
+			"blocklist.sync"
 		],
 		"status": "available",
 		"pricing": "Included in Instantly's Hypergrowth plan and above"
@@ -761,9 +1062,81 @@
 			"import.leads",
 			"import.mailboxes",
 			"observe.mailboxes",
-			"control.mailboxes"
+			"control.mailboxes",
+			"control.warmup",
+			"blocklist.sync"
 		],
 		"status": "available"
+	},
+	{
+		"id": "linkedin",
+		"name": "LinkedIn",
+		"category": "social",
+		"summary": "Track followers and posts of your company pages and profile, and post from them.",
+		"description": "Sign in with your own LinkedIn account: Outflare reaches your profile and every company page you administer. LinkedIn's API is free; on a self-hosted server, register a LinkedIn app with the Community Management API and set CONNECTOR_LINKEDIN_CLIENT_ID and CONNECTOR_LINKEDIN_CLIENT_SECRET.",
+		"website": "https://www.linkedin.com",
+		"docs_url": "https://learn.microsoft.com/en-us/linkedin/marketing/community-management/community-management-overview",
+		"auth_methods": [
+			"oauth2"
+		],
+		"capabilities": [
+			"social.metrics"
+		],
+		"status": "available",
+		"pricing": "Free"
+	},
+	{
+		"id": "reddit",
+		"name": "Reddit",
+		"category": "social",
+		"summary": "Find threads where your brand can help, and post approved replies from your brand's own account.",
+		"description": "Uses your own Reddit app, so searches and posts run on your Reddit API access. Make a web app at reddit.com/prefs/apps with this server's redirect URI, paste its client id and secret, then sign in with the brand's Reddit account to post replies a person approved. Every reply says who wrote it.",
+		"website": "https://www.reddit.com",
+		"docs_url": "https://www.reddit.com/dev/api/",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"social.search",
+			"social.reply"
+		],
+		"status": "available",
+		"pricing": "Reddit's Data API terms apply to your app"
+	},
+	{
+		"id": "x",
+		"name": "X",
+		"category": "social",
+		"summary": "Track your brand's X followers and posts, and post from its own account.",
+		"description": "Uses your own X developer app, so X bills your account for API use (pay per use). Make an app in the X developer console with OAuth 2.0 turned on (type: web app) and this server's redirect URI, paste its OAuth 2.0 client id and secret, then sign in with the brand's X account.",
+		"website": "https://x.com",
+		"docs_url": "https://docs.x.com/x-api/introduction",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"social.metrics"
+		],
+		"status": "available",
+		"pricing": "X bills your developer account per use",
+		"dark_logo": true
+	},
+	{
+		"id": "google_tag_manager",
+		"name": "Google Tag Manager",
+		"category": "tags",
+		"summary": "Add Outflare's website script to your site in one click, through your own Tag Manager container.",
+		"description": "Outflare adds one Custom HTML tag named \"Outflare\" that fires on all pages, in a Tag Manager workspace of its own, so nobody else's unpublished changes go live with it. It never edits or removes your other tags.",
+		"website": "https://tagmanager.google.com",
+		"docs_url": "https://developers.google.com/tag-platform/tag-manager/api/v2",
+		"auth_methods": [
+			"oauth2"
+		],
+		"capabilities": [
+			"tags.install"
+		],
+		"status": "available",
+		"pricing": "Free"
 	},
 	{
 		"id": "hotjar",
@@ -810,6 +1183,7 @@
 		"summary": "Meetings booked through SavvyCal links.",
 		"website": "https://savvycal.com",
 		"auth_methods": [
+			"oauth2",
 			"api_key"
 		],
 		"capabilities": [
@@ -824,26 +1198,13 @@
 		"summary": "Meetings booked through Zoom Scheduler.",
 		"website": "https://www.zoom.com/en/products/scheduler/",
 		"auth_methods": [
+			"oauth2",
 			"api_key"
 		],
 		"capabilities": [
 			"meetings.sync"
 		],
 		"status": "planned"
-	},
-	{
-		"id": "attio",
-		"name": "Attio",
-		"category": "crm",
-		"summary": "Sync replies and interested leads to Attio.",
-		"website": "https://attio.com",
-		"auth_methods": [
-			"oauth2",
-			"api_key"
-		],
-		"capabilities": [],
-		"status": "planned",
-		"dark_logo": true
 	},
 	{
 		"id": "pipedrive",
@@ -1042,19 +1403,6 @@
 		"status": "planned"
 	},
 	{
-		"id": "cloudflare",
-		"name": "Cloudflare",
-		"category": "dns",
-		"summary": "Set SPF, DKIM, DMARC and tracking records automatically.",
-		"website": "https://www.cloudflare.com",
-		"auth_methods": [
-			"oauth2",
-			"api_key"
-		],
-		"capabilities": [],
-		"status": "planned"
-	},
-	{
 		"id": "godaddy",
 		"name": "GoDaddy",
 		"category": "dns",
@@ -1072,6 +1420,30 @@
 		"category": "dns",
 		"summary": "Set SPF, DKIM, DMARC and tracking records automatically.",
 		"website": "https://www.namecheap.com",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [],
+		"status": "planned"
+	},
+	{
+		"id": "mailgun",
+		"name": "Mailgun",
+		"category": "email_sending",
+		"summary": "Send transactional and lifecycle email through Mailgun.",
+		"website": "https://www.mailgun.com",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [],
+		"status": "planned"
+	},
+	{
+		"id": "sendgrid",
+		"name": "SendGrid",
+		"category": "email_sending",
+		"summary": "Send transactional and lifecycle email through Twilio SendGrid.",
+		"website": "https://sendgrid.com",
 		"auth_methods": [
 			"api_key"
 		],

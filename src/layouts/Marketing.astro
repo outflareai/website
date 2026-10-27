@@ -3,7 +3,9 @@ import '../styles/marketing.css';
 import { app, repo, site } from '../data/project';
 import Analytics from '../components/Analytics.astro';
 import Logo from '../components/Logo.astro';
+import GitHubButton from '../components/GitHubButton.astro';
 import SignedIn from '../components/SignedIn.astro';
+import social from '../data/social.json';
 
 interface Props {
 	title: string;
@@ -12,9 +14,21 @@ interface Props {
 const { title, description } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const ogImage = '/brand/social/outflare-social-1200x630.png';
+// Tells search engines which profiles belong to Outflare (src/data/social.json).
+const organization = {
+	'@context': 'https://schema.org',
+	'@type': 'Organization',
+	name: 'Outflare',
+	url: site.url,
+	logo: `${site.url}/brand/icons/icon-512.png`,
+	email: site.email,
+	sameAs: social.profiles.map((p) => p.url),
+};
 
 const nav = [
 	{ href: '/integrations/', label: 'Integrations' },
+	{ href: '/playbooks/', label: 'Playbooks' },
+	{ href: '/pricing/', label: 'Pricing' },
 	{ href: '/docs/', label: 'Docs' },
 	{ href: '/docs/api/', label: 'API' },
 	{ href: '/docs/agents/mcp/', label: 'MCP' },
@@ -28,11 +42,14 @@ const footer = [
 			['Sign in', app.signIn],
 			['Quickstart', '/docs/quickstart/'],
 			['Integrations', '/integrations/'],
+			['Playbooks', '/playbooks/'],
+			['Pricing', '/pricing/'],
 			['Missions', '/docs/agents/missions/'],
 			['Website analytics', '/docs/integrations/analytics/'],
 			['SEO', '/docs/integrations/seo/'],
 			['Email campaigns', '/docs/guides/sequences/'],
 			['Roadmap', '/docs/project/roadmap/'],
+			['Changelog', '/changelog/'],
 		],
 	},
 	{
@@ -52,6 +69,7 @@ const footer = [
 			['GitHub', repo.url],
 			['Contact', `mailto:${site.email}`],
 			['Issues', repo.issues],
+			['Social', '/social/'],
 			['Brand', '/brand/'],
 			['Licensing', '/docs/project/license/'],
 			['Contributing', '/docs/project/contributing/'],
@@ -93,6 +111,8 @@ const footer = [
 			// Dark by default, like the app and the docs. Shares the docs' saved choice.
 			try { document.documentElement.dataset.theme = localStorage.getItem('starlight-theme') === 'light' ? 'light' : 'dark'; } catch {}
 		</script>
+		<script type="application/ld+json" set:html={JSON.stringify(organization)} />
+		<slot name="head" />
 		<SignedIn />
 		<Analytics />
 	</head>
@@ -106,7 +126,7 @@ const footer = [
 					</a>
 					<span class="badge badge-muted hidden sm:inline-flex">alpha</span>
 				</div>
-				<nav class="hidden items-center gap-1 md:flex" aria-label="Main">
+				<nav class="hidden items-center gap-1 lg:flex" aria-label="Main">
 					{nav.map((l) => <a href={l.href} class="rounded-md px-2.5 py-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground">{l.label}</a>)}
 				</nav>
 				<div class="ml-auto flex items-center gap-2">
@@ -114,18 +134,15 @@ const footer = [
 						<svg class="hidden dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
 						<svg class="dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"></path></svg>
 					</button>
-					<a href={repo.url} class="btn btn-ghost btn-sm hidden lg:inline-flex">
-						<svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
-						GitHub
-					</a>
+					<GitHubButton class="btn btn-ghost btn-sm hidden xl:inline-flex" />
 					<a href={app.signIn} data-signed-out class="btn btn-outline btn-sm hidden sm:inline-flex">Sign in</a>
 					<a href={app.signUp} data-signed-out class="btn btn-primary btn-sm">Sign up</a>
 					<a href={app.url} data-signed-in data-track="dashboard_click" class="btn btn-primary btn-sm">Dashboard</a>
 				</div>
 			</div>
-			<nav class="flex gap-1 overflow-x-auto border-t border-border/60 px-2 md:hidden" aria-label="Main">
+			<nav class="flex gap-1 overflow-x-auto border-t border-border/60 px-2 lg:hidden" aria-label="Main">
 				{nav.map((l) => <a href={l.href} class="touch inline-flex shrink-0 items-center rounded-md px-2.5 text-sm text-muted-foreground hover:text-foreground">{l.label}</a>)}
-				<a href={repo.url} class="touch inline-flex shrink-0 items-center rounded-md px-2.5 text-sm text-muted-foreground hover:text-foreground">GitHub</a>
+				<GitHubButton compact class="touch inline-flex shrink-0 items-center gap-1.5 rounded-md px-2.5 text-sm text-muted-foreground hover:text-foreground" />
 				<a href={app.signIn} data-signed-out class="touch inline-flex shrink-0 items-center rounded-md px-2.5 text-sm font-medium text-foreground sm:hidden">Sign in</a>
 			</nav>
 		</header>

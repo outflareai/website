@@ -15,9 +15,9 @@ Each brand has its own website (its point of truth), its own context for agents,
 
 ## Add a brand
 
-Open **Settings → Brands → Add a brand** and give its name, website and where it ships (web, iOS, Android, TV and so on). Add its other domains on its page, such as an app or help site. A workspace without brands works exactly as before. Anyone but a viewer can add a brand, and so can an API token or connected AI app that can make changes (the `context.manage` scope); only the workspace's own name and URL need `workspace.manage`.
+Open **Company → Brands → Add a brand** and give its name, website and where it ships (web, iOS, Android, TV and so on). Add its other domains on its page, such as an app or help site. A workspace without brands works exactly as before. Anyone but a viewer can add a brand, and so can an API token or connected AI app that can make changes (the `context.manage` scope); only the workspace's own name and URL need `workspace.manage`.
 
-Also on its page, under **Links**, add everywhere else the brand lives: its App Store and Google Play listings, TV app stores, the Chrome Web Store, Steam, socials and docs. Paste the address and Outflare works out what it is (apps.apple.com is the App Store); add a label such as "Fire TV" where it helps. Agents read the links with the brand's context.
+Also on its page, under **Links**, add everywhere else the brand lives: its App Store and Google Play listings, TV app stores, the Chrome Web Store, Steam, socials and docs. Paste the address and Outflare works out what it is (apps.apple.com is the App Store); add a label such as "Fire TV" where it helps. Agents read the links with the brand's context. With your own Geonode account connected, Outflare also reads the brand's website and suggests the socials and listings it links to, for you to add or dismiss ([Finding a brand's links](/docs/guides/social/#finding-a-brands-links)).
 
 The Brands page shows brands as cards or as a table you can sort; it remembers which you picked.
 
@@ -64,7 +64,7 @@ Each site in your analytics tools, such as a GA4 property, a Search Console site
 
 ## Keep brands from emailing the same person
 
-Leads and the suppression list are shared, so one person is one lead, and an unsubscribe from any brand stops every brand. You can go further and keep two brands from cold emailing the same person close together. In **Settings → Brands**, turn on **Contacting the same person** and choose how many days to wait (1 to 365).
+Leads and the suppression list are shared, so one person is one lead, and an unsubscribe from any brand stops every brand. You can go further and keep two brands from cold emailing the same person close together. In **Company → Brands**, turn on **Contacting the same person** and choose how many days to wait (1 to 365).
 
 With the rule on, a brand's sequence skips anyone another brand emailed within that many days. Their enrollment shows as blocked with the reason `other_brand:geonode`, naming the brand that got there first. The rule checks only first emails, so follow-ups already under way carry on, and sequences shared by every brand don't count. To check before you enroll, call `POST /recipients/check` with `brand`.
 
@@ -93,6 +93,7 @@ Changing someone's brands is in the audit log as `member.brands_changed`.
 | --- | --- | --- |
 | List brands | `GET /v1/workspaces/{ws}/brands` | `list_brands` |
 | Add or edit one, including its links | `POST /brands`, `PATCH /brands/{brand}` | `create_brand`, `update_brand` |
+| Links found on its website | `POST /brands/{brand}/links/discover`, `GET /brands/{brand}/link-suggestions` | `find_brand_links`, `list_brand_link_suggestions`, `add_brand_link`, `dismiss_brand_link` |
 | A brand's own context | `GET`/`PATCH /brands/{brand}/context` | `get_brand_context`, `update_brand_context` |
 | Company and brand context together | `GET /context?brand=repocket` | `get_context` with `brand` |
 | Move records in or out | `POST /brands/{brand}/add`, `/remove` | `add_to_brand`, `remove_from_brand` |

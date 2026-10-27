@@ -44,7 +44,7 @@ In the web app, click Add mailboxes on the connection and paste one address per 
 ```sh
 curl -X POST "$OUTFLARE_URL/v1/workspaces/$WS/oauth-connections/$CONN/mailboxes" \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" \
-  -d '{"mailboxes":[{"email":"ana@acme.com","display_name":"Ana Smith"},{"email":"bo@acme.com"}],"pool":"Warm"}'
+  -d '{"mailboxes":[{"email":"ana@acme.example","display_name":"Ana Smith"},{"email":"bo@acme.example"}],"pool":"Warm"}'
 ```
 
 A mailbox that already exists is switched to the connection. If a token cannot be had, for example because delegation does not cover that domain, the mailbox shows `error` with the provider's reason, such as `unauthorized_client`.
