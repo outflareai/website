@@ -75,6 +75,7 @@ export default defineConfig({
 					items: [
 						{ label: 'Introduction', link: '/docs/' },
 						{ label: 'Quickstart', link: '/docs/quickstart/' },
+						{ label: 'Open source and Cloud', link: '/docs/project/open-source-and-cloud/' },
 						{ label: 'Status and roadmap', link: '/docs/project/roadmap/' },
 					],
 				},
@@ -99,6 +100,7 @@ export default defineConfig({
 					label: 'Project',
 					items: [
 						{ label: 'Status and roadmap', link: '/docs/project/roadmap/' },
+						{ label: 'Open source and Cloud', link: '/docs/project/open-source-and-cloud/' },
 						{ label: 'Open source and licensing', link: '/docs/project/license/' },
 						{ label: 'Contributing', link: '/docs/project/contributing/' },
 						{ label: 'Security', link: '/docs/project/security/' },
