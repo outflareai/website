@@ -17,7 +17,7 @@ Each brand has its own website (its point of truth), its own context for agents,
 
 Open **Settings → Brands → Add a brand** and give its name, website and where it ships (web, iOS, Android, TV and so on). Add its other domains on its page, such as an app or help site. A workspace without brands works exactly as before. Anyone but a viewer can add a brand, and so can an API token or connected AI app that can make changes (the `context.manage` scope); only the workspace's own name and URL need `workspace.manage`.
 
-Also on its page, under **Links**, add everywhere else the brand lives: its App Store and Google Play listings, TV app stores, the Chrome Web Store, Steam, socials and docs. Paste the address and Outflare works out what it is (apps.apple.com is the App Store); add a label such as "Fire TV" where it helps. Agents read the links with the brand's context.
+Also on its page, under **Links**, add everywhere else the brand lives: its App Store and Google Play listings, TV app stores, the Chrome Web Store, Steam, socials and docs. Paste the address and Outflare works out what it is (apps.apple.com is the App Store); add a label such as "Fire TV" where it helps. Agents read the links with the brand's context. With your own Geonode account connected, Outflare also reads the brand's website and suggests the socials and listings it links to, for you to add or dismiss ([Finding a brand's links](/docs/guides/social/#finding-a-brands-links)).
 
 The Brands page shows brands as cards or as a table you can sort; it remembers which you picked.
 
@@ -93,6 +93,7 @@ Changing someone's brands is in the audit log as `member.brands_changed`.
 | --- | --- | --- |
 | List brands | `GET /v1/workspaces/{ws}/brands` | `list_brands` |
 | Add or edit one, including its links | `POST /brands`, `PATCH /brands/{brand}` | `create_brand`, `update_brand` |
+| Links found on its website | `POST /brands/{brand}/links/discover`, `GET /brands/{brand}/link-suggestions` | `find_brand_links`, `list_brand_link_suggestions`, `add_brand_link`, `dismiss_brand_link` |
 | A brand's own context | `GET`/`PATCH /brands/{brand}/context` | `get_brand_context`, `update_brand_context` |
 | Company and brand context together | `GET /context?brand=repocket` | `get_context` with `brand` |
 | Move records in or out | `POST /brands/{brand}/add`, `/remove` | `add_to_brand`, `remove_from_brand` |
