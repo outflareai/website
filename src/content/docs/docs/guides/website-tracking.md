@@ -9,6 +9,8 @@ sidebar:
 
 Website tracking records each visit to your sites as an event in your [customer records](/docs/guides/customer-records/). It keeps what the visitor arrived with, exactly as it came: UTM tags, ad click ids, the referrer and any referral or partner code. Outflare works out channels and attribution from these on the server, never in the browser. Visitors stay anonymous until your own product says who they are.
 
+[Website visitors](/docs/guides/website-visitors/) shows which known companies and people came, and who is ready to talk.
+
 ## Set it up
 
 The quickest way is your brand's [setup checklist](/docs/guides/brand-setup/): one click through your own Google Tag Manager, a message for your developer, or a prompt for your AI coding tool. By hand:
