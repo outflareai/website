@@ -31,6 +31,16 @@ Two promises come with it:
 
 Today everything these docs describe runs in both. When a Cloud-only feature ships, it gets its own page here and joins this table.
 
+## Coming to Cloud
+
+These are on the way, and run only in Outflare Cloud:
+
+- **Autopilots:** agents that keep working toward a target you set.
+- **Enterprise controls:** single sign-on, SCIM, audit log export and approvals across teams.
+- **Heavy work at scale:** AI visibility across many models, large site crawls and session replay.
+
+Self-hosted and Cloud are both free for now; see [Pricing](/pricing/).
+
 ## How these docs mark Cloud-only features
 
 A page for a feature that runs only in Outflare Cloud:
