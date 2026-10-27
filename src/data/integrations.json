@@ -393,6 +393,24 @@
 		"pricing": "One credit per email found"
 	},
 	{
+		"id": "moltsets",
+		"name": "MoltSets",
+		"category": "data",
+		"summary": "Search B2B people and find verified work emails from LinkedIn profiles with your own MoltSets plan.",
+		"description": "Build lists from MoltSets people searches by title, seniority, industry, company size, country and company domain, and fill in verified work emails for leads with a LinkedIn URL. Each email comes with MoltSets' risk score.",
+		"website": "https://moltsets.com",
+		"docs_url": "https://developer.moltsets.com/api-reference",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"data.search_people",
+			"data.enrich_person"
+		],
+		"status": "available",
+		"pricing": "Flat monthly plan; tokens are charged only when a lookup finds data"
+	},
+	{
 		"id": "peopledatalabs",
 		"name": "People Data Labs",
 		"category": "data",
