@@ -21,7 +21,9 @@ By default, unsubscribe and click links point at your instance's `PUBLIC_URL`. A
 2. At your DNS host, add a `CNAME` record from that subdomain to the target shown (your instance's host), or use the one-click button to [approve it at your DNS host or add it through Cloudflare](/docs/guides/dns-records/).
 3. Click **Check now**. Once the record is found the domain shows **In use**, and new emails use it.
 
-A tracking domain serves only those links (click, open and unsubscribe). The rest of Outflare, sign-in included, isn't available on it. If you self-host, give the tracking domain its own HTTPS certificate on your proxy, as you did for `PUBLIC_URL`.
+On Outflare Cloud, point the `CNAME` at `domains.outflare.ai` (the target shown). You don't need a Cloudflare account or a certificate of your own: once the record is found, Outflare gets the domain's HTTPS certificate for you. The domain shows **Setting up HTTPS** for a few minutes, and new emails switch to it as soon as the certificate is ready. Until then they keep using Outflare's own address, so no link goes out that a browser would warn about. If the certificate can't be issued (for example, a `CAA` record on your domain doesn't allow it), the domain shows **HTTPS failed** with the reason; fix it and click **Check now**. The tracking domain's `https_status` in the API says the same: `pending`, `active` or `failed`.
+
+A tracking domain serves only those links (click, open and unsubscribe). The rest of Outflare, sign-in included, isn't available on it. If you self-host, give the tracking domain its own HTTPS certificate on your proxy, as you did for `PUBLIC_URL`; `https_status` is then `null`.
 
 DNS changes can take up to an hour to show. If a verified domain later stops pointing at your instance, it's marked **Not pointing here** and emails go back to `PUBLIC_URL` until you fix it.
 
