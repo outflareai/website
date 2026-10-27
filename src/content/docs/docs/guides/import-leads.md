@@ -70,7 +70,7 @@ The suppression list holds addresses and whole domains that must never be emaile
 
 - **Add** entries under **Suppression** (paste or upload one per line) or with `POST /suppressions` and `{"values": ["bob@acme.com", "competitor.com"], "reason": "do_not_contact"}`. Domains are also accepted as `@acme.com` or a URL. Reasons are `manual`, `do_not_contact`, `unsubscribed`, `bounced` and `complained`. Up to 100,000 values per request.
 - **Remove** an entry only with the `suppressions.manage` scope, which owners and admins have and operators do not, because removing one can mean emailing someone who opted out. Removals are in the audit log.
-- Suppressed leads still import and are flagged, so your data stays complete, but they are never emailed. Every send goes through the [policy check](/docs/concepts/policy-check/), and you can run the same recipient check yourself before enrolling anyone with `POST /recipients/check`.
+- Suppressed leads still import and are flagged, so your data stays complete, but they are never emailed. An unsubscribe also withdraws the person's consent to all marketing email ([how unsubscribes work](/docs/guides/customer-records/#unsubscribes)). Every send goes through the [policy check](/docs/concepts/policy-check/), and you can run the same recipient check yourself before enrolling anyone with `POST /recipients/check`.
 
 ### Erasure requests
 
