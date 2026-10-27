@@ -2,12 +2,100 @@
 	"_comment": "Outflare's official profiles: the one list the /social page, the footer, the short links (outflare.ai/<short>, written to _redirects at build time) and the Organization sameAs all read. Add a profile only once it is claimed.",
 	"profiles": [
 		{
+			"id": "x",
+			"name": "X",
+			"handle": "@outflareai",
+			"url": "https://x.com/outflareai",
+			"short": "x",
+			"about": "News, launches and what shipped this week."
+		},
+		{
+			"id": "bluesky",
+			"name": "Bluesky",
+			"handle": "@outflare.ai",
+			"url": "https://bsky.app/profile/outflare.ai",
+			"short": "bluesky",
+			"about": "The same news on Bluesky, verified by our domain."
+		},
+		{
+			"id": "linkedin",
+			"name": "LinkedIn",
+			"handle": "Outflare",
+			"url": "https://www.linkedin.com/company/outflare",
+			"short": "linkedin",
+			"about": "Company news and what we’re building."
+		},
+		{
+			"id": "youtube",
+			"name": "YouTube",
+			"handle": "@outflareai",
+			"url": "https://www.youtube.com/@outflareai",
+			"short": "youtube",
+			"about": "Demos, walkthroughs and launch videos."
+		},
+		{
 			"id": "github",
 			"name": "GitHub",
 			"handle": "outflareai",
 			"url": "https://github.com/outflareai",
 			"short": "github",
 			"about": "The open-source code, issues and roadmap."
+		},
+		{
+			"id": "instagram",
+			"name": "Instagram",
+			"handle": "@outflareai",
+			"url": "https://www.instagram.com/outflareai",
+			"short": "instagram",
+			"about": "Short clips and launch moments."
+		},
+		{
+			"id": "threads",
+			"name": "Threads",
+			"handle": "@outflareai",
+			"url": "https://www.threads.com/@outflareai",
+			"short": "threads",
+			"about": "Updates and conversation."
+		},
+		{
+			"id": "tiktok",
+			"name": "TikTok",
+			"handle": "@outflareai",
+			"url": "https://www.tiktok.com/@outflareai",
+			"short": "tiktok",
+			"about": "Short demos of Outflare at work."
+		},
+		{
+			"id": "facebook",
+			"name": "Facebook",
+			"handle": "outflareai",
+			"url": "https://www.facebook.com/outflareai",
+			"short": "facebook",
+			"about": "News and launches."
+		},
+		{
+			"id": "mastodon",
+			"name": "Mastodon",
+			"handle": "@outflare@mastodon.social",
+			"url": "https://mastodon.social/@outflare",
+			"short": "mastodon",
+			"about": "Updates for the fediverse."
+		},
+		{
+			"id": "devto",
+			"name": "DEV",
+			"handle": "outflare",
+			"url": "https://dev.to/outflare",
+			"short": "devto",
+			"about": "Technical write-ups and guides."
+		},
+		{
+			"id": "docker",
+			"name": "Docker Hub",
+			"handle": "outflareai",
+			"url": "https://hub.docker.com/u/outflareai",
+			"short": "docker",
+			"about": "Our name on Docker Hub. The self-hosted image is published on GitHub."
 		},
 		{
 			"id": "npm",
