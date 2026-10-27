@@ -2,7 +2,7 @@
 	"version": "2026.10.27",
 	"date": "2026-10-27",
 	"status": "in-progress",
-	"updated": "2026-10-27T20:49:58Z",
+	"updated": "2026-10-27T21:00:07Z",
 	"items": [
 		{
 			"kind": "fix",
@@ -696,7 +696,28 @@
 			"edition": "open-source",
 			"text": "Indexability report: every page from the crawl, its sitemaps, Search Console and your SEO tool in one list, with whether it can be indexed and whether Google indexed it. Where the sources disagree it says which to trust, flags pages Google skipped, sitemap mistakes and orphans with how to fix each, and tracks it day by day.",
 			"at": "2026-10-27T20:49:58Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "People by name on the Visitors page: connect your own RB2B, Vector or Warmly, turn it on and accept the notice, then paste the webhook address into the tool. New people are added to your CRM tagged with the tool and held for review: hidden from the people list and never emailed until someone approves them.",
+			"at": "2026-10-27T21:00:07Z"
+		},
+		{
+			"kind": "launch",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Replies move deals: a reply rule can open or move a deal in Outflare's own CRM when a reply gets a label, such as \"interested\" to Qualified and \"meeting booked\" to Meeting. Deals only move forward, never out of won or lost, and never over a stage a person set.",
+			"at": "2026-10-27T21:00:07Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Feature flags: turn something on for the visitors you pick, or split them between versions of a page to see which works better. Each visitor keeps their version, your website and servers agree on it, and pages don't flicker. Find them under Analytics → Feature flags.",
+			"at": "2026-10-27T21:00:07Z"
 		}
 	],
-	"through": "dceb0ce+2f34203"
+	"through": "e1ec7ec+781ef72"
 }
