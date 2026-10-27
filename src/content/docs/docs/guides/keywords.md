@@ -5,7 +5,7 @@ sidebar:
   order: 14
 ---
 
-<span class="pill shipped">Shipped</span> Search Console by page and query, keyword targets, cannibalisation, indexing and sitemaps, in the app, through the API and for agents.
+<span class="pill shipped">Shipped</span> Search Console by page and query, keyword targets, internal links, cannibalisation, indexing and sitemaps, in the app, through the API and for agents.
 
 The **Keywords** page in the SEO module shows what Google shows each page of your site for and how often people click, for up to 16 months, with how Google indexed each page and the sitemaps it read. It works for the sites you [audit](/docs/guides/site-audits/), from your own [Google Search Console](/docs/integrations/analytics/) sign-in. Outflare only reads, and opening the page never calls Google: the sync stores the numbers every six hours.
 
@@ -22,6 +22,7 @@ Your site's numbers come from the Search Console property that covers it: a doma
 - **Pages:** each page's clicks, impressions, click-through rate and average position over the last 28 days Search Console has sent (it runs two or three days behind). Open a page to see the queries Google shows it for.
 - **Queries:** the same by query. Open a query to see which of your pages Google shows for it. Two pages sharing one query's impressions is often a sign they compete.
 - **Targets:** the keyword each page should rank for (see below).
+- **Internal links:** pages about a target keyword that don't link to its page yet (see below).
 - **Cannibalisation:** searches where Google shows more than one of your pages and splits the clicks (see below).
 - **Indexing:** what Google's URL Inspection says about your pages: indexed or not, Google's reason (for example "Crawled - currently not indexed"), the canonical Google chose when it differs from the page's own, and when Google last crawled it. Each sync inspects up to 100 pages, starting with the pages OutflareBot crawled and the pages Google shows, and checks each again after a week, within Google's daily limit. When a page's verdict changes, you see what it was before.
 - **Sitemaps:** each sitemap you submitted in Search Console, when Google last read it, its errors and warnings, and how many of its URLs are indexed.
@@ -33,6 +34,10 @@ Give each page the search it should rank for. Set it by hand, or accept the keyw
 Each target is checked against your latest crawl: is every word of the keyword in the page's title, its H1 and its meta description? Whatever is missing goes on the [fixes list](/docs/guides/site-audits/) as a keyword fix for that page, with a prompt you can hand to a coding agent. The check runs again whenever you change a target and after every crawl, so a fix you made is confirmed by the next crawl, and one that comes back opens again. Each target also shows the clicks, impressions and average position its keyword brought the page.
 
 Targets work without Search Console. Suggestions and the numbers need it.
+
+## Internal links worth adding
+
+For every page with a target keyword, **Internal links** lists up to five other pages of your site about the same keyword that don't link to it yet: pages Google shows for that search, or whose title or H1 has it. The pages with the most links of their own come first, since their links pass on the most. Add a link from each, with the keyword or a close variant as the link text. Each target page is on the fixes list, and the next crawl that finds the links marks it done.
 
 ## Pages that compete for one search
 
@@ -56,8 +61,9 @@ curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/workspaces/$W
 curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/workspaces/$WS/seo-sites/$SITE/targets"
 curl -X PUT -H "Authorization: Bearer $TOKEN" -d '{"url": "https://www.example.com/pricing", "keyword": "proxy pricing"}' "https://app.outflare.ai/v1/workspaces/$WS/seo-sites/$SITE/targets"
 curl -X POST -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/workspaces/$WS/seo-sites/$SITE/targets/accept"
-# Searches your pages compete for
+# Internal links worth adding, and searches your pages compete for
+curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/workspaces/$WS/seo-sites/$SITE/internal-links"
 curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/workspaces/$WS/seo-sites/$SITE/cannibalisation"
 ```
 
-Each answer has `source`, the property the numbers come from, or `null` when no Search Console property covers the site. Reading needs the `seo.read` scope, and setting targets `seo.manage`. Agents use the MCP tools `get_site_search`, `get_site_search_history`, `get_site_indexing`, `get_site_sitemaps`, `list_page_targets`, `set_page_target`, `accept_page_targets` and `get_site_cannibalisation`, for example: "Which pages get many impressions but few clicks, and what would you change on them?" or "Accept the suggested target keywords and fix the pages whose titles miss them."
+Each answer has `source`, the property the numbers come from, or `null` when no Search Console property covers the site. Reading needs the `seo.read` scope, and setting targets `seo.manage`. Agents use the MCP tools `get_site_search`, `get_site_search_history`, `get_site_indexing`, `get_site_sitemaps`, `list_page_targets`, `set_page_target`, `accept_page_targets`, `get_site_internal_links` and `get_site_cannibalisation`, for example: "Which pages get many impressions but few clicks, and what would you change on them?" or "Accept the suggested target keywords and fix the pages whose titles miss them."
