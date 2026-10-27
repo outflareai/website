@@ -28,6 +28,7 @@ By category, including what is planned:
 | Website analytics | [Google Analytics, Search Console, Bing Webmaster Tools, PostHog, Plausible, Fathom, Matomo, Umami, Mixpanel, Amplitude, Cloudflare, Simple Analytics, Clarity, Vercel](/docs/integrations/analytics/) |
 | SEO | [DataForSEO, Ahrefs](/docs/integrations/seo/), paid per call within a monthly budget |
 | Code and deploys | [GitHub, Vercel](/docs/integrations/deploys/): when each website ships, read only |
+| Social | [Reddit](/docs/guides/reddit/), with your workspace's own app: find posts and post replies a person approves from the brand's own account |
 | DNS and registrars | Cloudflare, Namecheap, GoDaddy, Route 53 |
 | AI models | [Claude, OpenAI, Gemini, Mistral, OpenRouter](/docs/agents/ai-models/), for planning and running missions and for [AI visibility](/docs/guides/ai-visibility/), with your own key |
 | Custom | Any HTTP API or MCP server you register |
