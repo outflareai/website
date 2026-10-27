@@ -20,11 +20,11 @@ Website tracking records each visit to your sites as an event in your [customer 
 
 3. When someone signs up or signs in, have your server send `identify` with their user id and their `anonymousId` to the [customer events API](/docs/guides/customer-records/). In the browser, `outflare.anonymousId()` gives it, and it's also in the `of_aid` cookie. Their earlier visits then join their record.
 
-To record a step that isn't a page, such as a click on a sign-up button, call `outflare.track("Signup Started")`.
+To record a step that isn't a page, such as a click on a sign-up button, call `outflare.track("Signup Started")`. Use plain names: dotted ones like `payment.succeeded` are Outflare's own.
 
 ## What each visit records
 
-- The page's address, query string, referrer and title.
+- The page's address and title, keeping only the campaign tags, click ids and referral codes below from its query string, and where the visitor came from (just the site and path). A sign-in link's token or an email address in a URL is never kept.
 - The `utm_source`, `utm_medium`, `utm_campaign`, `utm_term`, `utm_content` and `utm_id` tags.
 - Ad click ids: `gclid`, `gbraid`, `wbraid`, `fbclid`, `msclkid`, `li_fat_id`, `rdt_cid` and `twclid`.
 - A referral or partner code from `ref` or `via`, and an Outflare campaign link's `ofc`.
@@ -35,14 +35,14 @@ The site key is public by design. It can only add anonymous page views and track
 
 - It can't read anything.
 - It can't name, create or merge a person.
-- It doesn't start journeys or send email.
+- It doesn't start journeys, send email or count as revenue.
 - It works on no other part of the API.
 
 Limiting a key to your origins filters out stray traffic. **Rotate** gives the key a new value, and the old one keeps working for seven days while you update the site. **Revoke** stops it at once.
 
 ## Consent
 
-The visitor's id is a first-party cookie. By default, visitors in Europe and the UK, and anyone with Global Privacy Control on, get an id that ends with their browser session. Once they accept analytics cookies in your banner, call `outflare.consent(true)` and the id is kept for a year.
+The visitor's id is kept in a first-party cookie, but only with consent. By default, visitors in the EEA, Switzerland and the UK, and anyone with Global Privacy Control on, get no cookie: their id lasts only for the page they're on. Once they accept analytics cookies in your banner, call `outflare.consent(true)` and the id is kept for a year.
 
 You can change this on the script tag:
 

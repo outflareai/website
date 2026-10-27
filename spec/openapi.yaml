@@ -11005,10 +11005,12 @@ paths:
         Public: the site key (ofk_) in the body is the authority. What the tracking snippet (/site.js) sends: page views
         and track events on a visitor's anonymousId, with context.page, context.campaign (the utm_ tags) and, on page
         views, properties.click_ids, ofc and ref, exactly as the landing page had them. A userId, traits and timestamps
-        are ignored: the browser cannot say who someone is. Your own product links the visitor to a person by sending
+        are ignored: the browser cannot say who someone is. Query strings keep only the campaign tags, click ids, ofc, ref
+        and via, and the referrer only its origin and path. Track names must be plain (Signup Started): dotted names are
+        Outflare's own. Your own product links the visitor to a person by sending
         identify with userId and the same anonymousId to POST .../customer-events. Send the JSON as text/plain to skip
         the CORS preflight. At most 20 events per request; 300 requests a minute per address, 6,000 per key, and
-        250,000 events a day per key. The answer only counts what was taken.
+        250,000 events a day per key, 1,000,000 per workspace. The answer only counts what was taken.
       tags: [records]
       requestBody:
         required: true
