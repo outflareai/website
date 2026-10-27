@@ -13026,7 +13026,7 @@ paths:
       operationId: crmImportPreview
       x-outflare-access: { scope: integrations.read }
       summary: See what an import from another CRM would bring over
-      description: "Scope: integrations.read. Reads the connected CRM (Attio) live: its objects (People, Companies, Deals and custom ones) with their fields, select options and pipeline stages, its lists with their own fields, and how many records, list entries, notes, tasks and members it holds. Each count stops at limit and says so with capped; filled is how many of the counted records have a value in that field. Changes nothing, in Outflare or in the CRM."
+      description: "Scope: integrations.read. Reads the connected CRM (Attio) live: its objects (People, Companies, Deals and custom ones) with their fields, select options and pipeline stages, its lists with their own fields, and how many records, list entries, notes, tasks and members it holds. Each count stops at limit, or when the preview has spent about 15 seconds counting, and says so with capped; filled is how many of the counted records have a value in that field. Changes nothing, in Outflare or in the CRM."
       tags: [imports]
       responses:
         "200":
@@ -22044,7 +22044,7 @@ components:
       required: [count, capped]
       properties:
         count: { type: integer }
-        capped: { type: boolean, description: "True when counting stopped at the limit, so there are more." }
+        capped: { type: boolean, description: "True when counting stopped early, at the limit or out of time, so there may be more." }
     CRMObject:
       type: object
       required: [slug, name, plural, records, fields]
