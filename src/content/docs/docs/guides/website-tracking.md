@@ -54,6 +54,8 @@ The source is the `utm_source`, else the ad platform behind the click id (`gclid
 
 Bots, crawlers, link previews and scripts are counted on the key and left out of your data. A browser driven by automation sends nothing.
 
+If a visit can't be sent because of a network or server error, the script tries again after 1, 5 and 25 seconds. Each event has its own id, so a retry is never counted twice.
+
 ## Serve it from your own domain
 
 Ad blockers drop requests to analytics hosts, and Safari keeps a cookie set by a script for only seven days. To avoid both, forward a path on your own site to Outflare and load the script from there:
@@ -77,6 +79,24 @@ location /ofx/ { proxy_pass https://app.outflare.ai/; proxy_set_header Host app.
 ```
 
 Cloudflare Workers, Vercel and Netlify rewrites work the same way.
+
+### Keep the visitor's address
+
+Behind your proxy, every visit comes from your server's address. To pass the visitor's own address on, open the key and choose **Proxy secret** (or call `POST /v1/workspaces/{ws}/site-keys/{id}/proxy-secret`, or the MCP tool `create_site_proxy_secret`). The secret starts `ofp_` and is shown once. Keep it in your proxy's configuration, never in a page.
+
+Have the proxy send the secret in `X-Outflare-Proxy` and the visitor's address in `X-Outflare-Client-IP`, replacing anything the browser sent. With nginx:
+
+```nginx
+location /ofx/ {
+  proxy_pass https://app.outflare.ai/; proxy_set_header Host app.outflare.ai; proxy_ssl_server_name on;
+  proxy_set_header X-Outflare-Proxy "ofp_test_not_a_real_secret";
+  proxy_set_header X-Outflare-Client-IP $remote_addr;
+}
+```
+
+A Cloudflare Worker sets the same two headers, taking the address from `CF-Connecting-IP`. A plain Next.js rewrite can't add headers, so use middleware there. Behind a CDN, take the address from the CDN's own header, never from the first `X-Forwarded-For` entry, which the browser can set.
+
+Outflare uses the address only when the secret matches and the address is public. Otherwise it uses the connecting address. A new secret replaces the old one at once, and `DELETE .../proxy-secret` removes it.
 
 ## Sites on more than one domain
 
