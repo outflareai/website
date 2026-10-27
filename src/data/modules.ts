@@ -76,9 +76,24 @@ export const modules: Module[] = [
 		icon: '<path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/>',
 	},
 	{
+		name: 'Social',
+		summary: 'Followers and post numbers for every brand on X and LinkedIn, and helpful Reddit replies you approve before they post.',
+		status: 'live',
+		docs: '/docs/guides/social/',
+		icon: '<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.59 13.51 6.83 3.98"/><path d="m15.41 6.51-6.82 3.98"/>',
+	},
+	{
+		name: 'Paid media',
+		summary: 'Spend, clicks and conversions from Google, Meta, LinkedIn, Microsoft, Reddit and X Ads next to the rest of your numbers.',
+		status: 'live',
+		docs: '/docs/integrations/paid-media/',
+		icon: '<path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>',
+	},
+	{
 		name: 'Lifecycle email',
 		summary: 'Receipts, onboarding and product email from your own Amazon SES, Postmark or Resend account, with versioned templates.',
-		status: 'building',
+		status: 'live',
+		docs: '/docs/guides/lifecycle-email/',
 		icon: '<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
 	},
 	{
@@ -89,8 +104,9 @@ export const modules: Module[] = [
 	},
 	{
 		name: 'Customer data',
-		summary: 'One first-party profile per customer, built from your website, product and CRM, for every module and agent to use.',
-		status: 'planned',
+		summary: 'One record per person and company, built from your website, product, CRM and campaigns, for every module and agent to use.',
+		status: 'live',
+		docs: '/docs/guides/customer-records/',
 		icon: '<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/>',
 	},
 ];

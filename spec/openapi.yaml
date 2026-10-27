@@ -3589,12 +3589,21 @@ paths:
     get:
       operationId: listSuppressions
       x-outflare-access: { scope: leads.read, brand_limited: true }
-      summary: List the suppression list, ordered by value
-      description: "Scope: leads.read"
+      summary: List the opt-out list, ordered by value
+      description: |
+        Scope: leads.read. The one opt-out list every send checks: unsubscribes
+        and bounces from any tool, entries people add, competitors and others
+        never to contact. Each entry says why (reason), how it was added
+        (method: manual, automated, or ai_suggested when the AI read a reply
+        as an opt-out, with its confidence), who added it, from which tool
+        (source) and, for a sequencer's blocklist, which connection.
       tags: [suppression]
       parameters:
         - { name: kind, in: query, schema: { type: string, enum: [email, domain] } }
         - { name: reason, in: query, schema: { $ref: "#/components/schemas/SuppressionReason" } }
+        - { name: method, in: query, schema: { $ref: "#/components/schemas/SuppressionMethod" } }
+        - { name: source, in: query, description: "The tool or feature that added it, such as reply, smtp, emailbison_sync or apollo_import.", schema: { type: string } }
+        - { name: integration_id, in: query, description: The connection it came from., schema: { type: string, format: uuid } }
         - { name: q, in: query, schema: { type: string } }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
         - { name: after, in: query, description: "next_after from the previous page.", schema: { type: string } }
@@ -3624,7 +3633,10 @@ paths:
       description: |
         Scope: leads.manage. Each value is an email address or a domain
         (also accepted as @acme-com.example or a URL). A suppressed domain blocks
-        every address at it. Existing entries are left as they are.
+        every address at it. Existing entries are left as they are. Up to
+        100,000 values at once, so a list from an old tool moves in one call.
+        Recorded with who added them; method is manual unless given (an
+        agent's mission adds ai_suggested).
       tags: [suppression]
       requestBody:
         required: true
@@ -3640,6 +3652,12 @@ paths:
                   items: { type: string }
                 reason: { $ref: "#/components/schemas/SuppressionReason" }
                 note: { type: string, maxLength: 500 }
+                source:
+                  type: string
+                  pattern: "^[a-z0-9._-]{1,64}$"
+                  description: "Where the entries come from, such as the old tool a list moves from (hubspot_export). Default: manual from the web app, else the surface (api, mcp, cli, mission)."
+                  example: hubspot_export
+                method: { $ref: "#/components/schemas/SuppressionMethod" }
       responses:
         "200":
           description: Result.
@@ -3677,6 +3695,101 @@ paths:
         "404": { $ref: "#/components/responses/Error" }
         "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/suppression-syncs:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listSuppressionSyncs
+      x-outflare-access: { scope: leads.read }
+      summary: How the opt-out list is kept in step with each sequencer
+      description: |
+        Scope: leads.read. Every connected sequencer with a blocklist
+        (EmailBison, Instantly, Smartlead). On each sync its blocklist is read
+        into the opt-out list (source <connector>_sync) and the opt-out list
+        is written to it, so a send from either side honours both. Smartlead's
+        blocklist cannot be read, so it is only written to.
+      tags: [suppression]
+      responses:
+        "200":
+          description: The syncs.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/SuppressionSync" } }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/suppression-syncs/{integration}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: integration, in: path, required: true, schema: { type: string, format: uuid } }
+    patch:
+      operationId: updateSuppressionSync
+      x-outflare-access: { scope: suppressions.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Turn reading or writing a sequencer's blocklist on or off
+      description: "Scope: suppressions.manage. Both are on by default. Recorded as suppression_sync.updated."
+      tags: [suppression]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                pull: { type: boolean }
+                push: { type: boolean }
+      responses:
+        "200":
+          description: The sync.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SuppressionSync" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/contact-rules:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: getContactRules
+      x-outflare-access: { scope: workspace.read }
+      summary: Who may get marketing email
+      description: |
+        Scope: workspace.read. Marketing email (broadcasts, journeys,
+        lifecycle sends) goes by each person's contact basis
+        (Record.contactability): people who agreed always get it, people
+        who said no and third-party leads never do, and customer_marketing
+        says whether everyone else does.
+      tags: [suppression]
+      responses:
+        "200":
+          description: The rules.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ContactRules" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateContactRules
+      x-outflare-access: { scope: workspace.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Choose who may get marketing email
+      description: "Scope: workspace.manage. Recorded as contact_rules.updated."
+      tags: [suppression]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ContactRules" }
+      responses:
+        "200":
+          description: The rules.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ContactRules" }
+        "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/recipients/check:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     post:
@@ -3705,6 +3818,14 @@ paths:
                   maxItems: 1000
                   items: { type: string }
                 brand: { type: string, description: "The brand that would email them (id or handle), for the cross-brand rule.", example: repocket }
+                purpose:
+                  type: string
+                  enum: [cold, lifecycle, transactional]
+                  default: cold
+                  description: |
+                    What the email would be. lifecycle (marketing) also applies each person's contact basis:
+                    third_party_no_consent for a third-party lead who never agreed, no_consent when the contact
+                    rule is opt_in and they never agreed. transactional lets unsubscribes through.
       responses:
         "200":
           description: One decision per email, in order.
@@ -4973,18 +5094,23 @@ paths:
       description: |
         The company's logo as a square SVG, unmodified apart from cropping, or a
         monogram for connectors without one. Public, so it works in an `<img>`
-        tag. Add `theme=dark` for the variant made for dark backgrounds.
+        tag. Add `theme=dark` for the variant made for dark backgrounds. It
+        carries an `ETag` and is revalidated on every load, so send
+        `If-None-Match` to get `304` when it hasn't changed.
       tags: [connectors]
       security: []
       parameters:
         - { name: id, in: path, required: true, schema: { type: string }, example: hubspot }
         - { name: theme, in: query, schema: { type: string, enum: [light, dark], default: light } }
+        - { name: v, in: query, description: "Ignored; changes the address so old cached copies are dropped.", schema: { type: string } }
       responses:
         "200":
           description: The logo.
           content:
             image/svg+xml:
               schema: { type: string }
+        "304":
+          description: Not changed since the `ETag` in `If-None-Match`.
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/connectors:
@@ -13433,14 +13559,21 @@ paths:
       x-outflare-access: { scope: customers.read, brand_limited: true }
       summary: A record's timeline
       description: |
-        Scope: customers.read. Everything that happened to a person or company, newest first: their product events
-        (and, for a company, the group calls that named it), changes to their attributes, identities added and closed,
-        consent given or withdrawn, the cold email Outflare sent them and their replies (`message`, with `direction`
-        out or in), and their meetings and deals. Lifecycle email shows as the events Outflare records for it
-        (`email.sent`, `email.delivered` and so on, with `source: lifecycle`).
+        Scope: customers.read. One timeline per person or company, newest first, across every module: their
+        product events (and, for a company, the group calls that named it), changes to their attributes,
+        identities added and closed, consent given or withdrawn, the cold email Outflare sent them and their
+        replies (`message`, with `direction` out or in), meetings, deals, website visits (`visit`), opt-out list
+        entries (`opt_out`) and journeys entered and finished (`journey`). Lifecycle email and payments show as the
+        events Outflare records for them (`email.sent`, `email.delivered` and so on, with `source: lifecycle`).
+
+        A company's timeline includes its people's (the people linked to it), each item's `record_id` saying whose
+        it is; `people=false` leaves them out. `brand` keeps one brand's items and the ones no brand owns. Kind
+        names are stable: new kinds may be added.
       tags: [records]
       parameters:
-        - { name: kinds, in: query, description: "Comma-separated: event, attribute_change, identity, consent, message, meeting, deal. Default all.", schema: { type: string } }
+        - { name: kinds, in: query, description: "Comma-separated: event, attribute_change, identity, consent, message, meeting, deal, visit, opt_out, journey. Default all.", schema: { type: string } }
+        - { name: people, in: query, description: "For a company, include its people's items (the default). false shows the company's own.", schema: { type: string, enum: ["true", "false"] } }
+        - { $ref: "#/components/parameters/Brand" }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
         - { name: before, in: query, schema: { type: string } }
         - { $ref: "#/components/parameters/Cursor" }
@@ -14941,6 +15074,8 @@ paths:
                   accepted: { type: integer, description: "Changes made in the platform, accepted as manual ones." }
                   confirmed: { type: integer, description: Attaches the platform now shows. }
                   replies: { type: integer, description: New replies brought into the inbox, for a platform that reports them. }
+                  opt_outs_pulled: { type: integer, description: "Entries of the platform's blocklist added to the opt-out list." }
+                  opt_outs_pushed: { type: integer, description: "Opt-out list entries written to the platform's blocklist." }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         "502": { $ref: "#/components/responses/Error" }
@@ -19374,6 +19509,15 @@ components:
         name: { type: string }
         status: { $ref: "#/components/schemas/EmailBroadcastStatus" }
         status_reason: { type: [string, "null"] }
+        audience_bases:
+          type: object
+          description: "Only on a single broadcast that has not started: the audience by contact basis."
+          additionalProperties: { type: integer }
+          example: { opted_in: 120, opted_out: 4, customer: 300, third_party: 12, unknown: 9 }
+        warnings:
+          type: array
+          description: "Only on a single broadcast that has not started: what looks wrong about who it goes to."
+          items: { $ref: "#/components/schemas/ContactWarning" }
         template:
           type: object
           required: [id, handle, name]
@@ -23799,18 +23943,84 @@ components:
               account: { type: object, additionalProperties: true }
     SuppressionReason:
       type: string
-      enum: [unsubscribed, bounced, complained, manual, do_not_contact]
+      enum: [unsubscribed, bounced, complained, manual, do_not_contact, competitor, customer, partner, legal]
+      description: |
+        Why the entry is there. unsubscribed stops cold and marketing email but
+        not receipts; competitor stops cold and marketing email; customer and
+        partner keep people out of cold email only; bounced, complained,
+        manual, legal and do_not_contact stop every email.
+    SuppressionMethod:
+      type: string
+      enum: [manual, automated, ai_suggested]
+      description: "How it was added: by a person, automatically (a bounce, an unsubscribe link, a sync), or because the AI read a reply as an opt-out."
     Suppression:
       type: object
-      required: [id, kind, value, reason, note, source, created_at]
+      required: [id, kind, value, reason, note, source, method, added_by, added_by_type, integration_id, confidence, evidence, record_id, created_at]
       properties:
         id: { type: string, format: uuid }
         kind: { type: string, enum: [email, domain] }
         value: { type: string }
         reason: { $ref: "#/components/schemas/SuppressionReason" }
         note: { type: string }
-        source: { type: string }
+        source: { type: string, description: "The tool or feature that added it: manual, api, mcp, reply, smtp, unsubscribe_link, email_provider, bounce_report, <connector>_sync, <tool>_import." }
+        method: { $ref: "#/components/schemas/SuppressionMethod" }
+        added_by: { type: [string, "null"], format: uuid, description: The person's or token's actor id; null for the system. }
+        added_by_type: { type: string, description: "human, api_token, agent or system." }
+        integration_id: { type: [string, "null"], format: uuid, description: The connection it came from. }
+        confidence: { type: [number, "null"], minimum: 0, maximum: 1, description: How sure the AI was, for ai_suggested entries. }
+        evidence: { type: object, additionalProperties: true, description: "Ids that show why, such as inbound_message_id for a reply." }
+        record_id: { type: [string, "null"], format: uuid, description: The person it belongs to, when known. }
         created_at: { type: string, format: date-time }
+    SuppressionSync:
+      type: object
+      required: [integration_id, connector, name, can_pull, pull, push, pulled_at, pushed_at, pulled_count, pushed_count, last_error, error_code]
+      properties:
+        integration_id: { type: string, format: uuid }
+        connector: { type: string, example: emailbison }
+        name: { type: string }
+        can_pull: { type: boolean, description: "False when the platform's blocklist cannot be read (Smartlead): only push works." }
+        pull: { type: boolean, description: Its blocklist is read into the opt-out list. }
+        push: { type: boolean, description: The opt-out list is written to its blocklist. }
+        pulled_at: { type: [string, "null"], format: date-time }
+        pushed_at: { type: [string, "null"], format: date-time }
+        pulled_count: { type: integer }
+        pushed_count: { type: integer }
+        last_error: { type: [string, "null"] }
+        error_code: { type: [string, "null"] }
+    ContactRules:
+      type: object
+      required: [customer_marketing]
+      properties:
+        customer_marketing:
+          type: string
+          enum: [inferred, opt_in]
+          description: "inferred (the default): everyone but third-party leads gets marketing email unless they said no. opt_in: only people who agreed do. Third-party leads never get marketing email without agreeing."
+    Contactability:
+      type: object
+      required: [basis, acquired_via, allowed, suppressed, why]
+      description: What may go out to a person, and why.
+      properties:
+        basis:
+          type: string
+          enum: [opted_in, opted_out, customer, third_party, unknown]
+          description: "opted_in: agreed to marketing email. opted_out: took it back. customer: origin first_party. third_party: origin prospect (lead lists, data providers, sequencers, visitor reveals). unknown: from a CRM, an import or added by hand."
+        acquired_via: { type: string, description: "The tool the record came from, such as apollo, csv or attio; empty when not known." }
+        allowed:
+          type: object
+          required: [transactional, cold_outreach, marketing]
+          properties:
+            transactional: { type: boolean, description: "Receipts and account email." }
+            cold_outreach: { type: boolean }
+            marketing: { type: boolean, description: "Newsletters, product updates, journeys." }
+        suppressed: { type: array, items: { $ref: "#/components/schemas/SuppressionReason" }, description: The opt-out list's reasons for their addresses or domains. }
+        why: { type: string, description: The basis in a sentence. }
+    ContactWarning:
+      type: object
+      required: [code, count, message]
+      properties:
+        code: { type: string, enum: [third_party_in_audience, unknown_origin_in_audience] }
+        count: { type: integer, description: How many people it is about. }
+        message: { type: string, description: "What looks wrong and what to do instead, in plain words." }
     RecipientDecision:
       type: object
       required: [email, allowed, reasons]
@@ -23819,7 +24029,7 @@ components:
         allowed: { type: boolean }
         reasons:
           type: array
-          description: "Why it is blocked, e.g. invalid_email, suppressed_email:unsubscribed, suppressed_domain:do_not_contact."
+          description: "Why it is blocked: invalid_email, suppressed_email:<reason>, suppressed_domain:<reason>, marketing_withdrawn, other_brand:<handle>, third_party_no_consent or no_consent."
           items: { type: string }
     AllocationMode:
       type: string
@@ -24202,7 +24412,7 @@ components:
               code:
                 type: string
                 description: Stable; new codes may be added.
-                enum: [no_mailboxes, none_ready, mailbox_error, domain_critical, server_paused, connection_broken, connection_requested, approval_waiting, mission_paused, allocation_short, infra_plan_waiting, unread_replies, context_missing, analytics_site_unmapped, brand_without_analytics, fixes_waiting, email_domain_failed, email_broadcast_failed, social_drafts_waiting, duplicates_waiting, events_quarantined, crm_import_failed, install_broken, install_outdated]
+                enum: [no_mailboxes, none_ready, mailbox_error, domain_critical, server_paused, connection_broken, connection_requested, approval_waiting, mission_paused, allocation_short, infra_plan_waiting, unread_replies, context_missing, analytics_site_unmapped, brand_without_analytics, fixes_waiting, email_domain_failed, email_broadcast_failed, email_broadcast_audience_warning, social_drafts_waiting, duplicates_waiting, events_quarantined, crm_import_failed, install_broken, install_outdated]
               severity: { type: string, enum: [critical, warning, info] }
               area: { type: string, enum: [mailboxes, domains, servers, connectors, missions, sequences, infrastructure, inbox, context, analytics, fixes, lifecycle, social, customers, setup] }
               title: { type: string }
@@ -24378,7 +24588,8 @@ components:
       enum: [first_party, prospect, crm_sync, import, manual]
       description: |
         Where the record came from: first_party (the workspace's own product, billing or forms), prospect (lead lists
-        and data providers), crm_sync, import or manual. Lifecycle mail never relies on it: consent does.
+        and data providers), crm_sync, import or manual. With consent it sets the contact basis (Record.contactability):
+        prospects never get marketing email without agreeing.
     SearchHit:
       type: object
       required: [kind, id, record_id, record_name, title, snippet, detail, at, rank]
@@ -24457,6 +24668,7 @@ components:
         attributes: { type: object, additionalProperties: true, description: "Values by field key, as the catalog defines them." }
         attribute_sources: { type: object, additionalProperties: { type: string }, description: Which source set each value. }
         identities: { type: array, items: { $ref: "#/components/schemas/RecordIdentity" }, description: Active identities. }
+        contactability: { $ref: "#/components/schemas/Contactability" }
         version: { type: integer, description: Goes up on every change. }
         merged_into: { type: [string, "null"], format: uuid }
         archived: { type: boolean }
@@ -24479,6 +24691,7 @@ components:
         name: { type: string, maxLength: 500 }
         brand_id: { type: [string, "null"], description: "A brand's id or handle, or null for a record every brand shares." }
         origin: { $ref: "#/components/schemas/RecordOrigin" }
+        acquired_via: { type: string, pattern: "^[a-z0-9._-]{0,64}$", description: "The tool the record came from, such as apollo or csv.", example: apollo }
         source: { type: string, enum: [manual, first_party, crm_sync, enrichment, import], description: "Who these values come from, for precedence. Default manual." }
         attributes: { type: object, additionalProperties: true }
         identities: { type: array, maxItems: 50, items: { $ref: "#/components/schemas/RecordIdentityInput" }, description: Only when adding. }
@@ -24636,14 +24849,15 @@ components:
         created_at: { type: string, format: date-time }
     TimelineItem:
       type: object
-      required: [kind, id, at, title, detail, source]
+      required: [kind, id, at, title, detail, source, record_id]
       properties:
-        kind: { type: string, enum: [event, attribute_change, identity, consent, message, meeting, deal] }
+        kind: { type: string, enum: [event, attribute_change, identity, consent, message, meeting, deal, visit, opt_out, journey], description: "Stable; new kinds may be added." }
         id: { type: string }
         at: { type: string, format: date-time }
-        title: { type: string, description: "The event's name, the field that changed, the identity's namespace, the consent's channel, the email's subject, or the meeting's or deal's name." }
+        title: { type: string, description: "The event's name, the field that changed, the identity's namespace, the consent's channel, the email's subject, the meeting's or deal's name, the visit's landing page, the opt-out's reason or the journey's name." }
         detail: { type: object, additionalProperties: true }
         source: { type: string }
+        record_id: { type: string, format: uuid, description: "Whose item it is: the record itself or, on a company's timeline, one of its people." }
     Consent:
       type: object
       required: [id, record_id, channel, topic, purpose, status, source, evidence, occurred_at, created_by, created_at]
