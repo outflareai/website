@@ -29,25 +29,74 @@ const shown = stars !== null && stars > 0;
 
 <script>
 	import { formatStars } from '../data/format-stars';
+	import { repo } from '../data/project';
 
-	// One request per page, however many buttons it has.
+	// One lookup per visitor an hour, however many buttons and pages: the
+	// last count is kept in localStorage. /github-stars (cached at the edge)
+	// comes first; if it has no count, the browser asks GitHub itself, with no
+	// token. Any failure keeps the count from the build.
 	const buttons = document.querySelectorAll<HTMLAnchorElement>('[data-gh-stars]');
+	const storeKey = 'outflare:github-stars';
+	const maxAge = 3600 * 1000;
+
+	function show(n: number) {
+		for (const b of buttons) {
+			const count = b.querySelector<HTMLElement>('[data-gh-count]');
+			const num = b.querySelector<HTMLElement>('[data-gh-number]');
+			if (!count || !num) continue;
+			num.textContent = formatStars(n);
+			count.hidden = false;
+			b.setAttribute('aria-label', `Outflare on GitHub, ${n} stars`);
+		}
+	}
+
+	function remembered(): number | null {
+		try {
+			const v = JSON.parse(localStorage.getItem(storeKey) || 'null');
+			return v && typeof v.n === 'number' && Date.now() - v.at < maxAge ? v.n : null;
+		} catch {
+			return null;
+		}
+	}
+
+	function remember(n: number) {
+		try {
+			localStorage.setItem(storeKey, JSON.stringify({ n, at: Date.now() }));
+		} catch {
+			// Private windows and blocked storage just look it up again.
+		}
+	}
+
+	async function edge(): Promise<number | null> {
+		const r = await fetch('/github-stars');
+		if (!r.ok) return null;
+		const d: { stars: number | null } = await r.json();
+		return typeof d.stars === 'number' ? d.stars : null;
+	}
+
+	async function github(): Promise<number | null> {
+		const r = await fetch(`https://api.github.com/repos/${repo.owner}/${repo.name}`, {
+			headers: { accept: 'application/vnd.github+json' },
+		});
+		if (!r.ok) return null;
+		const d = await r.json();
+		return d.private === false && Number.isInteger(d.stargazers_count) ? d.stargazers_count : null;
+	}
+
 	if (buttons.length) {
-		fetch('/github-stars')
-			.then((r) => (r.ok ? r.json() : null))
-			.then((d: { stars: number | null } | null) => {
-				const n = d?.stars;
-				if (typeof n !== 'number' || n < 1) return;
-				for (const b of buttons) {
-					const count = b.querySelector<HTMLElement>('[data-gh-count]');
-					const num = b.querySelector<HTMLElement>('[data-gh-number]');
-					if (!count || !num) continue;
-					num.textContent = formatStars(n);
-					count.hidden = false;
-					b.setAttribute('aria-label', `Outflare on GitHub, ${n} stars`);
-				}
-			})
-			.catch(() => {});
+		const known = remembered();
+		if (known !== null) {
+			if (known > 0) show(known);
+		} else {
+			edge()
+				.catch(() => null)
+				.then((n) => (n === null ? github().catch(() => null) : n))
+				.then((n) => {
+					if (n === null) return;
+					remember(n);
+					if (n > 0) show(n);
+				});
+		}
 	}
 </script>
 
