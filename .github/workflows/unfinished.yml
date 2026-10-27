@@ -39,4 +39,5 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-        run: gh label create unfinished --color D93F0B --description "Not finished: read the Handoff in the description to pick it up" --force
+        run: |
+          gh label create unfinished --color D93F0B --description "Not finished. Read the Handoff in the description to pick it up." --force
