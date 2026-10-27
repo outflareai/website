@@ -101,3 +101,19 @@ You tell an agent what you want, and it connects what it needs. It never asks yo
 4. The key is tested and saved, and the agent sees the request turn `connected` and carries on.
 
 Links work once, expire after 24 hours by default, can be cancelled, and can only connect the one service they name. The audit log records which token asked.
+
+## Live updates (webhooks)
+
+Some tools can tell Outflare when something happens, instead of Outflare asking them again and again. A connection that can do this shows **Live updates** on its page in Connectors. Geonode is the first: Outflare hears straight away when an extract, batch or crawl job finishes.
+
+1. Open the connection on the Connectors page and press **Turn on live updates**.
+2. For Geonode, that's all: Outflare adds its address in your own Geonode account with the key you connected, and removes it again when you turn live updates off or disconnect. For a tool Outflare can't set up itself, copy the address into the tool, and paste its signing secret back if it shows one.
+
+What you can count on:
+
+- **Every delivery is checked.** With a signing secret, a delivery whose signature doesn't match is refused. Without one, the address itself is the secret, so keep it private. **New address** replaces it, and the old one stops working straight away.
+- **Repeats are ignored.** An event sent twice is handled once.
+- **Everything is logged.** The connection's page shows its recent events, and **Logs → Incoming webhooks** lists every event in the workspace for 90 days, with any error. A failed event can be **run again** for 30 days. From Geonode, Outflare keeps the job id, status and counts, never page content. Events nothing in Outflare uses yet are marked "logged".
+- **Self-hosted servers must be reachable.** Live updates need `PUBLIC_URL` set to the server's public https address. A server on `localhost` or a private network can't receive webhooks, and the card says so.
+
+Over the API: `POST /v1/workspaces/{ws}/integrations/{id}/hook` turns live updates on (`GET` to read it, `DELETE` to turn it off), `POST .../hook/rotate` makes a new address, `PUT .../hook/signing-secret` saves a signing secret, `GET /v1/workspaces/{ws}/hook-events` lists events, and `POST .../hook-events/{event}/replay` runs one again. The MCP tools are `get_connection_hook`, `set_up_connection_hook`, `rotate_connection_hook`, `remove_connection_hook`, `list_hook_events` and `replay_hook_event`.
