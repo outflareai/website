@@ -25,6 +25,7 @@ Every action a visitor takes that tells us something (a sign-up, sign-in, GitHub
 Tools are open source; loops, enterprise controls and the scaled versions of heavy features are Outflare Cloud only ([engine ADR 11](https://github.com/outflareai/engine/blob/main/docs/adr/0011-open-core-line.md), and the routing list in the engine's AGENTS.md).
 
 - **Cloud-only docs say so.** A page for a Cloud feature carries the Cloud badge and says "Outflare Cloud". It says what the feature does for you, never how it decides, its prompts or its limits.
+  - The badge is `sidebar: { badge: { text: 'Cloud', variant: 'note' } }` in the page's frontmatter, and the page opens with `<span class="pill cloud">Outflare Cloud</span>`. Add the feature as a row on [Open source and Cloud](src/content/docs/docs/project/open-source-and-cloud.md) in the same pull request.
 - **Only what has shipped.** A Cloud feature gets a page, a row on the open source vs Cloud page or a place on pricing once app.outflare.ai runs it (the `deployed` check), or when Jack approves announcing it.
 - **Published Cloud APIs come from an allowlist.** Staff, admin, sign-up and internal routes never appear in the API reference.
 
@@ -37,10 +38,10 @@ Docs describe what Outflare does today; see "Keeping the docs honest" in the REA
 This site deploys on every push to main (Cloudflare Pages), but app.outflare.ai deploys separately, after the engine and Cloud pull requests merge (the engine's and Cloud's AGENTS.md). So docs can go live before the feature. To keep them in order:
 
 1. **Name what the docs wait for.** A pull request that documents an engine or Cloud change has a line `Needs outflareai/engine#NN` (or `outflareai/cloud#NN`) per pull request in its description. Docs-only fixes and marketing copy need none.
-2. **The `deployed` check enforces it.** It fails until each named pull request is merged and contained in the version production reports at `/v1/meta` (`<engine commit>+<cloud commit>`), and, when the pull request changes `spec/openapi.yaml`, until production serves that exact file. Re-run it once the deploy is done; never merge around it.
+2. **The `deployed` check enforces it.** It fails until each named pull request is merged and contained in the version production reports at `/v1/meta` (`<engine commit>+<cloud commit>`), and, when the pull request changes `spec/openapi.yaml`, until production serves that exact file. It re-runs itself every 15 minutes while it is the only failing check (`recheck-deployed.yml`), so it turns green soon after the deploy; never merge around it.
 3. **Re-copy the spec before merging.** `spec/openapi.yaml` must equal the engine's `api/openapi.yaml` that production runs (`npm run sync-spec -- <that commit>`), not a branch.
 4. **Never say "live" or "deployed"** about a feature until production's `/v1/meta` version contains it.
-5. **No releases from here.** Self-hosted releases are tags on the engine, and only Jack pushes them.
+5. **No releases from here.** Self-hosted releases are cut, tagged and published to `outflareai/outflare` automatically after engine merges, once every check passes. Nobody tags or publishes by hand, from here or anywhere else.
 
 ## Secrets and security (hard rule)
 
