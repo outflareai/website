@@ -28,7 +28,7 @@ curl -X POST "https://app.outflare.ai/v1/workspaces/$WS/emails" \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" \
   -H "Idempotency-Key: $(uuidgen)" \
   -d '{"to": "ana@customer.example", "from": "Acme <billing@acme.example>",
-       "template": "password-reset", "data": {"reset_url": "https://app.acme.com/r/abc"}}'
+       "template": "password-reset", "data": {"reset_url": "https://app.acme.example/r/abc"}}'
 ```
 
 You can also send `subject` and `html` directly, without a template. Send the same `Idempotency-Key` when you retry, and the email goes out only once. The answer is `202` with the email, `queued`. Sends run on their own queue, so a password reset never waits behind a big send.
