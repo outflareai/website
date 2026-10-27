@@ -15,7 +15,7 @@ Website tracking records each visit to your sites as an event in your [customer 
 
 The quickest way is your brand's [setup checklist](/docs/guides/brand-setup/): one click through your own Google Tag Manager, a message for your developer, or a prompt for your AI coding tool. By hand:
 
-1. Open **Settings → General → Website tracking** and add your site. You can list the origins it takes events from, such as `https://example.com` or `https://*.example.com`.
+1. Open **Analytics → Website tracking** and pick your brand. **Get my script** makes the brand's script; with no brands yet, enter your site and press **Make script**. One script records every page of the site and its subdomains, so each brand needs only one.
 2. Copy the snippet and paste it into every page's `<head>`:
 
    ```html
@@ -119,7 +119,9 @@ The site key is public by design. It can only add anonymous page views and track
 - It doesn't start journeys, send email or count as revenue.
 - It works on no other part of the API.
 
-Limiting a key to your origins filters out stray traffic. **Rotate** gives the key a new value, and the old one keeps working for seven days while you update the site. **Revoke** stops it at once.
+**Edit sites** limits a script to your own domains, which filters out stray traffic: `example.com` covers the site and every subdomain, and `https://app.example.com` that one address. To track another domain with the same brand, add it here rather than making a second script; the tag then lists both, so a visit that crosses them stays one visit. If a brand ends up with two scripts, the page marks the one in use and lets you delete the spare.
+
+Under **More**, **Rotate key** gives the script a new key, and the old one keeps working for seven days while you update the site. **Delete script** stops it at once.
 
 ## Consent
 
