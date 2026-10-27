@@ -30,7 +30,7 @@ Agents read the catalog with `get_catalog` before writing anything, and reuse a 
 
 ## Which value wins
 
-Every value remembers where it came from: a person's edit, your own product, a CRM sync, enrichment or an import. When two sources disagree, the higher one wins. By default a person's edit comes first, then your product's own data, then the CRM, then enrichment. So enrichment never overwrites what someone typed, and a CRM sync never overwrites what your product knows. Every change is kept in the record's history, with who made it and from where.
+Every value remembers where it came from: a person's edit, your own product, a CRM sync, enrichment or an import. When two sources disagree, the higher one wins. By default a person's edit comes first, then your product's own data, then the CRM, then enrichment. So enrichment never overwrites what someone typed, and a CRM sync never overwrites what your product knows. Every change is kept in the record's history, with who made it and from where. Two people or agents changing the same record at once never overwrite each other: a change made against an old copy is refused, so it can be read again and redone. Agents always send the version they read; a change from an agent without one is refused.
 
 Paste the [website tracking](/docs/guides/website-tracking/) snippet into your site and every visit is recorded with the campaign it came from. Connect Stripe and each paying customer's plan, monthly revenue, lifetime revenue, first payment date and billing status are kept on their record for you. See [Revenue from Stripe](/docs/guides/revenue-from-stripe/).
 
@@ -113,6 +113,6 @@ curl -X POST https://app.outflare.ai/v1/workspaces/$WS/customer-events \
          "properties": {"total": 42}}]}'
 ```
 
-Agents use `track_customer_events`, `get_record_timeline`, `list_record_consents`, `record_consent`, `list_record_duplicates` and `merge_records`.
+To find a record or anything in its history by its words, or to count and add up across records, see [Query and search](/docs/guides/query-and-search/). Agents use `track_customer_events`, `get_record_timeline`, `list_record_consents`, `record_consent`, `list_record_duplicates` and `merge_records`.
 
 The full reference is under [API](/docs/api/), at `/v1/workspaces/{ws}/catalog`, `/v1/workspaces/{ws}/records` and `/v1/workspaces/{ws}/customer-events`.
