@@ -5063,6 +5063,11 @@ paths:
               properties:
                 sync: { type: boolean }
                 domain: { type: string, example: example.com }
+                conversion_events:
+                  type: array
+                  maxItems: 20
+                  items: { type: string, maxLength: 200, example: signed_up }
+                  description: "PostHog only: the events that count as a conversion when visits are counted by landing page (GET .../seo-sites/{site}/conversions). Changing them reads the last 90 days again; an empty list counts visits only."
       responses:
         "200":
           description: The site as it is now.
@@ -6492,6 +6497,61 @@ paths:
                               url: { type: string }
                               domain: { type: string }
                               title: { type: string }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/seo-sites/{site}/conversions:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: site, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getSiteConversions
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: Read conversions by landing page
+      description: "Scope: seo.read. Each page of the site with the visits that started on it, how many went on to a conversion event, and the same for visits from search engines, beside Search Console's clicks, impressions and position for the page and its target keyword. Counted by the workspace's own PostHog connection (the project with the most visits to the site), with the events chosen as conversions on it (`conversion_events` on PATCH .../analytics/{id}/sites/{site}). `source` is null when no product analytics has counted visits to the site. Defaults to the 28 days to the newest day stored. Reads only what the sync stored."
+      tags: [seo]
+      parameters:
+        - { name: from, in: query, schema: { type: string, format: date } }
+        - { name: to, in: query, schema: { type: string, format: date } }
+        - { name: sort, in: query, schema: { type: string, enum: [conversions, search_conversions, sessions, search_sessions, conversion_rate, clicks], default: conversions } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 1000, default: 100 } }
+      responses:
+        "200":
+          description: Pages, then totals for the site.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [source, data, totals]
+                properties:
+                  source:
+                    oneOf:
+                      - type: "null"
+                      - type: object
+                        required: [integration_id, name, connector, site, events, newest_day, last_run_at, last_error]
+                        properties:
+                          integration_id: { type: string, format: uuid }
+                          name: { type: string }
+                          connector: { type: string, example: posthog }
+                          site: { type: string, description: "The project at the tool, as GET .../analytics/{id}/sites lists it." }
+                          events: { type: array, items: { type: string }, description: "The events counted as conversions; empty counts visits only." }
+                          newest_day: { type: [string, "null"], format: date }
+                          last_run_at: { type: [string, "null"], format: date-time }
+                          last_error: { type: [string, "null"] }
+                  from: { type: string, format: date }
+                  to: { type: string, format: date }
+                  data: { type: array, items: { $ref: "#/components/schemas/PageConversion" } }
+                  totals:
+                    type: object
+                    required: [sessions, visitors, conversions, conversion_rate, search_sessions, search_conversions, search_conversion_rate]
+                    properties:
+                      sessions: { type: integer }
+                      visitors: { type: integer }
+                      conversions: { type: integer }
+                      conversion_rate: { type: number }
+                      search_sessions: { type: integer }
+                      search_conversions: { type: integer }
+                      search_conversion_rate: { type: number }
+        "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/seo-sites/{site}/targets:
@@ -15914,6 +15974,414 @@ webhooks:
             schema: { $ref: "#/components/schemas/WebhookEvent" }
       responses:
         "200": { description: Any 2xx answer means received; anything else is retried. }
+  record.created:
+    post:
+      operationId: webhook_record_created
+      summary: "A person, company or other record was created: by hand, an import, a lead, a sign-up or product events. data has type and origin."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  record.bulk_created:
+    post:
+      operationId: webhook_record_bulk_created
+      summary: "Many records were created at once (a lead import or unsubscribes from another sequencer). data has type, origin, via and count."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  record.updated:
+    post:
+      operationId: webhook_record_updated
+      summary: "A record's name, origin, brand or attributes changed. data.type is its record type; GET .../records/{id}/history has what changed."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  record.merged:
+    post:
+      operationId: webhook_record_merged
+      summary: "Two records were merged into one. The target is the record kept; data.from_id is the merged one and data has counts of what moved."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  identity.verified:
+    post:
+      operationId: webhook_identity_verified
+      summary: "Someone proved they own an email or phone, so it now claims that address for their record."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  identity.closed:
+    post:
+      operationId: webhook_identity_closed
+      summary: "An email, phone or id stopped pointing at a record (replaced or removed). It stays in the record's history."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  relationship.added:
+    post:
+      operationId: webhook_relationship_added
+      summary: "Two records were linked, such as a person to their company."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  relationship.ended:
+    post:
+      operationId: webhook_relationship_ended
+      summary: "A link between two records ended."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  consent.granted:
+    post:
+      operationId: webhook_consent_granted
+      summary: "A person gave consent. data has channel, purpose, source, and topic (true when it is for one topic rather than the whole channel)."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  consent.withdrawn:
+    post:
+      operationId: webhook_consent_withdrawn
+      summary: "A person withdrew consent, such as by unsubscribing from any email. data has channel, purpose, source and topic, as for consent.granted."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  consent.bulk_withdrawn:
+    post:
+      operationId: webhook_consent_bulk_withdrawn
+      summary: "Many people withdrew consent at once, such as unsubscribes imported from another sequencer. data.count says how many."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  brand.created:
+    post:
+      operationId: webhook_brand_created
+      summary: "A brand was added to the workspace."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  brand.updated:
+    post:
+      operationId: webhook_brand_updated
+      summary: "A brand's name, website or settings changed. data.fields lists what changed."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  email_broadcast.created:
+    post:
+      operationId: webhook_email_broadcast_created
+      summary: "A broadcast was drafted or scheduled."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  email_broadcast.started:
+    post:
+      operationId: webhook_email_broadcast_started
+      summary: "A broadcast started sending."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  email_broadcast.sent:
+    post:
+      operationId: webhook_email_broadcast_sent
+      summary: "A broadcast finished sending. data has recipients and skipped."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  email_broadcast.failed:
+    post:
+      operationId: webhook_email_broadcast_failed
+      summary: "A broadcast stopped before reaching everyone. GET the broadcast for status_reason."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  email_broadcast.cancelled:
+    post:
+      operationId: webhook_email_broadcast_cancelled
+      summary: "A broadcast was cancelled. data.emails_cancelled counts emails it had queued."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  journey.created:
+    post:
+      operationId: webhook_journey_created
+      summary: "A journey was created."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  journey.updated:
+    post:
+      operationId: webhook_journey_updated
+      summary: "A journey's settings or steps changed."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  journey_run.entered:
+    post:
+      operationId: webhook_journey_run_entered
+      summary: "A person entered a journey. The target is the journey; data.via is event or manual."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  journey_run.exited:
+    post:
+      operationId: webhook_journey_run_exited
+      summary: "A person left a journey before its end. The target is the journey; data.reason says why (goal, manual, ...)."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  seo_site.created:
+    post:
+      operationId: webhook_seo_site_created
+      summary: "A website was added for site audits."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  seo_site.verified:
+    post:
+      operationId: webhook_seo_site_verified
+      summary: "Ownership of a site was proved. data.method is how."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  seo_site.unverified:
+    post:
+      operationId: webhook_seo_site_unverified
+      summary: "A site's ownership proof was gone at a later check, so it is crawled as anyone else's would be."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  seo_site.deleted:
+    post:
+      operationId: webhook_seo_site_deleted
+      summary: "A site was removed from site audits."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  crawl.started:
+    post:
+      operationId: webhook_crawl_started
+      summary: "A crawl of a site started. data has site_id and trigger."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  crawl.stopped:
+    post:
+      operationId: webhook_crawl_stopped
+      summary: "A crawl was stopped by hand."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  crawl.done:
+    post:
+      operationId: webhook_crawl_done
+      summary: "A crawl finished. data has site_id, status (done, stopped or failed), reason and page counts; GET .../crawls/{id} has its audit."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  social_action.drafted:
+    post:
+      operationId: webhook_social_action_drafted
+      summary: "A social reply was drafted and waits for a person to approve it."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  social_action.approved:
+    post:
+      operationId: webhook_social_action_approved
+      summary: "A person approved a social reply, so it will post."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  social_action.rejected:
+    post:
+      operationId: webhook_social_action_rejected
+      summary: "A person rejected a drafted social reply."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  social_action.done:
+    post:
+      operationId: webhook_social_action_done
+      summary: "An approved social reply was posted from the brand's own account. data has channel and type; GET it for its link."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  social_action.failed:
+    post:
+      operationId: webhook_social_action_failed
+      summary: "An approved social reply could not be posted. GET it for status_reason."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
   workspace.updated:
     post:
       operationId: webhook_workspace_updated
@@ -16314,7 +16782,7 @@ components:
       required: [id, type, created_at, workspace_id, actor, target, request_id, data]
       properties:
         id: { type: string, description: "Unique per event, and the webhook-id header. Use it to ignore repeats.", example: evt_48213 }
-        type: { type: string, enum: [lead.replied, lead.unsubscribed, inbox.replied, inbox.updated, inbox.classified, lead.bounced, mailbox.auto_paused, lead.created, lead.updated, lead.deleted, leads.imported, suppressions.added, suppression.removed, lead_list.created, lead_list.leads_added, lead_list.run_started, lead_list.build_done, lead_list.build_failed, lead_list.refresh_done, lead_list.refresh_failed, lead_list.enrich_done, lead_list.enrich_failed, import.done, import.failed, sequence.created, sequence.updated, sequence.activated, sequence.paused, sequence.archived, sequence.deleted, sequence.steps_updated, sequence.leads_enrolled, enrollment.stopped, mailbox.imported, mailbox.updated, mailbox.paused, mailbox.resumed, mailbox.stage_changed, mailbox.deleted, domain.added, domain.paused, domain.resumed, domain.removed, email.queued, email.sent, email.delivered, email.bounced, email.complained, email.failed, email.suppressed, email.cancelled, email.unsubscribed, email.opened, email.clicked, email.preferences_changed, email_domain.verified, email_domain.verification_failed, email_provider.events_failed, email_template.published, meeting.created, meeting.updated, meeting.deleted, deal.created, deal.updated, deal.deleted, spend.recorded, integration.connected, integration.updated, integration.disconnected, connect_request.created, deploy.detected, deploy.failed, digest.ready, experiment.started, experiment.concluded, project.created, project.updated, project.deleted, mission.created, mission.updated, mission.submitted, mission.approved, mission.paused, mission.resumed, mission.stopped, mission.completed, mission.action_held, mission.action_approved, mission.action_rejected, infra.plan_created, infra.plan_approved, infra.ordered, infra.order_failed, infra.domains_bought, infra.mailbox_joined, infra.plan_warming, infra.plan_ready, infra.plan_cancelled, fix.found, fix.updated, fix.started, fix.verify_requested, fix.confirmed, fix.reopened, workspace.updated, webhook.test] }
+        type: { type: string, enum: [lead.replied, lead.unsubscribed, inbox.replied, inbox.updated, inbox.classified, lead.bounced, mailbox.auto_paused, lead.created, lead.updated, lead.deleted, leads.imported, suppressions.added, suppression.removed, lead_list.created, lead_list.leads_added, lead_list.run_started, lead_list.build_done, lead_list.build_failed, lead_list.refresh_done, lead_list.refresh_failed, lead_list.enrich_done, lead_list.enrich_failed, import.done, import.failed, sequence.created, sequence.updated, sequence.activated, sequence.paused, sequence.archived, sequence.deleted, sequence.steps_updated, sequence.leads_enrolled, enrollment.stopped, mailbox.imported, mailbox.updated, mailbox.paused, mailbox.resumed, mailbox.stage_changed, mailbox.deleted, domain.added, domain.paused, domain.resumed, domain.removed, email.queued, email.sent, email.delivered, email.bounced, email.complained, email.failed, email.suppressed, email.cancelled, email.unsubscribed, email.opened, email.clicked, email.preferences_changed, email_domain.verified, email_domain.verification_failed, email_provider.events_failed, email_template.published, meeting.created, meeting.updated, meeting.deleted, deal.created, deal.updated, deal.deleted, spend.recorded, integration.connected, integration.updated, integration.disconnected, connect_request.created, deploy.detected, deploy.failed, digest.ready, experiment.started, experiment.concluded, project.created, project.updated, project.deleted, mission.created, mission.updated, mission.submitted, mission.approved, mission.paused, mission.resumed, mission.stopped, mission.completed, mission.action_held, mission.action_approved, mission.action_rejected, infra.plan_created, infra.plan_approved, infra.ordered, infra.order_failed, infra.domains_bought, infra.mailbox_joined, infra.plan_warming, infra.plan_ready, infra.plan_cancelled, fix.found, fix.updated, fix.started, fix.verify_requested, fix.confirmed, fix.reopened, record.created, record.bulk_created, record.updated, record.merged, identity.verified, identity.closed, relationship.added, relationship.ended, consent.granted, consent.withdrawn, consent.bulk_withdrawn, brand.created, brand.updated, email_broadcast.created, email_broadcast.started, email_broadcast.sent, email_broadcast.failed, email_broadcast.cancelled, journey.created, journey.updated, journey_run.entered, journey_run.exited, seo_site.created, seo_site.verified, seo_site.unverified, seo_site.deleted, crawl.started, crawl.stopped, crawl.done, social_action.drafted, social_action.approved, social_action.rejected, social_action.done, social_action.failed, workspace.updated, webhook.test] }
         created_at: { type: string, format: date-time }
         workspace_id: { type: string, format: uuid }
         actor: { $ref: "#/components/schemas/WebhookRef" }
@@ -17664,11 +18132,12 @@ components:
       allOf:
         - { $ref: "#/components/schemas/AnalyticsSite" }
         - type: object
-          required: [host, domain, sync]
+          required: [host, domain, sync, conversion_events]
           properties:
             host: { type: string, example: example.com, description: "The domain the site counts under in the overview, compare and history; empty when unknown." }
             domain: { type: string, description: "The domain someone set for this site, overriding the tool's own; empty when none is set." }
             sync: { type: boolean, description: Whether the sync stores this site. }
+            conversion_events: { type: array, items: { type: string }, description: "The events that count as a conversion by landing page (PostHog); empty when none are chosen." }
     AnalyticsMetrics:
       type: object
       description: Every field is optional. A missing field means the provider does not measure it; zero means it measured none.
@@ -18147,6 +18616,22 @@ components:
               reason: { type: string, enum: [ranks, mentions], description: "ranks: Google shows it for the keyword; mentions: its title or H1 has the keyword." }
               impressions: { type: integer, description: "Its impressions for the keyword over 28 days." }
               links_in: { type: integer }
+    PageConversion:
+      type: object
+      required: [url, keyword, sessions, visitors, conversions, conversion_rate, search_sessions, search_conversions, search_conversion_rate, clicks, impressions, position]
+      properties:
+        url: { type: string, example: "https://www.example.com/pricing" }
+        keyword: { type: [string, "null"], description: The page's target keyword. }
+        sessions: { type: integer, description: Visits that started on the page. }
+        visitors: { type: integer, description: "People who started a visit on it, counted day by day." }
+        conversions: { type: integer, description: Visits that started on the page and went on to a conversion event. }
+        conversion_rate: { type: number, description: "conversions / sessions, 0 to 1." }
+        search_sessions: { type: integer, description: Visits from a search engine's results that started on the page. }
+        search_conversions: { type: integer }
+        search_conversion_rate: { type: number }
+        clicks: { type: [integer, "null"], description: "Search Console clicks to the page over the same days; null when it showed none or no property covers the site." }
+        impressions: { type: [integer, "null"] }
+        position: { type: [number, "null"], description: Average position, weighted by impressions. }
     TrackedKeyword:
       type: object
       required: [id, keyword, country, device, engine, frequency, status, integration_id, position, url, previous_position, best_position, last_checked_at, last_error, target_url, created_at]
@@ -21056,9 +21541,9 @@ components:
               code:
                 type: string
                 description: Stable; new codes may be added.
-                enum: [no_mailboxes, none_ready, mailbox_error, domain_critical, server_paused, connection_broken, connection_requested, approval_waiting, mission_paused, allocation_short, infra_plan_waiting, unread_replies, context_missing, analytics_site_unmapped, brand_without_analytics, fixes_waiting]
+                enum: [no_mailboxes, none_ready, mailbox_error, domain_critical, server_paused, connection_broken, connection_requested, approval_waiting, mission_paused, allocation_short, infra_plan_waiting, unread_replies, context_missing, analytics_site_unmapped, brand_without_analytics, fixes_waiting, email_domain_failed, email_broadcast_failed, social_drafts_waiting, duplicates_waiting, events_quarantined, crm_import_failed]
               severity: { type: string, enum: [critical, warning, info] }
-              area: { type: string, enum: [mailboxes, domains, servers, connectors, missions, sequences, infrastructure, inbox, context, analytics, fixes] }
+              area: { type: string, enum: [mailboxes, domains, servers, connectors, missions, sequences, infrastructure, inbox, context, analytics, fixes, lifecycle, social, customers] }
               title: { type: string }
               detail: { type: string, description: What it means and how to fix it. }
               count: { type: integer }
