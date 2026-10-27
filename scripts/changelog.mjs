@@ -62,6 +62,7 @@ function problemsIn(file, d) {
 		if (!areaLabels[i.area]) bad(`${at}: area must be one of ${Object.keys(areaLabels).join(', ')}`);
 		if (typeof i.text !== 'string' || i.text.length < 10 || i.text.length > 400) bad(`${at}: text must be 10 to 400 characters`);
 		if (i.edition === 'cloud' && i.prs?.length) bad(`${at}: Cloud lines never list pull requests`);
+		if (i.kind === 'security' && i.prs?.length) bad(`${at}: security lines never list pull requests`);
 		if (i.prs && !i.prs.every((p) => Number.isInteger(p) && p > 0)) bad(`${at}: prs must be engine pull request numbers`);
 		if (i.thanks && !i.thanks.every((h) => /^[A-Za-z0-9-]{1,39}$/.test(h))) bad(`${at}: thanks must be GitHub handles`);
 		if (i.at && !(i.at.startsWith(d.date) && /Z$/.test(i.at))) bad(`${at}: at must be a UTC time on ${d.date}`);
