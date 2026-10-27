@@ -37,13 +37,13 @@ The recipient checks are available on their own, so a script or agent can filter
 ```sh
 curl -X POST https://outflare.example.com/v1/workspaces/$WS/recipients/check \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" \
-  -d '{"emails": ["ana@acme.io", "bo@competitor.com", "not-an-email"]}'
+  -d '{"emails": ["ana@acme.example", "bo@competitor.example", "not-an-email"]}'
 ```
 
 ```json
 { "data": [
-  { "email": "ana@acme.io", "allowed": true, "reasons": [] },
-  { "email": "bo@competitor.com", "allowed": false, "reasons": ["suppressed_domain:do_not_contact"] },
+  { "email": "ana@acme.example", "allowed": true, "reasons": [] },
+  { "email": "bo@competitor.example", "allowed": false, "reasons": ["suppressed_domain:do_not_contact"] },
   { "email": "not-an-email", "allowed": false, "reasons": ["invalid_email"] }
 ] }
 ```

@@ -21,7 +21,7 @@ outflare login --url https://outflare.example.com
 Each operation's `operationId` is a command, in kebab case. Flags are its parameters and body fields:
 
 ```sh
-outflare upsert-lead --email ana@acme.com --first-name Ana --company Acme
+outflare upsert-lead --email ana@acme.example --first-name Ana --company Acme
 outflare list-leads --q acme --limit 20
 outflare get-lead --id bd11615b-2eab-4c55-945e-a3c1fb3fa9d0
 outflare create-webhook --url https://example.com/hook --events lead.replied,lead.bounced
