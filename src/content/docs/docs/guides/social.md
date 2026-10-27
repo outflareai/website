@@ -25,11 +25,16 @@ Social opens on **Your accounts**: every social profile of each brand, in one li
 | Instagram account | Followers, following and posts |
 | TikTok account | Followers, following and videos |
 | Facebook page | Followers |
+| Threads account | Followers |
+| Bluesky account | Followers, following and posts |
+| Mastodon account (mastodon.social and the other large servers) | Followers, following and posts |
 | Subreddit | Members |
-| GitHub account or organisation | Followers |
-| Discord server (an invite link) | Members |
+| Discord server (an invite link: discord.gg/…) | Members |
+| GitHub account or organisation | Stars across its repositories |
+| Docker Hub namespace | Pulls across its images |
+| DEV author | Published posts (DEV doesn't show followers) |
 
-A person's own LinkedIn profile and a Reddit user don't show followers publicly. A profile behind a login wall shows an error on its row and is tried again the next day; it never reads as zero.
+Paste several addresses into the add box at once to add them all to one brand. A person's own LinkedIn profile and a Reddit user don't show followers publicly, and a Discord channel link shows no members: use an invite link. A profile behind a login wall shows an error on its row and is tried again the next day; it never reads as zero.
 
 The numbers, the accounts table and top posts appear once something has been read.
 
