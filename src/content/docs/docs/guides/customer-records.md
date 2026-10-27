@@ -5,7 +5,7 @@ sidebar:
   order: 1.5
 ---
 
-<span class="pill shipped">Shipped</span> Records, identities, links, the shared catalog, product events, duplicates and merges, timelines and consent, through the REST API and the MCP server. Segments and the customer pages come next.
+<span class="pill shipped">Shipped</span> Records, identities, links, the shared catalog, product events, duplicates and merges, timelines and consent, through the REST API and the MCP server. [Smart lists](/docs/guides/smart-lists/) group records by rules. The customer pages come next.
 
 Outflare keeps one record of each person and company your business knows, plus anything else you track, such as deals, subscriptions or partners. The customer data platform, the CRM and lifecycle email all use the same records, so nobody types the same detail twice and nothing ends up in a separate copy.
 
@@ -68,7 +68,16 @@ Outflare merges on its own in one case only. If your product reports that someon
 
 ## Timeline
 
-Every person and company has a timeline, newest first: their product events, changes to their details, emails and ids added or replaced, consent given or taken back, cold email sent to them and their replies, meetings and deals. Filter it with `kinds`, for example `?kinds=message,meeting,deal` for just the outreach.
+Every person and company has one timeline across every module, newest first (`GET /records/{record}/timeline`, MCP `get_record_timeline`):
+
+- product events, including lifecycle email and payments
+- changes to their details, and emails and ids added or replaced
+- consent given or taken back, and entries on the [opt-out list](/docs/guides/who-can-be-emailed/#the-opt-out-list)
+- cold email sent to them and their replies, meetings and deals
+- visits to your website: the landing page, pages seen, where they came from and the campaign
+- journeys entered, and finished or left
+
+A company's timeline includes its people's, and each item says whose it is; `people=false` shows only the company's own. Filter it with `kinds`, for example `?kinds=message,meeting,deal` for just the outreach, and with `brand` for one brand's items and the shared ones. Pages are 50 items; pass `next_before` as `before` for the next.
 
 ## Consent
 

@@ -32,11 +32,11 @@ const glyphs: Record<string, string> = { linkedin: 'in' };
 	</section>
 
 	<div class="mx-auto max-w-6xl px-4 py-14 sm:px-6">
-		<ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+		<ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
 			{
 				social.profiles.map((p) => (
 					<li>
-						<a href={p.url} rel="me noopener" data-track="social_profile_click" data-track-label={p.id} class="card group flex h-full items-start gap-3.5 p-4 transition-colors hover:border-foreground/25">
+						<a href={p.url} rel="me noopener" data-track="social_profile_click" data-track-label={p.id} class="card group flex h-full items-center gap-3.5 p-4 transition-colors hover:border-foreground/25">
 							<span class="flex size-11 shrink-0 items-center justify-center rounded-lg border bg-background text-foreground">
 								{icons[p.id] ? (
 									<svg viewBox={icons[p.id].viewBox} class="size-5" aria-hidden="true"><path fill="currentColor" d={icons[p.id].d} /></svg>
@@ -45,18 +45,14 @@ const glyphs: Record<string, string> = { linkedin: 'in' };
 								)}
 							</span>
 							<span class="min-w-0">
-								<span class="flex flex-wrap items-baseline gap-x-2">
-									<span class="font-medium">{p.name}</span>
-									<span class="text-sm text-muted-foreground">{p.handle}</span>
-								</span>
-								<span class="mt-1 block text-sm text-muted-foreground">{p.about}</span>
-								<span class="mt-2 block font-mono text-xs text-muted-foreground">outflare.ai/{p.short}</span>
+								<span class="block font-medium">{p.name}</span>
+								<span class="block truncate text-sm text-muted-foreground">{p.handle}</span>
 							</span>
 						</a>
 					</li>
 				))
 			}
 		</ul>
-		<p class="mt-8 text-sm text-muted-foreground">More profiles appear here as we open them. Something else claiming to be Outflare? Tell us at <a href={`mailto:${site.email}`} class="underline underline-offset-4 hover:text-foreground">{site.email}</a>.</p>
+		<p class="mt-8 text-sm text-muted-foreground">Something else claiming to be Outflare? Tell us at <a href={`mailto:${site.email}`} class="underline underline-offset-4 hover:text-foreground">{site.email}</a>.</p>
 	</div>
 </Marketing>

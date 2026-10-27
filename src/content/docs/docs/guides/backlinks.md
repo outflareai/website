@@ -72,6 +72,21 @@ Nothing happens on a score alone. Open **Review** on a link and choose:
 
 Once something is marked, **Download disavow file** gives you the text file for Google Search Console's disavow links tool. It lists a whole domain (`domain:`) when every link from it is marked, and single pages otherwise. Upload it yourself in Search Console. Outflare never uploads it and never contacts the sites that link to you. Most sites never need a disavow file at all: Google ignores most spam links on its own.
 
+## Link opportunities on the fixes list
+
+Each weekly read, and each review, puts what is worth doing about a site's links on the workspace's [fixes list](/docs/guides/site-audits/#the-fixes-list), next to the site audit's fixes:
+
+| Fix | One per | When |
+| --- | --- | --- |
+| Win back a lost link | linking domain | A domain rated 30 or more stopped linking to you in the last 90 days |
+| Redirect a broken page | page | Live links point to a page your latest crawl found broken (4xx or 5xx) |
+| A domain that links to competitors | domain | A domain rated 30 or more links to 2 or more of your tracked [competitors](/docs/guides/competitors/) but not to you |
+| Review toxic links | site | Toxic links nobody has reviewed yet |
+
+Each kind adds at most 25 fixes a site, strongest first. A fix the next read no longer finds is done, and one marked done that is still found opens again. Marking links to disavow takes them out of the win-back and broken-page fixes. Open a fix to copy a prompt that lists the links behind it for your own agent, or jump to Backlinks or Competitors.
+
+These are suggestions only. Outflare never contacts a site, asks for a link or disavows anything on its own.
+
 ## How much it reads and costs
 
 Each week Outflare asks each tool for the 200 links from the strongest linking domains, plus the links lost in the last 90 days, for each site. Change the number per connection (1 to 1,000) with `link_rows` in its SEO settings.
@@ -105,8 +120,11 @@ curl -X PATCH -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/js
   -d '{"review": "disavow", "domain": true}' "$URL/v1/workspaces/$WS/backlinks/$LINK"
 curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/backlinks/disavow?site_id=$SITE" -o disavow.txt
 
+# Link opportunities on the fixes list
+curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/fixes?source=seo_links&status=open"
+
 # Each site's totals and weekly trend
 curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/backlinks/summary"
 ```
 
-Reading needs the `seo.read` scope and reviewing needs `seo.manage`, and a brand's token sees only its brand's sites. Agents use the MCP tools `list_backlinks` (with `spam=toxic`), `list_backlink_events`, `get_backlinks_summary`, `review_backlink` and `get_disavow_file`, and can ask things like "which strong links did we lose this month?". Each weekly read is the audit action `backlinks.synced`, with how many links were seen, gained, lost and regained.
+Reading needs the `seo.read` scope and reviewing needs `seo.manage`, and a brand's token sees only its brand's sites. Agents use the MCP tools `list_backlinks` (with `spam=toxic`), `list_backlink_events`, `get_backlinks_summary`, `review_backlink` and `get_disavow_file`, and can ask things like "which strong links did we lose this month?". Agents see link opportunities with `list_fixes` (`source: seo_links`) and `get_fix_prompt`. Each weekly read is the audit action `backlinks.synced`, with how many links were seen, gained, lost and regained and how many link opportunities it added, reopened and confirmed.

@@ -9,7 +9,7 @@ sidebar:
 
 People ask ChatGPT, Claude, Gemini and Perplexity which tool to buy. AI visibility asks AI models those same questions on a schedule and counts how often their answers name your brand, how you compare with your competitors, and which pages they cite.
 
-Every question goes to a model on **your own AI connection**: Claude, OpenAI, Gemini, Mistral or OpenRouter, connected on the [Connectors](/docs/integrations/connectors/) page with your own key. The provider bills your account. Outflare never supplies a key, so with no AI connection AI visibility stays off and tells you which connection to add. See [AI models](/docs/agents/ai-models/).
+Every question goes to a model on **your own AI connection**: Claude, OpenAI, Gemini, Mistral, xAI, or a router such as OpenRouter, Vercel AI Gateway or Requesty, connected on the [Connectors](/docs/integrations/connectors/) page with your own key. The provider bills your account. Outflare never supplies a key, so with no AI connection AI visibility stays off and tells you which connection to add. See [AI models](/docs/agents/ai-models/).
 
 ## Cohorts and prompts
 

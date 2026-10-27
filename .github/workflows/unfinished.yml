@@ -1,0 +1,43 @@
+# Unfinished work (AGENTS.md, "Unfinished work lives on GitHub"): a pull request
+# with the unfinished label fails this check, so it shows red until someone
+# finishes it and takes the label off. Separate from CI so the label re-runs
+# only this check.
+name: Unfinished
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+  push:
+    branches: [main]
+    paths: [.github/workflows/unfinished.yml]
+
+permissions:
+  contents: read
+
+jobs:
+  unfinished:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Not marked unfinished
+        env:
+          UNFINISHED: ${{ contains(github.event.pull_request.labels.*.name, 'unfinished') }}
+        run: |
+          if [ "$UNFINISHED" = "true" ]; then
+            echo "::error::This pull request is unfinished. Read the Handoff at the top of its description to pick it up, and take the unfinished label off once it is done."
+            exit 1
+          fi
+
+  # Keeps the label red and described, once this file reaches main.
+  label:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Create or update the unfinished label
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh label create unfinished --color D93F0B --description "Not finished. Read the Handoff in the description to pick it up." --force

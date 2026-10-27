@@ -2728,6 +2728,83 @@ paths:
               schema: { oneOf: [{ $ref: "#/components/schemas/Queued" }, { $ref: "#/components/schemas/MissionHeld" }] }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/sending-domains/{domain}/dns:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { $ref: "#/components/parameters/Domain" }
+    post:
+      operationId: addSendingDomainDNS
+      x-outflare-access: { scope: mailboxes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Add a domain's missing SPF or DMARC record in one click
+      description: "Scope: mailboxes.manage. Adds the records the domain's issues ask for (`issues[].record`) through the workspace's own DNS host connection (such as Cloudflare), in the background. It only adds records, never changes or deletes one. Poll the domain: `dns_install` says how it went, and the domain is checked again once they're in. 400 when nothing is missing."
+      tags: [domains]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [integration_id]
+              properties:
+                integration_id: { type: string, format: uuid, description: "One of `dns_connections`: a connection that can add DNS records (capability dns.write)." }
+      responses:
+        "202":
+          description: "Queued. Inside a mission, a MissionHeld answer when the call was held for approval or dry-run instead."
+          content:
+            application/json:
+              schema: { oneOf: [{ $ref: "#/components/schemas/Queued" }, { $ref: "#/components/schemas/MissionHeld" }] }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/sending-domains/{domain}/dns/approval:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { $ref: "#/components/parameters/Domain" }
+    get:
+      operationId: getSendingDomainDNSApproval
+      x-outflare-access: { scope: mailboxes.manage }
+      summary: Get a one-off approval link for a domain's missing SPF or DMARC record
+      description: "Scope: mailboxes.manage. Looks up the domain's DNS provider. When it supports Domain Connect and has Outflare's template, `url` takes the person to the provider's own screen to approve exactly these records once; Outflare keeps no access afterwards. Otherwise `reason` says why, and .../dns with a DNS host connection is the way."
+      tags: [domains]
+      parameters:
+        - { name: return, in: query, description: "The app path the provider sends the browser back to, such as /acme/domains. Default: /.", schema: { type: string } }
+      responses:
+        "200":
+          description: Whether the provider can, and the link.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DNSApproval" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/sending-domains/{domain}/dns/approved:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { $ref: "#/components/parameters/Domain" }
+    post:
+      operationId: reportSendingDomainDNSApproved
+      x-outflare-access: { scope: mailboxes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Report coming back from the DNS provider's approval
+      description: "Scope: mailboxes.manage. Call it when the provider sends the browser back. Without `error` Outflare checks the domain again (it trusts DNS, not the redirect) and `dns_install` shows `provider`; with one nothing changes."
+      tags: [domains]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/DNSApproved" }
+      responses:
+        "202":
+          description: "Noted. Inside a mission, a MissionHeld answer when the call was held for approval or dry-run instead."
+          content:
+            application/json:
+              schema: { oneOf: [{ $ref: "#/components/schemas/Queued" }, { $ref: "#/components/schemas/MissionHeld" }] }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/sending-servers:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
@@ -3522,6 +3599,196 @@ paths:
         "409": { $ref: "#/components/responses/Error" }
         "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/smart-lists:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listSmartLists
+      x-outflare-access: { scope: customers.read, brand_limited: true }
+      summary: List smart lists
+      description: |
+        Scope: customers.read. Groups of people on customer records that keep themselves up to date from rules, by name.
+        Lead lists (GET .../lead-lists) hold the leads someone picked or a search found; a smart list holds whoever
+        matches its rules now.
+      tags: [lists]
+      parameters:
+        - { $ref: "#/components/parameters/Brand" }
+      responses:
+        "200":
+          description: Smart lists.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/SmartList" } }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createSmartList
+      x-outflare-access: { scope: customers.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Create a smart list
+      description: |
+        Scope: customers.manage. The list fills itself straight away, then stays up to date: Outflare adds people who
+        start matching and removes people who stop, within about 15 minutes. Check the count first with
+        POST .../smart-lists/preview. A brand's list holds that brand's people and those shared by every brand.
+      tags: [lists]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SmartListInput" }
+      responses:
+        "201":
+          description: The list. Its members fill in a few seconds.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SmartList" }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/smart-lists/preview:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    post:
+      operationId: previewSmartList
+      x-outflare-access: { scope: customers.read, brand_limited: true }
+      summary: Count who rules pick, without saving
+      description: |
+        Scope: customers.read. How many people the rules pick right now and the 10 newest of them, so you can check a
+        list before saving it. Nothing is stored.
+      tags: [lists]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                brand_id: { type: [string, "null"], description: "A brand's id or handle; null or left out for every brand." }
+                rules: { type: array, maxItems: 20, items: { $ref: "#/components/schemas/SmartListRule" } }
+                match: { type: string, enum: [all, any], default: all }
+      responses:
+        "200":
+          description: The count and a sample.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [members, sample]
+                properties:
+                  members: { type: integer, description: How many people match now. }
+                  sample: { type: array, items: { $ref: "#/components/schemas/SmartListPerson" } }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/smart-lists/{id}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getSmartList
+      x-outflare-access: { scope: customers.read, brand_limited: true }
+      summary: Get a smart list
+      description: "Scope: customers.read."
+      tags: [lists]
+      responses:
+        "200":
+          description: The list.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SmartList" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateSmartList
+      x-outflare-access: { scope: customers.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Change a smart list
+      description: |
+        Scope: customers.manage. Send only what changes. Changing the rules, match or brand refreshes the members
+        straight away.
+      tags: [lists]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SmartListInput" }
+      responses:
+        "200":
+          description: The list.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SmartList" }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+    delete:
+      operationId: deleteSmartList
+      x-outflare-access: { scope: customers.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Delete a smart list. Its people stay.
+      description: "Scope: customers.manage."
+      tags: [lists]
+      responses:
+        "204": { description: Deleted. }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/smart-lists/{id}/members:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: listSmartListMembers
+      x-outflare-access: { scope: customers.read, brand_limited: true }
+      summary: Who is in a smart list now, newest to join first
+      description: "Scope: customers.read. As of the list's refreshed_at. Page with cursor=next_cursor."
+      tags: [lists]
+      parameters:
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
+        - { name: before, in: query, schema: { type: string }, description: From next_before. }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
+      responses:
+        "200":
+          description: Members.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/SmartListPerson" } }
+                  next_before: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/smart-lists/{id}/refresh:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: refreshSmartList
+      x-outflare-access: { scope: customers.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Bring a smart list's members up to date now
+      description: "Scope: customers.manage. Lists refresh on their own every 15 minutes; this does it now. Watch refreshed_at."
+      tags: [lists]
+      responses:
+        "202":
+          description: Queued.
+          content:
+            application/json:
+              schema: { oneOf: [{ $ref: "#/components/schemas/Queued" }, { $ref: "#/components/schemas/MissionHeld" }] }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/data-providers:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
@@ -3589,12 +3856,21 @@ paths:
     get:
       operationId: listSuppressions
       x-outflare-access: { scope: leads.read, brand_limited: true }
-      summary: List the suppression list, ordered by value
-      description: "Scope: leads.read"
+      summary: List the opt-out list, ordered by value
+      description: |
+        Scope: leads.read. The one opt-out list every send checks: unsubscribes
+        and bounces from any tool, entries people add, competitors and others
+        never to contact. Each entry says why (reason), how it was added
+        (method: manual, automated, or ai_suggested when the AI read a reply
+        as an opt-out, with its confidence), who added it, from which tool
+        (source) and, for a sequencer's blocklist, which connection.
       tags: [suppression]
       parameters:
         - { name: kind, in: query, schema: { type: string, enum: [email, domain] } }
         - { name: reason, in: query, schema: { $ref: "#/components/schemas/SuppressionReason" } }
+        - { name: method, in: query, schema: { $ref: "#/components/schemas/SuppressionMethod" } }
+        - { name: source, in: query, description: "The tool or feature that added it, such as reply, smtp, emailbison_sync or apollo_import.", schema: { type: string } }
+        - { name: integration_id, in: query, description: The connection it came from., schema: { type: string, format: uuid } }
         - { name: q, in: query, schema: { type: string } }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
         - { name: after, in: query, description: "next_after from the previous page.", schema: { type: string } }
@@ -3624,7 +3900,10 @@ paths:
       description: |
         Scope: leads.manage. Each value is an email address or a domain
         (also accepted as @acme-com.example or a URL). A suppressed domain blocks
-        every address at it. Existing entries are left as they are.
+        every address at it. Existing entries are left as they are. Up to
+        100,000 values at once, so a list from an old tool moves in one call.
+        Recorded with who added them; method is manual unless given (an
+        agent's mission adds ai_suggested).
       tags: [suppression]
       requestBody:
         required: true
@@ -3640,6 +3919,12 @@ paths:
                   items: { type: string }
                 reason: { $ref: "#/components/schemas/SuppressionReason" }
                 note: { type: string, maxLength: 500 }
+                source:
+                  type: string
+                  pattern: "^[a-z0-9._-]{1,64}$"
+                  description: "Where the entries come from, such as the old tool a list moves from (hubspot_export). Default: manual from the web app, else the surface (api, mcp, cli, mission)."
+                  example: hubspot_export
+                method: { $ref: "#/components/schemas/SuppressionMethod" }
       responses:
         "200":
           description: Result.
@@ -3677,6 +3962,101 @@ paths:
         "404": { $ref: "#/components/responses/Error" }
         "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/suppression-syncs:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listSuppressionSyncs
+      x-outflare-access: { scope: leads.read }
+      summary: How the opt-out list is kept in step with each sequencer
+      description: |
+        Scope: leads.read. Every connected sequencer with a blocklist
+        (EmailBison, Instantly, Smartlead). On each sync its blocklist is read
+        into the opt-out list (source <connector>_sync) and the opt-out list
+        is written to it, so a send from either side honours both. Smartlead's
+        blocklist cannot be read, so it is only written to.
+      tags: [suppression]
+      responses:
+        "200":
+          description: The syncs.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/SuppressionSync" } }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/suppression-syncs/{integration}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: integration, in: path, required: true, schema: { type: string, format: uuid } }
+    patch:
+      operationId: updateSuppressionSync
+      x-outflare-access: { scope: suppressions.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Turn reading or writing a sequencer's blocklist on or off
+      description: "Scope: suppressions.manage. Both are on by default. Recorded as suppression_sync.updated."
+      tags: [suppression]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                pull: { type: boolean }
+                push: { type: boolean }
+      responses:
+        "200":
+          description: The sync.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SuppressionSync" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/contact-rules:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: getContactRules
+      x-outflare-access: { scope: workspace.read }
+      summary: Who may get marketing email
+      description: |
+        Scope: workspace.read. Marketing email (broadcasts, journeys,
+        lifecycle sends) goes by each person's contact basis
+        (Record.contactability): people who agreed always get it, people
+        who said no and third-party leads never do, and customer_marketing
+        says whether everyone else does.
+      tags: [suppression]
+      responses:
+        "200":
+          description: The rules.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ContactRules" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateContactRules
+      x-outflare-access: { scope: workspace.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Choose who may get marketing email
+      description: "Scope: workspace.manage. Recorded as contact_rules.updated."
+      tags: [suppression]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ContactRules" }
+      responses:
+        "200":
+          description: The rules.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ContactRules" }
+        "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/recipients/check:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     post:
@@ -3705,6 +4085,14 @@ paths:
                   maxItems: 1000
                   items: { type: string }
                 brand: { type: string, description: "The brand that would email them (id or handle), for the cross-brand rule.", example: repocket }
+                purpose:
+                  type: string
+                  enum: [cold, lifecycle, transactional]
+                  default: cold
+                  description: |
+                    What the email would be. lifecycle (marketing) also applies each person's contact basis:
+                    third_party_no_consent for a third-party lead who never agreed, no_consent when the contact
+                    rule is opt_in and they never agreed. transactional lets unsubscribes through.
       responses:
         "200":
           description: One decision per email, in order.
@@ -3718,6 +4106,89 @@ paths:
                     type: array
                     items: { $ref: "#/components/schemas/RecipientDecision" }
         "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/email-finder/pattern:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: emailFinderPattern
+      x-outflare-access: { scope: leads.read }
+      summary: The address shape a company domain uses
+      description: |
+        Scope: leads.read. Returns what this workspace has learned about a
+        domain's email pattern, from its own leads and verification outcomes,
+        building it on first use. Free, and shared with no other workspace.
+      tags: [leads]
+      parameters:
+        - { name: domain, in: query, required: true, schema: { type: string }, example: acme.example }
+      responses:
+        "200":
+          description: The learned pattern and a code saying how confident it is.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, code]
+                properties:
+                  data: { $ref: "#/components/schemas/EmailPattern" }
+                  code: { $ref: "#/components/schemas/EmailFindCode" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/email-finder/find:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    post:
+      operationId: emailFinderFind
+      x-outflare-access: { scope: leads.read }
+      summary: Propose a likely work address for each person
+      description: |
+        Scope: leads.read. For each person (name plus company domain) proposes
+        the most likely address from the domain's learned pattern and
+        first-party history, with a confidence and a code. Free: it spends
+        nothing. At most 50 people a call, and only this workspace's own data.
+      tags: [leads]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/EmailFindRequest" }
+      responses:
+        "200":
+          description: One result per person, matched by ref.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { $ref: "#/components/schemas/EmailFindResult" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/email-finder/verify:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    post:
+      operationId: emailFinderVerify
+      x-outflare-access: { scope: leads.manage }
+      summary: Check addresses through the verification waterfall
+      description: |
+        Scope: leads.manage. Checks each address cheapest tier first (first-party
+        history, the learned pattern, the free built-in checks) and rolls up to
+        the workspace's own connected verifier only when confidence stays low.
+        That last tier spends on the workspace's own account, never Outflare's. A
+        slow check answers pending and runs as its own short job; re-call to
+        collect it. At most 50 addresses a call.
+      tags: [leads]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/EmailVerifyRequest" }
+      responses:
+        "200":
+          description: One result per address, matched by ref.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { $ref: "#/components/schemas/EmailFindResult" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/mailboxes/{id}/test-send:
     parameters:
@@ -4495,6 +4966,289 @@ paths:
         "202": { $ref: "#/components/responses/MissionHeld" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/alerts:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listAlerts
+      x-outflare-access: { scope: workspace.read, brand_limited: true }
+      summary: List alerts
+      description: |
+        Scope workspace.read, plus the scope of the module each kind comes
+        from (inbox.read for hot replies, customers.read for hot website
+        visitors); kinds the caller can't read are left out. Newest first.
+        Each alert says what happened, read fresh from what it is about, and
+        the app page that has it. Brand-limited callers see their brands'
+        alerts and the shared ones.
+      tags: [alerts]
+      parameters:
+        - { name: kind, in: query, schema: { type: string }, description: One kind, such as reply.hot. }
+        - { name: before, in: query, schema: { type: string, format: date-time }, description: next_before from the previous page. }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
+      responses:
+        "200":
+          description: Alerts.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, next_before, next_cursor]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/Alert" } }
+                  next_before: { type: [string, "null"], format: date-time }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/alerts/settings:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: getAlertSettings
+      x-outflare-access: { scope: workspace.read, brand_limited: true }
+      summary: Show who gets alerts by email
+      description: |
+        Scope workspace.read. The kinds of alert, who gets each by email
+        for the workspace and for each brand that chose differently, and
+        the kinds the caller muted for themselves. A kind no setting names
+        goes to the person it is for (owner), else the owners and admins.
+        Alert emails are Outflare's account email, at most
+        daily_email_limit a day for each person; the rest wait in the app.
+      tags: [alerts]
+      responses:
+        "200":
+          description: Settings.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [kinds, default_email, daily_email_limit, settings, muted]
+                properties:
+                  kinds: { type: array, items: { $ref: "#/components/schemas/AlertKind" } }
+                  default_email: { type: string, enum: [owner, admins, off] }
+                  daily_email_limit: { type: integer }
+                  settings: { type: array, items: { $ref: "#/components/schemas/AlertSetting" } }
+                  muted: { type: array, items: { type: string }, description: Kinds the caller muted for themselves. }
+        default: { $ref: "#/components/responses/Error" }
+    put:
+      operationId: setAlertSettings
+      x-outflare-access: { scope: workspace.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Choose where a kind of alert goes
+      description: |
+        Scope workspace.manage. For the workspace or, with brand_id, one
+        brand. email is who gets the kind by email: owner (the person it is
+        for, else the owners and admins), admins (every owner and admin),
+        off, or null to follow the workspace (for a brand) or the default.
+        slack_integration_id and slack_channel (from GET .../alerts/channels)
+        post it to a channel in one of the workspace's own Slack
+        connections; both null stops posting. Fields left out stay as they
+        are. When nothing is chosen any more the setting is removed and the
+        answer is {"cleared": true}. Alerts still show in the app and go to
+        webhooks whatever this says.
+      tags: [alerts]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [kind]
+              properties:
+                brand_id: { type: [string, "null"], format: uuid }
+                kind: { type: string, example: reply.hot }
+                email: { type: [string, "null"], enum: [owner, admins, off, null] }
+                slack_integration_id: { type: [string, "null"], format: uuid }
+                slack_channel: { type: [string, "null"], example: C0123456789 }
+      responses:
+        "200":
+          description: The saved setting, or cleared true.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - { $ref: "#/components/schemas/AlertSetting" }
+                  - type: object
+                    required: [cleared]
+                    properties:
+                      cleared: { type: boolean }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/alerts/channels:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listAlertChannels
+      x-outflare-access: { scope: workspace.manage }
+      summary: List the Slack channels alerts can post to
+      description: |
+        Scope workspace.manage. The channels one of the workspace's own Slack
+        connections can see, by name, through that connection.
+      tags: [alerts]
+      parameters:
+        - { name: integration_id, in: query, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: Channels.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, name, private]
+                      properties:
+                        id: { type: string }
+                        name: { type: string }
+                        private: { type: boolean }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/alerts/mutes:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    put:
+      operationId: setAlertMute
+      x-outflare-access: { scope: workspace.read, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Mute or unmute a kind of alert for yourself
+      description: |
+        Scope workspace.read. Stops (muted true) or restarts alert emails of
+        one kind to the caller in this workspace: the signed-in person, or
+        who made the token. Muted alerts still show in the app.
+      tags: [alerts]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [kind, muted]
+              properties:
+                kind: { type: string, example: visitor.hot }
+                muted: { type: boolean }
+      responses:
+        "200":
+          description: The mute as it now is.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [kind, muted]
+                properties:
+                  kind: { type: string }
+                  muted: { type: boolean }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/reply-rules:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: getReplyRules
+      x-outflare-access: { scope: inbox.read }
+      summary: List the reply rules
+      description: |
+        Scope inbox.read. What Outflare does when a reply gets a label it is
+        sure of (rules, a person, or the AI at 80% or more): the defaults,
+        the actions each label can take, and the sets saved for the
+        workspace, a project or a sequence. For a reply, the sequence's set
+        wins over its project's, which wins over the workspace's, label by
+        label; labels no set names follow the defaults.
+      tags: [inbox]
+      responses:
+        "200":
+          description: The rules.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [defaults, actions, data]
+                properties:
+                  defaults: { $ref: "#/components/schemas/ReplyRules" }
+                  actions:
+                    type: object
+                    description: The actions each label can take, the default first.
+                    additionalProperties: { type: array, items: { type: string } }
+                    example: { not_now: [snooze, restart, nothing], out_of_office: [reschedule, nothing], referral: [suggest, add, add_and_enroll], wrong_person: [suggest, add, add_and_enroll] }
+                  data: { type: array, items: { $ref: "#/components/schemas/ReplyRuleSet" } }
+        default: { $ref: "#/components/responses/Error" }
+    put:
+      operationId: setReplyRules
+      x-outflare-access: { scope: inbox.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Save the reply rules for the workspace, a project or a sequence
+      description: |
+        Scope inbox.manage. Replaces the set for the workspace (no ids), a
+        project (project_id) or a sequence (sequence_id). Labels left out
+        follow the next set up; an empty rules object removes the set and
+        answers {"cleared": true}. Every action can be undone: a snoozed
+        reply can be woken, a restarted or enrolled lead stopped.
+      tags: [inbox]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [rules]
+              properties:
+                project_id: { type: string, format: uuid }
+                sequence_id: { type: string, format: uuid }
+                rules: { $ref: "#/components/schemas/ReplyRules" }
+      responses:
+        "200":
+          description: The saved set, or cleared true when an empty set removed it.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - { $ref: "#/components/schemas/ReplyRuleSet" }
+                  - type: object
+                    required: [cleared]
+                    properties:
+                      cleared: { type: boolean }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/inbox/{id}/referral:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: addReplyReferral
+      x-outflare-access: { scope: inbox.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Add the person a reply refers you to as a lead
+      description: |
+        Scope inbox.manage. Adds the address the reply names (details.referral_email)
+        as a lead on the referrer's lists, with referred_by set, and with
+        sequence_id enrols them unless they are on the opt-out list. 422
+        no_referral when the reply names no address.
+      tags: [inbox]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                sequence_id: { type: string, format: uuid }
+      responses:
+        "200":
+          description: The lead.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [lead_id, email, created, enrolled]
+                properties:
+                  lead_id: { type: string, format: uuid }
+                  email: { type: string, format: email }
+                  created: { type: boolean, description: False when the lead already existed. }
+                  enrolled: { type: boolean }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "404": { $ref: "#/components/responses/Error" }
+        "422": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/inbox/{id}/reply:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
@@ -4973,18 +5727,23 @@ paths:
       description: |
         The company's logo as a square SVG, unmodified apart from cropping, or a
         monogram for connectors without one. Public, so it works in an `<img>`
-        tag. Add `theme=dark` for the variant made for dark backgrounds.
+        tag. Add `theme=dark` for the variant made for dark backgrounds. It
+        carries an `ETag` and is revalidated on every load, so send
+        `If-None-Match` to get `304` when it hasn't changed.
       tags: [connectors]
       security: []
       parameters:
         - { name: id, in: path, required: true, schema: { type: string }, example: hubspot }
         - { name: theme, in: query, schema: { type: string, enum: [light, dark], default: light } }
+        - { name: v, in: query, description: "Ignored; changes the address so old cached copies are dropped.", schema: { type: string } }
       responses:
         "200":
           description: The logo.
           content:
             image/svg+xml:
               schema: { type: string }
+        "304":
+          description: Not changed since the `ETag` in `If-None-Match`.
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/connectors:
@@ -5842,6 +6601,232 @@ paths:
               schema: { oneOf: [{ type: object, required: [queued], properties: { queued: { type: array, items: { type: string, format: uuid } } } }, { $ref: "#/components/schemas/MissionHeld" }] }
         "503": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/ads/conversion-targets:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+    get:
+      operationId: listAdConversionTargets
+      x-outflare-access: { scope: integrations.manage }
+      summary: List where an ad account's conversions can go
+      description: |
+        Scope: integrations.manage. Asks the platform, live: Google Ads
+        conversion actions that take uploaded clicks, Meta pixels (datasets),
+        Microsoft Advertising offline conversion goals, or Reddit's
+        Conversions API. `event_types` lists what a target takes as
+        `event_type` (Meta's Purchase or Lead), empty when the target is the
+        event already. `setup_needed` lists what the connection still needs
+        to send at all, such as Reddit's Conversions API token (add it with
+        PUT .../ads/connections/{integration_id}/setup).
+      tags: [ads]
+      parameters:
+        - { name: account_id, in: query, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: The targets.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, setup_needed, integration_id]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/AdConversionTarget" } }
+                  setup_needed: { type: array, items: { $ref: "#/components/schemas/ConnectorField" } }
+                  integration_id: { type: string, format: uuid }
+        "400": { $ref: "#/components/responses/Error" }
+        "422": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/ads/conversion-rules:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+    get:
+      operationId: listAdConversionRules
+      x-outflare-access: { scope: analytics.read }
+      summary: List the rules that send conversions to ad platforms
+      description: "Scope: analytics.read. Each rule sends one customer event (such as signed_up) to one conversion on one ad account, with what it sent, skipped and failed in the last 30 days."
+      tags: [ads]
+      parameters:
+        - { name: account_id, in: query, schema: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: The rules.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/AdConversionRule" } }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createAdConversionRule
+      x-outflare-access: { scope: integrations.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Send a customer event to an ad platform as a conversion
+      description: |
+        Scope: integrations.manage. From now on, each time the event
+        happens, the ad platform hears about it server to server within a
+        few minutes, with the ad click id from the person's visits and their
+        hashed email and phone, so its reporting and bidding learn from real
+        outcomes. Events from before the rule are never sent. The event id
+        is the one the browser pixel sends, so the platform counts each
+        conversion once. Consent follows GET .../ads/settings. The target is
+        checked with the platform first.
+      tags: [ads]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [account_id, event_name, target_id]
+              properties:
+                account_id: { type: string, format: uuid }
+                event_name: { type: string, example: order_completed }
+                target_id: { type: string, description: "From GET .../ads/conversion-targets." }
+                event_type: { type: string, example: Purchase, description: "One of the target's event_types; default the first." }
+                value_property: { type: string, example: total, description: "The event property that holds the value." }
+                value_unit: { type: string, enum: [major, minor], description: "major: 12.50; minor: 1250 (cents). Default major." }
+                fixed_value_micros: { type: integer, format: int64, minimum: 0, description: "A value for every conversion, used when value_property is empty or missing." }
+                currency: { type: string, example: USD, description: "Empty uses the event's currency property, then the account's." }
+                enabled: { type: boolean }
+      responses:
+        "201":
+          description: The rule.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdConversionRule" }
+        "400": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "422": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/ads/conversion-rules/{id}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    patch:
+      operationId: updateAdConversionRule
+      x-outflare-access: { scope: integrations.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Change or switch off a conversion rule
+      description: "Scope: integrations.manage. Change the event, the value or the currency, or switch the rule off (what was waiting is skipped, not sent later). The account and conversion are fixed: add a new rule instead."
+      tags: [ads]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                event_name: { type: string }
+                value_property: { type: string }
+                value_unit: { type: string, enum: [major, minor] }
+                fixed_value_micros: { type: integer, format: int64, minimum: 0 }
+                currency: { type: string }
+                enabled: { type: boolean }
+      responses:
+        "200":
+          description: The rule now.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdConversionRule" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+    delete:
+      operationId: deleteAdConversionRule
+      x-outflare-access: { scope: integrations.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Delete a conversion rule
+      description: "Scope: integrations.manage. Stops sending and removes the rule with its send log. Conversions the platform already has stay there."
+      tags: [ads]
+      responses:
+        "204": { description: Deleted. }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/ads/conversion-sends:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+    get:
+      operationId: listAdConversionSends
+      x-outflare-access: { scope: analytics.read }
+      summary: List the conversions sent to ad platforms
+      description: |
+        Scope: analytics.read. Newest first: every event a rule matched and
+        what happened. sent reached the platform (match_keys names the kinds
+        of identifiers it carried, such as gclid or email, never their
+        values); skipped was never sent, with the reason (no consent,
+        nothing to match on); failed was refused, or the platform could not
+        be reached after five tries; queued waits for the next send, within
+        a few minutes.
+      tags: [ads]
+      parameters:
+        - { name: rule_id, in: query, schema: { type: string, format: uuid } }
+        - { name: record_id, in: query, schema: { type: string, format: uuid } }
+        - { name: status, in: query, schema: { type: string, enum: [queued, sent, skipped, failed] } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
+        - { name: before, in: query, schema: { type: string, format: date-time } }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
+      responses:
+        "200":
+          description: The sends.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, next_before]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/AdConversionSend" } }
+                  next_before: { type: [string, "null"], format: date-time }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/ads/settings:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+    get:
+      operationId: getAdSettings
+      x-outflare-access: { scope: analytics.read }
+      summary: Read the paid media settings
+      description: "Scope: analytics.read. consent_mode decides who conversions are sent for outside the EEA, the UK and Switzerland: opt_out (the default) sends unless the person withdrew consent for ad data, opt_in only when they granted it. Inside those countries, and when a person's country is unknown, a grant is always needed."
+      tags: [ads]
+      responses:
+        "200":
+          description: The settings.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdSettings" }
+        default: { $ref: "#/components/responses/Error" }
+    put:
+      operationId: setAdSettings
+      x-outflare-access: { scope: integrations.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Change the paid media settings
+      description: "Scope: integrations.manage. Sets consent_mode."
+      tags: [ads]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [consent_mode]
+              properties:
+                consent_mode: { type: string, enum: [opt_out, opt_in] }
+      responses:
+        "200":
+          description: The settings now.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdSettings" }
+        "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/analytics/{id}/reports/{report}:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
@@ -5978,7 +6963,7 @@ paths:
       x-outflare-access: { scope: integrations.manage }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Set an SEO connection's domains, country, budget and snapshots
-      description: "Scope: integrations.manage. Send only what changes. `domains: null` follows the domains the analytics tools line up (at most five); `monthly_budget: null` is the default ($10 for DataForSEO, 10,000 API units for Ahrefs); 0 stops every call."
+      description: "Scope: integrations.manage. Send only what changes. `domains: null` follows the domains the analytics tools line up (at most five); `monthly_budget: null` is the default ($10 for DataForSEO, 10,000 API units for Ahrefs); 0 stops every call. The budget is the connection's monthly usage limit, which `PUT .../integrations/{id}/usage/limits` also sets, with a daily one."
       tags: [seo]
       requestBody:
         required: true
@@ -6152,6 +7137,16 @@ paths:
                 max_pages: { type: integer, minimum: 1, maximum: 10000, default: 100 }
                 crawl_delay_ms: { type: integer, minimum: 250, maximum: 60000, default: 2000, description: "The pause between requests. robots.txt's Crawl-delay can lengthen it." }
                 schedule: { type: string, enum: ["off", daily, weekly], default: "off" }
+                render_js: { type: string, enum: ["off", auto, always], description: "Run pages' scripts before reading them, through the workspace's own scraping connection (Geonode, which bills you for it) and only on a proved site. auto (the default) does it only for pages that are an empty app shell; always does it for every page." }
+                use_sitemaps: { type: boolean, description: "Read the sitemaps robots.txt lists (or /sitemap.xml) to find pages. Default true." }
+                follow_nofollow: { type: boolean, description: "Follow links marked rel=nofollow too. Default false." }
+                ignore_params: { type: boolean, description: "Crawl /page?a=1 and /page?a=2 as /page. Default false." }
+                max_depth: { type: integer, minimum: 0, maximum: 100, description: "Clicks from the start page; 0 (the default) is no limit." }
+                include_patterns: { type: array, maxItems: 20, items: { type: string, maxLength: 300 }, example: ["^/blog/"], description: "Regular expressions over a page's path and query. When set, only matching pages are crawled; the start page always is." }
+                exclude_patterns: { type: array, maxItems: 20, items: { type: string, maxLength: 300 }, example: ["^/tag/", "[?&]sort="], description: "Pages matching any of these are not crawled. They win over include_patterns." }
+                schedule_hour: { type: [integer, "null"], minimum: 0, maximum: 23, description: "The hour a scheduled crawl starts, in schedule_tz; null starts it any time." }
+                schedule_day: { type: [integer, "null"], minimum: 0, maximum: 6, description: "For a weekly schedule with an hour: the day, 0 is Sunday; null is any day." }
+                schedule_tz: { type: string, example: Australia/Sydney, description: "The time zone of schedule_hour. Default UTC." }
       responses:
         "201":
           description: The site.
@@ -6184,7 +7179,7 @@ paths:
       x-outflare-access: { scope: seo.manage, brand_limited: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Change an SEO site's settings
-      description: "Scope: seo.manage. Send only what changes, within the site's `limits`. `obey_robots: false` audits pages your own robots.txt hides from crawlers, and is only for a site you have proved you own. A crawl already running keeps the settings it started with."
+      description: "Scope: seo.manage. Send only what changes, within the site's `limits`. `obey_robots: false` audits pages your own robots.txt hides from crawlers, and is only for a site you have proved you own. `url` moves where crawls start, on the same host; another host is a site of its own. A crawl already running keeps the settings it started with."
       tags: [seo]
       requestBody:
         required: true
@@ -6197,8 +7192,19 @@ paths:
                 max_pages: { type: integer, minimum: 1, maximum: 10000 }
                 crawl_delay_ms: { type: integer, minimum: 250, maximum: 60000 }
                 obey_robots: { type: boolean }
+                url: { type: string, description: "Where crawls start, on the site's own host." }
                 schedule: { type: string, enum: ["off", daily, weekly] }
                 status: { type: string, enum: [active, paused] }
+                render_js: { type: string, enum: ["off", auto, always], description: "Run pages' scripts before reading them, through the workspace's own scraping connection (Geonode, which bills you for it) and only on a proved site. auto (the default) does it only for pages that are an empty app shell; always does it for every page." }
+                use_sitemaps: { type: boolean, description: "Read the sitemaps robots.txt lists (or /sitemap.xml) to find pages. Default true." }
+                follow_nofollow: { type: boolean, description: "Follow links marked rel=nofollow too. Default false." }
+                ignore_params: { type: boolean, description: "Crawl /page?a=1 and /page?a=2 as /page. Default false." }
+                max_depth: { type: integer, minimum: 0, maximum: 100, description: "Clicks from the start page; 0 (the default) is no limit." }
+                include_patterns: { type: array, maxItems: 20, items: { type: string, maxLength: 300 }, example: ["^/blog/"], description: "Regular expressions over a page's path and query. When set, only matching pages are crawled; the start page always is." }
+                exclude_patterns: { type: array, maxItems: 20, items: { type: string, maxLength: 300 }, example: ["^/tag/", "[?&]sort="], description: "Pages matching any of these are not crawled. They win over include_patterns." }
+                schedule_hour: { type: [integer, "null"], minimum: 0, maximum: 23, description: "The hour a scheduled crawl starts, in schedule_tz; null starts it any time." }
+                schedule_day: { type: [integer, "null"], minimum: 0, maximum: 6, description: "For a weekly schedule with an hour: the day, 0 is Sunday; null is any day." }
+                schedule_tz: { type: string, example: Australia/Sydney, description: "The time zone of schedule_hour. Default UTC." }
       responses:
         "200":
           description: The site.
@@ -6233,10 +7239,13 @@ paths:
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Check that you own a site
       description: |
-        Scope: seo.manage. Looks now for any one of the site's proofs (see
-        `verification`): a DNS TXT record, a meta tag in the start page's
-        head, or a file on the site. Found, the site is verified and its
-        limits rise. Not found answers 409 `verification_failed`, whose
+        Scope: seo.manage. Looks now for any one of the site's proofs: a
+        Google Search Console connection of the workspace that owns a
+        property covering the site, the workspace's Outflare tracking tag on
+        the start page, or one added from `verification` (a DNS TXT record,
+        a meta tag in the start page's head, or a file on the site). Found,
+        the site is verified, its limits rise, and a site still on the
+        unproved limits moves to the proved defaults. Not found answers 409 `verification_failed`, whose
         message lists the proofs. Outflare checks a verified site again
         every 30 days and lowers its limits if the proof is gone. A test
         workspace's sites pass without a check.
@@ -7879,6 +8888,213 @@ paths:
         "404": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/fix-tickets:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+    get:
+      operationId: listFixTickets
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: List fix tickets
+      description: "Scope: seo.read. The fixes list read as tickets: one per problem (a source's rule) on one subject, such as \"missing title\" on a site, with its fixes as parts (for a site audit, one per URL template). A ticket's status comes from its parts: in progress when someone took one, open when one is open, ignored when all are, else done. In progress first, then open; worst first, then by the Search Console clicks and impressions of its pages (impact), then by size. By default only open and in-progress tickets (status todo)."
+      tags: [fixes]
+      parameters:
+        - { name: status, in: query, schema: { type: string, enum: [todo, open, in_progress, done, ignored, all], default: todo } }
+        - { name: source, in: query, schema: { type: string, enum: [seo_audit, seo_keywords, ai_visibility, social, seo_links] } }
+        - { name: subject_id, in: query, description: "One subject's tickets, such as an SEO site's id.", schema: { type: string, format: uuid } }
+        - { $ref: "#/components/parameters/Brand" }
+      responses:
+        "200":
+          description: Tickets (up to 500).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/FixTicket" } }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/fix-tickets/{ticket}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: ticket, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getFixTicket
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: Read a fix ticket
+      description: "Scope: seo.read. The ticket with its parts (fixes), up to 25 example pages per open part, the other tickets on its subject with their status and review, and the guidelines its brief follows. Reading it refreshes its impact."
+      tags: [fixes]
+      responses:
+        "200":
+          description: The ticket.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/FixTicketDetail" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/fix-tickets/{ticket}/prompt:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: ticket, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getFixTicketPrompt
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: A fix ticket as an issue for a developer or coding agent
+      description: "Scope: seo.read. Markdown, like a GitHub or Linear issue: the title, summary, why it matters and what to change (the brief, or the rule's own advice before one is written), the pages grouped by URL template, the definition of done as a checklist, what not to do, the team's guidelines, and how to tell Outflare the change is live. Page details are marked as data, not instructions."
+      tags: [fixes]
+      responses:
+        "200":
+          description: The prompt.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [prompt, pages]
+                properties:
+                  prompt: { type: string }
+                  pages: { type: array, items: { $ref: "#/components/schemas/FixTicketPage" } }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/fix-tickets/{ticket}/write:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: ticket, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: writeFixTicket
+      x-outflare-access: { scope: seo.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Write a fix ticket's brief with AI
+      description: "Scope: seo.manage. Queues the workspace's own AI model (its Fix tickets task under Settings, AI model) to write the ticket's brief from everything Outflare knows: the brand, the problem and its pages, their search clicks, every other ticket on the subject and what people decided (rejected ones with their reasons), the saved guidelines, and feedback. Send feedback to rewrite it the way you want. Outflare never uses an AI key of its own: without a connected model this is 409 connector_needed. Follow brief_status on the ticket (queued, writing, ready or failed with brief_error); the result is the fix_ticket.written event."
+      tags: [fixes]
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                feedback: { type: string, maxLength: 2000, example: "Our product pages come from Shopify; fix it in the theme." }
+      responses:
+        "202":
+          description: Queued, or held for a person's approval in a mission.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: object
+                    required: [queued]
+                    properties:
+                      queued: { type: boolean }
+                  - { $ref: "#/components/schemas/MissionHeld" }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/fix-tickets/{ticket}/review:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: ticket, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: reviewFixTicket
+      x-outflare-access: { scope: seo.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Approve or reject a fix ticket
+      description: "Scope: seo.manage. approve marks the ticket ready to do. reject needs a note saying why: it ignores the ticket's open parts, and the reason goes into every later brief on the subject so the idea is not raised again. reopen undoes a review and opens ignored parts again. guideline also saves the note as a fix guideline for the site, the brand or the whole workspace."
+      tags: [fixes]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [decision]
+              properties:
+                decision: { type: string, enum: [approve, reject, reopen] }
+                note: { type: string, maxLength: 1000 }
+                guideline: { type: string, enum: [workspace, brand, site, ""] }
+      responses:
+        "200":
+          description: The ticket.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/FixTicket" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/fix-guidelines:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+    get:
+      operationId: listFixGuidelines
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: List fix guidelines
+      description: "Scope: seo.read. What people told the brief writer once, for every later brief: for the whole workspace, a brand, or one site (optionally one rule). Newest first."
+      tags: [fixes]
+      parameters:
+        - { $ref: "#/components/parameters/Brand" }
+      responses:
+        "200":
+          description: Guidelines.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/FixGuideline" } }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createFixGuideline
+      x-outflare-access: { scope: seo.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Add a fix guideline
+      description: "Scope: seo.manage. With subject_id it is for one site (and, with rule, one of its problems); with brand_id, for a brand; with neither, for the workspace. A workspace keeps up to 200."
+      tags: [fixes]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text]
+              properties:
+                text: { type: string, minLength: 1, maxLength: 1000, example: "Titles are in sentence case and end with | Northpeak." }
+                brand_id: { type: [string, "null"], description: A brand's id or handle. }
+                subject_id: { type: string, format: uuid, description: An SEO site's id. }
+                rule: { type: string, example: title_missing }
+      responses:
+        "201":
+          description: The guideline.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/FixGuideline" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/fix-guidelines/{guideline}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: guideline, in: path, required: true, schema: { type: string, format: uuid } }
+    delete:
+      operationId: deleteFixGuideline
+      x-outflare-access: { scope: seo.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Remove a fix guideline
+      description: "Scope: seo.manage."
+      tags: [fixes]
+      responses:
+        "204": { description: Removed. }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/ai-bot-hits:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
@@ -7963,7 +9179,7 @@ paths:
       description: |
         Scope: seo.manage. Send only what changes. Each model is one of the
         workspace's own AI model connections (Claude, OpenAI, Gemini,
-        Mistral or OpenRouter, with its own key) and a model id from GET
+        Mistral, xAI or a router, with its own key) and a model id from GET
         .../integrations/{id}/models. OpenRouter reaches many vendors'
         models with one key. `web_search` lets the model search the web
         before it answers, as AI assistants do for people, so its answer
@@ -9842,7 +11058,7 @@ paths:
       x-outflare-access: { scope: integrations.manage }
       summary: List the models an AI model connection can use
       description: |
-        Scope: integrations.manage. For a Claude, OpenAI, Gemini, Mistral or OpenRouter
+        Scope: integrations.manage. For an AI model (Claude, OpenAI, Gemini, Mistral, xAI or a router)
         connection: the chat models its key can use, asked of the provider
         live (costs nothing). `price` is set where Outflare knows the list
         price; for the rest, enter it with your choice in `PUT /ai-settings`.
@@ -9936,6 +11152,117 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/AIUsage" }
         "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/connection-usage:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listConnectionUsage
+      x-outflare-access: { scope: integrations.read }
+      summary: What each paid connection used, with its limits
+      description: |
+        Scope: integrations.read. Every connection whose calls cost money
+        per call (SEO data, lead data, email verification, page reads and
+        web searches), with what it used today and this calendar month
+        (UTC) and its daily and monthly limits. AI models are not here:
+        their spend and limits are under `GET /ai-usage`. The calls run on
+        the workspace's own account with each provider, which bills the
+        workspace; the limits only stop Outflare from making more of them.
+      tags: [connectors]
+      responses:
+        "200":
+          description: The paid connections.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/ConnectionUsage" } }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/integrations/{id}/usage:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getConnectionUsage
+      x-outflare-access: { scope: integrations.read }
+      summary: See a paid connection's usage and limits
+      description: |
+        Scope: integrations.read. What the connection used today and this
+        calendar month (UTC), in the unit its limits count (`USD`, or the
+        provider's own: `credit`, `API unit`, `token`), its usage per day
+        for the last 30 days, its limits and the warnings sent. Usage is
+        summed from the spend ledger, so every feature's calls count.
+        `estimated` means the provider doesn't say what a call cost, so it
+        is worked out from the price list. Not found for a connection that
+        costs nothing per call.
+      tags: [connectors]
+      responses:
+        "200":
+          description: The connection's usage.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ConnectionUsage" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/integrations/{id}/usage/limits:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    put:
+      operationId: updateConnectionLimits
+      x-outflare-access: { scope: integrations.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Set a paid connection's daily and monthly limits
+      description: |
+        Scope: integrations.manage. Replaces the connection's limits: send
+        all of them. A limit that is null or left out is no limit; 0 stops
+        every call. `unit` is one of the connection's `units` (its usual
+        one when left out). With `hard_stop` (the default) Outflare makes
+        no more calls through the connection once a limit is reached, and
+        the feature that wanted one says why (`usage_limit_reached`, or
+        `budget_reached` for SEO reports); false only warns. Owners and
+        admins are emailed when usage reaches 80% of a limit and again when
+        it reaches it, once a day or month (the `connection_limit.warned`
+        and `connection_limit.reached` webhooks). For Ahrefs and DataForSEO
+        the monthly limit is the SEO budget.
+      tags: [connectors]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                unit: { type: string, example: credit }
+                daily_limit: { type: [number, "null"], minimum: 0, maximum: 1000000000000, example: 200 }
+                monthly_limit: { type: [number, "null"], minimum: 0, maximum: 1000000000000, example: 3000 }
+                hard_stop: { type: boolean, default: true }
+      responses:
+        "200":
+          description: The connection's usage, with its new limits.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ConnectionUsage" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+    delete:
+      operationId: resetConnectionLimits
+      x-outflare-access: { scope: integrations.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Go back to a paid connection's starting limits
+      description: "Scope: integrations.manage. Removes the limits set for the connection. Ahrefs (10,000 API units a month) and DataForSEO (US$10 a month) go back to their starting monthly limit; other connections have none."
+      tags: [connectors]
+      responses:
+        "200":
+          description: The connection's usage, with its starting limits.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ConnectionUsage" }
+        "404": { $ref: "#/components/responses/Error" }
         "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/ai-settings:
@@ -10854,6 +12181,200 @@ paths:
         "404": { $ref: "#/components/responses/Error" }
         "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/playbooks:
+    get:
+      operationId: listPlaybookCatalog
+      security: []
+      summary: Every playbook this server ships
+      description: |
+        Public, no key needed. Playbooks are ready-made recipes from the
+        repository's `playbooks/` folder: what data and connections each one
+        needs, its steps (each names the operations, and so the MCP tools,
+        it uses), its guardrails, how to tell it worked, and the prompt that
+        runs it. Copy a prompt into any AI app with the Outflare MCP
+        connected, or start one in a workspace with
+        `POST /v1/workspaces/{ws}/playbooks/{id}/runs`.
+      tags: [playbooks]
+      responses:
+        "200":
+          description: Playbooks, by tier then title.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/Playbook" } }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/playbooks/{id}:
+    get:
+      operationId: getPlaybookCatalog
+      security: []
+      summary: Get a playbook
+      description: Public, no key needed.
+      tags: [playbooks]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string }, example: seo-quick-wins }
+      responses:
+        "200": { description: The playbook., content: { application/json: { schema: { $ref: "#/components/schemas/Playbook" } } } }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/playbooks:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listPlaybooks
+      x-outflare-access: { scope: missions.read }
+      summary: Playbooks, with whether this workspace is ready to run each
+      description: |
+        Scope: missions.read. Each playbook with `readiness`: the
+        connections the workspace still has to add (only its own accounts
+        count), optional ones that would help, and data it doesn't collect
+        yet. `runs` counts the missions started from it here.
+      tags: [playbooks]
+      responses:
+        "200":
+          description: Playbooks.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/WorkspacePlaybook" } }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/playbooks/{id}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string }, example: seo-quick-wins }
+    get:
+      operationId: getPlaybook
+      x-outflare-access: { scope: missions.read }
+      summary: Get a playbook and whether this workspace is ready to run it
+      description: "Scope: missions.read."
+      tags: [playbooks]
+      responses:
+        "200": { description: The playbook., content: { application/json: { schema: { $ref: "#/components/schemas/WorkspacePlaybook" } } } }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/playbooks/{id}/runs:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string }, example: seo-quick-wins }
+    post:
+      operationId: startPlaybook
+      x-outflare-access: { scope: missions.run }
+      summary: Start a playbook as a mission
+      description: |
+        Scope: missions.run. Creates a mission draft named after the
+        playbook, with its prompt filled in from `inputs`, its steps as the
+        plan and its guardrails in the instructions. Like any mission it
+        does nothing until a person approves it, and the mode decides
+        whether writes are dry runs, wait for approval or run within the
+        limits. Fails with 409 `connector_needed` while a required
+        connection is missing: playbooks run only on the workspace's own
+        accounts. Missing data doesn't stop it. With `apply_kit`, the
+        playbook's setup kit is applied in the same step (see
+        `POST /v1/workspaces/{ws}/kits/{id}/apply` for the scopes it
+        needs, and its 409 `conflict`).
+      tags: [playbooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PlaybookRunInput" }
+      responses:
+        "201": { description: The mission., content: { application/json: { schema: { $ref: "#/components/schemas/Mission" } } } }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/kits:
+    get:
+      operationId: listKitCatalog
+      security: []
+      summary: Every setup kit this server ships
+      description: |
+        Public, no key needed. A setup kit is what a playbook needs set up
+        before its first run, from the repository's `playbooks/kits`
+        folder: option lists (such as a pipeline's stages), record types
+        with their fields (such as a Partnerships pipeline), fields on
+        people and companies, and email drafts. `playbooks` lists the
+        playbooks that use it. Preview it in a workspace with
+        `GET /v1/workspaces/{ws}/kits/{id}/preview`.
+      tags: [playbooks]
+      responses:
+        "200":
+          description: Kits, by title.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/Kit" } }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/kits/{id}:
+    get:
+      operationId: getKitCatalog
+      security: []
+      summary: Get a setup kit
+      description: Public, no key needed.
+      tags: [playbooks]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string }, example: creators-partnerships }
+      responses:
+        "200": { description: The kit., content: { application/json: { schema: { $ref: "#/components/schemas/Kit" } } } }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/kits/{id}/preview:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string }, example: creators-partnerships }
+    get:
+      operationId: previewKit
+      x-outflare-access: { scope: customers.read }
+      summary: Preview what a setup kit would add to this workspace
+      description: |
+        Scope: customers.read. Compares the kit with the workspace's
+        catalog and email templates, part by part: `add` (new), `extend`
+        (an option list of the workspace's own gains the kit's missing
+        options), `reuse` (already there and matching) or `conflict`
+        (there but different, such as a field of another type under the
+        same key, or archived). Changes nothing.
+      tags: [playbooks]
+      responses:
+        "200": { description: What applying it would do., content: { application/json: { schema: { $ref: "#/components/schemas/KitPlan" } } } }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/kits/{id}/apply:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string }, example: creators-partnerships }
+    post:
+      operationId: applyKit
+      x-outflare-access: { scope: catalog.manage }
+      summary: Set up a kit in this workspace
+      description: |
+        Scope: catalog.manage, and emails.manage when the kit adds email
+        drafts (403 otherwise). Adds what the preview says, in one step,
+        with the same audit events as adding each part by hand, then
+        `kit.applied`. It only adds: matching parts are reused, option
+        lists of the workspace's own only gain options, and existing
+        email templates stay as they are. Email drafts are added
+        unpublished, so a person reads and publishes them before anything
+        sends them. Fails with 409 `conflict`, changing nothing, while any
+        part conflicts; the message names each one. Applying it again
+        changes nothing.
+      tags: [playbooks]
+      responses:
+        "200": { description: What it did., content: { application/json: { schema: { $ref: "#/components/schemas/KitPlan" } } } }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/missions:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
@@ -11530,7 +13051,7 @@ paths:
       operationId: crmImportPreview
       x-outflare-access: { scope: integrations.read }
       summary: See what an import from another CRM would bring over
-      description: "Scope: integrations.read. Reads the connected CRM (Attio) live: its objects (People, Companies, Deals and custom ones) with their fields, select options and pipeline stages, its lists with their own fields, and how many records, list entries, notes, tasks and members it holds. Each count stops at limit and says so with capped; filled is how many of the counted records have a value in that field. Changes nothing, in Outflare or in the CRM."
+      description: "Scope: integrations.read. Reads the connected CRM (Attio) live: its objects (People, Companies, Deals and custom ones) with their fields, select options and pipeline stages, its lists with their own fields, and how many records, list entries, notes, tasks and members it holds. Each count stops at limit, or when the preview has spent about 15 seconds counting, and says so with capped; filled is how many of the counted records have a value in that field. Changes nothing, in Outflare or in the CRM."
       tags: [imports]
       responses:
         "200":
@@ -13321,6 +14842,16 @@ paths:
           schema: { type: string }
           description: "Comma-separated kinds to search: record, message, meeting, deal, email. Default: every kind you may read."
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 100 }, description: Results to return. Default 20. }
+        - name: mode
+          in: query
+          schema: { type: string, enum: [words, meaning], default: words }
+          description: |
+            words matches the words typed. meaning finds what means the same even in other words ("unhappy with price"
+            finds "too expensive for us"), over records, received messages, meetings and deals (not email). It compares
+            vectors made with the workspace's own AI key (GET .../semantic-search); turning what was asked into one is a
+            small AI call on that key. It answers semantic_search_unavailable (503) when the server's database has no
+            pgvector, semantic_search_off (409) when an admin turned it off, and connector_needed (409) without an
+            OpenAI, Gemini, Mistral or OpenRouter connection. rank is then the similarity, from -1 to 1.
       responses:
         "200":
           description: The best matches.
@@ -13331,6 +14862,57 @@ paths:
                 required: [data]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/SearchHit" } }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/semantic-search:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+    get:
+      operationId: getSemanticSearch
+      x-outflare-access: { scope: integrations.read }
+      summary: Read whether meaning-based search is on, and how far along it is
+      description: |
+        Scope: integrations.read. Meaning-based search (`GET .../search?mode=meaning`) turns each record, received message,
+        meeting and deal into a vector (an embedding) with the workspace's own AI connection, so search can compare what
+        things mean. It is on unless an admin turned it off, and runs once the workspace has an OpenAI, Gemini, Mistral or
+        OpenRouter connection (Claude has no embeddings; the AI model chosen under Settings is used when it can). The calls
+        are billed by that provider to the workspace's account, under the tool `semantic_search` in `GET .../ai-usage`,
+        where a monthly limit for it can be set: usually cents a month, since each item is embedded once and again only
+        when it changes. `problem` says what is missing when it can't run: `semantic_search_unavailable` (the database has
+        no pgvector) or `connector_needed`.
+      tags: [search]
+      responses:
+        "200":
+          description: The settings and progress.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SemanticSearch" }
+        default: { $ref: "#/components/responses/Error" }
+    put:
+      operationId: updateSemanticSearch
+      x-outflare-access: { scope: integrations.manage }
+      summary: Turn meaning-based search on or off
+      description: |
+        Scope: integrations.manage. Off stops the embedding calls and deletes the workspace's vectors; word search carries
+        on. On embeds everything again, once a connection that makes embeddings is there.
+      tags: [search]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [enabled]
+              additionalProperties: false
+              properties:
+                enabled: { type: boolean }
+      responses:
+        "200":
+          description: The settings and progress.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SemanticSearch" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "400": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/query/tables:
     parameters:
@@ -13397,14 +14979,21 @@ paths:
       x-outflare-access: { scope: customers.read, brand_limited: true }
       summary: A record's timeline
       description: |
-        Scope: customers.read. Everything that happened to a person or company, newest first: their product events
-        (and, for a company, the group calls that named it), changes to their attributes, identities added and closed,
-        consent given or withdrawn, the cold email Outflare sent them and their replies (`message`, with `direction`
-        out or in), and their meetings and deals. Lifecycle email shows as the events Outflare records for it
-        (`email.sent`, `email.delivered` and so on, with `source: lifecycle`).
+        Scope: customers.read. One timeline per person or company, newest first, across every module: their
+        product events (and, for a company, the group calls that named it), changes to their attributes,
+        identities added and closed, consent given or withdrawn, the cold email Outflare sent them and their
+        replies (`message`, with `direction` out or in), meetings, deals, website visits (`visit`), opt-out list
+        entries (`opt_out`) and journeys entered and finished (`journey`). Lifecycle email and payments show as the
+        events Outflare records for them (`email.sent`, `email.delivered` and so on, with `source: lifecycle`).
+
+        A company's timeline includes its people's (the people linked to it), each item's `record_id` saying whose
+        it is; `people=false` leaves them out. `brand` keeps one brand's items and the ones no brand owns. Kind
+        names are stable: new kinds may be added.
       tags: [records]
       parameters:
-        - { name: kinds, in: query, description: "Comma-separated: event, attribute_change, identity, consent, message, meeting, deal. Default all.", schema: { type: string } }
+        - { name: kinds, in: query, description: "Comma-separated: event, attribute_change, identity, consent, message, meeting, deal, visit, opt_out, journey. Default all.", schema: { type: string } }
+        - { name: people, in: query, description: "For a company, include its people's items (the default). false shows the company's own.", schema: { type: string, enum: ["true", "false"] } }
+        - { $ref: "#/components/parameters/Brand" }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
         - { name: before, in: query, schema: { type: string } }
         - { $ref: "#/components/parameters/Cursor" }
@@ -13669,6 +15258,32 @@ paths:
               schema: { $ref: "#/components/schemas/VisitorSettings" }
         "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/visitors/companies:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    post:
+      operationId: addVisitorCompany
+      x-outflare-access: { scope: customers.manage }
+      summary: Add a visitor company to the CRM
+      description: |
+        Scope: customers.manage. A company found only from visitors' IP addresses (in_crm false on the Visitors list) becomes a CRM
+        company: a prospect, its domain marked as from a lookup (source visitor_reveal, unverified), and its visitors move onto it.
+        Lookups never add companies by themselves. A company the CRM already has at that domain is used instead (200).
+      tags: [records]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [domain]
+              properties:
+                domain: { type: string, example: northpeak.example, description: The company's domain as the Visitors list shows it. }
+      responses:
+        "200": { description: The CRM had it already., content: { application/json: { schema: { $ref: "#/components/schemas/VisitorCompanyAdded" } } } }
+        "201": { description: Added., content: { application/json: { schema: { $ref: "#/components/schemas/VisitorCompanyAdded" } } } }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/site/events:
     post:
       operationId: sendSiteEvents
@@ -13677,8 +15292,10 @@ paths:
         Public: the site key (ofk_) in the body is the authority. What the tracking snippet (/site.js) sends: page views
         and track events on a visitor's anonymousId, with context.page, context.campaign (the utm_ tags) and, on page
         views, properties.click_ids, ofc and ref, exactly as the landing page had them. A userId, traits and timestamps
-        are ignored: the browser cannot say who someone is. Query strings keep only the campaign tags, click ids, ofc, ref
-        and via, and the referrer only its origin and path. Track names must be plain (Signup Started): dotted names are
+        are ignored: the browser cannot say who someone is. Page addresses keep their query string except the parameters
+        the key's excluded_params lists and those always left out (sign-in tokens, passwords, codes, session ids, and any
+        value that is an email address); context.page.host is the page's host. The referrer keeps only its origin and
+        path. Track names must be plain (Signup Started): dotted names are
         Outflare's own. Your own product links the visitor to a person by sending
         identify with userId and the same anonymousId to POST .../customer-events. Each event joins a visit (a session:
         30 minutes without an event, or a new campaign, starts another), whose id is in context.sessionId; a person's
@@ -14905,6 +16522,8 @@ paths:
                   accepted: { type: integer, description: "Changes made in the platform, accepted as manual ones." }
                   confirmed: { type: integer, description: Attaches the platform now shows. }
                   replies: { type: integer, description: New replies brought into the inbox, for a platform that reports them. }
+                  opt_outs_pulled: { type: integer, description: "Entries of the platform's blocklist added to the opt-out list." }
+                  opt_outs_pushed: { type: integer, description: "Opt-out list entries written to the platform's blocklist." }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         "502": { $ref: "#/components/responses/Error" }
@@ -17568,6 +19187,30 @@ webhooks:
             schema: { $ref: "#/components/schemas/WebhookEvent" }
       responses:
         "200": { description: Any 2xx answer means received; anything else is retried. }
+  connection_limit.warned:
+    post:
+      operationId: webhook_connection_limit_warned
+      summary: "A paid connection used 80% of a daily or monthly usage limit."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  connection_limit.reached:
+    post:
+      operationId: webhook_connection_limit_reached
+      summary: "A paid connection reached a daily or monthly usage limit."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
   experiment.started:
     post:
       operationId: webhook_experiment_started
@@ -18396,6 +20039,18 @@ webhooks:
             schema: { $ref: "#/components/schemas/WebhookEvent" }
       responses:
         "200": { description: Any 2xx answer means received; anything else is retried. }
+  alert.raised:
+    post:
+      operationId: webhook_alert_raised
+      summary: "Something needs a person now: a hot reply (reply.hot), a hot website visitor (visitor.hot) or another kind a module raises, at most once per thing. data has alert_id, kind, target_type, target_id, record_id, owner_id (the user it is for, or null), brand_id and the kind's own ids; GET .../alerts has what it says."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
   visitor.became_hot:
     post:
       operationId: webhook_visitor_became_hot
@@ -18739,7 +20394,7 @@ components:
             secret:
               type: string
               description: The signing secret (whsec_...). Verify deliveries with any Standard Webhooks library.
-              example: whsec_MfKQ9r8GKYqrTwjUPD8ILPZIo2LaLaSw
+              example: whsec_test_not_a_real_secret
     WebhookCreate:
       type: object
       additionalProperties: false
@@ -18808,7 +20463,7 @@ components:
       required: [id, type, created_at, workspace_id, actor, target, request_id, data]
       properties:
         id: { type: string, description: "Unique per event, and the webhook-id header. Use it to ignore repeats.", example: evt_48213 }
-        type: { type: string, enum: [lead.replied, lead.unsubscribed, inbox.replied, inbox.updated, inbox.classified, lead.bounced, mailbox.auto_paused, lead.created, lead.updated, lead.deleted, leads.imported, suppressions.added, suppression.removed, lead_list.created, lead_list.leads_added, lead_list.run_started, lead_list.build_done, lead_list.build_failed, lead_list.refresh_done, lead_list.refresh_failed, lead_list.enrich_done, lead_list.enrich_failed, import.done, import.failed, sequence.created, sequence.updated, sequence.activated, sequence.paused, sequence.archived, sequence.deleted, sequence.steps_updated, sequence.leads_enrolled, enrollment.stopped, mailbox.imported, mailbox.updated, mailbox.paused, mailbox.resumed, mailbox.stage_changed, mailbox.deleted, domain.added, domain.paused, domain.resumed, domain.removed, email.queued, email.sent, email.delivered, email.bounced, email.complained, email.failed, email.suppressed, email.cancelled, email.unsubscribed, email.opened, email.clicked, email.preferences_changed, email_domain.verified, email_domain.verification_failed, email_provider.events_failed, email_template.published, meeting.created, meeting.updated, meeting.deleted, deal.created, deal.updated, deal.deleted, spend.recorded, integration.connected, integration.updated, integration.disconnected, connect_request.created, deploy.detected, deploy.failed, digest.ready, ai_budget.warned, ai_budget.reached, experiment.started, experiment.concluded, project.created, project.updated, project.deleted, mission.created, mission.updated, mission.submitted, mission.approved, mission.paused, mission.resumed, mission.stopped, mission.completed, mission.action_held, mission.action_approved, mission.action_rejected, infra.plan_created, infra.plan_approved, infra.ordered, infra.order_failed, infra.domains_bought, infra.mailbox_joined, infra.plan_warming, infra.plan_ready, infra.plan_cancelled, fix.found, fix.updated, fix.started, fix.verify_requested, fix.confirmed, fix.reopened, record.created, record.bulk_created, record.updated, record.merged, identity.verified, identity.closed, relationship.added, relationship.ended, consent.granted, consent.withdrawn, consent.bulk_withdrawn, brand.created, brand.updated, email_broadcast.created, email_broadcast.started, email_broadcast.sent, email_broadcast.failed, email_broadcast.cancelled, journey.created, journey.updated, journey_run.entered, journey_run.exited, brand_setup.installed, brand_setup.install_failed, install.issue_opened, install.issue_resolved, seo_site.created, seo_site.verified, seo_site.unverified, seo_site.deleted, crawl.started, crawl.stopped, crawl.done, social_action.drafted, social_action.approved, social_action.rejected, social_action.done, social_action.failed, visitor.became_hot, workspace.updated, webhook.test] }
+        type: { type: string, enum: [lead.replied, lead.unsubscribed, inbox.replied, inbox.updated, inbox.classified, lead.bounced, mailbox.auto_paused, lead.created, lead.updated, lead.deleted, leads.imported, suppressions.added, suppression.removed, lead_list.created, lead_list.leads_added, lead_list.run_started, lead_list.build_done, lead_list.build_failed, lead_list.refresh_done, lead_list.refresh_failed, lead_list.enrich_done, lead_list.enrich_failed, import.done, import.failed, sequence.created, sequence.updated, sequence.activated, sequence.paused, sequence.archived, sequence.deleted, sequence.steps_updated, sequence.leads_enrolled, enrollment.stopped, mailbox.imported, mailbox.updated, mailbox.paused, mailbox.resumed, mailbox.stage_changed, mailbox.deleted, domain.added, domain.paused, domain.resumed, domain.removed, email.queued, email.sent, email.delivered, email.bounced, email.complained, email.failed, email.suppressed, email.cancelled, email.unsubscribed, email.opened, email.clicked, email.preferences_changed, email_domain.verified, email_domain.verification_failed, email_provider.events_failed, email_template.published, meeting.created, meeting.updated, meeting.deleted, deal.created, deal.updated, deal.deleted, spend.recorded, integration.connected, integration.updated, integration.disconnected, connect_request.created, deploy.detected, deploy.failed, digest.ready, ai_budget.warned, ai_budget.reached, connection_limit.warned, connection_limit.reached, experiment.started, experiment.concluded, project.created, project.updated, project.deleted, mission.created, mission.updated, mission.submitted, mission.approved, mission.paused, mission.resumed, mission.stopped, mission.completed, mission.action_held, mission.action_approved, mission.action_rejected, infra.plan_created, infra.plan_approved, infra.ordered, infra.order_failed, infra.domains_bought, infra.mailbox_joined, infra.plan_warming, infra.plan_ready, infra.plan_cancelled, fix.found, fix.updated, fix.started, fix.verify_requested, fix.confirmed, fix.reopened, record.created, record.bulk_created, record.updated, record.merged, identity.verified, identity.closed, relationship.added, relationship.ended, consent.granted, consent.withdrawn, consent.bulk_withdrawn, brand.created, brand.updated, email_broadcast.created, email_broadcast.started, email_broadcast.sent, email_broadcast.failed, email_broadcast.cancelled, journey.created, journey.updated, journey_run.entered, journey_run.exited, brand_setup.installed, brand_setup.install_failed, install.issue_opened, install.issue_resolved, seo_site.created, seo_site.verified, seo_site.unverified, seo_site.deleted, crawl.started, crawl.stopped, crawl.done, social_action.drafted, social_action.approved, social_action.rejected, social_action.done, social_action.failed, alert.raised, visitor.became_hot, workspace.updated, webhook.test] }
         created_at: { type: string, format: date-time }
         workspace_id: { type: string, format: uuid }
         actor: { $ref: "#/components/schemas/WebhookRef" }
@@ -18956,7 +20611,7 @@ components:
         ends_at: { type: [string, "null"], format: date-time, description: The mission ends itself at this time. }
     Mission:
       type: object
-      required: [id, name, project_id, brand_id, project_name, goal, instructions, plan, plan_updated_at, mode, status, status_reason, token_id, token_name, limits, progress, writes, pending_actions, calls, last_call_at, brief_version, approved_by, approved_by_name, approved_at, started_at, ended_at, report, created_by, created_by_name, started_by_agent, runner, turns, created_at, updated_at]
+      required: [id, name, project_id, brand_id, project_name, goal, instructions, plan, plan_updated_at, mode, status, status_reason, token_id, token_name, limits, progress, writes, pending_actions, calls, last_call_at, brief_version, approved_by, approved_by_name, approved_at, started_at, ended_at, report, created_by, created_by_name, started_by_agent, runner, turns, playbook_id, playbook_version, created_at, updated_at]
       properties:
         id: { type: string, format: uuid }
         name: { type: string }
@@ -19018,8 +20673,204 @@ components:
           enum: [builtin, external]
           description: "external: your own agent sends the Outflare-Mission header. builtin: Outflare's agent runs it in turns."
         turns: { $ref: "#/components/schemas/MissionTurns" }
+        playbook_id: { type: [string, "null"], description: "The playbook it was started from (GET /v1/playbooks/{id})." }
+        playbook_version: { type: [integer, "null"] }
         created_at: { type: string, format: date-time }
         updated_at: { type: string, format: date-time }
+    Playbook:
+      type: object
+      description: A playbook from the repository's playbooks/ folder (playbooks/README.md has the format).
+      required: [id, version, title, summary, description, tier, goals, publisher, author, needs, inputs, steps, guardrails, measure, prompt, example, source_url]
+      properties:
+        id: { type: string, example: seo-quick-wins }
+        version: { type: integer, description: Raised whenever the steps or prompt change. }
+        title: { type: string }
+        summary: { type: string }
+        description: { type: string }
+        tier: { type: string, enum: [obvious, clever, edge], description: "obvious suits almost anyone; clever needs one more source or idea; edge is niche." }
+        goals:
+          type: array
+          items: { type: string, enum: [customers, revenue, activation, retention, partners, search, ai_answers, tracking, replies] }
+        publisher: { type: string, enum: [outflare, community], description: "outflare: looked after by the Outflare team. community: anyone else, after review." }
+        author:
+          type: object
+          required: [github]
+          properties:
+            github: { type: string }
+            name: { type: string }
+        needs:
+          type: object
+          required: [data, connections]
+          properties:
+            data:
+              type: array
+              items: { $ref: "#/components/schemas/PlaybookDataNeed" }
+            connections:
+              type: array
+              items: { $ref: "#/components/schemas/PlaybookConnectionNeed" }
+        inputs:
+          type: array
+          items:
+            type: object
+            required: [name, label, example, optional]
+            properties:
+              name: { type: string, description: "Used in the prompt as {{name}}." }
+              label: { type: string }
+              help: { type: string }
+              example: { type: string }
+              optional: { type: boolean }
+        steps:
+          type: array
+          items:
+            type: object
+            required: [say, tools]
+            properties:
+              say: { type: string }
+              tools: { type: array, items: { type: string }, description: The operationIds (and MCP tools) the step uses. }
+        guardrails: { type: array, items: { type: string } }
+        measure:
+          type: array
+          items:
+            type: object
+            required: [metric, how]
+            properties:
+              metric: { type: string }
+              how: { type: string }
+        prompt: { type: string, description: "The prompt to copy, with {{inputs}} to fill in." }
+        example: { type: string, description: A worked example with fictional data. }
+        kit: { type: string, description: "The setup kit it offers to apply before its first run (GET /v1/kits/{id}), if any.", example: creators-partnerships }
+        source_url: { type: string, format: uri, description: The playbook's file on GitHub. }
+    PlaybookDataNeed:
+      type: object
+      required: [check, label]
+      properties:
+        check: { type: string, enum: [records, customer_events, inbox, site_tracking, seo_site, mailboxes, leads] }
+        label: { type: string }
+    PlaybookConnectionNeed:
+      type: object
+      description: A connected account of the workspace's own. Any connector with the capability, or in the category, counts.
+      required: [label, optional, recommended]
+      properties:
+        capability: { type: string, example: email.send }
+        category: { type: string, example: analytics }
+        label: { type: string }
+        optional: { type: boolean }
+        recommended: { type: array, items: { type: string }, description: "Connector ids the author suggests, best first (GET /v1/connectors)." }
+    WorkspacePlaybook:
+      allOf:
+        - { $ref: "#/components/schemas/Playbook" }
+        - type: object
+          required: [readiness, runs]
+          properties:
+            readiness:
+              type: object
+              required: [ready, missing_connections, missing_optional, missing_data]
+              properties:
+                ready: { type: boolean, description: Every required connection and data source is in place. }
+                missing_connections: { type: array, items: { $ref: "#/components/schemas/PlaybookConnectionNeed" } }
+                missing_optional: { type: array, items: { $ref: "#/components/schemas/PlaybookConnectionNeed" } }
+                missing_data: { type: array, items: { $ref: "#/components/schemas/PlaybookDataNeed" } }
+            runs: { type: integer, description: Missions started from this playbook in the workspace. }
+    PlaybookRunInput:
+      type: object
+      properties:
+        inputs:
+          type: object
+          additionalProperties: { type: string, maxLength: 500 }
+          description: Values for the playbook's inputs, by name.
+        mode: { type: string, enum: [dry_run, approve_writes, autonomous], description: "Defaults to dry_run." }
+        project_id: { type: [string, "null"], format: uuid }
+        token_id: { type: [string, "null"], format: uuid, description: The API token that runs the mission. }
+        max_spend_cents: { type: [integer, "null"], format: int64 }
+        apply_kit: { type: boolean, description: "Apply the playbook's setup kit in the same step. Needs catalog.manage, and emails.manage when the kit adds email drafts." }
+    Kit:
+      type: object
+      description: A setup kit from the repository's playbooks/kits folder (playbooks/README.md has the format).
+      required: [id, version, title, summary, option_sets, record_types, fields, email_templates, source_url, playbooks]
+      properties:
+        id: { type: string, example: creators-partnerships }
+        version: { type: integer, description: Raised whenever the kit changes. }
+        title: { type: string }
+        summary: { type: string }
+        option_sets:
+          type: array
+          items:
+            type: object
+            required: [key, name, options]
+            properties:
+              key: { type: string }
+              name: { type: string }
+              options:
+                type: array
+                items:
+                  type: object
+                  required: [key, label]
+                  properties:
+                    key: { type: string }
+                    label: { type: string }
+        record_types:
+          type: array
+          items:
+            type: object
+            required: [key, name, plural, description, fields]
+            properties:
+              key: { type: string, example: partnership }
+              name: { type: string }
+              plural: { type: string }
+              description: { type: string }
+              stage: { type: string, description: "The status field that holds its stages, so it shows as a pipeline." }
+              fields: { type: array, items: { $ref: "#/components/schemas/KitField" } }
+        fields:
+          type: object
+          description: Fields to add to existing record types, by type key (person, account).
+          additionalProperties: { type: array, items: { $ref: "#/components/schemas/KitField" } }
+        email_templates:
+          type: array
+          items:
+            type: object
+            required: [handle, name, purpose, subject, text]
+            properties:
+              handle: { type: string }
+              name: { type: string }
+              purpose: { type: string, enum: [transactional, lifecycle] }
+              subject: { type: string }
+              text: { type: string }
+        source_url: { type: string, format: uri, description: The kit's file on GitHub. }
+        playbooks: { type: array, items: { type: string }, description: The playbooks that use it. }
+    KitField:
+      type: object
+      required: [key, label, value_type, multiple, filterable]
+      properties:
+        key: { type: string }
+        label: { type: string }
+        description: { type: string }
+        value_type: { type: string, description: A value type from the catalog (GET .../catalog). }
+        option_set: { type: string }
+        multiple: { type: boolean }
+        target_type: { type: string }
+        filterable: { type: boolean }
+    KitPlan:
+      type: object
+      description: What applying a kit does, or did, in a workspace.
+      required: [kit_id, version, title, items, changes, conflicts, applied]
+      properties:
+        kit_id: { type: string }
+        version: { type: integer }
+        title: { type: string }
+        items:
+          type: array
+          items:
+            type: object
+            required: [kind, key, label, action, detail]
+            properties:
+              kind: { type: string, enum: [option_set, record_type, field, email_template] }
+              key: { type: string, description: "A field's key is type.field." }
+              label: { type: string }
+              action: { type: string, enum: [add, extend, reuse, conflict] }
+              detail: { type: string, description: What it adds, or why it conflicts. }
+        changes: { type: integer, description: Parts it adds or extends. }
+        conflicts: { type: integer, description: Parts that stop it; applying fails with 409 until there are none. }
+        applied: { type: boolean, description: True once applied. }
     MissionTurns:
       type: object
       description: The built-in agent's turns. All empty for an external runner.
@@ -19338,6 +21189,15 @@ components:
         name: { type: string }
         status: { $ref: "#/components/schemas/EmailBroadcastStatus" }
         status_reason: { type: [string, "null"] }
+        audience_bases:
+          type: object
+          description: "Only on a single broadcast that has not started: the audience by contact basis."
+          additionalProperties: { type: integer }
+          example: { opted_in: 120, opted_out: 4, customer: 300, third_party: 12, unknown: 9 }
+        warnings:
+          type: array
+          description: "Only on a single broadcast that has not started: what looks wrong about who it goes to."
+          items: { $ref: "#/components/schemas/ContactWarning" }
         template:
           type: object
           required: [id, handle, name]
@@ -19789,7 +21649,7 @@ components:
         help: { type: string }
     Connector:
       type: object
-      required: [id, name, category, summary, description, website, docs_url, auth, auth_methods, auth_options, fields, capabilities, status, configured, connected, logo_url, logo_dark_url]
+      required: [id, name, category, summary, description, website, docs_url, auth, auth_methods, auth_options, fields, capabilities, status, configured, connected, logo_url, logo_dark_url, trust]
       properties:
         id: { type: string, example: zerobounce }
         name: { type: string }
@@ -19819,6 +21679,15 @@ components:
         capabilities: { type: array, items: { type: string }, example: [verify] }
         status: { type: string, enum: [available, planned], description: "planned: listed but not connectable yet." }
         pricing: { type: string }
+        tags:
+          type: array
+          items:
+            type: object
+            required: [label, help]
+            properties:
+              label: { type: string, example: Router }
+              help: { type: string, description: What the label means, in a sentence. }
+          description: "Short labels for the catalog card: Router on AI models that reach many vendors with one key, and which AI models also let people use a subscription plan instead of an API key (shown as soon until Outflare supports it)."
         also_connects:
           type: array
           items: { type: string }
@@ -19827,6 +21696,19 @@ components:
         connected: { type: integer, description: Accounts the workspace connected (0 in the public catalog). }
         logo_url: { type: string, format: uri, description: "The company's logo as a square SVG for light backgrounds, or a monogram when there is none. Public and cacheable." }
         logo_dark_url: { type: string, format: uri, description: The same logo for dark backgrounds. }
+        trust:
+          type: string
+          enum: [outflare, verified, community]
+          description: "How far the connector is trusted, shown as a badge. outflare: built by Outflare. verified: its publisher proved its domain and passed review. community: reviewed and added from the integrations/ folder, publisher not verified."
+        publisher: { $ref: "#/components/schemas/ConnectorPublisher" }
+    ConnectorPublisher:
+      type: object
+      required: [id, name]
+      description: Who built and looks after a connector added as a manifest in the integrations/ folder. Absent for connectors written into the engine, which are Outflare's own.
+      properties:
+        id: { type: string, example: outflare }
+        name: { type: string, example: Outflare }
+        website: { type: string, format: uri }
     ConnectorAuthMethod:
       type: string
       enum: [api_key, oauth2, none]
@@ -19991,10 +21873,11 @@ components:
     Visitor:
       type: object
       description: "A company or person on the website. Counts are totals since each of their browsers was first seen."
-      required: [kind, record_id, name, email, domain, job_title, company, people, people_sample, browsers, pageviews, key_pageviews, sessions, first_seen_at, last_seen_at, last_path, identified_by, score, hot]
+      required: [kind, record_id, in_crm, name, email, domain, job_title, company, people, people_sample, browsers, pageviews, key_pageviews, sessions, first_seen_at, last_seen_at, last_path, identified_by, score, hot]
       properties:
         kind: { type: string, enum: [company, person] }
-        record_id: { type: string, format: uuid, description: "The company or person record (GET .../records/{id})." }
+        record_id: { type: [string, "null"], format: uuid, description: "The company or person record (GET .../records/{id}); null for a company found only from addresses and not in the CRM." }
+        in_crm: { type: boolean, description: "False for a company a lookup found that is not in the CRM yet; add it with POST .../visitors/companies." }
         name: { type: string }
         email: { type: [string, "null"], description: "A person's email." }
         domain: { type: [string, "null"], description: "A company's domain." }
@@ -20009,9 +21892,15 @@ components:
         first_seen_at: { type: string, format: date-time }
         last_seen_at: { type: string, format: date-time }
         last_path: { type: string }
-        identified_by: { type: array, items: { type: string, enum: [product, email_click, company_ip, provider] }, description: "How they became known: product (the workspace's own sign-in), email_click (a tracked link in an email Outflare sent)." }
+        identified_by: { type: array, items: { type: string, enum: [product, email_click, company_ip, provider] }, description: "How they became known: product (the workspace's own sign-in), email_click (a tracked link in an email Outflare sent), company_ip (the company behind their IP address, from the workspace's own provider)." }
         score: { type: integer, minimum: 0, maximum: 100 }
         hot: { type: boolean }
+    VisitorCompanyAdded:
+      type: object
+      required: [record_id, created]
+      properties:
+        record_id: { type: string, format: uuid }
+        created: { type: boolean, description: False when the CRM had a company at that domain already. }
     VisitorRef:
       type: object
       required: [id, name]
@@ -20020,22 +21909,39 @@ components:
         name: { type: string }
     VisitorTotals:
       type: object
-      required: [browsers, known, people, companies, hot]
+      required: [browsers, known, people, companies, hot, no_company]
       properties:
         browsers: { type: integer, description: "Browsers seen, known or not." }
         known: { type: integer, description: "Browsers of known people." }
         people: { type: integer }
         companies: { type: integer }
         hot: { type: integer, description: "In this view." }
+        no_company: { type: integer, description: "Unknown browsers whose address turned out to be a home, phone, VPN or data-centre connection, so no company can be named. Lookups only." }
     VisitorSettings:
       type: object
-      required: [key_pages, hot_score, email_clicks, exclude_domains, exclude_customers, updated_at]
+      required: [key_pages, hot_score, email_clicks, exclude_domains, exclude_customers, reveal_companies, reveal_integration_id, reveal_daily_limit, not_companies, reveal_connections, reveals_today, updated_at]
       properties:
         key_pages: { type: array, items: { type: string }, example: ["/pricing*", "/demo*"], description: "Paths that show buying intent; a trailing * matches anything after it." }
         hot_score: { type: integer, minimum: 1, maximum: 100, description: "From this score a visitor is hot. Default 60." }
         email_clicks: { type: boolean, description: "Know visitors who arrive from tracked links in Outflare email. Default true." }
         exclude_domains: { type: array, items: { type: string }, description: "Companies left out, such as your own and competitors." }
         exclude_customers: { type: boolean, description: "Leave out people and companies that already pay." }
+        reveal_companies: { type: boolean, description: "Find the company behind unknown visitors' IP addresses with the workspace's own provider (People Data Labs, Snitcher), for visitors who accepted the site's cookies. Off until the workspace turns it on (default false), and needs such a connection." }
+        reveal_integration_id: { type: [string, "null"], format: uuid, description: "The connection that looks companies up; null for the first one that can." }
+        reveal_daily_limit: { type: integer, minimum: 1, maximum: 100000, description: "Lookups a day (UTC) at most, so the provider's credits are never run down. Default 500." }
+        not_companies: { type: array, items: { type: string }, description: "Domains marked as not a company, such as an ISP or mobile carrier whose customers' traffic a provider took for its own. Lookups that name them name nobody. Adding one takes it off its visitors and archives company records only lookups made." }
+        reveal_connections:
+          type: array
+          description: The workspace's connections that can find companies from addresses.
+          items:
+            type: object
+            required: [id, name, connector, status]
+            properties:
+              id: { type: string, format: uuid }
+              name: { type: string }
+              connector: { type: string, example: snitcher }
+              status: { type: string }
+        reveals_today: { type: integer, description: "Addresses looked up today (UTC)." }
         updated_at: { type: [string, "null"], format: date-time }
     VisitorSettingsInput:
       type: object
@@ -20046,15 +21952,20 @@ components:
         email_clicks: { type: boolean }
         exclude_domains: { type: array, maxItems: 200, items: { type: string } }
         exclude_customers: { type: boolean }
+        reveal_companies: { type: boolean }
+        reveal_integration_id: { type: [string, "null"], format: uuid }
+        reveal_daily_limit: { type: integer, minimum: 1, maximum: 100000 }
+        not_companies: { type: array, maxItems: 1000, items: { type: string } }
     SiteKey:
       type: object
-      required: [id, name, key, brand_id, origins, previous_expires_at, events_today, bots_today, created_at, last_used_at, rotated_at, proxy_secret_at, snippet]
+      required: [id, name, key, brand_id, origins, excluded_params, previous_expires_at, events_today, bots_today, created_at, last_used_at, rotated_at, proxy_secret_at, snippet]
       properties:
         id: { type: string, format: uuid }
         name: { type: string, description: Usually the site's domain. }
         key: { type: string, description: "The public key (ofk_). It only writes browser events.", example: ofk_test_not_a_real_key }
         brand_id: { type: [string, "null"], format: uuid, description: The brand whose site it is; its events get this brand. }
         origins: { type: array, items: { type: string }, description: "Origins events are taken from. A bare domain (example.com) is stored as https://*.example.com, which takes the site and every subdomain; https://app.example.com (or http://localhost:3000) takes that exact origin, port included. A whole domain is https on the default port; list other ports exactly. Empty: any. A filter against stray traffic, not a lock." }
+        excluded_params: { type: array, items: { type: string }, description: "Query parameters left out of the page addresses this site records, by name (any case), or every name starting with a prefix that ends in * (fb_*). Every other parameter is kept. Sign-in tokens, passwords, codes, session ids and any value that is an email address are always left out, whatever this lists." }
         previous_expires_at: { type: [string, "null"], format: date-time, description: Until when the value before the last rotation still works. }
         events_today: { type: integer, description: Events taken today (UTC). }
         bots_today: { type: integer, description: "Requests from bots, crawlers and scripts today (UTC): counted, not stored." }
@@ -20070,6 +21981,7 @@ components:
         name: { type: string, maxLength: 100 }
         brand_id: { type: [string, "null"], format: uuid }
         origins: { type: array, maxItems: 20, items: { type: string } }
+        excluded_params: { type: array, maxItems: 50, items: { type: string, maxLength: 100 }, description: "Query parameters to leave out of page addresses, such as plan or fb_*." }
     ConnectionHook:
       type: object
       description: A connection's live updates, its own webhook address.
@@ -20157,7 +22069,7 @@ components:
       required: [count, capped]
       properties:
         count: { type: integer }
-        capped: { type: boolean, description: "True when counting stopped at the limit, so there are more." }
+        capped: { type: boolean, description: "True when counting stopped early, at the limit or out of time, so there may be more." }
     CRMObject:
       type: object
       required: [slug, name, plural, records, fields]
@@ -20454,6 +22366,61 @@ components:
         last_synced_at: { type: [string, "null"], format: date-time }
         last_error: { type: [string, "null"] }
         created_at: { type: string, format: date-time }
+    AdConversionTarget:
+      type: object
+      required: [id, name, event_types]
+      properties:
+        id: { type: string, description: "A Google conversion action id, a Meta pixel id, a Microsoft goal name or a Reddit account id." }
+        name: { type: string }
+        event_types: { type: array, items: { type: string }, description: "What the target takes as event_type; empty when the target is the event." }
+    AdConversionRule:
+      type: object
+      required: [id, ad_account_id, connector, event_name, target_id, target_name, event_type, value_property, value_unit, fixed_value_micros, currency, enabled, sent_30d, skipped_30d, failed_30d, queued, last_sent_at, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        ad_account_id: { type: string, format: uuid }
+        connector: { type: string, example: google_ads }
+        event_name: { type: string, example: order_completed }
+        target_id: { type: string }
+        target_name: { type: string }
+        event_type: { type: string, example: Purchase }
+        value_property: { type: string }
+        value_unit: { type: string, enum: [major, minor] }
+        fixed_value_micros: { type: [integer, "null"], format: int64 }
+        currency: { type: string }
+        enabled: { type: boolean }
+        sent_30d: { type: integer, format: int64 }
+        skipped_30d: { type: integer, format: int64 }
+        failed_30d: { type: integer, format: int64 }
+        queued: { type: integer, format: int64 }
+        last_sent_at: { type: [string, "null"], format: date-time }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    AdConversionSend:
+      type: object
+      required: [id, rule_id, connector, event_name, record_id, event_id, occurred_at, status, reason, match_keys, value_micros, currency, attempts, sent_at, created_at]
+      properties:
+        id: { type: string, format: uuid }
+        rule_id: { type: string, format: uuid }
+        connector: { type: string }
+        event_name: { type: string }
+        record_id: { type: [string, "null"], format: uuid }
+        event_id: { type: string, description: "The id the platform dedupes on: the event's message id, which the browser pixel sends too." }
+        occurred_at: { type: string, format: date-time }
+        status: { type: string, enum: [queued, sent, skipped, failed] }
+        reason: { type: string }
+        match_keys: { type: array, items: { type: string }, example: [gclid, email] }
+        value_micros: { type: [integer, "null"], format: int64 }
+        currency: { type: string }
+        attempts: { type: integer }
+        sent_at: { type: [string, "null"], format: date-time }
+        created_at: { type: string, format: date-time }
+    AdSettings:
+      type: object
+      required: [consent_mode, updated_at]
+      properties:
+        consent_mode: { type: string, enum: [opt_out, opt_in] }
+        updated_at: { type: [string, "null"], format: date-time }
     AdTotals:
       type: object
       description: "Money in micros (millionths) of the currency. Conversions, conversion value and platform_roas are what the platform claims: never add them across platforms."
@@ -20731,9 +22698,10 @@ components:
       required: [unit, limit, spent, default]
       properties:
         unit: { type: string, enum: [USD, API unit] }
-        limit: { type: number }
+        limit: { type: number, description: "The connection's monthly usage limit (0 when unlimited)." }
         spent: { type: number, description: Spent this calendar month (UTC). }
         default: { type: boolean }
+        unlimited: { type: boolean, description: "No monthly limit stops calls (set on the connection's page under Connectors); a daily one still may." }
     SEOAnswer:
       type: object
       required: [report, target, country, totals, notes, cost, integration_id, connector, cached, fetched_at, budget]
@@ -20939,7 +22907,7 @@ components:
         checked_at: { type: string, format: date-time }
     SEOSite:
       type: object
-      required: [id, brand_id, host, start_url, status, schedule, max_pages, crawl_delay_ms, obey_robots, verified, verified_at, verify_method, verify_checked_at, verification, dns_install, dns_connections, limits, last_crawl, created_at, updated_at]
+      required: [id, brand_id, host, start_url, status, schedule, max_pages, crawl_delay_ms, obey_robots, render_js, use_sitemaps, follow_nofollow, ignore_params, max_depth, include_patterns, exclude_patterns, schedule_hour, schedule_day, schedule_tz, render_connections, verified, verified_at, verify_method, verify_checked_at, verification, dns_install, dns_connections, limits, last_crawl, created_at, updated_at]
       properties:
         id: { type: string, format: uuid }
         brand_id: { type: [string, "null"], format: uuid, description: The brand the site belongs to; null is shared by every brand. }
@@ -20950,9 +22918,20 @@ components:
         max_pages: { type: integer }
         crawl_delay_ms: { type: integer }
         obey_robots: { type: boolean, description: "false audits pages the site's robots.txt hides; only for a verified site." }
+        render_js: { type: string, enum: ["off", auto, always], description: "Whether pages' scripts run before they are read: off, auto (only empty app shells) or always. It needs a proved site and a connection in render_connections." }
+        use_sitemaps: { type: boolean }
+        follow_nofollow: { type: boolean }
+        ignore_params: { type: boolean }
+        max_depth: { type: integer, description: 0 is no limit. }
+        include_patterns: { type: array, items: { type: string } }
+        exclude_patterns: { type: array, items: { type: string } }
+        schedule_hour: { type: [integer, "null"] }
+        schedule_day: { type: [integer, "null"] }
+        schedule_tz: { type: string, example: UTC }
+        render_connections: { type: array, items: { type: string, format: uuid }, description: "The workspace's connections that can run pages' scripts for the site's brand, such as Geonode. Empty means render_js does nothing yet." }
         verified: { type: boolean, description: Whether this workspace has proved it owns the site. }
         verified_at: { type: [string, "null"], format: date-time }
-        verify_method: { type: [string, "null"], enum: [dns, meta, file, test, null] }
+        verify_method: { type: [string, "null"], enum: [dns, meta, file, test, search_console, tracking, null], description: "How the site was proved: a DNS record, meta tag or file, a Search Console connection that owns it (search_console), or the workspace's Outflare tracking tag on its start page (tracking)." }
         verify_checked_at: { type: [string, "null"], format: date-time }
         verification:
           type: object
@@ -20979,7 +22958,7 @@ components:
         updated_at: { type: string, format: date-time }
     Crawl:
       type: object
-      required: [id, site_id, host, status, trigger, reason, error_code, max_pages, delay_ms, obey_robots, pages_fetched, pages_blocked, pages_failed, pages_found, pages_fallback, pages_firewalled, fallback_hint, health_score, issues, bytes, created_at, started_at, finished_at]
+      required: [id, site_id, host, status, trigger, reason, error_code, max_pages, delay_ms, obey_robots, pages_fetched, pages_blocked, pages_failed, pages_found, pages_fallback, pages_firewalled, fallback_hint, pages_excluded, pages_rendered, settings, health_score, issues, bytes, created_at, started_at, finished_at]
       properties:
         id: { type: string, format: uuid }
         site_id: { type: string, format: uuid }
@@ -21004,6 +22983,20 @@ components:
           type: string
           enum: ["", verify_site, connect_geonode]
           description: "What would let the next crawl read firewalled pages: prove you own the site, or connect Geonode with your own key. Outflare never reads them with keys of its own. Empty when nothing is needed."
+        pages_excluded: { type: integer, description: "Links the crawl's settings left out: include and exclude patterns, and max_depth." }
+        pages_rendered: { type: integer, description: "Pages read after running their scripts (render_js)." }
+        settings:
+          type: object
+          description: The settings the crawl ran with, copied from the site when it started.
+          required: [render_js, use_sitemaps, follow_nofollow, ignore_params, max_depth, include_patterns, exclude_patterns]
+          properties:
+            render_js: { type: string, enum: ["off", auto, always] }
+            use_sitemaps: { type: boolean }
+            follow_nofollow: { type: boolean }
+            ignore_params: { type: boolean }
+            max_depth: { type: integer }
+            include_patterns: { type: [array, "null"], items: { type: string } }
+            exclude_patterns: { type: [array, "null"], items: { type: string } }
         health_score: { type: [integer, "null"], minimum: 0, maximum: 100, description: "The share of the crawl's pages (HTML or broken) with no error-level issue. null until the crawl has finished." }
         issues:
           type: object
@@ -21256,7 +23249,7 @@ components:
       required: [integration_id, provider, model, web_search]
       properties:
         integration_id: { type: string, format: uuid }
-        provider: { type: string, enum: [claude, openai, gemini, mistral, openrouter] }
+        provider: { type: string, enum: [claude, openai, gemini, mistral, xai, openrouter, vercel_ai_gateway, requesty] }
         model: { type: string }
         web_search: { type: boolean }
         input_cents_per_million: { type: number }
@@ -21637,12 +23630,14 @@ components:
         created_at: { type: string, format: date-time }
     SocialAccountChannel:
       type: string
-      enum: [x, linkedin, youtube, instagram, tiktok, facebook, reddit, github, discord]
+      enum: [x, linkedin, youtube, instagram, tiktok, facebook, reddit, github, discord, bluesky, threads, mastodon, dev_to, docker_hub]
       description: |
         A channel whose pages and profiles Outflare reads. X and LinkedIn are read through their own app or sign-in, with posts;
         every channel's public profiles in a brand's links (an X account, a LinkedIn company page, a YouTube channel, an Instagram,
-        TikTok, Facebook or GitHub account, a subreddit, a Discord invite) have their followers read every day through the
-        workspace's own page reader (Geonode).
+        TikTok, Facebook, Threads, Bluesky or Mastodon account, a GitHub account, a subreddit, a Discord invite, a DEV author, a
+        Docker Hub namespace) have their headline count read every day through the workspace's own page reader (Geonode):
+        followers, or subscribers (YouTube), members (subreddit, Discord), stars across repositories (GitHub), pulls across
+        images (Docker Hub) or published posts (DEV), kept in `followers`.
     SocialAccount:
       type: object
       description: A page or profile of the brand's own, reached through the workspace's own connection.
@@ -21951,6 +23946,118 @@ components:
         fixed_at: { type: [string, "null"], format: date-time }
         created_at: { type: string, format: date-time }
         updated_at: { type: string, format: date-time }
+    FixTicket:
+      type: object
+      required: [id, source, subject, brand_id, rule, title, status, count, unit, parts, open_parts, brief_status, brief, brief_error, brief_model, brief_feedback, brief_written_at, review, review_note, reviewed_by, reviewed_at, impact, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        source: { type: string, enum: [seo_audit, seo_keywords, ai_visibility, social, seo_links] }
+        subject:
+          type: object
+          required: [type, id]
+          properties:
+            type: { type: string, enum: [seo_site, ai_prompt, social_watch, ai_fact] }
+            id: { type: string, format: uuid }
+        brand_id: { type: [string, "null"], format: uuid }
+        rule: { $ref: "#/components/schemas/SEORule" }
+        title: { type: string, description: "The brief's title once written, else the rule's.", example: Add titles to 42 product pages }
+        status: { type: string, enum: [open, in_progress, done, ignored] }
+        count: { type: integer, description: "What is left across its open parts, in unit." }
+        unit: { type: string, example: pages }
+        parts: { type: integer, description: "Its fixes: for a site audit, one per URL template." }
+        open_parts: { type: integer }
+        brief_status: { type: string, enum: [none, queued, writing, ready, failed] }
+        brief:
+          oneOf:
+            - { $ref: "#/components/schemas/FixTicketBrief" }
+            - { type: "null" }
+        brief_error: { type: string, description: "Why the last write failed, for a person." }
+        brief_model: { type: string, example: claude-sonnet-5-5 }
+        brief_feedback: { type: string, description: The feedback the latest write followed. }
+        brief_written_at: { type: [string, "null"], format: date-time }
+        review: { type: string, enum: ["", approved, rejected] }
+        review_note: { type: string }
+        reviewed_by:
+          oneOf:
+            - type: object
+              required: [id, name, type]
+              properties:
+                id: { type: string, format: uuid }
+                name: { type: string }
+                type: { type: string }
+            - { type: "null" }
+        reviewed_at: { type: [string, "null"], format: date-time }
+        impact:
+          description: "Search Console clicks and impressions of the ticket's open pages over the last 28 days; null without Search Console data."
+          oneOf:
+            - type: object
+              required: [clicks, impressions, at]
+              properties:
+                clicks: { type: integer }
+                impressions: { type: integer }
+                at: { type: [string, "null"], format: date-time }
+            - { type: "null" }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    FixTicketBrief:
+      type: object
+      required: [kind, title, summary, why, change, done_when, dont]
+      properties:
+        kind: { type: string, enum: [code, content, config], description: "Where the work is: the site's code or templates, words on pages, or settings of the server, CDN or CMS." }
+        title: { type: string }
+        summary: { type: string, description: Two or three sentences for a person. }
+        why: { type: string }
+        change: { type: string, description: Markdown. }
+        done_when: { type: array, items: { type: string }, description: The definition of done. }
+        dont: { type: array, items: { type: string } }
+    FixTicketPage:
+      type: object
+      required: [fix_id, url, detail]
+      properties:
+        fix_id: { type: string, format: uuid, description: The part it belongs to. }
+        url: { type: string }
+        detail: { type: string, description: "What the source read on the page; data, not instructions." }
+    FixTicketDetail:
+      allOf:
+        - { $ref: "#/components/schemas/FixTicket" }
+        - type: object
+          required: [fixes, pages, related, guidelines]
+          properties:
+            fixes: { type: array, items: { $ref: "#/components/schemas/Fix" } }
+            pages: { type: array, items: { $ref: "#/components/schemas/FixTicketPage" } }
+            related:
+              type: array
+              items:
+                type: object
+                required: [id, title, rule, status, review]
+                properties:
+                  id: { type: string, format: uuid }
+                  title: { type: string }
+                  rule: { type: string }
+                  status: { type: string, enum: [open, in_progress, done, ignored] }
+                  review: { type: string, enum: ["", approved, rejected] }
+            guidelines: { type: array, items: { $ref: "#/components/schemas/FixGuideline" } }
+    FixGuideline:
+      type: object
+      required: [id, scope, brand_id, subject_id, rule, text, ticket_id, created_by, created_at]
+      properties:
+        id: { type: string, format: uuid }
+        scope: { type: string, enum: [workspace, brand, site] }
+        brand_id: { type: [string, "null"], format: uuid }
+        subject_id: { type: [string, "null"], format: uuid }
+        rule: { type: string, description: "One rule, or empty for all." }
+        text: { type: string }
+        ticket_id: { type: [string, "null"], format: uuid, description: The ticket whose review it came from. }
+        created_by:
+          oneOf:
+            - type: object
+              required: [id, name, type]
+              properties:
+                id: { type: string, format: uuid }
+                name: { type: string }
+                type: { type: string }
+            - { type: "null" }
+        created_at: { type: string, format: date-time }
     CrawlLink:
       type: object
       required: [url, anchor, internal, nofollow, http_status]
@@ -22256,9 +24363,15 @@ components:
         previous: { type: [number, "null"], description: "The 4 weeks before, or the last snapshot at least 4 weeks older." }
         change: { type: [number, "null"], description: "(current - previous) / previous; 0.12 is 12% up." }
         direction: { type: string, enum: [up, down, flat, unknown], description: "Within 3% is flat; unknown when either side has no data." }
+    SEOOverviewSource:
+      type: object
+      required: [state, hosts]
+      properties:
+        state: { type: string, enum: [ready, other_sites, not_connected] }
+        hosts: { type: array, items: { type: string }, description: "For other_sites: the websites that do have numbers." }
     SEOOverviewBrand:
       type: object
-      required: [brand, terms, hosts, weeks, seo, trends, sites, open_fixes, seo_status]
+      required: [brand, terms, hosts, weeks, seo, trends, sites, open_fixes, seo_status, sources]
       properties:
         brand:
           oneOf:
@@ -22307,15 +24420,26 @@ components:
           properties:
             state:
               type: string
-              enum: [not_connected, no_website, not_followed, "off", reading, failed, ready]
+              enum: [not_connected, not_shared, no_website, not_followed, "off", reading, failed, ready]
               description: |
-                not_connected: no SEO tool serves the brand. no_website: the brand has no website to read. not_followed:
+                not_connected: no SEO tool is connected. not_shared: one is, but only for other brands. no_website: the brand has no website to read. not_followed:
                 its SEO tool reads other domains. off: snapshots are turned off. reading: the first read is under way.
                 failed: the last read failed. ready: read every week.
             message: { type: string, description: "What it means and what to do, for people. A failed read's reason needs seo.read." }
             integration_id: { type: [string, "null"], format: uuid, description: The SEO connection the numbers come from. }
             connector: { type: [string, "null"] }
             last_ok_at: { type: [string, "null"], format: date-time, description: The last good read of the brand's domains. }
+        sources:
+          type: object
+          description: |
+            Whether the brand's websites have search numbers (from a search console) and visitor numbers (from an
+            analytics tool) in the period. ready: they do. other_sites: a connected tool has numbers for other websites
+            of the workspace only, so the brand's website is not in that tool or the site is set to another brand.
+            not_connected: no tool has these numbers yet.
+          required: [search, traffic]
+          properties:
+            search: { $ref: "#/components/schemas/SEOOverviewSource" }
+            traffic: { $ref: "#/components/schemas/SEOOverviewSource" }
         trends:
           type: object
           required: [branded_search, search_clicks, visitors, domain_rating, backlinks, referring_domains, organic_traffic, organic_keywords]
@@ -22391,7 +24515,7 @@ components:
             type: object
             required: [provider, model]
             properties:
-              provider: { type: string, enum: [claude, openai, gemini, mistral, openrouter] }
+              provider: { type: string, enum: [claude, openai, gemini, mistral, xai, openrouter, vercel_ai_gateway, requesty] }
               model: { type: string }
               input_cents_per_million: { type: number }
               output_cents_per_million: { type: number }
@@ -22402,7 +24526,7 @@ components:
             type: object
             required: [task, name, description, model, price, price_source, custom]
             properties:
-              task: { type: string, enum: [plan, turn, check_in, reply_labelling, classify_domain, ai_visibility, social_replies, email_verification] }
+              task: { type: string, enum: [plan, turn, check_in, reply_labelling, classify_domain, ai_visibility, social_replies, email_verification, fix_tickets] }
               name: { type: string }
               description: { type: string }
               model: { type: [string, "null"], description: Null when no model can run yet. }
@@ -22423,7 +24547,7 @@ components:
             - type: object
               required: [provider, provider_name, integration_id, model, price, price_source]
               properties:
-                provider: { type: string, enum: [claude, openai, gemini, mistral, openrouter] }
+                provider: { type: string, enum: [claude, openai, gemini, mistral, xai, openrouter, vercel_ai_gateway, requesty] }
                 provider_name: { type: string }
                 integration_id: { type: string, format: uuid }
                 model: { type: string }
@@ -22444,7 +24568,7 @@ components:
             type: object
             required: [connector, name, default_model, light_model, cheap_model, key_url, pricing_url, connections, known_prices]
             properties:
-              connector: { type: string, enum: [claude, openai, gemini, mistral, openrouter] }
+              connector: { type: string, enum: [claude, openai, gemini, mistral, xai, openrouter, vercel_ai_gateway, requesty] }
               name: { type: string }
               default_model: { type: [string, "null"] }
               light_model: { type: [string, "null"], description: The lighter model routine check-ins use by default; null uses the main model. }
@@ -22475,6 +24599,56 @@ components:
         cache_write_tokens: { type: integer }
         web_searches: { type: integer }
         cost_cents: { type: integer, description: "US cents on the workspace's own provider bill, each call rounded up." }
+    ConnectionUsage:
+      type: object
+      required: [integration_id, name, connector, units, limits, used, estimated]
+      properties:
+        integration_id: { type: string, format: uuid }
+        name: { type: string }
+        connector: { type: string, example: ahrefs }
+        units: { type: array, items: { type: string }, description: "Units the limits can count, the usual one first: USD, or the provider's own (credit, API unit, token).", example: [API unit] }
+        limits: { $ref: "#/components/schemas/ConnectionLimits" }
+        used:
+          type: object
+          required: [unit, today, month]
+          properties:
+            unit: { type: string }
+            today: { type: number, description: Used today (UTC). }
+            month: { type: number, description: Used this calendar month (UTC). }
+        estimated: { type: boolean, description: "The provider doesn't say what each call cost, so usage is worked out from its price list." }
+        days:
+          type: array
+          description: Usage per day for the last 30 days (GET .../usage only).
+          items:
+            type: object
+            required: [date, used, calls]
+            properties:
+              date: { type: string, format: date }
+              used: { type: number }
+              calls: { type: integer }
+        alerts:
+          type: array
+          description: The last warnings sent (GET .../usage only).
+          items:
+            type: object
+            required: [period, period_start, level, unit, limit, used, sent_at]
+            properties:
+              period: { type: string, enum: [day, month] }
+              period_start: { type: string, format: date }
+              level: { type: integer, enum: [80, 100] }
+              unit: { type: string }
+              limit: { type: number }
+              used: { type: number }
+              sent_at: { type: string, format: date-time }
+    ConnectionLimits:
+      type: object
+      required: [unit, daily_limit, monthly_limit, hard_stop, default]
+      properties:
+        unit: { type: string, example: API unit }
+        daily_limit: { type: [number, "null"], description: Per day (UTC); null is no limit. }
+        monthly_limit: { type: [number, "null"], description: Per calendar month (UTC); null is no limit. }
+        hard_stop: { type: boolean, description: "Calls stop at a limit; false only warns." }
+        default: { type: boolean, description: "Nobody set limits: the connector's starting limit applies (Ahrefs 10,000 API units, DataForSEO US$10 a month), or none." }
     AIUsage:
       type: object
       required: [month, spent_cents, monthly_limit_cents, total, tools, models, days, recent, retention_days]
@@ -23455,8 +25629,10 @@ components:
       allOf:
         - { $ref: "#/components/schemas/SendingDomain" }
         - type: object
-          required: [daily]
+          required: [daily, dns_install, dns_connections]
           properties:
+            dns_install: { oneOf: [{ $ref: "#/components/schemas/EmailDomainDNSInstall" }, { type: "null" }], description: The last one-click run that added the domain's missing SPF or DMARC record (addSendingDomainDNS). }
+            dns_connections: { type: array, items: { type: string, format: uuid }, description: "The workspace's connections that can add the domain's records, such as Cloudflare." }
             daily:
               type: array
               description: The last 14 days by UTC date, oldest first.
@@ -23663,6 +25839,52 @@ components:
         skip_in_sequences: { type: boolean, description: "Leave out people active in another sequence. Default true." }
         min_score: { type: integer, minimum: 0, maximum: 100, description: "Leave out people whose ICP fit is below this, before spending credits. Default 0." }
         refresh_every_days: { type: [integer, "null"], minimum: 1, maximum: 365, description: Refresh on a schedule. Null refreshes only when asked. }
+    SmartListRule:
+      type: object
+      required: [op]
+      description: |
+        One test a person must pass. Set one of attribute (a field on their customer record, such as plan or
+        address.country), event (whether they did this customer event: exists, or not_exists; within_days limits it
+        to the last that many days) or in_list (whether they are a lead in this lead list: exists, or not_exists).
+        Attributes compare as journeys compare them: numbers as numbers, text ignoring case, dates as text.
+      properties:
+        attribute: { type: string, maxLength: 200 }
+        event: { type: string, maxLength: 100 }
+        within_days: { type: integer, minimum: 0, maximum: 3650, description: "event: only the last this many days; 0 or left out is ever." }
+        in_list: { type: string, format: uuid, description: A lead list's id. }
+        op: { type: string, enum: [eq, neq, gt, lt, contains, exists, not_exists] }
+        value: { description: "What eq, neq, gt, lt and contains compare with: text, a number or true or false." }
+    SmartListInput:
+      type: object
+      properties:
+        name: { type: string, minLength: 1, maxLength: 200 }
+        description: { type: string, maxLength: 2000 }
+        brand_id: { type: [string, "null"], description: "A brand's id or handle, or null for people of every brand." }
+        rules: { type: array, maxItems: 20, items: { $ref: "#/components/schemas/SmartListRule" } }
+        match: { type: string, enum: [all, any], description: "Whether a person must pass all the rules (the default) or any of them." }
+    SmartList:
+      type: object
+      required: [id, name, description, brand_id, rules, match, members, refreshed_at, error_code, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        description: { type: string }
+        brand_id: { type: [string, "null"], format: uuid, description: "Null: people of every brand." }
+        rules: { type: array, items: { $ref: "#/components/schemas/SmartListRule" } }
+        match: { type: string, enum: [all, any] }
+        members: { type: integer, description: How many people matched at the last refresh. }
+        refreshed_at: { type: [string, "null"], format: date-time, description: "When the members were last brought up to date; null until the first refresh." }
+        error_code: { type: [string, "null"], description: "Why the last refresh failed (query_timeout: the rules took too long), or null." }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    SmartListPerson:
+      type: object
+      required: [id, name, email]
+      properties:
+        id: { type: string, format: uuid, description: The person's customer record. }
+        name: { type: string }
+        email: { type: string, description: "Their email address, or empty." }
+        entered_at: { type: string, format: date-time, description: "members: when they joined the list." }
     LeadList:
       type: object
       required: [id, name, description, project_id, brand_id, kind, leads, search_integration_id, filters, enrich_integration_ids, max_leads,
@@ -23799,18 +26021,85 @@ components:
               account: { type: object, additionalProperties: true }
     SuppressionReason:
       type: string
-      enum: [unsubscribed, bounced, complained, manual, do_not_contact]
+      enum: [unsubscribed, bounced, complained, manual, do_not_contact, competitor, customer, partner, legal, blocklist]
+      description: |
+        Why the entry is there. unsubscribed stops cold and marketing email but
+        not receipts; competitor stops cold and marketing email; customer,
+        partner and blocklist (on a connected sequencer's blocklist) keep
+        people out of cold email only; bounced, complained, manual, legal and
+        do_not_contact stop every email.
+    SuppressionMethod:
+      type: string
+      enum: [manual, automated, ai_suggested]
+      description: "How it was added: by a person, automatically (a bounce, an unsubscribe link, a sync), or because the AI read a reply as an opt-out."
     Suppression:
       type: object
-      required: [id, kind, value, reason, note, source, created_at]
+      required: [id, kind, value, reason, note, source, method, added_by, added_by_type, integration_id, confidence, evidence, record_id, created_at]
       properties:
         id: { type: string, format: uuid }
         kind: { type: string, enum: [email, domain] }
         value: { type: string }
         reason: { $ref: "#/components/schemas/SuppressionReason" }
         note: { type: string }
-        source: { type: string }
+        source: { type: string, description: "The tool or feature that added it: manual, api, mcp, reply, smtp, unsubscribe_link, email_provider, bounce_report, <connector>_sync, <tool>_import." }
+        method: { $ref: "#/components/schemas/SuppressionMethod" }
+        added_by: { type: [string, "null"], format: uuid, description: The person's or token's actor id; null for the system. }
+        added_by_type: { type: string, description: "human, api_token, agent or system." }
+        integration_id: { type: [string, "null"], format: uuid, description: The connection it came from. }
+        confidence: { type: [number, "null"], minimum: 0, maximum: 1, description: How sure the AI was, for ai_suggested entries. }
+        evidence: { type: object, additionalProperties: true, description: "Ids that show why, such as inbound_message_id for a reply." }
+        record_id: { type: [string, "null"], format: uuid, description: The person it belongs to, when known. }
         created_at: { type: string, format: date-time }
+    SuppressionSync:
+      type: object
+      required: [integration_id, connector, name, can_pull, pull, push, pulled_at, pushed_at, pulled_count, pushed_count, last_error, error_code]
+      properties:
+        integration_id: { type: string, format: uuid }
+        connector: { type: string, example: emailbison }
+        name: { type: string }
+        can_pull: { type: boolean, description: "False when the platform's blocklist cannot be read (Smartlead): only push works." }
+        pull: { type: boolean, description: Its blocklist is read into the opt-out list. }
+        push: { type: boolean, description: The opt-out list is written to its blocklist. }
+        pulled_at: { type: [string, "null"], format: date-time }
+        pushed_at: { type: [string, "null"], format: date-time }
+        pulled_count: { type: integer }
+        pushed_count: { type: integer }
+        last_error: { type: [string, "null"] }
+        error_code: { type: [string, "null"] }
+    ContactRules:
+      type: object
+      required: [customer_marketing]
+      properties:
+        customer_marketing:
+          type: string
+          enum: [inferred, opt_in]
+          description: "inferred (the default): everyone but third-party leads gets marketing email unless they said no. opt_in: only people who agreed do. Third-party leads never get marketing email without agreeing."
+    Contactability:
+      type: object
+      required: [basis, acquired_via, allowed, suppressed, why]
+      description: What may go out to a person, and why.
+      properties:
+        basis:
+          type: string
+          enum: [opted_in, opted_out, customer, third_party, unknown]
+          description: "opted_in: agreed to marketing email. opted_out: took it back. customer: origin first_party. third_party: origin prospect (lead lists, data providers, sequencers, visitor reveals). unknown: from a CRM, an import or added by hand."
+        acquired_via: { type: string, description: "The tool the record came from, such as apollo, csv or attio; empty when not known." }
+        allowed:
+          type: object
+          required: [transactional, cold_outreach, marketing]
+          properties:
+            transactional: { type: boolean, description: "Receipts and account email." }
+            cold_outreach: { type: boolean }
+            marketing: { type: boolean, description: "Newsletters, product updates, journeys." }
+        suppressed: { type: array, items: { $ref: "#/components/schemas/SuppressionReason" }, description: The opt-out list's reasons for their addresses or domains. }
+        why: { type: string, description: The basis in a sentence. }
+    ContactWarning:
+      type: object
+      required: [code, count, message]
+      properties:
+        code: { type: string, enum: [third_party_in_audience, unknown_origin_in_audience] }
+        count: { type: integer, description: How many people it is about. }
+        message: { type: string, description: "What looks wrong and what to do instead, in plain words." }
     RecipientDecision:
       type: object
       required: [email, allowed, reasons]
@@ -23819,8 +26108,89 @@ components:
         allowed: { type: boolean }
         reasons:
           type: array
-          description: "Why it is blocked, e.g. invalid_email, suppressed_email:unsubscribed, suppressed_domain:do_not_contact."
+          description: "Why it is blocked: invalid_email, suppressed_email:<reason>, suppressed_domain:<reason>, marketing_withdrawn, other_brand:<handle>, third_party_no_consent or no_consent."
           items: { type: string }
+    EmailFindCode:
+      type: string
+      description: |
+        The outcome of finding or verifying one address, driving what a pipeline
+        does next: found/verified (use it), risky (your policy), not_found or
+        undeliverable (skip), pending (re-call shortly), retry (retry later),
+        stop (can't continue; see stop_code).
+      enum: [found, verified, risky, not_found, undeliverable, pending, retry, stop]
+    EmailPattern:
+      type: object
+      required: [domain, top_shape, confidence, provider, catch_all, sample_size]
+      properties:
+        domain: { type: string, example: acme.example }
+        top_shape: { type: string, description: "The dominant local-part shape, e.g. first.last, flast, firstlast; empty when nothing is known.", example: first.last }
+        confidence: { type: integer, minimum: 0, maximum: 100 }
+        provider: { type: string, description: "The mailbox provider inferred from MX (google, microsoft, …), empty when unknown." }
+        catch_all: { type: boolean, description: "The domain accepts any address, so a match proves nothing on its own." }
+        sample_size: { type: integer, description: "How many of the workspace's own addresses at this domain the shape was learned from." }
+    EmailFindCost:
+      type: object
+      required: [cents, units, provider]
+      properties:
+        cents: { type: integer, description: "Provider spend in cents; 0 for the free native tiers." }
+        units: { type: integer, description: "Provider credits or units used." }
+        provider: { type: string, description: "builtin or outflare for native work, otherwise the connector id." }
+        connection: { type: string, description: "Which workspace connection answered, when a bring-your-own-key verifier was used." }
+    EmailFindItemResult:
+      type: object
+      required: [ref, confidence, code, cost]
+      properties:
+        ref: { type: string, description: "The caller's own reference, echoed back so results match without relying on order." }
+        record_id: { type: string }
+        email: { type: string }
+        confidence: { type: integer, minimum: 0, maximum: 100 }
+        code: { $ref: "#/components/schemas/EmailFindCode" }
+        evidence: { type: string, description: "Where the confidence came from: history, pattern or default." }
+        cost: { $ref: "#/components/schemas/EmailFindCost" }
+        stop_code: { type: string, description: "An error-catalog code when code is stop." }
+        retry_after: { type: integer, description: "Nanoseconds to wait before re-calling, set when code is pending or retry." }
+    EmailFindResult:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/EmailFindItemResult" }
+        retry_after: { type: integer, description: "Batch-level wait in nanoseconds, set when the whole batch is rate limited." }
+    EmailFindRequest:
+      type: object
+      required: [items]
+      properties:
+        idempotency_key: { type: string, description: "Repeat with the same key in the same workspace to get the cached result without re-spending." }
+        items:
+          type: array
+          minItems: 1
+          maxItems: 50
+          items:
+            type: object
+            required: [ref, first_name, last_name, domain]
+            properties:
+              ref: { type: string }
+              record_id: { type: string }
+              first_name: { type: string, example: Alice }
+              last_name: { type: string, example: Nguyen }
+              domain: { type: string, example: acme.example }
+              company: { type: string }
+    EmailVerifyRequest:
+      type: object
+      required: [items]
+      properties:
+        force: { type: boolean, description: "Re-check even if a recent result is cached." }
+        items:
+          type: array
+          minItems: 1
+          maxItems: 50
+          items:
+            type: object
+            required: [ref, email]
+            properties:
+              ref: { type: string }
+              email: { type: string, example: alice.nguyen@acme.example }
     AllocationMode:
       type: string
       enum: [suggest, automatic]
@@ -24202,7 +26572,7 @@ components:
               code:
                 type: string
                 description: Stable; new codes may be added.
-                enum: [no_mailboxes, none_ready, mailbox_error, domain_critical, server_paused, connection_broken, connection_requested, approval_waiting, mission_paused, allocation_short, infra_plan_waiting, unread_replies, context_missing, analytics_site_unmapped, brand_without_analytics, fixes_waiting, email_domain_failed, email_broadcast_failed, social_drafts_waiting, duplicates_waiting, events_quarantined, crm_import_failed, install_broken, install_outdated]
+                enum: [no_mailboxes, none_ready, mailbox_error, domain_critical, server_paused, connection_broken, connection_requested, approval_waiting, mission_paused, allocation_short, infra_plan_waiting, unread_replies, context_missing, analytics_site_unmapped, brand_without_analytics, fixes_waiting, email_domain_failed, email_broadcast_failed, email_broadcast_audience_warning, social_drafts_waiting, duplicates_waiting, events_quarantined, crm_import_failed, install_broken, install_outdated]
               severity: { type: string, enum: [critical, warning, info] }
               area: { type: string, enum: [mailboxes, domains, servers, connectors, missions, sequences, infrastructure, inbox, context, analytics, fixes, lifecycle, social, customers, setup] }
               title: { type: string }
@@ -24378,7 +26748,8 @@ components:
       enum: [first_party, prospect, crm_sync, import, manual]
       description: |
         Where the record came from: first_party (the workspace's own product, billing or forms), prospect (lead lists
-        and data providers), crm_sync, import or manual. Lifecycle mail never relies on it: consent does.
+        and data providers), crm_sync, import or manual. With consent it sets the contact basis (Record.contactability):
+        prospects never get marketing email without agreeing.
     SearchHit:
       type: object
       required: [kind, id, record_id, record_name, title, snippet, detail, at, rank]
@@ -24388,10 +26759,28 @@ components:
         record_id: { type: [string, "null"], format: uuid, description: Whose it is, when it is linked to a record. }
         record_name: { type: [string, "null"], description: "That record's name, when you may read it." }
         title: { type: string, description: "A record's name, or the subject or title." }
-        snippet: { type: string, description: The words around the match in a reply's body or a meeting's notes; empty otherwise. }
+        snippet: { type: string, description: "The words around the match in a reply's body or a meeting's notes (by meaning: their start); empty otherwise." }
         detail: { type: string, description: "A record's type or the identity that matched (email: ...), sent or received for a message, a meeting's status, a deal's stage, an email's status." }
         at: { type: string, format: date-time }
-        rank: { type: number, description: How well it matched; higher is better. }
+        rank: { type: number, description: How well it matched; higher is better. By meaning, the similarity from -1 to 1. }
+    SemanticSearch:
+      type: object
+      required: [enabled, available, provider, model, embedded, waiting, problem]
+      properties:
+        enabled: { type: boolean, description: On unless an admin turned it off. }
+        available: { type: boolean, description: Whether the server's database has pgvector. }
+        provider: { type: [string, "null"], description: "The connector making the embeddings: openai, gemini, mistral or openrouter." }
+        model: { type: [string, "null"], description: "The provider's embedding model, such as text-embedding-3-small." }
+        embedded: { type: integer, description: Items with a current vector. }
+        waiting: { type: integer, description: "Items new or changed since their vector was made, embedded within minutes." }
+        problem:
+          oneOf:
+            - type: "null"
+            - type: object
+              required: [code, message]
+              properties:
+                code: { type: string }
+                message: { type: string }
     QueryTable:
       type: object
       required: [name, description, scope, available, columns]
@@ -24439,6 +26828,7 @@ components:
         attributes: { type: object, additionalProperties: true, description: "Values by field key, as the catalog defines them." }
         attribute_sources: { type: object, additionalProperties: { type: string }, description: Which source set each value. }
         identities: { type: array, items: { $ref: "#/components/schemas/RecordIdentity" }, description: Active identities. }
+        contactability: { $ref: "#/components/schemas/Contactability" }
         version: { type: integer, description: Goes up on every change. }
         merged_into: { type: [string, "null"], format: uuid }
         archived: { type: boolean }
@@ -24461,6 +26851,7 @@ components:
         name: { type: string, maxLength: 500 }
         brand_id: { type: [string, "null"], description: "A brand's id or handle, or null for a record every brand shares." }
         origin: { $ref: "#/components/schemas/RecordOrigin" }
+        acquired_via: { type: string, pattern: "^[a-z0-9._-]{0,64}$", description: "The tool the record came from, such as apollo or csv.", example: apollo }
         source: { type: string, enum: [manual, first_party, crm_sync, enrichment, import], description: "Who these values come from, for precedence. Default manual." }
         attributes: { type: object, additionalProperties: true }
         identities: { type: array, maxItems: 50, items: { $ref: "#/components/schemas/RecordIdentityInput" }, description: Only when adding. }
@@ -24618,21 +27009,22 @@ components:
         created_at: { type: string, format: date-time }
     TimelineItem:
       type: object
-      required: [kind, id, at, title, detail, source]
+      required: [kind, id, at, title, detail, source, record_id]
       properties:
-        kind: { type: string, enum: [event, attribute_change, identity, consent, message, meeting, deal] }
+        kind: { type: string, enum: [event, attribute_change, identity, consent, message, meeting, deal, visit, opt_out, journey], description: "Stable; new kinds may be added." }
         id: { type: string }
         at: { type: string, format: date-time }
-        title: { type: string, description: "The event's name, the field that changed, the identity's namespace, the consent's channel, the email's subject, or the meeting's or deal's name." }
+        title: { type: string, description: "The event's name, the field that changed, the identity's namespace, the consent's channel, the email's subject, the meeting's or deal's name, the visit's landing page, the opt-out's reason or the journey's name." }
         detail: { type: object, additionalProperties: true }
         source: { type: string }
+        record_id: { type: string, format: uuid, description: "Whose item it is: the record itself or, on a company's timeline, one of its people." }
     Consent:
       type: object
       required: [id, record_id, channel, topic, purpose, status, source, evidence, occurred_at, created_by, created_at]
       properties:
         id: { type: string, format: uuid }
         record_id: { type: string, format: uuid }
-        channel: { type: string, enum: [email, sms, push, whatsapp, in_app] }
+        channel: { type: string, enum: [email, sms, push, whatsapp, in_app, ads] }
         topic: { type: string, description: "A subscription topic's key, or empty for the whole channel." }
         purpose: { type: string, example: marketing }
         status: { type: string, enum: [granted, withdrawn] }
@@ -24646,7 +27038,7 @@ components:
       additionalProperties: false
       required: [channel, status]
       properties:
-        channel: { type: string, enum: [email, sms, push, whatsapp, in_app] }
+        channel: { type: string, enum: [email, sms, push, whatsapp, in_app, ads] }
         topic: { type: string, description: "A subscription topic's key, such as product_updates. Empty for the whole channel." }
         purpose: { type: string, description: Default marketing. }
         status: { type: string, enum: [granted, withdrawn] }
@@ -24704,7 +27096,7 @@ components:
       type: object
       required: [url]
       properties:
-        kind: { type: string, enum: [app_store, google_play, tv_app, chrome_web_store, microsoft_store, steam, docs, help, blog, status, x, linkedin, youtube, instagram, tiktok, facebook, discord, reddit, github, other], description: "What it is. Guessed from the address when left out (apps.apple.com is app_store); other when unknown." }
+        kind: { type: string, enum: [app_store, google_play, tv_app, chrome_web_store, microsoft_store, steam, docs, help, blog, status, x, linkedin, youtube, instagram, tiktok, facebook, discord, reddit, github, bluesky, threads, mastodon, dev_to, docker_hub, other], description: "What it is. Guessed from the address when left out (apps.apple.com is app_store); other when unknown." }
         url: { type: string, format: uri, example: "https://apps.apple.com/app/repocket/id1234567890" }
         label: { type: string, maxLength: 60, description: "Optional, such as Fire TV or Support docs." }
     BrandLinkSuggestion:
@@ -25199,6 +27591,73 @@ components:
         color: { type: string, enum: [gray, red, orange, amber, green, teal, blue, violet, pink] }
         replies: { type: integer, description: Replies with this tag. }
         created_at: { type: string, format: date-time }
+    Alert:
+      type: object
+      required: [id, kind, brand_id, target_type, target_id, record_id, owner_id, data, created_at, title, text, path]
+      properties:
+        id: { type: string, format: uuid }
+        kind: { type: string, example: reply.hot }
+        brand_id: { type: [string, "null"], format: uuid }
+        target_type: { type: string, example: inbound_message }
+        target_id: { type: string, format: uuid }
+        record_id: { type: [string, "null"], format: uuid }
+        owner_id: { type: [string, "null"], format: uuid, description: The user it is for, when there is one. }
+        data: { type: object, additionalProperties: true, description: "Ids, enums and counts, as in the alert.raised webhook." }
+        created_at: { type: string, format: date-time }
+        title: { type: string, example: Kim Lee at Northpeak is interested }
+        text: { type: string }
+        path: { type: string, description: "The app page that has it, under the workspace: /{workspace}/{path}.", example: inbox/5f0c1e2a-0000-4000-8000-000000000000 }
+    AlertKind:
+      type: object
+      required: [id, title, description]
+      properties:
+        id: { type: string, example: reply.hot }
+        title: { type: string }
+        description: { type: string }
+    AlertSetting:
+      type: object
+      required: [brand_id, kind, email, slack_integration_id, slack_channel, slack_channel_name, updated_at]
+      properties:
+        brand_id: { type: [string, "null"], format: uuid, description: Null for the workspace. }
+        kind: { type: string }
+        email: { type: [string, "null"], enum: [owner, admins, off, null], description: Null follows the workspace or the default. }
+        slack_integration_id: { type: [string, "null"], format: uuid }
+        slack_channel: { type: [string, "null"] }
+        slack_channel_name: { type: [string, "null"] }
+        updated_at: { type: string, format: date-time }
+    ReplyRule:
+      type: object
+      required: [action]
+      additionalProperties: false
+      properties:
+        action: { type: string, description: "One of the label's actions (see actions in GET .../reply-rules).", example: snooze }
+        days: { type: integer, minimum: 1, maximum: 730, description: "not_now only: how long to wait when the reply gives no date. Default 90." }
+        sequence_id: { type: string, format: uuid, description: "add_and_enroll only: the sequence to enrol the person in." }
+    ReplyRules:
+      type: object
+      description: |
+        A rule per label. not_now: snooze (default; the reply comes back to
+        the open inbox on the date it gives, else after days), restart (the
+        sequence it stopped picks up again then) or nothing. out_of_office:
+        reschedule (default; the lead's next email waits until the day
+        after the return date the AI read) or nothing. referral and
+        wrong_person: suggest (default; the inbox offers to add the person),
+        add (a lead on the referrer's lists) or add_and_enroll.
+      properties:
+        not_now: { $ref: "#/components/schemas/ReplyRule" }
+        out_of_office: { $ref: "#/components/schemas/ReplyRule" }
+        referral: { $ref: "#/components/schemas/ReplyRule" }
+        wrong_person: { $ref: "#/components/schemas/ReplyRule" }
+      additionalProperties: false
+    ReplyRuleSet:
+      type: object
+      required: [id, project_id, sequence_id, rules, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        project_id: { type: [string, "null"], format: uuid, description: Set for a project's set. }
+        sequence_id: { type: [string, "null"], format: uuid, description: Set for a sequence's set. }
+        rules: { $ref: "#/components/schemas/ReplyRules" }
+        updated_at: { type: string, format: date-time }
     InboxView:
       type: object
       required: [id, name, shared, filters, position, created_at, updated_at]
