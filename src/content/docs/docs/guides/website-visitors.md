@@ -1,6 +1,6 @@
 ---
 title: Website visitors
-description: See which companies and people from your CRM visit your website, what they look at, and who is ready to talk, with an alert when someone becomes hot.
+description: See which companies and people visit your website, what they look at, and who is ready to talk, with an alert when someone becomes hot. Optionally, match unknown visitors to a company with your own data provider.
 sidebar:
   order: 9.7
 ---
@@ -11,7 +11,7 @@ sidebar:
 
 ## How visitors are named
 
-Outflare only names a visitor it can tie to someone already in your workspace. It never buys or guesses identities.
+Outflare names a visitor it can tie to someone already in your workspace. It has no identity data of its own and never guesses. The one exception is the optional [company lookups](#company-lookups) below, which use your own data provider.
 
 - **Your product.** When your product tells Outflare who signed up or signed in (see [website tracking](/docs/guides/website-tracking/)), their earlier and later visits join their record.
 - **Email clicks.** When someone clicks a link to your own site in a sequence or lifecycle email you sent them, the link carries a short signed token (`ofvisit`). The snippet sends it with the first page view and removes it from the address bar, and that browser's visits join the person the email went to.
@@ -26,6 +26,20 @@ The email-click token is safe to sit in a link:
 - It is only added to links to your own site (a brand's domain or website, or one of your site's origins), and only while your site is tracked.
 
 Turn it off with **Know people from email clicks** in the page's settings.
+
+## Company lookups
+
+Visitors nobody knows yet can be matched to a company from their IP address, using your own data provider: [People Data Labs](https://www.peopledatalabs.com) (IP Enrichment) or [Snitcher](https://www.snitcher.com) (IP to Company). Connect one under **Settings → Connectors** with your own key. Outflare never looks anything up on its own account. Lookups are off until you turn on **Look up companies from visitors' addresses** in the page's settings.
+
+- **Who is looked up.** Only visitors who accepted your site's cookies. Each browser is looked up at most once a day and each address at most once a week, up to **Lookups a day at most** (500 by default). Lookups spend your provider's credits.
+- **What is kept.** The address goes to your provider in a background job and is never stored. Outflare keeps a keyed hash of it, with the company's domain and name.
+- **Home and phone connections.** A home, phone, VPN or data-centre connection names nobody. Those visitors are counted separately, as on such a network.
+- **Nothing goes in your CRM on its own.** Lookups are often wrong, so they never add anything to your CRM.
+  - A company your CRM already has at that domain is linked straight away and can turn hot.
+  - Any other company is listed as **Not in CRM** until someone clicks **Add to CRM**. It is then added as a prospect, with its domain marked as coming from a lookup (unverified). It is never treated as having opted in.
+- **Not a company (ISP).** Use this when an internet provider or mobile carrier is mistaken for its customers. Its visitors lose it, it is never named again, and any company record that only lookups put in your CRM is archived.
+- **Old matches.** A company found for visitors who don't come back within 90 days, and that nobody added, is dropped.
+- **Sites behind a proxy.** If your site sends its events through its own domain, Outflare sees your server's address instead of the visitor's. Lookups name nobody in that case unless your proxy passes on the visitor's address with a proxy secret (see [website tracking](/docs/guides/website-tracking/)).
 
 ## Companies and people
 
@@ -46,5 +60,6 @@ Add your own company's domains under **Leave out these domains** so your team do
 ## API and MCP
 
 - `GET /v1/workspaces/{ws}/visitors` (scope `customers.read`): `view` (`companies` or `people`), `days`, `hot`, `limit` and `brand`.
-- `GET` and `PUT /v1/workspaces/{ws}/visitors/settings` (`customers.read`, `customers.manage`).
-- MCP tools: `list_website_visitors`, `get_visitor_settings`, `update_visitor_settings`.
+- `GET` and `PUT /v1/workspaces/{ws}/visitors/settings` (`customers.read`, `customers.manage`). Company lookups are `reveal_companies`, `reveal_daily_limit` and `not_companies`.
+- `POST /v1/workspaces/{ws}/visitors/companies` (`customers.manage`): add a looked-up company to your CRM.
+- MCP tools: `list_website_visitors`, `get_visitor_settings`, `update_visitor_settings`, `add_visitor_company`.
