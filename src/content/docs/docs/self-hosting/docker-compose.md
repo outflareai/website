@@ -12,6 +12,7 @@ The repository ships a Compose file, `deploy/docker-compose.yml`, with two servi
 - A Linux server with Docker and the Compose plugin. 1 vCPU and 1 GB of RAM is enough to start; add memory as you add mailboxes, since each one keeps an IMAP connection open once inbox sync ships.
 - Outbound access to your mailboxes' SMTP and IMAP servers: ports 465 or 587 and 993. Some cloud providers block outbound SMTP by default, so check yours.
 - A domain name and HTTPS in front of the engine if anyone other than you will use it.
+- Optional: [pgvector](/docs/guides/query-and-search/#self-hosting) in Postgres for meaning-based search. Use the `pgvector/pgvector:pg16` image for the `postgres` service to have it.
 
 ## Install
 

@@ -13296,6 +13296,16 @@ paths:
           schema: { type: string }
           description: "Comma-separated kinds to search: record, message, meeting, deal, email. Default: every kind you may read."
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 100 }, description: Results to return. Default 20. }
+        - name: mode
+          in: query
+          schema: { type: string, enum: [words, meaning], default: words }
+          description: |
+            words matches the words typed. meaning finds what means the same even in other words ("unhappy with price"
+            finds "too expensive for us"), over records, received messages, meetings and deals (not email). It compares
+            vectors made with the workspace's own AI key (GET .../semantic-search); turning what was asked into one is a
+            small AI call on that key. It answers semantic_search_unavailable (503) when the server's database has no
+            pgvector, semantic_search_off (409) when an admin turned it off, and connector_needed (409) without an
+            OpenAI, Gemini, Mistral or OpenRouter connection. rank is then the similarity, from -1 to 1.
       responses:
         "200":
           description: The best matches.
@@ -13306,6 +13316,57 @@ paths:
                 required: [data]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/SearchHit" } }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/semantic-search:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+    get:
+      operationId: getSemanticSearch
+      x-outflare-access: { scope: integrations.read }
+      summary: Read whether meaning-based search is on, and how far along it is
+      description: |
+        Scope: integrations.read. Meaning-based search (`GET .../search?mode=meaning`) turns each record, received message,
+        meeting and deal into a vector (an embedding) with the workspace's own AI connection, so search can compare what
+        things mean. It is on unless an admin turned it off, and runs once the workspace has an OpenAI, Gemini, Mistral or
+        OpenRouter connection (Claude has no embeddings; the AI model chosen under Settings is used when it can). The calls
+        are billed by that provider to the workspace's account, under the tool `semantic_search` in `GET .../ai-usage`,
+        where a monthly limit for it can be set: usually cents a month, since each item is embedded once and again only
+        when it changes. `problem` says what is missing when it can't run: `semantic_search_unavailable` (the database has
+        no pgvector) or `connector_needed`.
+      tags: [search]
+      responses:
+        "200":
+          description: The settings and progress.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SemanticSearch" }
+        default: { $ref: "#/components/responses/Error" }
+    put:
+      operationId: updateSemanticSearch
+      x-outflare-access: { scope: integrations.manage }
+      summary: Turn meaning-based search on or off
+      description: |
+        Scope: integrations.manage. Off stops the embedding calls and deletes the workspace's vectors; word search carries
+        on. On embeds everything again, once a connection that makes embeddings is there.
+      tags: [search]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [enabled]
+              additionalProperties: false
+              properties:
+                enabled: { type: boolean }
+      responses:
+        "200":
+          description: The settings and progress.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SemanticSearch" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "400": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/query/tables:
     parameters:
@@ -24327,10 +24388,28 @@ components:
         record_id: { type: [string, "null"], format: uuid, description: Whose it is, when it is linked to a record. }
         record_name: { type: [string, "null"], description: "That record's name, when you may read it." }
         title: { type: string, description: "A record's name, or the subject or title." }
-        snippet: { type: string, description: The words around the match in a reply's body or a meeting's notes; empty otherwise. }
+        snippet: { type: string, description: "The words around the match in a reply's body or a meeting's notes (by meaning: their start); empty otherwise." }
         detail: { type: string, description: "A record's type or the identity that matched (email: ...), sent or received for a message, a meeting's status, a deal's stage, an email's status." }
         at: { type: string, format: date-time }
-        rank: { type: number, description: How well it matched; higher is better. }
+        rank: { type: number, description: How well it matched; higher is better. By meaning, the similarity from -1 to 1. }
+    SemanticSearch:
+      type: object
+      required: [enabled, available, provider, model, embedded, waiting, problem]
+      properties:
+        enabled: { type: boolean, description: On unless an admin turned it off. }
+        available: { type: boolean, description: Whether the server's database has pgvector. }
+        provider: { type: [string, "null"], description: "The connector making the embeddings: openai, gemini, mistral or openrouter." }
+        model: { type: [string, "null"], description: "The provider's embedding model, such as text-embedding-3-small." }
+        embedded: { type: integer, description: Items with a current vector. }
+        waiting: { type: integer, description: "Items new or changed since their vector was made, embedded within minutes." }
+        problem:
+          oneOf:
+            - type: "null"
+            - type: object
+              required: [code, message]
+              properties:
+                code: { type: string }
+                message: { type: string }
     QueryTable:
       type: object
       required: [name, description, scope, available, columns]
