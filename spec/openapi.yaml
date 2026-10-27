@@ -10905,6 +10905,143 @@ paths:
               schema: { $ref: "#/components/schemas/Consent" }
         "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/site-keys:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listSiteKeys
+      x-outflare-access: { scope: customers.read }
+      summary: List site keys
+      description: "Scope: customers.read. The keys websites send page views with, each with its snippet to paste into the site."
+      tags: [records]
+      responses:
+        "200":
+          description: Keys, oldest first.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/SiteKey" } }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createSiteKey
+      x-outflare-access: { scope: customers.manage }
+      summary: Add a site key
+      description: |
+        Scope: customers.manage. A public key for one website's tracking snippet. It only adds page views and
+        track events on anonymous visitors: it reads nothing, never names or merges a person and opens no other
+        endpoint, so it can sit in the page's HTML. At most 20 per workspace.
+      tags: [records]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SiteKeyInput" }
+      responses:
+        "201":
+          description: The key and its snippet.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SiteKey" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/site-keys/{id}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    patch:
+      operationId: updateSiteKey
+      x-outflare-access: { scope: customers.manage }
+      summary: Change a site key
+      description: "Scope: customers.manage. Its name, brand or origins."
+      tags: [records]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SiteKeyInput" }
+      responses:
+        "200":
+          description: The key.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SiteKey" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+    delete:
+      operationId: revokeSiteKey
+      x-outflare-access: { scope: customers.manage }
+      summary: Revoke a site key
+      description: "Scope: customers.manage. It, and its value before a rotation, stop working at once. Events already taken stay."
+      tags: [records]
+      responses:
+        "204": { description: Revoked. }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/site-keys/{id}/rotate:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: rotateSiteKey
+      x-outflare-access: { scope: customers.manage }
+      summary: Rotate a site key
+      description: "Scope: customers.manage. Gives the key a new value. The old one keeps working for seven days (previous_expires_at), so the site can be updated without losing visits."
+      tags: [records]
+      responses:
+        "200":
+          description: The key with its new value.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SiteKey" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/site/events:
+    post:
+      operationId: sendSiteEvents
+      summary: Send website events
+      description: |
+        Public: the site key (ofk_) in the body is the authority. What the tracking snippet (/site.js) sends: page views
+        and track events on a visitor's anonymousId, with context.page, context.campaign (the utm_ tags) and, on page
+        views, properties.click_ids, ofc and ref, exactly as the landing page had them. A userId, traits and timestamps
+        are ignored: the browser cannot say who someone is. Your own product links the visitor to a person by sending
+        identify with userId and the same anonymousId to POST .../customer-events. Send the JSON as text/plain to skip
+        the CORS preflight. At most 20 events per request; 300 requests a minute per address, 6,000 per key, and
+        250,000 events a day per key. The answer only counts what was taken.
+      tags: [records]
+      requestBody:
+        required: true
+        content:
+          text/plain:
+            schema: { type: string }
+          application/json:
+            schema:
+              type: object
+              required: [key, batch]
+              properties:
+                key: { type: string, example: ofk_test_not_a_real_key }
+                batch: { type: array, maxItems: 20, items: { type: object, additionalProperties: true } }
+      responses:
+        "200":
+          description: How many were taken.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [accepted, rejected]
+                properties:
+                  accepted: { type: integer }
+                  rejected: { type: integer, description: Events refused, such as an identify call or one without anonymousId. }
+        default: { $ref: "#/components/responses/Error" }
+    options:
+      operationId: sendSiteEventsPreflight
+      summary: CORS preflight for website events
+      description: "Public. Any origin may send; the key, not the page, is checked."
+      tags: [records]
+      responses:
+        "204": { description: Allowed. }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/customer-events:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
@@ -16101,6 +16238,28 @@ components:
       properties:
         campaigns: { type: array, items: { $ref: "#/components/schemas/ExternalCampaign" } }
         mailboxes: { $ref: "#/components/schemas/MailboxMatch" }
+    SiteKey:
+      type: object
+      required: [id, name, key, brand_id, origins, previous_expires_at, events_today, created_at, last_used_at, rotated_at, snippet]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string, description: Usually the site's domain. }
+        key: { type: string, description: "The public key (ofk_). It only writes browser events.", example: ofk_test_not_a_real_key }
+        brand_id: { type: [string, "null"], format: uuid, description: The brand whose site it is; its events get this brand. }
+        origins: { type: array, items: { type: string }, description: "Origins events are taken from, such as https://example.com or https://*.example.com. Empty: any. A filter against stray traffic, not a lock." }
+        previous_expires_at: { type: [string, "null"], format: date-time, description: Until when the value before the last rotation still works. }
+        events_today: { type: integer, description: Events taken today (UTC). }
+        created_at: { type: string, format: date-time }
+        last_used_at: { type: [string, "null"], format: date-time }
+        rotated_at: { type: [string, "null"], format: date-time }
+        snippet: { type: string, description: "The script tag to paste into the site's <head>." }
+    SiteKeyInput:
+      type: object
+      additionalProperties: false
+      properties:
+        name: { type: string, maxLength: 100 }
+        brand_id: { type: [string, "null"], format: uuid }
+        origins: { type: array, maxItems: 20, items: { type: string } }
     PaymentSync:
       type: object
       description: Where a payment connection's sync got to.
