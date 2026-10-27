@@ -2,20 +2,95 @@
 	"_comment": "Outflare's official profiles: the one list the /social page, the footer, the short links (outflare.ai/<short>, written to _redirects at build time) and the Organization sameAs all read. Add a profile only once it is claimed.",
 	"profiles": [
 		{
+			"id": "x",
+			"name": "X",
+			"handle": "@outflareai",
+			"url": "https://x.com/outflareai",
+			"short": "x"
+		},
+		{
+			"id": "bluesky",
+			"name": "Bluesky",
+			"handle": "@outflare.ai",
+			"url": "https://bsky.app/profile/outflare.ai",
+			"short": "bluesky"
+		},
+		{
+			"id": "linkedin",
+			"name": "LinkedIn",
+			"handle": "Outflare",
+			"url": "https://www.linkedin.com/company/outflare",
+			"short": "linkedin"
+		},
+		{
+			"id": "youtube",
+			"name": "YouTube",
+			"handle": "@outflareai",
+			"url": "https://www.youtube.com/@outflareai",
+			"short": "youtube"
+		},
+		{
 			"id": "github",
 			"name": "GitHub",
 			"handle": "outflareai",
 			"url": "https://github.com/outflareai",
-			"short": "github",
-			"about": "The open-source code, issues and roadmap."
+			"short": "github"
+		},
+		{
+			"id": "instagram",
+			"name": "Instagram",
+			"handle": "@outflareai",
+			"url": "https://www.instagram.com/outflareai",
+			"short": "instagram"
+		},
+		{
+			"id": "threads",
+			"name": "Threads",
+			"handle": "@outflareai",
+			"url": "https://www.threads.com/@outflareai",
+			"short": "threads"
+		},
+		{
+			"id": "tiktok",
+			"name": "TikTok",
+			"handle": "@outflareai",
+			"url": "https://www.tiktok.com/@outflareai",
+			"short": "tiktok"
+		},
+		{
+			"id": "facebook",
+			"name": "Facebook",
+			"handle": "outflareai",
+			"url": "https://www.facebook.com/outflareai",
+			"short": "facebook"
+		},
+		{
+			"id": "mastodon",
+			"name": "Mastodon",
+			"handle": "@outflare",
+			"url": "https://mastodon.social/@outflare",
+			"short": "mastodon"
+		},
+		{
+			"id": "devto",
+			"name": "DEV",
+			"handle": "outflare",
+			"url": "https://dev.to/outflare",
+			"short": "devto"
+		},
+		{
+			"id": "docker",
+			"name": "Docker Hub",
+			"handle": "outflareai",
+			"url": "https://hub.docker.com/u/outflareai",
+			"short": "docker"
 		},
 		{
 			"id": "npm",
 			"name": "npm",
 			"handle": "@outflare",
 			"url": "https://www.npmjs.com/org/outflare",
-			"short": "npm",
-			"about": "The npm scope for the TypeScript SDK and MCP server."
+			"short": "npm"
 		}
 	]
 }

@@ -68,7 +68,16 @@ Outflare merges on its own in one case only. If your product reports that someon
 
 ## Timeline
 
-Every person and company has a timeline, newest first: their product events, changes to their details, emails and ids added or replaced, consent given or taken back, cold email sent to them and their replies, meetings and deals. Filter it with `kinds`, for example `?kinds=message,meeting,deal` for just the outreach.
+Every person and company has one timeline across every module, newest first (`GET /records/{record}/timeline`, MCP `get_record_timeline`):
+
+- product events, including lifecycle email and payments
+- changes to their details, and emails and ids added or replaced
+- consent given or taken back, and entries on the [opt-out list](/docs/guides/who-can-be-emailed/#the-opt-out-list)
+- cold email sent to them and their replies, meetings and deals
+- visits to your website: the landing page, pages seen, where they came from and the campaign
+- journeys entered, and finished or left
+
+A company's timeline includes its people's, and each item says whose it is; `people=false` shows only the company's own. Filter it with `kinds`, for example `?kinds=message,meeting,deal` for just the outreach, and with `brand` for one brand's items and the shared ones. Pages are 50 items; pass `next_before` as `before` for the next.
 
 ## Consent
 

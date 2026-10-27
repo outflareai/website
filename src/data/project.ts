@@ -35,7 +35,8 @@ export interface Milestone {
 	docs?: string;
 }
 
-// The v1 milestones, one pull request each in the main repo.
+// The v1 milestones, one step each. All of v1 has shipped; what came after
+// is on the home page's modules (modules.ts).
 export const milestones: Milestone[] = [
 	{
 		step: 1,
@@ -89,8 +90,8 @@ export const milestones: Milestone[] = [
 	{
 		step: 8,
 		title: 'Web app polish and TypeScript SDK',
-		status: 'building',
-		summary: 'Workspace overview, URL routing and mobile layout; @outflare/sdk with ok() errors, installed from the repository.',
+		status: 'shipped',
+		summary: 'Workspace overview, URL routing and mobile layout; @outflare/sdk with ok() errors, installed from the repository (not on npm yet).',
 		docs: '/docs/sdk/typescript/',
 	},
 	{
@@ -221,9 +222,9 @@ export const milestones: Milestone[] = [
 	},
 	{
 		step: null,
-		title: 'CLI, more CRMs, provider marketplace, Cloud',
+		title: 'More CRMs and a provider marketplace',
 		status: 'later',
-		summary: 'A CLI for scripting, Salesforce, Pipedrive and Attio, and a marketplace for data, model and mailbox providers.',
+		summary: 'Salesforce and Pipedrive, and a marketplace for data, model and mailbox providers.',
 	},
 ];
 

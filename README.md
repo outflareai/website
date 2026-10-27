@@ -72,7 +72,7 @@ When the main repo changes:
 1. Refresh the API contract: `npm run sync-spec` (from `main`), or `npm run sync-spec -- <branch>`, or `OUTFLARE_DIR=../outflare npm run sync-spec` from a local checkout.
 2. Update `src/data/project.ts` when a roadmap step ships, and remove the **Planned** label from its docs page.
 3. Check install and configuration pages against `README.md`, `deploy/` and `engine/internal/config` in the main repo.
-4. Merge only once app.outflare.ai runs the change. Put `Needs outflareai/engine#NN` (or `outflareai/cloud#NN`) in the pull request's description; the `deployed` check (`scripts/check-deployed.mjs`) stays red until that pull request is merged and in the version production reports at `/v1/meta`, and until production serves the same `spec/openapi.yaml`. Re-run it after the deploy. It reads the private repositories with the `DEPLOY_CHECK_TOKEN` secret.
+4. Merge only once app.outflare.ai runs the change. Put `Needs outflareai/engine#NN` (or `outflareai/cloud#NN`) in the pull request's description; the `deployed` check (`scripts/check-deployed.mjs`) stays red until that pull request is merged and in the version production reports at `/v1/meta`, and until production serves the same `spec/openapi.yaml`. It re-runs itself every 15 minutes while it is the only failing check (`recheck-deployed.yml`). It reads the private repositories with the `DEPLOY_CHECK_TOKEN` secret.
 
 ## License
 
