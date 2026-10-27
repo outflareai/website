@@ -30,7 +30,8 @@ To record a step that isn't a page, such as a click on a sign-up button, call `o
 
 ## What each visit records
 
-- The page's address and title, keeping only the campaign tags, click ids and referral codes below from its query string, and where the visitor came from (just the site and path). A sign-in link's token or an email address in a URL is never kept.
+- The page's address, host, path and title, with its whole query string, so reports can filter on any parameter. A sign-in link's token, a password, a code, a session id or an email address in a URL is never kept, and **Edit sites** lets you leave out more by name (`plan`) or prefix (`fb_*`).
+- Where the visitor came from: just the other site's address and path, without its query string.
 - The `utm_source`, `utm_medium`, `utm_campaign`, `utm_term`, `utm_content` and `utm_id` tags.
 - Ad click ids: `gclid`, `gbraid`, `wbraid`, `fbclid`, `msclkid`, `li_fat_id`, `rdt_cid` and `twclid`.
 - A referral or partner code from `ref` or `via`, and an Outflare campaign link's `ofc`.
