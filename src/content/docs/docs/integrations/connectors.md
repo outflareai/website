@@ -62,6 +62,9 @@ If the server has no OAuth app for a provider, the dialog says so and asks for t
 | Cloudflare Web Analytics | Cloudflare | API token and account id |
 | LinkedIn | LinkedIn | |
 | X | Your own X app (OAuth 2.0 with PKCE) | Your app's client id and secret, then sign in |
+| Cal.com | Cal.com (cloud) | API key (also self-hosted) |
+| Stripe | Stripe | Restricted key |
+| OpenRouter | OpenRouter, no app to register | API key |
 | Everything else | Not offered by the vendor | API key or token |
 
 In a workspace with [brands](/docs/guides/brands/), a connection is made once and shared with every brand, or with the brands you pick, and a brand with an account of its own can connect that one for itself. See [Connect a tool once for every brand](/docs/guides/brands/#connect-a-tool-once-for-every-brand).
@@ -78,7 +81,7 @@ curl -X POST https://outflare.example.com/v1/workspaces/$WS/integrations \
 
 Any connector whose `auth_methods` include `api_key` connects this way, even if it also offers OAuth. To sign in instead, open `GET /v1/workspaces/$WS/integrations/oauth/{connector}/authorize` in a browser (add `?format=json` to get the link). A wrong key is refused with the provider's reason. `POST /integrations/{id}/test` signs in again, `PATCH` renames it or replaces the key, and `DELETE` disconnects it. These need scope `integrations.manage`.
 
-Signing in needs an app registered with the provider. Self-hosters set `CONNECTOR_<ID>_CLIENT_ID` and `CONNECTOR_<ID>_CLIENT_SECRET`, and use `<PUBLIC_URL>/v1/integrations/oauth/callback` as the redirect URL. Google connectors fall back to `GOOGLE_OAUTH_CLIENT_ID` and Outlook to `MICROSOFT_OAUTH_CLIENT_ID`. PostHog needs no app, only a public https `PUBLIC_URL`. If you registered the app with different scopes, `CONNECTOR_<ID>_SCOPES` (space separated) replaces the defaults. Without an app, any connector that also takes a key still connects with the key.
+Signing in needs an app registered with the provider. Self-hosters set `CONNECTOR_<ID>_CLIENT_ID` and `CONNECTOR_<ID>_CLIENT_SECRET`, and use `<PUBLIC_URL>/v1/integrations/oauth/callback` as the redirect URL. Google connectors fall back to `GOOGLE_OAUTH_CLIENT_ID` and Outlook to `MICROSOFT_OAUTH_CLIENT_ID`. PostHog needs no app, only a public https `PUBLIC_URL`, and OpenRouter needs none at all: signing in makes a key on your own OpenRouter account. If you registered the app with different scopes, `CONNECTOR_<ID>_SCOPES` (space separated) replaces the defaults. Without an app, any connector that also takes a key still connects with the key.
 
 | Provider | Register the app at | Variables |
 | --- | --- | --- |
@@ -88,6 +91,8 @@ Signing in needs an app registered with the provider. Self-hosters set `CONNECTO
 | Apollo | Apollo, Settings, Integrations, API, OAuth registration | `CONNECTOR_APOLLO_CLIENT_ID`, `_CLIENT_SECRET` |
 | Ahrefs | Ahrefs, Account settings, Ahrefs Connect (Ahrefs approves production access) | `CONNECTOR_AHREFS_CLIENT_ID`, `_CLIENT_SECRET` |
 | Cloudflare | Cloudflare dashboard, Manage account, OAuth clients | `CONNECTOR_CLOUDFLARE_WEB_ANALYTICS_CLIENT_ID`, `_CLIENT_SECRET` |
+| Cal.com | app.cal.com, Settings, Developer, OAuth clients, scopes `PROFILE_READ` and `BOOKING_READ` (Cal.com reviews new clients) | `CONNECTOR_CAL_COM_CLIENT_ID`, `_CLIENT_SECRET` |
+| Stripe | A Stripe App with read access to customers, charges, events, products, prices and subscriptions (Stripe reviews public apps). The secret is the key of the Stripe account that owns the app, and `_AUTH_URL` is the app's OAuth install link | `CONNECTOR_STRIPE_CLIENT_ID`, `_CLIENT_SECRET`, `_AUTH_URL` |
 
 PostHog and HubSpot used to be two connectors each (`posthog_cloud`, `hubspot_private_app`). Each is now one connector with both ways in. The old ids still work in API calls, and existing connections moved over automatically.
 
