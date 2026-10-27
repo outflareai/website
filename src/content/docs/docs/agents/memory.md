@@ -60,8 +60,14 @@ Outflare's own mission agent reads the same context and pinned memories every tu
 | Infrastructure plans awaiting approval | You approve: it spends money |
 | Unread replies | The agent triages them |
 | Company details still missing | The agent asks you once |
+| Open errors on the fixes list | The agent takes them, or hands one to a coding agent |
+| Analytics sites with no brand, brands no analytics tool reads | You map the site or connect the tool |
+| Email sending domains the provider wouldn't verify, broadcasts that stopped | You add the DNS records; the agent finds out why a broadcast stopped |
+| Social replies waiting for approval | You approve or reject them: nothing posts without you |
+| Possible duplicate people, new product event names held for review | The agent merges, links or dismisses, and approves the event names |
+| CRM imports that failed | The agent runs the import again |
 
-Each blocker names the tool an agent calls next, the dashboard page that fixes it, and whether the agent or a person has to act. The Home page shows the same list.
+Each blocker names the tool an agent calls next, the dashboard page that fixes it, and whether the agent or a person has to act. Home's **Needs you** list shows the same list, so there is one place for every module's to-dos.
 
 When a call fails, the agent gets the error code and a plain next step (for example, which scope to add to its token), so it fixes the cause or tells you exactly what to do instead of retrying blindly.
 

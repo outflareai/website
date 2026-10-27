@@ -173,6 +173,52 @@ Every type is also in the API document, under `webhooks:` and in the `WebhookEve
 | `domain.resumed` | A paused sending domain was resumed. |
 | `domain.removed` | A sending domain was removed. |
 
+### Customer records and consent
+
+| Event | When |
+| --- | --- |
+| `record.created` | A person, company or other record was created: by hand, an import, a lead, a sign-up or product events. data has type and origin. |
+| `record.bulk_created` | Many records were created at once (a lead import or unsubscribes from another sequencer). data has type, origin, via and count. |
+| `record.updated` | A record's name, origin, brand or attributes changed. data.type is its record type; GET .../records/{id}/history has what changed. |
+| `record.merged` | Two records were merged into one. The target is the record kept; data.from_id is the merged one and data has counts of what moved. |
+| `identity.verified` | Someone proved they own an email or phone, so it now claims that address for their record. |
+| `identity.closed` | An email, phone or id stopped pointing at a record (replaced or removed). It stays in the record's history. |
+| `relationship.added` | Two records were linked, such as a person to their company. |
+| `relationship.ended` | A link between two records ended. |
+| `consent.granted` | A person gave consent. data has channel, purpose, source, and topic (true when it is for one topic rather than the whole channel). |
+| `consent.withdrawn` | A person withdrew consent, such as by unsubscribing from any email. data has channel, purpose, source and topic, as for consent.granted. |
+| `consent.bulk_withdrawn` | Many people withdrew consent at once, such as unsubscribes imported from another sequencer. data.count says how many. |
+
+### Lifecycle email, broadcasts and journeys
+
+| Event | When |
+| --- | --- |
+| `email.queued` | A lifecycle or transactional email was queued. GET .../emails/{id} has it; data has purpose, recipients and template_id. |
+| `email.sent` | The email provider accepted an email. data has provider_id, connector and purpose. |
+| `email.delivered` | The receiving mail server accepted an email. |
+| `email.bounced` | An email bounced permanently and the address was suppressed. data.bounce_type is hard. |
+| `email.complained` | A recipient marked an email as spam and the address was suppressed. |
+| `email.failed` | An email could not be sent. data.error_code says why; GET the email for the provider's answer. |
+| `email.suppressed` | An email was not sent because every recipient is on the suppression list, or the provider refused the address. |
+| `email.cancelled` | A queued or scheduled email was cancelled. |
+| `email.unsubscribed` | A recipient used a lifecycle email's unsubscribe link and was suppressed. |
+| `email.opened` | An email was opened for the first time: its tracking pixel loaded (track_opens), or the provider reported it. |
+| `email.clicked` | A link in an email was clicked for the first time: a tracked link (track_clicks), or the provider reported it. |
+| `email.preferences_changed` | Someone changed their topics or turned off all marketing email on the preference page behind an email's unsubscribe link. The choices are consents on their customer record. |
+| `email_domain.verified` | A sending domain was verified by its email provider and can send. |
+| `email_domain.verification_failed` | A sending domain was still not verified after three days of checks. |
+| `email_provider.events_failed` | Outflare could not set up delivery events with an email provider. GET the provider for events_error. |
+| `email_template.published` | A template's draft was published as a new version. data.version is its number. |
+| `email_broadcast.created` | A broadcast was drafted or scheduled. |
+| `email_broadcast.started` | A broadcast started sending. |
+| `email_broadcast.sent` | A broadcast finished sending. data has recipients and skipped. |
+| `email_broadcast.failed` | A broadcast stopped before reaching everyone. GET the broadcast for status_reason. |
+| `email_broadcast.cancelled` | A broadcast was cancelled. data.emails_cancelled counts emails it had queued. |
+| `journey.created` | A journey was created. |
+| `journey.updated` | A journey's settings or steps changed. |
+| `journey_run.entered` | A person entered a journey. The target is the journey; data.via is event or manual. |
+| `journey_run.exited` | A person left a journey before its end. The target is the journey; data.reason says why (goal, manual, ...). |
+
 ### Outcomes
 
 | Event | When |
@@ -194,12 +240,59 @@ Every type is also in the API document, under `webhooks:` and in the `WebhookEve
 | `integration.disconnected` | A connector was disconnected. |
 | `connect_request.created` | A one-time connect link was created for a person to finish connecting a service. |
 
+### Brands
+
+| Event | When |
+| --- | --- |
+| `brand.created` | A brand was added to the workspace. |
+| `brand.updated` | A brand's name, website or settings changed. data.fields lists what changed. |
+
+### Site audits
+
+| Event | When |
+| --- | --- |
+| `seo_site.created` | A website was added for site audits. |
+| `seo_site.verified` | Ownership of a site was proved. data.method is how. |
+| `seo_site.unverified` | A site's ownership proof was gone at a later check, so it is crawled as anyone else's would be. |
+| `seo_site.deleted` | A site was removed from site audits. |
+| `crawl.started` | A crawl of a site started. data has site_id and trigger. |
+| `crawl.stopped` | A crawl was stopped by hand. |
+| `crawl.done` | A crawl finished. data has site_id, status (done, stopped or failed), reason and page counts; GET .../crawls/{id} has its audit. |
+
+### Fixes
+
+| Event | When |
+| --- | --- |
+| `fix.found` | A new fix was added to the fixes list (a site audit found an issue). data has source, rule, subject_type, subject_id and run_id. GET .../fixes/{id}/prompt turns it into a prompt for a coding agent. |
+| `fix.updated` | Someone or an agent took, finished, ignored or reopened a fix, or changed its note. data holds what changed. |
+| `fix.verify_requested` | Someone or an agent said a fix is out and asked for a check (POST .../fixes/{id}/verify). data.run_id is the crawl that checks it. |
+| `fix.confirmed` | A complete crawl no longer found a fix's issue, so it is done. data.run_id is the crawl. |
+| `fix.reopened` | A fix marked done was found again by a crawl, so it is open again. data.run_id is the crawl. |
+| `fix.started` | Someone or an agent took a fix before changing the site (POST .../fixes/{id}/start). data.autonomy says what fix autonomy decided. |
+
+### SEO experiments
+
+| Event | When |
+| --- | --- |
+| `experiment.started` | An SEO experiment started measuring: its site deployed, or a person said when the change went live. data has site_id, by (deploy or person), deploy_id and changed_at. |
+| `experiment.concluded` | An SEO experiment ended with a result. data has site_id, design, metric, verdict (better, worse, no_clear_change or too_early), lift, p_value, days_measured and treatment_pages. |
+
 ### Deploys
 
 | Event | When |
 | --- | --- |
 | `deploy.detected` | A watched repository or project went live in production. `data` has `target_id`, `site_id` (the site it serves, or null), `kind` (`deployment` or `push`), `commit`, `ref` and `deployed_at`. |
 | `deploy.failed` | A production deploy of a watched repository or project failed. |
+
+### Social
+
+| Event | When |
+| --- | --- |
+| `social_action.drafted` | A social reply was drafted and waits for a person to approve it. |
+| `social_action.approved` | A person approved a social reply, so it will post. |
+| `social_action.rejected` | A person rejected a drafted social reply. |
+| `social_action.done` | An approved social reply was posted from the brand's own account. data has channel and type; GET it for its link. |
+| `social_action.failed` | An approved social reply could not be posted. GET it for status_reason. |
 
 ### Digests
 
@@ -244,16 +337,6 @@ Every type is also in the API document, under `webhooks:` and in the `WebhookEve
 | `infra.plan_warming` | A plan's mailboxes are all in and warming up. |
 | `infra.plan_ready` | A plan's mailboxes finished warming up and are ready to send. |
 | `infra.plan_cancelled` | An infrastructure plan was cancelled. |
-
-### Fixes
-
-| Event | When |
-| --- | --- |
-| `fix.found` | A new fix was added to the fixes list (a site audit found an issue). data has source, rule, subject_type, subject_id and run_id. GET .../fixes/{id}/prompt turns it into a prompt for a coding agent. |
-| `fix.updated` | Someone or an agent took, finished, ignored or reopened a fix, or changed its note. data holds what changed. |
-| `fix.verify_requested` | Someone or an agent said a fix is out and asked for a check (POST .../fixes/{id}/verify). data.run_id is the crawl that checks it. |
-| `fix.confirmed` | A complete crawl no longer found a fix's issue, so it is done. data.run_id is the crawl. |
-| `fix.reopened` | A fix marked done was found again by a crawl, so it is open again. data.run_id is the crawl. |
 
 ### Workspace
 
