@@ -40,7 +40,7 @@ This site deploys on every push to main (Cloudflare Pages), but app.outflare.ai 
 2. **The `deployed` check enforces it.** It fails until each named pull request is merged and contained in the version production reports at `/v1/meta` (`<engine commit>+<cloud commit>`), and, when the pull request changes `spec/openapi.yaml`, until production serves that exact file. Re-run it once the deploy is done; never merge around it.
 3. **Re-copy the spec before merging.** `spec/openapi.yaml` must equal the engine's `api/openapi.yaml` that production runs (`npm run sync-spec -- <that commit>`), not a branch.
 4. **Never say "live" or "deployed"** about a feature until production's `/v1/meta` version contains it.
-5. **No releases from here.** Self-hosted releases are tags on the engine, and only Jack pushes them.
+5. **No releases from here.** Self-hosted releases are cut, tagged and published to `outflareai/outflare` automatically after engine merges, once every check passes. Nobody tags or publishes by hand, from here or anywhere else.
 
 ## Secrets and security (hard rule)
 
