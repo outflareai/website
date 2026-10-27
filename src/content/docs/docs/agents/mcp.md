@@ -198,7 +198,7 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `list_members`, `triage_inbox_message` | Workspace members; label, assign, snooze, tag, close or flag a reply for review | Yes |
 | `create_inbox_tag`, `update_inbox_tag`, `delete_inbox_tag` | Add, rename, recolour or delete a reply tag | Yes |
 | `create_inbox_view`, `update_inbox_view`, `delete_inbox_view` | Save, change or delete a shared set of inbox filters | Yes |
-| `set_reply_rules` | Choose what happens for a not now, an out-of-office or a referral, for the workspace, a project or a sequence | Yes |
+| `set_reply_rules` | Choose what happens for a not now, an out-of-office or a referral, and which deal stage a labelled reply moves its deal to, for the workspace, a project or a sequence | Yes |
 | `add_reply_referral` | Add the person a reply refers you to as a lead, and optionally enrol them | Yes |
 | `list_alerts` | What needs someone now: hot replies, hot website visitors, with the page that has each | |
 | `get_alert_settings` | Who gets each kind of alert by email, and the kinds you muted | |

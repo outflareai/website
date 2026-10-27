@@ -5,7 +5,7 @@ sidebar:
   order: 8
 ---
 
-<span class="pill shipped">Shipped</span> IMAP sync, one inbox across all mailboxes, stop on reply, opt-out and bounce handling, labelling replies by what they mean in four groups, assigning, snoozing, coloured tags, saved views, label webhooks, replying from the inbox, replies from EmailBison, AI labelling with your own AI key, reply rules, and [alerts](/docs/guides/alerts/) for hot replies. <span class="pill">Next</span> Other sequencers.
+<span class="pill shipped">Shipped</span> IMAP sync, one inbox across all mailboxes, stop on reply, opt-out and bounce handling, labelling replies by what they mean in four groups, assigning, snoozing, coloured tags, saved views, label webhooks, replying from the inbox, replies from EmailBison, AI labelling with your own AI key, reply rules that also move deals in your CRM, and [alerts](/docs/guides/alerts/) for hot replies. <span class="pill">Next</span> Other sequencers.
 
 ## How mail arrives
 
@@ -125,6 +125,24 @@ curl -X PUT https://outflare.example.com/v1/workspaces/$WS/reply-rules \
 `GET /v1/workspaces/{ws}/reply-rules` shows the defaults, the actions each label can take, and every saved set. Sending empty `rules` removes a set. Add a referral by hand with `POST /v1/workspaces/{ws}/inbox/{id}/referral`, optionally with a `sequence_id`. Agents use `get_reply_rules`, `set_reply_rules` and `add_reply_referral`. Changing rules needs `inbox.manage`.
 
 The AI reads dates and referred people only from replies it labels, so these rules act on dates and referrals once [your own AI model](#ai-labelling-with-your-own-key) is connected. Without it, a not now waits the default 90 days.
+
+### Move deals from replies
+
+Reply rules can also keep your pipeline in Outflare's own CRM up to date. In **Rules → Deals**, pick a stage for any label a person could set (interested, meeting booked, question, objection, not now, not interested, unsubscribe, complaint), for example *Interested → Qualified* and *Meeting booked → Meeting*. When a reply gets that label:
+
+- The reply's deal is the newest open deal that points at the person or their company. It moves to the stage you picked.
+- A deal only moves forward. A later "not now" never drags it back, and a stage a person set by hand is never overridden.
+- A deal in a closed stage (won and lost by default) is left alone. With no open deal, a new one opens at that stage, named after the company and linked to the person and company.
+
+This needs a deal type in your [customer records](/docs/guides/customer-records/): a record type with a status field for its stages, and a field that points at a person or a company. Rules on automatic labels such as auto-reply and out of office can't move deals. Through the API, add a `deal` to a label's rule:
+
+```sh
+curl -X PUT https://outflare.example.com/v1/workspaces/$WS/reply-rules \
+  -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" \
+  -d '{"rules": {"interested": {"deal": {"type": "deal", "field": "stage", "stage": "qualified", "closed": ["won", "lost"]}}}}'
+```
+
+Each move is recorded on the deal's history and as an `inbox.rule_applied` event with the action `deal`.
 
 ## Tags and saved views
 
