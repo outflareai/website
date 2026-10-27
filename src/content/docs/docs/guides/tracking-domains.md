@@ -21,6 +21,8 @@ By default, unsubscribe and click links point at your instance's `PUBLIC_URL`. A
 2. At your DNS host, add a `CNAME` record from that subdomain to the target shown (your instance's host).
 3. Click **Check now**. Once the record is found the domain shows **In use**, and new emails use it.
 
+A tracking domain serves only those links (click, open and unsubscribe). The rest of Outflare, sign-in included, isn't available on it. If you self-host, give the tracking domain its own HTTPS certificate on your proxy, as you did for `PUBLIC_URL`.
+
 DNS changes can take up to an hour to show. If a verified domain later stops pointing at your instance, it's marked **Not pointing here** and emails go back to `PUBLIC_URL` until you fix it.
 
 ```sh
