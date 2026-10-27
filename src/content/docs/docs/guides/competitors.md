@@ -24,6 +24,8 @@ In the app, open **SEO** in the sidebar, then **Competitors**.
 
 When your workspace has a customer record with the competitor's domain, the competitor is linked to it.
 
+**Name it** in a competitor's menu to give it a name and the other names it goes by, such as a short name AI answers use. Agents set them with `update_seo_competitor`.
+
 ## What Outflare follows
 
 - **Their numbers, from your connection.** Each week the snapshot takes an overview of up to 10 tracked competitors a site: domain rating, organic traffic and keywords, and referring domains. Each costs about what one of your own domains costs, and counts against the connection's monthly budget.

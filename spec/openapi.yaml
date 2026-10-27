@@ -6112,6 +6112,8 @@ paths:
               type: object
               required: [site_id, host]
               properties:
+                name: { type: string, maxLength: 100 }
+                aliases: { type: array, maxItems: 10, items: { type: string, maxLength: 100 } }
                 site_id: { type: string, format: uuid }
                 host: { type: string, maxLength: 300, examples: [rival.example] }
       responses:
@@ -6176,8 +6178,8 @@ paths:
       operationId: updateSEOCompetitor
       x-outflare-access: { scope: seo.manage, brand_limited: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
-      summary: Track or dismiss a competitor
-      description: "Scope: seo.manage. `tracked` starts the weekly look and numbers (at most 20 a site); `dismissed` stops them and keeps a suggestion from coming back."
+      summary: Track, dismiss or name a competitor
+      description: "Scope: seo.manage. `tracked` starts the weekly look and numbers (at most 20 a site); `dismissed` stops them and keeps a suggestion from coming back. `name` and `aliases` say what it is called, for features that look for it by name, such as AI answers."
       tags: [seo]
       requestBody:
         required: true
@@ -6185,9 +6187,11 @@ paths:
           application/json:
             schema:
               type: object
-              required: [status]
+              minProperties: 1
               properties:
                 status: { type: string, enum: [tracked, dismissed] }
+                name: { type: string, maxLength: 100 }
+                aliases: { type: array, maxItems: 10, items: { type: string, maxLength: 100 }, description: Replaces the list. }
       responses:
         "200":
           description: The competitor.
@@ -15983,12 +15987,14 @@ components:
               finished_at: { type: [string, "null"], format: date-time }
     SEOCompetitor:
       type: object
-      required: [id, site_id, brand_id, host, status, source, common_keywords, record_id, title, description, pages, checked_at, check_error, numbers, created_at, updated_at]
+      required: [id, site_id, brand_id, host, name, aliases, status, source, common_keywords, record_id, title, description, pages, checked_at, check_error, numbers, created_at, updated_at]
       properties:
         id: { type: string, format: uuid }
         site_id: { type: string, format: uuid }
         brand_id: { type: [string, "null"], description: "The site's brand." }
         host: { type: string, description: "The competitor's domain, without www." }
+        name: { type: string, description: "What people call it; empty until someone names it." }
+        aliases: { type: array, items: { type: string }, description: "Other names it goes by, such as a short name AI answers use." }
         status: { type: string, enum: [suggested, tracked, dismissed] }
         source: { type: string, description: "manual, or the connector that suggested it." }
         common_keywords: { type: [number, "null"], description: "Keywords it shares with the site, by the suggesting connection." }
