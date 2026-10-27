@@ -298,8 +298,8 @@ Every type is also in the API document, under `webhooks:` and in the `WebhookEve
 
 | Event | When |
 | --- | --- |
-| `ai_budget.warned` | This month's AI calls reached 80% of the workspace's monthly AI limit or of one tool's [limit](/docs/guides/ai-usage/). `data` has `task` (empty for the workspace's limit, else the tool id), `level` (`80`), `limit_cents`, `spent_cents` and `month` (`YYYY-MM`). |
-| `ai_budget.reached` | This month's AI calls reached a limit, so Outflare makes no more of those calls until next month or a higher limit. `data` has `task`, `level` (`100`), `limit_cents`, `spent_cents` and `month`. |
+| `ai_budget.warned` | This month's AI calls reached 80% of the workspace's monthly AI limit or of one tool's [limit](/docs/guides/ai-usage/). `data` has `task` (empty for the workspace's limit, else the tool id), `level` (`80`), `limit_cents`, `spent_cents`, `month` (`YYYY-MM`) and `hard_stop` (`false` when the limit only warns). |
+| `ai_budget.reached` | This month's AI calls reached a limit. Unless the limit only warns, Outflare makes no more of those calls until next month or a higher limit. `data` has `task`, `level` (`100`), `limit_cents`, `spent_cents`, `month` and `hard_stop`. |
 
 ### Paid connection limits
 

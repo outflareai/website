@@ -44,6 +44,10 @@ The workspace's **monthly AI limit** (US$50 by default, under [AI model](/docs/a
 
 Limits count calendar months in UTC.
 
+### Warn only
+
+Every limit stops calls by default. To keep AI running past a limit, untick **Stop** next to that tool, or **Stop all AI calls at the workspace's monthly limit** for the workspace's limit, then save. A limit set to warn only still sends both emails below, but the calls carry on and your provider keeps billing you. Your provider's own hard limit still applies either way.
+
 ## Warnings before a limit is reached
 
 When this month's AI spend reaches **80%** of a limit, and again when it **reaches** it, each owner and admin with a confirmed email address gets an email, once a month for each limit. The same moments are the `ai_budget.warned` and `ai_budget.reached` [webhooks](/docs/api/webhooks/#ai-spend), so you can post them to Slack or your own tools.
@@ -53,12 +57,12 @@ When this month's AI spend reaches **80%** of a limit, and again when it **reach
 | Endpoint | MCP tool | What it does |
 | --- | --- | --- |
 | `GET /v1/workspaces/{ws}/ai-usage?month=2026-10` | `get_ai_usage` | A month of AI calls by tool, model and day, each tool's limit, and the 50 latest calls |
-| `PUT /v1/workspaces/{ws}/ai-usage/limits` | `update_ai_tool_limits` | Replace the per-tool limits, in US cents |
+| `PUT /v1/workspaces/{ws}/ai-usage/limits` | `update_ai_tool_limits` | Replace the per-tool limits, in US cents, and choose which limits stop calls (`hard_stop` for the workspace's limit, `hard_stops` per tool; `false` only warns) |
 
 ```sh
 curl -X PUT https://outflare.example.com/v1/workspaces/$WS/ai-usage/limits \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" \
-  -d '{"limits": {"reply_labelling": 1000, "social_replies": 500}}'
+  -d '{"limits": {"reply_labelling": 1000, "social_replies": 500}, "hard_stops": {"social_replies": false}}'
 ```
 
 Reading needs the `integrations.read` scope and changing limits `integrations.manage`.
