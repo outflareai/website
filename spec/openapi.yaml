@@ -1251,7 +1251,7 @@ paths:
       x-outflare-access: { scope: members.manage }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Invite someone by email
-      description: "Scope: members.manage. The token and link are returned once; they expire after 7 days."
+      description: "Scope: members.manage. Emails the invite link to the person, and returns the token and link once to share another way; they expire after 7 days. A new invite for the same email replaces a pending one. Inviting someone who is already a member is a 409 conflict."
       tags: [access]
       requestBody:
         required: true
@@ -1275,6 +1275,7 @@ paths:
                   invite: { $ref: "#/components/schemas/Invite" }
                   token: { type: string }
                   invite_url: { type: string }
+                  emailed: { type: boolean, description: "Whether the invite is being emailed. False when this server has no email service set up: share invite_url instead." }
         "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/invites/{id}:
@@ -8907,7 +8908,7 @@ paths:
       tags: [connectors]
       parameters:
         - { name: format, in: query, schema: { type: string, enum: [json] } }
-        - { name: return, in: query, description: "The app page to land on afterwards. Default: Connectors.", schema: { type: string, enum: [get-started, reddit, social] } }
+        - { name: return, in: query, description: "The app page to land on afterwards. Default: Connectors.", schema: { type: string, enum: [get-started, setup, reddit, social] } }
       responses:
         "200":
           description: The sign-in link (format=json).
@@ -9593,7 +9594,7 @@ paths:
       parameters:
         - { name: name, in: query, schema: { type: string } }
         - { name: format, in: query, schema: { type: string, enum: [json] } }
-        - { name: return, in: query, description: "The app page to land on afterwards. Default: Connectors.", schema: { type: string, enum: [get-started] } }
+        - { name: return, in: query, description: "The app page to land on afterwards. Default: Connectors.", schema: { type: string, enum: [get-started, setup] } }
         - { name: brand, in: query, description: "Make it this brand's own connection (id or handle). Default: a workspace connection shared with every brand.", schema: { type: string } }
       responses:
         "200":
@@ -11479,6 +11480,33 @@ paths:
         "400": { $ref: "#/components/responses/Error" }
         "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/install-health:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: getInstallHealth
+      x-outflare-access: { scope: workspace.read, brand_limited: true }
+      summary: Check what is installed for problems
+      description: |
+        Scope: workspace.read. What the workspace put on its websites or
+        wired to Outflare that went quiet, fell behind or broke: a website
+        script with no visits for two days or none since it was added, an
+        old copy of the script, a site whose DNS proof never appeared, a
+        connection that fails, an SDK or MCP server older than the newest,
+        and calls to deprecated API routes. Worst first, each with how to fix
+        it. An empty `checks` with counts in `checked` means healthy. New
+        problems are recorded as install.issue_opened (a webhook) and shown on
+        Home.
+      tags: [brands]
+      parameters:
+        - { name: brand, in: query, description: "A brand's id or handle: its installs and the workspace's. Required for a token kept to some brands.", schema: { type: string } }
+      responses:
+        "200":
+          description: The checks.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/InstallHealth" }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/memories:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
@@ -11605,6 +11633,97 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/WorkspaceStatus" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/ideal-customer-profiles:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listCustomerProfiles
+      x-outflare-access: { scope: projects.read, brand_limited: true }
+      summary: List ideal customer profiles
+      description: |
+        Scope: projects.read. Who the workspace sells to: each profile is a description in words plus filters in the
+        same vocabulary as lead searches. Projects, lead list fit scores and the lead finder read them. Active ones by
+        default, by name.
+      tags: [projects]
+      parameters:
+        - { name: status, in: query, schema: { type: string, enum: [active, archived, all] } }
+        - { name: brand, in: query, description: "A brand's id or handle, none for shared profiles, or all.", schema: { type: string } }
+      responses:
+        "200":
+          description: Profiles.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/CustomerProfile" } }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createCustomerProfile
+      x-outflare-access: { scope: projects.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Create an ideal customer profile
+      description: "Scope: projects.manage. Link it to projects with their `profile_id`. At most 500 per workspace."
+      tags: [projects]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CustomerProfileInput" }
+      responses:
+        "201":
+          description: The profile.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CustomerProfile" }
+        "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/ideal-customer-profiles/{id}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getCustomerProfile
+      x-outflare-access: { scope: projects.read, brand_limited: true }
+      summary: Get an ideal customer profile
+      description: "Scope: projects.read."
+      tags: [projects]
+      responses:
+        "200":
+          description: The profile.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CustomerProfile" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateCustomerProfile
+      x-outflare-access: { scope: projects.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Edit, archive or restore an ideal customer profile
+      description: |
+        Scope: projects.manage. New filters are copied to every project that uses the profile, and bump those
+        projects' `brief_version`. A change to description or filters bumps the profile's `version`.
+      tags: [projects]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CustomerProfileInput" }
+      responses:
+        "200":
+          description: The profile.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CustomerProfile" }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/projects:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
@@ -12722,9 +12841,13 @@ paths:
         are ignored: the browser cannot say who someone is. Query strings keep only the campaign tags, click ids, ofc, ref
         and via, and the referrer only its origin and path. Track names must be plain (Signup Started): dotted names are
         Outflare's own. Your own product links the visitor to a person by sending
-        identify with userId and the same anonymousId to POST .../customer-events. Send the JSON as text/plain to skip
-        the CORS preflight. At most 20 events per request; 300 requests a minute per address, 6,000 per key, and
-        250,000 events a day per key, 1,000,000 per workspace. The answer only counts what was taken.
+        identify with userId and the same anonymousId to POST .../customer-events. Each event joins a visit (a session:
+        30 minutes without an event, or a new campaign, starts another), whose id is in context.sessionId; a person's
+        first and last touch fields come from their visits. Requests from bots and crawlers are counted, not stored.
+        With consent true, the answer sets the visitor's of_aid cookie on the site's domain, which browsers keep when
+        events reach Outflare through the site's own domain. Send the JSON as text/plain to skip the CORS preflight.
+        At most 20 events per request; 6,000 requests a minute per key, and 250,000 events a day per key, 1,000,000 per
+        workspace; an address that keeps sending unknown keys is turned away. The answer only counts what was taken.
       tags: [records]
       requestBody:
         required: true
@@ -12738,6 +12861,7 @@ paths:
               properties:
                 key: { type: string, example: ofk_test_not_a_real_key }
                 batch: { type: array, maxItems: 20, items: { type: object, additionalProperties: true } }
+                consent: { type: boolean, description: "The visitor accepted the site's analytics cookies." }
       responses:
         "200":
           description: How many were taken.
@@ -12966,6 +13090,220 @@ paths:
         "404": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
         "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/brands/{brand}/setup:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { $ref: "#/components/parameters/BrandRef" }
+    get:
+      operationId: getBrandSetup
+      x-outflare-access: { scope: workspace.read, brand_limited: true }
+      summary: Read a brand's setup checklist
+      description: |
+        Scope: workspace.read. The steps that get one brand's website and
+        tools working, most needed first: the website script, verifying the
+        website, analytics, Search Console, email, payments, ads, social and
+        a CRM. A step is `done` when the workspace has it however it was
+        done (a visit arrived, the site's proof was found, a tool is
+        connected), `waiting` when its part is done and Outflare is waiting
+        for a visit or the DNS, and `skipped` when a person left it for
+        later. The website script and verify steps carry `install`: every
+        way to do them at once, from a one-click install through the
+        workspace's own Tag Manager or DNS host (POST .../setup/install), to a
+        message for a developer and a prompt for an AI coding tool.
+      tags: [brands]
+      responses:
+        "200":
+          description: The checklist.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BrandSetup" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateBrandSetup
+      x-outflare-access: { scope: workspace.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Skip steps or close a brand's setup checklist
+      description: |
+        Scope: workspace.manage. `skip` leaves steps for later and `unskip`
+        brings them back; `dismissed: true` closes the checklist so Home stops
+        showing it, and `false` opens it again. A skipped step still counts as
+        done once the workspace has it.
+      tags: [brands]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                skip: { type: array, items: { $ref: "#/components/schemas/BrandSetupStepID" } }
+                unskip: { type: array, items: { $ref: "#/components/schemas/BrandSetupStepID" } }
+                dismissed: { type: boolean }
+      responses:
+        "200":
+          description: The checklist.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BrandSetup" }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/brands/{brand}/setup/prepare:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { $ref: "#/components/parameters/BrandRef" }
+    post:
+      operationId: prepareBrandSetup
+      x-outflare-access: { scope: workspace.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Make what an install step installs
+      description: |
+        Scope: workspace.manage. For `site_script`, makes the brand's site
+        key when it has none, so the step has its snippet; for
+        `verify_site`, adds the brand's website for site audits when it
+        isn't there, so the step has its DNS record. Calling it again changes
+        nothing.
+      tags: [brands]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [step]
+              properties:
+                step: { type: string, enum: [site_script, verify_site] }
+      responses:
+        "200":
+          description: The checklist.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BrandSetup" }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/brands/{brand}/setup/install:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { $ref: "#/components/parameters/BrandRef" }
+    post:
+      operationId: installBrandSetup
+      x-outflare-access: { scope: workspace.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Do an install step in one click
+      description: |
+        Scope: workspace.manage. Queues the install with the workspace's own
+        connection: `site_script` with `gtm` adds a Custom HTML tag named
+        Outflare on all pages to the Tag Manager `container`, in a workspace
+        of its own, and publishes it unless `publish` is false;
+        `verify_site` with `dns` adds the site's TXT record on the DNS host
+        and then checks for it every minute. The connection must be one the
+        brand uses. The step's `install.last` shows how it went, and
+        brand_setup.installed or brand_setup.install_failed is recorded.
+      tags: [brands]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [step, method, integration_id]
+              properties:
+                step: { type: string, enum: [site_script, verify_site] }
+                method: { type: string, enum: [gtm, dns] }
+                integration_id: { type: string, format: uuid }
+                container: { type: string, description: "For gtm: a container id from GET .../setup/tag-containers." }
+                publish: { type: boolean, description: "For gtm: publish the change at once (default), or leave it in Tag Manager for a person to publish." }
+      responses:
+        "202":
+          description: Queued, or held for approval in a mission.
+          content:
+            application/json:
+              schema: { oneOf: [{ $ref: "#/components/schemas/Queued" }, { $ref: "#/components/schemas/MissionHeld" }] }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/brands/{brand}/setup/check:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { $ref: "#/components/parameters/BrandRef" }
+    post:
+      operationId: checkBrandSetup
+      x-outflare-access: { scope: workspace.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Look for a site's proof now
+      description: |
+        Scope: workspace.manage. For `verify_site`: looks for the DNS record
+        (or the meta tag or file) now, and keeps looking every minute, then
+        hourly, for three days if it isn't there yet.
+      tags: [brands]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [step]
+              properties:
+                step: { type: string, enum: [verify_site] }
+      responses:
+        "200":
+          description: The checklist.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BrandSetup" }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/brands/{brand}/setup/tag-containers:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { $ref: "#/components/parameters/BrandRef" }
+    get:
+      operationId: listTagContainers
+      x-outflare-access: { scope: workspace.read, brand_limited: true }
+      summary: List the Tag Manager containers a connection can edit
+      description: |
+        Scope: workspace.read. The web containers of every account the
+        Google Tag Manager connection sees, the ones whose domains match
+        the brand's website first (`matches_website`).
+      tags: [brands]
+      parameters:
+        - { name: integration_id, in: query, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: The containers.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, name, public_id, account, domains, matches_website]
+                      properties:
+                        id: { type: string, example: accounts/1/containers/2 }
+                        name: { type: string }
+                        public_id: { type: string, example: GTM-ABC1234 }
+                        account: { type: string }
+                        domains: { type: array, items: { type: string } }
+                        matches_website: { type: boolean }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "422": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/brands/{brand}/add:
     parameters:
@@ -16785,6 +17123,54 @@ webhooks:
             schema: { $ref: "#/components/schemas/WebhookEvent" }
       responses:
         "200": { description: Any 2xx answer means received; anything else is retried. }
+  brand_setup.installed:
+    post:
+      operationId: webhook_brand_setup_installed
+      summary: "A one-click install on a brand's setup checklist finished: the website script through Tag Manager, or a DNS record through the DNS host. data has brand_id, step, method and integration_id."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  brand_setup.install_failed:
+    post:
+      operationId: webhook_brand_setup_install_failed
+      summary: "A one-click install on a brand's setup checklist failed. data has brand_id, step, method and integration_id; GET .../brands/{brand}/setup says why."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  install.issue_opened:
+    post:
+      operationId: webhook_install_issue_opened
+      summary: "Something installed stopped working or fell behind, such as a website script with no visits or an old SDK. data has kind, severity, subject and brand_id; GET .../install-health says what to do."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  install.issue_resolved:
+    post:
+      operationId: webhook_install_issue_resolved
+      summary: "An install problem cleared. data has kind and brand_id."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
   seo_site.created:
     post:
       operationId: webhook_seo_site_created
@@ -17329,7 +17715,7 @@ components:
       required: [id, type, created_at, workspace_id, actor, target, request_id, data]
       properties:
         id: { type: string, description: "Unique per event, and the webhook-id header. Use it to ignore repeats.", example: evt_48213 }
-        type: { type: string, enum: [lead.replied, lead.unsubscribed, inbox.replied, inbox.updated, inbox.classified, lead.bounced, mailbox.auto_paused, lead.created, lead.updated, lead.deleted, leads.imported, suppressions.added, suppression.removed, lead_list.created, lead_list.leads_added, lead_list.run_started, lead_list.build_done, lead_list.build_failed, lead_list.refresh_done, lead_list.refresh_failed, lead_list.enrich_done, lead_list.enrich_failed, import.done, import.failed, sequence.created, sequence.updated, sequence.activated, sequence.paused, sequence.archived, sequence.deleted, sequence.steps_updated, sequence.leads_enrolled, enrollment.stopped, mailbox.imported, mailbox.updated, mailbox.paused, mailbox.resumed, mailbox.stage_changed, mailbox.deleted, domain.added, domain.paused, domain.resumed, domain.removed, email.queued, email.sent, email.delivered, email.bounced, email.complained, email.failed, email.suppressed, email.cancelled, email.unsubscribed, email.opened, email.clicked, email.preferences_changed, email_domain.verified, email_domain.verification_failed, email_provider.events_failed, email_template.published, meeting.created, meeting.updated, meeting.deleted, deal.created, deal.updated, deal.deleted, spend.recorded, integration.connected, integration.updated, integration.disconnected, connect_request.created, deploy.detected, deploy.failed, digest.ready, experiment.started, experiment.concluded, project.created, project.updated, project.deleted, mission.created, mission.updated, mission.submitted, mission.approved, mission.paused, mission.resumed, mission.stopped, mission.completed, mission.action_held, mission.action_approved, mission.action_rejected, infra.plan_created, infra.plan_approved, infra.ordered, infra.order_failed, infra.domains_bought, infra.mailbox_joined, infra.plan_warming, infra.plan_ready, infra.plan_cancelled, fix.found, fix.updated, fix.started, fix.verify_requested, fix.confirmed, fix.reopened, record.created, record.bulk_created, record.updated, record.merged, identity.verified, identity.closed, relationship.added, relationship.ended, consent.granted, consent.withdrawn, consent.bulk_withdrawn, brand.created, brand.updated, email_broadcast.created, email_broadcast.started, email_broadcast.sent, email_broadcast.failed, email_broadcast.cancelled, journey.created, journey.updated, journey_run.entered, journey_run.exited, seo_site.created, seo_site.verified, seo_site.unverified, seo_site.deleted, crawl.started, crawl.stopped, crawl.done, social_action.drafted, social_action.approved, social_action.rejected, social_action.done, social_action.failed, workspace.updated, webhook.test] }
+        type: { type: string, enum: [lead.replied, lead.unsubscribed, inbox.replied, inbox.updated, inbox.classified, lead.bounced, mailbox.auto_paused, lead.created, lead.updated, lead.deleted, leads.imported, suppressions.added, suppression.removed, lead_list.created, lead_list.leads_added, lead_list.run_started, lead_list.build_done, lead_list.build_failed, lead_list.refresh_done, lead_list.refresh_failed, lead_list.enrich_done, lead_list.enrich_failed, import.done, import.failed, sequence.created, sequence.updated, sequence.activated, sequence.paused, sequence.archived, sequence.deleted, sequence.steps_updated, sequence.leads_enrolled, enrollment.stopped, mailbox.imported, mailbox.updated, mailbox.paused, mailbox.resumed, mailbox.stage_changed, mailbox.deleted, domain.added, domain.paused, domain.resumed, domain.removed, email.queued, email.sent, email.delivered, email.bounced, email.complained, email.failed, email.suppressed, email.cancelled, email.unsubscribed, email.opened, email.clicked, email.preferences_changed, email_domain.verified, email_domain.verification_failed, email_provider.events_failed, email_template.published, meeting.created, meeting.updated, meeting.deleted, deal.created, deal.updated, deal.deleted, spend.recorded, integration.connected, integration.updated, integration.disconnected, connect_request.created, deploy.detected, deploy.failed, digest.ready, experiment.started, experiment.concluded, project.created, project.updated, project.deleted, mission.created, mission.updated, mission.submitted, mission.approved, mission.paused, mission.resumed, mission.stopped, mission.completed, mission.action_held, mission.action_approved, mission.action_rejected, infra.plan_created, infra.plan_approved, infra.ordered, infra.order_failed, infra.domains_bought, infra.mailbox_joined, infra.plan_warming, infra.plan_ready, infra.plan_cancelled, fix.found, fix.updated, fix.started, fix.verify_requested, fix.confirmed, fix.reopened, record.created, record.bulk_created, record.updated, record.merged, identity.verified, identity.closed, relationship.added, relationship.ended, consent.granted, consent.withdrawn, consent.bulk_withdrawn, brand.created, brand.updated, email_broadcast.created, email_broadcast.started, email_broadcast.sent, email_broadcast.failed, email_broadcast.cancelled, journey.created, journey.updated, journey_run.entered, journey_run.exited, brand_setup.installed, brand_setup.install_failed, install.issue_opened, install.issue_resolved, seo_site.created, seo_site.verified, seo_site.unverified, seo_site.deleted, crawl.started, crawl.stopped, crawl.done, social_action.drafted, social_action.approved, social_action.rejected, social_action.done, social_action.failed, workspace.updated, webhook.test] }
         created_at: { type: string, format: date-time }
         workspace_id: { type: string, format: uuid }
         actor: { $ref: "#/components/schemas/WebhookRef" }
@@ -18256,7 +18642,7 @@ components:
         created_at: { type: string, format: date-time }
     ConnectorCategory:
       type: string
-      enum: [email_verification, email_sending, sequencer, mailbox_provider, dns, crm, data, signals, analytics, seo, social, code, ads, payments, calendar, registrar, warehouse, notification, model, custom]
+      enum: [email_verification, email_sending, sequencer, mailbox_provider, dns, tags, crm, data, signals, analytics, seo, social, code, ads, payments, calendar, registrar, warehouse, notification, model, custom]
     ConnectorField:
       type: object
       required: [name, label, secret, optional]
@@ -18469,7 +18855,7 @@ components:
         mailboxes: { $ref: "#/components/schemas/MailboxMatch" }
     SiteKey:
       type: object
-      required: [id, name, key, brand_id, origins, previous_expires_at, events_today, created_at, last_used_at, rotated_at, snippet]
+      required: [id, name, key, brand_id, origins, previous_expires_at, events_today, bots_today, created_at, last_used_at, rotated_at, snippet]
       properties:
         id: { type: string, format: uuid }
         name: { type: string, description: Usually the site's domain. }
@@ -18478,10 +18864,11 @@ components:
         origins: { type: array, items: { type: string }, description: "Origins events are taken from, such as https://example.com or https://*.example.com. Empty: any. A filter against stray traffic, not a lock." }
         previous_expires_at: { type: [string, "null"], format: date-time, description: Until when the value before the last rotation still works. }
         events_today: { type: integer, description: Events taken today (UTC). }
+        bots_today: { type: integer, description: "Requests from bots, crawlers and scripts today (UTC): counted, not stored." }
         created_at: { type: string, format: date-time }
         last_used_at: { type: [string, "null"], format: date-time }
         rotated_at: { type: [string, "null"], format: date-time }
-        snippet: { type: string, description: "The script tag to paste into the site's <head>." }
+        snippet: { type: string, description: "The script tag to paste into the site's <head>. Lists the origins' domains in data-domains when there is more than one, so a visit can cross them." }
     SiteKeyInput:
       type: object
       additionalProperties: false
@@ -22053,6 +22440,28 @@ components:
         employee_ranges: { type: array, items: { type: string }, example: ["51-200", "201-500"] }
         locations: { type: array, items: { type: string }, example: [Australia] }
         keywords: { type: array, items: { type: string }, example: [Series B] }
+    CustomerProfile:
+      type: object
+      required: [id, name, brand_id, description, filters, status, version, project_ids, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string, example: "Series A fintech, AU" }
+        brand_id: { type: [string, "null"], format: uuid, description: "The brand it describes customers for; null for every brand." }
+        description: { type: string, description: "Who they are and why they buy, in words. AI steps read it." }
+        filters: { $ref: "#/components/schemas/ICP" }
+        status: { type: string, enum: [active, archived] }
+        version: { type: integer, description: Bumped on every change to description or filters. }
+        project_ids: { type: array, items: { type: string, format: uuid }, description: The projects that use it. }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    CustomerProfileInput:
+      type: object
+      properties:
+        name: { type: string, maxLength: 100 }
+        description: { type: string, maxLength: 4000 }
+        filters: { oneOf: [{ $ref: "#/components/schemas/ICPInput" }, { type: "null" }], description: Replaces all the filters. Null clears them. }
+        brand_id: { type: [string, "null"], description: "A brand's id or handle; null for every brand." }
+        status: { type: string, enum: [active, archived], description: Updates only. }
     ICPInput:
       type: object
       additionalProperties: false
@@ -22066,7 +22475,7 @@ components:
         keywords: { type: array, items: { type: string } }
     Project:
       type: object
-      required: [id, name, status, brand_id, offer, audience, market, brief, icp, brief_version, brief_updated_at, daily_send_limit, counts, sent_24h, created_at, updated_at]
+      required: [id, name, status, brand_id, offer, audience, market, brief, icp, profile_id, brief_version, brief_updated_at, daily_send_limit, counts, sent_24h, created_at, updated_at]
       properties:
         id: { type: string, format: uuid }
         name: { type: string, example: "Fintech CFOs, AU" }
@@ -22077,7 +22486,8 @@ components:
         market: { type: string, description: "Where, and in which language." }
         brief: { type: string, description: "Everything else, in Markdown: messaging, proof, objections, words to avoid." }
         icp: { $ref: "#/components/schemas/ICP" }
-        brief_version: { type: integer, description: "Bumped on every change to offer, audience, market, brief or icp." }
+        profile_id: { type: [string, "null"], format: uuid, description: "The ideal customer profile the icp belongs to; icp is always its filters. A project given an icp without one gets a profile of its own." }
+        brief_version: { type: integer, description: "Bumped on every change to offer, audience, market, brief, icp or profile." }
         brief_updated_at: { type: string, format: date-time }
         daily_send_limit: { type: [integer, "null"], description: "Most cold sends from all of the project's sequences together in any 24 hours. Null is no project limit." }
         counts:
@@ -22131,6 +22541,116 @@ components:
         walkthrough: { type: boolean, description: "Part of the full-page walk-through; false for steps left to Home's checklist, such as inviting the team." }
         page: { type: string, description: "The dashboard page that does the step, such as /acme/brands." }
         tool: { type: string, description: The MCP tool an agent can use for it; empty when a person must. }
+    BrandSetupStepID:
+      type: string
+      enum: [site_script, verify_site, analytics, search, email, payments, ads, social, crm]
+    BrandSetupInstallRun:
+      type: object
+      required: [method, status, at]
+      properties:
+        method: { type: string, enum: [gtm, dns] }
+        status: { type: string, enum: [queued, done, failed] }
+        error: { type: string }
+        link: { type: string, description: Where to see the change in Tag Manager. }
+        at: { type: string, format: date-time }
+        published: { type: boolean, description: "For gtm: false when the change waits in Tag Manager for a person to publish it." }
+    BrandSetupInstall:
+      type: object
+      required: [methods, site_key_id, site_id, record, ai_prompt, developer, connector, connections, oauth_ready, last]
+      properties:
+        methods: { type: array, items: { type: string, enum: [gtm, dns, developer, ai, manual] }, description: The ways to do the step, quickest first. }
+        site_key_id: { type: [string, "null"], format: uuid }
+        site_id: { type: [string, "null"], format: uuid }
+        snippet: { type: string, description: The script tag for every page's head. }
+        record:
+          type: [object, "null"]
+          required: [type, name, content]
+          properties:
+            type: { type: string, example: TXT }
+            name: { type: string, example: example.com }
+            content: { type: string }
+        meta_tag: { type: string }
+        file_url: { type: string }
+        file_body: { type: string }
+        ai_prompt: { type: string, description: A prompt for an AI coding tool that does the step. }
+        developer:
+          type: object
+          required: [subject, body]
+          properties:
+            subject: { type: string }
+            body: { type: string }
+        connector: { type: string, description: The connector a one-click install uses. }
+        connections: { type: array, items: { type: string, format: uuid }, description: The brand's connections to it. }
+        oauth_ready: { type: boolean, description: Whether this server can sign in to that connector. }
+        last: { oneOf: [{ $ref: "#/components/schemas/BrandSetupInstallRun" }, { type: "null" }] }
+    BrandSetupStep:
+      type: object
+      required: [id, title, detail, status, done, skipped, page, tool, connectors, install]
+      properties:
+        id: { $ref: "#/components/schemas/BrandSetupStepID" }
+        title: { type: string }
+        detail: { type: string }
+        status: { type: string, enum: [todo, waiting, done, skipped] }
+        done: { type: boolean }
+        skipped: { type: boolean }
+        waiting: { type: string }
+        page: { type: string }
+        tool: { type: string }
+        connectors: { type: array, items: { type: string } }
+        install: { oneOf: [{ $ref: "#/components/schemas/BrandSetupInstall" }, { type: "null" }] }
+    BrandSetup:
+      type: object
+      required: [brand_id, brand, website, steps, done, total, next_step, complete, dismissed, issues]
+      properties:
+        brand_id: { type: string, format: uuid }
+        brand: { type: string }
+        website: { type: string }
+        steps: { type: array, items: { $ref: "#/components/schemas/BrandSetupStep" } }
+        done: { type: integer }
+        total: { type: integer }
+        next_step: { oneOf: [{ $ref: "#/components/schemas/BrandSetupStepID" }, { type: "null" }] }
+        complete: { type: boolean }
+        dismissed: { type: boolean }
+        issues: { type: integer, description: Open install problems for the brand (GET .../install-health). }
+    InstallCheck:
+      type: object
+      required: [key, kind, severity, title, detail, brand_id, subject, fix, since]
+      properties:
+        key: { type: string }
+        kind: { type: string, enum: [site_script_missing, site_script_silent, site_script_outdated, site_unverified, connection_broken, client_outdated, api_deprecated] }
+        severity: { type: string, enum: [critical, warning, info] }
+        title: { type: string }
+        detail: { type: string }
+        brand_id: { type: [string, "null"], format: uuid }
+        subject: { type: string }
+        fix:
+          type: object
+          required: [tool, page, who]
+          properties:
+            tool: { type: string }
+            page: { type: string }
+            who: { type: string, enum: [agent, person] }
+        since: { type: [string, "null"], format: date-time }
+    InstallHealth:
+      type: object
+      required: [checks, checked, latest, checked_at]
+      properties:
+        checks: { type: array, items: { $ref: "#/components/schemas/InstallCheck" } }
+        checked:
+          type: object
+          required: [site_keys, sites, connections, clients]
+          properties:
+            site_keys: { type: integer }
+            sites: { type: integer }
+            connections: { type: integer }
+            clients: { type: integer }
+        latest:
+          type: object
+          required: [site_script, clients]
+          properties:
+            site_script: { type: string }
+            clients: { type: object, additionalProperties: { type: string } }
+        checked_at: { type: string, format: date-time }
     Onboarding:
       type: object
       required: [steps, done, total, next_step, complete, goal, dismissed, dismissed_at, show]
@@ -22266,9 +22786,9 @@ components:
               code:
                 type: string
                 description: Stable; new codes may be added.
-                enum: [no_mailboxes, none_ready, mailbox_error, domain_critical, server_paused, connection_broken, connection_requested, approval_waiting, mission_paused, allocation_short, infra_plan_waiting, unread_replies, context_missing, analytics_site_unmapped, brand_without_analytics, fixes_waiting, email_domain_failed, email_broadcast_failed, social_drafts_waiting, duplicates_waiting, events_quarantined, crm_import_failed]
+                enum: [no_mailboxes, none_ready, mailbox_error, domain_critical, server_paused, connection_broken, connection_requested, approval_waiting, mission_paused, allocation_short, infra_plan_waiting, unread_replies, context_missing, analytics_site_unmapped, brand_without_analytics, fixes_waiting, email_domain_failed, email_broadcast_failed, social_drafts_waiting, duplicates_waiting, events_quarantined, crm_import_failed, install_broken, install_outdated]
               severity: { type: string, enum: [critical, warning, info] }
-              area: { type: string, enum: [mailboxes, domains, servers, connectors, missions, sequences, infrastructure, inbox, context, analytics, fixes, lifecycle, social, customers] }
+              area: { type: string, enum: [mailboxes, domains, servers, connectors, missions, sequences, infrastructure, inbox, context, analytics, fixes, lifecycle, social, customers, setup] }
               title: { type: string }
               detail: { type: string, description: What it means and how to fix it. }
               count: { type: integer }
@@ -22790,7 +23310,8 @@ components:
         audience: { type: string, maxLength: 4000 }
         market: { type: string, maxLength: 4000 }
         brief: { type: string, maxLength: 100000 }
-        icp: { oneOf: [{ $ref: "#/components/schemas/ICPInput" }, { type: "null" }], description: Replaces the whole ICP. Null clears it. }
+        icp: { oneOf: [{ $ref: "#/components/schemas/ICPInput" }, { type: "null" }], description: "Replaces the whole ICP, and so the filters of the profile it belongs to. Null clears it." }
+        profile_id: { type: [string, "null"], format: uuid, description: "The ideal customer profile to use: its filters become the icp. It must be shared or of the project's brand. Null unlinks it and keeps the icp." }
         daily_send_limit: { type: [integer, "null"], minimum: 1, maximum: 1000000 }
         brand_id: { type: [string, "null"], description: "The brand the project markets: a brand's id or handle. Null makes it shared. Changing it moves everything in the project to the brand. Not for project tokens." }
         brief_version: { type: integer, description: "Updates only: the version your edit is based on. A brief edit fails with 409 if the brief changed since." }
