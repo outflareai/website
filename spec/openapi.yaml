@@ -6203,7 +6203,9 @@ paths:
         - { name: status, in: query, schema: { type: string, enum: [live, lost] } }
         - { name: nofollow, in: query, schema: { type: boolean } }
         - { name: q, in: query, schema: { type: string }, description: "Part of the linking domain, URL or anchor." }
-        - { name: order, in: query, schema: { type: string, enum: [rating, newest, lost], default: rating } }
+        - { name: order, in: query, schema: { type: string, enum: [rating, newest, lost, spam], default: rating } }
+        - { name: spam, in: query, schema: { type: string, enum: [clean, suspect, toxic] } }
+        - { name: review, in: query, description: "none for links nobody reviewed.", schema: { type: string, enum: [none, ok, disavow] } }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
         - { name: offset, in: query, schema: { type: integer, minimum: 0 } }
         - { $ref: "#/components/parameters/Fields" }
@@ -6285,6 +6287,68 @@ paths:
                   data: { type: array, items: { $ref: "#/components/schemas/BacklinkSiteSummary" } }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/backlinks/disavow:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: getDisavowFile
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: Download a site's disavow file
+      description: |
+        Scope: seo.read. A text file for Google Search Console's disavow
+        links tool: `domain:` for a domain whose every link to the site
+        people marked disavow, and the single URLs otherwise. It lists only
+        what people marked (PATCH .../backlinks/{id}), never a link on its
+        score alone. Outflare never uploads it: that is yours to do.
+      tags: [seo]
+      parameters:
+        - { name: site_id, in: query, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: The disavow file.
+          content:
+            text/plain:
+              schema: { type: string }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/backlinks/{backlink}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: backlink, in: path, required: true, schema: { type: string, format: uuid } }
+    patch:
+      operationId: reviewBacklink
+      x-outflare-access: { scope: seo.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Review a backlink
+      description: "Scope: seo.manage. Say a link is real (`ok`) or should go in the disavow file (`disavow`), or clear it (`none`). `domain: true` applies it to every link from the same domain to the site. Outflare never contacts the linking site."
+      tags: [seo]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [review]
+              properties:
+                review: { type: string, enum: [ok, disavow, none] }
+                note: { type: string, maxLength: 2000 }
+                domain: { type: boolean, default: false }
+      responses:
+        "200":
+          description: The link, and how many links changed.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [backlink, updated]
+                properties:
+                  backlink: { $ref: "#/components/schemas/Backlink" }
+                  updated: { type: integer }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/seo-competitors:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
@@ -6699,6 +6763,33 @@ paths:
                               url: { type: string }
                               domain: { type: string }
                               title: { type: string }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/seo-sites/{site}/regressions:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: site, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getSiteRegressions
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: List what got worse for a site
+      description: "Scope: seo.read. Regressions found by comparing the latest numbers the syncs stored with the ones before, checked after every Search Console sync, rank check, conversions sync and crawl: a page's search clicks this week 40% or more under its weekly average over the four weeks before (at least 20 a week), a tracked keyword in the top 20 that fell 5 or more places or out of the top 100, a page Google indexed and no longer does, a landing page's conversions half or less of its weekly average (at least 5 a week), and a crawl's health score 10 or more points under the one before. Each open regression is a fix on the fixes list (source seo_keywords, rule = kind, `fix_id`), so webhooks fix.found and fix.confirmed announce them; one that recovers is resolved and its fix confirmed. Newest first, open before resolved."
+      tags: [seo]
+      parameters:
+        - { name: status, in: query, schema: { type: string, enum: [open, resolved, all], default: open } }
+        - { name: kind, in: query, schema: { type: string, enum: [search_clicks_dropped, rank_dropped, page_deindexed, conversions_dropped, health_dropped] } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
+      responses:
+        "200":
+          description: Regressions.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/SEORegression" } }
+        "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/seo-sites/{site}/conversions:
@@ -18818,6 +18909,21 @@ components:
               reason: { type: string, enum: [ranks, mentions], description: "ranks: Google shows it for the keyword; mentions: its title or H1 has the keyword." }
               impressions: { type: integer, description: "Its impressions for the keyword over 28 days." }
               links_in: { type: integer }
+    SEORegression:
+      type: object
+      required: [id, kind, subject, before, after, detail, status, fix_id, detected_at, last_seen_at, resolved_at]
+      properties:
+        id: { type: string, format: uuid }
+        kind: { type: string, enum: [search_clicks_dropped, rank_dropped, page_deindexed, conversions_dropped, health_dropped] }
+        subject: { type: string, description: "What dropped: a page URL, a tracked keyword with its country and device (\"proxy pricing (US, desktop)\"), or empty for the site's health." }
+        before: { type: [number, "null"], description: "Clicks or conversions a week, a position or a health score before; null when it has none." }
+        after: { type: [number, "null"], description: "The same now; null for a keyword out of the top 100 or a page out of the index." }
+        detail: { type: string, example: "12 search clicks in the week to 2026-10-24, down from 48 a week before" }
+        status: { type: string, enum: [open, resolved] }
+        fix_id: { type: [string, "null"], format: uuid, description: The open regression's fix on the fixes list. }
+        detected_at: { type: string, format: date-time }
+        last_seen_at: { type: string, format: date-time }
+        resolved_at: { type: [string, "null"], format: date-time }
     PageConversion:
       type: object
       required: [url, keyword, sessions, visitors, conversions, conversion_rate, search_sessions, search_conversions, search_conversion_rate, clicks, impressions, position]
@@ -19082,7 +19188,7 @@ components:
       properties:
         id: { type: string, example: title_missing }
         severity: { type: string, enum: [error, warning, notice] }
-        category: { type: string, enum: [indexability, links, content, metadata, performance, security, social, ai_visibility, keywords] }
+        category: { type: string, enum: [indexability, links, content, metadata, performance, security, social, ai_visibility, keywords, regressions] }
         title: { type: string, example: Missing title }
         why: { type: string, description: "Why it matters, in plain words." }
         fix: { type: string, description: How to fix it. }
@@ -19163,11 +19269,11 @@ components:
         description: { type: string, maxLength: 2000 }
         locale: { type: string, example: en-US, description: "Where the asker is, told to the model with each prompt; empty for none." }
         aliases: { type: array, maxItems: 20, items: { type: string }, description: "Other names the brand goes by in answers, on top of its name and domains." }
-        competitors: { type: array, maxItems: 25, items: { $ref: "#/components/schemas/AIEntityInput" }, description: "The competitors to count against." }
+        competitors: { type: array, maxItems: 25, items: { $ref: "#/components/schemas/AIEntityInput" }, description: "Competitors to count against on top of those tracked on the SEO Competitors page for the brand, or to name them differently. Leave empty to count the tracked ones only." }
         schedule: { type: string, enum: ["off", daily, weekly], description: "off (the default) runs only when asked." }
     AICohort:
       type: object
-      required: [id, brand_id, name, description, locale, aliases, competitors, schedule, status, prompts, last_run, created_at, updated_at]
+      required: [id, brand_id, name, description, locale, aliases, competitors, tracked_competitors, schedule, status, prompts, last_run, created_at, updated_at]
       properties:
         id: { type: string, format: uuid }
         brand_id: { type: [string, "null"], format: uuid }
@@ -19176,6 +19282,7 @@ components:
         locale: { type: string }
         aliases: { type: array, items: { type: string } }
         competitors: { type: array, items: { $ref: "#/components/schemas/AIEntity" } }
+        tracked_competitors: { type: array, items: { $ref: "#/components/schemas/AIEntity" }, description: "Competitors tracked on the SEO Competitors page for the cohort's brand (hosts of one company grouped, with their names and other names) that runs count too, after the cohort's own. Its own list wins where both name the same company. At most 25 in all." }
         schedule: { type: string, enum: ["off", daily, weekly] }
         status: { type: string, enum: [active, paused] }
         prompts: { type: integer, description: Active prompts. }
@@ -19874,7 +19981,7 @@ components:
       required: [id, source, subject, brand_id, rule, group, status, assignee, note, count, unit, found_by, last_found_by, confirmed_by, fixed_at, created_at, updated_at]
       properties:
         id: { type: string, format: uuid }
-        source: { type: string, enum: [seo_audit, seo_keywords, ai_visibility, social], description: "What found it: seo_audit is a site audit's crawl issues; seo_keywords is search intelligence (a page's keyword target, internal links worth adding, pages competing for one search, pages sharing a target keyword); ai_visibility is AI answers that leave the brand out." }
+        source: { type: string, enum: [seo_audit, seo_keywords, ai_visibility, social], description: "What found it: seo_audit is a site audit's crawl issues; seo_keywords is search intelligence (a page's keyword target, internal links worth adding, pages competing for one search, pages sharing a target keyword, and regressions such as a drop in clicks, rank or conversions); ai_visibility is AI answers that leave the brand out." }
         subject:
           type: object
           required: [type, id]
@@ -19915,7 +20022,7 @@ components:
         http_status: { type: [integer, "null"], description: "The status this crawl got from the page; null when it did not read it." }
     Backlink:
       type: object
-      required: [id, site_id, brand_id, source_url, target_url, source_domain, anchor, nofollow, sponsored, ugc, status, source_rating, first_seen_at, lost_at, regained_at, checked_at, providers]
+      required: [id, site_id, brand_id, source_url, target_url, source_domain, anchor, nofollow, sponsored, ugc, status, source_rating, first_seen_at, lost_at, regained_at, checked_at, providers, spam_score, spam_level, spam_factors, review, review_note, reviewed_at]
       properties:
         id: { type: string, format: uuid }
         site_id: { type: string, format: uuid }
@@ -19950,6 +20057,20 @@ components:
               title: { type: string }
               run_id: { type: string, format: uuid }
               checked_at: { type: string, format: date-time }
+        spam_score: { type: [integer, "null"], minimum: 0, maximum: 100, description: "0 (clean) to 100 (spam): the highest of the providers' own spam judgements and Outflare's checks added up. Null until scored." }
+        spam_level: { type: [string, "null"], enum: [clean, suspect, toxic, null], description: "suspect from 30, toxic from 60." }
+        spam_factors:
+          type: array
+          description: "Why: provider_spam (a provider's own score), weak_domain, spam_tld, spam_anchor, link_farm, many_outlinks, sitewide."
+          items:
+            type: object
+            required: [code, points]
+            properties:
+              code: { type: string }
+              points: { type: integer }
+        review: { type: string, enum: ["", ok, disavow], description: "A person's verdict: empty until reviewed, ok for a real link, disavow for the disavow file." }
+        review_note: { type: string }
+        reviewed_at: { type: [string, "null"], format: date-time }
     BacklinkEvent:
       type: object
       required: [id, site_id, kind, at, connector, source_rating, reason, backlink]
@@ -19981,7 +20102,7 @@ components:
         regained: { type: integer }
     BacklinkSiteSummary:
       type: object
-      required: [site, live, lost, referring_domains, followed, last_30_days, weeks, providers]
+      required: [site, live, lost, referring_domains, followed, spam, last_30_days, weeks, providers]
       properties:
         site:
           type: object
@@ -19994,6 +20115,14 @@ components:
         lost: { type: integer }
         referring_domains: { type: integer, description: Distinct domains with a live link. }
         followed: { type: integer, description: Live links without nofollow. }
+        spam:
+          type: object
+          required: [toxic, suspect, unreviewed, disavowed]
+          properties:
+            toxic: { type: integer, description: Live links scoring 60 or more. }
+            suspect: { type: integer, description: Live links scoring 30 to 59. }
+            unreviewed: { type: integer, description: Live suspect or toxic links nobody reviewed yet. }
+            disavowed: { type: integer, description: Links people marked disavow. }
         last_30_days: { $ref: "#/components/schemas/BacklinkCounts" }
         weeks:
           type: array
