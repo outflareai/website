@@ -2534,7 +2534,7 @@ paths:
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Add a domain to track before it has mailboxes
       description: |
-        Scope: mailboxes.manage. Accepts `acme.com`, `@acme.com`, a URL or an
+        Scope: mailboxes.manage. Accepts `acme-com.example`, `@acme-com.example`, a URL or an
         address on the domain. Its DNS check runs in the background; poll the
         domain until `checked_at` is set. Domains of connected mailboxes are
         added on their own.
@@ -2547,7 +2547,7 @@ paths:
               type: object
               required: [domain]
               properties:
-                domain: { type: string, example: acme.com }
+                domain: { type: string, example: acme-com.example }
       responses:
         "201":
           description: Added.
@@ -2839,7 +2839,7 @@ paths:
               type: object
               required: [domain]
               properties:
-                domain: { type: string, example: links.acme.com }
+                domain: { type: string, example: links.acme-com.example }
       responses:
         "201":
           description: The domain, with the result of the first check.
@@ -3507,7 +3507,7 @@ paths:
       summary: Add emails or domains to the suppression list
       description: |
         Scope: leads.manage. Each value is an email address or a domain
-        (also accepted as @acme.com or a URL). A suppressed domain blocks
+        (also accepted as @acme-com.example or a URL). A suppressed domain blocks
         every address at it. Existing entries are left as they are.
       tags: [suppression]
       requestBody:
@@ -18081,7 +18081,7 @@ components:
       name: domain
       in: path
       required: true
-      schema: { type: string, example: acme.com }
+      schema: { type: string, example: acme-com.example }
     From:
       name: from
       in: query
@@ -19783,7 +19783,7 @@ components:
       required: [id, name]
       properties:
         id: { type: string, example: "123456789" }
-        name: { type: string, example: "acme.com (Acme)" }
+        name: { type: string, example: "acme-com.example (Acme)" }
         url: { type: string }
     AnalyticsSitePlan:
       allOf:
@@ -21068,13 +21068,17 @@ components:
         created_at: { type: string, format: date-time }
     SocialAccountChannel:
       type: string
-      enum: [x, linkedin]
-      description: A channel whose pages and profiles Outflare reads.
+      enum: [x, linkedin, youtube, instagram, tiktok, facebook, reddit, github, discord]
+      description: |
+        A channel whose pages and profiles Outflare reads. X and LinkedIn are read through their own app or sign-in, with posts;
+        every channel's public profiles in a brand's links (an X account, a LinkedIn company page, a YouTube channel, an Instagram,
+        TikTok, Facebook or GitHub account, a subreddit, a Discord invite) have their followers read every day through the
+        workspace's own page reader (Geonode).
     SocialAccount:
       type: object
       description: A page or profile of the brand's own, reached through the workspace's own connection.
       required: [id, channel, kind, brand_id, integration_id, external_id, handle, name, url, avatar_url, status, followers, following, posts,
-        followers_change_7d, followers_change_28d, last_synced_at, next_sync_at, last_error, created_at, updated_at]
+        followers_change_1d, followers_change_7d, followers_change_28d, last_synced_at, next_sync_at, last_error, created_at, updated_at]
       properties:
         id: { type: string, format: uuid }
         channel: { $ref: "#/components/schemas/SocialAccountChannel" }
@@ -21090,6 +21094,7 @@ components:
         followers: { type: [integer, "null"], description: Null when the channel does not report it. }
         following: { type: [integer, "null"] }
         posts: { type: [integer, "null"] }
+        followers_change_1d: { type: [integer, "null"], description: Followers gained (negative for lost) since the day before; null until there is a count that old. }
         followers_change_7d: { type: [integer, "null"], description: Followers gained (negative for lost) over 7 days; null until there is a count that old. }
         followers_change_28d: { type: [integer, "null"] }
         last_synced_at: { type: [string, "null"], format: date-time }
@@ -22770,7 +22775,7 @@ components:
       type: object
       required: [domain, status, daily_limit, notes, source, health, issues, mx_provider, mx_hosts, spf, spf_record, dkim, dkim_selector, dmarc, dmarc_record, dmarc_policy, blocklists, checked_at, mailboxes, mailbox_counts, daily_capacity, sent_24h, sent_7d, replies_7d, contacted_leads_7d, replied_leads_7d, bounces_7d, warmup, created_at, updated_at]
       properties:
-        domain: { type: string, example: acme.com }
+        domain: { type: string, example: acme-com.example }
         status: { type: string, enum: [active, paused], description: "paused: no sequence or test sends from the domain's mailboxes." }
         daily_limit: { type: [integer, "null"], description: Cap on sends from all the domain's mailboxes together in 24 hours. Null is no domain cap. }
         project_id: { type: [string, "null"], format: uuid, description: "The project that owns the domain, or null when shared. Move it with POST /projects/{id}/add." }
@@ -23011,7 +23016,7 @@ components:
           description: "Company sizes as min-max, or min+ for open-ended: 1-10, 11-50, 51-200, 201-500, 501-1000, 1001-5000, 5001-10000, 10001+."
         locations: { type: array, maxItems: 50, items: { type: string }, description: Where the person is. }
         company_locations: { type: array, maxItems: 50, items: { type: string }, description: Where the company is based. }
-        company_domains: { type: array, maxItems: 50, items: { type: string }, example: [acme.com] }
+        company_domains: { type: array, maxItems: 50, items: { type: string }, example: [acme-com.example] }
         keywords: { type: array, maxItems: 50, items: { type: string } }
     LeadListInput:
       type: object
@@ -23274,7 +23279,7 @@ components:
       required: [company, website, about, goals, voice, rules, notes, brands, version, updated_at, updated_by, missing, ask_for_missing]
       properties:
         company: { type: string, description: The company's name. }
-        website: { type: string, description: "Its main site, such as acme.com." }
+        website: { type: string, description: "Its main site, such as acme-com.example." }
         about: { type: string, description: "What the company does, in a few sentences." }
         goals: { type: string, description: "What the person wants from Outflare, such as 20 demos a month from US fintech." }
         voice: { type: string, description: "How emails should sound: tone, length, sign-off." }
@@ -24399,7 +24404,7 @@ components:
       required: [id, domain, status, error, target, last_checked_at, verified_at, created_at, dns_install, dns_connections]
       properties:
         id: { type: string, format: uuid }
-        domain: { type: string, example: links.acme.com }
+        domain: { type: string, example: links.acme-com.example }
         status: { type: string, enum: [pending, verified, failed], description: "pending until the CNAME is first seen; failed when a verified domain stops pointing here." }
         error: { type: string, description: "What to fix, when not verified." }
         target: { type: string, description: The host the CNAME record must point to. }
@@ -24800,7 +24805,7 @@ components:
         provider: { type: string, enum: [google, microsoft] }
         domain_count: { type: integer, minimum: 1, maximum: 200 }
         mailboxes_per_domain: { type: integer, minimum: 1, maximum: 10 }
-        brand: { type: string, maxLength: 60, description: "Domain names are made from it, e.g. getacme.com, acmehq.com." }
+        brand: { type: string, maxLength: 60, description: "Domain names are made from it, e.g. getacme-com.example, acmehq-com.example." }
         personas: { type: array, items: { $ref: "#/components/schemas/InfraPersona" }, maxItems: 20 }
         domains: { type: array, items: { type: string }, description: Domain names you chose. The rest are suggested from brand. }
         ready_by: { type: [string, "null"], format: date }
@@ -24868,7 +24873,7 @@ components:
         provider: { type: string, enum: [google, microsoft] }
         domain_count: { type: integer, minimum: 1, maximum: 200 }
         mailboxes_per_domain: { type: integer, minimum: 1, maximum: 10 }
-        brand: { type: string, maxLength: 60, description: "Domain names are made from it, e.g. getacme.com, acmehq.com." }
+        brand: { type: string, maxLength: 60, description: "Domain names are made from it, e.g. getacme-com.example, acmehq-com.example." }
         personas: { type: array, items: { $ref: "#/components/schemas/InfraPersona" }, maxItems: 20 }
         ready_by: { type: [string, "null"], format: date }
         warmup_days: { type: integer, minimum: 7, maximum: 60 }
