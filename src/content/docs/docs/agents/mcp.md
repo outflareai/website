@@ -200,6 +200,11 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `create_inbox_view`, `update_inbox_view`, `delete_inbox_view` | Save, change or delete a shared set of inbox filters | Yes |
 | `set_reply_rules` | Choose what happens for a not now, an out-of-office or a referral, for the workspace, a project or a sequence | Yes |
 | `add_reply_referral` | Add the person a reply refers you to as a lead, and optionally enrol them | Yes |
+| `list_alerts` | What needs someone now: hot replies, hot website visitors, with the page that has each | |
+| `get_alert_settings` | Who gets each kind of alert by email, and the kinds you muted | |
+| `set_alert_settings` | Choose who gets a kind of alert by email and the Slack channel it posts to, for the workspace or a brand | Yes |
+| `list_alert_channels` | The Slack channels your Slack can post alerts to | |
+| `mute_alerts` | Mute or unmute a kind of alert for yourself | Yes |
 | `list_tracking_domains`, `add_tracking_domain`, `check_tracking_domain` | Optional own domain for unsubscribe and click links, verified by CNAME | Yes |
 | `list_analytics`, `get_analytics_summary` | Connected website analytics tools, and traffic across all of them for a period | |
 | `get_analytics_report` | One tool's traffic, pages, sources, search queries or events report | |

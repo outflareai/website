@@ -37,7 +37,7 @@ Every person and company gets a score from 0 to 100. More key pages, more return
 
 Key pages are the paths that show buying intent. The defaults are pricing, plans, demo, contact, booking, comparison, alternatives, enterprise, sign-up and trial pages. Set your own as paths; a trailing `*` matches everything under it, such as `/pricing*`.
 
-When a person or company reaches the hot score (60 by default), Outflare sends the `visitor.became_hot` [webhook](/docs/api/webhooks/), at most once a week each, and they appear in your [digest](/docs/guides/digests/).
+When a person or company reaches the hot score (60 by default), Outflare sends the `visitor.became_hot` [webhook](/docs/api/webhooks/), at most once a week each, raises an [alert](/docs/guides/alerts/) for the owners and admins, and they appear in your [digest](/docs/guides/digests/).
 
 ## Leave people out
 
