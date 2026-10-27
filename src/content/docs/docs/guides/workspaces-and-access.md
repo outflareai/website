@@ -47,7 +47,7 @@ In the API: `GET /v1/workspaces/{ws}/roles` lists the roles with their scopes (M
 
 ## Invites
 
-Admins and owners invite people by email from **Settings → Members**, picking any role they could give themselves (Admin by default; only owners invite owners). For a role without workspace-wide permissions, you can also keep the person to some brands. The invite link starts with `ofi_` and expires. Pending invites can be revoked. Invite links use your instance's `PUBLIC_URL`, so set it when you run behind a domain.
+Admins and owners invite people by email from **Settings → Members**, picking any role they could give themselves (Admin by default; only owners invite owners). For a role without workspace-wide permissions, you can also keep the person to some brands. **Send invite** emails them a link to join, through the instance's account email service, and shows you the link once so you can share it another way too (an instance with no email service only shows it). The link starts with `ofi_`, works once and expires after 7 days. A new invite to the same address replaces a pending one, and someone already in the workspace can't be invited again. Pending invites can be revoked. Invite links use your instance's `PUBLIC_URL`, so set it when you run behind a domain.
 
 ## Signing in
 
