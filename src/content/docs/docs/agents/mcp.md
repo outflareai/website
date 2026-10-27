@@ -99,6 +99,8 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `get_lead` | One lead: fields, custom fields, lists, verification and suppression | |
 | `list_lead_lists`, `get_lead_list` | Lead lists with sizes, search settings and the latest build | |
 | `list_lead_list_members` | A list's leads with their fit score and reasons, best first | |
+| `list_smart_lists`, `get_smart_list`, `list_smart_list_members` | Smart lists with their rules and size, and who is in one now | |
+| `preview_smart_list` | How many people a smart list's rules pick, with a sample; nothing saved | |
 | `list_data_providers` | Connected data providers that search, find emails or enrich, and the filters each understands | |
 | `list_list_runs`, `get_list_run` | Builds, refreshes and enrichments: found, added, left out by reason, credits spent | |
 | `get_lead_sources` | Which data provider a lead came from | |
@@ -156,6 +158,8 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `create_lead_list`, `update_lead_list` | A manual list, or one built from a search with an email waterfall, fit scores, dedupe and credit caps | Yes, provider |
 | `run_lead_list` | Build, refresh or enrich a list, within its caps | Yes, provider |
 | `cancel_list_run` | Stop a run; leads already added stay | Yes |
+| `create_smart_list`, `update_smart_list`, `refresh_smart_list` | Make or change a smart list, or update who is in it now | Yes |
+| `delete_smart_list` | Delete a smart list; the people stay | Yes |
 | `create_sequence`, `replace_sequence_steps` | Build a draft sequence and its steps | Yes |
 | `update_sequence` | Change settings, or start, pause or archive | Yes, sends |
 | `enroll_leads` | Add leads or a list to a sequence | Yes, sends |

@@ -1,13 +1,13 @@
 ---
 title: Ideal customers
-description: Describe who you sell to once, in words and as filters, and every project, lead list and the lead finder uses it.
+description: Describe who you sell to once, in words and as filters, and every project and lead list uses it.
 sidebar:
   order: 1.45
 ---
 
 <span class="pill shipped">Shipped</span> In the web app, the REST API and the MCP server.
 
-An ideal customer profile says who you sell to, once. [Projects](/docs/guides/projects/), [lead list](/docs/guides/lead-lists/) fit scores and the lead finder all read the same profile, so the same customer is never typed twice in different words.
+An ideal customer profile says who you sell to, once. [Projects](/docs/guides/projects/) and [lead list](/docs/guides/lead-lists/) fit scores read the same profile, so the same customer is never typed twice in different words.
 
 In the app, open **Company** in the sidebar, then **Ideal customers**. Profiles live inside Outflare and call no third-party service.
 
