@@ -60,6 +60,8 @@ Outflare-Mission: 27f975ce-56ff-4631-9352-a152480d08fa
 Outflare-Reason: Create the approved sequence
 ```
 
+Apps connected through [Connect your AI](/docs/agents/connect/) make changes only this way, unless you turn off **Only inside missions** for the app: a write without the header is refused with `403 mission_required`.
+
 Every call is logged against the mission. Reads always run. What happens to a write depends on the mission:
 
 | Mission | A write |

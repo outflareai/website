@@ -95,7 +95,7 @@ You tell an agent what you want, and it connects what it needs. It never asks yo
 
 1. The agent calls `request_connection` (MCP) or `POST /v1/workspaces/{ws}/connect-requests` with the service and one sentence on why it needs it.
 2. It gives you a one-time link.
-3. You open the link. It names the workspace, the service and the agent's reason. Paste the key there, or sign in with the provider.
+3. You open the link and sign in to Outflare. Only an owner or admin of the workspace that asked can use it; anyone else is told the link isn't for them. The page names the workspace, the service, who asked and the agent's reason. Paste the key there, or sign in with the provider. Only connect when you expected the request: Outflare never asks for keys in an email or a chat.
 4. The key is tested and saved, and the agent sees the request turn `connected` and carries on.
 
 Links work once, expire after 24 hours by default, can be cancelled, and can only connect the one service they name. The audit log records which token asked.
