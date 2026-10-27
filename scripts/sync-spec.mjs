@@ -1,6 +1,6 @@
 // Copies api/openapi.yaml from the main repo into spec/openapi.yaml.
 //
-//   npm run sync-spec               # from outflareai/outflare@main
+//   npm run sync-spec               # from outflareai/engine@main (GITHUB_TOKEN: a token that can read it)
 //   npm run sync-spec -- mailboxes  # from another branch, tag or commit
 //   OUTFLARE_DIR=../outflare npm run sync-spec   # from a local checkout
 import { readFile, writeFile } from 'node:fs/promises';
@@ -14,8 +14,9 @@ let spec;
 if (dir) {
 	spec = await readFile(`${dir}/api/openapi.yaml`, 'utf8');
 } else {
-	const url = `https://raw.githubusercontent.com/outflareai/outflare/${ref}/api/openapi.yaml`;
-	const res = await fetch(url);
+	const url = `https://raw.githubusercontent.com/outflareai/engine/${ref}/api/openapi.yaml`;
+	const token = process.env.GITHUB_TOKEN;
+	const res = await fetch(url, token ? { headers: { Authorization: `Bearer ${token}` } } : {});
 	if (!res.ok) {
 		console.error(`Could not fetch ${url}: ${res.status} ${res.statusText}`);
 		process.exit(1);
