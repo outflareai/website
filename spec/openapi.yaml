@@ -6316,6 +6316,184 @@ paths:
                   not_crawled: { type: array, items: { type: string }, description: Target pages the latest crawl did not read. }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/seo-sites/{site}/rankings:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: site, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: listRankings
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: List the keywords a site tracks and where it ranks
+      description: "Scope: seo.read. Each tracked keyword with the site's latest position in the top 100 (null when it is not there), the page that ranks, the position the check before and the best so far, and the page that targets the keyword. `connection` is the SERP connection checks use by default (DataForSEO for Google), or null when none is connected."
+      tags: [seo]
+      responses:
+        "200":
+          description: Tracked keywords, best ranked first.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, connection]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/TrackedKeyword" } }
+                  connection:
+                    oneOf:
+                      - type: "null"
+                      - type: object
+                        required: [integration_id, name, connector]
+                        properties:
+                          integration_id: { type: string, format: uuid }
+                          name: { type: string }
+                          connector: { type: string, example: dataforseo }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: trackKeywords
+      x-outflare-access: { scope: seo.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Track keywords for a site
+      description: "Scope: seo.manage. Adds up to 100 keywords (and, with `from_targets`, every page's target keyword) for one country and device; keywords already tracked there are skipped. Each is checked weekly by default, or daily, through the workspace's own SERP connection within its monthly budget (about $0.02 a check with DataForSEO), and the first check starts now."
+      tags: [seo]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                keywords: { type: array, maxItems: 100, items: { type: string, maxLength: 200 } }
+                from_targets: { type: boolean, description: "Also track every page's target keyword." }
+                country: { type: string, example: US, default: US }
+                device: { type: string, enum: [desktop, mobile], default: desktop }
+                frequency: { type: string, enum: [daily, weekly], default: weekly }
+                integration_id: { type: string, format: uuid, description: "The SERP connection to check with; the workspace's first by default." }
+      responses:
+        "201":
+          description: What it added.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, added, skipped]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/TrackedKeyword" } }
+                  added: { type: integer }
+                  skipped: { type: integer, description: Keywords already tracked for that country and device. }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/seo-sites/{site}/rankings/check:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: site, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: checkRankings
+      x-outflare-access: { scope: seo.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Check a site's rankings now
+      description: "Scope: seo.manage. Queues a check of every active keyword not checked today. Each check is paid on the SERP connection and stops at its monthly budget; a keyword that could not be checked says why in `last_error`. 409 connector_needed when no SERP connection is connected."
+      tags: [seo]
+      responses:
+        "202":
+          description: Queued.
+          content:
+            application/json:
+              schema: { oneOf: [{ $ref: "#/components/schemas/Queued" }, { $ref: "#/components/schemas/MissionHeld" }] }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/seo-sites/{site}/rankings/{tracked}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: site, in: path, required: true, schema: { type: string, format: uuid } }
+      - { name: tracked, in: path, required: true, schema: { type: string, format: uuid } }
+    patch:
+      operationId: updateTrackedKeyword
+      x-outflare-access: { scope: seo.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Change how a keyword is tracked
+      description: "Scope: seo.manage. Pause or resume it, check it daily or weekly, or check it with another SERP connection. The keyword, country and device cannot change: track it again with the new ones."
+      tags: [seo]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status: { type: string, enum: [active, paused] }
+                frequency: { type: string, enum: [daily, weekly] }
+                integration_id: { type: string, format: uuid }
+      responses:
+        "200":
+          description: The tracked keyword.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TrackedKeyword" }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+    delete:
+      operationId: deleteTrackedKeyword
+      x-outflare-access: { scope: seo.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Stop tracking a keyword
+      description: "Scope: seo.manage. Its history goes with it."
+      tags: [seo]
+      responses:
+        "204": { description: Removed. }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/seo-sites/{site}/rankings/{tracked}/history:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: site, in: path, required: true, schema: { type: string, format: uuid } }
+      - { name: tracked, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getRankHistory
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: Read a tracked keyword's history
+      description: "Scope: seo.read. One check a day, newest first, up to 400: the site's position and page, and the top 10 results, so you can see who outranks it."
+      tags: [seo]
+      responses:
+        "200":
+          description: The keyword and its checks.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [tracked, data]
+                properties:
+                  tracked: { $ref: "#/components/schemas/TrackedKeyword" }
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [day, position, url, engine, top]
+                      properties:
+                        day: { type: string, format: date }
+                        position: { type: [integer, "null"] }
+                        url: { type: string }
+                        engine: { type: string, example: google }
+                        top:
+                          type: array
+                          items:
+                            type: object
+                            required: [position, url, domain, title]
+                            properties:
+                              position: { type: integer }
+                              url: { type: string }
+                              domain: { type: string }
+                              title: { type: string }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/seo-sites/{site}/targets:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
@@ -11745,7 +11923,7 @@ paths:
                   merged_from: { type: string, format: uuid }
                   moved:
                     type: object
-                    required: [identities, attributes, relationships, events, consents, subscriptions]
+                    required: [identities, attributes, relationships, events, consents, subscriptions, activity]
                     properties:
                       identities: { type: integer }
                       attributes: { type: integer }
@@ -11753,6 +11931,7 @@ paths:
                       events: { type: integer }
                       consents: { type: integer }
                       subscriptions: { type: integer, description: Subscriptions from payment connections. }
+                      activity: { type: integer, description: "Leads, cold emails, replies, meetings, deals, lifecycle emails, broadcast sends and journey runs that moved to the record kept." }
         "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/records/{record}/timeline:
@@ -11766,10 +11945,12 @@ paths:
       description: |
         Scope: customers.read. Everything that happened to a person or company, newest first: their product events
         (and, for a company, the group calls that named it), changes to their attributes, identities added and closed,
-        and consent given or withdrawn.
+        consent given or withdrawn, the cold email Outflare sent them and their replies (`message`, with `direction`
+        out or in), and their meetings and deals. Lifecycle email shows as the events Outflare records for it
+        (`email.sent`, `email.delivered` and so on, with `source: lifecycle`).
       tags: [records]
       parameters:
-        - { name: kinds, in: query, description: "Comma-separated: event, attribute_change, identity, consent. Default all.", schema: { type: string } }
+        - { name: kinds, in: query, description: "Comma-separated: event, attribute_change, identity, consent, message, meeting, deal. Default all.", schema: { type: string } }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
         - { name: before, in: query, schema: { type: string } }
         - { $ref: "#/components/parameters/Cursor" }
@@ -17966,6 +18147,26 @@ components:
               reason: { type: string, enum: [ranks, mentions], description: "ranks: Google shows it for the keyword; mentions: its title or H1 has the keyword." }
               impressions: { type: integer, description: "Its impressions for the keyword over 28 days." }
               links_in: { type: integer }
+    TrackedKeyword:
+      type: object
+      required: [id, keyword, country, device, engine, frequency, status, integration_id, position, url, previous_position, best_position, last_checked_at, last_error, target_url, created_at]
+      properties:
+        id: { type: string, format: uuid }
+        keyword: { type: string, example: proxy pricing }
+        country: { type: string, example: US }
+        device: { type: string, enum: [desktop, mobile] }
+        engine: { type: string, example: google }
+        frequency: { type: string, enum: [daily, weekly] }
+        status: { type: string, enum: [active, paused] }
+        integration_id: { type: [string, "null"], format: uuid, description: "The SERP connection it is checked with; null uses the workspace's first." }
+        position: { type: [integer, "null"], description: "The site's best organic position at the latest check; null when not in the top 100, or not checked yet." }
+        url: { type: string, description: The page that ranks. }
+        previous_position: { type: [integer, "null"], description: The position at the check before. }
+        best_position: { type: [integer, "null"] }
+        last_checked_at: { type: [string, "null"], format: date-time }
+        last_error: { type: [string, "null"], description: "Why the latest check could not run, such as a spent budget." }
+        target_url: { type: [string, "null"], description: The page whose target keyword this is. }
+        created_at: { type: string, format: date-time }
     PageTarget:
       type: object
       required: [id, url, keyword, secondary, status, origin, checks, search, created_at, updated_at]
@@ -20364,9 +20565,10 @@ components:
         detail: { type: string }
     Lead:
       type: object
-      required: [id, email, domain, first_name, last_name, company, title, phone, linkedin_url, website, custom, source, suppressed, verification, list_ids, created_at, updated_at]
+      required: [id, email, domain, first_name, last_name, company, title, phone, linkedin_url, website, custom, source, suppressed, verification, list_ids, created_at, updated_at, record_id]
       properties:
         id: { type: string, format: uuid }
+        record_id: { type: [string, "null"], format: uuid, description: "The person record this lead is (GET .../records/{record}). Null for a moment after a big import, until the link job reaches it." }
         email: { type: string }
         domain: { type: string }
         first_name: { type: string }
@@ -20854,9 +21056,9 @@ components:
               code:
                 type: string
                 description: Stable; new codes may be added.
-                enum: [no_mailboxes, none_ready, mailbox_error, domain_critical, server_paused, connection_broken, connection_requested, approval_waiting, mission_paused, allocation_short, infra_plan_waiting, unread_replies, context_missing, analytics_site_unmapped, brand_without_analytics]
+                enum: [no_mailboxes, none_ready, mailbox_error, domain_critical, server_paused, connection_broken, connection_requested, approval_waiting, mission_paused, allocation_short, infra_plan_waiting, unread_replies, context_missing, analytics_site_unmapped, brand_without_analytics, fixes_waiting]
               severity: { type: string, enum: [critical, warning, info] }
-              area: { type: string, enum: [mailboxes, domains, servers, connectors, missions, sequences, infrastructure, inbox, context, analytics] }
+              area: { type: string, enum: [mailboxes, domains, servers, connectors, missions, sequences, infrastructure, inbox, context, analytics, fixes] }
               title: { type: string }
               detail: { type: string, description: What it means and how to fix it. }
               count: { type: integer }
@@ -21224,10 +21426,10 @@ components:
       type: object
       required: [kind, id, at, title, detail, source]
       properties:
-        kind: { type: string, enum: [event, attribute_change, identity, consent] }
+        kind: { type: string, enum: [event, attribute_change, identity, consent, message, meeting, deal] }
         id: { type: string }
         at: { type: string, format: date-time }
-        title: { type: string, description: "The event's name, the field that changed, the identity's namespace or the consent's channel." }
+        title: { type: string, description: "The event's name, the field that changed, the identity's namespace, the consent's channel, the email's subject, or the meeting's or deal's name." }
         detail: { type: object, additionalProperties: true }
         source: { type: string }
     Consent:
