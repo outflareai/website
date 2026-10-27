@@ -11,6 +11,12 @@ Outflare keeps one record of each person and company your business knows, plus a
 
 Moving from Attio? [Import it once](/docs/guides/move-from-attio/) and its people, companies and deals become records here.
 
+## Leads are people
+
+Every lead you import or add is a person record too. A new lead joins the person who already has its email, or gets a record of its own marked as a prospect, with its name, job title and LinkedIn filled in. Its email stays unverified, so it never takes over an address someone later proves they own. Each lead in the API has a `record_id` that points at its person.
+
+Cold email, replies, meetings and deals are linked to the person as well: through their lead, or else through the address (a reply's sender, a meeting's attendee). Merging two records moves all of it to the one you keep.
+
 ## The catalog
 
 The catalog lists everything a record can hold, and every feature uses the same definitions.
@@ -25,6 +31,8 @@ Agents read the catalog with `get_catalog` before writing anything, and reuse a 
 ## Which value wins
 
 Every value remembers where it came from: a person's edit, your own product, a CRM sync, enrichment or an import. When two sources disagree, the higher one wins. By default a person's edit comes first, then your product's own data, then the CRM, then enrichment. So enrichment never overwrites what someone typed, and a CRM sync never overwrites what your product knows. Every change is kept in the record's history, with who made it and from where.
+
+Paste the [website tracking](/docs/guides/website-tracking/) snippet into your site and every visit is recorded with the campaign it came from. Connect Stripe and each paying customer's plan, monthly revenue, lifetime revenue, first payment date and billing status are kept on their record for you. See [Revenue from Stripe](/docs/guides/revenue-from-stripe/).
 
 ## Emails, phones and ids
 
@@ -50,7 +58,7 @@ Traits that match a field in the catalog fill in the record: `firstName` is firs
 
 When two records share an email or phone number, they might be the same person. Outflare lists each such pair once, with both records side by side, so someone can decide. This includes pairs you already had before the upgrade.
 
-- **Merge** keeps one record. The other one's emails and ids, links, product events and consent move to the kept record, and its details fill in whatever the kept record is missing. The usual "which value wins" order still applies, so a CRM value never replaces one someone typed. The merged record stays in the archive, so its history and any old links still lead to the record you kept.
+- **Merge** keeps one record. The other one's emails and ids, links, product events, consent, leads and outreach move to the kept record, and its details fill in whatever the kept record is missing. The usual "which value wins" order still applies, so a CRM value never replaces one someone typed. The merged record stays in the archive, so its history and any old links still lead to the record you kept.
 - **Link** keeps both records but marks them as the same person, for example one person with two accounts in your product.
 - **Dismiss** says they are different people. You won't be asked about the pair again.
 
@@ -60,11 +68,17 @@ Outflare merges on its own in one case only. If your product reports that someon
 
 ## Timeline
 
-Every person and company has a timeline, newest first: their product events, changes to their details, emails and ids added or replaced, and consent given or taken back. Lifecycle email will add each email's delivery to it.
+Every person and company has a timeline, newest first: their product events, changes to their details, emails and ids added or replaced, consent given or taken back, cold email sent to them and their replies, meetings and deals. Filter it with `kinds`, for example `?kinds=message,meeting,deal` for just the outreach.
 
 ## Consent
 
 Consent is recorded per person and channel (email, SMS, push, WhatsApp, in-app), optionally for one topic such as product updates, with where it was given and what proves it, such as the sign-up form and its wording. Nothing is overwritten: the latest grant or withdrawal counts, and the rest stay as the history. Withdrawing from a whole channel covers every topic on it. Lifecycle email sends marketing only to people whose email consent is granted. Where a record came from never counts as consent.
+
+### Unsubscribes
+
+An unsubscribe from any email, whether a cold sequence's link, a reply asking to stop, the lifecycle unsubscribe link or one imported from another sequencer, does two things. It adds the address to the [suppression list](/docs/guides/import-leads/#the-suppression-list), and it records on the person that they withdrew consent to all marketing email. So they are out of every sequence, broadcast and journey, in every brand. Email they need, such as receipts and password resets, still reaches them.
+
+Only the person opting in again clears it, for example by creating an account and agreeing to receive email, or turning email back on in the preference page. In the API that is a grant to all marketing email with a `source` of `signup_form`, `signup`, `opt_in`, `double_opt_in`, `checkout`, `form`, `in_app` or `preference_center`. It removes the unsubscribe from the suppression list and the audit log records it. A grant from an import, a CRM sync, an agent or the API without one of those sources never clears an unsubscribe, and bounces, complaints and manual blocks always stay.
 
 ## Who can do what
 

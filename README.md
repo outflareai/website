@@ -47,7 +47,7 @@ The site is meant for Cloudflare Pages, with the domain's DNS on Cloudflare (the
 | Build output directory | `dist` |
 | Environment variables | `NODE_VERSION` = `24` |
 
-Then add `outflare.ai` and `www.outflare.ai` (redirected to `outflare.ai`) under Custom domains. Every push to `main` deploys, and pull requests get preview links. `public/_headers` sets security headers and long caching for `/_astro/` files.
+Then add `outflare.ai` and `www.outflare.ai` (redirected to `outflare.ai`) under Custom domains. Every push to `main` deploys, and pull requests get preview links. `public/_headers` sets security headers and long caching for `/_astro/` files. Official profiles live in `src/data/social.json`: the [/social](https://outflare.ai/social/) page, the Organization `sameAs` data and the short links (`outflare.ai/x` and so on, written to `_redirects` at build time) all read it.
 
 ### Analytics
 
@@ -61,7 +61,7 @@ Analytics are off unless the build sets their IDs, so forks and local builds sen
 
 Cloudflare Web Analytics needs no code: enable it under the Pages project's Metrics tab and Pages injects it. The tags themselves live in `src/components/Analytics.astro`, used by both the marketing layout and the docs head.
 
-With either tag on, clicks on sign-up (`sign_up_click`), sign-in (`sign_in_click`), Dashboard (`dashboard_click`, shown instead of Sign in and Sign up to people signed in to the app), GitHub (`github_click`) and contact (`contact_click`) links, brand page downloads (`brand_kit_download`, `brand_asset_download`) and colour copies (`brand_color_copy`), and script errors (`site_error`), are sent to GA4 and PostHog by one helper, `window.outflareTrack`. In GA4, mark `sign_up_click` as a key event once it arrives. [`AGENTS.md`](AGENTS.md) has the rule for new events.
+With either tag on, clicks on sign-up (`sign_up_click`), sign-in (`sign_in_click`), Dashboard (`dashboard_click`, shown instead of Sign in and Sign up to people signed in to the app), GitHub (`github_click`) and contact (`contact_click`) links, brand page downloads (`brand_kit_download`, `brand_asset_download`) and colour copies (`brand_color_copy`), clicks on the profiles at /social (`social_profile_click`, labelled by profile), and script errors (`site_error`), are sent to GA4 and PostHog by one helper, `window.outflareTrack`. In GA4, mark `sign_up_click` as a key event once it arrives. [`AGENTS.md`](AGENTS.md) has the rule for new events.
 
 ## Keeping the docs honest
 

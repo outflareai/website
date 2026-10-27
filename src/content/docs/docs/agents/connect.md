@@ -95,7 +95,11 @@ You only see the switches your role allows; viewers can only give read access.
 
 Whatever you choose, a connected app can never invite or remove people, change the workspace, create API tokens, manage webhooks, edit the suppression list or approve its own missions. Every email still goes through the [policy check](/docs/concepts/policy-check/), and every change is in the audit log under the app's name.
 
-If Outflare doesn't recognise the app, the screen says so and shows where it will send you back. Only continue if you started connecting from there.
+If Outflare doesn't recognise the app, the screen says so and shows where it will send you back. Only continue if you started connecting from there. Outflare recognises Claude, ChatGPT, Cursor, VS Code and apps on your own computer. Any other app may only read until the person who runs your Outflare server checks it (`outflare verify-app <client_id>`, with the id shown on the app's page).
+
+### Changes happen inside missions
+
+A connected app reads freely, but it makes changes only inside a [mission](/docs/agents/missions/) you approved. Asked to change something outside one, it is told to start a mission, which waits for you to approve its plan; then its changes follow the mission's mode (dry run, approve each change, or autonomous). To let an app change things directly, open it on the **Connect your AI** page and turn off **Only inside missions**.
 
 ## Change or disconnect apps
 

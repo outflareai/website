@@ -39,13 +39,28 @@ A brand's mailboxes only send for that brand's sequences, so Repocket never emai
 
 ## See one brand at a time
 
-The brand picker under the workspace name in the sidebar narrows every page to one brand: projects, sequences, lead lists, mailboxes, domains, missions and analytics. The link keeps the choice (`?brand=repocket`), so a link you share opens on the same brand. With **All brands**, each record shows the brand it belongs to.
+Like a project in PostHog, you work on one brand at a time. The brand picker sits at the top of the sidebar, under your workspace (on a phone, in the top bar), and narrows every page to that brand: projects, sequences, lead lists, mailboxes, domains, missions, connectors and analytics. Outflare opens on the brand you picked last, or your first brand. The link keeps the choice (`?brand=repocket`), so a link you share opens on the same brand.
+
+To compare brands side by side, pick **All brands** at the bottom of the picker. Each record then shows the brand it belongs to.
 
 ![Projects with All brands picked: each one shows its brand](/screens/brands-badges.png)
 
+## Connect a tool once for every brand
+
+Connectors belong to the workspace, so you connect Google Analytics, Search Console, your verification service or your ad accounts once and every brand uses them. Each brand still reads its own GA4 property, Search Console site or ad account on that one connection (see below).
+
+You can narrow it down on the **Connectors** page, where the **Used by** column says who uses each connection. Open **More → Choose who uses it** to pick:
+
+- **Shared from the workspace**: every brand, or only the brands you tick.
+- **One brand's own**: for a brand with an account of its own, say Repocket's own Plausible. Only that brand uses it, and it takes the place of the shared Plausible for Repocket alone. The other brands keep the shared one.
+
+With one brand picked, Connectors lists what that brand uses and marks each one as **Shared from workspace** or the brand's own. When you connect something new there, choose **Every brand** or **Only Repocket**. Someone kept to some brands only sees the connections their brands use.
+
+In the API, every connection has `brand_id` (set on a brand's own) and `brand_ids` (the brands a shared one is shared with; empty means every brand). `GET /v1/workspaces/{ws}/integrations?brand=repocket` lists what a brand uses. Set who uses a connection with `brand_id` or `brand_ids` on `POST` or `PATCH /integrations`, or `?brand=` on the sign-in link. The MCP tools are `list_integrations` and `update_integration`.
+
 ## Analytics by brand
 
-Each site in your analytics tools, such as a GA4 property, a Search Console site or a PostHog project, counts as a brand's when its domain is one of the brand's domains. Subdomains count too, so app.repocket.com is Repocket's. For a site named after an app rather than a domain, pick its brand yourself (`PUT /v1/workspaces/{ws}/analytics/{id}/site-brand`), or mark it as shared.
+Each site in your analytics tools, such as a GA4 property, a Search Console site or a PostHog project, counts as a brand's when its domain is one of the brand's domains. Subdomains count too, so app.repocket.com is Repocket's. A site read through a brand's own connection always counts for that brand. For a site named after an app rather than a domain, pick its brand yourself (`PUT /v1/workspaces/{ws}/analytics/{id}/site-brand`), or mark it as shared.
 
 ## Keep brands from emailing the same person
 

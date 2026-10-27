@@ -13,7 +13,7 @@ There are two ways in. The MCP server is the quickest one for Claude, ChatGPT, C
 
 ## The MCP server <span class="pill shipped">Shipped</span>
 
-[`@outflare/mcp`](https://github.com/outflareai/outflare/tree/main/mcp) is an [MCP](https://modelcontextprotocol.io) server that gives an agent 294 tools over the API (3 more in agency mode): run [missions](/docs/agents/missions/) toward a goal with approvals, read and update the brief of the project it works on, check sending domains and mailbox warm-up, import leads, check them against the suppression list, build, preview and start sequences, see and change which mailboxes each sequence sends from, and read and answer replies.
+[`@outflare/mcp`](https://github.com/outflareai/outflare/tree/main/mcp) is an [MCP](https://modelcontextprotocol.io) server that gives an agent 438 tools over the API (3 more in agency mode): run [missions](/docs/agents/missions/) toward a goal with approvals, read and update the brief of the project it works on, check sending domains and mailbox warm-up, import leads, check them against the suppression list, build, preview and start sequences, see and change which mailboxes each sequence sends from, and read and answer replies.
 
 It calls the same API with a scoped token, so:
 
@@ -171,7 +171,8 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `decide_allocation_suggestion`, `undo_allocation_change` | Apply or decline a suggestion; undo a change | Yes |
 | `create_sender`, `confirm_mailbox_sender` | Add a sender and confirm which mailboxes send as it | Yes |
 | `resolve_orphaned_follow_ups` | Cancel, or hand to another mailbox, follow-ups whose mailbox is gone | Yes, sends |
-| `plan_mission` | Turn a goal in plain words into a mission waiting for approval; Claude drafts it with the workspace's own key (needs the Claude connector) | Yes |
+| `plan_mission` | Turn a goal in plain words into a mission waiting for approval, drafted by the workspace's [AI model](/docs/agents/ai-models/) with its own key | Yes |
+| `update_ai_settings` | Choose the AI model missions use, its price and the monthly AI limit | Yes |
 | `create_mission`, `update_mission`, `submit_mission_plan` | Start a mission (a draft, so changes are dry runs), edit it, send the plan for approval | Yes |
 | `post_mission_update`, `request_connector` | Progress and questions; ask a person to connect a tool | Yes |
 | `pause_mission`, `stop_mission`, `complete_mission` | Pause, end now, or finish with a report | Yes |
@@ -181,6 +182,7 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `get_oauth_link` | A sign-in link for an OAuth connector | |
 | `connect_integration`, `update_integration`, `test_integration`, `disconnect_integration` | Connect with credentials the agent already holds, rename or replace a key, sign in again, or remove an account | Yes |
 | `list_integrations` | Connected accounts with status, the account found at sign-in and the last error; never the credentials | |
+| `get_ai_settings`, `list_ai_models` | The AI model missions use with this month's AI spend, and the models a connected key can use | |
 | `verify_emails` | Verify addresses, a lead list or every lead without a fresh result, with the connected verification service | Yes, *provider* |
 | `list_verifications`, `verification_summary` | Verification results, and how many leads are verified, stale or unchecked | |
 | `classify_email` | What kind of email domain an address or domain is (free, private, alias, throwaway, school, government, unknown), with the evidence and a suggested sign-up action | |
@@ -206,7 +208,21 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `verify_seo_site`, `start_crawl`, `get_crawl`, `list_crawls`, `stop_crawl` | Check the DNS record, meta tag or file that proves ownership; crawl a site and follow the crawl | Yes |
 | `list_crawl_pages`, `get_crawl_page` | Every URL a crawl found: HTTP status, redirects, noindex, nofollow, robots.txt blocks, title, description, canonical, h1, hreflang, structured data, word count, links in and out | |
 | `list_crawl_issues`, `get_crawl_issue` | A crawl's audit: the rules its pages break, by URL template, with why and how to fix each, and the pages behind one rule | |
-| `list_fixes`, `update_fix` | The workspace's shared fixes list (site audits' fixes so far): take a fix, mark it done (the next crawl checks), ignore it, or leave a note | Yes |
+| `list_fixes`, `update_fix` | The workspace's shared fixes list (site audits' and AI visibility's fixes): take a fix, mark it done (the next crawl or run checks), ignore it, or leave a note | Yes |
+| `list_deploy_options`, `list_deploy_targets`, `add_deploy_target`, `update_deploy_target`, `remove_deploy_target`, `check_deploys`, `list_deploys` | Watch a [GitHub repository or Vercel project](/docs/integrations/deploys/) for production deploys, tied to the site it serves, and see when each website went live | Yes |
+| `get_fix_prompt`, `verify_fix` | Hand a fix to a coding agent as a prompt, then report it live so a fresh crawl confirms it or opens it again | Yes |
+| `start_fix`, `get_fix_autonomy`, `update_fix_autonomy` | [Fix autonomy](/docs/guides/fix-autonomy/): take a fix before changing the site, and choose how far agents in a mission may go on their own (copilot, rules or autonomous); redirect, canonical, indexing and robots fixes always wait for a person | Yes |
+| `get_ai_visibility` | How often AI answers name each brand: mention rate, share of voice against competitors, position, cited pages, by model and week. See [AI visibility](/docs/guides/ai-visibility/) | |
+| `get_ai_visibility_settings`, `update_ai_visibility_settings` | Which models AI visibility asks (on your own AI connections), answers per prompt, and its monthly limit | Yes |
+| `list_ai_cohorts`, `create_ai_cohort`, `update_ai_cohort`, `delete_ai_cohort` | Prompt cohorts: a brand's questions, other names, competitors, locale and schedule | Yes |
+| `list_ai_prompts`, `add_ai_prompts`, `update_ai_prompt`, `delete_ai_prompt` | The questions in a cohort | Yes |
+| `run_ai_prompts`, `list_ai_runs`, `get_ai_run`, `stop_ai_run` | Ask every model a cohort's questions now (costs money on your AI key), follow the run, stop it | Yes |
+| `list_ai_samples`, `get_ai_sample` | Each AI answer: model, text, brands named, pages cited, and which brand facts it agrees with or contradicts | |
+| `list_ai_facts`, `add_ai_fact`, `update_ai_fact`, `delete_ai_fact` | What is true about each brand, and how often AI answers agree with or contradict each fact | Yes |
+| `get_crawl_ai_access` | What a crawled site's robots.txt lets each AI search, user and training crawler read, and whether it has an llms.txt | |
+| `get_ai_bot_hits` | How often AI crawlers requested each site, per crawler and day, from your own Cloudflare request logs | |
+| `get_digest_settings`, `update_digest_settings`, `list_digests`, `preview_digest`, `send_digest` | The workspace's [daily or weekly digest](/docs/guides/digests/): when it is made, who gets it by email through your own provider, past digests, a preview, and one made now | Yes |
+| `list_experiments`, `create_experiment`, `get_experiment`, `list_experiment_pages`, `start_experiment`, `stop_experiment`, `delete_experiment` | [SEO experiments](/docs/guides/seo-experiments/): split a site's pages into matched treatment and control groups, start measuring on the next deploy, and read the lift, p-value and verdict from your own Search Console data | Yes |
 | `list_clients`, `use_client`, `create_client` | Agency mode only (`OUTFLARE_AGENCY`): every client with this week's numbers, switch client, add a client | Yes |
 
 The tools that make email go out, the ones that can spend data provider credits (marked *provider*), and `approve_infra_plan`, which spends money, are marked as reaching the outside world in their MCP annotations, so clients that support it can ask you before running them.

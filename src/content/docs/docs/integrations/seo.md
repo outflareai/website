@@ -36,6 +36,7 @@ Every tool answers the same reports in the same shape, keyed by domain.
 | `overview` | Domain rating, backlinks, referring domains, ranking keywords, keywords in the top 3, estimated visits and traffic value per month | Yes | Yes |
 | `keywords` | The keywords the domain ranks for: position, searches per month, estimated visits, ranking page | Yes | Yes |
 | `backlinks` | The referring domains linking to it, strongest first | Yes | Yes |
+| `links` | Single links to it, strongest linking domains first; `since=YYYY-MM-DD` adds links lost since then | Yes | Yes |
 | `competitors` | Domains competing for the same keywords, with keywords in common | Yes | Yes |
 | `audit` | Site audit health score and issues, errors first | No | Yes, for a site already set up as an Ahrefs Site Audit project |
 
@@ -107,6 +108,14 @@ and its open fixes. Websites no brand claims show as shared. Pick a brand in
 the brand switcher to see only that one. An answer reads "Not enough data"
 until its tool has synced eight weeks, or two snapshots four weeks apart.
 
+## Backlinks
+
+Each weekly snapshot also reads the links to every site you [audit](/docs/guides/site-audits/), merges what both tools found into one list and keeps every link gained, lost and regained. See [Track your backlinks](/docs/guides/backlinks/).
+
+## Competitors
+
+Each weekly snapshot also suggests the domains competing with each audited site for the same keywords. Tracked competitors get an overview each week (up to 10 a site, priced like one of your own domains) and a light look from OutflareBot at their robots.txt, sitemaps and home page, and every change is kept in a feed. See [Follow your competitors](/docs/guides/competitors/).
+
 ## API
 
 ```sh
@@ -148,4 +157,13 @@ Reading needs `analytics.read`; settings and snapshots need
 - `get_seo_report`: a live report. Costs money within the budget, so it is
   hidden when the MCP server runs read-only.
 - `update_seo_settings` and `sync_seo`: change settings, take a snapshot.
+- `list_backlinks`, `list_backlink_events` and `get_backlinks_summary`: the
+  links to your audited sites from both tools, what was gained, lost and
+  regained, and each site's totals. Free.
+- `list_seo_competitors` and `list_competitor_events`: each site's suggested
+  and tracked competitors with their numbers, and what changed at them. Free.
+  `add_seo_competitor`, `update_seo_competitor`, `remove_seo_competitor` and
+  `check_seo_competitor` track, dismiss, remove or look at one.
+- `get_seo_competitor_gaps`: keywords your tracked competitors rank for that
+  you don't, and domains that link to them but not to you. Free.
 - `get_analytics_overview` includes each website's latest SEO figures.

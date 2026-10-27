@@ -31,7 +31,7 @@ PostHog projects also count, for the SEO module, the visits that start on each p
 | Umami (`umami`) | Cloud API key, or a self-hosted address and login | traffic, pages, sources, events |
 | Mixpanel (`mixpanel`) | Service account and project id | traffic (from the page view event), pages, sources, events |
 | Amplitude (`amplitude`) | API key and secret key | traffic (active users, page views), pages, events |
-| Cloudflare Web Analytics (`cloudflare_web_analytics`) | Sign in with Cloudflare, or an API token and account id | traffic (page views, visits), pages, sources |
+| Cloudflare Web Analytics (`cloudflare_web_analytics`) | Sign in with Cloudflare, or an API token and account id | traffic (page views, visits), pages, sources; with Zone Read and Analytics Read on the token, also [AI crawler visits](/docs/guides/ai-visibility/#are-ai-crawlers-visiting) |
 | Simple Analytics (`simple_analytics`) | Domain, plus API key for private sites | traffic, pages, sources |
 | Microsoft Clarity (`microsoft_clarity`) | API token | traffic and pages for the last three days only, plus rage and dead clicks |
 | Vercel Web Analytics (`vercel_analytics`) | Access token, plus team id for team projects | traffic, pages, sources, events (custom events); production traffic only, and the project needs Web Analytics turned on |
