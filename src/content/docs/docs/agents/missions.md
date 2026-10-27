@@ -13,7 +13,7 @@ A **mission** is a goal an agent works toward inside a [project](/docs/guides/pr
 
 ## Start from a goal
 
-You don't need an agent of your own. Connect an [AI model](/docs/agents/ai-models/) (Claude, OpenAI, Gemini, Mistral or OpenRouter) with your own API key; usage is billed by the provider, to your account. Then type the goal in the box at the top of the Missions page, which says which model it uses.
+You don't need an agent of your own. Connect an [AI model](/docs/agents/ai-models/) (Claude, OpenAI, Gemini, Mistral, xAI, or a router such as OpenRouter) with your own API key; usage is billed by the provider, to your account. Then type the goal in the box at the top of the Missions page, which says which model it uses.
 
 ![The goal box on the Missions page](/screens/goal-box.png)
 
