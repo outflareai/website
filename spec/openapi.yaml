@@ -10,7 +10,9 @@ info:
     optionally `Outflare-Reason: <why>`) on their calls. The call is logged
     against the mission, and a write may be answered `202` with a
     `MissionHeld` body instead of running: a dry run, or held until a
-    person approves it. See the missions endpoints.
+    person approves it. See the missions endpoints. A token that requires
+    a mission (AI apps connected with OAuth, unless a person turned it
+    off) gets 403 `mission_required` for a write without the header.
 
     Every operation says who may call it in `x-outflare-access`: `scope`
     (the API token scope it needs in the workspace) and `project_tokens`
@@ -1414,7 +1416,7 @@ paths:
       x-outflare-access: { scope: workspace.read }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Change what a connected AI app may do
-      description: "Scope: workspace.read for an app you connected, tokens.manage for anyone's; people only, never a token, so an app can't change its own access. The app keeps reading what the person who connected it can read; `scopes` lists the changes it may make, from the app's `available_scopes`. Takes effect on the app's next call, with no need to connect again."
+      description: "Scope: workspace.read for an app you connected, tokens.manage for anyone's; people only, never a token, so an app can't change its own access. The app keeps reading what the person who connected it can read; `scopes` lists the changes it may make, from the app's `available_scopes`, and `require_mission` whether it makes them only inside a mission a person approved. Send `scopes`, `require_mission` or both. An app that isn't `verified` may only read. Takes effect on the app's next call, with no need to connect again."
       tags: [access]
       requestBody:
         required: true
@@ -1422,9 +1424,9 @@ paths:
           application/json:
             schema:
               type: object
-              required: [scopes]
               properties:
-                scopes: { type: array, items: { $ref: "#/components/schemas/Scope" }, description: "The write scopes to allow. Empty is read only." }
+                scopes: { type: array, items: { $ref: "#/components/schemas/Scope" }, description: "The write scopes to allow. Empty is read only. Left out keeps them as they are." }
+                require_mission: { type: boolean, description: "Whether the app's changes need a mission a person approved. Left out keeps it as it is." }
       responses:
         "200":
           description: The app.
@@ -1449,7 +1451,7 @@ paths:
       operationId: getAgentAuthorization
       x-outflare-access: { signed_in: true }
       summary: What an AI app asks to connect to
-      description: For the consent screen at `/oauth/authorize`. Names the app that registered `client_id`, where it sends the person back to, whether that is an app Outflare recognises, and the workspaces the person can connect it to with what it may do in each.
+      description: "For the consent screen at `/oauth/authorize`. Names the app that registered `client_id`, where it sends the person back to, whether that is an app Outflare recognises, and the workspaces the person can connect it to with what it may do in each. An app that isn't `verified` gets read access only, whatever the person picks. Apps connected this way make changes only inside a mission a person approved, until someone turns that off for the app."
       tags: [access]
       parameters:
         - { name: client_id, in: query, required: true, schema: { type: string } }
@@ -1461,7 +1463,7 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [client, app, redirect_host, resource, workspaces]
+                required: [client, app, verified, redirect_host, resource, workspaces]
                 properties:
                   client:
                     type: object
@@ -1471,6 +1473,7 @@ paths:
                       name: { type: string, description: "The name the app registered with. Anyone can register any name, so trust app and redirect_host over it." }
                       uri: { type: string }
                   app: { $ref: "#/components/schemas/AgentAppKind" }
+                  verified: { type: boolean, description: "The app is one Outflare recognises (any app but unknown), or the server's operator checked it. Otherwise it may only read." }
                   redirect_host: { type: string, description: Where the person is sent back to after approving. }
                   resource: { type: string, description: The MCP server the app gets access to. }
                   workspaces:
@@ -4717,6 +4720,178 @@ paths:
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/Connector" } }
         default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/tracking-taxonomy:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: getTrackingTaxonomy
+      x-outflare-access: { scope: analytics.read }
+      summary: The channels campaign links can be in
+      description: |
+        Scope: analytics.read. The workspace-wide tagging scheme: each channel, the utm_medium its links get and the
+        usual utm_source values. Spend entries use the same channel ids, so cost and credit line up per channel.
+      tags: [analytics]
+      responses:
+        "200":
+          description: The channels, in display order.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [channels]
+                properties:
+                  channels: { type: array, items: { $ref: "#/components/schemas/TrackingChannel" } }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/tracking-campaigns:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listTrackingCampaigns
+      x-outflare-access: { scope: analytics.read }
+      summary: List campaigns, newest first
+      description: |
+        Scope: analytics.read. Campaigns fix the tags every link in them carries: channel, source, medium, the
+        utm_campaign slug and the ofc code. Includes the ones modules made for their sequences, broadcasts, posts and
+        partners (object_kind). The latest 1000.
+      tags: [analytics]
+      parameters:
+        - { name: status, in: query, schema: { type: string, enum: [active, archived] } }
+        - { name: channel, in: query, schema: { $ref: "#/components/schemas/TrackingChannelID" } }
+        - { name: brand, in: query, description: A brand's id or handle., schema: { type: string } }
+      responses:
+        "200":
+          description: Campaigns.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/TrackingCampaign" } }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createTrackingCampaign
+      x-outflare-access: { scope: analytics.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Create a campaign
+      description: |
+        Scope: analytics.manage. The slug (utm_campaign) comes from the name unless given; the medium comes from the
+        channel; the source is cleaned (fb and facebook.com become facebook). Slug, channel and source can't change
+        later, because links already shared carry them. Then make links with POST .../links.
+      tags: [analytics]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/TrackingCampaignInput" }
+      responses:
+        "201":
+          description: The campaign.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TrackingCampaign" }
+        "400": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/tracking-campaigns/{id}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, description: "The campaign's id, slug or ofc code.", schema: { type: string } }
+    get:
+      operationId: getTrackingCampaign
+      x-outflare-access: { scope: analytics.read }
+      summary: Get a campaign
+      description: "Scope: analytics.read. Look one up by its ofc code to see which campaign a visit came from."
+      tags: [analytics]
+      responses:
+        "200":
+          description: The campaign.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TrackingCampaign" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateTrackingCampaign
+      x-outflare-access: { scope: analytics.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Rename, rebrand, change the landing page of, archive or restore a campaign
+      description: "Scope: analytics.manage. Slug, channel and source can't change: make another campaign instead. Archived campaigns take no new links; links already shared keep working."
+      tags: [analytics]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/TrackingCampaignInput" }
+      responses:
+        "200":
+          description: The campaign.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TrackingCampaign" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/tracking-campaigns/{id}/links:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, description: "The campaign's id, slug or ofc code.", schema: { type: string } }
+    get:
+      operationId: listTrackingLinks
+      x-outflare-access: { scope: analytics.read }
+      summary: List a campaign's links, newest first
+      description: "Scope: analytics.read. Every link made in the campaign, with its tagged address."
+      tags: [analytics]
+      responses:
+        "200":
+          description: Links.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/TrackingLink" } }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createTrackingLink
+      x-outflare-access: { scope: analytics.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Make a tagged link
+      description: |
+        Scope: analytics.manage. Tags a page with the campaign's utm_source, utm_medium and utm_campaign, the content and
+        term given, and its ofc code. Tags the page already had are replaced; other parameters stay. The same page,
+        content and term give back the link already made (200). Links go straight to the page, with no redirect: the
+        website tracking snippet reads the tags there.
+      tags: [analytics]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                url: { type: string, maxLength: 2000, description: "The page, such as https://example.com/pricing. The campaign's landing page when left out." }
+                content: { type: string, maxLength: 80, description: "utm_content: which ad, button or post, such as hero-cta. Cleaned to lowercase." }
+                term: { type: string, maxLength: 80, description: "utm_term: the keyword, for search ads." }
+      responses:
+        "201":
+          description: The new link.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TrackingLink" }
+        "200":
+          description: The same link, made before.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TrackingLink" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/analytics:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
@@ -7063,10 +7238,10 @@ paths:
       operationId: listFixes
       x-outflare-access: { scope: seo.read, brand_limited: true }
       summary: List the fixes list
-      description: "Scope: seo.read (the list holds SEO fixes so far). One list of work for the whole workspace, shared by people and agents: in progress first, then open, worst and biggest first. Each fix has a source (what found it), a subject (what it is about) and a rule with why it matters and how to fix it. Site audits (source seo_audit) keep one fix per rule and URL template of a site: each finished crawl recounts the pages, a fix the next complete crawl no longer finds is done, confirmed by that crawl, and one that comes back opens again. Search intelligence (source seo_keywords) keeps one fix per rule and page with a target (its keyword missing from the page's title, H1 or description, checked when the target changes and after every crawl), per search several pages compete for (checked after every Search Console sync) and per keyword several pages target. AI visibility (source ai_visibility) keeps one fix per prompt whose AI answers never name the brand; a run whose answers name it confirms it done. Social watches (source social) keep a fix for posts waiting for a reply and one for drafts waiting for a person's approval; each is done when nothing is left."
+      description: "Scope: seo.read (the list holds SEO fixes so far). One list of work for the whole workspace, shared by people and agents: in progress first, then open, worst and biggest first. Each fix has a source (what found it), a subject (what it is about) and a rule with why it matters and how to fix it. Site audits (source seo_audit) keep one fix per rule and URL template of a site: each finished crawl recounts the pages, a fix the next complete crawl no longer finds is done, confirmed by that crawl, and one that comes back opens again. Search intelligence (source seo_keywords) keeps one fix per rule and page with a target (its keyword missing from the page's title, H1 or description, checked when the target changes and after every crawl), per search several pages compete for (checked after every Search Console sync) and per keyword several pages target. AI visibility (source ai_visibility) keeps one fix per prompt whose AI answers never name the brand; a run whose answers name it confirms it done. Social watches (source social) keep a fix for posts waiting for a reply and one for drafts waiting for a person's approval; each is done when nothing is left. Link opportunities (source seo_links) are suggestions, checked with each weekly links read and after a link review: strong links lost in the last 90 days (link_reclaim, one per linking domain), live links to pages the latest crawl found broken (link_broken_target, one per page), strong domains linking to 2 or more tracked competitors but not to you (link_gap_domain), and toxic links nobody reviewed (toxic_links). Outflare never contacts a site or disavows a link on its own."
       tags: [fixes]
       parameters:
-        - { name: source, in: query, schema: { type: string, enum: [seo_audit, seo_keywords, ai_visibility, social] } }
+        - { name: source, in: query, schema: { type: string, enum: [seo_audit, seo_keywords, ai_visibility, social, seo_links] } }
         - { name: subject_id, in: query, description: "One subject's fixes, such as an SEO site's id.", schema: { type: string, format: uuid } }
         - { name: status, in: query, schema: { type: string, enum: [open, in_progress, done, ignored] } }
         - { name: severity, in: query, schema: { type: string, enum: [error, warning, notice] } }
@@ -9122,9 +9297,16 @@ paths:
       operationId: listIntegrations
       x-outflare-access: { scope: integrations.read, brand_limited: true }
       summary: List connected accounts
-      description: "Scope: integrations.read. Credentials are never returned."
+      description: |
+        Scope: integrations.read. Credentials are never returned. With
+        `brand`, only the connections that brand uses: its own, and the
+        workspace's shared with it, leaving out a shared connection when the
+        brand has its own to the same tool. `brand=none` lists the
+        workspace connections every brand shares. Someone kept to some
+        brands sees only connections their brands use.
       tags: [connectors]
       parameters:
+        - { $ref: "#/components/parameters/Brand" }
         - { name: connector, in: query, schema: { type: string }, description: Only this connector id. }
         - { name: category, in: query, schema: { $ref: "#/components/schemas/ConnectorCategory" } }
       responses:
@@ -9162,6 +9344,8 @@ paths:
               properties:
                 connector: { type: string, example: zerobounce }
                 name: { type: string, description: "Defaults to the connector's name, numbered if taken." }
+                brand_id: { type: [string, "null"], description: "Make it this brand's own connection (id or handle): only that brand uses it, in place of the workspace's connections to the same tool. Default: a workspace connection." }
+                brand_ids: { type: array, items: { type: string }, description: "Share a workspace connection with only these brands (ids or handles). Default: every brand. Not with brand_id." }
                 credentials:
                   type: object
                   additionalProperties: { type: string }
@@ -9201,8 +9385,8 @@ paths:
       operationId: updateIntegration
       x-outflare-access: { scope: integrations.manage }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
-      summary: Rename, replace the API key, or change settings
-      description: "Scope: integrations.manage. New credentials are tested before they replace the old ones."
+      summary: Rename, replace the API key, change settings, or share with brands
+      description: "Scope: integrations.manage. New credentials are tested before they replace the old ones. brand_id moves the connection to one brand (null: back to the workspace); brand_ids picks the brands a workspace connection is shared with (empty: every brand)."
       tags: [connectors]
       requestBody:
         required: true
@@ -9214,6 +9398,8 @@ paths:
                 name: { type: string }
                 credentials: { type: object, additionalProperties: { type: string } }
                 config: { type: object, additionalProperties: true }
+                brand_id: { type: [string, "null"], description: "The brand whose own connection this is (id or handle), or null for a workspace connection. Moving it to a brand stops sharing it with others." }
+                brand_ids: { type: array, items: { type: string }, description: "The brands a workspace connection is shared with (ids or handles); empty is every brand." }
       responses:
         "200":
           description: Updated.
@@ -9408,6 +9594,7 @@ paths:
         - { name: name, in: query, schema: { type: string } }
         - { name: format, in: query, schema: { type: string, enum: [json] } }
         - { name: return, in: query, description: "The app page to land on afterwards. Default: Connectors.", schema: { type: string, enum: [get-started] } }
+        - { name: brand, in: query, description: "Make it this brand's own connection (id or handle). Default: a workspace connection shared with every brand.", schema: { type: string } }
       responses:
         "200":
           description: The sign-in link (format=json).
@@ -10760,10 +10947,13 @@ paths:
   /v1/connect/lookup:
     post:
       operationId: connectLookup
+      x-outflare-access: { signed_in: true }
       summary: What a connect link is for
-      description: Used by the link's page. No login; the token from the link is the authority.
+      description: |
+        Used by the link's page. The link opens only for a signed-in member of the workspace that asked whose role
+        connects services (owner or admin); anyone else gets 403 (`not_a_member` outside the workspace), with nothing
+        about the workspace. API tokens are refused.
       tags: [connectors]
-      security: []
       requestBody:
         required: true
         content:
@@ -10783,17 +10973,21 @@ paths:
                   name: { type: string }
                   reason: { type: string }
                   requested_by: { type: string, enum: [agent, person] }
+                  requested_by_email:
+                    type: [string, "null"]
+                    description: The account email of the person who asked, or of the person whose token or app asked. Null when there is none (such as Outflare's own agent).
                   expires_at: { type: string, format: date-time }
+        "403": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         "410": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
   /v1/connect/complete:
     post:
       operationId: connectComplete
+      x-outflare-access: { signed_in: true }
       summary: Finish a connect link with an API key
-      description: Tests the credentials and saves the integration. The link then stops working.
+      description: Tests the credentials and saves the integration. The link then stops working. Signed-in members who connect services only, as for connectLookup.
       tags: [connectors]
-      security: []
       requestBody:
         required: true
         content:
@@ -10825,9 +11019,10 @@ paths:
   /v1/connect/oauth:
     post:
       operationId: connectOAuth
+      x-outflare-access: { signed_in: true }
       summary: Start the OAuth sign-in for a connect link
+      description: Signed-in members who connect services only, as for connectLookup.
       tags: [connectors]
-      security: []
       requestBody:
         required: true
         content:
@@ -12430,6 +12625,7 @@ paths:
       x-outflare-access: { scope: customers.read }
       summary: List site keys
       description: "Scope: customers.read. The keys websites send page views with, each with its snippet to paste into the site."
+      parameters: [{ $ref: "#/components/parameters/Brand" }]
       tags: [records]
       responses:
         "200":
@@ -13973,6 +14169,7 @@ paths:
         Postmark or Resend integration: connect one with `POST
         .../integrations` and it appears here, with delivery events being set
         up on its own. The default provider sends when a send names none.
+      parameters: [{ $ref: "#/components/parameters/Brand" }]
       tags: [emails]
       responses:
         "200":
@@ -14215,6 +14412,7 @@ paths:
       description: "Scope: emails.read."
       tags: [emails]
       parameters:
+        - { $ref: "#/components/parameters/Brand" }
         - { name: status, in: query, schema: { type: string, enum: [active, archived] } }
       responses:
         "200":
@@ -14483,6 +14681,7 @@ paths:
       description: "Scope: emails.read. The latest 200."
       tags: [emails]
       parameters:
+        - { $ref: "#/components/parameters/Brand" }
         - { name: status, in: query, schema: { $ref: "#/components/schemas/EmailBroadcastStatus" } }
       responses:
         "200":
@@ -14655,6 +14854,7 @@ paths:
       description: "Scope: emails.read. The latest 200; archived journeys only with status=archived."
       tags: [emails]
       parameters:
+        - { $ref: "#/components/parameters/Brand" }
         - { name: status, in: query, schema: { $ref: "#/components/schemas/JourneyStatus" } }
       responses:
         "200":
@@ -14913,6 +15113,7 @@ paths:
       description: "Scope: emails.read. Page with cursor."
       tags: [emails]
       parameters:
+        - { $ref: "#/components/parameters/Brand" }
         - { $ref: "#/components/parameters/Cursor" }
         - { $ref: "#/components/parameters/Fields" }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
@@ -17549,6 +17750,58 @@ components:
         sent_30d: { type: integer, description: "Emails in this topic in the last 30 days, not counting tests." }
         created_at: { type: string, format: date-time }
         updated_at: { type: string, format: date-time }
+    TrackingChannelID:
+      type: string
+      enum: [paid_ads, organic_social, reddit, outbound_email, lifecycle_email, affiliates, referral, seo, ai_answers]
+    TrackingChannel:
+      type: object
+      required: [id, label, medium, sources]
+      properties:
+        id: { $ref: "#/components/schemas/TrackingChannelID" }
+        label: { type: string }
+        medium: { type: string, description: The utm_medium every link in the channel gets. }
+        sources: { type: array, items: { type: string }, description: "The usual utm_source values, most common first. Any other source is allowed." }
+    TrackingCampaign:
+      type: object
+      required: [id, name, slug, code, channel, source, medium, brand_id, object_kind, object_id, landing_url, landing_link, status, links, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        slug: { type: string, description: "utm_campaign. It never changes." }
+        code: { type: string, description: "ofc: the campaign's short code. It names the campaign even when someone edits the UTM tags." }
+        channel: { $ref: "#/components/schemas/TrackingChannelID" }
+        source: { type: string, description: utm_source. }
+        medium: { type: string, description: "utm_medium, from the channel." }
+        brand_id: { type: [string, "null"], format: uuid }
+        object_kind: { type: string, description: "What made it: '' by hand, or the module object it belongs to, such as email_broadcast or sequence." }
+        object_id: { type: string }
+        landing_url: { type: string, description: "Where links go when no page is given; '' for none." }
+        landing_link: { type: string, description: "The landing page with the campaign's tags, ready to share; '' without a landing page." }
+        status: { type: string, enum: [active, archived] }
+        links: { type: integer, description: Links made in it. }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    TrackingCampaignInput:
+      type: object
+      properties:
+        name: { type: string, maxLength: 120 }
+        slug: { type: string, maxLength: 80, description: "utm_campaign: lowercase letters, digits and hyphens. From the name when left out. Create only." }
+        channel: { $ref: "#/components/schemas/TrackingChannelID" }
+        source: { type: string, maxLength: 60, description: "utm_source, such as google, linkedin or a partner's code. Create only; a channel with one usual source (reddit) fills it in." }
+        brand: { type: [string, "null"], description: "A brand's id or handle; empty or null for none." }
+        landing_url: { type: string, maxLength: 2000, description: "The page links go to by default; '' for none." }
+        status: { type: string, enum: [active, archived], description: Update only. }
+    TrackingLink:
+      type: object
+      required: [id, campaign_id, url, content, term, tagged_url, created_at]
+      properties:
+        id: { type: string, format: uuid }
+        campaign_id: { type: string, format: uuid }
+        url: { type: string, description: The page, without tags. }
+        content: { type: string, description: "utm_content; '' for none." }
+        term: { type: string, description: "utm_term; '' for none." }
+        tagged_url: { type: string, description: The link to share. }
+        created_at: { type: string, format: date-time }
     EmailBroadcastStatus: { type: string, enum: [draft, scheduled, sending, sent, cancelled, failed] }
     EmailBroadcastAudience:
       type: object
@@ -18432,10 +18685,12 @@ components:
         url: { type: string, description: The one-time link. Only in the answer to POST. }
     Integration:
       type: object
-      required: [id, connector, auth_method, connector_name, category, capabilities, name, status, account, config, last_checked_at, last_error, created_at, updated_at]
+      required: [id, connector, auth_method, connector_name, category, capabilities, name, status, account, config, brand_id, brand_ids, last_checked_at, last_error, created_at, updated_at]
       properties:
         id: { type: string, format: uuid }
         connector: { type: string }
+        brand_id: { type: [string, "null"], format: uuid, description: "The brand whose own connection this is: only that brand uses it, in place of the workspace's connections to the same tool. Null: a workspace connection." }
+        brand_ids: { type: array, items: { type: string, format: uuid }, description: "The brands a workspace connection is shared with. Empty: every brand." }
         auth_method: { type: string, enum: [api_key, oauth2], description: How it was connected. Pasting new credentials with PATCH switches a signed-in connection to api_key. }
         connector_name: { type: string }
         category: { $ref: "#/components/schemas/ConnectorCategory" }
@@ -20034,7 +20289,7 @@ components:
       required: [id, source, subject, brand_id, rule, group, status, assignee, note, count, unit, found_by, last_found_by, confirmed_by, fixed_at, created_at, updated_at]
       properties:
         id: { type: string, format: uuid }
-        source: { type: string, enum: [seo_audit, seo_keywords, ai_visibility, social], description: "What found it: seo_audit is a site audit's crawl issues; seo_keywords is search intelligence (a page's keyword target, internal links worth adding, pages competing for one search, pages sharing a target keyword, and regressions such as a drop in clicks, rank or conversions); ai_visibility is AI answers that leave the brand out." }
+        source: { type: string, enum: [seo_audit, seo_keywords, ai_visibility, social, seo_links], description: "What found it: seo_audit is a site audit's crawl issues; seo_keywords is search intelligence (a page's keyword target, internal links worth adding, pages competing for one search, pages sharing a target keyword, and regressions such as a drop in clicks, rank or conversions); ai_visibility is AI answers that leave the brand out; social is social watches' posts and drafts; seo_links is link opportunities from backlinks, their spam scores and competitors' links." }
         subject:
           type: object
           required: [type, id]
@@ -21005,7 +21260,7 @@ components:
       enum: [owner, admin, operator, viewer]
     Scope:
       type: string
-      enum: [workspace.read, workspace.manage, context.manage, members.read, members.manage, tokens.manage, audit.read, mailboxes.read, mailboxes.manage, leads.read, leads.manage, suppressions.manage, sequences.read, sequences.manage, inbox.read, inbox.manage, integrations.read, integrations.manage, outcomes.read, outcomes.manage, projects.read, projects.manage, infrastructure.read, infrastructure.manage, infrastructure.approve, analytics.read, missions.read, missions.run, missions.approve, seo.read, seo.manage, social.read, social.manage, social.post, webhooks.read, webhooks.manage, emails.read, emails.send, emails.manage, customers.read, customers.manage, catalog.manage]
+      enum: [workspace.read, workspace.manage, context.manage, members.read, members.manage, tokens.manage, audit.read, mailboxes.read, mailboxes.manage, leads.read, leads.manage, suppressions.manage, sequences.read, sequences.manage, inbox.read, inbox.manage, integrations.read, integrations.manage, outcomes.read, outcomes.manage, projects.read, projects.manage, infrastructure.read, infrastructure.manage, infrastructure.approve, analytics.read, analytics.manage, missions.read, missions.run, missions.approve, seo.read, seo.manage, social.read, social.manage, social.post, webhooks.read, webhooks.manage, emails.read, emails.send, emails.manage, customers.read, customers.manage, catalog.manage]
     Workspace:
       type: object
       required: [id, name, slug, test]
@@ -21100,10 +21355,13 @@ components:
       description: The app, told from where it sends people back to (not from the name it registered with). local is an app on the person's computer (a loopback address); unknown is any other site.
     AgentApp:
       type: object
-      required: [id, token_id, name, app, uri, scopes, available_scopes, user_id, user_name, created_at, last_used_at]
+      required: [id, token_id, client_id, name, app, verified, uri, scopes, available_scopes, require_mission, user_id, user_name, created_at, last_used_at]
       properties:
         id: { type: string, format: uuid }
         token_id: { type: string, format: uuid, description: The API token the app runs on. }
+        client_id: { type: string, description: "The id the app registered with, which the server's operator verifies it by (`outflare verify-app <client_id>`)." }
+        verified: { type: boolean, description: "The app is one Outflare recognises (any app but unknown), or the server's operator checked it. Otherwise it may only read and available_scopes is empty." }
+        require_mission: { type: boolean, description: "The app makes changes only inside a mission a person approved (the Outflare-Mission header); other writes get 403 mission_required. On for apps connected with OAuth." }
         name: { type: string, description: The name the app registered with. }
         app: { $ref: "#/components/schemas/AgentAppKind" }
         uri: { type: string }
