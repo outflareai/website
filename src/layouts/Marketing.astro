@@ -33,6 +33,7 @@ const footer = [
 			['SEO', '/docs/integrations/seo/'],
 			['Email campaigns', '/docs/guides/sequences/'],
 			['Roadmap', '/docs/project/roadmap/'],
+			['Changelog', '/changelog/'],
 		],
 	},
 	{
@@ -93,6 +94,7 @@ const footer = [
 			// Dark by default, like the app and the docs. Shares the docs' saved choice.
 			try { document.documentElement.dataset.theme = localStorage.getItem('starlight-theme') === 'light' ? 'light' : 'dark'; } catch {}
 		</script>
+		<slot name="head" />
 		<SignedIn />
 		<Analytics />
 	</head>

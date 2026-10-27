@@ -24,6 +24,10 @@ Every action a visitor takes that tells us something (a sign-up, sign-in, GitHub
 
 Docs describe what Outflare does today; see "Keeping the docs honest" in the README. An engine change that adds a feature gets a matching docs change here.
 
+## Changelog
+
+`/changelog/` has one entry per day (UTC) for what reached app.outflare.ai, named by the date (`2026.10.27`). Outflare Cloud's deploy pipeline writes `src/data/changelog/<date>.json` and the Markdown record in `changelog/`, and opens a pull request that merges itself once CI passes. A day is `in-progress` until midnight UTC, then `final`; never edit a final day, add a correction to a later one. Lines are tagged **Open source** (in the engine, so self-hosted from the next release) or **Cloud** (only on app.outflare.ai). Cloud lines never link pull requests, and `scripts/changelog.mjs check` fails on anything that looks private. Self-hosted versions stay the engine's tags.
+
 ## Docs after the deploy (hard rule)
 
 This site deploys on every push to main (Cloudflare Pages), but app.outflare.ai deploys separately, after the engine and Cloud pull requests merge (the engine's and Cloud's AGENTS.md). So docs can go live before the feature. To keep them in order:
