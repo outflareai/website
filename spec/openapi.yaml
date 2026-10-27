@@ -6267,6 +6267,32 @@ paths:
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/seo-sites/{site}/cannibalisation:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: site, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getSiteCannibalisation
+      x-outflare-access: { scope: seo.read, brand_limited: true }
+      summary: List the searches a site's pages compete for
+      description: "Scope: seo.read. Searches Google shows several of the site's pages for over the 28 days to the newest day Search Console sent: shown at least 100 times, with two or more pages each getting at least a tenth of the impressions (10 or more) at an average position of 30 or better. Searches naming the site's brand are left out. Each has the page to keep: the one that targets the search, otherwise the one with the most clicks. The 50 most shown are fixes on the fixes list (source seo_keywords, rule keyword_cannibalised), checked again after every sync."
+      tags: [seo]
+      parameters:
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
+      responses:
+        "200":
+          description: Competing searches, the most shown first.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [source, data]
+                properties:
+                  source: { oneOf: [{ $ref: "#/components/schemas/SearchSource" }, { type: "null" }] }
+                  data: { type: array, items: { $ref: "#/components/schemas/SearchCompetition" } }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/seo-sites/{site}/targets:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
@@ -6430,7 +6456,7 @@ paths:
       operationId: listFixes
       x-outflare-access: { scope: seo.read, brand_limited: true }
       summary: List the fixes list
-      description: "Scope: seo.read (the list holds SEO fixes so far). One list of work for the whole workspace, shared by people and agents: in progress first, then open, worst and biggest first. Each fix has a source (what found it), a subject (what it is about) and a rule with why it matters and how to fix it. Site audits (source seo_audit) keep one fix per rule and URL template of a site: each finished crawl recounts the pages, a fix the next complete crawl no longer finds is done, confirmed by that crawl, and one that comes back opens again. Keyword targets (source seo_keywords) keep one fix per rule and page with a target: a target's keyword missing from the page's title, H1 or description, checked when the target changes and after every crawl. AI visibility (source ai_visibility) keeps one fix per prompt whose AI answers never name the brand; a run whose answers name it confirms it done. Social watches (source social) keep a fix for posts waiting for a reply and one for drafts waiting for a person's approval; each is done when nothing is left."
+      description: "Scope: seo.read (the list holds SEO fixes so far). One list of work for the whole workspace, shared by people and agents: in progress first, then open, worst and biggest first. Each fix has a source (what found it), a subject (what it is about) and a rule with why it matters and how to fix it. Site audits (source seo_audit) keep one fix per rule and URL template of a site: each finished crawl recounts the pages, a fix the next complete crawl no longer finds is done, confirmed by that crawl, and one that comes back opens again. Search intelligence (source seo_keywords) keeps one fix per rule and page with a target (its keyword missing from the page's title, H1 or description, checked when the target changes and after every crawl), per search several pages compete for (checked after every Search Console sync) and per keyword several pages target. AI visibility (source ai_visibility) keeps one fix per prompt whose AI answers never name the brand; a run whose answers name it confirms it done. Social watches (source social) keep a fix for posts waiting for a reply and one for drafts waiting for a person's approval; each is done when nothing is left."
       tags: [fixes]
       parameters:
         - { name: source, in: query, schema: { type: string, enum: [seo_audit, seo_keywords, ai_visibility, social] } }
@@ -7758,6 +7784,193 @@ paths:
         "404": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/social/accounts:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listSocialAccounts
+      x-outflare-access: { scope: social.read, brand_limited: true }
+      summary: List the brand's social accounts
+      description: |
+        Scope: social.read. The pages and profiles the workspace's own X and
+        LinkedIn connections reach, with their latest followers and the
+        change over 7 and 28 days. Outflare finds them when a connection
+        signs in and reads them every day (X once a day, LinkedIn twice).
+      tags: [social]
+      parameters:
+        - { name: channel, in: query, schema: { $ref: "#/components/schemas/SocialAccountChannel" } }
+        - { name: status, in: query, schema: { type: string, enum: [active, paused, disconnected] } }
+        - { $ref: "#/components/parameters/Brand" }
+      responses:
+        "200":
+          description: Accounts.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/SocialAccount" } }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/social/accounts/sync:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    post:
+      operationId: syncSocialAccounts
+      x-outflare-access: { scope: social.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Read social accounts now
+      description: |
+        Scope: social.manage. Queues a read of every X and LinkedIn
+        connection now: it finds new pages and profiles and reads the
+        accounts that are due. Answers connector_needed (409) when none is
+        connected.
+      tags: [social]
+      responses:
+        "202":
+          description: Queued, or held in a mission.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: object
+                    required: [queued, connections]
+                    properties:
+                      queued: { type: boolean, const: true }
+                      connections: { type: integer, description: Connections queued. }
+                  - { $ref: "#/components/schemas/MissionHeld" }
+        "403": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/social/accounts/{id}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getSocialAccount
+      x-outflare-access: { scope: social.read, brand_limited: true }
+      summary: Get a social account
+      description: "Scope: social.read."
+      tags: [social]
+      responses:
+        "200":
+          description: The account.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SocialAccount" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateSocialAccount
+      x-outflare-access: { scope: social.manage, brand_limited: true }
+      summary: Put a social account on a brand, or pause it
+      description: |
+        Scope: social.manage. brand_id puts the account and its posts on a
+        brand (null: shared by every brand). status paused stops reading it;
+        active starts again. A disconnected account comes back when a
+        connection reaches it again.
+      tags: [social]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                brand_id: { type: [string, "null"], description: "A brand id or handle, or null." }
+                status: { type: string, enum: [active, paused] }
+      responses:
+        "200":
+          description: The account.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SocialAccount" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/social/accounts/{id}/days:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: listSocialAccountDays
+      x-outflare-access: { scope: social.read, brand_limited: true }
+      summary: List an account's followers day by day
+      description: "Scope: social.read. One row per day the account was read, oldest first. A count the channel does not report is null."
+      tags: [social]
+      parameters:
+        - { name: days, in: query, schema: { type: integer, minimum: 1, maximum: 365, default: 90 } }
+      responses:
+        "200":
+          description: Days.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/SocialAccountDay" } }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/social/posts:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listSocialPosts
+      x-outflare-access: { scope: social.read, brand_limited: true }
+      summary: List the brand's own social posts and how they did
+      description: |
+        Scope: social.read. The accounts' own posts from the last `days`
+        days (default 28) with their latest counts. LinkedIn gives company
+        pages' posts; it does not let apps list a person's own posts. sort
+        engagements or impressions lists the best first.
+      tags: [social]
+      parameters:
+        - { name: channel, in: query, schema: { $ref: "#/components/schemas/SocialAccountChannel" } }
+        - { name: account_id, in: query, schema: { type: string, format: uuid } }
+        - { name: days, in: query, schema: { type: integer, minimum: 1, maximum: 365, default: 28 } }
+        - { name: sort, in: query, schema: { type: string, enum: [recent, engagements, impressions], default: recent } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
+        - { $ref: "#/components/parameters/Brand" }
+      responses:
+        "200":
+          description: Posts.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/SocialPost" } }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/social/growth:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: getSocialGrowth
+      x-outflare-access: { scope: social.read, brand_limited: true }
+      summary: Get social growth over a period
+      description: |
+        Scope: social.read. Per channel: active accounts, followers now and
+        the change over the period, and the accounts' own posts in the
+        period with their impressions, engagements (likes, replies, reposts
+        and quotes), clicks and engagement rate (engagements over
+        impressions, from posts that report impressions). Also total
+        followers day by day.
+      tags: [social]
+      parameters:
+        - { name: days, in: query, schema: { type: integer, minimum: 1, maximum: 365, default: 28 } }
+        - { $ref: "#/components/parameters/Brand" }
+      responses:
+        "200":
+          description: Growth.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SocialGrowth" }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/integrations/{id}/sign-in:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
@@ -7770,16 +7983,18 @@ paths:
         Scope: integrations.manage. For connections whose own app (client id
         and secret) signs in to an account, such as Reddit: redirects to the
         service's consent page, where a person signs in to the brand's
-        account. Register the `redirect_uri` from GET /social (this server's
-        /v1/integrations/oauth/callback) on the app first. Afterwards the
-        browser lands on the Connectors page, or on the Reddit page with
-        `return=reddit`, and the connection can act as that account. With
+        account (X uses PKCE). Register the `redirect_uri` from GET /social
+        (this server's /v1/integrations/oauth/callback) on the app first.
+        Afterwards the browser lands on the Connectors page, or on the
+        Reddit page with `return=reddit` or the Social page with
+        `return=social`, and the connection can act as that account. An X
+        sign-in also starts reading the account's followers and posts. With
         `format=json` it returns the link instead, for an agent to hand to a
         person.
       tags: [connectors]
       parameters:
         - { name: format, in: query, schema: { type: string, enum: [json] } }
-        - { name: return, in: query, description: "The app page to land on afterwards. Default: Connectors.", schema: { type: string, enum: [get-started, reddit] } }
+        - { name: return, in: query, description: "The app page to land on afterwards. Default: Connectors.", schema: { type: string, enum: [get-started, reddit, social] } }
       responses:
         "200":
           description: The sign-in link (format=json).
@@ -17322,6 +17537,26 @@ components:
         previous_verdict: { type: string }
         verdict_changed_at: { type: [string, "null"], format: date-time }
         inspected_at: { type: string, format: date-time }
+    SearchCompetition:
+      type: object
+      required: [query, clicks, impressions, pages, keep]
+      properties:
+        query: { type: string, example: cheap proxies }
+        clicks: { type: integer }
+        impressions: { type: integer }
+        keep: { type: string, description: "The page to keep: the one that targets the search, otherwise the one with the most clicks." }
+        pages:
+          type: array
+          items:
+            type: object
+            required: [url, clicks, impressions, position, share, target]
+            properties:
+              url: { type: string }
+              clicks: { type: integer }
+              impressions: { type: integer }
+              position: { type: number }
+              share: { type: number, description: "The page's part of the search's impressions, 0 to 1." }
+              target: { type: boolean, description: Whether the search is the page's target keyword. }
     PageTarget:
       type: object
       required: [id, url, keyword, secondary, status, origin, checks, search, created_at, updated_at]
@@ -17981,6 +18216,97 @@ components:
         emailed: { type: integer, description: "Emails queued for it." }
         email_error: { type: [string, "null"], description: "Why it wasn't emailed, when it should have been." }
         created_at: { type: string, format: date-time }
+    SocialAccountChannel:
+      type: string
+      enum: [x, linkedin]
+      description: A channel whose pages and profiles Outflare reads.
+    SocialAccount:
+      type: object
+      description: A page or profile of the brand's own, reached through the workspace's own connection.
+      required: [id, channel, kind, brand_id, integration_id, external_id, handle, name, url, avatar_url, status, followers, following, posts,
+        followers_change_7d, followers_change_28d, last_synced_at, next_sync_at, last_error, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        channel: { $ref: "#/components/schemas/SocialAccountChannel" }
+        kind: { type: string, enum: [profile, page], description: "profile: an X account or a person's own LinkedIn profile. page: a company page." }
+        brand_id: { type: [string, "null"], format: uuid }
+        integration_id: { type: [string, "null"], format: uuid, description: The connection that reaches it. }
+        external_id: { type: string, description: "The channel's own id: an X user id or a LinkedIn URN.", example: "urn:li:organization:12345" }
+        handle: { type: string, example: northpeak }
+        name: { type: string, example: Northpeak }
+        url: { type: string }
+        avatar_url: { type: string }
+        status: { type: string, enum: [active, paused, disconnected], description: "active: read every day. paused: kept, not read. disconnected: its connection no longer reaches it." }
+        followers: { type: [integer, "null"], description: Null when the channel does not report it. }
+        following: { type: [integer, "null"] }
+        posts: { type: [integer, "null"] }
+        followers_change_7d: { type: [integer, "null"], description: Followers gained (negative for lost) over 7 days; null until there is a count that old. }
+        followers_change_28d: { type: [integer, "null"] }
+        last_synced_at: { type: [string, "null"], format: date-time }
+        next_sync_at: { type: string, format: date-time }
+        last_error: { type: [string, "null"] }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    SocialAccountDay:
+      type: object
+      required: [day, followers, following, posts]
+      properties:
+        day: { type: string, format: date }
+        followers: { type: [integer, "null"] }
+        following: { type: [integer, "null"] }
+        posts: { type: [integer, "null"] }
+    SocialPost:
+      type: object
+      description: One of the brand's own posts with its latest counts. A count the channel does not report is null.
+      required: [id, account_id, channel, brand_id, external_id, url, body, posted_at, impressions, likes, replies, reposts, quotes, bookmarks, clicks,
+        engagements, engagement_rate, metrics_at]
+      properties:
+        id: { type: string, format: uuid }
+        account_id: { type: string, format: uuid }
+        channel: { $ref: "#/components/schemas/SocialAccountChannel" }
+        brand_id: { type: [string, "null"], format: uuid }
+        external_id: { type: string }
+        url: { type: string }
+        body: { type: string }
+        posted_at: { type: string, format: date-time }
+        impressions: { type: [integer, "null"] }
+        likes: { type: [integer, "null"] }
+        replies: { type: [integer, "null"], description: "Replies on X, comments on LinkedIn." }
+        reposts: { type: [integer, "null"], description: "Reposts on X, shares on LinkedIn." }
+        quotes: { type: [integer, "null"] }
+        bookmarks: { type: [integer, "null"] }
+        clicks: { type: [integer, "null"], description: "Link clicks on X, clicks on LinkedIn." }
+        engagements: { type: integer, description: Likes, replies, reposts and quotes. }
+        engagement_rate: { type: [number, "null"], description: Engagements over impressions; null without impressions. }
+        metrics_at: { type: [string, "null"], format: date-time }
+    SocialGrowth:
+      type: object
+      required: [days, channels, followers_by_day]
+      properties:
+        days: { type: integer }
+        channels:
+          type: array
+          items:
+            type: object
+            required: [channel, accounts, followers, followers_change, posts, impressions, engagements, clicks, engagement_rate]
+            properties:
+              channel: { $ref: "#/components/schemas/SocialAccountChannel" }
+              accounts: { type: integer }
+              followers: { type: integer }
+              followers_change: { type: [integer, "null"], description: Over the period; null until there are counts that old. }
+              posts: { type: integer }
+              impressions: { type: integer }
+              engagements: { type: integer }
+              clicks: { type: integer }
+              engagement_rate: { type: [number, "null"] }
+        followers_by_day:
+          type: array
+          items:
+            type: object
+            required: [day, followers]
+            properties:
+              day: { type: string, format: date }
+              followers: { type: integer }
     SocialChannel:
       type: string
       enum: [reddit]
@@ -18171,7 +18497,7 @@ components:
       required: [id, source, subject, brand_id, rule, group, status, assignee, note, count, unit, found_by, last_found_by, confirmed_by, fixed_at, created_at, updated_at]
       properties:
         id: { type: string, format: uuid }
-        source: { type: string, enum: [seo_audit, seo_keywords, ai_visibility, social], description: "What found it: seo_audit is a site audit's crawl issues; seo_keywords is search intelligence (a page's keyword target, one fix per rule and page); ai_visibility is AI answers that leave the brand out." }
+        source: { type: string, enum: [seo_audit, seo_keywords, ai_visibility, social], description: "What found it: seo_audit is a site audit's crawl issues; seo_keywords is search intelligence (a page's keyword target, pages competing for one search, pages sharing a target keyword); ai_visibility is AI answers that leave the brand out." }
         subject:
           type: object
           required: [type, id]
