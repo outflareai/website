@@ -239,6 +239,32 @@ paths:
                     type: array
                     items: { $ref: "#/components/schemas/ErrorCode" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/domain-connect:
+    get:
+      operationId: getDomainConnect
+      security: []
+      summary: Outflare's Domain Connect key and templates
+      description: "The public key this server signs Domain Connect requests with, to publish as TXT records at `key.host`, and the templates it applies (providerId outflare.ai). `ready` says whether the published key is this one. Nothing here is secret."
+      tags: [system]
+      responses:
+        "200":
+          description: The key and templates.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [provider_id, ready, key, templates]
+                properties:
+                  provider_id: { type: string }
+                  ready: { type: boolean }
+                  key:
+                    type: [object, "null"]
+                    required: [host, txt]
+                    properties:
+                      host: { type: string, example: _dck1.outflare.ai }
+                      txt: { type: array, items: { type: string } }
+                  templates: { type: array, items: { type: string } }
+        default: { $ref: "#/components/responses/Error" }
   /v1/openapi.yaml:
     get:
       operationId: getOpenAPI
@@ -577,6 +603,49 @@ paths:
       responses:
         "204": { description: Removed. It no longer signs you in. }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/me/community:
+    get:
+      operationId: getCommunityLinks
+      x-outflare-access: { signed_in: true }
+      summary: The "Star us on GitHub" and "Follow us on X" items
+      description: |
+        Two optional one-click items the app shows on Home and at the end of Get started. Nobody can check a star or a
+        follow, so opening a link ticks its item. Each person has their own. `links` is empty when the server's operator
+        turned them off (`OUTFLARE_COMMUNITY_LINKS=off`); "Follow us on X" is listed only when `OUTFLARE_FOLLOW_URL` is set.
+      tags: [access]
+      responses:
+        "200":
+          description: The items and which ones this person opened.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CommunityLinks" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateCommunityLinks
+      x-outflare-access: { signed_in: true }
+      summary: Tick a community item, or hide them
+      tags: [access]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                clicked:
+                  type: string
+                  description: The link the person just opened, one of the `id`s in `links`. Ticks its item.
+                hidden:
+                  type: boolean
+                  description: True hides the items for this person; false shows them again.
+      responses:
+        "200":
+          description: The items after the change.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CommunityLinks" }
+        "400": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
   /v1/auth/google/start:
     get:
@@ -2909,6 +2978,53 @@ paths:
       responses:
         "202":
           description: "Queued. Inside a mission, a MissionHeld answer when the call was held for approval or dry-run instead."
+          content:
+            application/json:
+              schema: { oneOf: [{ $ref: "#/components/schemas/Queued" }, { $ref: "#/components/schemas/MissionHeld" }] }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/tracking-domains/{id}/dns/approval:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getTrackingDomainDNSApproval
+      x-outflare-access: { scope: mailboxes.manage }
+      summary: Get a one-off approval link for a tracking domain's CNAME
+      description: "Scope: mailboxes.manage. Looks up the domain's DNS provider. When it supports Domain Connect and has Outflare's template, `url` takes the person to the provider's own screen to approve exactly these records once; Outflare keeps no access afterwards. Otherwise `reason` says why, and .../dns with a DNS host connection is the way."
+      tags: [tracking]
+      parameters:
+        - { name: return, in: query, description: "The app path the provider sends the browser back to, such as /acme/audits. Default: /.", schema: { type: string } }
+      responses:
+        "200":
+          description: Whether the provider can, and the link.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DNSApproval" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/tracking-domains/{id}/dns/approved:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: reportTrackingDomainDNSApproved
+      x-outflare-access: { scope: mailboxes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Report coming back from the DNS provider's approval
+      description: "Scope: mailboxes.manage. Call it when the provider sends the browser back. Without `error` Outflare starts looking for the records (it trusts DNS, not the redirect) and `dns_install` shows `provider`; with one nothing changes."
+      tags: [tracking]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/DNSApproved" }
+      responses:
+        "202":
+          description: "Noted. Inside a mission, a MissionHeld answer when the call was held for approval or dry-run instead."
           content:
             application/json:
               schema: { oneOf: [{ $ref: "#/components/schemas/Queued" }, { $ref: "#/components/schemas/MissionHeld" }] }
@@ -5828,8 +5944,8 @@ paths:
       description: |
         Scope: analytics.read. One answer per brand, from what is already stored (analytics syncs, SEO snapshots,
         site audits and the fixes list), so it calls and costs nothing. Each brand gets whole weeks (Monday to Sunday)
-        of branded search, search clicks and visitors, its SEO snapshots (domain rating, backlinks, referring domains),
-        and trends that compare the last 4 weeks with the 4 before. Branded search counts the search console queries
+        of branded search, search clicks and visitors, its SEO snapshots (domain rating, backlinks, referring domains,
+        organic traffic and keywords) up to today, `seo_status` saying why snapshots are missing, and trends that compare the last 4 weeks with the 4 before. Branded search counts the search console queries
         that contain one of the brand's `terms` (its name, handle and domain names); consoles hide rare queries, so it
         is a floor. Websites no brand claims are a shared entry with `brand: null`. Site audits and open fixes need
         seo.read as well.
@@ -6158,6 +6274,53 @@ paths:
       responses:
         "202":
           description: "Queued. Inside a mission, a MissionHeld answer when the call was held for approval or dry-run instead."
+          content:
+            application/json:
+              schema: { oneOf: [{ $ref: "#/components/schemas/Queued" }, { $ref: "#/components/schemas/MissionHeld" }] }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/seo-sites/{site}/dns/approval:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: site, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getSEOSiteDNSApproval
+      x-outflare-access: { scope: seo.manage, brand_limited: true }
+      summary: Get a one-off approval link for a site's DNS proof
+      description: "Scope: seo.manage. Looks up the domain's DNS provider. When it supports Domain Connect and has Outflare's template, `url` takes the person to the provider's own screen to approve exactly these records once; Outflare keeps no access afterwards. Otherwise `reason` says why, and .../dns with a DNS host connection is the way."
+      tags: [seo]
+      parameters:
+        - { name: return, in: query, description: "The app path the provider sends the browser back to, such as /acme/audits. Default: /.", schema: { type: string } }
+      responses:
+        "200":
+          description: Whether the provider can, and the link.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DNSApproval" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/seo-sites/{site}/dns/approved:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: site, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: reportSEOSiteDNSApproved
+      x-outflare-access: { scope: seo.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Report coming back from the DNS provider's approval
+      description: "Scope: seo.manage. Call it when the provider sends the browser back. Without `error` Outflare starts looking for the records (it trusts DNS, not the redirect) and `dns_install` shows `provider`; with one nothing changes."
+      tags: [seo]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/DNSApproved" }
+      responses:
+        "202":
+          description: "Noted. Inside a mission, a MissionHeld answer when the call was held for approval or dry-run instead."
           content:
             application/json:
               schema: { oneOf: [{ $ref: "#/components/schemas/Queued" }, { $ref: "#/components/schemas/MissionHeld" }] }
@@ -11356,6 +11519,185 @@ paths:
         "429": { $ref: "#/components/responses/Error" }
         "502": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/hooks/{token}:
+    parameters:
+      - { name: token, in: path, required: true, schema: { type: string }, description: "The secret part of a connection's address, starting ofh_." }
+    post:
+      operationId: receiveConnectionHook
+      security: []
+      summary: Where a connector posts its webhooks
+      description: |
+        Not called directly. Each connection with live updates has its own
+        address (GET .../integrations/{id}/hook); the connector posts its
+        events there. A signed delivery is checked against the connection's
+        signing secrets; repeats of an event are accepted and ignored. Events
+        are handled in the background and listed by GET .../hook-events.
+      tags: [connectors]
+      responses:
+        "200":
+          description: Accepted.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [received, duplicates]
+                properties:
+                  received: { type: integer, description: New events queued. }
+                  duplicates: { type: integer, description: Events already received, ignored. }
+        "400": { $ref: "#/components/responses/Error" }
+        "401": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "413": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/integrations/{id}/hook:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getConnectionHook
+      x-outflare-access: { scope: integrations.read }
+      summary: See a connection's live updates
+      description: "Scope: integrations.read. For a connection whose tool can send webhooks (capability hooks.receive, such as Geonode): its own address, whether Outflare registered it there or it is pasted, whether events arrive, and what the tool supports. status off means not set up. Not found for a connection that can't send them."
+      tags: [connectors]
+      responses:
+        "200":
+          description: Live updates.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ConnectionHook" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: setUpConnectionHook
+      x-outflare-access: { scope: integrations.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Turn on a connection's live updates
+      description: "Scope: integrations.manage. Makes the connection's address. When the tool's API allows (supports.auto), Outflare registers it there in the background: status is setting_up, then waiting until the first event, or failed with last_error. Otherwise paste url into the tool and, if it signs deliveries, its secret into PUT .../hook/signing-secret. Connections made while the server is reachable get this on their own. Already on, it only retries a failed registration. A server without a public https PUBLIC_URL answers conflict."
+      tags: [connectors]
+      responses:
+        "200":
+          description: Live updates.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ConnectionHook" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+    delete:
+      operationId: removeConnectionHook
+      x-outflare-access: { scope: integrations.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Turn off a connection's live updates
+      description: "Scope: integrations.manage. The address stops working at once, and a registration Outflare made at the tool is removed in the background. The event log stays."
+      tags: [connectors]
+      responses:
+        "204": { description: Turned off. }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/integrations/{id}/hook/rotate:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: rotateConnectionHook
+      x-outflare-access: { scope: integrations.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Give a connection a new webhook address
+      description: "Scope: integrations.manage. The old address stops at once. One Outflare registered is replaced at the tool in the background; a pasted one must be pasted again."
+      tags: [connectors]
+      responses:
+        "200":
+          description: Live updates, with the new address.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ConnectionHook" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/integrations/{id}/hook/signing-secret:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    put:
+      operationId: setConnectionHookSecret
+      x-outflare-access: { scope: integrations.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Save the signing secret for a pasted address
+      description: "Scope: integrations.manage. After pasting the address into the tool yourself, paste the signing secret it shows, so every delivery is checked. \"\" removes it, leaving the address as the only lock."
+      tags: [connectors]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [secret]
+              additionalProperties: false
+              properties:
+                secret: { type: string, maxLength: 500 }
+      responses:
+        "200":
+          description: Live updates.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ConnectionHook" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/hook-events:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listHookEvents
+      x-outflare-access: { scope: integrations.read }
+      summary: List the events connectors sent by webhook
+      description: "Scope: integrations.read. Newest first, from every connection or one (integration_id). queued waits for a worker, handled was used, ignored arrived but nothing in Outflare uses it yet, failed gave up (error_code says why; replay it). summary holds the ids, counts and statuses the tool reported. Bodies are kept 30 days for replays, events 90."
+      tags: [connectors]
+      parameters:
+        - { name: integration_id, in: query, schema: { type: string, format: uuid } }
+        - { name: status, in: query, schema: { type: string, enum: [queued, handled, ignored, failed] } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
+        - { name: before, in: query, schema: { type: string, format: date-time } }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
+      responses:
+        "200":
+          description: Events.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, next_before]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/HookEvent" } }
+                  next_before: { type: [string, "null"], format: date-time }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/hook-events/{event}/replay:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: event, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: replayHookEvent
+      x-outflare-access: { scope: integrations.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Handle a webhook event again
+      description: "Scope: integrations.manage. Queues the event as if it had just arrived, such as after fixing what made it fail."
+      tags: [connectors]
+      responses:
+        "202":
+          description: "Queued. Inside a mission, a MissionHeld answer when the call was held for approval or dry-run instead."
+          content:
+            application/json:
+              schema: { oneOf: [{ $ref: "#/components/schemas/Queued" }, { $ref: "#/components/schemas/MissionHeld" }] }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/integrations/{id}/payment-sync:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
@@ -15384,6 +15726,53 @@ paths:
         "404": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/email-provider-domains/{id}/dns/approval:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getEmailProviderDomainDNSApproval
+      x-outflare-access: { scope: emails.manage }
+      summary: Get a one-off approval link for a sending domain's records
+      description: "Scope: emails.manage. Looks up the domain's DNS provider. When it supports Domain Connect and has Outflare's template, `url` takes the person to the provider's own screen to approve exactly these records once; Outflare keeps no access afterwards. Otherwise `reason` says why, and .../dns with a DNS host connection is the way."
+      tags: [emails]
+      parameters:
+        - { name: return, in: query, description: "The app path the provider sends the browser back to, such as /acme/audits. Default: /.", schema: { type: string } }
+      responses:
+        "200":
+          description: Whether the provider can, and the link.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DNSApproval" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/email-provider-domains/{id}/dns/approved:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: reportEmailProviderDomainDNSApproved
+      x-outflare-access: { scope: emails.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Report coming back from the DNS provider's approval
+      description: "Scope: emails.manage. Call it when the provider sends the browser back. Without `error` Outflare starts looking for the records (it trusts DNS, not the redirect) and `dns_install` shows `provider`; with one nothing changes."
+      tags: [emails]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/DNSApproved" }
+      responses:
+        "202":
+          description: "Noted. Inside a mission, a MissionHeld answer when the call was held for approval or dry-run instead."
+          content:
+            application/json:
+              schema: { oneOf: [{ $ref: "#/components/schemas/Queued" }, { $ref: "#/components/schemas/MissionHeld" }] }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/email-templates:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
@@ -18774,10 +19163,11 @@ components:
     EmailDomainDNSInstall:
       type: object
       description: "The last one-click run that added DNS records through the workspace's own DNS host: a sending domain's, a site's proof or a tracking domain's CNAME."
-      required: [status, integration_id, added, existing, at]
+      required: [status, added, existing, at]
       properties:
         status: { type: string, enum: [queued, done, failed] }
-        integration_id: { type: string, format: uuid }
+        integration_id: { type: string, format: uuid, description: "The connection that added them. Absent when they were approved at the DNS provider instead (`provider`)." }
+        provider: { type: string, description: "The DNS provider the records were approved at, with its own one-off screen (Domain Connect). There are no counts then: Outflare looks for the records itself." }
         added: { type: integer, description: Records added. }
         existing: { type: integer, description: "Records that were already there, such as a DMARC policy kept as it is." }
         zone: { type: string, description: The DNS zone the records went in. }
@@ -19314,6 +19704,23 @@ components:
         html: { type: string, description: "Only on GET .../emails/{id}." }
         text: { type: string, description: "Only on GET .../emails/{id}." }
         events: { type: array, items: { $ref: "#/components/schemas/EmailEvent" }, description: "Only on GET .../emails/{id}." }
+    DNSApproval:
+      type: object
+      description: "Whether the domain's DNS provider can add the records with a one-off approval on its own screen (Domain Connect), and the link to it. Outflare keeps no access afterwards."
+      required: [available]
+      properties:
+        available: { type: boolean }
+        provider: { type: string, description: "The DNS provider, such as Cloudflare, when it was found." }
+        url: { type: string, format: uri, description: "Send the person here (same window). The provider shows the exact records, then sends the browser back to `return` with `state` (and `error` when it didn't happen). Then call .../dns/approved." }
+        reason:
+          type: string
+          enum: [not_configured, no_provider, not_onboarded, no_template, nothing_to_add, lookup_failed]
+          description: "Why not: this server can't sign requests (self-hosted installs), the provider doesn't support Domain Connect or hasn't taken Outflare's template yet, the records don't fit a template, they're all in place already, or the lookup failed. Use a DNS host connection (.../dns) instead."
+    DNSApproved:
+      type: object
+      properties:
+        error: { type: string, description: "The `error` the provider sent back, such as access_denied when the person cancelled. Empty when they approved." }
+        provider: { type: string, maxLength: 60, description: "The provider's name from the approval, for the record." }
     Queued:
       type: object
       description: The work was queued and runs in the background.
@@ -19383,6 +19790,7 @@ components:
           properties:
             scopes: { type: array, items: { type: string } }
             client_metadata: { type: boolean, description: "The provider reads Outflare's sign-in details from a document this server hosts, so it only needs PUBLIC_URL on a public https address, no app to register." }
+            key_exchange: { type: boolean, description: "Signing in makes an API key on the person's own account and saves it as the connection's key (OpenRouter), so no app is registered." }
         capabilities: { type: array, items: { type: string }, example: [verify] }
         status: { type: string, enum: [available, planned], description: "planned: listed but not connectable yet." }
         pricing: { type: string }
@@ -19637,6 +20045,50 @@ components:
         name: { type: string, maxLength: 100 }
         brand_id: { type: [string, "null"], format: uuid }
         origins: { type: array, maxItems: 20, items: { type: string } }
+    ConnectionHook:
+      type: object
+      description: A connection's live updates, its own webhook address.
+      required: [integration_id, connector, status, setup, url, signed, last_error, last_event_at, rotated_at, created_at, reachable, supports]
+      properties:
+        integration_id: { type: string, format: uuid }
+        connector: { type: string }
+        status:
+          type: string
+          enum: [off, setting_up, waiting, receiving, failed]
+          description: "off: not set up. setting_up: Outflare is registering the address at the tool. waiting: no event yet. receiving: events arrive. failed: registering failed, see last_error."
+        setup: { type: [string, "null"], enum: [auto, manual, null], description: "auto: Outflare registered the address at the tool. manual: pasted by a person." }
+        url: { type: [string, "null"], description: "The address. Treat it like a password: anyone with it can post events. Null when off or when the server can't be reached from the internet." }
+        signed: { type: boolean, description: Deliveries are checked against a signing secret. }
+        last_error: { type: [string, "null"] }
+        last_event_at: { type: [string, "null"], format: date-time }
+        rotated_at: { type: [string, "null"], format: date-time }
+        created_at: { type: [string, "null"], format: date-time }
+        reachable: { type: boolean, description: "This server has a public https address tools can reach." }
+        supports:
+          type: object
+          required: [auto, signed, events, steps]
+          properties:
+            auto: { type: boolean, description: Outflare can register the address through the tool's API. }
+            signed: { type: boolean, description: The tool signs its deliveries. }
+            events: { type: array, items: { type: string } }
+            steps: { type: string, description: Where to paste the address by hand. }
+    HookEvent:
+      type: object
+      description: One event a connector sent by webhook.
+      required: [id, integration_id, connector, type, status, error_code, summary, duplicates, attempts, replayable, received_at, handled_at]
+      properties:
+        id: { type: string, format: uuid }
+        integration_id: { type: string, format: uuid }
+        connector: { type: string }
+        type: { type: string, description: "The tool's event type, such as batch_completed." }
+        status: { type: string, enum: [queued, handled, ignored, failed] }
+        error_code: { type: [string, "null"] }
+        summary: { type: object, additionalProperties: true, description: "Ids, counts and statuses the tool reported." }
+        duplicates: { type: integer, description: Repeats of this event that arrived and were ignored. }
+        attempts: { type: integer }
+        replayable: { type: boolean, description: The body is still kept (30 days). }
+        received_at: { type: string, format: date-time }
+        handled_at: { type: [string, "null"], format: date-time }
     PaymentSync:
       type: object
       description: Where a payment connection's sync got to.
@@ -21745,7 +22197,7 @@ components:
         direction: { type: string, enum: [up, down, flat, unknown], description: "Within 3% is flat; unknown when either side has no data." }
     SEOOverviewBrand:
       type: object
-      required: [brand, terms, hosts, weeks, seo, trends, sites, open_fixes]
+      required: [brand, terms, hosts, weeks, seo, trends, sites, open_fixes, seo_status]
       properties:
         brand:
           oneOf:
@@ -21778,17 +22230,34 @@ components:
           description: "One row per snapshot day, oldest first: Ahrefs when it is connected, the main website's rating, links added up across the brand's websites."
           items:
             type: object
-            required: [day, connector, domain_rating, backlinks, referring_domains, organic_traffic]
+            required: [day, connector, domain_rating, backlinks, referring_domains, organic_traffic, organic_keywords]
             properties:
               day: { type: string, format: date }
               connector: { type: string }
               domain_rating: { type: [number, "null"] }
               backlinks: { type: [number, "null"] }
               referring_domains: { type: [number, "null"] }
-              organic_traffic: { type: [number, "null"] }
+              organic_traffic: { type: [number, "null"], description: "The provider's estimate of monthly visits from search." }
+              organic_keywords: { type: [number, "null"], description: Keywords ranking in the top 100. }
+        seo_status:
+          type: object
+          description: Where the brand's SEO snapshots stand, so a missing number has a reason and a next step.
+          required: [state, message, integration_id, connector, last_ok_at]
+          properties:
+            state:
+              type: string
+              enum: [not_connected, no_website, not_followed, "off", reading, failed, ready]
+              description: |
+                not_connected: no SEO tool serves the brand. no_website: the brand has no website to read. not_followed:
+                its SEO tool reads other domains. off: snapshots are turned off. reading: the first read is under way.
+                failed: the last read failed. ready: read every week.
+            message: { type: string, description: "What it means and what to do, for people. A failed read's reason needs seo.read." }
+            integration_id: { type: [string, "null"], format: uuid, description: The SEO connection the numbers come from. }
+            connector: { type: [string, "null"] }
+            last_ok_at: { type: [string, "null"], format: date-time, description: The last good read of the brand's domains. }
         trends:
           type: object
-          required: [branded_search, search_clicks, visitors, domain_rating, backlinks, referring_domains]
+          required: [branded_search, search_clicks, visitors, domain_rating, backlinks, referring_domains, organic_traffic, organic_keywords]
           properties:
             branded_search: { $ref: "#/components/schemas/SEOTrend" }
             search_clicks: { $ref: "#/components/schemas/SEOTrend" }
@@ -21796,6 +22265,8 @@ components:
             domain_rating: { $ref: "#/components/schemas/SEOTrend" }
             backlinks: { $ref: "#/components/schemas/SEOTrend" }
             referring_domains: { $ref: "#/components/schemas/SEOTrend" }
+            organic_traffic: { $ref: "#/components/schemas/SEOTrend" }
+            organic_keywords: { $ref: "#/components/schemas/SEOTrend" }
         sites:
           type: array
           description: The brand's audited sites and their latest health score; empty without seo.read.
@@ -23388,7 +23859,8 @@ components:
         ask_for_missing: { type: boolean, description: "Whether to ask the person for the missing fields: false once they are filled or a person said not to ask." }
     OnboardingStepId:
       type: string
-      enum: [brand, goal, ai, connect, mission, team]
+      description: "The steps in order. `community` (star the repository on GitHub and follow on X) is listed only when the server shows community links (`GET /v1/me/community`), and is done for the person asking once they opened every link."
+      enum: [brand, goal, ai, connect, community, mission, team]
     OnboardingGoal:
       type: string
       description: "What a workspace wants to do first: find and email new customers (outreach), grow search traffic (search), report on what works (reports) or nurture existing customers (nurture)."
@@ -23517,6 +23989,23 @@ components:
             site_script: { type: string }
             clients: { type: object, additionalProperties: { type: string } }
         checked_at: { type: string, format: date-time }
+    CommunityLinks:
+      type: object
+      required: [links, hidden, hidden_at, show]
+      properties:
+        links:
+          type: array
+          items:
+            type: object
+            required: [id, title, url, done]
+            properties:
+              id: { type: string, enum: [github, x] }
+              title: { type: string, example: Star us on GitHub }
+              url: { type: string, format: uri }
+              done: { type: boolean, description: The person opened the link. }
+        hidden: { type: boolean, description: The person hid the items. }
+        hidden_at: { type: [string, "null"], format: date-time }
+        show: { type: boolean, description: "Whether the app shows the items: there are links, the person didn't hide them, and one isn't done yet." }
     Onboarding:
       type: object
       required: [steps, done, total, next_step, complete, goal, dismissed, dismissed_at, show]
