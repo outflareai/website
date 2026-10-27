@@ -20,6 +20,14 @@ Every action a visitor takes that tells us something (a sign-up, sign-in, GitHub
 - **Properties.** Fixed labels, the page path and the link's location only. Never what someone typed, their email address, or anything from the URL's query string except UTM tags.
 - **Off by default.** Nothing loads unless the build sets `PUBLIC_GTM_ID` or `PUBLIC_POSTHOG_KEY`, so forks and local builds send nothing. PostHog runs cookieless; GA4 follows the consent defaults in `Analytics.astro`.
 
+## Open core: open source and Cloud (hard rule)
+
+Tools are open source; loops, enterprise controls and the scaled versions of heavy features are Outflare Cloud only ([engine ADR 11](https://github.com/outflareai/outflare/blob/main/docs/adr/0011-open-core-line.md), and the routing list in the engine's AGENTS.md).
+
+- **Cloud-only docs say so.** A page for a Cloud feature carries the Cloud badge and says "Outflare Cloud". It says what the feature does for you, never how it decides, its prompts or its limits.
+- **Only what has shipped.** A Cloud feature gets a page, a row on the open source vs Cloud page or a place on pricing once app.outflare.ai runs it (the `deployed` check), or when Jack approves announcing it.
+- **Published Cloud APIs come from an allowlist.** Staff, admin, sign-up and internal routes never appear in the API reference.
+
 ## Docs
 
 Docs describe what Outflare does today; see "Keeping the docs honest" in the README. An engine change that adds a feature gets a matching docs change here.
@@ -60,6 +68,8 @@ The secrets rules above say what must never leak. These say what else may and ma
 - **Text on GitHub is permanent.** PR titles and descriptions, comments, review replies, commit messages and branch names are public, and GitHub keeps every edited revision and every pull request's commits after the branch is deleted. Write them as if they were on the homepage. If something slips, editing isn't enough: tell Jack, who deletes the revision from the edit history (and rotates it first if it's a secret).
 - **Hosted-only stays in Cloud.** A pull request that documents a Cloud change names it (`Needs outflareai/cloud#NN`) and describes only what customers see. Never describe the staff console, sign-up abuse rules, billing internals, costs, Railway or Cloudflare account details, internal hostnames, or production numbers (users, revenue, volumes) here.
 - **Security fixes are explained after they ship.** Docs or a pull request about a vulnerability fix say what changed for people ("Sign-in limits are stricter"), with no way to exploit it, and only once app.outflare.ai runs the fix (`SECURITY.md`).
+- **When in doubt, keep it private.** A page can be published later. Once published, it stays in caches and archives.
+- **Production never reaches this repository.** No error reports, logs, visitor or customer counts, in pages, issues, comments or PR text.
 - **No history from elsewhere, no private branches.** Never merge, subtree or push commits from another repository, old or private, into this one: bring content over as new, reviewed commits. Never park notes, dumps or drafts on a branch, because every branch is as public as main. Delete a branch once its pull request merges.
 
 ## Costs registry (hard rule)
