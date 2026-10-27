@@ -1,0 +1,37 @@
+# Re-runs the `deployed` check on docs pull requests that are only waiting for
+# production (AGENTS.md, "Docs after the deploy"), so nobody has to press
+# Re-run once app.outflare.ai has the change. Every 15 minutes it looks at
+# each open pull request's latest CI run: if `deployed` is the only job that
+# failed, it re-runs that job. It runs no pull request code.
+name: Recheck deployed
+
+on:
+  schedule:
+    - cron: "7,22,37,52 * * * *"
+  workflow_dispatch:
+
+permissions:
+  actions: write # re-run the failed job
+
+jobs:
+  recheck:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Re-run waiting deployed checks
+        run: |
+          for sha in $(gh api "repos/$GH_REPO/pulls?state=open&per_page=50" --jq '.[] | select(.draft | not) | .head.sha'); do
+            run=$(gh api "repos/$GH_REPO/actions/runs?head_sha=$sha&event=pull_request&per_page=20" \
+              --jq '[.workflow_runs[] | select(.path == ".github/workflows/ci.yml")] | sort_by(.created_at) | last | select(. != null and .status == "completed" and .conclusion == "failure") | "\(.id) \(.run_attempt)"')
+            [ -n "$run" ] || continue
+            set -- $run
+            # A day of re-runs is enough; after that a person looks.
+            [ "$2" -lt 100 ] || continue
+            failed=$(gh api "repos/$GH_REPO/actions/runs/$1/attempts/$2/jobs" --jq '[.jobs[] | select(.conclusion == "failure") | .name] | join(",")')
+            if [ "$failed" = deployed ]; then
+              echo "Re-running deployed for ${sha::7} (run $1)."
+              gh api -X POST "repos/$GH_REPO/actions/runs/$1/rerun-failed-jobs" >/dev/null || echo "::warning::Could not re-run run $1."
+            fi
+          done
