@@ -5,7 +5,7 @@ sidebar:
   order: 8
 ---
 
-<span class="pill shipped">Shipped</span> IMAP sync, one inbox across all mailboxes, stop on reply, opt-out and bounce handling, labelling replies by what they mean in four groups, assigning, snoozing, coloured tags, saved views, label webhooks, replying from the inbox, replies from EmailBison, and AI labelling with your own AI key. <span class="pill">Next</span> Other sequencers, and reply rules.
+<span class="pill shipped">Shipped</span> IMAP sync, one inbox across all mailboxes, stop on reply, opt-out and bounce handling, labelling replies by what they mean in four groups, assigning, snoozing, coloured tags, saved views, label webhooks, replying from the inbox, replies from EmailBison, AI labelling with your own AI key, and reply rules. <span class="pill">Next</span> Alerts by email and Slack, and other sequencers.
 
 ## How mail arrives
 
@@ -103,6 +103,28 @@ Filter the list with:
 - `needs_review` and `min_confidence`.
 
 Every change is recorded in the audit log. Agents use `triage_inbox_message`, and `list_members` to find who to assign to.
+
+## Reply rules
+
+Once a reply has a label Outflare is sure of, a reply rule acts on it. "Sure" means a label set by the built-in rules, by a person or agent, or by the AI at 80% or more. A label waiting for review runs nothing until someone confirms it with **The label is right**. A reply's text only ever picks a label, never an action, and everything a rule does can be undone.
+
+| Label | What the rule can do (default first) |
+| --- | --- |
+| Not now | **Snooze** the reply until the date it gives, or 90 days if it gives none, so it comes back to the open inbox then. **Restart** the sequence it stopped on that date instead. Or do nothing. |
+| Out of office | **Wait**: the lead's next email moves to the day after the return date the AI read. Or keep the sequence as it is. |
+| Referral, and wrong person naming someone else | **Offer to add them**: the reply shows an "Add … as a lead" button. **Add them** as a lead on the referrer's lists, marked `referred_by`. Or **add and enrol** them in a sequence you pick. Someone on the opt-out list is never enrolled. |
+
+Choose the workspace's rules under **Rules** in the inbox. A project or a sequence can have its own rules for some labels, which win for its replies, through the API or MCP:
+
+```sh
+curl -X PUT https://outflare.example.com/v1/workspaces/$WS/reply-rules \
+  -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" \
+  -d '{"sequence_id": "'$SEQUENCE_ID'", "rules": {"not_now": {"action": "restart", "days": 30}}}'
+```
+
+`GET /v1/workspaces/{ws}/reply-rules` shows the defaults, the actions each label can take, and every saved set. Sending empty `rules` removes a set. Add a referral by hand with `POST /v1/workspaces/{ws}/inbox/{id}/referral`, optionally with a `sequence_id`. Agents use `get_reply_rules`, `set_reply_rules` and `add_reply_referral`. Changing rules needs `inbox.manage`.
+
+The AI reads dates and referred people only from replies it labels, so these rules act on dates and referrals once [your own AI model](#ai-labelling-with-your-own-key) is connected. Without it, a not now waits the default 90 days.
 
 ## Tags and saved views
 

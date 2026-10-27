@@ -8,6 +8,11 @@
 //   PUBLIC_POSTHOG_KEY     PostHog project key, cookieless on this site, sent
 //   PUBLIC_POSTHOG_REGION  through /ingest (functions/ingest) on our own domain.
 // Cloudflare Web Analytics needs no code: Pages injects it when it is enabled.
+// Outflare's own website tracking (app.outflare.ai/site.js) comes first, as
+// its setup asks, with the key copied exactly from our workspace's Website
+// tracking settings. The key is public by design. It loads with the IDs above,
+// so forks and local builds send nothing to it either. Its consent mode is the
+// default (auto): no cookie in Europe, the UK or with Global Privacy Control.
 //
 // Every click on a sign-up, sign-in, GitHub or contact link (or element with data-track) and
 // every script error is an event, sent to both (track below). AGENTS.md has
@@ -20,6 +25,10 @@ const region = import.meta.env.PUBLIC_POSTHOG_REGION === 'eu' ? 'eu' : 'us';
 const gtmId = /^GTM-[A-Z0-9]{4,12}$/.test(gtm) ? gtm : '';
 const phKey = /^phc_[A-Za-z0-9_-]{10,80}$/.test(posthogKey) ? posthogKey : '';
 ---
+
+{(gtmId || phKey) && (
+	<script async src="https://app.outflare.ai/site.js" data-key="ofk_8lJEvAQToOsRy0K4j8ncItMM93_Es__S" is:inline></script>
+)}
 
 {gtmId && (
 	<script is:inline define:vars={{ gtmId }}>
@@ -65,12 +74,15 @@ const phKey = /^phc_[A-Za-z0-9_-]{10,80}$/.test(posthogKey) ? posthogKey : '';
 {(gtmId || phKey) && (
 	<script is:inline>
 		// One helper for the site's events: GA4 through the dataLayer (event
-		// names are snake_case, GA allows no dots) and PostHog. Properties
-		// are fixed labels only: never what someone typed.
+		// names are snake_case, GA allows no dots), PostHog and Outflare's own
+		// tracking (queued until site.js loads). Properties are fixed labels
+		// only: never what someone typed.
 		window.outflareTrack = function (name, props) {
 			props = props || {};
 			if (window.dataLayer) window.dataLayer.push(Object.assign({ event: name }, props));
 			if (window.posthog) window.posthog.capture(name, props);
+			if (window.outflare && window.outflare.loaded) window.outflare.track(name, props);
+			else (window.outflare = Array.isArray(window.outflare) ? window.outflare : []).push(['track', name, props]);
 		};
 		// Links are classified by where they go, so no page needs its own code.
 		function linkEvent(a) {

@@ -294,6 +294,20 @@ Every type is also in the API document, under `webhooks:` and in the `WebhookEve
 | `social_action.done` | An approved social reply was posted from the brand's own account. data has channel and type; GET it for its link. |
 | `social_action.failed` | An approved social reply could not be posted. GET it for status_reason. |
 
+### AI spend
+
+| Event | When |
+| --- | --- |
+| `ai_budget.warned` | This month's AI calls reached 80% of the workspace's monthly AI limit or of one tool's [limit](/docs/guides/ai-usage/). `data` has `task` (empty for the workspace's limit, else the tool id), `level` (`80`), `limit_cents`, `spent_cents` and `month` (`YYYY-MM`). |
+| `ai_budget.reached` | This month's AI calls reached a limit, so Outflare makes no more of those calls until next month or a higher limit. `data` has `task`, `level` (`100`), `limit_cents`, `spent_cents` and `month`. |
+
+### Paid connection limits
+
+| Event | When |
+| --- | --- |
+| `connection_limit.warned` | A paid connection (SEO data, lead data, email verification, page reads) used 80% of its daily or monthly [usage limit](/docs/guides/usage-limits/). `data` has `integration_id`, `connector`, `period` (`day` or `month`), `period_start`, `level` (`80`), `unit` (`USD`, `credit`, `API unit`, `token`), `limit`, `used` and `hard_stop`. |
+| `connection_limit.reached` | A paid connection reached a limit, so with `hard_stop` Outflare makes no more calls through it until the next day or month, or a higher limit. `data` has the same fields, with `level` `100`. |
+
 ### Digests
 
 | Event | When |

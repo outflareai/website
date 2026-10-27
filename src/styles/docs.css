@@ -135,6 +135,8 @@ starlight-theme-select, .theme-toggle { flex-shrink: 0; }
 .pill.building { color: var(--status-next); }
 .pill.planned { color: var(--status-planned); }
 .pill.later { color: var(--muted-foreground); }
+/* Outflare Cloud only: a feature open source servers do not have. */
+.pill.cloud { color: oklch(0.6 0.18 300); }
 
 /* API reference */
 .endpoint { border: 1px solid var(--border); border-radius: var(--radius-xl); background: var(--card); padding: 0.9rem 1rem; margin-top: 1rem; }
