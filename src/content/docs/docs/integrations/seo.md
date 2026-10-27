@@ -73,9 +73,14 @@ DataForSEO also reads Google's live results for one keyword, which is how [rank 
 Once a week each SEO connection takes an overview and the top 50 keywords
 for each of its domains and stores them (`seo_snapshots`). That is what the
 SEO page, `GET /seo/history` and the overview read, so looking is free.
+A new connection takes its first snapshot straight away, so its numbers show
+a few minutes after you connect it. A domain it starts following, such as a
+new brand's website, is read within the hour.
 
-- **Domains:** the connection's `domains` setting, or else the websites
-  your analytics tools follow (up to five).
+- **Domains:** the connection's `domains` setting, or else up to five of
+  your websites: your brands' websites first, then the sites you audit, then
+  the ones your analytics tools follow. A subdomain of a domain already read
+  is left out, because the providers count it with its domain.
 - **Cost:** about $0.05 a domain a week on DataForSEO (about $0.20 a
   month). About 1,200 units a domain a week on Ahrefs, so the default
   10,000-unit budget covers about two domains; raise it for more. A
@@ -100,8 +105,15 @@ before, each marked Growing, Falling or Steady (within 3%):
   Consoles hide rare searches, so this is a floor, not a total.
 - **Visitors**, from your analytics tools (GA4, Plausible and the like), and
   search clicks. A website two tools both measure is counted once.
-- **Domain rating** and **referring domains and backlinks**, from the weekly
-  snapshots above. Ahrefs DR is used when Ahrefs is connected.
+- **Domain rating**, **referring domains and backlinks**, and **organic
+  traffic and keywords**, from the snapshots above, including this week's.
+  Ahrefs numbers are used when Ahrefs is connected.
+
+When those numbers are missing, the brand says why and what to do next: no
+SEO tool connected, no website on the brand, the tool reads other domains,
+snapshots turned off, the first read still running (the page checks back on
+its own), or the last read failed, for example because the monthly budget is
+used up.
 
 Below them are the brand's audited sites with their [health score](/docs/guides/site-audits/)
 and its open fixes. Websites no brand claims show as shared. Pick a brand in

@@ -5828,8 +5828,8 @@ paths:
       description: |
         Scope: analytics.read. One answer per brand, from what is already stored (analytics syncs, SEO snapshots,
         site audits and the fixes list), so it calls and costs nothing. Each brand gets whole weeks (Monday to Sunday)
-        of branded search, search clicks and visitors, its SEO snapshots (domain rating, backlinks, referring domains),
-        and trends that compare the last 4 weeks with the 4 before. Branded search counts the search console queries
+        of branded search, search clicks and visitors, its SEO snapshots (domain rating, backlinks, referring domains,
+        organic traffic and keywords) up to today, `seo_status` saying why snapshots are missing, and trends that compare the last 4 weeks with the 4 before. Branded search counts the search console queries
         that contain one of the brand's `terms` (its name, handle and domain names); consoles hide rare queries, so it
         is a floor. Websites no brand claims are a shared entry with `brand: null`. Site audits and open fixes need
         seo.read as well.
@@ -21648,7 +21648,7 @@ components:
         direction: { type: string, enum: [up, down, flat, unknown], description: "Within 3% is flat; unknown when either side has no data." }
     SEOOverviewBrand:
       type: object
-      required: [brand, terms, hosts, weeks, seo, trends, sites, open_fixes]
+      required: [brand, terms, hosts, weeks, seo, trends, sites, open_fixes, seo_status]
       properties:
         brand:
           oneOf:
@@ -21681,17 +21681,34 @@ components:
           description: "One row per snapshot day, oldest first: Ahrefs when it is connected, the main website's rating, links added up across the brand's websites."
           items:
             type: object
-            required: [day, connector, domain_rating, backlinks, referring_domains, organic_traffic]
+            required: [day, connector, domain_rating, backlinks, referring_domains, organic_traffic, organic_keywords]
             properties:
               day: { type: string, format: date }
               connector: { type: string }
               domain_rating: { type: [number, "null"] }
               backlinks: { type: [number, "null"] }
               referring_domains: { type: [number, "null"] }
-              organic_traffic: { type: [number, "null"] }
+              organic_traffic: { type: [number, "null"], description: "The provider's estimate of monthly visits from search." }
+              organic_keywords: { type: [number, "null"], description: Keywords ranking in the top 100. }
+        seo_status:
+          type: object
+          description: Where the brand's SEO snapshots stand, so a missing number has a reason and a next step.
+          required: [state, message, integration_id, connector, last_ok_at]
+          properties:
+            state:
+              type: string
+              enum: [not_connected, no_website, not_followed, "off", reading, failed, ready]
+              description: |
+                not_connected: no SEO tool serves the brand. no_website: the brand has no website to read. not_followed:
+                its SEO tool reads other domains. off: snapshots are turned off. reading: the first read is under way.
+                failed: the last read failed. ready: read every week.
+            message: { type: string, description: "What it means and what to do, for people. A failed read's reason needs seo.read." }
+            integration_id: { type: [string, "null"], format: uuid, description: The SEO connection the numbers come from. }
+            connector: { type: [string, "null"] }
+            last_ok_at: { type: [string, "null"], format: date-time, description: The last good read of the brand's domains. }
         trends:
           type: object
-          required: [branded_search, search_clicks, visitors, domain_rating, backlinks, referring_domains]
+          required: [branded_search, search_clicks, visitors, domain_rating, backlinks, referring_domains, organic_traffic, organic_keywords]
           properties:
             branded_search: { $ref: "#/components/schemas/SEOTrend" }
             search_clicks: { $ref: "#/components/schemas/SEOTrend" }
@@ -21699,6 +21716,8 @@ components:
             domain_rating: { $ref: "#/components/schemas/SEOTrend" }
             backlinks: { $ref: "#/components/schemas/SEOTrend" }
             referring_domains: { $ref: "#/components/schemas/SEOTrend" }
+            organic_traffic: { $ref: "#/components/schemas/SEOTrend" }
+            organic_keywords: { $ref: "#/components/schemas/SEOTrend" }
         sites:
           type: array
           description: The brand's audited sites and their latest health score; empty without seo.read.
