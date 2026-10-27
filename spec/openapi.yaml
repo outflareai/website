@@ -12692,7 +12692,8 @@ paths:
         Scope: customers.manage. attributes merges: a key set to null clears it, keys left out stay. Each value keeps
         the source that set it, and a write from a lower-precedence source (by default manual, then first_party,
         crm_sync, enrichment) leaves it as it is and lists it in skipped. Send version to refuse the change with
-        record_changed if someone else changed the record since you read it.
+        record_changed if someone else changed the record since you read it. Agents (the MCP server, a connected
+        AI app or a mission) must send it: without it the change is refused with version_required.
       tags: [records]
       requestBody:
         required: true
@@ -12892,7 +12893,9 @@ paths:
         and consents move here; its attributes fill in what this record lacks, or replace a value a lower-precedence
         source set, and lists such as companies are joined. from is kept, archived, with merged_into set, so its
         history and old links still lead here. Records of different types, or two records with their own user ids
-        (two accounts in your product), are refused with merge_refused: link those instead.
+        (two accounts in your product), are refused with merge_refused: link those instead. Send version (this
+        record's, as read) to refuse the merge with record_changed if it changed since; agents must send it
+        (version_required).
       tags: [records]
       requestBody:
         required: true
@@ -12928,6 +12931,95 @@ paths:
                       subscriptions: { type: integer, description: Subscriptions from payment connections. }
                       activity: { type: integer, description: "Leads, cold emails, replies, meetings, deals, lifecycle emails, broadcast sends and journey runs that moved to the record kept." }
         "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/search:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+    get:
+      operationId: searchWorkspace
+      x-outflare-access: { brand_limited: true }
+      summary: Search records and their history
+      description: |
+        The read scope of each kind searched: record (customers.read: names, attribute text, emails, phones and ids),
+        message (emails sent, sequences.read, by subject; and received, inbox.read, by subject and body), meeting and
+        deal (outcomes.read) and email (lifecycle email, emails.read, by subject). Every word must match, each as the
+        start of a word ("pric" finds pricing), in any language. Results are ranked, records first, with record_id
+        and record_name saying whose each one is, and a snippet of the text that matched. A caller kept to some
+        brands finds their rows and the shared ones, as on the record timeline.
+      tags: [search]
+      parameters:
+        - { name: q, in: query, required: true, schema: { type: string, maxLength: 500 }, description: The words to search for. }
+        - name: kinds
+          in: query
+          schema: { type: string }
+          description: "Comma-separated kinds to search: record, message, meeting, deal, email. Default: every kind you may read."
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 100 }, description: Results to return. Default 20. }
+      responses:
+        "200":
+          description: The best matches.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/SearchHit" } }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/query/tables:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+    get:
+      operationId: listQueryTables
+      x-outflare-access: { brand_limited: true }
+      summary: List the tables a query can read
+      description: |
+        Any caller in the workspace. The tables Query reads, with their columns and the read scope each needs. available
+        says whether you hold it; a table you can't read returns no rows. Tables show only this workspace's rows and,
+        for a caller kept to some brands, those brands' rows and the shared ones.
+      tags: [query]
+      responses:
+        "200":
+          description: The tables.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/QueryTable" } }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/query:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+    post:
+      operationId: runQuery
+      x-outflare-access: { brand_limited: true }
+      summary: Run a read-only SQL query
+      description: |
+        The read scope of each table the query reads (GET .../query/tables), such as customers.read. Runs one
+        SELECT (or WITH ... SELECT) in a read-only transaction, as a database role that can read only the query
+        tables, so it sees exactly what you can see through the API: this workspace, your brands, your scopes.
+        It never changes anything, so an agent kept to missions may run it outside one. Up to limit rows come back
+        (default 100, at most 1000), with truncated set when there were more; a query running over 15 seconds is
+        stopped with query_timeout. SQL the database refuses fails with query_invalid and its message.
+      tags: [query]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [sql]
+              properties:
+                sql: { type: string, maxLength: 20000, description: "One SELECT, such as select stage, count(*) from deals group by stage." }
+                limit: { type: integer, minimum: 1, maximum: 1000, description: Rows to return. Default 100. }
+      responses:
+        "200":
+          description: The rows.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/QueryResult" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/records/{record}/timeline:
     parameters:
@@ -23732,6 +23824,54 @@ components:
       description: |
         Where the record came from: first_party (the workspace's own product, billing or forms), prospect (lead lists
         and data providers), crm_sync, import or manual. Lifecycle mail never relies on it: consent does.
+    SearchHit:
+      type: object
+      required: [kind, id, record_id, record_name, title, snippet, detail, at, rank]
+      properties:
+        kind: { type: string, enum: [record, message, meeting, deal, email], description: The same kinds as a record's timeline. }
+        id: { type: string, format: uuid, description: "The record's, message's, meeting's, deal's or email's id." }
+        record_id: { type: [string, "null"], format: uuid, description: Whose it is, when it is linked to a record. }
+        record_name: { type: [string, "null"], description: "That record's name, when you may read it." }
+        title: { type: string, description: "A record's name, or the subject or title." }
+        snippet: { type: string, description: The words around the match in a reply's body or a meeting's notes; empty otherwise. }
+        detail: { type: string, description: "A record's type or the identity that matched (email: ...), sent or received for a message, a meeting's status, a deal's stage, an email's status." }
+        at: { type: string, format: date-time }
+        rank: { type: number, description: How well it matched; higher is better. }
+    QueryTable:
+      type: object
+      required: [name, description, scope, available, columns]
+      properties:
+        name: { type: string, description: "The table's name in SQL, such as people or deals." }
+        description: { type: string }
+        scope: { type: string, description: The read scope it needs. }
+        available: { type: boolean, description: Whether you hold that scope (and, for leads, aren't kept to some brands). }
+        columns:
+          type: array
+          items:
+            type: object
+            required: [name, type]
+            properties:
+              name: { type: string }
+              type: { type: string, description: "The column's Postgres type, such as uuid, text, jsonb or timestamp with time zone." }
+    QueryResult:
+      type: object
+      required: [columns, rows, row_count, truncated, duration_ms]
+      properties:
+        columns:
+          type: array
+          items:
+            type: object
+            required: [name, type]
+            properties:
+              name: { type: string }
+              type: { type: string, description: "The value's Postgres type, such as int8, text, uuid or timestamptz." }
+        rows:
+          type: array
+          description: One array per row, in the order of columns. jsonb comes back as JSON, numeric as a number, times as RFC 3339.
+          items: { type: array, items: {} }
+        row_count: { type: integer }
+        truncated: { type: boolean, description: There were more rows than limit, or the answer passed 4 MB. }
+        duration_ms: { type: integer }
     Record:
       type: object
       required: [id, type, name, brand_id, origin, attributes, attribute_sources, identities, version, merged_into, archived, created_at, updated_at]
