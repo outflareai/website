@@ -59,7 +59,7 @@ The engine's tests check every value against the running server, so the contract
 Responses are JSON. Lists are wrapped in a `data` array:
 
 ```json
-{ "data": [ { "id": "…", "email": "ana@getacme.co", "status": "active" } ] }
+{ "data": [ { "id": "…", "email": "ana@getacme.example", "status": "active" } ] }
 ```
 
 API answers are never cached (`Cache-Control: no-store`), and every answer carries the usual security headers: `X-Content-Type-Options: nosniff`, a `Referrer-Policy`, `frame-ancestors 'none'`, and `Strict-Transport-Security` when the server is on https.
@@ -82,7 +82,7 @@ Add `fields` to any `GET` to get back only what you read. A list trims each item
 
 ```sh
 curl "https://outflare.example.com/v1/workspaces/$WS/leads?fields=email,company" -H "Authorization: Bearer $OUTFLARE_TOKEN"
-# → { "data": [{ "id": "…", "email": "ana@acme.com", "company": "Acme" }], "next_cursor": null, … }
+# → { "data": [{ "id": "…", "email": "ana@acme.example", "company": "Acme" }], "next_cursor": null, … }
 ```
 
 A name the items don't have answers `400 invalid_request` with `param: "fields"` and a message listing the fields they do have. The CLI takes `--fields email,company`, the Python SDK `fields=["email", "company"]`, and the MCP list tools a `fields` list, which keeps long answers small in an agent's context.
@@ -98,7 +98,7 @@ curl -X POST https://outflare.example.com/v1/workspaces/$WS/leads \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" \
   -H "Idempotency-Key: 6f1c2f9e-2b1d-4c43-9a51-5c1f0d6e7a20" \
   -H "Content-Type: application/json" \
-  -d '{"email": "ana@getacme.co"}'
+  -d '{"email": "ana@getacme.example"}'
 ```
 
 - The key covers the method, path, query and body. Reusing it for a different request is refused with `422 idempotency_key_reused`.

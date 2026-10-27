@@ -1,6 +1,6 @@
 ---
 title: Lead lists
-description: Build lead lists from your own Apollo or People Data Labs account, find emails through a waterfall of providers with a cache and credit caps, score fit against the project's ideal customer, and refresh on a schedule.
+description: Build lead lists from your own Apollo, People Data Labs or MoltSets account, find emails through a waterfall of providers with a cache and credit caps, score fit against the project's ideal customer, and refresh on a schedule.
 sidebar:
   order: 6.5
 ---
@@ -21,6 +21,7 @@ Paste an API key in **Connectors** (or from the Lead lists page). See [Connector
 | --- | --- | --- | --- |
 | Apollo | yes | yes | Search is free; revealing an email costs one credit |
 | People Data Labs | yes | yes | One credit per record returned |
+| MoltSets | yes | yes | Flat monthly plans with fair-use limits (free tier: 1,000 tokens); a lookup that finds nothing is free |
 | Prospeo | | yes | One credit per email found |
 | LeadMagic | | yes | One credit per email found |
 | Findymail | | yes | One credit per verified email found |
