@@ -66,6 +66,8 @@ Duplicates count only among pages meant to be indexed: a page marked `noindex`, 
 
 Each audit's issues go on the workspace's **fixes list**: one list of work for everyone in the workspace and their agents, so nothing is tracked in two places. A site audit adds one fix per rule and URL template, such as "pages in /blog/* have no meta description", with how many pages are left.
 
+Other features add to the same list, such as [link opportunities](/docs/guides/backlinks/#link-opportunities-on-the-fixes-list) from your backlinks.
+
 - Take a fix, mark it in progress, done or ignored (when the issue is intended), and leave a note.
 - The next complete crawl checks a fix marked done. If the issue is gone, the crawl confirms it. If it is still there, or comes back later, the fix opens again.
 - Fixes follow their site's brand, so a brand filter shows that brand's work.
