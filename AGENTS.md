@@ -25,6 +25,7 @@ Every action a visitor takes that tells us something (a sign-up, sign-in, GitHub
 Tools are open source; loops, enterprise controls and the scaled versions of heavy features are Outflare Cloud only ([engine ADR 11](https://github.com/outflareai/engine/blob/main/docs/adr/0011-open-core-line.md), and the routing list in the engine's AGENTS.md).
 
 - **Cloud-only docs say so.** A page for a Cloud feature carries the Cloud badge and says "Outflare Cloud". It says what the feature does for you, never how it decides, its prompts or its limits.
+  - The badge is `sidebar: { badge: { text: 'Cloud', variant: 'note' } }` in the page's frontmatter, and the page opens with `<span class="pill cloud">Outflare Cloud</span>`. Add the feature as a row on [Open source and Cloud](src/content/docs/docs/project/open-source-and-cloud.md) in the same pull request.
 - **Only what has shipped.** A Cloud feature gets a page, a row on the open source vs Cloud page or a place on pricing once app.outflare.ai runs it (the `deployed` check), or when Jack approves announcing it.
 - **Published Cloud APIs come from an allowlist.** Staff, admin, sign-up and internal routes never appear in the API reference.
 
