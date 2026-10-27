@@ -396,8 +396,8 @@
 		"id": "moltsets",
 		"name": "MoltSets",
 		"category": "data",
-		"summary": "Search B2B people and find verified work emails from LinkedIn profiles with your own MoltSets plan.",
-		"description": "Build lists from MoltSets people searches by title, seniority, industry, company size, country and company domain, and fill in verified work emails for leads with a LinkedIn URL. Each email comes with MoltSets' risk score.",
+		"summary": "Search B2B people and find valid work emails with your own MoltSets plan.",
+		"description": "Build lists from MoltSets people searches by title, seniority, industry, company size, country, company domain and keywords, and find work emails from a LinkedIn URL, an email, or a name with a company domain. Each email carries MoltSets' send-safety grade.",
 		"website": "https://moltsets.com",
 		"docs_url": "https://developer.moltsets.com/api-reference",
 		"auth_methods": [
@@ -405,10 +405,11 @@
 		],
 		"capabilities": [
 			"data.search_people",
-			"data.enrich_person"
+			"data.enrich_person",
+			"data.find_email"
 		],
 		"status": "available",
-		"pricing": "Flat monthly plan; tokens are charged only when a lookup finds data"
+		"pricing": "Flat monthly plans with fair-use limits; a free tier of 1,000 tokens"
 	},
 	{
 		"id": "peopledatalabs",

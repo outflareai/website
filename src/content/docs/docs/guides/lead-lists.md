@@ -21,7 +21,7 @@ Paste an API key in **Connectors** (or from the Lead lists page). See [Connector
 | --- | --- | --- | --- |
 | Apollo | yes | yes | Search is free; revealing an email costs one credit |
 | People Data Labs | yes | yes | One credit per record returned |
-| MoltSets | yes | yes, from a LinkedIn URL or an email | Flat monthly plan; tokens are charged only when a lookup finds data |
+| MoltSets | yes | yes | Flat monthly plans with fair-use limits (free tier: 1,000 tokens); a lookup that finds nothing is free |
 | Prospeo | | yes | One credit per email found |
 | LeadMagic | | yes | One credit per email found |
 | Findymail | | yes | One credit per verified email found |
