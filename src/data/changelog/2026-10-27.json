@@ -1,0 +1,723 @@
+{
+	"version": "2026.10.27",
+	"date": "2026-10-27",
+	"status": "in-progress",
+	"updated": "2026-10-27T21:17:13Z",
+	"items": [
+		{
+			"kind": "fix",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Importing from Attio no longer gets stuck on the first screen for large workspaces. The preview reads your objects in parallel and stops counting after about 15 seconds, showing counts like \"5,000+\" when there are more.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "Playbooks can now set up what they need before their first run: a pipeline in the CRM, fields on people and email drafts, shown first and added only with your OK. The first one, Run creator partnerships, adds a Partnerships board for creator, newsletter and podcast deals.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Reply rules: once a reply has a label Outflare is sure of, it acts on it.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "fix",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Connectors can now be added as a manifest instead of Go code: a short YAML file in the new integrations/ folder (Apache-2.0) that names the service's https address, the key a person pastes and how its answers map onto Outflare's own types.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "fix",
+			"area": "general",
+			"edition": "open-source",
+			"text": "The six-hourly ad sync now runs by itself again; before, ad accounts only synced when you pressed Sync now or added a developer token.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Paid ads can send conversions back to Google Ads, Meta, Microsoft Advertising and Reddit: add a rule on the Paid ads page (or POST .../ads/conversion-rules) and each new sign-up, payment or other customer event goes to the platform with the ad click and hashed email and phone, so its bidding learns from real results.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Smart lists: groups of people on your customer records that keep themselves up to date from rules, such as \"plan is pro and paid in the last 90 days\".",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Email finding now learns each domain's address shape (first.last, flast, and so on) from your own leads and their verification results, so it can propose a likely work address for a new name at a domain you already reach — with a confidence score and no third-party spend.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "fix",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Entries read from a sequencer's blocklist (EmailBison, Instantly) are filed as blocklist, which keeps people out of cold email only.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "general",
+			"edition": "open-source",
+			"text": "The open-core decision record (ADR 5) and the releasing guide are shorter: they describe what this repository does, not the hosted service's own setup.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Company lookups on the Visitors page: with your own People Data Labs or Snitcher key, and only once you turn it on, unknown visitors who accepted cookies are matched to a company from their IP address.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "fix",
+			"area": "general",
+			"edition": "open-source",
+			"text": "A worker no longer picks up a job it has no handler for, so a job queued by a newer or extended version during a deploy waits for a worker that can run it instead of dying.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "New AI connections: xAI (Grok) and two more routers beside OpenRouter, Vercel AI Gateway and Requesty, each with your own key.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "general",
+			"edition": "open-source",
+			"text": "The SEO overview tells a brand when its tools are connected but not for it: an SEO tool shared with other brands only (\"Not shared\", with a button to share it), or a search console or analytics tool that has numbers for other websites of the workspace but not the brand's.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Everywhere Outflare asks you to add DNS records (proving a site is yours, a tracking domain, a sending domain's records, an email provider's domain) now offers the same four ways: one click (your DNS host's own approval screen, or your Cloudflare connection), a prompt to paste into your own AI agent, a message for a developer, or doing it yourself.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Social also reads Bluesky, Threads and Mastodon accounts (followers), DEV authors (published posts) and Docker Hub namespaces (pulls across their images) every day, and GitHub accounts now count stars across their repositories instead of followers.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Usage limits for every paid connection: Ahrefs, DataForSEO, lead data providers such as Apollo, email verifiers and Geonode.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Meaning-based search: GET .../search?mode=meaning (and mode: \"meaning\" on the MCP tool search_workspace) finds records, replies, meetings and deals by what they mean, so \"unhappy with price\" finds \"too expensive for us\".",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "**Playbooks**: ready-made recipes for growth, such as welcoming new sign-ups, answering interested replies and fixing SEO quick wins.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "One timeline per person and company across every module: GET .../records/{record}/timeline (MCP get_record_timeline) now adds website visits, opt-out list entries and journeys to product events, changes, consent, cold email, replies, meetings and deals.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Who can be emailed, on every person: contactability on records says their contact basis (opted_in, opted_out, customer, third_party or unknown), the tool they came from (acquired_via), and whether receipts, cold outreach and marketing email may go to them.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "One opt-out list with its history: each suppression says how it was added (method: manual, automated, or ai_suggested with the AI's confidence when it read a reply as an opt-out), who added it, from which tool (source) and connection, and filters by them.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "The opt-out list is kept in step with EmailBison, Instantly and Smartlead: every platform sync reads their blocklist into it and writes it to theirs (Smartlead write only), so a send from either side honours both (GET/PATCH .../suppression-syncs, MCP list_suppression_syncs, update_suppression_sync).",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Agents must send a customer record's version when they change or merge it.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "One-off DNS approval (Domain Connect): when a domain's DNS host supports it, the one-click button for site verification, tracking domains and sending domains sends you to your DNS host's own \"apply these records?\" screen.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Cal.com, Stripe and OpenRouter connect with a sign-in as well as a key.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "fix",
+			"area": "general",
+			"edition": "open-source",
+			"text": "The SEO overview shows Ahrefs or DataForSEO numbers a few minutes after you connect them, instead of after the next weekly snapshot and the end of the week.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "fix",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Calls the hosted MCP server refuses (at /mcp) now show their reason on the Logs page: invalid_request with the JSON-RPC method an app sent before starting a session, not_found for an expired session, instead of a bare http_400.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Live updates: a connection can now get its own webhook address, so a tool tells Outflare when something happens instead of being asked.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Get started has a skippable **Star and follow Outflare** step before the first mission, and Home shows the same two optional one-click items, **Star us on GitHub** and **Follow us on X**, to anyone who hasn't opened them.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Connecting Geonode from the page that needs it is one step: Social, a brand's links and site audits show a Connect Geonode button with Geonode's logo, Connectors says what that page uses Geonode for, and you land back on the same page once it's connected (or if you close it).",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Social opens on Your accounts: each brand's X and LinkedIn accounts, from its links or found on its website, to confirm in one click, with what each needs to be read (Geonode for X followers, a LinkedIn sign-in) and its followers once read.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Social tracks every social profile in a brand's links, not only X and LinkedIn: YouTube channels, Instagram, TikTok, Facebook and GitHub accounts, subreddits, Discord servers and LinkedIn company pages have their followers read every day from their public page through your own Geonode account, so growth shows day by day (new followers_change_1d on social accounts).",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "One click for every DNS record Outflare asks for: a site's proof of ownership (Site audits, POST .../seo-sites/{site}/dns, MCP add_seo_site_dns) and a tracking domain's CNAME (POST .../tracking-domains/{id}/dns, MCP add_tracking_domain_dns) join sending domains and brand setup.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "A pipeline runtime for work that moves through stages one item at a time (docs/pipeline.md).",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "**Analytics → Website tracking** puts Outflare's script on a brand's site in three steps: get it, add it (one click through your own Google Tag Manager, a message to a developer, a prompt for an AI coding tool, or paste), then watch for the first visit, which turns the page green.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "MoltSets is a data connector.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "**AI usage** (Settings → AI usage, GET /ai-usage, MCP get_ai_usage): every AI call Outflare makes with the workspace's own key is logged with the tool that made it (planning, agent turns, reply labelling, domain research, AI visibility, social replies, email verification, or an extension's own), its provider, model, tokens and cost, so you can see where your AI spend goes.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "A monthly AI limit for each tool, on top of the workspace's (PUT /ai-usage/limits, MCP update_ai_tool_limits).",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Connecting an AI model now asks you to confirm that your provider bills you for every call, that the spend is yours to manage, and that you should set a hard limit with the provider.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "email_verification is a model task, so verifying addresses with AI can use a cheaper model (Claude Haiku 5.5 by default).",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Metrics outflare_ai_calls_total, outflare_ai_tokens_total, outflare_ai_cost_cents_total and outflare_ai_budget_alerts_total, an AI row on the dashboard and two alerts (a tool calling AI in a loop, many limits reached at once).",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Brand links are found for you: with Geonode connected, Outflare reads each brand's website and suggests the social profiles and app store listings it links to, to add (correcting the address if need be) or dismiss under the brand's Links, with the common places it has no link for shown as gaps.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Proxy secrets for website tracking: a site that forwards tracking through its own domain can pass on each visitor's real address (X-Outflare-Proxy and X-Outflare-Client-IP), with per-visitor limits; the snippet now retries failed sends.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "security",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Security improvements.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Editable and custom roles.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Owners can invite owners, and anyone but the last owner can leave a workspace (POST /v1/workspaces/{ws}/leave).",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "general",
+			"edition": "open-source",
+			"text": "The operator role is called Member in the app, and members can connect tools (integrations.manage) by default.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Extensions can add sidebar items for some people only, with Host.AddMenuLinks.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Website events are queued before they are stored: POST /v1/site/events checks the key, limits and each event's shape, writes the batch to an inbox and answers, and the workers store it in order, as of when it arrived.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Website visitors: see which companies and people visited your site, with a score and a visitor.became_hot alert.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Lifecycle sending domains: add the DNS records in one click through your own Cloudflare connection, or hand them to your AI agent or a developer with a ready-made prompt or message (POST .../email-provider-domains/{id}/dns, ai_prompt, developer; MCP add_email_domain_dns).",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "fix",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Jobs that run longer than five minutes, such as large lead list runs, no longer start a second copy on another worker: a running job now renews its lease while it works, and a job taken over after a long database outage stops instead of finishing twice.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "general",
+			"edition": "open-source",
+			"text": "The brand picker moved to the top of the sidebar, under the workspace (on a phone, the top bar), and a workspace with brands now shows one brand at a time, like a project in PostHog: it opens on the brand picked last, or the first brand.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Brand setup: each brand gets an ordered checklist under **Company → Brand setup** (the website script, verifying the website, then analytics, Search Console, email, payments, ads, social and a CRM), and Home shows \"Continue setting up Acme · 3 of 9\" until it's done or closed.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Install health: Outflare now watches what is installed and tells you when something is out of date or broken: a site that never sent a visit or went quiet for two days, a page still running an old copy of the website script (the script now reports its version), an unverified site, a connection that needs signing in again, an SDK, CLI or MCP server below the supported…",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "general",
+			"edition": "open-source",
+			"text": "The web app uses the whole width of the screen.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Ideal customer profiles (Company → Ideal customers, /v1/workspaces/{ws}/ideal-customer-profiles): describe who you sell to once, in words and as lead search filters, and every project, lead list fit score and the lead finder uses it.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Run Outflare as separate services from one image with OUTFLARE_ROLE: api (app and API), ingest (website events and site.js on their own address) and worker (jobs and background loops), so a deploy or a busy app doesn't drop website events.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Broadcasts, journeys and social replies tag their own links with a campaign: one per broadcast, journey or watch, listed under Analytics → Campaign links.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Website tracking v2: visits (sessions) with landing page, referrer, tags, rough country, device and browser; first and last touch fields and a referral code on people; bot filtering; serving the snippet from your own domain with a server-set cookie; and visits across several domains (data-domains).",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Monitoring: set OUTFLARE_METRICS_ADDR (such as :9091) and the server serves Prometheus metrics on that private address: requests and latency per route, the job queue's depth and oldest waiting job by kind, job run and wait times, the database pool, Postgres connections, locks, cache hits and largest tables, and CPU, memory and goroutines.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Campaign links (Analytics → Campaign links, /v1/workspaces/{ws}/tracking-campaigns): one taxonomy of nine channels, each with a fixed utm_medium and the usual sources, and a builder that tags any page with utm_source, utm_medium, utm_campaign, utm_content, utm_term and a short campaign id, ofc.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Scale product analytics past Postgres: set OUTFLARE_CLICKHOUSE_URL and every product event is copied to ClickHouse within about a minute, edits and deletions included.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Connections shared with brands: connect a tool once for the workspace and every brand uses it, or only the brands you pick; a brand with its own account (say, its own Plausible) connects it on that brand, and it replaces the shared one for that brand alone.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "general",
+			"edition": "open-source",
+			"text": "The brand picker moved to the top bar, next to the page name, and a workspace with brands now shows one brand at a time, like a project in PostHog: it opens on the brand picked last, or the first brand.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Keep your server's own usage events in one of your workspaces: set OUTFLARE_EVENTS_WORKSPACE to its id and every action, API and MCP call, and error is stored there as a product event (source outflare), with the people who use your server as customer records identified by their account's email.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Link opportunities on the fixes list (source seo_links): strong links lost lately to win back, links to pages your latest crawl found broken, strong domains that link to two or more of your tracked competitors but not to you, and toxic links nobody reviewed.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Competitor gaps: the keywords your tracked competitors rank for that you don't (or rank well below), and the domains that link to them but not to you, from the weekly snapshot of the first five tracked competitors a site.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Link spam scoring: every backlink gets a spam score from 0 to 100 with the reasons (your SEO tool's own judgement, weak or spammy linking domains, spam anchors, link farms, sitewide links).",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Regressions: after every Search Console sync, rank check, conversions sync and crawl, Outflare compares each SEO site's latest numbers with the ones before and lists what dropped on the Keywords page (Drops): a page's search clicks or conversions well under its weekly average, a tracked keyword that fell five places or more, a page out of Google's index, or the site's health…",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "SEO competitors: each week your DataForSEO or Ahrefs connection suggests the sites competing with each SEO site for the same keywords; track the ones that matter or add your own, and give them names.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "A Paid ads page in the app: spend, clicks, CTR, cost per click and platform-reported conversions by platform and campaign for 7, 28 or 90 days, each ad account's brand and sync switch, and a place to add a Google Ads or Microsoft Advertising developer token.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "One to-do list for every module: GET /v1/workspaces/{ws}/status, and with it Home's **Needs you** list, now also reports email sending domains the provider wouldn't verify (email_domain_failed), broadcasts that stopped this week (email_broadcast_failed), social replies waiting for approval (social_drafts_waiting), possible duplicate people (duplicates_waiting), new product…",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "34 more webhook events: customer records (record.created, record.updated, record.merged, record.bulk_created, identity.verified, identity.closed, relationship.added, relationship.ended), consent (consent.granted, consent.withdrawn, consent.bulk_withdrawn), brands (brand.created, brand.updated), broadcasts and journeys (email_broadcast.*, journey.*, journey_run.entered…",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Conversions by landing page: with your own PostHog connected, the Keywords page (Conversions) shows, for each page, the visits that started on it and how many went on to a conversion event, overall and from search engines, beside its Search Console clicks, position and target keyword.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "general",
+			"edition": "open-source",
+			"text": "The sidebar is regrouped so each thing has one home as Outreach grows.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Home has one **Needs you** list: everything waiting on a person, worst first (red, then amber, then set-up, then the rest), with the next set-up step as one row and a check mark when nothing needs you.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Leads are people.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "An unsubscribe from any email, cold or lifecycle, is also a withdrawn consent to all marketing email on the person's record, in every brand.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Rank tracking: follow where your site ranks on Google for the keywords you choose, or every page's target keyword, by country and device, checked weekly or daily through your own DataForSEO connection within its monthly budget (about $0.02 a check, recorded on Outcomes).",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Fix autonomy: how far agents may go with the fixes list on their own.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "SEO experiments: did a change to a website's pages help?",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Internal links worth adding: for each page with a target keyword, the Keywords page (Internal links) lists up to five other pages about that keyword that don't link to it yet, from the latest crawl and Search Console.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Website tracking: add a site key (Settings → General → Website tracking, /v1/workspaces/{ws}/site-keys, MCP create_site_key) and paste its snippet (/site.js) into your site.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Cannibalisation: the Keywords page (Cannibalisation) lists the searches Google shows several of your pages for, splitting the clicks, with each page's share and the page to keep.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Social growth for X and LinkedIn: connect your own X developer app (signed in with OAuth 2.0 and PKCE) or sign in to LinkedIn, and Outflare reads followers every day and your own posts' impressions, likes, replies, reposts and clicks, for X accounts, LinkedIn company pages you administer and your own LinkedIn profile.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Digests: a daily or weekly summary of the whole workspace (what needs a person, fixes, deploys, site health, outreach, lifecycle email and missions, each compared with the period before).",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Site audits check AI crawlers: what robots.txt lets each AI search, user and training crawler (OAI-SearchBot, ChatGPT-User, GPTBot, Claude-SearchBot, ClaudeBot, PerplexityBot and others) read, from the robots.txt the crawl already read, and whether the site has an llms.txt (GET /v1/workspaces/{ws}/crawls/{crawl}/ai-access, MCP get_crawl_ai_access).",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "AI crawler visits from request logs: with a Cloudflare Web Analytics connection whose token has Zone Read and Analytics Read, the daily analytics sync counts requests by each AI search, user and training crawler per host and day (GET /v1/workspaces/{ws}/ai-bot-hits, MCP get_ai_bot_hits) (docs/ai-visibility.md).",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "An **AI visibility** page in the SEO module: choose the models to ask (on your own AI connections) and the monthly limit, add cohorts of questions and competitors, run them, and see mention rate, share of voice, citations, fact accuracy, the sites answers cite, and AI crawler visits.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Reddit, the first channel of the Social module: watches find posts where your brand can help (by phrase, in chosen subreddits or all of Reddit), the workspace's own AI drafts replies that end with a disclosure line, and a person approves each one before it posts from the brand's own account through the workspace's own Reddit app.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "A keyword target for each page: set the search a page should rank for, or accept the query Search Console says brings it the most clicks.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "AI visibility checks facts: list what is true about each brand (prices, features, where it sells) and every AI answer naming the brand is checked against it by the workspace's own model for the AI visibility task.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "launch",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Payments from Stripe in customer records.",
+			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "Extensions can list their own AI calls as a tool on Settings → AI usage, with a name, a description and a monthly limit of their own, while using the model chosen for a built-in task.",
+			"at": "2026-10-27T20:49:58Z"
+		},
+		{
+			"kind": "launch",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "CRM → Lead finder: on Outflare Cloud, AI searches the web for companies that fit your ideal customer, reads their websites and tells you which fit and why, for you to review before they're added. It runs on your own Geonode account and AI key. Self-hosted servers show what it does and where to get it.",
+			"at": "2026-10-27T20:49:58Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "general",
+			"edition": "open-source",
+			"text": "**Follow us on X** now shows next to **Star us on GitHub** on Home and in Get started, opening Outflare's profile (@outflareai).",
+			"at": "2026-10-27T20:49:58Z"
+		},
+		{
+			"kind": "launch",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Indexability report: every page from the crawl, its sitemaps, Search Console and your SEO tool in one list, with whether it can be indexed and whether Google indexed it. Where the sources disagree it says which to trust, flags pages Google skipped, sitemap mistakes and orphans with how to fix each, and tracks it day by day.",
+			"at": "2026-10-27T20:49:58Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "People by name on the Visitors page: connect your own RB2B, Vector or Warmly, turn it on and accept the notice, then paste the webhook address into the tool. New people are added to your CRM tagged with the tool and held for review: hidden from the people list and never emailed until someone approves them.",
+			"at": "2026-10-27T21:00:07Z"
+		},
+		{
+			"kind": "launch",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Replies move deals: a reply rule can open or move a deal in Outflare's own CRM when a reply gets a label, such as \"interested\" to Qualified and \"meeting booked\" to Meeting. Deals only move forward, never out of won or lost, and never over a stage a person set.",
+			"at": "2026-10-27T21:00:07Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Feature flags: turn something on for the visitors you pick, or split them between versions of a page to see which works better. Each visitor keeps their version, your website and servers agree on it, and pages don't flicker. Find them under Analytics → Feature flags.",
+			"at": "2026-10-27T21:00:07Z"
+		}
+	],
+	"through": "e1ec7ec+9e30ced"
+}

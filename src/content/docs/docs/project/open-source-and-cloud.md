@@ -31,6 +31,16 @@ Two promises come with it:
 
 Today everything these docs describe runs in both. When a Cloud-only feature ships, it gets its own page here and joins this table.
 
+## Coming to Cloud
+
+These are on the way, and run only in Outflare Cloud:
+
+- **Autopilots:** agents that keep working toward a target you set.
+- **Enterprise controls:** single sign-on, SCIM, audit log export and approvals across teams.
+- **Heavy work at scale:** AI visibility across many models, large site crawls and session replay.
+
+Self-hosted and Cloud are both free for now; see [Pricing](/pricing/).
+
 ## How these docs mark Cloud-only features
 
 A page for a feature that runs only in Outflare Cloud:
@@ -44,4 +54,4 @@ A page for a feature that runs only in Outflare Cloud:
 - **Self-host** when your data must stay on your own servers, you want to read or change the code, or you already run Postgres and containers. Start with the [quickstart](/docs/quickstart/).
 - **Use Outflare Cloud** when you'd rather not run servers. [Sign up](https://app.outflare.ai/signup) and connect your first tools in a few minutes.
 
-Both serve the same API, so your scripts, agents and MCP setups work against either.
+Both serve the same API, so your scripts, agents and MCP setups work against either. [Pricing](/pricing/) has what each costs.

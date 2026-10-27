@@ -9,6 +9,9 @@ An open-source go-to-market platform that people and AI agents share. It brings 
 **Who is it for?**
 Marketing and growth teams, agencies and GTM engineers who want their go-to-market in one place, their data in their own database, and agents and scripts working through a real API.
 
+**How much does it cost?**
+Nothing. Self-hosting is free, and Outflare Cloud is free during early access. You bring your own API keys and pay those providers directly. See [Pricing](/pricing/).
+
 **Is there a hosted version?**
 Yes: Outflare Cloud at [app.outflare.ai](https://app.outflare.ai/), free during early access. Or self-host the same engine with Docker Compose. [Open source and Cloud](/docs/project/open-source-and-cloud/) explains the difference.
 
