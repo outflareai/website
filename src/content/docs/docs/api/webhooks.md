@@ -201,6 +201,12 @@ Every type is also in the API document, under `webhooks:` and in the `WebhookEve
 | `deploy.detected` | A watched repository or project went live in production. `data` has `target_id`, `site_id` (the site it serves, or null), `kind` (`deployment` or `push`), `commit`, `ref` and `deployed_at`. |
 | `deploy.failed` | A production deploy of a watched repository or project failed. |
 
+### Digests
+
+| Event | When |
+| --- | --- |
+| `digest.ready` | A daily or weekly [digest](/docs/guides/digests/) of the workspace is ready. `data` has `frequency`, `trigger` (`scheduled` or `manual`), `period_start`, `period_end`, `sections` (their ids) and `emailed`; `GET .../digests/{id}` has the numbers. |
+
 ### Projects
 
 | Event | When |
