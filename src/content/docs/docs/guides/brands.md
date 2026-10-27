@@ -17,7 +17,7 @@ Each brand has its own website (its point of truth), its own context for agents,
 
 Open **Settings → Brands → Add a brand** and give its name, website and where it ships (web, iOS, Android, TV and so on). Add its other domains on its page, such as an app or help site. A workspace without brands works exactly as before. Anyone but a viewer can add a brand, and so can an API token or connected AI app that can make changes (the `context.manage` scope); only the workspace's own name and URL need `workspace.manage`.
 
-Also on its page, under **Links**, add everywhere else the brand lives: its App Store and Google Play listings, TV app stores, the Chrome Web Store, Steam, socials and docs. Paste the address and Outflare works out what it is (apps.apple.com is the App Store); add a label such as "Fire TV" where it helps. Agents read the links with the brand's context.
+Also on its page, under **Links**, add everywhere else the brand lives: its App Store and Google Play listings, TV app stores, the Chrome Web Store, Steam, socials and docs. Paste the address and Outflare works out what it is (apps.apple.com is the App Store); add a label such as "Fire TV" where it helps. Agents read the links with the brand's context. With your own Geonode account connected, Outflare also reads the brand's website and suggests the socials and listings it links to, for you to add or dismiss ([Finding a brand's links](/docs/guides/social/#finding-a-brands-links)).
 
 The Brands page shows brands as cards or as a table you can sort; it remembers which you picked.
 
@@ -39,7 +39,7 @@ A brand's mailboxes only send for that brand's sequences, so Repocket never emai
 
 ## See one brand at a time
 
-Like a project in PostHog, you work on one brand at a time. The brand picker sits in the top bar, next to the page name, and narrows every page to that brand: projects, sequences, lead lists, mailboxes, domains, missions, connectors and analytics. Outflare opens on the brand you picked last, or your first brand. The link keeps the choice (`?brand=repocket`), so a link you share opens on the same brand.
+Like a project in PostHog, you work on one brand at a time. The brand picker sits at the top of the sidebar, under your workspace (on a phone, in the top bar), and narrows every page to that brand: projects, sequences, lead lists, mailboxes, domains, missions, connectors and analytics. Outflare opens on the brand you picked last, or your first brand. The link keeps the choice (`?brand=repocket`), so a link you share opens on the same brand.
 
 To compare brands side by side, pick **All brands** at the bottom of the picker. Each record then shows the brand it belongs to.
 
@@ -54,7 +54,7 @@ You can narrow it down on the **Connectors** page, where the **Used by** column 
 - **Shared from the workspace**: every brand, or only the brands you tick.
 - **One brand's own**: for a brand with an account of its own, say Repocket's own Plausible. Only that brand uses it, and it takes the place of the shared Plausible for Repocket alone. The other brands keep the shared one.
 
-With one brand picked in the top bar, Connectors lists what that brand uses and marks each one as **Shared from workspace** or the brand's own. When you connect something new there, choose **Every brand** or **Only Repocket**. Someone kept to some brands only sees the connections their brands use.
+With one brand picked, Connectors lists what that brand uses and marks each one as **Shared from workspace** or the brand's own. When you connect something new there, choose **Every brand** or **Only Repocket**. Someone kept to some brands only sees the connections their brands use.
 
 In the API, every connection has `brand_id` (set on a brand's own) and `brand_ids` (the brands a shared one is shared with; empty means every brand). `GET /v1/workspaces/{ws}/integrations?brand=repocket` lists what a brand uses. Set who uses a connection with `brand_id` or `brand_ids` on `POST` or `PATCH /integrations`, or `?brand=` on the sign-in link. The MCP tools are `list_integrations` and `update_integration`.
 
@@ -93,6 +93,7 @@ Changing someone's brands is in the audit log as `member.brands_changed`.
 | --- | --- | --- |
 | List brands | `GET /v1/workspaces/{ws}/brands` | `list_brands` |
 | Add or edit one, including its links | `POST /brands`, `PATCH /brands/{brand}` | `create_brand`, `update_brand` |
+| Links found on its website | `POST /brands/{brand}/links/discover`, `GET /brands/{brand}/link-suggestions` | `find_brand_links`, `list_brand_link_suggestions`, `add_brand_link`, `dismiss_brand_link` |
 | A brand's own context | `GET`/`PATCH /brands/{brand}/context` | `get_brand_context`, `update_brand_context` |
 | Company and brand context together | `GET /context?brand=repocket` | `get_context` with `brand` |
 | Move records in or out | `POST /brands/{brand}/add`, `/remove` | `add_to_brand`, `remove_from_brand` |

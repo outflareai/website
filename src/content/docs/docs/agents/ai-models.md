@@ -11,7 +11,7 @@ Outflare plans [missions](/docs/agents/missions/) from a goal and runs its own a
 
 ## Pick a provider and a model
 
-1. Open **Connectors** and connect one of the AI providers with its API key: **Claude** (Anthropic), **OpenAI**, **Gemini** (Google AI Studio), **Mistral** or **OpenRouter** (one key for many vendors' models). The key is checked with the provider before it is saved.
+1. Open **Connectors** and connect one of the AI providers with its API key: **Claude** (Anthropic), **OpenAI**, **Gemini** (Google AI Studio), **Mistral** or **OpenRouter** (one key for many vendors' models). The key is checked with the provider before it is saved. OpenRouter also lets you sign in instead: you approve on OpenRouter's page and it makes a key on your own account for Outflare, so there's nothing to copy.
 2. Open **Settings**, **General**, and find **AI model**. Choose the provider and pick a model. The list comes live from the provider, with only the chat models your key can use.
 3. Save. The Missions page then says which model it uses, with a link to change it.
 
@@ -35,6 +35,7 @@ Not every task needs the strongest model. Under **Model for each task** you can 
 | **Reply labelling** | Labelling replies to your outreach that the built-in rules can't place: interested, not now, out of office and so on | The provider's cheapest model: Claude Haiku 5.5 |
 | **Domain research** | Reading an unknown email domain's homepage to classify it | The provider's cheapest model: Claude Haiku 5.5 |
 | **AI visibility** | Reading what AI models answer about your brands, such as checking answers against your brand's facts. The questions themselves go to the models you pick for [AI visibility](/docs/guides/ai-visibility/) | The provider's cheaper model: Claude Sonnet 5.5 under Claude Opus 5.5 |
+| **Email verification** | Checking email addresses the free checks could not settle | The provider's cheapest model: Claude Haiku 5.5 |
 
 The cheaper defaults are Claude's; with another provider every task uses the main model until you pick one. Each list shows what the model costs, in US$ per million input/output tokens, and every call is priced at its own model's price. A choice belongs to the provider it was made for: switch provider and the tasks go back to their defaults.
 
@@ -44,7 +45,8 @@ The cheaper defaults are Claude's; with another provider every task uses the mai
 
 - **Monthly AI limit** for the workspace, across every plan and every turn of Outflare's agent: US$50 a month by default, or no limit. Once it is reached, planning answers `409` with `ai_budget_reached` and running missions pause and say why.
 - **Each mission's own spend limit** still applies, and every plan and turn is recorded in the mission's spend.
-- **Set a limit with the provider too.** It is the only limit that holds whatever happens, so we recommend a key made just for Outflare with a spend limit on it.
+- **A limit per tool**, such as reply labelling or social replies, on top of the workspace's. See where each tool's spend goes and set its limit under [AI usage](/docs/guides/ai-usage/). Owners and admins are emailed at 80% of a limit and when it is reached.
+- **Set a limit with the provider too.** Your provider bills your account for every call, and Outflare takes no responsibility for that spend. The provider's limit is the only one that holds whatever happens, so we recommend a key made just for Outflare with a hard spend limit on it. Outflare asks you to confirm this when you connect a model.
 
 ## How your key is kept safe
 
@@ -66,7 +68,7 @@ Outflare's agent reads text written by people outside your workspace: email repl
 | Endpoint | MCP tool | What |
 | --- | --- | --- |
 | `GET /v1/workspaces/{ws}/ai-settings` | `get_ai_settings` | The model in use, the connected providers, this month's spend and what's missing |
-| `PUT /v1/workspaces/{ws}/ai-settings` | `update_ai_settings` | Choose the connection and model, a model per task (`task_models`: `plan`, `turn`, `check_in`, `reply_labelling`, `classify_domain`), prices and the monthly limit |
+| `PUT /v1/workspaces/{ws}/ai-settings` | `update_ai_settings` | Choose the connection and model, a model per task (`task_models`: `plan`, `turn`, `check_in`, `reply_labelling`, `classify_domain`, `ai_visibility`, `social_replies`, `email_verification`), prices and the monthly limit |
 | `GET /v1/workspaces/{ws}/integrations/{id}/models` | `list_ai_models` | The models a connection's key can use |
 
 ```sh

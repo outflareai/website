@@ -18,8 +18,6 @@ export interface Item {
 	// open-source: in the engine, so it runs self-hosted and on Cloud. cloud: only on app.outflare.ai.
 	edition: Edition;
 	text: string;
-	// Engine pull requests (public). Cloud pull requests are never listed.
-	prs?: number[];
 	// GitHub handles of outside contributors to thank.
 	thanks?: string[];
 	// When the deploy that shipped it finished (ISO 8601, UTC).
@@ -33,8 +31,6 @@ export interface Day {
 	status: 'in-progress' | 'final';
 	// When the entry last changed (ISO 8601, UTC).
 	updated: string;
-	// The engine commit production ran at the end of the day.
-	engine?: string;
 	// The production version (/v1/meta, <engine>+<cloud>) this day covers up to,
 	// so the next run knows where to carry on.
 	through?: string;

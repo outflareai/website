@@ -14,7 +14,8 @@ import { join } from 'node:path';
 const root = new URL('..', import.meta.url).pathname;
 const dataDir = join(root, 'src/data/changelog');
 const outDir = join(root, 'changelog');
-const engine = 'https://github.com/outflareai/outflare';
+// The public repository: self-hosted releases are published there.
+const publicRepo = 'https://github.com/outflareai/outflare';
 
 const kinds = { launch: 'New', improvement: 'Improved', fix: 'Fixed', security: 'Security' };
 const editions = { 'open-source': 'Open source', cloud: 'Cloud' };
@@ -51,7 +52,7 @@ function problemsIn(file, d) {
 	if (d.version !== d.date?.replaceAll('-', '.')) bad(`version must be ${d.date?.replaceAll('-', '.')}`);
 	if (!['in-progress', 'final'].includes(d.status)) bad('status must be in-progress or final');
 	if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?Z$/.test(d.updated ?? '')) bad('updated must be an ISO time in UTC');
-	if (d.engine && !/^[0-9a-f]{7,40}$/.test(d.engine)) bad('engine must be a commit hash');
+	if ('engine' in d) bad('days carry no engine commit: the engine is private (through has the production version)');
 	if (d.through && !/^[0-9a-f]{7}\+[0-9a-f]{7}$/.test(d.through)) bad('through must be a production version, <engine>+<cloud>');
 	if (d.selfHosted && !/^v\d+\.\d+\.\d+(-[\w.]+)?$/.test(d.selfHosted)) bad('selfHosted must be a version tag');
 	if (!Array.isArray(d.items) || d.items.length === 0) bad('a day needs at least one line');
@@ -61,9 +62,7 @@ function problemsIn(file, d) {
 		if (!editions[i.edition]) bad(`${at}: edition must be open-source or cloud`);
 		if (!areaLabels[i.area]) bad(`${at}: area must be one of ${Object.keys(areaLabels).join(', ')}`);
 		if (typeof i.text !== 'string' || i.text.length < 10 || i.text.length > 400) bad(`${at}: text must be 10 to 400 characters`);
-		if (i.edition === 'cloud' && i.prs?.length) bad(`${at}: Cloud lines never list pull requests`);
-		if (i.kind === 'security' && i.prs?.length) bad(`${at}: security lines never list pull requests`);
-		if (i.prs && !i.prs.every((p) => Number.isInteger(p) && p > 0)) bad(`${at}: prs must be engine pull request numbers`);
+		if ('prs' in i) bad(`${at}: lines never list pull requests: Outflare is built in private repositories`);
 		if (i.thanks && !i.thanks.every((h) => /^[A-Za-z0-9-]{1,39}$/.test(h))) bad(`${at}: thanks must be GitHub handles`);
 		if (i.at && !(i.at.startsWith(d.date) && /Z$/.test(i.at))) bad(`${at}: at must be a UTC time on ${d.date}`);
 		if (i.kind === 'security' && !securityWording.test(i.text)) bad(`${at}: security lines say only "Security improvements to <area>."`);
@@ -76,17 +75,15 @@ function markdown(d) {
 	const lines = [`# Outflare ${d.version}`, ''];
 	lines.push(d.status === 'final' ? `Final. Last updated ${d.updated.replace('T', ' ').slice(0, 16)} UTC.` : `In progress: this day closes at midnight UTC. Last updated ${d.updated.replace('T', ' ').slice(0, 16)} UTC.`);
 	lines.push('', `On the web: https://outflare.ai/changelog/#${d.date}`);
-	if (d.engine) lines.push(`Engine commit on Outflare Cloud: [${d.engine.slice(0, 7)}](${engine}/commit/${d.engine})`);
-	if (d.selfHosted) lines.push(`Self-hosted release: [${d.selfHosted}](${engine}/releases/tag/${d.selfHosted})`);
+	if (d.selfHosted) lines.push(`Self-hosted release: [${d.selfHosted}](${publicRepo}/releases/tag/${d.selfHosted})`);
 	for (const [kind, label] of Object.entries(kinds)) {
 		const items = d.items.filter((i) => i.kind === kind);
 		if (!items.length) continue;
 		lines.push('', `## ${label}`, '');
 		for (const i of items) {
-			const prs = (i.prs ?? []).map((n) => `[#${n}](${engine}/pull/${n})`).join(' ');
 			const thanks = i.thanks?.length ? ` Thanks ${i.thanks.map((h) => `@${h}`).join(', ')}.` : '';
 			const time = i.at ? ` (${i.at.slice(11, 16)} UTC)` : '';
-			lines.push(`- **${editions[i.edition]}** · ${areaLabels[i.area]}: ${i.text}${thanks}${prs ? ` ${prs}` : ''}${time}`);
+			lines.push(`- **${editions[i.edition]}** · ${areaLabels[i.area]}: ${i.text}${thanks}${time}`);
 		}
 	}
 	return lines.join('\n') + '\n';
@@ -98,7 +95,7 @@ function render(days) {
 	const index = [
 		'# Outflare changelog',
 		'',
-		'One file per day for what reached Outflare Cloud, named by the date in UTC. A day fills up as updates go live and is final at midnight UTC. **Open source** lines are in the [engine](https://github.com/outflareai/outflare) and reach self-hosted installs with the next release ([CHANGELOG.md](https://github.com/outflareai/outflare/blob/main/CHANGELOG.md)); **Cloud** lines are only on app.outflare.ai.',
+		'One file per day for what reached Outflare Cloud, named by the date in UTC. A day fills up as updates go live and is final at midnight UTC. **Open source** lines are in the open-source engine and reach self-hosted installs with the next release ([releases](https://github.com/outflareai/outflare/releases)); **Cloud** lines are only on app.outflare.ai.',
 		'',
 		'Also at https://outflare.ai/changelog/, as JSON at https://outflare.ai/changelog.json and as RSS at https://outflare.ai/changelog.xml. These files are generated from `src/data/changelog/`; edit those, then run `node scripts/changelog.mjs render`.',
 		'',

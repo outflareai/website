@@ -33,7 +33,7 @@ curl -X POST localhost:8080/v1/workspaces/$WS/integrations/$INTEGRATION/mailboxe
   -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" -d '{"all":true}'
 ```
 
-To import only some, send `{"emails": ["ana@acme-mail.com", "ben@acme-mail.com"]}` or `{"external_ids": [...]}` instead. The answer says how many were queued, how many wait for Cheap Inboxes, and which addresses it didn't find.
+To import only some, send `{"emails": ["ana@acme-mail.example", "ben@acme-mail.example"]}` or `{"external_ids": [...]}` instead. The answer says how many were queued, how many wait for Cheap Inboxes, and which addresses it didn't find.
 
 Follow progress in the list (scope `mailboxes.read`). Each mailbox has an `import_state`:
 

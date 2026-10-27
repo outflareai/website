@@ -19,7 +19,6 @@ export function GET({ site }: { site: URL }) {
 				edition: i.edition,
 				edition_label: editions[i.edition],
 				text: i.text,
-				prs: (i.prs ?? []).map((n) => `https://github.com/outflareai/outflare/pull/${n}`),
 				thanks: i.thanks ?? [],
 				at: i.at ?? null,
 			})),

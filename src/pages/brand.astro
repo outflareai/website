@@ -42,7 +42,23 @@ const donts = [
 	{ id: 'retype', text: 'Retype the name in a font', style: '' },
 ];
 
-const kitSize = '450 KB';
+// Profile artwork for our own accounts (and anyone setting one up for us): the
+// white logo centred on Night, sized for each platform.
+const profiles = [
+	{ name: 'Avatar', use: 'Profile picture everywhere', size: '1024 × 1024', href: `${b}/icons/outflare-avatar-dark-1024.png` },
+	{ name: 'X banner', use: 'Header photo', size: '1500 × 500', href: `${b}/social/outflare-banner-x-1500x500.png` },
+	{ name: 'Bluesky banner', use: 'Banner', size: '3000 × 1000', href: `${b}/social/outflare-banner-bluesky-3000x1000.png` },
+	{ name: 'LinkedIn banner', use: 'Company page cover', size: '1128 × 191', href: `${b}/social/outflare-banner-linkedin-1128x191.png` },
+	{ name: 'YouTube banner', use: 'Channel art; the logo sits in the safe area', size: '2560 × 1440', href: `${b}/social/outflare-banner-youtube-2560x1440.png` },
+	{ name: 'Facebook cover', use: 'Page cover photo', size: '1640 × 624', href: `${b}/social/outflare-banner-facebook-1640x624.png` },
+	{ name: 'Reddit banner', use: 'Community and profile banner', size: '1920 × 384', href: `${b}/social/outflare-banner-reddit-1920x384.png` },
+	{ name: 'Discord banner', use: 'Server banner and invite splash', size: '960 × 540', href: `${b}/social/outflare-banner-discord-960x540.png` },
+	{ name: 'Mastodon header', use: 'Header image', size: '1500 × 500', href: `${b}/social/outflare-banner-mastodon-1500x500.png` },
+	{ name: 'Video thumbnail', use: 'YouTube and video covers', size: '1280 × 720', href: `${b}/social/outflare-thumbnail-1280x720.png` },
+	{ name: 'Square post', use: 'Instagram, Threads, TikTok and listings that ask for a square', size: '1080 × 1080', href: `${b}/social/outflare-square-1080x1080.png` },
+];
+
+const kitSize = '610 KB';
 ---
 
 <Marketing title="Brand · Outflare" description="The Outflare logo, mark, app icons and colours, with downloads in SVG and PNG for light and dark backgrounds, and the rules for using them.">
@@ -60,7 +76,7 @@ const kitSize = '450 KB';
 					</a>
 					<a href={`mailto:${site.email}`} class="btn btn-outline btn-lg">Ask us a question</a>
 				</div>
-				<p class="mt-3 text-xs text-muted-foreground">ZIP, {kitSize}: every logo in SVG, PNG and WebP, app icons, avatars and the social image.</p>
+				<p class="mt-3 text-xs text-muted-foreground">ZIP, {kitSize}: every logo in SVG, PNG and WebP, app icons, avatars, the social image and profile banners.</p>
 			</div>
 			<div class="card relative flex aspect-[16/9] items-center justify-center overflow-hidden">
 				<div class="grid-bg absolute inset-0 [--grid-mask:radial-gradient(ellipse_75%_70%_at_50%_50%,#000_30%,transparent_100%)]" aria-hidden="true"></div>
@@ -278,6 +294,33 @@ const kitSize = '450 KB';
 				</div>
 			</div>
 			<img src={`${b}/social/outflare-social-1200x630.webp`} alt="Outflare social image: the logo and the line 'The open-source GTM platform for humans and agents' on a dark background" width="1200" height="630" class="w-full rounded-xl border" loading="lazy" />
+		</div>
+	</section>
+
+	<!-- Profiles -->
+	<section id="profiles" class="border-t">
+		<div class="mx-auto max-w-6xl scroll-mt-20 px-4 py-20 sm:px-6">
+			<p class="eyebrow"><span class="text-foreground">08</span> / Profiles</p>
+			<h2 class="h2 mt-3">Profile pictures and banners</h2>
+			<p class="sub">What our accounts use, sized for each platform. Display name Outflare, handle @outflareai, link https://outflare.ai. Our profiles are listed on the <a href="/social/" class="font-medium text-foreground underline underline-offset-4">Social</a> page.</p>
+			<img src={`${b}/social/outflare-banner-x-1500x500.png`} alt="Outflare banner: the white logo centred on a near-black background" width="1500" height="500" class="mt-10 w-full rounded-xl border" loading="lazy" />
+			<ul class="card mt-4 divide-y">
+				{
+					profiles.map((p) => (
+						<li class="flex items-center justify-between gap-3 px-4 py-2.5">
+							<div class="min-w-0">
+								<p class="text-sm font-medium">{p.name} <span class="font-normal text-muted-foreground">· {p.size} PNG</span></p>
+								<p class="text-xs text-muted-foreground">{p.use}</p>
+								<p class="truncate font-mono text-[11px] text-muted-foreground">https://outflare.ai{p.href}</p>
+							</div>
+							<a href={p.href} download class="btn btn-ghost btn-sm shrink-0" data-track="brand_asset_download" data-track-label={label(p.href)} aria-label={`Download ${p.name.toLowerCase()} (${p.size} PNG)`}>
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"/><path d="m7 10 5 5 5-5"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>
+								Download
+							</a>
+						</li>
+					))
+				}
+			</ul>
 		</div>
 	</section>
 

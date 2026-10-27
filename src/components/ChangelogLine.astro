@@ -1,7 +1,6 @@
 ---
-// One line of a changelog day: its edition tag, the text, and links to the engine
-// pull requests it came from.
-import { repo } from '../data/project';
+// One line of a changelog day: its edition tag, the text, thanks and the time it went live.
+// No pull request links: Outflare is built in private repositories and published by release.
 import { editions, type Item } from '../data/changelog';
 
 interface Props {
@@ -16,7 +15,6 @@ const { item, big } = Astro.props;
 	<span class="min-w-0">
 		<span class={big ? 'text-foreground' : ''}>{item.text}</span>
 		{item.kind === 'security' && <span class="badge badge-muted ml-1">Security</span>}
-		{item.prs?.map((n) => <a href={`${repo.url}/pull/${n}`} class="ml-1.5 font-mono text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline">#{n}</a>)}
 		{item.thanks?.length ? <span class="ml-1.5 text-xs">Thanks {item.thanks.map((h, i) => <>{i > 0 && ', '}<a href={`https://github.com/${h}`} class="underline hover:text-foreground">@{h}</a></>)}</span> : null}
 		{item.at && <span class="ml-1.5 font-mono text-xs text-muted-foreground/70">{item.at.slice(11, 16)} UTC</span>}
 	</span>

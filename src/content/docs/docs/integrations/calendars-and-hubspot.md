@@ -14,7 +14,7 @@ Connect them under **Connectors**, like any other connector: paste an API key, o
 | Google Calendar | OAuth (read-only events) | Meetings, incrementally | Nothing |
 | Outlook | OAuth (`Calendars.Read`) | Meetings, incrementally | Nothing |
 | Calendly | OAuth, or a personal access token | Scheduled events and invitees | Nothing |
-| Cal.com | API key; base URL for self-hosted Cal.com | Accepted bookings | Nothing |
+| Cal.com | OAuth, or an API key (with a base URL for self-hosted Cal.com) | Accepted bookings | Nothing |
 | HubSpot | OAuth, or a private app token | Meetings with their outcome; deals with stage and amount | Booked meetings, when turned on |
 
 Only events with a lead among the attendees are stored. Your other meetings are never copied.
@@ -38,6 +38,7 @@ On a self-hosted instance, signing in needs an app registered with the provider.
 | Outlook | `CONNECTOR_OUTLOOK_CALENDAR_CLIENT_ID`, `CONNECTOR_OUTLOOK_CALENDAR_CLIENT_SECRET` |
 | HubSpot | `CONNECTOR_HUBSPOT_CLIENT_ID`, `CONNECTOR_HUBSPOT_CLIENT_SECRET` |
 | Calendly | `CONNECTOR_CALENDLY_CLIENT_ID`, `CONNECTOR_CALENDLY_CLIENT_SECRET` |
+| Cal.com | `CONNECTOR_CAL_COM_CLIENT_ID`, `CONNECTOR_CAL_COM_CLIENT_SECRET` |
 
 Calendly tokens, Cal.com keys and HubSpot private app tokens need no app registration, so those connectors work without one. Chili Piper, SavvyCal and Zoom Scheduler are planned.
 

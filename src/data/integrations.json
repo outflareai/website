@@ -393,6 +393,25 @@
 		"pricing": "One credit per email found"
 	},
 	{
+		"id": "moltsets",
+		"name": "MoltSets",
+		"category": "data",
+		"summary": "Search B2B people and find valid work emails with your own MoltSets plan.",
+		"description": "Build lists from MoltSets people searches by title, seniority, industry, company size, country, company domain and keywords, and find work emails from a LinkedIn URL, an email, or a name with a company domain. Each email carries MoltSets' send-safety grade.",
+		"website": "https://moltsets.com",
+		"docs_url": "https://developer.moltsets.com/api-reference",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"data.search_people",
+			"data.enrich_person",
+			"data.find_email"
+		],
+		"status": "available",
+		"pricing": "Flat monthly plans with fair-use limits; a free tier of 1,000 tokens"
+	},
+	{
 		"id": "peopledatalabs",
 		"name": "People Data Labs",
 		"category": "data",
