@@ -5,7 +5,7 @@ sidebar:
   order: 8
 ---
 
-<span class="pill shipped">Shipped</span> IMAP sync, one inbox across all mailboxes, stop on reply, opt-out and bounce handling, labelling replies by what they mean in four groups, assigning, snoozing, coloured tags, saved views, label webhooks, replying from the inbox, replies from EmailBison, AI labelling with your own AI key, and reply rules. <span class="pill">Next</span> Alerts by email and Slack, and other sequencers.
+<span class="pill shipped">Shipped</span> IMAP sync, one inbox across all mailboxes, stop on reply, opt-out and bounce handling, labelling replies by what they mean in four groups, assigning, snoozing, coloured tags, saved views, label webhooks, replying from the inbox, replies from EmailBison, AI labelling with your own AI key, reply rules, and [alerts](/docs/guides/alerts/) for hot replies. <span class="pill">Next</span> Alerts in Slack, and other sequencers.
 
 ## How mail arrives
 
@@ -131,6 +131,10 @@ The AI reads dates and referred people only from replies it labels, so these rul
 Tags have a colour and are listed with how many replies carry each. Manage them under **Tags** in the inbox, or with `GET`, `POST`, `PATCH` and `DELETE` on `/v1/workspaces/{ws}/inbox-tags`. Renaming a tag renames it on every reply; deleting one takes it off them.
 
 Save a set of filters as a view from the **Views** menu, or with `POST /v1/workspaces/{ws}/inbox-views` and a name and `filters` (the same names as the list's filters). A view is yours alone unless you share it. Views an API token or agent saves are shared, so everyone sees what an agent set up. Agents use `list_inbox_views`, `create_inbox_view` and the tag tools.
+
+## Alerts for hot replies
+
+A reply labelled interested, meeting booked or question raises an [alert](/docs/guides/alerts/): it shows under **Settings → Alerts**, goes to the `alert.raised` webhook and is emailed to the person the reply is assigned to, else whoever made the sequence.
 
 ## Send labels to other systems
 
