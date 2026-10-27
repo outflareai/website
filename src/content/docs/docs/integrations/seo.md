@@ -110,6 +110,10 @@ until its tool has synced eight weeks, or two snapshots four weeks apart.
 
 Each weekly snapshot also reads the links to every site you [audit](/docs/guides/site-audits/), merges what both tools found into one list and keeps every link gained, lost and regained. See [Track your backlinks](/docs/guides/backlinks/).
 
+## Competitors
+
+Each weekly snapshot also suggests the domains competing with each audited site for the same keywords. Tracked competitors get an overview each week (up to 10 a site, priced like one of your own domains) and a light look from OutflareBot at their robots.txt, sitemaps and home page, and every change is kept in a feed. See [Follow your competitors](/docs/guides/competitors/).
+
 ## API
 
 ```sh
@@ -154,4 +158,8 @@ Reading needs `analytics.read`; settings and snapshots need
 - `list_backlinks`, `list_backlink_events` and `get_backlinks_summary`: the
   links to your audited sites from both tools, what was gained, lost and
   regained, and each site's totals. Free.
+- `list_seo_competitors` and `list_competitor_events`: each site's suggested
+  and tracked competitors with their numbers, and what changed at them. Free.
+  `add_seo_competitor`, `update_seo_competitor`, `remove_seo_competitor` and
+  `check_seo_competitor` track, dismiss, remove or look at one.
 - `get_analytics_overview` includes each website's latest SEO figures.
