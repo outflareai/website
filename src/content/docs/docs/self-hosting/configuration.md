@@ -15,6 +15,7 @@ The engine is configured only through environment variables. When you use the bu
 | `HTTP_ADDR` | no | `:8080` | Address the engine listens on inside the container. |
 | `PUBLIC_URL` | no | `http://localhost:8080` | External base URL. Used in links the engine generates, such as invites and the unsubscribe link in every email, and to decide whether session cookies are marked `Secure`. Set it to your public `https://` address before sending: recipients must be able to reach unsubscribe links. |
 | `WORKERS` | no | `32` | Number of job worker goroutines. |
+| `OUTFLARE_QUERY_CONNECTIONS` | no | `3` | How many [queries](/docs/guides/query-and-search/) run at once on this server, each on its own database connection. `0` turns Query off. |
 | `WEB_DIR` | no | `/web` in the Docker image | Directory of the built web app to serve. Empty disables serving the web app. |
 | `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET` | no | none | Your Google OAuth app, for connecting one mailbox at a time through Google's consent screen. Also enables **Continue with Google** on the sign-in and invite pages. Register `$PUBLIC_URL/v1/oauth/callback` and `$PUBLIC_URL/v1/auth/google/callback` as its redirect URIs. See [Google Workspace and Microsoft 365](/docs/integrations/google-and-microsoft/). |
 | `MICROSOFT_OAUTH_CLIENT_ID`, `MICROSOFT_OAUTH_CLIENT_SECRET` | no | none | The same for Microsoft's consent screen, with an Entra app registration. |
@@ -42,6 +43,10 @@ Compose-only settings:
 | --- | --- | --- |
 | `POSTGRES_PASSWORD` | `outflare` | Password for the bundled Postgres container. |
 | `PORT` | `8080` | Host port that the engine is published on. |
+
+## Scaling, metrics and analytics storage
+
+`OUTFLARE_ROLE` splits one server into app, website-event and worker services; `OUTFLARE_METRICS_ADDR`, `OUTFLARE_METRICS_TOKEN` and `OUTFLARE_METRICS_PPROF` turn on Prometheus metrics; and `OUTFLARE_CLICKHOUSE_URL`, `OUTFLARE_S3_*` and `OUTFLARE_EVENT_RETENTION_DAYS` move analytics events out of Postgres. All of them are optional and explained in [Scaling and monitoring](/docs/self-hosting/scaling/).
 
 ## Third-party keys
 

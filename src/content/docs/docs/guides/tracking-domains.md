@@ -15,10 +15,10 @@ You can turn the header off for a sequence (**Add an unsubscribe header** in its
 
 ## Tracking domain
 
-By default, unsubscribe and click links point at your instance's `PUBLIC_URL`. A tracking domain puts them on a domain of your own, such as `links.yourdomain.com`, so links in your emails match your brand and don't share a reputation with anyone else's.
+By default, unsubscribe and click links point at your instance's `PUBLIC_URL`. A tracking domain puts them on a domain of your own, such as `links.yourdomain.example`, so links in your emails match your brand and don't share a reputation with anyone else's.
 
 1. On the **Domains** page, under **Tracking domain**, enter a subdomain of your sending domain.
-2. At your DNS host, add a `CNAME` record from that subdomain to the target shown (your instance's host).
+2. At your DNS host, add a `CNAME` record from that subdomain to the target shown (your instance's host), or use the one-click button to [approve it at your DNS host or add it through Cloudflare](/docs/guides/dns-records/).
 3. Click **Check now**. Once the record is found the domain shows **In use**, and new emails use it.
 
 A tracking domain serves only those links (click, open and unsubscribe). The rest of Outflare, sign-in included, isn't available on it. If you self-host, give the tracking domain its own HTTPS certificate on your proxy, as you did for `PUBLIC_URL`.
@@ -27,7 +27,7 @@ DNS changes can take up to an hour to show. If a verified domain later stops poi
 
 ```sh
 curl -X POST https://outflare.example.com/v1/workspaces/$WS/tracking-domains \
-  -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" -d '{"domain": "links.acme.com"}'
+  -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" -d '{"domain": "links.acme.example"}'
 curl -X POST https://outflare.example.com/v1/workspaces/$WS/tracking-domains/$ID/check -H "Authorization: Bearer $OUTFLARE_TOKEN"
 ```
 

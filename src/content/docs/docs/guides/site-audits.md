@@ -27,7 +27,7 @@ Any site can be crawled lightly. Proving that you own a site lets you crawl it f
 
 Add any one of these, then ask Outflare to check (`POST .../verify`, or the `verify_seo_site` tool):
 
-- **A DNS record:** a TXT record on your domain (without `www.`) with the value `outflare-site-verification=` followed by your site's token.
+- **A DNS record:** a TXT record on your domain (without `www.`) with the value `outflare-site-verification=` followed by your site's token. The one-click button can [add it for you](/docs/guides/dns-records/).
 - **A meta tag** in the `<head>` of the start page: `<meta name="outflare-site-verification" content="your token">`.
 - **A file** at `/.well-known/outflare-site-verification.txt` holding the token.
 

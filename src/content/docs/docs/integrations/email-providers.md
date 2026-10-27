@@ -43,7 +43,16 @@ Add the domain you send from on the provider page. Outflare registers it with th
 - SPF and bounce handling (MAIL FROM)
 - a DMARC record, if you have none
 
-Every record has copy buttons and shows whether public DNS has it yet. Outflare checks every minute for the first 15 minutes, then less often, for three days.
+There are four ways to add them, quickest first:
+
+- **One click.** When your DNS host supports Domain Connect, press **Approve in** your DNS host and approve the exact records on its own screen, with no account connected ([how it works](/docs/guides/dns-records/)). Otherwise connect the Cloudflare account your domain is on, then press **Add the records in Cloudflare**. Outflare adds only the records that are missing, marks each one "Added by Outflare", and never changes or deletes a record. It keeps a DMARC policy you already have, and it won't add a second SPF record to a name that has one: it tells you what to merge instead. The Cloudflare connection is your own account.
+- **Ask your AI agent.** Copy a prompt that lists every missing record exactly as it must be added, or open it straight in Claude or ChatGPT.
+- **Send to a developer.** A ready-to-send message with the same records, from your own email.
+- **Do it yourself.** Every record has copy buttons.
+
+You don't need to tell Outflare when you're done. It asks your domain's own nameservers, so a record shows within about a minute of being added. It checks every minute for 15 minutes after you add the domain, then less often, for three days. **Check now** checks straight away and starts the every-minute checks again.
+
+Each record shows whether it is in place. When it isn't, Outflare says what looks wrong when it can tell: a different value (shown next to the expected one), your domain typed twice in the name, a CNAME proxied by Cloudflare (switch it to DNS only), or a second SPF record. A DMARC policy you already have counts, and Outflare shows yours rather than its suggestion.
 
 ## New account limits
 
