@@ -19,7 +19,7 @@ from outflare import Outflare
 
 client = Outflare()  # reads OUTFLARE_TOKEN, and OUTFLARE_URL for a self-hosted server
 
-lead = client.upsert_lead(email="ana@acme.com", first_name="Ana", company="Acme")
+lead = client.upsert_lead(email="ana@acme.example", first_name="Ana", company="Acme")
 
 for mailbox in client.paginate(client.list_mailboxes, status="active"):
     print(mailbox["email"], mailbox["daily_limit"])
