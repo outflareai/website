@@ -26,6 +26,8 @@ Agents read the catalog with `get_catalog` before writing anything, and reuse a 
 
 Every value remembers where it came from: a person's edit, your own product, a CRM sync, enrichment or an import. When two sources disagree, the higher one wins. By default a person's edit comes first, then your product's own data, then the CRM, then enrichment. So enrichment never overwrites what someone typed, and a CRM sync never overwrites what your product knows. Every change is kept in the record's history, with who made it and from where.
 
+Paste the [website tracking](/docs/guides/website-tracking/) snippet into your site and every visit is recorded with the campaign it came from. Connect Stripe and each paying customer's plan, monthly revenue, lifetime revenue, first payment date and billing status are kept on their record for you. See [Revenue from Stripe](/docs/guides/revenue-from-stripe/).
+
 ## Emails, phones and ids
 
 A record's identities say who it is: emails, phone numbers, push device tokens, your product's own user ids, payment customer ids and company domains.
