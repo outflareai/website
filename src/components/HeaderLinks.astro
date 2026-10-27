@@ -8,6 +8,7 @@ const links = [
 	{ href: '/', label: 'Home' },
 	{ href: '/integrations/', label: 'Integrations' },
 	{ href: '/playbooks/', label: 'Playbooks' },
+	{ href: '/pricing/', label: 'Pricing' },
 	{ href: '/docs/api/', label: 'API' },
 	{ href: '/docs/agents/mcp/', label: 'MCP' },
 	{ href: '/docs/project/roadmap/', label: 'Roadmap' },
@@ -64,5 +65,8 @@ const here = Astro.url.pathname;
 	}
 	.signin:hover { opacity: 0.9; }
 	@media (max-width: 639px), (pointer: coarse) { .header-links ~ :global(.gh), .signin { min-height: 2.75rem; } }
-	@media (max-width: 64rem) { .header-links { display: none; } }
+	@media (max-width: 68rem) { .header-links { display: none; } }
+	/* Room for every link on mid-size screens: the logo already goes home, and GitHub is in the footer. */
+	@media (max-width: 80rem) { .header-links a[href='/'] { display: none; } }
+	@media (max-width: 90rem) { .header-links ~ :global(.gh) { display: none; } }
 </style>

@@ -44,4 +44,4 @@ A page for a feature that runs only in Outflare Cloud:
 - **Self-host** when your data must stay on your own servers, you want to read or change the code, or you already run Postgres and containers. Start with the [quickstart](/docs/quickstart/).
 - **Use Outflare Cloud** when you'd rather not run servers. [Sign up](https://app.outflare.ai/signup) and connect your first tools in a few minutes.
 
-Both serve the same API, so your scripts, agents and MCP setups work against either.
+Both serve the same API, so your scripts, agents and MCP setups work against either. [Pricing](/pricing/) has what each costs.
