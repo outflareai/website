@@ -62,6 +62,10 @@ In the API, every connection has `brand_id` (set on a brand's own) and `brand_id
 
 Each site in your analytics tools, such as a GA4 property, a Search Console site or a PostHog project, counts as a brand's when its domain is one of the brand's domains. Subdomains count too, so app.repocket.com is Repocket's. A site read through a brand's own connection always counts for that brand. For a site named after an app rather than a domain, pick its brand yourself (`PUT /v1/workspaces/{ws}/analytics/{id}/site-brand`), or mark it as shared.
 
+You connect Google Analytics (or any analytics tool) once for the workspace, and every property ends up in one of three places: a brand, **Shared by all brands**, or **Don't import**. Outflare suggests a brand for each and says why ("Matches repocket.com", "Name matches"), and nothing is imported until every property has a choice. A property no brand fits can start one: **New brand from this site** makes a brand named after it, with its domain as the website. Outflare never makes a brand on its own.
+
+With one brand picked and no analytics counting for it yet, the Analytics page offers **Pick from Google Analytics**: it uses the connection you already have, with no second sign-in, and lists only that brand's properties and the ones no brand has yet. Someone kept to some brands, or their API token, can only place properties in their own brands, never another brand's property or a shared one. Campaigns inside a brand are told apart with UTM tags on their links, not with separate properties.
+
 ## Keep brands from emailing the same person
 
 Leads and the suppression list are shared, so one person is one lead, and an unsubscribe from any brand stops every brand. You can go further and keep two brands from cold emailing the same person close together. In **Settings → Brands**, turn on **Contacting the same person** and choose how many days to wait (1 to 365).
