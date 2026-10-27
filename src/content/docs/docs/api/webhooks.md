@@ -294,6 +294,13 @@ Every type is also in the API document, under `webhooks:` and in the `WebhookEve
 | `social_action.done` | An approved social reply was posted from the brand's own account. data has channel and type; GET it for its link. |
 | `social_action.failed` | An approved social reply could not be posted. GET it for status_reason. |
 
+### AI spend
+
+| Event | When |
+| --- | --- |
+| `ai_budget.warned` | This month's AI calls reached 80% of the workspace's monthly AI limit or of one tool's [limit](/docs/guides/ai-usage/). `data` has `task` (empty for the workspace's limit, else the tool id), `level` (`80`), `limit_cents`, `spent_cents` and `month` (`YYYY-MM`). |
+| `ai_budget.reached` | This month's AI calls reached a limit, so Outflare makes no more of those calls until next month or a higher limit. `data` has `task`, `level` (`100`), `limit_cents`, `spent_cents` and `month`. |
+
 ### Digests
 
 | Event | When |
