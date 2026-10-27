@@ -26,6 +26,8 @@ The quickest way is your brand's [setup checklist](/docs/guides/brand-setup/): o
 
 The script tells Outflare its version with every visit. If your pages run an old copy, or a site stops sending visits, [install health](/docs/guides/brand-setup/#when-something-goes-out-of-date) tells you on Home.
 
+To show visitors different versions of a page, or turn something on for some of them, add `data-flags` and use [feature flags](/docs/guides/feature-flags/).
+
 To record a step that isn't a page, such as a click on a sign-up button, call `outflare.track("Signup Started")`. Use plain names: dotted ones like `payment.succeeded` are Outflare's own.
 
 ## What each visit records
