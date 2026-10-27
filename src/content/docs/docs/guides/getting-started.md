@@ -27,6 +27,12 @@ Home keeps one checklist of what's left, including **Invite your team**, which w
 
 ![The checklist on Home](/screens/get-started-home.png)
 
+## Help Outflare grow
+
+Get started has a **Star and follow Outflare** step before your first mission: **Star us on GitHub** and **Follow us on X**. Each is one click: it opens the page in a new tab and ticks the item. Nobody can check a star or a follow, so opening the link counts, and the step is done once you've opened both. Skip it like any step. Home shows the same two items to anyone who hasn't opened them; each person has their own, and **Hide** puts them away for good.
+
+On a self-hosted server, `OUTFLARE_COMMUNITY_LINKS=off` turns them off for everyone, and **Follow us on X** shows only when `OUTFLARE_FOLLOW_URL` is set (see [Configuration](/docs/self-hosting/configuration/)).
+
 ## Skip anything, come back any time
 
 - **Skip this step** moves on and marks it skipped. Skipping turns nothing off.
