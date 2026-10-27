@@ -2,7 +2,7 @@
 	"version": "2026.10.27",
 	"date": "2026-10-27",
 	"status": "in-progress",
-	"updated": "2026-10-27T20:28:53Z",
+	"updated": "2026-10-27T20:49:58Z",
 	"items": [
 		{
 			"kind": "fix",
@@ -668,7 +668,35 @@
 			"edition": "open-source",
 			"text": "Payments from Stripe in customer records.",
 			"at": "2026-10-27T20:28:53Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "Extensions can list their own AI calls as a tool on Settings → AI usage, with a name, a description and a monthly limit of their own, while using the model chosen for a built-in task.",
+			"at": "2026-10-27T20:49:58Z"
+		},
+		{
+			"kind": "launch",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "CRM → Lead finder: on Outflare Cloud, AI searches the web for companies that fit your ideal customer, reads their websites and tells you which fit and why, for you to review before they're added. It runs on your own Geonode account and AI key. Self-hosted servers show what it does and where to get it.",
+			"at": "2026-10-27T20:49:58Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "general",
+			"edition": "open-source",
+			"text": "**Follow us on X** now shows next to **Star us on GitHub** on Home and in Get started, opening Outflare's profile (@outflareai).",
+			"at": "2026-10-27T20:49:58Z"
+		},
+		{
+			"kind": "launch",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Indexability report: every page from the crawl, its sitemaps, Search Console and your SEO tool in one list, with whether it can be indexed and whether Google indexed it. Where the sources disagree it says which to trust, flags pages Google skipped, sitemap mistakes and orphans with how to fix each, and tracks it day by day.",
+			"at": "2026-10-27T20:49:58Z"
 		}
 	],
-	"through": "e046e64+9b65197"
+	"through": "dceb0ce+2f34203"
 }
