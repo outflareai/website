@@ -17,7 +17,7 @@ A **cohort** is a set of questions about one [brand](/docs/guides/brands/), the 
 
 - the brand it measures, or your company when you have no brands;
 - other names the brand goes by, so "Acme Cloud" counts as Acme;
-- its competitors, each with a name, websites and other names;
+- its competitors: the ones you track on the SEO **Competitors** page for the brand count by themselves, with one company's websites grouped under its name and other names. Add others to the cohort, or name one differently, only when you need to;
 - a locale such as `en-US`, so answers suit that market;
 - a schedule: run by hand, daily or weekly.
 
