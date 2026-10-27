@@ -67,7 +67,7 @@ With the API, `POST /projects/{id}/add` and `POST /projects/{id}/remove` take an
 ```sh
 curl -X POST https://outflare.example.com/v1/workspaces/$WS/projects/$PROJECT/add \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" \
-  -d '{"domains": ["acme-mail.com"], "sequence_ids": ["'$SEQ'"]}'
+  -d '{"domains": ["acme-mail.example"], "sequence_ids": ["'$SEQ'"]}'
 ```
 
 Every list of domains, mailboxes and sequences takes `?project_id=<id>` for one project's records, or `?project_id=none` for the shared ones.

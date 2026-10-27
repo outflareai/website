@@ -2886,6 +2886,36 @@ paths:
         "404": { $ref: "#/components/responses/Error" }
         "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/tracking-domains/{id}/dns:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: addTrackingDomainDNS
+      x-outflare-access: { scope: mailboxes.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Add a tracking domain's CNAME in one click
+      description: "Scope: mailboxes.manage. Adds the CNAME to `target` through the workspace's own DNS host connection (such as Cloudflare), in the background. It only adds records, never changes or deletes one. Poll the domain: `dns_install` says how it went, and Outflare looks for the CNAME on its own over the next hour."
+      tags: [tracking]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [integration_id]
+              properties:
+                integration_id: { type: string, format: uuid, description: "One of `dns_connections`: a connection that can add DNS records (capability dns.write)." }
+      responses:
+        "202":
+          description: "Queued. Inside a mission, a MissionHeld answer when the call was held for approval or dry-run instead."
+          content:
+            application/json:
+              schema: { oneOf: [{ $ref: "#/components/schemas/Queued" }, { $ref: "#/components/schemas/MissionHeld" }] }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/leads:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
@@ -6105,6 +6135,36 @@ paths:
         "409": { $ref: "#/components/responses/Error" }
         "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/seo-sites/{site}/dns:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: site, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: addSEOSiteDNS
+      x-outflare-access: { scope: seo.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Add a site's DNS proof in one click
+      description: "Scope: seo.manage. Adds the TXT record in `verification` through the workspace's own DNS host connection (such as Cloudflare), in the background. It only adds records, never changes or deletes one. Poll the site: `dns_install` says how it went, and Outflare looks for the proof every minute until the site is verified."
+      tags: [seo]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [integration_id]
+              properties:
+                integration_id: { type: string, format: uuid, description: "One of `dns_connections`: a connection that can add DNS records (capability dns.write)." }
+      responses:
+        "202":
+          description: "Queued. Inside a mission, a MissionHeld answer when the call was held for approval or dry-run instead."
+          content:
+            application/json:
+              schema: { oneOf: [{ $ref: "#/components/schemas/Queued" }, { $ref: "#/components/schemas/MissionHeld" }] }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/seo-sites/{site}/crawls:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
@@ -9049,7 +9109,7 @@ paths:
       tags: [connectors]
       parameters:
         - { name: format, in: query, schema: { type: string, enum: [json] } }
-        - { name: return, in: query, description: "The app page to land on afterwards. Default: Connectors.", schema: { type: string, enum: [get-started, setup, reddit, social] } }
+        - { name: return, in: query, description: "The app page to land on afterwards. Default: Connectors.", schema: { type: string, enum: [get-started, setup, reddit, social, providers, audits, domains] } }
       responses:
         "200":
           description: The sign-in link (format=json).
@@ -9809,7 +9869,7 @@ paths:
       parameters:
         - { name: name, in: query, schema: { type: string } }
         - { name: format, in: query, schema: { type: string, enum: [json] } }
-        - { name: return, in: query, description: "The app page to land on afterwards. Default: Connectors.", schema: { type: string, enum: [get-started, setup, tracking] } }
+        - { name: return, in: query, description: "The app page to land on afterwards: Get started, brand setup, website tracking, or where a DNS record was asked for (providers: Email providers, audits: Site audits, domains: Domains). Default: Connectors.", schema: { type: string, enum: [get-started, setup, tracking, providers, audits, domains] } }
         - { name: brand, in: query, description: "Make it this brand's own connection (id or handle). Default: a workspace connection shared with every brand.", schema: { type: string } }
       responses:
         "200":
@@ -18621,12 +18681,13 @@ components:
         hint: { type: string, description: "What looks wrong, in words, when the check can tell: the domain typed twice in the name, a proxied CNAME, a second SPF record." }
     EmailDomainDNSInstall:
       type: object
+      description: "The last one-click run that added DNS records through the workspace's own DNS host: a sending domain's, a site's proof or a tracking domain's CNAME."
       required: [status, integration_id, added, existing, at]
       properties:
         status: { type: string, enum: [queued, done, failed] }
         integration_id: { type: string, format: uuid }
         added: { type: integer, description: Records added. }
-        existing: { type: integer, description: "Records that were already there, including a DMARC policy kept as it is." }
+        existing: { type: integer, description: "Records that were already there, such as a DMARC policy kept as it is." }
         zone: { type: string, description: The DNS zone the records went in. }
         error: { type: string, description: Why it failed. }
         at: { type: string, format: date-time }
@@ -20309,7 +20370,7 @@ components:
         checked_at: { type: string, format: date-time }
     SEOSite:
       type: object
-      required: [id, brand_id, host, start_url, status, schedule, max_pages, crawl_delay_ms, obey_robots, verified, verified_at, verify_method, verify_checked_at, verification, limits, last_crawl, created_at, updated_at]
+      required: [id, brand_id, host, start_url, status, schedule, max_pages, crawl_delay_ms, obey_robots, verified, verified_at, verify_method, verify_checked_at, verification, dns_install, dns_connections, limits, last_crawl, created_at, updated_at]
       properties:
         id: { type: string, format: uuid }
         brand_id: { type: [string, "null"], format: uuid, description: The brand the site belongs to; null is shared by every brand. }
@@ -20334,6 +20395,8 @@ components:
             meta_tag: { type: string, example: '<meta name="outflare-site-verification" content="4f1c2a9e">', description: Goes in the head of the start page. }
             file_url: { type: string, example: "https://www.example.com/.well-known/outflare-site-verification.txt" }
             file_body: { type: string, example: 4f1c2a9e }
+        dns_install: { oneOf: [{ $ref: "#/components/schemas/EmailDomainDNSInstall" }, { type: "null" }], description: The last one-click run that added the DNS proof (addSEOSiteDNS). }
+        dns_connections: { type: array, items: { type: string, format: uuid }, description: "The workspace's connections that can add the DNS proof for the site's brand, such as Cloudflare." }
         limits:
           type: object
           description: What this site's settings may be, which proving ownership raises.
@@ -24333,7 +24396,7 @@ components:
         updated_at: { type: string, format: date-time }
     TrackingDomain:
       type: object
-      required: [id, domain, status, error, target, last_checked_at, verified_at, created_at]
+      required: [id, domain, status, error, target, last_checked_at, verified_at, created_at, dns_install, dns_connections]
       properties:
         id: { type: string, format: uuid }
         domain: { type: string, example: links.acme.com }
@@ -24343,6 +24406,8 @@ components:
         last_checked_at: { type: [string, "null"], format: date-time }
         verified_at: { type: [string, "null"], format: date-time }
         created_at: { type: string, format: date-time }
+        dns_install: { oneOf: [{ $ref: "#/components/schemas/EmailDomainDNSInstall" }, { type: "null" }], description: The last one-click run that added the CNAME (addTrackingDomainDNS). }
+        dns_connections: { type: array, items: { type: string, format: uuid }, description: "The workspace's connections that can add the CNAME, such as Cloudflare." }
     EnrollmentStatus:
       type: string
       enum: [active, completed, stopped, unsubscribed, bounced, replied, blocked, failed]

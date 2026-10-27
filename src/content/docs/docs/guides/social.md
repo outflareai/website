@@ -61,6 +61,23 @@ Choose **Connect LinkedIn** on Social (or go to **Connectors**, **Social**, **Li
 
 Self-hosted, the operator registers a LinkedIn app with the Community Management API and sets `CONNECTOR_LINKEDIN_CLIENT_ID` and `CONNECTOR_LINKEDIN_CLIENT_SECRET` (see [Configuration](/docs/self-hosting/configuration/)).
 
+## Finding a brand's links
+
+With Geonode connected, Outflare reads a brand's homepage through your Geonode account and suggests the social profiles and app store listings it links to: X, LinkedIn, YouTube, Instagram, TikTok, Facebook, Discord, Reddit, GitHub and the app stores. Share buttons and single posts are left out. A page built in the browser is read again with JavaScript on, so a brand costs one or two tokens.
+
+It runs when you add a brand with a website, when its website changes and when you first connect Geonode. Choose **Find links** under the brand's **Links** to run it again.
+
+Nothing is added on its own. Under **Links**, each suggestion has **Add** and **Not theirs**: correct the address first if it's wrong. A dismissed link isn't suggested again. The common places the brand has no link for yet (X, LinkedIn, YouTube, Instagram, TikTok and Facebook) show as gaps you can fill in by hand. A social profile you add is read for followers straight away.
+
+| What | REST | MCP tool |
+| --- | --- | --- |
+| Read the website for links | `POST /brands/{brand}/links/discover` | `find_brand_links` |
+| See what was found, and the gaps | `GET /brands/{brand}/link-suggestions` | `list_brand_link_suggestions` |
+| Add one, corrected if need be | `POST /brands/{brand}/link-suggestions/{id}/add` | `add_brand_link` |
+| Dismiss one | `POST /brands/{brand}/link-suggestions/{id}/dismiss` | `dismiss_brand_link` |
+
+Without Geonode, finding links answers `409 connector_needed`.
+
 ## Accounts and brands
 
 Each page and profile becomes an account on the Social page.
