@@ -2,9 +2,9 @@
 
 # Outflare website
 
-**Live at [outflare.ai](https://outflare.ai)** · [Docs](https://outflare.ai/docs/) · [Engine repo](https://github.com/outflareai/outflare) · [hello@outflare.ai](mailto:hello@outflare.ai)
+**Live at [outflare.ai](https://outflare.ai)** · [Docs](https://outflare.ai/docs/) · [Engine repo](https://github.com/outflareai/engine) · [hello@outflare.ai](mailto:hello@outflare.ai)
 
-The marketing site and documentation for [Outflare](https://outflare.ai), open-source GTM infrastructure for humans and agents. The product itself lives in [outflareai/outflare](https://github.com/outflareai/outflare).
+The marketing site and documentation for [Outflare](https://outflare.ai), open-source GTM infrastructure for humans and agents. The product itself lives in [outflareai/engine](https://github.com/outflareai/engine) (private; releases are published to the public [outflareai/outflare](https://github.com/outflareai/outflare)).
 
 Built with [Astro](https://astro.build) and [Starlight](https://starlight.astro.build). The output is a static site with built-in search.
 
@@ -72,7 +72,7 @@ When the main repo changes:
 1. Refresh the API contract: `npm run sync-spec` (from `main`), or `npm run sync-spec -- <branch>`, or `OUTFLARE_DIR=../outflare npm run sync-spec` from a local checkout.
 2. Update `src/data/project.ts` when a roadmap step ships, and remove the **Planned** label from its docs page.
 3. Check install and configuration pages against `README.md`, `deploy/` and `engine/internal/config` in the main repo.
-4. Merge only once app.outflare.ai runs the change. Put `Needs outflareai/outflare#NN` (or `outflareai/cloud#NN`) in the pull request's description; the `deployed` check (`scripts/check-deployed.mjs`) stays red until that pull request is merged and in the version production reports at `/v1/meta`, and until production serves the same `spec/openapi.yaml`. Re-run it after the deploy. It reads the private repositories with the `DEPLOY_CHECK_TOKEN` secret.
+4. Merge only once app.outflare.ai runs the change. Put `Needs outflareai/engine#NN` (or `outflareai/cloud#NN`) in the pull request's description; the `deployed` check (`scripts/check-deployed.mjs`) stays red until that pull request is merged and in the version production reports at `/v1/meta`, and until production serves the same `spec/openapi.yaml`. Re-run it after the deploy. It reads the private repositories with the `DEPLOY_CHECK_TOKEN` secret.
 
 ## License
 
