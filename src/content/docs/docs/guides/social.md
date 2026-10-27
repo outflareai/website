@@ -7,28 +7,40 @@ sidebar:
 
 <span class="pill shipped">Shipped</span> Followers and post numbers for X and LinkedIn, in the app, through the API and for agents.
 
-Outflare reads your brand's own X accounts, the LinkedIn company pages you administer and your own LinkedIn profile every day. The **Social** page (`/<workspace>/social`) shows followers over time, the posts you published, and their impressions, likes, replies, reposts and clicks. You see it per channel and per brand.
+Outflare reads your brand's own X accounts, the LinkedIn company pages you administer and your own LinkedIn profile every day. **Social → Accounts** (`/<workspace>/social`) shows followers over time, the posts you published, and their impressions, likes, replies, reposts and clicks. You see it per channel and per brand.
+
+## Start: confirm your accounts
+
+Social opens on **Your accounts**: each brand's X and LinkedIn accounts.
+
+1. **Confirm.** Accounts already in the brand's links show as confirmed. Accounts Outflare found on the brand's website show with **Confirm** and **Not ours**. If a brand has none, choose **Find it on the website** or **Add it**.
+2. **Connect.** Each confirmed account says what it needs to be read. For X followers that is your own Geonode account; for LinkedIn, your own LinkedIn sign-in. **Connect Geonode** or **Connect LinkedIn** opens it on Connectors, says what it's for, and brings you back to Social once it's connected.
+3. **Read.** Confirming an account that something can read reads it straight away. After that its followers update every day, and the row shows the count and when it was last read.
+
+The numbers, the accounts table and top posts appear once something has been read.
 
 Publishing, listening for mentions and replying on X and LinkedIn come next, in the same Social module as Reddit.
 
 ## Your own accounts only
 
-Outflare never uses a shared X or LinkedIn key. X runs on your workspace's own X developer app, and LinkedIn on your own sign-in. Until you connect one, nothing is read for that channel.
+Outflare never uses a shared X, Geonode or LinkedIn key. X followers come from each account's public profile, read through your own Geonode account (a token or so a day per account). X posts and their numbers need your workspace's own X developer app, and LinkedIn your own sign-in. Until you connect one, nothing is read for that channel.
 
 X bills the owner of the developer app for each post it reads. To keep that small, Outflare reads each X account once a day and at most 50 of its recent posts. You pay X directly.
 
-## Connect X
+## Add X posts with your own X app
+
+Followers on X need only Geonode. For your posts and their numbers too:
 
 1. In the X developer console, create an app with OAuth 2.0 turned on. Choose **Web App** (a confidential client).
 2. Set its callback URL to your Outflare's `/v1/integrations/oauth/callback`. On Outflare Cloud that is `https://app.outflare.ai/v1/integrations/oauth/callback`.
 3. Under **Connectors**, **Social**, **X**, paste the app's client id and client secret.
-4. On the Social page, choose **Sign in to X** and sign in to the brand's X account.
+4. On Social, choose **Sign in to X** and sign in to the brand's X account.
 
 The first read starts as soon as you sign in.
 
 ## Connect LinkedIn
 
-Under **Connectors**, **Social**, **LinkedIn**, sign in to your own LinkedIn account. Outflare finds your profile and every company page you administer.
+Choose **Connect LinkedIn** on Social (or go to **Connectors**, **Social**, **LinkedIn**) and sign in to your own LinkedIn account. Outflare finds your profile and every company page you administer.
 
 - **Company pages** get followers, and their posts with impressions, clicks, likes, comments and shares.
 - **Your profile** gets followers, where LinkedIn allows it. LinkedIn doesn't let apps list a person's own posts, so profile posts don't show.
