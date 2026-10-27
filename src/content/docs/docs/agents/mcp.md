@@ -221,6 +221,7 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `get_crawl_ai_access` | What a crawled site's robots.txt lets each AI search, user and training crawler read, and whether it has an llms.txt | |
 | `get_ai_bot_hits` | How often AI crawlers requested each site, per crawler and day, from your own Cloudflare request logs | |
 | `get_digest_settings`, `update_digest_settings`, `list_digests`, `preview_digest`, `send_digest` | The workspace's [daily or weekly digest](/docs/guides/digests/): when it is made, who gets it by email through your own provider, past digests, a preview, and one made now | Yes |
+| `list_experiments`, `create_experiment`, `get_experiment`, `list_experiment_pages`, `start_experiment`, `stop_experiment`, `delete_experiment` | [SEO experiments](/docs/guides/seo-experiments/): split a site's pages into matched treatment and control groups, start measuring on the next deploy, and read the lift, p-value and verdict from your own Search Console data | Yes |
 | `list_clients`, `use_client`, `create_client` | Agency mode only (`OUTFLARE_AGENCY`): every client with this week's numbers, switch client, add a client | Yes |
 
 The tools that make email go out, the ones that can spend data provider credits (marked *provider*), and `approve_infra_plan`, which spends money, are marked as reaching the outside world in their MCP annotations, so clients that support it can ask you before running them.

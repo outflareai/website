@@ -207,6 +207,13 @@ Every type is also in the API document, under `webhooks:` and in the `WebhookEve
 | --- | --- |
 | `digest.ready` | A daily or weekly [digest](/docs/guides/digests/) of the workspace is ready. `data` has `frequency`, `trigger` (`scheduled` or `manual`), `period_start`, `period_end`, `sections` (their ids) and `emailed`; `GET .../digests/{id}` has the numbers. |
 
+### Experiments
+
+| Event | When |
+| --- | --- |
+| `experiment.started` | An [SEO experiment](/docs/guides/seo-experiments/) started measuring: its site deployed, or a person said when the change went live. `data` has `site_id`, `by` (`deploy` or `person`), `deploy_id` and `changed_at`. |
+| `experiment.concluded` | An experiment ended with a result. `data` has `site_id`, `design`, `metric`, `verdict` (`better`, `worse`, `no_clear_change` or `too_early`), `lift`, `p_value`, `days_measured` and `treatment_pages`. |
+
 ### Projects
 
 | Event | When |
