@@ -27,6 +27,7 @@ By category, including what is planned:
 | CRMs and calendars | HubSpot, Salesforce, Pipedrive, Attio, Google Calendar, Outlook, Calendly, Cal.com |
 | Website analytics | [Google Analytics, Search Console, Bing Webmaster Tools, PostHog, Plausible, Fathom, Matomo, Umami, Mixpanel, Amplitude, Cloudflare, Simple Analytics, Clarity, Vercel](/docs/integrations/analytics/) |
 | SEO | [DataForSEO, Ahrefs](/docs/integrations/seo/), paid per call within a monthly budget |
+| Social | [X, LinkedIn](/docs/guides/social/): followers and your own posts' numbers, with your own X app and LinkedIn sign-in |
 | Code and deploys | [GitHub, Vercel](/docs/integrations/deploys/): when each website ships, read only |
 | Social | [Reddit](/docs/guides/reddit/), with your workspace's own app: find posts and post replies a person approves from the brand's own account |
 | Ad platforms | [Google Ads, Meta Ads, Microsoft Advertising, Reddit Ads, X Ads, LinkedIn Ads](/docs/integrations/paid-media/), read only, with your own ad accounts |
@@ -59,6 +60,8 @@ If the server has no OAuth app for a provider, the dialog says so and asks for t
 | Apollo | Apollo | Master API key |
 | Ahrefs | Ahrefs Connect | API key |
 | Cloudflare Web Analytics | Cloudflare | API token and account id |
+| LinkedIn | LinkedIn | |
+| X | Your own X app (OAuth 2.0 with PKCE) | Your app's client id and secret, then sign in |
 | Everything else | Not offered by the vendor | API key or token |
 
 Each catalog entry says how it connects. `auth_methods` lists the ways, recommended first. `auth_options` says which of them work on this server, and what to set when one doesn't. Each connection records its `auth_method` (`oauth2` or `api_key`).
