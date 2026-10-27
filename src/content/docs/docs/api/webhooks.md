@@ -258,6 +258,7 @@ Every type is also in the API document, under `webhooks:` and in the `WebhookEve
 | --- | --- |
 | `fix.found` | A new fix was added to the fixes list (a site audit found an issue). data has source, rule, subject_type, subject_id and run_id. GET .../fixes/{id}/prompt turns it into a prompt for a coding agent. |
 | `fix.updated` | Someone or an agent took, finished, ignored or reopened a fix, or changed its note. data holds what changed. |
+| `fix.started` | Someone or an agent took a fix before changing the site (POST .../fixes/{id}/start). data has source, rule, subject_type, subject_id and autonomy, the reason the [fix autonomy](/docs/guides/fix-autonomy/) setting gave. |
 | `fix.verify_requested` | Someone or an agent said a fix is out and asked for a check (POST .../fixes/{id}/verify). data.run_id is the crawl that checks it. |
 | `fix.confirmed` | A complete crawl no longer found a fix's issue, so it is done. data.run_id is the crawl. |
 | `fix.reopened` | A fix marked done was found again by a crawl, so it is open again. data.run_id is the crawl. |
