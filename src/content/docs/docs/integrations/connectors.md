@@ -64,6 +64,8 @@ If the server has no OAuth app for a provider, the dialog says so and asks for t
 | X | Your own X app (OAuth 2.0 with PKCE) | Your app's client id and secret, then sign in |
 | Everything else | Not offered by the vendor | API key or token |
 
+In a workspace with [brands](/docs/guides/brands/), a connection is made once and shared with every brand, or with the brands you pick, and a brand with an account of its own can connect that one for itself. See [Connect a tool once for every brand](/docs/guides/brands/#connect-a-tool-once-for-every-brand).
+
 Each catalog entry says how it connects. `auth_methods` lists the ways, recommended first. `auth_options` says which of them work on this server, and what to set when one doesn't. Each connection records its `auth_method` (`oauth2` or `api_key`).
 
 ## Connect over the API
