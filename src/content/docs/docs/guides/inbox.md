@@ -5,7 +5,7 @@ sidebar:
   order: 8
 ---
 
-<span class="pill shipped">Shipped</span> IMAP sync, one inbox across all mailboxes, stop on reply, opt-out and bounce handling, labelling replies by what they mean in four groups, assigning, snoozing, coloured tags, saved views, label webhooks, replying from the inbox, replies from EmailBison, AI labelling with your own AI key, reply rules, and [alerts](/docs/guides/alerts/) for hot replies. <span class="pill">Next</span> Alerts in Slack, and other sequencers.
+<span class="pill shipped">Shipped</span> IMAP sync, one inbox across all mailboxes, stop on reply, opt-out and bounce handling, labelling replies by what they mean in four groups, assigning, snoozing, coloured tags, saved views, label webhooks, replying from the inbox, replies from EmailBison, AI labelling with your own AI key, reply rules, and [alerts](/docs/guides/alerts/) for hot replies. <span class="pill">Next</span> Other sequencers.
 
 ## How mail arrives
 
@@ -134,7 +134,7 @@ Save a set of filters as a view from the **Views** menu, or with `POST /v1/works
 
 ## Alerts for hot replies
 
-A reply labelled interested, meeting booked or question raises an [alert](/docs/guides/alerts/): it shows under **Settings → Alerts**, goes to the `alert.raised` webhook and is emailed to the person the reply is assigned to, else whoever made the sequence.
+A reply labelled interested, meeting booked or question raises an [alert](/docs/guides/alerts/): it shows under **Settings → Alerts**, goes to the `alert.raised` webhook, is emailed to the person the reply is assigned to (else whoever made the sequence) and, if you choose, is posted to a Slack channel.
 
 ## Send labels to other systems
 

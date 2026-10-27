@@ -202,7 +202,8 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `add_reply_referral` | Add the person a reply refers you to as a lead, and optionally enrol them | Yes |
 | `list_alerts` | What needs someone now: hot replies, hot website visitors, with the page that has each | |
 | `get_alert_settings` | Who gets each kind of alert by email, and the kinds you muted | |
-| `set_alert_settings` | Choose who gets a kind of alert by email, for the workspace or a brand | Yes |
+| `set_alert_settings` | Choose who gets a kind of alert by email and the Slack channel it posts to, for the workspace or a brand | Yes |
+| `list_alert_channels` | The Slack channels your Slack can post alerts to | |
 | `mute_alerts` | Mute or unmute a kind of alert for yourself | Yes |
 | `list_tracking_domains`, `add_tracking_domain`, `check_tracking_domain` | Optional own domain for unsubscribe and click links, verified by CNAME | Yes |
 | `list_analytics`, `get_analytics_summary` | Connected website analytics tools, and traffic across all of them for a period | |

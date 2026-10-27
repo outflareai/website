@@ -1,11 +1,11 @@
 ---
 title: Alerts
-description: Hear about hot replies and hot website visitors as they happen, in the app, by email to the right person, and as a webhook.
+description: Hear about hot replies and hot website visitors as they happen, in the app, by email to the right person, in Slack, and as a webhook.
 sidebar:
   order: 16
 ---
 
-<span class="pill shipped">Shipped</span> Alerts for hot replies and hot website visitors, in the app, by email, as a webhook, in the digest and for agents. <span class="pill">Next</span> Alerts in a Slack channel.
+<span class="pill shipped">Shipped</span> Alerts for hot replies and hot website visitors, in the app, by email, in Slack, as a webhook, in the digest and for agents.
 
 An alert says something needs a person now. Outflare raises one once for each thing that happens:
 
@@ -20,6 +20,7 @@ Each alert is:
 - **Sent as the `alert.raised` [webhook](/docs/api/webhooks/)**, with ids only, so Slack, a CRM or Zapier can act on it.
 - **Counted in the [digest](/docs/guides/digests/)**.
 - **Emailed** to the person it's for, to every owner and admin, or to nobody, as you choose.
+- **Posted to Slack**, in a channel you pick, through your own Slack.
 
 ## Alert emails
 
@@ -35,10 +36,24 @@ curl -X PUT https://outflare.example.com/v1/workspaces/$WS/alerts/settings \
   -d '{"brand_id": "'$BRAND_ID'", "kind": "visitor.hot", "email": "off"}'
 ```
 
-`email` is `owner`, `admins`, `off`, or `default` to follow the workspace again. Changing settings needs `workspace.manage`.
+`email` is `owner`, `admins`, `off`, or `null` to follow the workspace again. Changing settings needs `workspace.manage`.
+
+## Slack
+
+Connect your Slack under **Connectors → Slack**: sign in with Slack, or paste a bot token from a Slack app of your own (bot scopes `chat:write`, `chat:write.public`, `channels:read` and `groups:read`). Outflare only posts, and never reads your messages. Then pick a channel for each kind of alert under **Settings → Alerts**. Each post says what happened and has a button to open it in Outflare. Without a Slack connection, nothing is posted.
+
+Through the API, list the channels with `GET /v1/workspaces/{ws}/alerts/channels?integration_id=` and pick one:
+
+```sh
+curl -X PUT https://outflare.example.com/v1/workspaces/$WS/alerts/settings \
+  -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" \
+  -d '{"kind": "reply.hot", "slack_integration_id": "'$SLACK_ID'", "slack_channel": "C0123456789"}'
+```
+
+Send both as `null` to stop posting.
 
 ## API and agents
 
 `GET /v1/workspaces/{ws}/alerts` lists alerts, newest first, with a `title`, a line of `text` and the app `path` that has each one. Filter with `kind` and page with `before` (`next_before` from the last page). You see the kinds your role can read: hot replies need `inbox.read`, hot visitors `customers.read`, and brand-limited people see their brands' alerts and the shared ones.
 
-`GET /v1/workspaces/{ws}/alerts/settings` shows the kinds and who gets each, and `PUT /v1/workspaces/{ws}/alerts/mutes` with `kind` and `muted` mutes one for you. Agents use `list_alerts`, `get_alert_settings`, `set_alert_settings` and `mute_alerts`.
+`GET /v1/workspaces/{ws}/alerts/settings` shows the kinds and who gets each, and `PUT /v1/workspaces/{ws}/alerts/mutes` with `kind` and `muted` mutes one for you. Agents use `list_alerts`, `get_alert_settings`, `set_alert_settings`, `list_alert_channels` and `mute_alerts`.
