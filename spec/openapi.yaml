@@ -5992,6 +5992,7 @@ paths:
                 monthly_budget: { type: [number, "null"], minimum: 0, description: "Per calendar month (UTC): US dollars for DataForSEO, API units for Ahrefs." }
                 sync: { type: string, enum: [weekly, "off"] }
                 link_rows: { type: [integer, "null"], minimum: 1, maximum: 1000, description: "Links each weekly read asks for per SEO site, strongest linking domains first; null is the default, 200." }
+                link_traffic: { type: boolean, description: "Ahrefs only: also read the linking pages' and domains' traffic and referring domains, about 25 more API units a link (5,200 a site a week at the default 200 links)." }
                 gap_rows: { type: [integer, "null"], minimum: 0, maximum: 500, description: "Keywords and linking domains each weekly read takes of up to 5 tracked competitors a site, for the gaps; 0 turns that off, null is the default, 50." }
       responses:
         "200":
@@ -6737,15 +6738,39 @@ paths:
         sites, merged from every SEO connection that reads links (Ahrefs,
         DataForSEO): one row per link, with each provider's own view in
         `providers`. A link is live while any provider still finds it.
-        Reads only what the weekly snapshot stored, so it costs nothing.
+        Reads only what the weekly snapshot stored, so it costs nothing,
+        however often it is filtered.
+
+        `group` shows one link per linking domain (`domain`) or page
+        (`page`): the best one (live, followed, in the main content, from
+        the strongest page), with `group_links` saying how many it stands
+        for. `since` adds links lost since that date to the live ones;
+        `change` lists only links first seen (`new`) or lost (`lost`) since
+        then (default: the last 30 days).
       tags: [seo]
       parameters:
         - { $ref: "#/components/parameters/Brand" }
         - { name: site_id, in: query, schema: { type: string, format: uuid } }
         - { name: status, in: query, schema: { type: string, enum: [live, lost] } }
+        - { name: since, in: query, schema: { type: string, format: date }, description: "History: also list links lost on or after this date." }
+        - { name: change, in: query, schema: { type: string, enum: [new, lost] }, description: "Only links first seen, or lost, since `since`." }
+        - { name: group, in: query, schema: { type: string, enum: [all, domain, page], default: all } }
         - { name: nofollow, in: query, schema: { type: boolean } }
-        - { name: q, in: query, schema: { type: string }, description: "Part of the linking domain, URL or anchor." }
-        - { name: order, in: query, schema: { type: string, enum: [rating, newest, lost, spam], default: rating } }
+        - { name: follow, in: query, schema: { type: string, enum: [dofollow, nofollow, ugc, sponsored] } }
+        - { name: link_type, in: query, schema: { type: string, enum: [content, text, image, redirect, canonical, alternate, frame, form, rss] }, description: "content: links in the page's main content." }
+        - { name: dr_min, in: query, schema: { type: number, minimum: 0 } }
+        - { name: dr_max, in: query, schema: { type: number, minimum: 0 } }
+        - { name: ur_min, in: query, schema: { type: number, minimum: 0 } }
+        - { name: ur_max, in: query, schema: { type: number, minimum: 0 } }
+        - { name: domain_traffic_min, in: query, schema: { type: number, minimum: 0 } }
+        - { name: domain_traffic_max, in: query, schema: { type: number, minimum: 0 } }
+        - { name: page_traffic_min, in: query, schema: { type: number, minimum: 0 } }
+        - { name: page_traffic_max, in: query, schema: { type: number, minimum: 0 } }
+        - { name: page_type, in: query, schema: { type: string, maxLength: 100 }, description: "A top-level page type of the linking page, like Article or Listing (see the summary's page_types)." }
+        - { name: source_domain, in: query, schema: { type: string }, description: "Only links from this domain." }
+        - { name: q, in: query, schema: { type: string }, description: "Words or a phrase to find." }
+        - { name: q_in, in: query, schema: { type: string, enum: [source_url, target_url, anchor, title] }, description: "Where to look for q; unset is the linking domain, page URL, title, anchor and target URL." }
+        - { name: order, in: query, schema: { type: string, enum: [rating, url_rating, domain_traffic, page_traffic, keywords, newest, oldest, last_seen, lost, spam], default: rating } }
         - { name: spam, in: query, schema: { type: string, enum: [clean, suspect, toxic] } }
         - { name: review, in: query, description: "none for links nobody reviewed.", schema: { type: string, enum: [none, ok, disavow] } }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
@@ -21937,7 +21962,7 @@ components:
         http_status: { type: [integer, "null"], description: "The status this crawl got from the page; null when it did not read it." }
     Backlink:
       type: object
-      required: [id, site_id, brand_id, source_url, target_url, source_domain, anchor, nofollow, sponsored, ugc, status, source_rating, first_seen_at, lost_at, regained_at, checked_at, providers, spam_score, spam_level, spam_factors, review, review_note, reviewed_at]
+      required: [id, site_id, brand_id, source_url, target_url, source_domain, anchor, nofollow, sponsored, ugc, status, source_rating, first_seen_at, lost_at, regained_at, checked_at, providers, spam_score, spam_level, spam_factors, review, review_note, reviewed_at, url_rating, domain_traffic, page_traffic, page_keywords, page_referring_domains, linked_domains, external_links, title, author, page_types, page_categories, languages, platforms, link_type, in_content, hops, last_seen_at, group_links]
       properties:
         id: { type: string, format: uuid }
         site_id: { type: string, format: uuid }
@@ -21986,6 +22011,32 @@ components:
         review: { type: string, enum: ["", ok, disavow], description: "A person's verdict: empty until reviewed, ok for a real link, disavow for the disavow file." }
         review_note: { type: string }
         reviewed_at: { type: [string, "null"], format: date-time }
+        url_rating: { type: [number, "null"], description: "The linking page's strength, 0 to 100 (Ahrefs UR)." }
+        domain_traffic: { type: [number, "null"], description: "The linking domain's estimated monthly organic visits; null unless the Ahrefs connection reads traffic (link_traffic)." }
+        page_traffic: { type: [number, "null"], description: "The linking page's estimated monthly organic visits, likewise." }
+        page_keywords: { type: [number, "null"], description: "Keywords the linking page ranks for in the top 100." }
+        page_referring_domains: { type: [number, "null"], description: "Domains linking to the linking page (with traffic)." }
+        linked_domains: { type: [number, "null"], description: "Domains the linking page links to." }
+        external_links: { type: [number, "null"], description: "Links from the linking page to other sites." }
+        title: { type: string, description: "The linking page's title." }
+        author: { type: string }
+        page_types: { type: array, items: { type: string }, description: "What kind of page links, as paths (/Article/Listicle)." }
+        page_categories: { type: array, items: { type: string }, description: "Its topics, as paths (/Computers/Security)." }
+        languages: { type: array, items: { type: string } }
+        platforms: { type: array, items: { type: string }, description: "What the linking site is built with (WordPress, ...)." }
+        link_type: { type: string, description: "text, image, redirect, canonical, alternate, frame, form or rss; empty when unknown." }
+        in_content: { type: boolean, description: "The link sits in the page's main content." }
+        hops:
+          type: array
+          description: "Where the linked URL leads: each redirect after target_url, in order."
+          items:
+            type: object
+            required: [kind, url]
+            properties:
+              kind: { type: string, description: "The HTTP status (301, 302, ...), redirect, or canonical." }
+              url: { type: string }
+        last_seen_at: { type: [string, "null"], format: date-time, description: "When a provider last found it live." }
+        group_links: { type: integer, description: "How many links this row stands for when the list is grouped; 1 otherwise." }
     BacklinkEvent:
       type: object
       required: [id, site_id, kind, at, connector, source_rating, reason, backlink]
@@ -22017,7 +22068,7 @@ components:
         regained: { type: integer }
     BacklinkSiteSummary:
       type: object
-      required: [site, live, lost, referring_domains, followed, spam, last_30_days, weeks, providers]
+      required: [site, live, lost, referring_domains, followed, spam, last_30_days, weeks, providers, page_types, link_types, traffic]
       properties:
         site:
           type: object
@@ -22061,6 +22112,15 @@ components:
               error: { type: [string, "null"] }
               links_seen: { type: integer }
               finished_at: { type: [string, "null"], format: date-time }
+        page_types: { type: array, items: { $ref: "#/components/schemas/BacklinkFacet" }, description: "Live links by the linking page's top-level type." }
+        link_types: { type: array, items: { $ref: "#/components/schemas/BacklinkFacet" }, description: "Live links by link type." }
+        traffic: { type: boolean, description: "Some links carry traffic, so traffic columns and filters mean something." }
+    BacklinkFacet:
+      type: object
+      required: [value, links]
+      properties:
+        value: { type: string }
+        links: { type: integer }
     SEOCompetitor:
       type: object
       required: [id, site_id, brand_id, host, name, aliases, status, source, common_keywords, record_id, title, description, pages, checked_at, check_error, numbers, created_at, updated_at]
@@ -22145,7 +22205,7 @@ components:
         at: { type: string, format: date-time }
     SEOSource:
       type: object
-      required: [id, name, connector, connector_name, status, last_error, account, reports, country, sync, link_rows, gap_rows, domains_set, domains, budget]
+      required: [id, name, connector, connector_name, status, last_error, account, reports, country, sync, link_rows, link_traffic, gap_rows, domains_set, domains, budget]
       properties:
         id: { type: string, format: uuid }
         name: { type: string }
@@ -22158,6 +22218,7 @@ components:
         country: { type: string }
         sync: { type: string, enum: [weekly, "off"] }
         link_rows: { type: integer, description: "Links the weekly read asks for per SEO site (default 200); 0 for a connection that does not read links." }
+        link_traffic: { type: boolean, description: "The weekly links read also takes the linking pages' and domains' traffic (Ahrefs only, about 25 more API units a link)." }
         gap_rows: { type: integer, description: "Keywords and linking domains the weekly read takes of each of up to 5 tracked competitors a site (default 50); 0 is off." }
         domains_set: { type: boolean, description: "false: the domains follow the analytics tools." }
         domains:
