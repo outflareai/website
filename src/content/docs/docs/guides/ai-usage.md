@@ -35,6 +35,7 @@ The tools are:
 | **Social replies** | Drafting replies to posts your [social watches](/docs/guides/social/) found |
 | **Email verification** | Checking addresses the free checks could not settle |
 | **Meaning-based search** | Turning your records, replies, meetings and deals into vectors so search can find them by what they mean. On by default, usually cents a month, and you can [turn it off](/docs/guides/query-and-search/#on-by-default-and-how-to-turn-it-off). [Why it costs anything](/docs/guides/query-and-search/#what-it-costs-and-why-it-shows-in-ai-usage) |
+| **Lead finder** <span class="pill cloud">Outflare Cloud</span> | Planning web searches for the lead finder, and reading the websites it finds to check each company against your ideal customer profile. It uses the model you chose for domain research, and you can give it a limit of its own |
 
 Costs are each model's price times the tokens, rounded up to the cent per call, or the provider's own figure where it reports one (OpenRouter). Your provider's bill is the final word. Outflare keeps only the counts, never what was asked or answered, and keeps them for 13 months.
 
