@@ -33,7 +33,7 @@ Memories can belong to the company, to a brand or to a project. An agent working
 
 ## Decide what belongs to each brand
 
-On a brand's page, turn on the projects and sending domains that are its own. A project brings everything in it, and a domain brings its mailboxes. Anything you leave off is shared by every brand. Records inside a project always follow the project's brand, so move the project rather than its parts.
+On a brand's page, turn on the projects and sending domains that are its own. A project brings everything in it, and a domain brings its mailboxes. Anything you leave off belongs to no brand: its mailboxes can still send for any brand, but it only shows under **All brands**. Records inside a project always follow the project's brand, so move the project rather than its parts.
 
 A brand's mailboxes only send for that brand's sequences, so Repocket never emails from a Geonode domain. Shared mailboxes can still send for any brand.
 
@@ -42,6 +42,12 @@ A brand's mailboxes only send for that brand's sequences, so Repocket never emai
 Like a project in PostHog, you work on one brand at a time. The brand picker sits at the top of the sidebar, under your workspace (on a phone, in the top bar), and narrows every page to that brand: projects, sequences, lead lists, mailboxes, domains, missions, connectors and analytics. Outflare opens on the brand you picked last, or your first brand. The link keeps the choice (`?brand=repocket`), so a link you share opens on the same brand.
 
 To compare brands side by side, pick **All brands** at the bottom of the picker. Each record then shows the brand it belongs to.
+
+With one brand picked you see only that brand. Home, infrastructure, warm-up, mailbox health, leads, allocation, meetings and deals count nothing from other brands, and nothing that belongs to no brand.
+
+### Records in no brand
+
+Under **All brands**, Home tells you when projects, domains, mailboxes, lead lists or sequences belong to no brand. **Company → Brands** lists them under **Not in a brand**: tick what belongs together, choose the brand and move them in one go. A project brings everything in it, and a domain brings its mailboxes. Agents do the same with `add_to_brand`.
 
 ![Projects with All brands picked: each one shows its brand](/screens/brands-badges.png)
 
