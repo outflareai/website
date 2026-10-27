@@ -57,3 +57,7 @@ Send both as `null` to stop posting.
 `GET /v1/workspaces/{ws}/alerts` lists alerts, newest first, with a `title`, a line of `text` and the app `path` that has each one. Filter with `kind` and page with `before` (`next_before` from the last page). You see the kinds your role can read: hot replies need `inbox.read`, hot visitors `customers.read`, and brand-limited people see their brands' alerts and the shared ones.
 
 `GET /v1/workspaces/{ws}/alerts/settings` shows the kinds and who gets each, and `PUT /v1/workspaces/{ws}/alerts/mutes` with `kind` and `muted` mutes one for you. Agents use `list_alerts`, `get_alert_settings`, `set_alert_settings`, `list_alert_channels` and `mute_alerts`.
+
+## In your CRM
+
+Hot replies can also land in HubSpot as a note on the contact and a follow-up task for the lead's owner, through your own HubSpot connection. Set `push_replies` and `reply_tasks` on it ([Calendars and HubSpot](/docs/integrations/calendars-and-hubspot/)).
