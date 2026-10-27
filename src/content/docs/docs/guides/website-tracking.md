@@ -9,6 +9,8 @@ sidebar:
 
 Website tracking records each visit to your sites as an event in your [customer records](/docs/guides/customer-records/). It keeps what the visitor arrived with, exactly as it came: UTM tags, ad click ids, the referrer and any referral or partner code. Outflare works out channels and attribution from these on the server, never in the browser. Visitors stay anonymous until your own product says who they are.
 
+[Website visitors](/docs/guides/website-visitors/) shows which known companies and people came, and who is ready to talk.
+
 ## Set it up
 
 1. Open **Settings → General → Website tracking** and add your site. You can list the origins it takes events from, such as `https://example.com` or `https://*.example.com`.
