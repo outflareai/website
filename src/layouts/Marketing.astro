@@ -49,6 +49,7 @@ const footer = [
 			['SEO', '/docs/integrations/seo/'],
 			['Email campaigns', '/docs/guides/sequences/'],
 			['Roadmap', '/docs/project/roadmap/'],
+			['Changelog', '/changelog/'],
 		],
 	},
 	{
@@ -111,6 +112,7 @@ const footer = [
 			try { document.documentElement.dataset.theme = localStorage.getItem('starlight-theme') === 'light' ? 'light' : 'dark'; } catch {}
 		</script>
 		<script type="application/ld+json" set:html={JSON.stringify(organization)} />
+		<slot name="head" />
 		<SignedIn />
 		<Analytics />
 	</head>
