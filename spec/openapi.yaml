@@ -90,6 +90,24 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
         default: { $ref: "#/components/responses/Error" }
+  /v1/business-models:
+    get:
+      operationId: listBusinessModels
+      security: []
+      summary: List the business models a brand can pick
+      description: |
+        What a brand can say it does, in groups ("What does this brand do?" in
+        brand setup), and the ways its customers pay. Each model names the
+        report packs that suit it, the first one primary. The same on every
+        server; set a brand's with PATCH .../brands/{brand}.
+      tags: [brands]
+      responses:
+        "200":
+          description: The list.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BusinessModels" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/meta:
     get:
       operationId: getMeta
@@ -9791,7 +9809,7 @@ paths:
       parameters:
         - { name: name, in: query, schema: { type: string } }
         - { name: format, in: query, schema: { type: string, enum: [json] } }
-        - { name: return, in: query, description: "The app page to land on afterwards. Default: Connectors.", schema: { type: string, enum: [get-started, setup] } }
+        - { name: return, in: query, description: "The app page to land on afterwards. Default: Connectors.", schema: { type: string, enum: [get-started, setup, tracking] } }
         - { name: brand, in: query, description: "Make it this brand's own connection (id or handle). Default: a workspace connection shared with every brand.", schema: { type: string } }
       responses:
         "200":
@@ -13543,8 +13561,9 @@ paths:
       summary: Read a brand's setup checklist
       description: |
         Scope: workspace.read. The steps that get one brand's website and
-        tools working, most needed first: the website script, verifying the
-        website, analytics, Search Console, email, payments, ads, social and
+        tools working, most needed first: what the brand does (its business
+        model, set with PATCH .../brands/{brand}), the website script,
+        verifying the website, analytics, Search Console, email, payments, ads, social and
         a CRM. A step is `done` when the workspace has it however it was
         done (a visit arrived, the site's proof was found, a tool is
         connected), `waiting` when its part is done and Outflare is waiting
@@ -19449,7 +19468,7 @@ components:
         name: { type: string, description: Usually the site's domain. }
         key: { type: string, description: "The public key (ofk_). It only writes browser events.", example: ofk_test_not_a_real_key }
         brand_id: { type: [string, "null"], format: uuid, description: The brand whose site it is; its events get this brand. }
-        origins: { type: array, items: { type: string }, description: "Origins events are taken from, such as https://example.com or https://*.example.com. Empty: any. A filter against stray traffic, not a lock." }
+        origins: { type: array, items: { type: string }, description: "Origins events are taken from. A bare domain (example.com) is stored as https://*.example.com, which takes the site and every subdomain; https://app.example.com (or http://localhost:3000) takes that exact origin, port included. A whole domain is https on the default port; list other ports exactly. Empty: any. A filter against stray traffic, not a lock." }
         previous_expires_at: { type: [string, "null"], format: date-time, description: Until when the value before the last rotation still works. }
         events_today: { type: integer, description: Events taken today (UTC). }
         bots_today: { type: integer, description: "Requests from bots, crawlers and scripts today (UTC): counted, not stored." }
@@ -23228,7 +23247,7 @@ components:
         tool: { type: string, description: The MCP tool an agent can use for it; empty when a person must. }
     BrandSetupStepID:
       type: string
-      enum: [site_script, verify_site, analytics, search, email, payments, ads, social, crm]
+      enum: [business_model, site_script, verify_site, analytics, search, email, payments, ads, social, crm]
     BrandSetupInstallRun:
       type: object
       required: [method, status, at]
@@ -23285,11 +23304,13 @@ components:
         install: { oneOf: [{ $ref: "#/components/schemas/BrandSetupInstall" }, { type: "null" }] }
     BrandSetup:
       type: object
-      required: [brand_id, brand, website, steps, done, total, next_step, complete, dismissed, issues]
+      required: [brand_id, brand, website, business_model, revenue_models, steps, done, total, next_step, complete, dismissed, issues]
       properties:
         brand_id: { type: string, format: uuid }
         brand: { type: string }
         website: { type: string }
+        business_model: { type: [string, "null"], description: "What the brand does (GET /v1/business-models); set with PATCH .../brands/{brand}." }
+        revenue_models: { type: array, items: { type: string } }
         steps: { type: array, items: { $ref: "#/components/schemas/BrandSetupStep" } }
         done: { type: integer }
         total: { type: integer }
@@ -23876,7 +23897,7 @@ components:
         occurred_at: { type: string, format: date-time, description: Default now. }
     Brand:
       type: object
-      required: [id, name, handle, website, domains, platforms, links, status, context_version, counts, created_at, updated_at]
+      required: [id, name, handle, website, domains, platforms, links, status, business_model, revenue_models, context_version, counts, created_at, updated_at]
       properties:
         id: { type: string, format: uuid }
         name: { type: string, example: Repocket }
@@ -23886,6 +23907,8 @@ components:
         platforms: { type: array, items: { type: string, enum: [web, ios, android, tv, desktop, console, extension, api] } }
         links: { type: array, items: { $ref: "#/components/schemas/BrandLink" }, description: "Where else the brand lives: app store listings, socials, docs." }
         status: { type: string, enum: [active, archived], description: "archived: hidden from pickers; its records are kept." }
+        business_model: { type: [string, "null"], example: b2b_saas_self_serve, description: "What the brand does: a model id from GET /v1/business-models; null until picked." }
+        revenue_models: { type: array, items: { type: string }, example: [subscription], description: "How its customers pay: ids from GET /v1/business-models." }
         context_version: { type: integer, description: The brand context's version. }
         counts:
           type: object
@@ -23948,6 +23971,38 @@ components:
         platforms: { type: array, items: { type: string, enum: [web, ios, android, tv, desktop, console, extension, api] } }
         links: { type: array, maxItems: 50, items: { $ref: "#/components/schemas/BrandLink" }, description: "Replaces the brand's links. kind is guessed from the address when left out." }
         status: { type: string, enum: [active, archived], description: Updates only. }
+        business_model: { type: string, description: "A model id from GET /v1/business-models; empty clears it. Changing it records brand.business_model_changed." }
+        revenue_models: { type: array, items: { type: string }, description: "Ids from GET /v1/business-models; replaces the list." }
+    BusinessModels:
+      type: object
+      required: [groups, models, revenue_models]
+      properties:
+        groups:
+          type: array
+          items:
+            type: object
+            required: [id, label]
+            properties:
+              id: { type: string, example: software }
+              label: { type: string, example: Software }
+        models:
+          type: array
+          items:
+            type: object
+            required: [id, group, label, packs]
+            properties:
+              id: { type: string, example: b2b_saas_self_serve }
+              group: { type: string, example: software }
+              label: { type: string, example: "B2B SaaS, self-serve" }
+              packs: { type: array, items: { type: string }, example: [saas_self_serve, subscription], description: "Report packs that suit it, the first one primary." }
+        revenue_models:
+          type: array
+          items:
+            type: object
+            required: [id, label]
+            properties:
+              id: { type: string, example: subscription }
+              label: { type: string, example: Subscription }
     BrandContext:
       type: object
       required: [brand_id, name, handle, website, platforms, links, about, audience, goals, voice, rules, notes, version, updated_at, updated_by]
