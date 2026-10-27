@@ -3,23 +3,18 @@ title: Introduction
 description: What Outflare is, what works today, and how these docs are organised.
 ---
 
-import { Card, CardGrid, LinkCard, Aside } from '@astrojs/starlight/components';
+import { CardGrid, LinkCard } from '@astrojs/starlight/components';
 
-Outflare is open-source go-to-market infrastructure that people and AI agents share. You run it yourself or use the hosted app, Outflare Cloud. Self-hosted, it keeps your mailboxes, leads and send history in your own Postgres, and every client (the web app, the SDK, your scripts and your agents) uses the same documented API.
-
-The first module is a **cold-email sequencer** built for teams that buy inboxes in bulk: connect hundreds of reseller mailboxes on Google Workspace or Microsoft 365 at once, run multi-step sequences across mailbox pools, and send every email through one suppression and policy check.
-
-<Aside type="caution" title="Early development">
-Outflare is being built in public. Workspaces, access control and bulk mailbox connection work today. Lead import, sequences, sending and the reply inbox are next. Pages for features that are not built yet are marked **Planned** and describe the intended design, so you can give feedback before it ships. See [Status and roadmap](/docs/project/roadmap/).
-</Aside>
+Outflare is an open-source go-to-market platform that people and AI agents share. Connect the tools you already use, see what's working across your website, search and campaigns, and let your agents do the work through one API. Use the hosted app, Outflare Cloud, or run it yourself: self-hosted, everything lives in your own Postgres. Either way the web app, the SDKs, your scripts and your agents all use the same documented API. What is open source and what is Cloud only is on [Open source and Cloud](/docs/project/open-source-and-cloud/).
 
 ## What you can do today
 
-- Use the hosted app at [app.outflare.ai](https://app.outflare.ai/). It's free during early access: [sign up](https://app.outflare.ai/signup), or [sign in](https://app.outflare.ai/) if you have an account.
-- [Self-host](/docs/self-hosting/docker-compose/) the engine, web app and Postgres with one Docker Compose file.
-- Create a workspace, [invite teammates with roles](/docs/guides/workspaces-and-access/), and read the audit log of every change.
-- [Bulk import mailboxes](/docs/guides/import-mailboxes/) from your reseller's CSV. Each one is signed in to over SMTP and IMAP, and each sending domain's SPF, DKIM and DMARC are checked.
-- Create [scoped API tokens](/docs/api/authentication/) for scripts and agents, and call the [REST API](/docs/api/) described by an OpenAPI 3.1 contract.
+- **Start in minutes.** Use the hosted app at [app.outflare.ai](https://app.outflare.ai/), free during early access ([sign up](https://app.outflare.ai/signup)), or [self-host](/docs/self-hosting/docker-compose/) the engine, web app and Postgres with one Docker Compose file.
+- **See your marketing in one place.** [Website analytics](/docs/integrations/analytics/) from Google Analytics, Search Console, PostHog and more, side by side, [SEO](/docs/integrations/seo/) from Ahrefs or DataForSEO, [AI visibility](/docs/guides/ai-visibility/), [paid media](/docs/integrations/paid-media/), [social](/docs/guides/social/) and [outcomes and cost](/docs/guides/outcomes/).
+- **Know every customer.** [Customer records](/docs/guides/customer-records/) for every person and company, filled by [website tracking](/docs/guides/website-tracking/), your CRM, Stripe and your campaigns, with [who can be emailed](/docs/guides/who-can-be-emailed/) worked out for each one.
+- **Run email.** [Cold email sequences](/docs/guides/sequences/) across hundreds of mailboxes with [sending domains](/docs/guides/sending-domains/) checked daily, one [inbox](/docs/guides/inbox/) for every reply, and [lifecycle email](/docs/guides/lifecycle-email/) from your own Amazon SES, Postmark or Resend account.
+- **Hand work to agents.** [Connect Claude, ChatGPT or Cursor](/docs/agents/connect/) with one URL, or give Outflare's own agent a goal as a [mission](/docs/agents/missions/), with approvals and send and spend limits you set.
+- **Run several businesses** from one workspace with [brands](/docs/guides/brands/), or every client in its own workspace with [agency mode](/docs/guides/agencies/).
 
 ## Find your way
 
@@ -33,13 +28,14 @@ Outflare is being built in public. Workspaces, access control and bulk mailbox c
 
 ## Where the code lives
 
-All of the product is in one public repository, [outflareai/outflare](https://github.com/outflareai/outflare). These docs live in [outflareai/website](https://github.com/outflareai/website); every page has an "Edit page" link at the bottom.
+The open-source engine is published at [outflareai/outflare](https://github.com/outflareai/outflare), one commit per release. Outflare Cloud's own code is private. These docs live in [outflareai/website](https://github.com/outflareai/website); every page has an "Edit page" link at the bottom.
 
 | Path in the repo | What it is | License |
 | --- | --- | --- |
 | `engine/` | Go engine: API, job queue, sending, inbox sync, policy check | AGPL-3.0 |
 | `api/openapi.yaml` | The API contract that SDKs and these docs are generated from | AGPL-3.0 |
 | `web/` | React web app | AGPL-3.0 |
-| `sdk/ts/` | TypeScript SDK | Apache-2.0 |
+| `mcp/` | MCP server for agents | Apache-2.0 |
+| `sdk/ts/`, `sdk/python/` | TypeScript and Python SDKs | Apache-2.0 |
 | `deploy/` | Docker Compose for self-hosting | AGPL-3.0 |
 | `docs/adr/` | Architecture decision records | |
