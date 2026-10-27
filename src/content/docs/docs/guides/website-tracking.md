@@ -49,4 +49,6 @@ You can change this on the script tag:
 - `data-consent="required"` asks everyone for consent first.
 - `data-consent="granted"` is for sites whose banner runs before the script loads.
 
+Without consent, the campaign tags a visitor landed with are kept with that first visit only. If they sign up later, on another visit or another domain, Outflare can't join the two. So on a site without a consent banner, keep the landing page's `utm_*` tags, ad click ids, `ref` and `ofc` (for example in hidden fields on your sign-up form) and send them with the sign-up `identify`: the tags in `context.campaign` and the click ids in `properties.click_ids`, just as the script does. The sign-up is then credited to the right channel even when the visits can't be joined.
+
 Visits are stored in your workspace with the rest of your customer data and aren't shared with anyone.
