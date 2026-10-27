@@ -14,12 +14,14 @@ sidebar:
 Outflare only names a visitor it can tie to someone already in your workspace. It never buys or guesses identities.
 
 - **Your product.** When your product tells Outflare who signed up or signed in (see [website tracking](/docs/guides/website-tracking/)), their earlier and later visits join their record.
-- **Email clicks.** When someone clicks a link to your own site in a sequence or lifecycle email you sent them, the link carries a short signed token. The snippet sends it with the first page view and removes it from the address bar, and that browser's visits join the person the email went to.
+- **Email clicks.** When someone clicks a link to your own site in a sequence or lifecycle email you sent them, the link carries a short signed token (`ofvisit`). The snippet sends it with the first page view and removes it from the address bar, and that browser's visits join the person the email went to.
 
 The email-click token is safe to sit in a link:
 
 - Outflare signs it, so nobody can make one up, and your public site key still can't name or merge anyone.
 - It names one browser only: the first one to use it. The same link forwarded to a colleague, or opened on another device, names nobody.
+- It is weaker than a sign-in: if someone the email was forwarded to clicks it and later signs in to your product as themselves, their browser and its visits move to their own record.
+- Until the snippet removes it, the token is in the landing page's address, so your own server logs or other analytics may record it. It only works with your site, for seven days, and only until the first browser claims it.
 - It lasts seven days, mail scanners and link checkers never get one, and it is never stored in your events.
 - It is only added to links to your own site (a brand's domain or website, or one of your site's origins), and only while your site is tracked.
 
