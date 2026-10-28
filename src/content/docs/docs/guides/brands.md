@@ -33,7 +33,7 @@ Memories can belong to the company, to a brand or to a project. An agent working
 
 ## Decide what belongs to each brand
 
-On a brand's page, turn on the projects and sending domains that are its own. A project brings everything in it, and a domain brings its mailboxes. Anything you leave off is shared by every brand. Records inside a project always follow the project's brand, so move the project rather than its parts.
+On a brand's page, turn on the projects and sending domains that are its own. A project brings everything in it, and a domain brings its mailboxes. Anything you leave off belongs to no brand: its mailboxes can still send for any brand, but it only shows under **All brands**. Records inside a project always follow the project's brand, so move the project rather than its parts.
 
 A brand's mailboxes only send for that brand's sequences, so Repocket never emails from a Geonode domain. Shared mailboxes can still send for any brand.
 
@@ -48,6 +48,12 @@ Switching brand reloads the page you're on with that brand's records. If you had
 SEO and analytics read through a connection every brand shares, such as Ahrefs or Google Search Console, count each website for the brand whose domains include it. So a brand only sees the keywords and traffic of its own websites.
 
 To compare brands side by side, pick **All brands** at the bottom of the picker. Each record then shows the brand it belongs to.
+
+With one brand picked you see only that brand. Home, infrastructure, warm-up, mailbox health, leads, allocation, meetings and deals count nothing from other brands, and nothing that belongs to no brand.
+
+### Records in no brand
+
+Under **All brands**, Home tells you when projects, domains, mailboxes, lead lists or sequences belong to no brand. **Company → Brands** lists them under **Not in a brand**: tick what belongs together, choose the brand and move them in one go. A project brings everything in it, and a domain brings its mailboxes. Agents do the same with `add_to_brand`.
 
 ![Projects with All brands picked: each one shows its brand](/screens/brands-badges.png)
 
@@ -67,6 +73,10 @@ In the API, every connection has `brand_id` (set on a brand's own) and `brand_id
 ## Analytics by brand
 
 Each site in your analytics tools, such as a GA4 property, a Search Console site or a PostHog project, counts as a brand's when its domain is one of the brand's domains. Subdomains count too, so app.repocket.com is Repocket's. A site read through a brand's own connection always counts for that brand. For a site named after an app rather than a domain, pick its brand yourself (`PUT /v1/workspaces/{ws}/analytics/{id}/site-brand`), or mark it as shared.
+
+You connect Google Analytics (or any analytics tool) once for the workspace, and every property ends up in one of three places: a brand, **Shared by all brands**, or **Don't import**. Outflare suggests a brand for each and says why ("Matches repocket.com", "Name matches"), and nothing is imported until every property has a choice. A property no brand fits can start one: **New brand from this site** makes a brand named after it, with its domain as the website. Outflare never makes a brand on its own.
+
+With one brand picked and no analytics counting for it yet, the Analytics page offers **Pick from Google Analytics**: it uses the connection you already have, with no second sign-in, and lists only that brand's properties and the ones no brand has yet. Someone kept to some brands, or their API token, can only place properties in their own brands, never another brand's property or a shared one. Campaigns inside a brand are told apart with UTM tags on their links, not with separate properties.
 
 ## Keep brands from emailing the same person
 
