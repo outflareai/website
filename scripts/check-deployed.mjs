@@ -45,9 +45,15 @@ if (specChanged) {
 	}
 }
 
-const needs = [...body.matchAll(/\bNeeds:?\s+(?:https:\/\/github\.com\/)?outflareai\/(engine|outflare|cloud)(?:#|\/pull\/)(\d+)/gi)].map(
-	(m) => ({ repo: m[1].toLowerCase() === 'cloud' ? 'cloud' : 'engine', number: Number(m[2]) }),
-);
+// Every pull request named on a "Needs" line. The template writes it in
+// bold with several on one line (**Needs:** outflareai/engine#1,
+// outflareai/cloud#2), so markdown around the word and the references is
+// allowed.
+const needs = body
+	.split('\n')
+	.filter((line) => /\bNeeds\b:?[*_]*\s/i.test(line))
+	.flatMap((line) => [...line.matchAll(/(?:https:\/\/github\.com\/)?outflareai\/(engine|outflare|cloud)(?:#|\/pull\/)(\d+)/gi)])
+	.map((m) => ({ repo: m[1].toLowerCase() === 'cloud' ? 'cloud' : 'engine', number: Number(m[2]) }));
 const gh = (path) =>
 	get(`https://api.github.com/repos/outflareai/${path}`, {
 		Accept: 'application/vnd.github+json',

@@ -35,6 +35,11 @@ export const categories: { id: string; label: string; blurb: string; docs: strin
 	{ id: 'crm', label: 'CRM', blurb: 'Replies, interested leads and meetings synced to your CRM.', docs: '/docs/integrations/calendars-and-hubspot/' },
 	{ id: 'dns', label: 'DNS', blurb: 'SPF, DKIM, DMARC and tracking records set for you.', docs: '/docs/integrations/connectors/' },
 	{ id: 'signals', label: 'Signals', blurb: 'Buying signals that tell you who to reach and when.', docs: '/docs/integrations/connectors/' },
+	{ id: 'ads', label: 'Paid media', blurb: 'Ad spend, clicks and conversions per campaign, and conversions sent back.', docs: '/docs/integrations/paid-media/' },
+	{ id: 'email_sending', label: 'Email providers', blurb: 'Send lifecycle email from your own provider account.', docs: '/docs/integrations/email-providers/' },
+	{ id: 'social', label: 'Social', blurb: 'Followers and post numbers, and replies posted from your own accounts.', docs: '/docs/guides/social/' },
+	{ id: 'tags', label: 'Tag managers', blurb: 'Install the website tracking tag for you.', docs: '/docs/guides/website-tracking/' },
+	{ id: 'code', label: 'Code and deploys', blurb: 'Your deploys, lined up with what changed on your website.', docs: '/docs/integrations/deploys/' },
 ];
 
 export const categoryOf = (id: string) =>
@@ -58,6 +63,23 @@ const capabilityWords: Record<string, string> = {
 	'deals.sync': 'Records deals and their stages',
 	'crm.push': 'Pushes replies and interested leads to your CRM',
 	plan: 'Plans and runs missions from a goal you type',
+	'ads.read': 'Reads ad spend, clicks and conversions per campaign',
+	'blocklist.sync': 'Keeps its blocklist in step with your opt-out list',
+	'control.warmup': 'Turns warm-up on and off for your mailboxes',
+	'deploys.read': 'Reads your deploys',
+	'dns.write': 'Adds DNS records for you',
+	'email.send': 'Sends email from your own account',
+	'hooks.receive': 'Sends events to Outflare as they happen',
+	'import.crm': 'Imports your CRM records',
+	'payments.read': 'Reads customers, plans and payments',
+	'replies.read': 'Reads replies to your campaigns',
+	'serp.read': 'Reads search results',
+	'social.metrics': 'Reads followers and post numbers',
+	'social.reply': 'Posts replies you approve from your own account',
+	'social.search': 'Finds conversations about your topics',
+	'tags.install': 'Installs the tracking tag on your website',
+	'web.search': 'Searches the web',
+	'crawl.fetch': 'Reads web pages for you',
 };
 export const capabilityText = (cap: string) => capabilityWords[cap];
 

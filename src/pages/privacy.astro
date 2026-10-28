@@ -2,7 +2,7 @@
 import Marketing from '../layouts/Marketing.astro';
 import { site } from '../data/project';
 
-const updated = '27 October 2026';
+const updated = '28 October 2026';
 ---
 
 <Marketing title="Privacy policy · Outflare" description="What Outflare collects on outflare.ai and in the hosted app at app.outflare.ai, how Google user data is accessed, used, stored, shared and deleted, and how to exercise your rights.">
@@ -76,7 +76,8 @@ const updated = '27 October 2026';
 				<li>OAuth access and refresh tokens are encrypted at rest with AES-256-GCM, using a key held only by the running service and never stored in the database or source code.</li>
 				<li>All traffic between your browser, Outflare and Google is encrypted in transit with TLS.</li>
 				<li>Every workspace's data is kept separate, and every request is checked against the workspace it belongs to.</li>
-				<li>Access to production systems is limited to the people who run the service. People at Outflare do not read your Google data unless you ask us to for support, it is needed to investigate a security issue or abuse, or the law requires it.</li>
+				<li>Access to production systems is limited to the people who run the service. Apart from support access, people at Outflare do not read your Google data unless you ask us to for support, it is needed to investigate a security issue or abuse, or the law requires it.</li>
+				<li>While support access is on (see <a href="#support-access">Support access</a> below), Outflare staff helping you can view your account read-only, including your Google Analytics, Search Console and Calendar reports. A view never shows your Gmail inbox, the replies you receive or the content of emails you send. You can turn support access off at any time under Your account, Support access.</li>
 			</ul>
 
 			<h3 class="pt-2 font-semibold text-foreground">Retention and deletion of Google user data</h3>
@@ -90,6 +91,7 @@ const updated = '27 October 2026';
 
 			<h2>How we use information</h2>
 			<p>We use the information above to provide the service you asked for: to sign you in, send and receive the email you set up, run your sequences, show your reports, keep the service secure and prevent abuse, understand how the product is used so we can improve it, and contact you about your account. We do not sell personal data.</p>
+			<p id="support-access"><strong>Support access.</strong> Unless you turn it off under Your account, Support access, Outflare staff can view your account read-only to help you, to investigate abuse or a security issue, or where the law requires it. A view shows what you see in the app, including reports from tools you connect such as Google Analytics, Google Search Console and Google Calendar. It never shows your inbox, the replies you receive or the content of emails you send, and staff can't change anything while viewing. Each view lasts at most an hour, is recorded in our staff log, and is listed for you under Support access with when it started and ended. Turning support access off ends a view straight away.</p>
 
 			<h2>Who we share it with</h2>
 			<ul>
@@ -103,8 +105,8 @@ const updated = '27 October 2026';
 
 			<h2>Cookies and analytics</h2>
 			<ul>
-				<li><strong>This website</strong> measures visits with PostHog in cookieless mode, and may use Google Analytics through Google Tag Manager with Google's consent mode (no analytics cookies in the EEA, UK and Switzerland) and Cloudflare Web Analytics, which sets no cookies.</li>
-				<li><strong>The app</strong> uses a session cookie to keep you signed in, and PostHog to understand which features are used. Text on the page, form inputs and element attributes are masked, and URLs are reduced to the page name, so the content of your workspace is not sent.</li>
+				<li><strong>This website</strong> measures visits with PostHog in cookieless mode, and may use Google Analytics through Google Tag Manager with Google's consent mode (no analytics cookies in the EEA, UK and Switzerland), Cloudflare Web Analytics, which sets no cookies, and Outflare's own website tracking. Outflare's tracking keeps a random visitor id in an <code>of_aid</code> cookie for up to a year, shared with app.outflare.ai, except in Europe or when your browser sends Global Privacy Control, where it sets no cookie.</li>
+				<li><strong>The app</strong> uses a session cookie to keep you signed in, and PostHog to understand which features are used. Text on the page, form inputs and element attributes are masked, and URLs are reduced to the page name, so the content of your workspace is not sent to PostHog. Outflare's own website tracking also counts the app's pages, with the same visitor id as on this website; it records each page's address and title, which can include your workspace's name, and keeps them in Outflare's own database.</li>
 			</ul>
 
 			<h2>International transfers</h2>

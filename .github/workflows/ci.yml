@@ -24,6 +24,8 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
+      - name: Changelog days are well formed and public-safe
+        run: node scripts/changelog.mjs check
       - run: npm run build
       - name: Internal links resolve
         run: node scripts/check-links.mjs
