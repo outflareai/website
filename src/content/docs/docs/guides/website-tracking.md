@@ -103,6 +103,8 @@ A Cloudflare Worker sets the same two headers, taking the address from `CF-Conne
 
 Outflare uses the address only when the secret matches and the address is public. Otherwise it uses the connecting address. A new secret replaces the old one at once, and `DELETE .../proxy-secret` removes it.
 
+With the secret, the proxy can also pass the visitor's country in `X-Outflare-Country` (two letters, such as `DE`), from `CF-IPCountry` on Cloudflare or `x-vercel-ip-country` on Vercel. The [consent banner](/docs/guides/consent-banner/) then picks each region's rule by country.
+
 ## Sites on more than one domain
 
 Without help, a visitor going from `northpeak.example` to `northpeak-app.example` would get a new id on the second site. List both domains in `data-domains` and links between them carry the visitor along:
@@ -136,5 +138,7 @@ You can change this on the script tag:
 - `data-consent="granted"` is for sites whose banner runs before the script loads.
 
 Without consent, the campaign tags a visitor landed with are kept with that first visit only. If they sign up later, on another visit or another domain, Outflare can't join the two. So on a site without a consent banner, keep the landing page's `utm_*` tags, ad click ids, `ref` and `ofc` (for example in hidden fields on your sign-up form) and send them with the sign-up `identify`: the tags in `context.campaign` and the click ids in `properties.click_ids`, just as the script does. The sign-up is then credited to the right channel even when the visits can't be joined.
+
+To have Outflare show the banner for you, with each region's rules, Google Consent Mode and the ad platforms' consent signals, and keep a cookie policy that updates itself, turn on the [consent banner](/docs/guides/consent-banner/). `outflare.consent()` then also takes categories (`{analytics: true, marketing: false}`), and every choice is kept as the visitor's consent.
 
 Visits are stored in your workspace with the rest of your customer data and aren't shared with anyone.
