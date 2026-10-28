@@ -17392,6 +17392,160 @@ paths:
               schema: { $ref: "#/components/schemas/ConsentBanner" }
         "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/site-keys/{id}/cookies:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: listSiteCookies
+      x-outflare-access: { scope: customers.read }
+      summary: List a site's cookies and scripts
+      description: |
+        Scope: customers.read. Every cookie, storage key, script, embed and pixel found on the site key's site, from scans of
+        its pages and from what the website script sees in visitors' browsers (names only, never values), each matched to a
+        vendor in Outflare's catalogue. Ones the catalogue doesn't know have category unknown and status new: classify them
+        (PATCH .../cookies/{cookie}) for them to be in the cookie policy. before_consent marks one a browser had before the
+        visitor allowed its category. counts.to_review is how many wait for a person.
+      tags: [records]
+      responses:
+        "200":
+          description: What was found, the last scan and the policy's latest version.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, counts, scan, policy]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/SiteCookie" } }
+                  counts:
+                    type: object
+                    required: [total, listed, to_review, before_consent]
+                    properties:
+                      total: { type: integer }
+                      listed: { type: integer, description: In the cookie policy. }
+                      to_review: { type: integer, description: "Unknown to the catalogue and not yet classified." }
+                      before_consent: { type: integer, description: "Seen in a browser before the visitor allowed their category." }
+                  scan: { oneOf: [{ $ref: "#/components/schemas/CookieScan" }, { type: "null" }], description: The latest scan. }
+                  policy:
+                    oneOf:
+                      - type: "null"
+                      - type: object
+                        required: [version, published_at, url]
+                        properties:
+                          version: { type: integer }
+                          published_at: { type: string, format: date-time }
+                          url: { type: string, description: The hosted policy page. }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/site-keys/{id}/cookies/{cookie}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      - { name: cookie, in: path, required: true, schema: { type: string, format: uuid } }
+    patch:
+      operationId: updateSiteCookie
+      x-outflare-access: { scope: customers.manage }
+      summary: Classify a cookie or script
+      description: |
+        Scope: customers.manage. Say what it is: its category, purpose and how long it is kept, and status listed (in the
+        policy) or ignored (never listed, such as a test cookie). A person's word stands over the catalogue's from then on.
+        The policy is published again when it changes. Records site_cookie.classified.
+      tags: [records]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SiteCookieInput" }
+      responses:
+        "200":
+          description: The item.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SiteCookie" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/site-keys/{id}/cookie-scans:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: startCookieScan
+      x-outflare-access: { scope: customers.manage }
+      summary: Scan a site for cookies
+      description: |
+        Scope: customers.manage. Reads up to 20 of the site's pages as OutflareBot (each origin's home page, then the pages visits
+        land on most), following robots.txt, and records the cookies its server sets and the third-party scripts, embeds and
+        pixels in its HTML. Cookies that scripts set come from visitors' browsers instead. Sites with the consent banner on are
+        scanned every week. Answers 201 with the new scan, or 200 with one already waiting or running. Records cookie_scan.started.
+      tags: [records]
+      responses:
+        "201":
+          description: Queued.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CookieScan" }
+        "200":
+          description: A scan was already waiting or running.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CookieScan" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/site-keys/{id}/cookie-policy:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getCookiePolicy
+      x-outflare-access: { scope: customers.read }
+      summary: Get a site's cookie policy
+      description: |
+        Scope: customers.read. The site's cookie policy as published: its latest version, or an earlier one with version. It
+        lists what was found on the site by category and vendor, everything not ignored and seen in the last 30 days, with its
+        purpose and how long it is kept. content is the policy in format (markdown, text or html). Published again on its own
+        whenever what the site uses changes; a version that adds a vendor needing consent asks visitors again. 404 until the
+        first scan or browser report.
+      tags: [records]
+      parameters:
+        - { name: format, in: query, schema: { type: string, enum: [markdown, text, html] }, description: "content's format. Default markdown." }
+        - { name: version, in: query, schema: { type: integer, minimum: 1 } }
+      responses:
+        "200":
+          description: The policy.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CookiePolicy" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/site-keys/{id}/cookie-policy/versions:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: listCookiePolicyVersions
+      x-outflare-access: { scope: customers.read }
+      summary: List a site's cookie policy versions
+      description: "Scope: customers.read. Every version, newest first, with what it added and removed (kind:name) and whether it asked visitors again."
+      tags: [records]
+      responses:
+        "200":
+          description: Versions.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [version, published_at, added, removed, reasked]
+                      properties:
+                        version: { type: integer }
+                        published_at: { type: string, format: date-time }
+                        added: { type: array, items: { type: string } }
+                        removed: { type: array, items: { type: string } }
+                        reasked: { type: boolean }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/visitors:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
@@ -17686,6 +17840,84 @@ paths:
     options:
       operationId: sendSiteConsentPreflight
       summary: CORS preflight for consent choices
+      description: "Public. Any origin may send; the key, not the page, is checked."
+      tags: [records]
+      responses:
+        "204": { description: Allowed. }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/site/cookie-policy:
+    get:
+      operationId: getSiteCookiePolicy
+      summary: Get a site's cookie policy, publicly
+      description: |
+        Public: the site key (ofk_) is the authority. The site's latest cookie policy, for its own pages: json (the policy),
+        markdown, text or html (a fragment for a page, with a button that opens the consent banner). The website script fills
+        elements with data-outflare-cookie-policy from it; the same policy as a whole page is at /cookie-policy/{site key id}.
+        404 until the site's first scan or browser report.
+      tags: [records]
+      parameters:
+        - { name: key, in: query, required: true, schema: { type: string }, example: ofk_test_not_a_real_key }
+        - { name: format, in: query, schema: { type: string, enum: [json, markdown, text, html] }, description: "Default json." }
+      responses:
+        "200":
+          description: The policy.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CookiePolicy" }
+            text/markdown:
+              schema: { type: string }
+            text/plain:
+              schema: { type: string }
+            text/html:
+              schema: { type: string }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/site/cookies:
+    post:
+      operationId: sendSiteCookies
+      summary: Report a site's cookies from a browser
+      description: |
+        Public: the site key (ofk_) in the body is the authority. What the website script sends at most once a day per browser:
+        the names of the page's cookies and storage keys and the host and first path segment of its scripts and iframes, never
+        a value, a query string or who the visitor is. granted is the visitor's choice when the consent banner is on, so what
+        was there before they allowed it is flagged. Send the JSON as text/plain to skip the CORS preflight.
+      tags: [records]
+      requestBody:
+        required: true
+        content:
+          text/plain:
+            schema: { type: string }
+          application/json:
+            schema:
+              type: object
+              required: [key]
+              properties:
+                key: { type: string, example: ofk_test_not_a_real_key }
+                cookies: { type: array, maxItems: 200, items: { type: string } }
+                local: { type: array, maxItems: 200, items: { type: string } }
+                session: { type: array, maxItems: 200, items: { type: string } }
+                scripts: { type: array, maxItems: 200, items: { type: string } }
+                iframes: { type: array, maxItems: 100, items: { type: string } }
+                path: { type: string }
+                granted:
+                  type: object
+                  properties:
+                    analytics: { type: boolean }
+                    marketing: { type: boolean }
+                    preferences: { type: boolean }
+      responses:
+        "200":
+          description: Taken.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [added]
+                properties:
+                  added: { type: integer, description: Names new to the site. }
+        default: { $ref: "#/components/responses/Error" }
+    options:
+      operationId: sendSiteCookiesPreflight
+      summary: CORS preflight for cookie reports
       description: "Public. Any origin may send; the key, not the page, is checked."
       tags: [records]
       responses:
@@ -31719,6 +31951,88 @@ components:
         revenue_models: { type: array, items: { type: string }, description: "Ids from GET /v1/business-models; replaces the list." }
         logo_url: { type: string, maxLength: 2000, description: "An https address of the brand's own logo; empty for the company's." }
         colors: { $ref: "#/components/schemas/LookColors" }
+    SiteCookie:
+      type: object
+      required: [id, kind, name, host, vendor, vendor_name, category, purpose, retention, status, sources, before_consent, pages, reviewed_at, first_seen_at, last_seen_at]
+      properties:
+        id: { type: string, format: uuid }
+        kind: { type: string, enum: [cookie, local_storage, session_storage, script, iframe, pixel] }
+        name: { type: string, description: "A cookie's or storage key's name; for a script, embed or pixel its host and first path segment." }
+        host: { type: string, description: "The cookie's domain, or the script's host." }
+        vendor: { type: string, description: "The catalogue's vendor id, or empty when unknown." }
+        vendor_name: { type: string }
+        category: { type: string, enum: [necessary, analytics, marketing, preferences, unknown] }
+        purpose: { type: string }
+        retention: { type: string, example: 13 months }
+        status: { type: string, enum: [new, listed, ignored], description: "new: not looked at by a person (in the policy when its vendor is known); listed: confirmed; ignored: never listed." }
+        sources: { type: array, items: { type: string, enum: [crawl, browser] } }
+        before_consent: { type: boolean, description: "A browser had it before the visitor allowed its category: the tag may need data-category to wait for consent." }
+        pages: { type: array, items: { type: string }, description: A few pages it was on. }
+        reviewed_at: { type: [string, "null"], format: date-time }
+        first_seen_at: { type: string, format: date-time }
+        last_seen_at: { type: string, format: date-time }
+    SiteCookieInput:
+      type: object
+      additionalProperties: false
+      properties:
+        category: { type: string, enum: [necessary, analytics, marketing, preferences] }
+        purpose: { type: string, maxLength: 1000 }
+        retention: { type: string, maxLength: 100 }
+        status: { type: string, enum: [listed, ignored] }
+    CookieScan:
+      type: object
+      required: [id, site_key_id, status, trigger, pages, found, added, error, created_at, started_at, finished_at]
+      properties:
+        id: { type: string, format: uuid }
+        site_key_id: { type: string, format: uuid }
+        status: { type: string, enum: [queued, running, done, failed] }
+        trigger: { type: string, enum: [person, schedule, api] }
+        pages: { type: integer, description: Pages read. }
+        found: { type: integer }
+        added: { type: integer, description: New to the site. }
+        error: { type: string, description: "Why it failed, such as no page could be read." }
+        created_at: { type: string, format: date-time }
+        started_at: { type: [string, "null"], format: date-time }
+        finished_at: { type: [string, "null"], format: date-time }
+    CookiePolicy:
+      type: object
+      required: [version, published_at, site, categories, format, content, url]
+      properties:
+        version: { type: integer }
+        published_at: { type: string, format: date-time }
+        site: { type: string }
+        categories:
+          type: array
+          items:
+            type: object
+            required: [id, vendors]
+            properties:
+              id: { type: string, enum: [necessary, analytics, marketing, preferences] }
+              vendors:
+                type: array
+                items:
+                  type: object
+                  required: [id, name, company, privacy_url, purpose, items]
+                  properties:
+                    id: { type: string, description: "The catalogue's id; empty for the site's own." }
+                    name: { type: string }
+                    company: { type: string }
+                    privacy_url: { type: string }
+                    purpose: { type: string }
+                    items:
+                      type: array
+                      items:
+                        type: object
+                        required: [kind, name, host, purpose, retention]
+                        properties:
+                          kind: { type: string }
+                          name: { type: string }
+                          host: { type: string }
+                          purpose: { type: string }
+                          retention: { type: string }
+        format: { type: string, enum: [json, markdown, text, html] }
+        content: { type: string, description: "The policy in format; empty for json." }
+        url: { type: string, description: The hosted policy page. }
     ConsentBanner:
       type: object
       required: [site_key_id, config, version, consent_version, saved, look, updated_at]
