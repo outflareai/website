@@ -2,7 +2,7 @@
 	"version": "2026.10.28",
 	"date": "2026-10-28",
 	"status": "in-progress",
-	"updated": "2026-10-28T20:42:47Z",
+	"updated": "2026-10-28T20:54:56Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -164,7 +164,14 @@
 			"edition": "open-source",
 			"text": "A/B tests: pick a feature flag, choose what counts as success, and see which version wins, with the chance each one beats the original, the likely size of the lift, and a warning when the split looks wrong. Results are safe to check every day.",
 			"at": "2026-10-28T20:12:51Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "CRM → Lead finder shows how far each run has got, step by step: how many companies are waiting, being read, judged or reviewed, which were set aside and why, and which step is slowest. A run that pauses (at its page or AI limit, or for a connection to fix) says why, and Resume carries it on, raising the limit first if needed.",
+			"at": "2026-10-28T20:54:56Z"
 		}
 	],
-	"through": "dade7d6+bee926d"
+	"through": "656f036+0b00d8d"
 }
