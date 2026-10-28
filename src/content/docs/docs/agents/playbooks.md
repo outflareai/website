@@ -27,6 +27,23 @@ Open one to see what it needs, its steps and the API operations each step uses, 
 
 Missions started from a playbook carry `playbook_id` and `playbook_version`, so you can compare results per playbook and version.
 
+## Setup kits
+
+Some playbooks need things set up before their first run, such as a pipeline in the CRM, fields on people and email drafts. Those playbooks come with a **setup kit**, so you don't build it by hand and every workspace gets the same fields, which reports and other playbooks can rely on.
+
+When you open such a playbook, **What it sets up** lists each part of the kit:
+
+- **Adds**: new to your workspace.
+- **Extends**: an option list you made yourself gains the options it's missing.
+- **Have**: already there and set up the same way.
+- **Conflict**: you already have something under the same name, set up differently (for example a text field where the kit wants a number).
+
+Tick **Set up what it needs when I start**, and the kit is added in the same step as the mission draft. A kit only ever adds: nothing you already have changes, email drafts arrive unpublished so you read and publish them first, and while anything conflicts it changes nothing and tells you what's in the way. Setting it up again changes nothing.
+
+The first kit, **Creator partnerships**, adds a Partnerships pipeline (Found, Vetted, Pitched, Negotiating, Agreed, Live, Measured, Renewed or Declined) with the creator, deal type, fee, deliverables, platform, go-live date, post, content rights, tracked link and promo code; creator fields on people (platforms, audience size, topics, rate card, past sponsors); and email drafts for the brief, a go-live reminder, thanks with first results, and an invite for customers who create. The creator playbooks use it.
+
+Setting up a kit needs permission to manage the data catalog (`catalog.manage`), and to manage email (`emails.manage`) when it adds email drafts. Agents use the MCP tools `preview_kit` and `apply_kit`, or `apply_kit` on `start_playbook`.
+
 ## API
 
 | Call | What it does |
@@ -35,8 +52,11 @@ Missions started from a playbook carry `playbook_id` and `playbook_version`, so 
 | `GET /v1/playbooks/{id}` | One playbook |
 | `GET /v1/workspaces/{ws}/playbooks` | Playbooks with `readiness` and `runs` for your workspace (`missions.read`) |
 | `GET /v1/workspaces/{ws}/playbooks/{id}` | One, with its readiness (`missions.read`) |
-| `POST /v1/workspaces/{ws}/playbooks/{id}/runs` | Start one as a mission draft (`missions.run`) |
+| `POST /v1/workspaces/{ws}/playbooks/{id}/runs` | Start one as a mission draft (`missions.run`); `apply_kit: true` also sets up its kit |
+| `GET /v1/kits`, `GET /v1/kits/{id}` | Setup kits, with the playbooks that use each. Public, no key needed |
+| `GET /v1/workspaces/{ws}/kits/{id}/preview` | What a kit would add, extend, reuse or conflict with (`customers.read`) |
+| `POST /v1/workspaces/{ws}/kits/{id}/apply` | Set it up (`catalog.manage`, and `emails.manage` for email drafts). `409 conflict` names what's in the way |
 
 ## Write your own
 
-Playbooks are open source (Apache-2.0): one `playbook.yaml` per folder in [`playbooks/`](https://github.com/outflareai/outflare/tree/main/playbooks#readme) in the Outflare repository. Recommend the connectors you trust, including your own tool once it is a connector, and send a pull request. The checks make sure every step names a real API operation and every recommended connector exists; a maintainer reviews it. Once merged, it ships with the next deploy and shows on outflare.ai and in every workspace, with a Community badge and your GitHub handle.
+Playbooks are open source (Apache-2.0): one `playbook.yaml` per folder in [`playbooks/`](https://github.com/outflareai/outflare/tree/main/playbooks#readme) in the Outflare repository, with optional setup kits in `playbooks/kits/`. Recommend the connectors you trust, including your own tool once it is a connector, and send a pull request. The checks make sure every step names a real API operation and every recommended connector exists; a maintainer reviews it. Once merged, it ships with the next deploy and shows on outflare.ai and in every workspace, with a Community badge and your GitHub handle.

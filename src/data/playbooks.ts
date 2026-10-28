@@ -26,6 +26,8 @@ export interface Playbook {
 	measure: { metric: string; how: string }[];
 	prompt: string;
 	example?: string;
+	// The setup kit it offers to apply before the first run.
+	kit?: { id: string; title: string; summary: string; adds: string[]; source_url: string };
 	source_url: string;
 }
 
