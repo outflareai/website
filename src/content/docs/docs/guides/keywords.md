@@ -20,7 +20,7 @@ Your site's numbers come from the Search Console property that covers it: a doma
 ## What it shows
 
 - **Pages:** each page's clicks, impressions, click-through rate and average position over the last 28 days Search Console has sent (it runs two or three days behind). Open a page to see the queries Google shows it for.
-- **Queries:** the same by query. Open a query to see which of your pages Google shows for it. Two pages sharing one query's impressions is often a sign they compete.
+- **Queries:** the same by query. Open a query to see which of your pages Google shows for it. Two pages sharing one query's impressions is often a sign they compete. Press **Track** on a query to add it to rank tracking in one click (US, desktop, weekly); queries you already track show **Tracked**. The same button is on each query in a page's breakdown and on each search under Cannibalisation.
 - **Drops:** what got worse since the numbers before (see below).
 - **Targets:** the keyword each page should rank for (see below).
 - **Rankings:** where your site ranks on Google for the keywords you track (see below).
