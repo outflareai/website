@@ -21,12 +21,25 @@ Cold email, replies, meetings and deals are linked to the person as well: throug
 
 The catalog lists everything a record can hold, and every feature uses the same definitions.
 
-- **Record types.** People and companies come built in. Add your own, such as Deal.
+- **Record types.** People, companies and [deals](#deals) come ready to use. Add your own, such as subscriptions or partners.
 - **Fields.** First and last name, job title, seniority, companies, country, city, time zone, LinkedIn and lifecycle stage for people. Website, industry, company size, country, LinkedIn and lifecycle stage for companies. Add your own fields with a value type: text, number, currency, date, checkbox, a choice from a list, rating, email, phone, URL, location, or a link to another record or a teammate.
 - **Option lists.** Choices shared across fields, such as country, industry, company size, seniority and lifecycle stage. Add your own, such as deal stages. Options are archived, never deleted, so old records keep their meaning.
 - **Product events.** Define the events your product sends, such as `product.activated`, with their properties.
 
 Agents read the catalog with `get_catalog` before writing anything, and reuse a field before adding a new one.
+
+## Deals
+
+Every deal is one record, wherever it came from: made in the CRM, opened by a [reply rule](/docs/guides/inbox/#move-deals-from-replies), brought over from Attio, logged for outreach or synced from HubSpot. The deal you see under Deals and the deal in your [outcomes](/docs/guides/outcomes/) are the same deal, with the same id, so a change on either side shows on the other.
+
+- **Fields.** A deal has a stage (lead, qualified, meeting booked, proposal, negotiation, won, lost), a value, a close date, its people and its company. They match Attio's, so deals from Attio fit as they are. If you made your own Deal type before, it's kept, and gets any of these fields it didn't have, plus won and lost stages.
+- **Won and lost** close a deal and count as won or lost in outcomes. Every other stage is open.
+- **People and company.** A deal logged for a lead is linked to that person, and to their company when the deal has none.
+- **Outreach.** A deal made in the CRM is credited to the outreach that reached its person, the same way a HubSpot deal is: the sequence and project that emailed them, and their latest meeting.
+- **HubSpot** stays the source of truth for the deals it syncs: the next sync of a deal writes its name, stage, value and close date again.
+- **Archiving** a deal takes it out of outcomes and reports.
+
+A deal shows on the timelines of its people and its company, and its own timeline shows its history.
 
 ## Which value wins
 

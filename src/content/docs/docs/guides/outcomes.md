@@ -33,7 +33,7 @@ Fix any of them on the Meetings tab: move a meeting to another sequence or proje
 
 ## Deals
 
-Deals are read from HubSpot: name, stage, open, won or lost, amount and close date, linked to the lead's most recent meeting. HubSpot stays the source of truth; Outflare keeps a copy for reporting and refuses edits to the fields HubSpot owns. Without a CRM, log deals by hand.
+Deals come from Outflare's own CRM and from HubSpot. Every deal is one [deal record](/docs/guides/customer-records/#deals), so a deal you make or move under Deals counts here, credited to the outreach that reached its person. Deals from HubSpot bring their name, stage, open, won or lost, amount and close date, linked to the lead's most recent meeting. HubSpot stays the source of truth for those, and Outflare refuses edits to the fields HubSpot owns. You can also log a deal here by hand.
 
 Set `push_meetings` on the HubSpot connection (see [Settings](/docs/integrations/calendars-and-hubspot/#settings)) and meetings booked from outreach are added to HubSpot too, with the contact created or updated by email. It is off by default. Outflare is not a CRM and never will be.
 
