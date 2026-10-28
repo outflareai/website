@@ -2,7 +2,7 @@
 	"version": "2026.10.28",
 	"date": "2026-10-28",
 	"status": "in-progress",
-	"updated": "2026-10-28T21:17:59Z",
+	"updated": "2026-10-28T21:21:11Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -178,7 +178,42 @@
 			"edition": "open-source",
 			"text": "Companies added by a tool, such as an extension finding companies, now record which tool added them, like people already do.",
 			"at": "2026-10-28T21:03:42Z"
+		},
+		{
+			"kind": "launch",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "News watch: save news searches that run on a schedule through your own Geonode account, follow a topic and who writes about it, and keep every article about your brand as its coverage, on the outlet's company record, to confirm or dismiss.",
+			"at": "2026-10-28T21:21:11Z"
+		},
+		{
+			"kind": "fix",
+			"area": "social",
+			"edition": "open-source",
+			"text": "Review pages, social profiles and rank checks that fail to read are now tried again the same day (after 15 minutes, then 1, 2 and every 4 hours), so day-by-day numbers have no gaps. Review pages showing a bot check are read again in a browser. Each says why its last read failed, with a Try again button.",
+			"at": "2026-10-28T21:21:11Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "A/B tests: see how long a test will take on your real traffic before you start it, get test ideas and new versions of your copy from your own AI model, and a plain-English summary of results. The lift range now always agrees with \"safe to stop\", and a chart shows each version day by day.",
+			"at": "2026-10-28T21:21:11Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Consent banner: the website script now shows your cookie consent banner itself. It follows each region's law (ask first in Europe, opt-out in the US), Global Privacy Control, Google Consent Mode v2 and the Meta, TikTok and Microsoft signals, holds back tags until they're allowed, and keeps each visitor's choice as a consent that joins their record when they sign up.",
+			"at": "2026-10-28T21:21:11Z"
+		},
+		{
+			"kind": "launch",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Link building checks each prospect's page for you: whether it's up, whether it already links to you, which of its links are broken (with what the Internet Archive kept), what your own AI makes of it, which of your pages to offer, and who to contact. Lost links can be added as prospects to win back in one click.",
+			"at": "2026-10-28T21:21:11Z"
 		}
 	],
-	"through": "420c068+a11b36c"
+	"through": "4b2582d+c637479"
 }
