@@ -2,7 +2,7 @@
 	"version": "2026.10.28",
 	"date": "2026-10-28",
 	"status": "in-progress",
-	"updated": "2026-10-28T17:44:02Z",
+	"updated": "2026-10-28T18:40:46Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -122,7 +122,14 @@
 			"edition": "open-source",
 			"text": "Add a lead by hand on the Leads page with **Add lead**, and click any lead to see its details, edit its name, company, title, links and custom fields, or delete it.",
 			"at": "2026-10-28T15:27:23Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Rank tracking can now check Google through your own Geonode connection as well as DataForSEO, at about $0.005 for the top 100. With both connected, choose which one checks each keyword on the Rankings tab.",
+			"at": "2026-10-28T18:40:46Z"
 		}
 	],
-	"through": "ecc76d6+a950536"
+	"through": "cce2e5f+5fa1ae8"
 }
