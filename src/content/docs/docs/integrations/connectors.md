@@ -11,6 +11,8 @@ Outflare is the brain of your outbound. Connectors are how it reaches everything
 
 **Every connection is your own account.** Outflare never lends its own API keys for connectors or AI models, on Outflare Cloud or anywhere else: you add your own key, or sign in to your own account, for each service a feature uses. A feature that needs a service you haven't connected stays off until you connect it.
 
+Don't see your service? Anyone can add one with a short manifest and a pull request: see [Build a connector](/docs/integrations/build-a-connector/).
+
 ## What can be connected
 
 Ready to connect today:
