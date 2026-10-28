@@ -35,6 +35,7 @@ The tools are:
 | **Social replies** | Drafting replies to posts your [social watches](/docs/guides/social/) found |
 | **Email verification** | Checking addresses the free checks could not settle |
 | **Meaning-based search** | Turning your records, replies, meetings and deals into vectors so search can find them by what they mean. On by default, usually cents a month, and you can [turn it off](/docs/guides/query-and-search/#on-by-default-and-how-to-turn-it-off). [Why it costs anything](/docs/guides/query-and-search/#what-it-costs-and-why-it-shows-in-ai-usage) |
+| **Lead finder** <span class="pill cloud">Outflare Cloud</span> | Planning web searches for the lead finder, and reading the websites it finds to check each company against your ideal customer profile. It uses the model you chose for domain research, and you can give it a limit of its own |
 
 Costs are each model's price times the tokens, rounded up to the cent per call, or the provider's own figure where it reports one (OpenRouter). Your provider's bill is the final word. Outflare keeps only the counts, never what was asked or answered, and keeps them for 13 months.
 
@@ -43,6 +44,10 @@ Costs are each model's price times the tokens, rounded up to the cent per call, 
 The workspace's **monthly AI limit** (US$50 by default, under [AI model](/docs/agents/ai-models/#limit-what-ai-can-spend)) covers every AI call. On the AI usage page an owner or admin can also give any tool a **monthly limit of its own**, such as US$10 for reply labelling. A call stops at whichever limit comes first: planning answers `409` with `ai_budget_reached`, missions pause and say why, and background work such as reply labelling waits for next month or a higher limit. A limit of 0 turns the tool's AI off.
 
 Limits count calendar months in UTC.
+
+### Warn only
+
+Every limit stops calls by default. To keep AI running past a limit, untick **Stop** next to that tool, or **Stop all AI calls at the workspace's monthly limit** for the workspace's limit, then save. A limit set to warn only still sends both emails below, but the calls carry on and your provider keeps billing you. Your provider's own hard limit still applies either way.
 
 ## Warnings before a limit is reached
 
@@ -53,12 +58,12 @@ When this month's AI spend reaches **80%** of a limit, and again when it **reach
 | Endpoint | MCP tool | What it does |
 | --- | --- | --- |
 | `GET /v1/workspaces/{ws}/ai-usage?month=2026-10` | `get_ai_usage` | A month of AI calls by tool, model and day, each tool's limit, and the 50 latest calls |
-| `PUT /v1/workspaces/{ws}/ai-usage/limits` | `update_ai_tool_limits` | Replace the per-tool limits, in US cents |
+| `PUT /v1/workspaces/{ws}/ai-usage/limits` | `update_ai_tool_limits` | Replace the per-tool limits, in US cents, and choose which limits stop calls (`hard_stop` for the workspace's limit, `hard_stops` per tool; `false` only warns) |
 
 ```sh
 curl -X PUT https://outflare.example.com/v1/workspaces/$WS/ai-usage/limits \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" \
-  -d '{"limits": {"reply_labelling": 1000, "social_replies": 500}}'
+  -d '{"limits": {"reply_labelling": 1000, "social_replies": 500}, "hard_stops": {"social_replies": false}}'
 ```
 
 Reading needs the `integrations.read` scope and changing limits `integrations.manage`.
