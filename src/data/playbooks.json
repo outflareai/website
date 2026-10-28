@@ -381,6 +381,170 @@
 		"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/welcome-new-signups/playbook.yaml"
 	},
 	{
+		"id": "find-creators-covering-competitors",
+		"version": 1,
+		"title": "Find creators who already cover your competitors",
+		"summary": "Videos, newsletters and podcasts that reviewed or sponsored a competitor, vetted and pitched, all tracked on your Partnerships board.",
+		"description": "A creator who reviewed a competitor has shown three things: their audience cares about your category, they take sponsorships, and they can explain a product like yours. This playbook finds who covered your competitors in the last year, drops the ones that are off-topic or too small, and drafts a personal pitch for each one you approve, with a partnership on the board for every creator so nothing gets lost.",
+		"tier": "clever",
+		"goals": [
+			"customers",
+			"partners"
+		],
+		"publisher": "outflare",
+		"author": {
+			"github": "outflareai"
+		},
+		"needs": {
+			"data": [
+				{
+					"check": "mailboxes",
+					"label": "A mailbox to send pitches from"
+				}
+			],
+			"connections": [
+				{
+					"capability": "web.search",
+					"label": "Web search, unless your AI app searches the web itself",
+					"optional": true,
+					"recommended": [
+						"geonode"
+					],
+					"recommended_names": [
+						"Geonode"
+					]
+				},
+				{
+					"capability": "social.search",
+					"label": "Social search, to find posts that mention your competitors",
+					"optional": true,
+					"recommended": [
+						"reddit"
+					],
+					"recommended_names": [
+						"Reddit"
+					]
+				},
+				{
+					"capability": "plan",
+					"label": "An AI model, unless you run this from your own AI app",
+					"optional": true,
+					"recommended": [
+						"claude",
+						"openai"
+					],
+					"recommended_names": [
+						"Claude",
+						"OpenAI"
+					]
+				}
+			]
+		},
+		"inputs": [
+			{
+				"name": "brand",
+				"label": "Brand",
+				"example": "Northpeak",
+				"optional": false
+			},
+			{
+				"name": "competitors",
+				"label": "Competitors",
+				"help": "Two to five names, the way people write them.",
+				"example": "Acme Trail, Summit Gear",
+				"optional": false
+			},
+			{
+				"name": "platforms",
+				"label": "Where to look",
+				"help": "Leave it empty to look everywhere your buyers might be.",
+				"example": "YouTube, newsletters, podcasts",
+				"optional": true
+			}
+		],
+		"steps": [
+			{
+				"say": "Read the brand's context, and check its setup kit is applied so the Partnerships board and creator fields are there.",
+				"tools": [
+					"getBrandContext",
+					"listRecordTypes"
+				]
+			},
+			{
+				"say": "Look at partnerships already on the board, so nobody is pitched twice.",
+				"tools": [
+					"listRecords"
+				]
+			},
+			{
+				"say": "Find reviews, comparisons and sponsored posts about each competitor from the last twelve months, with the brand's social watches and web search.",
+				"tools": [
+					"createSocialWatch",
+					"checkSocialWatch",
+					"listSocialItems"
+				]
+			},
+			{
+				"say": "For each creator behind them, find or add a person with their platforms, audience size, topics and past sponsors, and a partnership at Found.",
+				"tools": [
+					"lookupRecords",
+					"createRecord",
+					"updateRecord"
+				]
+			},
+			{
+				"say": "Vet each one (topic fit, recent views, how the review read) and move them to Vetted or Declined with a one-line reason.",
+				"tools": [
+					"updateRecord"
+				]
+			},
+			{
+				"say": "Draft a short pitch for each vetted creator that names what they said about the competitor and why your product is worth a look, as a sequence held until a person approves the sends.",
+				"tools": [
+					"createSequence",
+					"replaceSequenceSteps",
+					"previewSequence"
+				]
+			},
+			{
+				"say": "Move partnerships to Pitched when the sequence runs, and to Negotiating or Declined as replies come in.",
+				"tools": [
+					"listInbox",
+					"updateRecord"
+				]
+			}
+		],
+		"guardrails": [
+			"Never send a pitch, accept terms or promise money without a person's approval.",
+			"Never criticise a competitor in a pitch; say what your product does better.",
+			"Only use contact details a creator publishes for business, and never contact anyone who opted out."
+		],
+		"measure": [
+			{
+				"metric": "Reply rate",
+				"how": "Replies from pitched creators divided by creators pitched."
+			},
+			{
+				"metric": "Partnerships agreed",
+				"how": "Partnerships that reach Agreed within 30 days."
+			}
+		],
+		"prompt": "Find creators who already cover {{brand}}'s competitors: {{competitors}}. Look at {{platforms}} for reviews, comparisons and sponsored posts from the last year. Vet them, put each one on the Partnerships board, and draft a personal pitch for the best ten. Nothing is sent until I approve it.",
+		"example": "Northpeak named two competitors. The agent found 64 videos and 18 newsletters that reviewed them, kept 22 that were on-topic with at least 2,000 views, and drafted 12 pitches. Four replied and two agreed: a newsletter slot for 400 USD and a video for 900 USD.",
+		"kit": {
+			"id": "creators-partnerships",
+			"title": "Creator partnerships",
+			"summary": "A Partnerships pipeline for creator, newsletter and podcast deals, creator fields on people, and email drafts for briefs, go-live reminders and thank-yous.",
+			"adds": [
+				"Partnerships pipeline",
+				"5 fields on people",
+				"4 email drafts"
+			],
+			"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/kits/creators-partnerships.yaml"
+		},
+		"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/find-creators-covering-competitors/playbook.yaml"
+	},
+	{
 		"id": "get-named-in-ai-answers",
 		"version": 1,
 		"title": "Get named in AI answers",
@@ -476,6 +640,737 @@
 		"prompt": "Run the \"Get named in AI answers\" playbook for {{brand}}, which sells {{category}}. Check how often AI assistants name us today. If there's no set of buyer questions for our category, add one. Then find the answers that name competitors but not us, read the pages they cite, and give me a short list of pages to write or facts to correct so we get named.",
 		"example": "Northpeak was named in 4 of 40 answers about agency project tools. Most answers cited two comparison pages and a review site, none of which listed Northpeak; the list started with asking those three to add it.",
 		"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/get-named-in-ai-answers/playbook.yaml"
+	},
+	{
+		"id": "recruit-partners-from-signups",
+		"version": 1,
+		"title": "Recruit affiliates and creators from your own sign-ups",
+		"summary": "Find the people who signed up and run a blog, channel, newsletter or comparison site in your space, and invite them to partner with you.",
+		"description": "Some of your best partners already use your product. A sign-up from a company whose website is a review site, a developer blog or a YouTube channel about your category can send you customers who trust them. This playbook reads recent sign-ups, looks at the website behind each one, picks those with a real audience in your topic, puts them on the Partnerships board, and drafts a personal invite for each one you approve: a commission on every sale, free product, or a paid post.",
+		"tier": "clever",
+		"goals": [
+			"partners",
+			"customers"
+		],
+		"publisher": "outflare",
+		"author": {
+			"github": "outflareai"
+		},
+		"needs": {
+			"data": [
+				{
+					"check": "records",
+					"label": "People who signed up, with their company or website"
+				},
+				{
+					"check": "customer_events",
+					"label": "Sign-up events sent to Outflare"
+				}
+			],
+			"connections": [
+				{
+					"capability": "email.send",
+					"label": "An email provider for invites to your own users",
+					"optional": false,
+					"recommended": [
+						"resend",
+						"postmark",
+						"amazon_ses"
+					],
+					"recommended_names": [
+						"Resend",
+						"Postmark",
+						"Amazon SES"
+					]
+				},
+				{
+					"capability": "crawl.fetch",
+					"label": "A way to read their websites, unless your AI app can",
+					"optional": true,
+					"recommended": [
+						"geonode"
+					],
+					"recommended_names": [
+						"Geonode"
+					]
+				},
+				{
+					"capability": "plan",
+					"label": "An AI model, unless you run this from your own AI app",
+					"optional": true,
+					"recommended": [
+						"claude",
+						"openai"
+					],
+					"recommended_names": [
+						"Claude",
+						"OpenAI"
+					]
+				}
+			]
+		},
+		"inputs": [
+			{
+				"name": "brand",
+				"label": "Brand",
+				"example": "Northpeak",
+				"optional": false
+			},
+			{
+				"name": "topics",
+				"label": "Your space",
+				"help": "What a partner's audience should care about.",
+				"example": "trail running, outdoor gear",
+				"optional": false
+			},
+			{
+				"name": "since",
+				"label": "Sign-ups since",
+				"example": "the last 90 days",
+				"optional": false
+			},
+			{
+				"name": "offer",
+				"label": "What you offer partners",
+				"help": "Leave it empty and the agent suggests a commission, free product or a paid post for each one.",
+				"example": "20% of every sale for 12 months",
+				"optional": true
+			}
+		],
+		"steps": [
+			{
+				"say": "Read the brand's context, and check its setup kit is applied so the Partnerships board is there.",
+				"tools": [
+					"getBrandContext",
+					"listRecordTypes"
+				]
+			},
+			{
+				"say": "List people who signed up in the period, with their companies and websites, and skip anyone already on the board or who opted out of marketing email.",
+				"tools": [
+					"listCustomerEvents",
+					"listRecords",
+					"getRecord"
+				]
+			},
+			{
+				"say": "Look at the website behind each one and note what it is (review or comparison site, blog, newsletter, channel, agency, or a normal business), its topics and any sign of an audience.",
+				"tools": []
+			},
+			{
+				"say": "For each one with an audience in the space, save their creator fields and add a partnership at Found with a suggested deal type, and a one-line reason.",
+				"tools": [
+					"updateRecord",
+					"createRecord"
+				]
+			},
+			{
+				"say": "Draft a short, personal invite for each, from a real person at the brand, that says why them and what they'd get. Hold every send until a person approves it.",
+				"tools": [
+					"previewEmailTemplate",
+					"sendEmail"
+				]
+			},
+			{
+				"say": "Move partnerships to Pitched when the invite goes out, and to Negotiating or Declined as replies come in.",
+				"tools": [
+					"listInbox",
+					"updateRecord"
+				]
+			}
+		],
+		"guardrails": [
+			"Never send an invite or agree terms without a person's approval.",
+			"Only write to people who allow marketing email from the brand; the opt-out list always wins.",
+			"Never mention what you know about their account or usage beyond the fact that they signed up."
+		],
+		"measure": [
+			{
+				"metric": "Partners found",
+				"how": "Sign-ups added to the board divided by sign-ups reviewed."
+			},
+			{
+				"metric": "Partners agreed",
+				"how": "Partnerships from this playbook that reach Agreed within 30 days."
+			}
+		],
+		"prompt": "Find partners among {{brand}}'s own sign-ups from {{since}}. Look at the website behind each one and pick the people who run a blog, channel, newsletter or comparison site about {{topics}}. Put them on the Partnerships board and draft a personal invite for each, offering {{offer}}. Nothing is sent until I approve it.",
+		"example": "Northpeak reviewed 1,240 sign-ups from the last 90 days. 31 came from websites with an audience: 12 running blogs, 9 YouTube channels, 6 newsletters and 4 gear comparison sites. Northpeak approved 18 invites; 7 joined on commission and 2 asked for a paid post.",
+		"kit": {
+			"id": "creators-partnerships",
+			"title": "Creator partnerships",
+			"summary": "A Partnerships pipeline for creator, newsletter and podcast deals, creator fields on people, and email drafts for briefs, go-live reminders and thank-yous.",
+			"adds": [
+				"Partnerships pipeline",
+				"5 fields on people",
+				"4 email drafts"
+			],
+			"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/kits/creators-partnerships.yaml"
+		},
+		"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/recruit-partners-from-signups/playbook.yaml"
+	},
+	{
+		"id": "renew-what-works",
+		"version": 1,
+		"title": "Renew the creator deals that pay back",
+		"summary": "Each month, rank every creator deal by what it brought in for what it cost, draft renewals for the winners and a polite pass for the rest.",
+		"description": "Once a few creator deals have run, the question is which to do again. This playbook lines up every partnership's spend against the visits, sign-ups and paying customers from its link and code, ranks them, and drafts a renewal for each one that paid back and a kind note to the ones that didn't, so the next month's budget goes where it works.",
+		"tier": "clever",
+		"goals": [
+			"revenue",
+			"partners"
+		],
+		"publisher": "outflare",
+		"author": {
+			"github": "outflareai"
+		},
+		"needs": {
+			"data": [
+				{
+					"check": "records",
+					"label": "Partnerships on the board with their results"
+				}
+			],
+			"connections": [
+				{
+					"capability": "plan",
+					"label": "An AI model, unless you run this from your own AI app",
+					"optional": true,
+					"recommended": [
+						"claude",
+						"openai"
+					],
+					"recommended_names": [
+						"Claude",
+						"OpenAI"
+					]
+				}
+			]
+		},
+		"inputs": [
+			{
+				"name": "brand",
+				"label": "Brand",
+				"example": "Northpeak",
+				"optional": false
+			},
+			{
+				"name": "target",
+				"label": "Most you'll pay for a customer",
+				"help": "Deals that cost less per paying customer than this are renewed.",
+				"example": "80 USD",
+				"optional": false
+			}
+		],
+		"steps": [
+			{
+				"say": "Read the brand's context, and list partnerships at Live or Measured.",
+				"tools": [
+					"getBrandContext",
+					"listRecords"
+				]
+			},
+			{
+				"say": "For each one, add up its recorded spend and its visits, sign-ups and paying customers from its link and code.",
+				"tools": [
+					"listSpend",
+					"getAnalyticsReport",
+					"outcomesReport"
+				]
+			},
+			{
+				"say": "Rank them by cost per paying customer, mark each as renew, renegotiate or stop against the target, and move them to Measured.",
+				"tools": [
+					"updateRecord"
+				]
+			},
+			{
+				"say": "Draft a renewal for each one to renew, a new rate for each to renegotiate, and a short thank-you for the rest, held until a person approves them.",
+				"tools": [
+					"createSequence",
+					"replaceSequenceSteps",
+					"previewSequence"
+				]
+			},
+			{
+				"say": "Once the person decides, move each partnership to Renewed or Declined.",
+				"tools": [
+					"updateRecord"
+				]
+			}
+		],
+		"guardrails": [
+			"Never agree a renewal, a new rate or a payment without a person's approval.",
+			"Keep the numbers you share with a creator to their own deal."
+		],
+		"measure": [
+			{
+				"metric": "Cost per paying customer",
+				"how": "Across creator deals, this month against last."
+			},
+			{
+				"metric": "Share of spend on winners",
+				"how": "Spend on renewed deals divided by all creator spend."
+			}
+		],
+		"prompt": "Review {{brand}}'s creator partnerships. Rank every deal at Live or Measured by cost per paying customer, renew the ones under {{target}}, suggest a new rate for the close ones and a polite pass for the rest. Draft each message for me to approve.",
+		"example": "Northpeak had six live deals. Two newsletters cost 38 and 44 USD per paying customer and were renewed, one video at 95 USD got a lower rate offer, and three were thanked and dropped.",
+		"kit": {
+			"id": "creators-partnerships",
+			"title": "Creator partnerships",
+			"summary": "A Partnerships pipeline for creator, newsletter and podcast deals, creator fields on people, and email drafts for briefs, go-live reminders and thank-yous.",
+			"adds": [
+				"Partnerships pipeline",
+				"5 fields on people",
+				"4 email drafts"
+			],
+			"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/kits/creators-partnerships.yaml"
+		},
+		"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/renew-what-works/playbook.yaml"
+	},
+	{
+		"id": "creator-partnerships",
+		"version": 1,
+		"title": "Run creator partnerships from first find to results",
+		"summary": "Find creators your buyers already follow, pitch them personally, track every deal on a Partnerships board, and see which ones paid off.",
+		"description": "Creators, newsletters and podcasts reach the people you want, but the work around them is messy: a spreadsheet of names, pitches lost in inboxes, fees nobody adds up, and no idea which post brought sign-ups. This playbook sets up a Partnerships pipeline in the CRM, finds creators who already cover your space, drafts a personal pitch for each one you approve, gives every deal its own tracked link, and reports sign-ups and cost per deal, so you renew what works and drop what doesn't.",
+		"tier": "clever",
+		"goals": [
+			"customers",
+			"partners"
+		],
+		"publisher": "outflare",
+		"author": {
+			"github": "outflareai"
+		},
+		"needs": {
+			"data": [
+				{
+					"check": "mailboxes",
+					"label": "A mailbox to send pitches from"
+				}
+			],
+			"connections": [
+				{
+					"capability": "plan",
+					"label": "An AI model, unless you run this from your own AI app",
+					"optional": true,
+					"recommended": [
+						"claude",
+						"openai"
+					],
+					"recommended_names": [
+						"Claude",
+						"OpenAI"
+					]
+				}
+			]
+		},
+		"inputs": [
+			{
+				"name": "brand",
+				"label": "Brand",
+				"example": "Northpeak",
+				"optional": false
+			},
+			{
+				"name": "topics",
+				"label": "What your buyers watch and read about",
+				"help": "A few topics, so the agent looks for creators in the right places.",
+				"example": "trail running, ultralight hiking gear",
+				"optional": false
+			},
+			{
+				"name": "budget",
+				"label": "Budget per partnership",
+				"help": "Leave it empty to start with free product and commission deals only.",
+				"example": "500 USD",
+				"optional": true
+			}
+		],
+		"steps": [
+			{
+				"say": "Read the brand's context, and check its setup kit is applied so the Partnerships board and creator fields are there.",
+				"tools": [
+					"getBrandContext",
+					"listRecordTypes"
+				]
+			},
+			{
+				"say": "Look at partnerships already on the board, so nobody is pitched twice.",
+				"tools": [
+					"listRecords"
+				]
+			},
+			{
+				"say": "Find creators who already cover the topics, starting with people in your own records who create, then the web through your AI app. Add each one as a person with their platforms, audience size and topics, and a partnership at Found.",
+				"tools": [
+					"searchWorkspace",
+					"lookupRecords",
+					"createRecord",
+					"updateRecord"
+				]
+			},
+			{
+				"say": "Vet each one (recent posts, audience fit, past sponsors) and move them to Vetted or Declined with a one-line reason.",
+				"tools": [
+					"updateRecord"
+				]
+			},
+			{
+				"say": "Draft a short, personal pitch for each vetted creator as a sequence, held until a person approves the sends.",
+				"tools": [
+					"createSequence",
+					"replaceSequenceSteps",
+					"previewSequence"
+				]
+			},
+			{
+				"say": "Watch for replies and move partnerships to Negotiating or Declined. For each agreed deal, make its own tracked link and promo code, save them on the partnership, and record the fee as spend.",
+				"tools": [
+					"listInbox",
+					"updateRecord",
+					"createTrackingLink",
+					"recordSpend"
+				]
+			},
+			{
+				"say": "When a post goes live, save its link and move it to Live; after two weeks, report visits, sign-ups and cost per sign-up for each, and move it to Measured.",
+				"tools": [
+					"updateRecord",
+					"getAnalyticsReport",
+					"outcomesReport"
+				]
+			}
+		],
+		"guardrails": [
+			"Never send a pitch, accept terms or promise money without a person's approval.",
+			"Only use contact details a creator publishes for business, and never contact anyone who opted out.",
+			"Ask every creator to label the post as sponsored the way their platform requires.",
+			"Stay within the budget per partnership, if one was given."
+		],
+		"measure": [
+			{
+				"metric": "Partnerships live",
+				"how": "Partnerships at Live or later on the board."
+			},
+			{
+				"metric": "Sign-ups per partnership",
+				"how": "Sign-ups from each partnership's tracked link."
+			},
+			{
+				"metric": "Cost per sign-up",
+				"how": "Each partnership's recorded spend divided by its sign-ups."
+			}
+		],
+		"prompt": "Run creator partnerships for {{brand}}. Their buyers follow creators, newsletters and podcasts about {{topics}}. Find ten creators who already cover this, vet them, and draft a personal pitch for the best five. Track every one on the Partnerships board, give each agreed deal its own tracked link, and keep each deal within {{budget}}. Nothing is sent or agreed until I approve it.",
+		"example": "Northpeak sells trail running gear. The agent found twelve creators, three of them already Northpeak customers, vetted eight, and drafted five pitches. Two agreed: a newsletter for a flat fee and a YouTube channel for free product plus commission. After two weeks the newsletter brought 41 sign-ups at 12 USD each and was renewed.",
+		"kit": {
+			"id": "creators-partnerships",
+			"title": "Creator partnerships",
+			"summary": "A Partnerships pipeline for creator, newsletter and podcast deals, creator fields on people, and email drafts for briefs, go-live reminders and thank-yous.",
+			"adds": [
+				"Partnerships pipeline",
+				"5 fields on people",
+				"4 email drafts"
+			],
+			"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/kits/creators-partnerships.yaml"
+		},
+		"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/creator-partnerships/playbook.yaml"
+	},
+	{
+		"id": "seed-product-to-creators",
+		"version": 1,
+		"title": "Seed your product to creators",
+		"summary": "Offer free product or credits to a vetted list of creators, give each a code and link, and follow up when they post.",
+		"description": "Many creators will try a product for free and talk about it if they like it. Seeding costs little, but it only works if the list is right, the offer is clear and nobody is left without a follow-up. This playbook picks creators who fit, sends a short offer, gives everyone who accepts their own link and code, records what the product cost you, and checks back when they post.",
+		"tier": "clever",
+		"goals": [
+			"customers",
+			"partners"
+		],
+		"publisher": "outflare",
+		"author": {
+			"github": "outflareai"
+		},
+		"needs": {
+			"data": [
+				{
+					"check": "mailboxes",
+					"label": "A mailbox to send offers from"
+				}
+			],
+			"connections": [
+				{
+					"capability": "payments.read",
+					"label": "Payments, to see which codes turn into paying customers",
+					"optional": true,
+					"recommended": [
+						"stripe"
+					],
+					"recommended_names": [
+						"Stripe"
+					]
+				},
+				{
+					"capability": "plan",
+					"label": "An AI model, unless you run this from your own AI app",
+					"optional": true,
+					"recommended": [
+						"claude",
+						"openai"
+					],
+					"recommended_names": [
+						"Claude",
+						"OpenAI"
+					]
+				}
+			]
+		},
+		"inputs": [
+			{
+				"name": "brand",
+				"label": "Brand",
+				"example": "Northpeak",
+				"optional": false
+			},
+			{
+				"name": "offer",
+				"label": "What you give",
+				"example": "a free pair of trail shoes",
+				"optional": false
+			},
+			{
+				"name": "how_many",
+				"label": "How many creators",
+				"example": "20",
+				"optional": false
+			}
+		],
+		"steps": [
+			{
+				"say": "Read the brand's context, and check its setup kit is applied so the Partnerships board and creator fields are there.",
+				"tools": [
+					"getBrandContext",
+					"listRecordTypes"
+				]
+			},
+			{
+				"say": "Pick creators from the board at Found or Vetted who fit the offer, and suggest more from your own records who create, up to the number given.",
+				"tools": [
+					"listRecords",
+					"searchWorkspace"
+				]
+			},
+			{
+				"say": "Draft a short offer that says what they get and that there's no obligation to post, as a sequence held until a person approves it.",
+				"tools": [
+					"createSequence",
+					"replaceSequenceSteps",
+					"previewSequence"
+				]
+			},
+			{
+				"say": "For each creator who accepts, set the deal type to free product, make their tracked link, save it and their promo code on the partnership, record what the product cost as spend, and move it to Agreed.",
+				"tools": [
+					"updateRecord",
+					"createTrackingLink",
+					"recordSpend"
+				]
+			},
+			{
+				"say": "Two weeks later, check who posted, save the post link and move them to Live; suggest a friendly nudge for the rest.",
+				"tools": [
+					"listSocialItems",
+					"updateRecord"
+				]
+			},
+			{
+				"say": "After a month, report visits, sign-ups and paying customers per creator, and say who to offer a paid deal.",
+				"tools": [
+					"getAnalyticsReport",
+					"outcomesReport"
+				]
+			}
+		],
+		"guardrails": [
+			"Never send an offer or ship anything without a person's approval.",
+			"Never ask for a positive review or make posting a condition of the gift.",
+			"Ask every creator who posts to say they got the product free, the way their platform requires."
+		],
+		"measure": [
+			{
+				"metric": "Post rate",
+				"how": "Creators who posted divided by creators who accepted."
+			},
+			{
+				"metric": "Paying customers per creator",
+				"how": "Paying customers from each creator's link and code."
+			}
+		],
+		"prompt": "Seed {{brand}}'s product to {{how_many}} creators. Offer {{offer}}, with no obligation to post. Pick creators who fit from the Partnerships board and our own records, give everyone who accepts their own link and code, and follow up when they post. Nothing is sent until I approve it.",
+		"example": "Northpeak offered shoes to 20 creators. Fourteen accepted, nine posted within two weeks, and three of them brought more than 10 paying customers each. Those three were offered a paid video.",
+		"kit": {
+			"id": "creators-partnerships",
+			"title": "Creator partnerships",
+			"summary": "A Partnerships pipeline for creator, newsletter and podcast deals, creator fields on people, and email drafts for briefs, go-live reminders and thank-yous.",
+			"adds": [
+				"Partnerships pipeline",
+				"5 fields on people",
+				"4 email drafts"
+			],
+			"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/kits/creators-partnerships.yaml"
+		},
+		"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/seed-product-to-creators/playbook.yaml"
+	},
+	{
+		"id": "sponsor-newsletters-and-podcasts",
+		"version": 1,
+		"title": "Sponsor newsletters and podcasts that pay back",
+		"summary": "Shortlist newsletters and podcasts your buyers read, ask for rates, book small test slots, and scale the ones that bring paying customers.",
+		"description": "Newsletter and podcast sponsorships are easy to buy and hard to judge. This playbook shortlists the ones that reach your buyers, compares them by price per 1,000 readers or listeners, books one small test slot at a time, and gives each slot its own tracked link and promo code, so the next decision is based on paying customers, not opens.",
+		"tier": "clever",
+		"goals": [
+			"customers"
+		],
+		"publisher": "outflare",
+		"author": {
+			"github": "outflareai"
+		},
+		"needs": {
+			"data": [
+				{
+					"check": "mailboxes",
+					"label": "A mailbox to ask for rates from"
+				}
+			],
+			"connections": [
+				{
+					"capability": "web.search",
+					"label": "Web search, unless your AI app searches the web itself",
+					"optional": true,
+					"recommended": [
+						"geonode"
+					],
+					"recommended_names": [
+						"Geonode"
+					]
+				},
+				{
+					"capability": "plan",
+					"label": "An AI model, unless you run this from your own AI app",
+					"optional": true,
+					"recommended": [
+						"claude",
+						"openai"
+					],
+					"recommended_names": [
+						"Claude",
+						"OpenAI"
+					]
+				}
+			]
+		},
+		"inputs": [
+			{
+				"name": "brand",
+				"label": "Brand",
+				"example": "Northpeak",
+				"optional": false
+			},
+			{
+				"name": "topics",
+				"label": "What your buyers read and listen to",
+				"example": "trail running, outdoor gear",
+				"optional": false
+			},
+			{
+				"name": "test_budget",
+				"label": "Budget for the first test slots",
+				"example": "1,500 USD",
+				"optional": false
+			}
+		],
+		"steps": [
+			{
+				"say": "Read the brand's context, and check its setup kit is applied so the Partnerships board is there.",
+				"tools": [
+					"getBrandContext",
+					"listRecordTypes"
+				]
+			},
+			{
+				"say": "Look at partnerships already on the board, so nobody is asked twice.",
+				"tools": [
+					"listRecords"
+				]
+			},
+			{
+				"say": "Shortlist newsletters and podcasts on the topics, with their audience size and published prices, and work out the price per 1,000 readers or listeners where they share it.",
+				"tools": []
+			},
+			{
+				"say": "Add each one as a company with its host or editor as a person, and a partnership at Found with the platform, deal type flat fee and the published price as the fee.",
+				"tools": [
+					"lookupRecords",
+					"createRecord",
+					"updateRecord"
+				]
+			},
+			{
+				"say": "Draft a short rate card request to the best shortlisted ones that don't publish prices, as a sequence held until a person approves it.",
+				"tools": [
+					"createSequence",
+					"replaceSequenceSteps",
+					"previewSequence"
+				]
+			},
+			{
+				"say": "Suggest which test slots to book within the budget, cheapest per reader first. For each slot a person books, make its tracked link, save it and the promo code on the partnership, and record the fee as spend.",
+				"tools": [
+					"updateRecord",
+					"createTrackingLink",
+					"recordSpend"
+				]
+			},
+			{
+				"say": "Thirty days after each slot runs, report visits, sign-ups, paying customers and cost per paying customer, and say which to book again.",
+				"tools": [
+					"getAnalyticsReport",
+					"outcomesReport",
+					"updateRecord"
+				]
+			}
+		],
+		"guardrails": [
+			"Never book a slot, agree a price or pay anyone; a person does that from their own account.",
+			"Stay within the test budget.",
+			"Ask every newsletter and podcast to label the slot as sponsored."
+		],
+		"measure": [
+			{
+				"metric": "Cost per paying customer",
+				"how": "Each slot's recorded fee divided by paying customers from its link and code."
+			},
+			{
+				"metric": "Slots booked again",
+				"how": "Partnerships that reach Renewed."
+			}
+		],
+		"prompt": "Find newsletters and podcasts about {{topics}} that {{brand}}'s buyers read and listen to. Shortlist them by price per 1,000 readers, ask the best ones for rates, and suggest test slots within {{test_budget}}. Track each slot on the Partnerships board with its own link and code, and tell me after 30 days which ones to book again. Nothing is booked or sent until I approve it.",
+		"example": "Northpeak shortlisted 18 newsletters and 6 podcasts. Two test slots were booked for 1,300 USD in all. After 30 days the newsletter brought 9 paying customers at 44 USD each and the podcast 1 at 900 USD, so the newsletter was booked again and the podcast was dropped.",
+		"kit": {
+			"id": "creators-partnerships",
+			"title": "Creator partnerships",
+			"summary": "A Partnerships pipeline for creator, newsletter and podcast deals, creator fields on people, and email drafts for briefs, go-live reminders and thank-yous.",
+			"adds": [
+				"Partnerships pipeline",
+				"5 fields on people",
+				"4 email drafts"
+			],
+			"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/kits/creators-partnerships.yaml"
+		},
+		"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/sponsor-newsletters-and-podcasts/playbook.yaml"
 	},
 	{
 		"id": "content-from-customer-questions",
