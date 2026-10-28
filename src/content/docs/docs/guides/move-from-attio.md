@@ -14,7 +14,7 @@ Outflare has its own CRM on [customer records](/docs/guides/customer-records/), 
 
 ## What comes over
 
-- **People, companies and deals.** People become person records, companies become company records, and deals and your own Attio objects become record types of their own.
+- **People, companies and deals.** People become person records, companies become company records, and deals become [deal records](/docs/guides/customer-records/#deals), which count in your outcomes. Your own Attio objects become record types of their own.
 - **Fields.** Each Attio field becomes a field in your catalog, or goes into one you already have when it holds the same kind of value. A company's industry goes into Outflare's industry field, for example. Choices and pipeline stages become option lists, so a deal keeps its stage.
 - **Emails, phones and domains** become the record's identities. Emails and phones come in unverified, because nobody proved who owns them.
 - **Owners** point at the Outflare member with the same email. Attio members who aren't in your workspace are left out.

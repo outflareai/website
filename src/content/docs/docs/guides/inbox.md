@@ -134,7 +134,7 @@ Reply rules can also keep your pipeline in Outflare's own CRM up to date. In **R
 - A deal only moves forward. A later "not now" never drags it back, and a stage a person set by hand is never overridden.
 - A deal in a closed stage (won and lost by default) is left alone. With no open deal, a new one opens at that stage, named after the company and linked to the person and company.
 
-This needs a deal type in your [customer records](/docs/guides/customer-records/): a record type with a status field for its stages, and a field that points at a person or a company. Rules on automatic labels such as auto-reply and out of office can't move deals. Through the API, add a `deal` to a label's rule:
+Every workspace has a [Deal type](/docs/guides/customer-records/#deals) ready for this, and the deals it opens count in your outcomes. Another record type works too, if it has a status field for its stages and a field that points at a person or a company. Rules on automatic labels such as auto-reply and out of office can't move deals. Through the API, add a `deal` to a label's rule:
 
 ```sh
 curl -X PUT https://outflare.example.com/v1/workspaces/$WS/reply-rules \
