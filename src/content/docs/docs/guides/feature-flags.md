@@ -56,6 +56,8 @@ Then use the visitor's versions in a script:
 
 Or in CSS alone: the page gets a class for each version the visitor has, such as `of-flag-pricing-headline-faster`.
 
+To see which version wins, run an [A/B test](/docs/guides/ab-tests/) on the flag. A page that reads a flag (or, with `data-flags`, shows its class) tells Outflare once per visit, so the test counts that visitor.
+
 ### No flicker
 
 So visitors don't see the original for a moment before their version, put this first in your `<head>`. The page stays hidden until the flags arrive, and never longer than one and a half seconds:
