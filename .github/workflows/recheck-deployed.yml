@@ -1,8 +1,13 @@
-# Re-runs the `deployed` check on docs pull requests that are only waiting for
-# production (AGENTS.md, "Docs after the deploy"), so nobody has to press
-# Re-run once app.outflare.ai has the change. Every 15 minutes it looks at
-# each open pull request's latest CI run: if `deployed` is the only job that
-# failed, it re-runs that job. It runs no pull request code.
+# Ships docs pull requests that are only waiting for production (AGENTS.md,
+# "Docs after the deploy"), so nobody has to watch for the deploy. Every 15
+# minutes it looks at each open pull request, drafts included, that names
+# what it waits for on a "Needs outflareai/..." line:
+# - if `deployed` is the only job that failed in its latest CI run, it
+#   re-runs that job;
+# - once every check on its head is green, it merges it (a merge commit),
+#   marking a draft ready first.
+# A pull request labelled `unfinished` or `hold` is left alone. It runs no
+# pull request code.
 name: Recheck deployed
 
 on:
@@ -10,28 +15,48 @@ on:
     - cron: "7,22,37,52 * * * *"
   workflow_dispatch:
 
-permissions:
-  actions: write # re-run the failed job
+permissions: {}
 
 jobs:
   recheck:
     runs-on: ubuntu-latest
+    permissions:
+      actions: write # re-run the failed job
+      contents: write # merge
+      pull-requests: write # mark a draft ready
     env:
       GH_TOKEN: ${{ github.token }}
       GH_REPO: ${{ github.repository }}
     steps:
-      - name: Re-run waiting deployed checks
+      - name: Re-run waiting deployed checks and merge green docs
         run: |
-          for sha in $(gh api "repos/$GH_REPO/pulls?state=open&per_page=50" --jq '.[] | select(.draft | not) | .head.sha'); do
+          gh api "repos/$GH_REPO/pulls?state=open&per_page=50" --jq '.[]
+            | select([.labels[].name] | index("unfinished") or index("hold") | not)
+            | select((.body // "") | test("\\bNeeds\\b:?[*_]*\\s+[^\\n]*outflareai/"; "i"))
+            | "\(.number) \(.head.sha) \(.draft) \(.node_id)"' |
+          while read -r pr sha draft node; do
             run=$(gh api "repos/$GH_REPO/actions/runs?head_sha=$sha&event=pull_request&per_page=20" \
-              --jq '[.workflow_runs[] | select(.path == ".github/workflows/ci.yml")] | sort_by(.created_at) | last | select(. != null and .status == "completed" and .conclusion == "failure") | "\(.id) \(.run_attempt)"')
+              --jq '[.workflow_runs[] | select(.path == ".github/workflows/ci.yml")] | sort_by(.created_at) | last | select(. != null and .status == "completed") | "\(.id) \(.run_attempt) \(.conclusion)"')
             [ -n "$run" ] || continue
             set -- $run
-            # A day of re-runs is enough; after that a person looks.
-            [ "$2" -lt 100 ] || continue
-            failed=$(gh api "repos/$GH_REPO/actions/runs/$1/attempts/$2/jobs" --jq '[.jobs[] | select(.conclusion == "failure") | .name] | join(",")')
-            if [ "$failed" = deployed ]; then
-              echo "Re-running deployed for ${sha::7} (run $1)."
-              gh api -X POST "repos/$GH_REPO/actions/runs/$1/rerun-failed-jobs" >/dev/null || echo "::warning::Could not re-run run $1."
+            if [ "$3" = failure ]; then
+              # A day of re-runs is enough; after that a person looks.
+              [ "$2" -lt 100 ] || continue
+              failed=$(gh api "repos/$GH_REPO/actions/runs/$1/attempts/$2/jobs" --jq '[.jobs[] | select(.conclusion == "failure") | .name] | join(",")')
+              if [ "$failed" = deployed ]; then
+                echo "Re-running deployed for #$pr (run $1)."
+                gh api -X POST "repos/$GH_REPO/actions/runs/$1/rerun-failed-jobs" >/dev/null || echo "::warning::Could not re-run run $1."
+              fi
+              continue
             fi
+            [ "$3" = success ] || continue
+            # Every check on the head, not just CI, has finished and passed.
+            bad=$(gh api "repos/$GH_REPO/commits/$sha/check-runs?per_page=100" \
+              --jq '[.check_runs[] | select(.status != "completed" or (.conclusion | IN("success", "skipped", "neutral") | not))] | length')
+            [ "$bad" = 0 ] || continue
+            if [ "$draft" = true ]; then
+              gh api graphql -f query='mutation($id: ID!) { markPullRequestReadyForReview(input: {pullRequestId: $id}) { clientMutationId } }' -f id="$node" >/dev/null || { echo "::warning::Could not mark #$pr ready."; continue; }
+            fi
+            echo "Merging #$pr: production runs what it documents and every check passed."
+            gh api -X PUT "repos/$GH_REPO/pulls/$pr/merge" -f merge_method=merge -f sha="$sha" >/dev/null || echo "::warning::Could not merge #$pr."
           done
