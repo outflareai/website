@@ -2,7 +2,7 @@
 	"version": "2026.10.28",
 	"date": "2026-10-28",
 	"status": "in-progress",
-	"updated": "2026-10-28T13:17:05Z",
+	"updated": "2026-10-28T13:39:31Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -66,7 +66,28 @@
 			"edition": "open-source",
 			"text": "Tracking domain setup is clearer: each domain shows its steps and whose turn it is, and updates on its own. Domains on Cloudflare get a reminder to set the record to DNS only (grey cloud) and a link to the common mistakes.",
 			"at": "2026-10-28T13:17:05Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Choosing what an analytics connection imports says why each site's brand was suggested, waits until every site has a brand, is shared or is left out, and can make a new brand from a site. With one brand picked, Analytics offers that brand's sites from connections it already uses. Records in no brand are listed under Company → Brands to move.",
+			"at": "2026-10-28T13:39:31Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "App links name the brand after the workspace, like `/acme/repocket/seo`, or `/acme/all/seo` for every brand; older `?brand=` links still open. Switching brand reloads the page, and an item from the other brand closes back to its list. A brand's handle can no longer be the name of a page.",
+			"at": "2026-10-28T13:39:31Z"
+		},
+		{
+			"kind": "fix",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "With a brand picked, every page shows only that brand: Home, SEO, analytics, ad platforms, site audits, mailboxes, warm-up, leads, meetings, deals, email domains and search. Websites read through a shared connection, like Ahrefs or Search Console, count for the brand that owns them.",
+			"at": "2026-10-28T13:39:31Z"
 		}
 	],
-	"through": "b3b40be+515aaa8"
+	"through": "5be7066+9a3a1ff"
 }
