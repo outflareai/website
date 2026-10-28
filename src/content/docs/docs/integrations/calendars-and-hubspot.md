@@ -14,7 +14,7 @@ Connect them under **Connectors**, like any other connector: paste an API key, o
 | Google Calendar | OAuth (read-only events) | Meetings, incrementally | Nothing |
 | Outlook | OAuth (`Calendars.Read`) | Meetings, incrementally | Nothing |
 | Calendly | OAuth, or a personal access token | Scheduled events and invitees | Nothing |
-| Cal.com | API key; base URL for self-hosted Cal.com | Accepted bookings | Nothing |
+| Cal.com | OAuth, or an API key (with a base URL for self-hosted Cal.com) | Accepted bookings | Nothing |
 | HubSpot | OAuth, or a private app token | Meetings with their outcome; deals with stage and amount | Booked meetings, when turned on |
 
 Only events with a lead among the attendees are stored. Your other meetings are never copied.
@@ -26,6 +26,8 @@ Each connection takes these settings as `config` with `PATCH /v1/workspaces/{ws}
 - `own_domains`: your own email domains, so colleagues on an invite are never taken for prospects.
 - `calendar_id` (Google, Outlook): which calendar to read. The primary one by default.
 - `push_meetings` (HubSpot): write meetings booked from outreach into HubSpot, creating or updating the contact by email. Off by default.
+- `push_replies` (HubSpot): reply labels to write into HubSpot, such as `["interested", "meeting_request"]`, or `["hot"]` for every hot label. Each matching reply creates or updates the contact and adds a note with the reply and a link to it in Outflare, once, when it is labelled. Empty by default.
+- `reply_tasks` (HubSpot): with `push_replies`, also add a high-priority task to follow up within a day, for the HubSpot user with the same email as the reply's owner in Outflare. Assigning it needs the `crm.objects.owners.read` scope; without it the task is unassigned.
 - `paused`: stop syncing without disconnecting.
 
 ## OAuth apps for self-hosting
@@ -38,6 +40,7 @@ On a self-hosted instance, signing in needs an app registered with the provider.
 | Outlook | `CONNECTOR_OUTLOOK_CALENDAR_CLIENT_ID`, `CONNECTOR_OUTLOOK_CALENDAR_CLIENT_SECRET` |
 | HubSpot | `CONNECTOR_HUBSPOT_CLIENT_ID`, `CONNECTOR_HUBSPOT_CLIENT_SECRET` |
 | Calendly | `CONNECTOR_CALENDLY_CLIENT_ID`, `CONNECTOR_CALENDLY_CLIENT_SECRET` |
+| Cal.com | `CONNECTOR_CAL_COM_CLIENT_ID`, `CONNECTOR_CAL_COM_CLIENT_SECRET` |
 
 Calendly tokens, Cal.com keys and HubSpot private app tokens need no app registration, so those connectors work without one. Chili Piper, SavvyCal and Zoom Scheduler are planned.
 

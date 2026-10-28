@@ -1,10 +1,10 @@
 # AGENTS.md
 
-Instructions for coding agents (and humans) working on outflare.ai, the marketing site and docs for **Outflare**. Use only that name: never any other product name, and the domain is always `outflare.ai` (no `www`). The engine's own rules are in [`outflareai/outflare` AGENTS.md](https://github.com/outflareai/outflare/blob/main/AGENTS.md); this file adds what is specific to the site.
+Instructions for coding agents (and humans) working on outflare.ai, the marketing site and docs for **Outflare**. Use only that name: never any other product name, and the domain is always `outflare.ai` (no `www`). The engine's own rules are in [`outflareai/engine` AGENTS.md](https://github.com/outflareai/engine/blob/main/AGENTS.md); this file adds what is specific to the site.
 
 ## Bring your own keys (hard rule, no exceptions)
 
-All third-party APIs are on an account basis. Outflare never gives access to its own API keys for connectors, AI or any other third-party service: everybody adds their own. No exceptions. The engine enforces it in code and CI ([engine AGENTS.md](https://github.com/outflareai/outflare/blob/main/AGENTS.md), "Bring your own keys"); on this site:
+All third-party APIs are on an account basis. Outflare never gives access to its own API keys for connectors, AI or any other third-party service: everybody adds their own. No exceptions. The engine enforces it in code and CI ([engine AGENTS.md](https://github.com/outflareai/engine/blob/main/AGENTS.md), "Bring your own keys"); on this site:
 
 - **Never promise or describe an Outflare-provided key.** No free credits, included AI, trial keys, "works out of the box with our key", or a shared Geonode, Anthropic, OpenAI or data provider account, on any page, plan or comparison table, for Cloud or self-hosting.
 - **Docs for a feature that calls a third-party API say whose account it runs on:** the workspace connects its own key or signs in to its own account, and the feature stays off until it does. Link the connector's page.
@@ -14,25 +14,48 @@ All third-party APIs are on an account basis. Outflare never gives access to its
 
 Every action a visitor takes that tells us something (a sign-up, sign-in, GitHub or contact click, a button that matters) is an event, and every script error is one too. A change that adds a call to action or a script without its event is not done.
 
-- **One helper.** Send events only through `window.outflareTrack(name, props)` from `src/components/Analytics.astro`, which feeds both GA4 (through GTM's `dataLayer`) and PostHog. Never call `gtag`, `dataLayer.push` or `posthog.capture` from a page.
+- **One helper.** Send events only through `window.outflareTrack(name, props)` from `src/components/Analytics.astro`, which feeds GA4 (through GTM's `dataLayer`), PostHog and Outflare's own website tracking (`app.outflare.ai/site.js`). Never call `gtag`, `dataLayer.push`, `posthog.capture` or `outflare.track` from a page.
 - **Links track themselves.** Links to `app.outflare.ai/signup` (`sign_up_click`), `app.outflare.ai` (`sign_in_click`), `github.com/outflareai` (`github_click`) and `mailto:` (`contact_click`) are recorded with where they sit (`header`, `footer`, `nav`, `page`). For anything else, add `data-track="name"` to the element, and `data-track-label="fixed-label"` to say which one (for example which file was downloaded). Script errors are `site_error`.
-- **Names.** snake_case `object_verb` (GA4 allows no dots), the same in GA4 and PostHog. Never rename a shipped name: GA4 key events and dashboards depend on them.
+- **Names.** snake_case `object_verb` (GA4 allows no dots), the same in GA4, PostHog and Outflare. Never rename a shipped name: GA4 key events and dashboards depend on them.
 - **Properties.** Fixed labels, the page path and the link's location only. Never what someone typed, their email address, or anything from the URL's query string except UTM tags.
-- **Off by default.** Nothing loads unless the build sets `PUBLIC_GTM_ID` or `PUBLIC_POSTHOG_KEY`, so forks and local builds send nothing. PostHog runs cookieless; GA4 follows the consent defaults in `Analytics.astro`.
+- **Off by default.** Nothing loads, Outflare's own tag included, unless the build sets `PUBLIC_GTM_ID` or `PUBLIC_POSTHOG_KEY`, so forks and local builds send nothing. PostHog runs cookieless; GA4 follows the consent defaults in `Analytics.astro`.
+
+## Open core: open source and Cloud (hard rule)
+
+Tools are open source; loops, enterprise controls and the scaled versions of heavy features are Outflare Cloud only ([engine ADR 11](https://github.com/outflareai/engine/blob/main/docs/adr/0011-open-core-line.md), and the routing list in the engine's AGENTS.md).
+
+- **Cloud-only docs say so.** A page for a Cloud feature carries the Cloud badge and says "Outflare Cloud". It says what the feature does for you, never how it decides, its prompts or its limits.
+  - The badge is `sidebar: { badge: { text: 'Cloud', variant: 'note' } }` in the page's frontmatter, and the page opens with `<span class="pill cloud">Outflare Cloud</span>`. Add the feature as a row on [Open source and Cloud](src/content/docs/docs/project/open-source-and-cloud.md) in the same pull request.
+- **Only what has shipped.** A Cloud feature gets a page, a row on the open source vs Cloud page or a place on pricing once app.outflare.ai runs it (the `deployed` check), or when Jack approves announcing it.
+- **Published Cloud APIs come from an allowlist.** Staff, admin, sign-up and internal routes never appear in the API reference.
 
 ## Docs
 
 Docs describe what Outflare does today; see "Keeping the docs honest" in the README. An engine change that adds a feature gets a matching docs change here.
 
+## Changelog
+
+`/changelog/` has one entry per day (UTC) for what reached app.outflare.ai, named by the date (`2026.10.27`). Outflare Cloud's deploy pipeline writes `src/data/changelog/<date>.json` and the Markdown record in `changelog/`, and opens a pull request that merges itself once CI passes. A day is `in-progress` until midnight UTC, then `final`; never edit a final day, add a correction to a later one. Lines are tagged **Open source** (in the engine, so self-hosted from the next release) or **Cloud** (only on app.outflare.ai). No line links a pull request or engine commit (the engine and Cloud are private; self-hosted releases are published to the public `outflareai/outflare`), and `scripts/changelog.mjs check` fails on anything that looks private. Self-hosted versions stay the engine's tags.
+
 ## Docs after the deploy (hard rule)
 
 This site deploys on every push to main (Cloudflare Pages), but app.outflare.ai deploys separately, after the engine and Cloud pull requests merge (the engine's and Cloud's AGENTS.md). So docs can go live before the feature. To keep them in order:
 
-1. **Name what the docs wait for.** A pull request that documents an engine or Cloud change has a line `Needs outflareai/outflare#NN` (or `outflareai/cloud#NN`) per pull request in its description. Docs-only fixes and marketing copy need none.
-2. **The `deployed` check enforces it.** It fails until each named pull request is merged and contained in the version production reports at `/v1/meta` (`<engine commit>+<cloud commit>`), and, when the pull request changes `spec/openapi.yaml`, until production serves that exact file. Re-run it once the deploy is done; never merge around it.
+1. **Name what the docs wait for.** A pull request that documents an engine or Cloud change has a line `Needs outflareai/engine#NN` (or `outflareai/cloud#NN`) per pull request in its description. Docs-only fixes and marketing copy need none.
+2. **The `deployed` check enforces it.** It fails until each named pull request is merged and contained in the version production reports at `/v1/meta` (`<engine commit>+<cloud commit>`), and, when the pull request changes `spec/openapi.yaml`, until production serves that exact file. It re-runs itself right after each production deploy (Cloud's Deploy sends a `production-deployed` dispatch) and every 15 minutes as a fallback while it is the only failing check (`recheck-deployed.yml`), drafts included, and once every check is green that job merges the pull request itself (a draft is marked ready first), so docs go live minutes after the deploy with nobody watching. Label a pull request `hold` to keep it from merging on its own (for example while someone still reviews the copy), and `unfinished` while work is left. Never merge around the check.
 3. **Re-copy the spec before merging.** `spec/openapi.yaml` must equal the engine's `api/openapi.yaml` that production runs (`npm run sync-spec -- <that commit>`), not a branch.
 4. **Never say "live" or "deployed"** about a feature until production's `/v1/meta` version contains it.
-5. **No releases from here.** Self-hosted releases are tags on the engine, and only Jack pushes them.
+5. **No releases from here.** Self-hosted releases are cut, tagged and published to `outflareai/outflare` automatically after engine merges, once every check passes. Nobody tags or publishes by hand, from here or anywhere else.
+
+## Unfinished work lives on GitHub (hard rule)
+
+Half-finished work must survive a lost session and a switch to another coding agent (Claude Code, Codex, Cursor) or a person. So it never lives only in one agent's session, a local branch, or a bundle or patch file in a shared folder. A draft pull request for real work is not a parked draft (see "No history from elsewhere, no private branches"): it is work in progress that someone will finish.
+
+- **A draft pull request from the first push.** Commit and push as you go, and open a draft pull request on the first push, not when the work is done. Work that builds on another unfinished branch gets its own draft pull request based on that branch, and each links the other.
+- **Tag it `unfinished`.** Every draft that isn't done carries the red `unfinished` label, so nobody mistakes it for finished work and anyone can find what's left to pick up: [every unfinished pull request](https://github.com/pulls?q=is%3Apr+is%3Aopen+org%3Aoutflareai+label%3Aunfinished). Take the label off, and mark the pull request ready for review, only when the work is finished and its checks pass. The `Unfinished` check (`.github/workflows/unfinished.yml`) fails while the label is on, so nobody merges it by mistake. A pull request that is finished but waiting (for a deploy, a review, an approval) doesn't carry the label; its Handoff says what it waits for.
+- **A Handoff at the top, kept current.** The description starts with the Handoff section from [`.github/pull_request_template.md`](.github/pull_request_template.md): the goal, what's done, the next steps in order, the decisions and why, the context from the conversation, what it's waiting on, the pull requests it needs, and how to run and test it. Update it on every push that changes any of these, and at the end of every working session. A stale Handoff is a bug.
+- **Write the context for a stranger, in public.** The next agent has never seen the conversation, and this repository is public, so the Handoff follows every rule under "Secrets and security" and "What may go in a public repository" below. Say what the page or change is for, what was decided and why, the options ruled out, and what the docs wait for. Never link a chat or project thread, quote a person, or name internal tools, people or numbers. Private context (the conversation, what the owner said) goes in the Handoff of the engine or Cloud pull request it pairs with, named by number (`Needs outflareai/engine#NN`).
+- **Picking one up.** Read the Handoff and the latest comments first, then check out the branch and merge main into it. Carry on on the same branch when your tool allows it. If it only lets you push to a branch of its own, start that branch from this one, open a new draft pull request with the Handoff copied over, and close the old one with "Continued in #NN". Update the Handoff before you stop.
 
 ## Secrets and security (hard rule)
 
@@ -56,10 +79,12 @@ The secrets rules above say what must never leak. These say what else may and ma
 
 - **Fake people have reserved addresses.** Every email address, domain and URL for a made-up person or company, in pages, docs, examples, screenshots, commit messages and PR text, uses `example.com`/`.org`/`.net` or a `.example`, `.test` or `.invalid` domain (`ana@acme.example`). Never invent a person at a real company (a made-up Zoe at `vercel.com`) or use a domain someone could register (`trynorthwind.com`). Real names allowed: `outflare.ai`'s shared inboxes, Geonode and Repocket as example brands (names and websites, never an email address), and providers named for what they are (`gmail.com`). The `fake-data` check in the Security workflow fails a pull request that adds any other email address, in its code, title or description; run `node scripts/check-fake-data.mjs origin/main HEAD` before you push. A new real address or domain goes in `scripts/fake-data-allowed.txt` only with Jack's approval.
 - **No real people, including us.** No real names, email addresses, phone numbers or photos of customers, contacts or our own team. Refer to the team by role ("the owner", "staff") or GitHub handle.
-- **Screenshots come only from the demo workspace.** Build it with the engine's [`scripts/demo`](https://github.com/outflareai/outflare/blob/main/scripts/demo/README.md) (fictional Northpeak data) and shoot it locally. Never screenshot app.outflare.ai or a real workspace, even blurred or cropped.
+- **Screenshots come only from the demo workspace.** Build it with the engine's [`scripts/demo`](https://github.com/outflareai/engine/blob/main/scripts/demo/README.md) (fictional Northpeak data) and shoot it locally. Never screenshot app.outflare.ai or a real workspace, even blurred or cropped.
 - **Text on GitHub is permanent.** PR titles and descriptions, comments, review replies, commit messages and branch names are public, and GitHub keeps every edited revision and every pull request's commits after the branch is deleted. Write them as if they were on the homepage. If something slips, editing isn't enough: tell Jack, who deletes the revision from the edit history (and rotates it first if it's a secret).
 - **Hosted-only stays in Cloud.** A pull request that documents a Cloud change names it (`Needs outflareai/cloud#NN`) and describes only what customers see. Never describe the staff console, sign-up abuse rules, billing internals, costs, Railway or Cloudflare account details, internal hostnames, or production numbers (users, revenue, volumes) here.
 - **Security fixes are explained after they ship.** Docs or a pull request about a vulnerability fix say what changed for people ("Sign-in limits are stricter"), with no way to exploit it, and only once app.outflare.ai runs the fix (`SECURITY.md`).
+- **When in doubt, keep it private.** A page can be published later. Once published, it stays in caches and archives.
+- **Production never reaches this repository.** No error reports, logs, visitor or customer counts, in pages, issues, comments or PR text.
 - **No history from elsewhere, no private branches.** Never merge, subtree or push commits from another repository, old or private, into this one: bring content over as new, reviewed commits. Never park notes, dumps or drafts on a branch, because every branch is as public as main. Delete a branch once its pull request merges.
 
 ## Costs registry (hard rule)

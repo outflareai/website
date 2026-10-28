@@ -4,10 +4,11 @@
 //
 //   - If the pull request changes spec/openapi.yaml, production must serve
 //     exactly that file at /v1/openapi.yaml.
-//   - Each "Needs outflareai/outflare#NN" (or outflareai/cloud#NN) line in
+//   - Each "Needs outflareai/engine#NN" (or outflareai/cloud#NN) line in
 //     the pull request's description names a pull request that must be
 //     merged and included in the version production reports at /v1/meta
-//     (<engine commit>+<cloud commit>).
+//     (<engine commit>+<cloud commit>). The engine's old name,
+//     outflareai/outflare#NN, still counts: its pull requests moved with it.
 //
 // Until then the check fails and says what it is waiting for. Re-run it once
 // the deploy is done. Reading the private repositories needs DEPLOY_CHECK_TOKEN.
@@ -44,9 +45,15 @@ if (specChanged) {
 	}
 }
 
-const needs = [...body.matchAll(/\bNeeds:?\s+(?:https:\/\/github\.com\/)?outflareai\/(outflare|cloud)(?:#|\/pull\/)(\d+)/gi)].map(
-	(m) => ({ repo: m[1].toLowerCase(), number: Number(m[2]) }),
-);
+// Every pull request named on a "Needs" line. The template writes it in
+// bold with several on one line (**Needs:** outflareai/engine#1,
+// outflareai/cloud#2), so markdown around the word and the references is
+// allowed.
+const needs = body
+	.split('\n')
+	.filter((line) => /\bNeeds\b:?[*_]*\s/i.test(line))
+	.flatMap((line) => [...line.matchAll(/(?:https:\/\/github\.com\/)?outflareai\/(engine|outflare|cloud)(?:#|\/pull\/)(\d+)/gi)])
+	.map((m) => ({ repo: m[1].toLowerCase() === 'cloud' ? 'cloud' : 'engine', number: Number(m[2]) }));
 const gh = (path) =>
 	get(`https://api.github.com/repos/outflareai/${path}`, {
 		Accept: 'application/vnd.github+json',
@@ -55,7 +62,7 @@ const gh = (path) =>
 
 for (const { repo, number } of needs) {
 	const name = `outflareai/${repo}#${number}`;
-	const live = repo === 'outflare' ? engineLive : cloudLive;
+	const live = repo === 'engine' ? engineLive : cloudLive;
 	try {
 		const pr = await gh(`${repo}/pulls/${number}`);
 		if (!pr.merged_at) {

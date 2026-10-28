@@ -8,7 +8,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "sync-spec": "node scripts/sync-spec.mjs",
-    "sync-integrations": "node scripts/sync-integrations.mjs"
+    "sync-integrations": "node scripts/sync-integrations.mjs",
+    "sync-playbooks": "node scripts/sync-playbooks.mjs"
   },
   "dependencies": {
     "@astrojs/starlight": "^0.42.6",

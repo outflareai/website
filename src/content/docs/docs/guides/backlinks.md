@@ -24,6 +24,22 @@ A link is one page on another site linking to one page on yours. When Ahrefs and
 - **Followed or nofollow**, plus sponsored and user-generated links, come from the link's rel attributes.
 - Links between your own subdomains are not backlinks and are left out.
 
+## Read it like Ahrefs
+
+The links table follows Ahrefs' backlinks report, and it only reads what Outflare stored, so you can filter as much as you like without spending anything.
+
+- **Full URLs you can click.** Each row shows the referring page's title and its whole URL, and the anchor with the whole target URL on your site. When the target redirects, each hop shows under it (for example `301 →` and the page it lands on). Every URL opens in a new tab.
+- **One link per domain.** By default each linking domain is one row, the best link from it (live, followed, in the page's content, from its strongest page). The number in **Links** says how many links it stands for; open it to see the rest. Switch to **One link per page** or **All links**.
+- **All, New and Lost, with history.** **All** shows live links plus the ones lost in the range you pick under **Show history** (last 7 days to all time). **New** lists links first seen in that range, **Lost** links lost in it, with the reason when the tool knows it.
+- **Filters.** Dofollow, nofollow, UGC and sponsored; backlink type (in content, text, image, redirect, canonical and more); DR; domain traffic; the referring page's type (article, listing, forum and so on); spam score; and a word or phrase, anywhere or only in the referring page URL, its title, the anchor or the target URL.
+- **Columns.** DR (the linking domain's strength) and UR (the page's), domain traffic, the page's referring domains, linked domains and external links, page traffic, keywords the page ranks for, the anchor and target, and first seen, last seen and lost dates. Sort by any of the numbers or dates.
+
+Filters stay in the page's address, so you can bookmark or share a view.
+
+### Where each detail comes from
+
+Ahrefs gives every column. DataForSEO gives the page's rank (shown as UR), the link type, language, platform and redirects, but no traffic or page type. Traffic costs extra on Ahrefs, so it's off until you turn on **Read traffic for each backlink** in the Ahrefs connection's settings on **Rankings & backlinks** (or `link_traffic: true` in its SEO settings). It adds about 25 Ahrefs units a link: about 5,200 units a site a week at the default 200 links. New details fill in on the next weekly read, or straight away with **Snapshot now**.
+
 ## Gained, lost and regained
 
 A link is **live** while any of your tools still finds it, and **lost** once none does. Each change is an event in the **Changes** feed:
@@ -56,12 +72,27 @@ Nothing happens on a score alone. Open **Review** on a link and choose:
 
 Once something is marked, **Download disavow file** gives you the text file for Google Search Console's disavow links tool. It lists a whole domain (`domain:`) when every link from it is marked, and single pages otherwise. Upload it yourself in Search Console. Outflare never uploads it and never contacts the sites that link to you. Most sites never need a disavow file at all: Google ignores most spam links on its own.
 
+## Link opportunities on the fixes list
+
+Each weekly read, and each review, puts what is worth doing about a site's links on the workspace's [fixes list](/docs/guides/site-audits/#the-fixes-list), next to the site audit's fixes:
+
+| Fix | One per | When |
+| --- | --- | --- |
+| Win back a lost link | linking domain | A domain rated 30 or more stopped linking to you in the last 90 days |
+| Redirect a broken page | page | Live links point to a page your latest crawl found broken (4xx or 5xx) |
+| A domain that links to competitors | domain | A domain rated 30 or more links to 2 or more of your tracked [competitors](/docs/guides/competitors/) but not to you |
+| Review toxic links | site | Toxic links nobody has reviewed yet |
+
+Each kind adds at most 25 fixes a site, strongest first. A fix the next read no longer finds is done, and one marked done that is still found opens again. Marking links to disavow takes them out of the win-back and broken-page fixes. Open a fix to copy a prompt that lists the links behind it for your own agent, or jump to Backlinks or Competitors.
+
+These are suggestions only. Outflare never contacts a site, asks for a link or disavows anything on its own.
+
 ## How much it reads and costs
 
 Each week Outflare asks each tool for the 200 links from the strongest linking domains, plus the links lost in the last 90 days, for each site. Change the number per connection (1 to 1,000) with `link_rows` in its SEO settings.
 
 - **DataForSEO:** about $0.03 a site a week.
-- **Ahrefs:** about 50 to 200 API units a site a week at the default size.
+- **Ahrefs:** about 50 to 200 API units a site a week at the default size, plus about 25 units a link if you turn on link traffic.
 
 The read counts against the connection's monthly budget like any other SEO call, and its cost is in Outcomes. If a read fails (a missing Backlinks subscription at DataForSEO, say), the page shows why and the rest of the snapshot still runs. To read now instead of waiting for the week, take a snapshot on **Rankings & backlinks**, or call `POST /v1/workspaces/$WS/seo/$ID/sync`.
 
@@ -70,6 +101,13 @@ The read counts against the connection's monthly budget like any other SEO call,
 ```sh
 # Links, strongest first: free, reads what is stored
 curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/backlinks?status=live&order=rating"
+
+# One followed link per domain from DR 50 and up, new in the last month
+curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/backlinks?group=domain&follow=dofollow&dr_min=50&change=new&since=2026-09-27"
+
+# Links lost since a date, and links whose anchor mentions a phrase
+curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/backlinks?change=lost&since=2026-09-01"
+curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/backlinks?q=free%20trial&q_in=anchor"
 
 # What changed in the last 30 days
 curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/backlinks/events?days=30"
@@ -82,8 +120,11 @@ curl -X PATCH -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/js
   -d '{"review": "disavow", "domain": true}' "$URL/v1/workspaces/$WS/backlinks/$LINK"
 curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/backlinks/disavow?site_id=$SITE" -o disavow.txt
 
+# Link opportunities on the fixes list
+curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/fixes?source=seo_links&status=open"
+
 # Each site's totals and weekly trend
 curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/backlinks/summary"
 ```
 
-Reading needs the `seo.read` scope and reviewing needs `seo.manage`, and a brand's token sees only its brand's sites. Agents use the MCP tools `list_backlinks` (with `spam=toxic`), `list_backlink_events`, `get_backlinks_summary`, `review_backlink` and `get_disavow_file`, and can ask things like "which strong links did we lose this month?". Each weekly read is the audit action `backlinks.synced`, with how many links were seen, gained, lost and regained.
+Reading needs the `seo.read` scope and reviewing needs `seo.manage`, and a brand's token sees only its brand's sites. Agents use the MCP tools `list_backlinks` (with `spam=toxic`), `list_backlink_events`, `get_backlinks_summary`, `review_backlink` and `get_disavow_file`, and can ask things like "which strong links did we lose this month?". Agents see link opportunities with `list_fixes` (`source: seo_links`) and `get_fix_prompt`. Each weekly read is the audit action `backlinks.synced`, with how many links were seen, gained, lost and regained and how many link opportunities it added, reopened and confirmed.

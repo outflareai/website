@@ -1,0 +1,106 @@
+---
+import Marketing from '../layouts/Marketing.astro';
+import { app, repo } from '../data/project';
+
+// Keep in step with docs/project/open-source-and-cloud.md and the FAQ.
+const plans = [
+	{
+		name: 'Self-hosted',
+		price: 'Free',
+		note: 'Open source, always free',
+		points: [
+			'Every module, missions, the API, MCP server and every connector',
+			'Your data in your own Postgres, on your own servers',
+			'You run the hosting and the upgrades',
+			'AGPL-3.0, so you can read and change the code',
+		],
+	},
+	{
+		name: 'Outflare Cloud',
+		price: 'Free',
+		note: 'Free during early access',
+		points: [
+			'Everything in self-hosted, on the same API',
+			'We host it and keep it up to date',
+			'Sign up in the browser, nothing to install',
+		],
+		// Names only, never limits or how they work (AGENTS.md, "Open core").
+		coming: [
+			'Autopilots: agents that keep working toward a target you set',
+			'Enterprise controls: single sign-on, SCIM, audit log export and approvals across teams',
+			'Heavy work at scale: AI visibility across many models, large site crawls and session replay',
+		],
+	},
+];
+---
+
+<Marketing title="Pricing · Outflare" description="Outflare is free to self-host and free on Outflare Cloud during early access. You bring your own API keys and pay those providers directly.">
+	<section class="relative border-b">
+		<div class="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
+			<p class="eyebrow">Pricing</p>
+			<h1 class="mt-3 text-4xl font-semibold tracking-tighter text-balance sm:text-5xl">Free, however you run it.</h1>
+			<p class="sub">Run Outflare yourself or use it hosted. Cloud has everything self-hosted has, plus features of its own. Either way you bring your own API keys and pay those providers directly.</p>
+		</div>
+	</section>
+
+	<div class="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+		<div class="grid gap-6 md:grid-cols-2">
+			{plans.map((p, i) => (
+				<div class="card flex flex-col p-6 sm:p-8">
+					<h2 class="text-lg font-semibold">{p.name}</h2>
+					<p class="mt-4 text-4xl font-semibold tracking-tight">{p.price}</p>
+					<p class="mt-1 text-sm text-muted-foreground">{p.note}</p>
+					<ul class="mt-6 grow space-y-2.5 text-sm">
+						{p.points.map((t) => (
+							<li class="flex gap-2">
+								<svg class="mt-0.5 size-4 shrink-0 text-brand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>
+								{t}
+							</li>
+						))}
+					</ul>
+					{p.coming && (
+						<>
+							<p class="mt-6 text-sm font-medium">Coming to Cloud</p>
+							<ul class="mt-3 space-y-2.5 text-sm text-muted-foreground">
+								{p.coming.map((t) => (
+									<li class="flex gap-2">
+										<svg class="mt-0.5 size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+										{t}
+									</li>
+								))}
+							</ul>
+						</>
+					)}
+					{i === 0 ? (
+						<div class="mt-8 flex flex-col gap-3 sm:flex-row">
+							<a href={repo.url} class="btn btn-outline">Self-host on GitHub</a>
+							<a href="/docs/quickstart/" class="btn btn-ghost">Quickstart →</a>
+						</div>
+					) : (
+						<div class="mt-8 flex flex-col gap-3 sm:flex-row">
+							<a href={app.signUp} data-signed-out class="btn btn-primary">Sign up free</a>
+							<a href={app.url} data-signed-in data-track="dashboard_click" class="btn btn-primary">Open your dashboard</a>
+						</div>
+					)}
+				</div>
+			))}
+		</div>
+
+		<div class="mt-16 grid gap-10 md:grid-cols-2">
+			<div>
+				<h2 class="text-xl font-semibold tracking-tight">Bring your own keys</h2>
+				<div class="mt-3 space-y-3 text-muted-foreground">
+					<p>Outflare never lends you an API key or pays for your AI, data or other services, on Cloud or self-hosted. Each workspace connects its own accounts, such as its AI model or data providers, and you pay those providers directly at their own prices.</p>
+					<p>A feature stays off until you connect what it needs. <a href="/docs/integrations/connectors/" class="font-medium text-foreground underline-offset-4 hover:underline">How connectors work</a></p>
+				</div>
+			</div>
+			<div>
+				<h2 class="text-xl font-semibold tracking-tight">Why it's free</h2>
+				<div class="mt-3 space-y-3 text-muted-foreground">
+					<p>We run a startup in the data space and built Outflare because we needed it ourselves. We use it every day.</p>
+					<p>We may charge for Outflare Cloud one day. Self-hosting stays free, and a feature in the open-source engine never becomes paid. <a href="/docs/project/open-source-and-cloud/" class="font-medium text-foreground underline-offset-4 hover:underline">Open source and Cloud</a></p>
+				</div>
+			</div>
+		</div>
+	</div>
+</Marketing>

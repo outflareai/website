@@ -47,8 +47,8 @@ A minimal file:
 
 ```csv title="mailboxes.csv"
 email,password,daily_limit
-ana@getacme.co,abcd efgh ijkl mnop,30
-ben@getacme.co,qrst uvwx yzab cdef,30
+ana@getacme.example,abcd efgh ijkl mnop,30
+ben@getacme.example,qrst uvwx yzab cdef,30
 ```
 
 ## Google Workspace and Microsoft 365
@@ -102,7 +102,7 @@ Before you start a sequence, send yourself one email from a mailbox with **Test 
 ```sh
 curl -X POST https://outflare.example.com/v1/workspaces/$WS/mailboxes/$MAILBOX/test-send \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" \
-  -d '{"to": "you@yourdomain.com"}'
+  -d '{"to": "you@yourdomain.example"}'
 ```
 
 A test send goes through the recipient check and the mailbox's limits, and counts towards its daily limit. It returns `409` if the policy blocks it and `502` with the SMTP error if the server refuses it.

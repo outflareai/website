@@ -5,7 +5,7 @@ sidebar:
   order: 1.5
 ---
 
-<span class="pill shipped">Shipped</span> Records, identities, links, the shared catalog, product events, duplicates and merges, timelines and consent, through the REST API and the MCP server. Segments and the customer pages come next.
+<span class="pill shipped">Shipped</span> Records, identities, links, the shared catalog, product events, duplicates and merges, timelines and consent, through the REST API and the MCP server. [Smart lists](/docs/guides/smart-lists/) group records by rules. The customer pages come next.
 
 Outflare keeps one record of each person and company your business knows, plus anything else you track, such as deals, subscriptions or partners. The customer data platform, the CRM and lifecycle email all use the same records, so nobody types the same detail twice and nothing ends up in a separate copy.
 
@@ -30,7 +30,7 @@ Agents read the catalog with `get_catalog` before writing anything, and reuse a 
 
 ## Which value wins
 
-Every value remembers where it came from: a person's edit, your own product, a CRM sync, enrichment or an import. When two sources disagree, the higher one wins. By default a person's edit comes first, then your product's own data, then the CRM, then enrichment. So enrichment never overwrites what someone typed, and a CRM sync never overwrites what your product knows. Every change is kept in the record's history, with who made it and from where.
+Every value remembers where it came from: a person's edit, your own product, a CRM sync, enrichment or an import. When two sources disagree, the higher one wins. By default a person's edit comes first, then your product's own data, then the CRM, then enrichment. So enrichment never overwrites what someone typed, and a CRM sync never overwrites what your product knows. Every change is kept in the record's history, with who made it and from where. Two people or agents changing the same record at once never overwrite each other: a change made against an old copy is refused, so it can be read again and redone. Agents always send the version they read; a change from an agent without one is refused.
 
 Paste the [website tracking](/docs/guides/website-tracking/) snippet into your site and every visit is recorded with the campaign it came from. Connect Stripe and each paying customer's plan, monthly revenue, lifetime revenue, first payment date and billing status are kept on their record for you. See [Revenue from Stripe](/docs/guides/revenue-from-stripe/).
 
@@ -68,7 +68,16 @@ Outflare merges on its own in one case only. If your product reports that someon
 
 ## Timeline
 
-Every person and company has a timeline, newest first: their product events, changes to their details, emails and ids added or replaced, consent given or taken back, cold email sent to them and their replies, meetings and deals. Filter it with `kinds`, for example `?kinds=message,meeting,deal` for just the outreach.
+Every person and company has one timeline across every module, newest first (`GET /records/{record}/timeline`, MCP `get_record_timeline`):
+
+- product events, including lifecycle email and payments
+- changes to their details, and emails and ids added or replaced
+- consent given or taken back, and entries on the [opt-out list](/docs/guides/who-can-be-emailed/#the-opt-out-list)
+- cold email sent to them and their replies, meetings and deals
+- visits to your website: the landing page, pages seen, where they came from and the campaign
+- journeys entered, and finished or left
+
+A company's timeline includes its people's, and each item says whose it is; `people=false` shows only the company's own. Filter it with `kinds`, for example `?kinds=message,meeting,deal` for just the outreach, and with `brand` for one brand's items and the shared ones. Pages are 50 items; pass `next_before` as `before` for the next.
 
 ## Consent
 
@@ -113,6 +122,6 @@ curl -X POST https://app.outflare.ai/v1/workspaces/$WS/customer-events \
          "properties": {"total": 42}}]}'
 ```
 
-Agents use `track_customer_events`, `get_record_timeline`, `list_record_consents`, `record_consent`, `list_record_duplicates` and `merge_records`.
+To find a record or anything in its history by its words, or to count and add up across records, see [Query and search](/docs/guides/query-and-search/). Agents use `track_customer_events`, `get_record_timeline`, `list_record_consents`, `record_consent`, `list_record_duplicates` and `merge_records`.
 
 The full reference is under [API](/docs/api/), at `/v1/workspaces/{ws}/catalog`, `/v1/workspaces/{ws}/records` and `/v1/workspaces/{ws}/customer-events`.

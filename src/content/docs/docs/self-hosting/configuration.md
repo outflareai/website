@@ -15,6 +15,7 @@ The engine is configured only through environment variables. When you use the bu
 | `HTTP_ADDR` | no | `:8080` | Address the engine listens on inside the container. |
 | `PUBLIC_URL` | no | `http://localhost:8080` | External base URL. Used in links the engine generates, such as invites and the unsubscribe link in every email, and to decide whether session cookies are marked `Secure`. Set it to your public `https://` address before sending: recipients must be able to reach unsubscribe links. |
 | `WORKERS` | no | `32` | Number of job worker goroutines. |
+| `OUTFLARE_QUERY_CONNECTIONS` | no | `3` | How many [queries](/docs/guides/query-and-search/) run at once on this server, each on its own database connection. `0` turns Query off. |
 | `WEB_DIR` | no | `/web` in the Docker image | Directory of the built web app to serve. Empty disables serving the web app. |
 | `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET` | no | none | Your Google OAuth app, for connecting one mailbox at a time through Google's consent screen. Also enables **Continue with Google** on the sign-in and invite pages. Register `$PUBLIC_URL/v1/oauth/callback` and `$PUBLIC_URL/v1/auth/google/callback` as its redirect URIs. See [Google Workspace and Microsoft 365](/docs/integrations/google-and-microsoft/). |
 | `MICROSOFT_OAUTH_CLIENT_ID`, `MICROSOFT_OAUTH_CLIENT_SECRET` | no | none | The same for Microsoft's consent screen, with an Entra app registration. |
@@ -30,6 +31,8 @@ The engine is configured only through environment variables. When you use the bu
 | `OUTFLARE_LOG_RETENTION_DAYS` | no | `30` | Days to keep [request logs](/docs/api/logs/) (the Logs page), from 1 to 3650. Older calls are deleted every hour. |
 | `OUTFLARE_CRAWL_ALLOW_PRIVATE` | no | `false` | `true` lets [site audits](/docs/guides/site-audits/) crawl private addresses and other ports, to audit an intranet or a site in development. Leave it off on a server other people use. |
 | `OUTFLARE_CONNECTORS_ALLOW_PRIVATE` | no | `false` | `true` lets connectors with an address you type (a self-hosted Matomo, Umami, Plausible, PostHog, EmailBison or Cal.com) and mailboxes' SMTP and IMAP servers be on private, loopback and link-local addresses. Off, they only reach the public internet. Leave it off on a server other people use. |
+| `OUTFLARE_COMMUNITY_LINKS` | no | `on` | `off` hides the optional **Star us on GitHub** and **Follow us on X** items on Home and Get started ([Getting started](/docs/guides/getting-started/#help-outflare-grow)). |
+| `OUTFLARE_FOLLOW_URL` | no | `https://x.com/outflareai` | The `https://` X profile **Follow us on X** opens. `off` leaves that item out. |
 | `OUTFLARE_TELEMETRY` | no | on | `off` stops the anonymous daily usage report and update check. See [Usage stats and update checks](/docs/self-hosting/telemetry/). |
 | `DO_NOT_TRACK` | no | none | `1` does the same as `OUTFLARE_TELEMETRY=off`. |
 | `OUTFLARE_POSTHOG_KEY` | no | none | Your own PostHog project key (`phc_...`). Turns on product analytics: the web app's usage through `/ingest/` on your server, and the server's own events (every action, API and MCP call, and error), with ids and error codes but never customer data. See [Product analytics](#product-analytics). |
@@ -42,6 +45,10 @@ Compose-only settings:
 | --- | --- | --- |
 | `POSTGRES_PASSWORD` | `outflare` | Password for the bundled Postgres container. |
 | `PORT` | `8080` | Host port that the engine is published on. |
+
+## Scaling, metrics and analytics storage
+
+`OUTFLARE_ROLE` splits one server into app, website-event and worker services; `OUTFLARE_METRICS_ADDR`, `OUTFLARE_METRICS_TOKEN` and `OUTFLARE_METRICS_PPROF` turn on Prometheus metrics; and `OUTFLARE_CLICKHOUSE_URL`, `OUTFLARE_S3_*` and `OUTFLARE_EVENT_RETENTION_DAYS` move analytics events out of Postgres. All of them are optional and explained in [Scaling and monitoring](/docs/self-hosting/scaling/).
 
 ## Third-party keys
 

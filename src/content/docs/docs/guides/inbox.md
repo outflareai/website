@@ -5,7 +5,7 @@ sidebar:
   order: 8
 ---
 
-<span class="pill shipped">Shipped</span> IMAP sync, one inbox across all mailboxes, stop on reply, opt-out and bounce handling, labelling replies by what they mean in four groups, assigning, snoozing, coloured tags, saved views, label webhooks, replying from the inbox, replies from EmailBison, and AI labelling with your own AI key. <span class="pill">Next</span> Other sequencers, and reply rules.
+<span class="pill shipped">Shipped</span> IMAP sync, one inbox across all mailboxes, stop on reply, opt-out and bounce handling, labelling replies by what they mean in four groups, assigning, snoozing, coloured tags, saved views, label webhooks, replying from the inbox, replies from EmailBison, AI labelling with your own AI key, reply rules that also move deals in your CRM, and [alerts](/docs/guides/alerts/) for hot replies. <span class="pill">Next</span> Other sequencers.
 
 ## How mail arrives
 
@@ -58,7 +58,7 @@ Built-in rules label the clear cases as they arrive. What they can't place is le
 
 ### AI labelling with your own key
 
-Connect an AI model under Connectors (Claude, OpenAI, Gemini, Mistral or OpenRouter, with your own API key) and choose it under **Settings → AI model**. Replies the rules leave unlabelled are then read by that model in the background. Outflare never uses a key of its own: without your connection, only the rules run.
+Connect an AI model under Connectors (Claude, OpenAI, Gemini, Mistral, xAI, or a router such as OpenRouter, with your own API key) and choose it under **Settings → AI model**. Replies the rules leave unlabelled are then read by that model in the background. Outflare never uses a key of its own: without your connection, only the rules run.
 
 - **Sure (80% or more):** the AI labels the reply on its own. Automatic mail is marked done.
 - **Unsure:** the label is set and the reply is flagged `needs_review`, so a person checks it.
@@ -104,11 +104,55 @@ Filter the list with:
 
 Every change is recorded in the audit log. Agents use `triage_inbox_message`, and `list_members` to find who to assign to.
 
+## Reply rules
+
+Once a reply has a label Outflare is sure of, a reply rule acts on it. "Sure" means a label set by the built-in rules, by a person or agent, or by the AI at 80% or more. A label waiting for review runs nothing until someone confirms it with **The label is right**. A reply's text only ever picks a label, never an action, and everything a rule does can be undone.
+
+| Label | What the rule can do (default first) |
+| --- | --- |
+| Not now | **Snooze** the reply until the date it gives, or 90 days if it gives none, so it comes back to the open inbox then. **Restart** the sequence it stopped on that date instead. Or do nothing. |
+| Out of office | **Wait**: the lead's next email moves to the day after the return date the AI read. Or keep the sequence as it is. |
+| Referral, and wrong person naming someone else | **Offer to add them**: the reply shows an "Add … as a lead" button. **Add them** as a lead on the referrer's lists, marked `referred_by`. Or **add and enrol** them in a sequence you pick. Someone on the opt-out list is never enrolled. |
+
+Choose the workspace's rules under **Rules** in the inbox. A project or a sequence can have its own rules for some labels, which win for its replies, through the API or MCP:
+
+```sh
+curl -X PUT https://outflare.example.com/v1/workspaces/$WS/reply-rules \
+  -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" \
+  -d '{"sequence_id": "'$SEQUENCE_ID'", "rules": {"not_now": {"action": "restart", "days": 30}}}'
+```
+
+`GET /v1/workspaces/{ws}/reply-rules` shows the defaults, the actions each label can take, and every saved set. Sending empty `rules` removes a set. Add a referral by hand with `POST /v1/workspaces/{ws}/inbox/{id}/referral`, optionally with a `sequence_id`. Agents use `get_reply_rules`, `set_reply_rules` and `add_reply_referral`. Changing rules needs `inbox.manage`.
+
+The AI reads dates and referred people only from replies it labels, so these rules act on dates and referrals once [your own AI model](#ai-labelling-with-your-own-key) is connected. Without it, a not now waits the default 90 days.
+
+### Move deals from replies
+
+Reply rules can also keep your pipeline in Outflare's own CRM up to date. In **Rules → Deals**, pick a stage for any label a person could set (interested, meeting booked, question, objection, not now, not interested, unsubscribe, complaint), for example *Interested → Qualified* and *Meeting booked → Meeting*. When a reply gets that label:
+
+- The reply's deal is the newest open deal that points at the person or their company. It moves to the stage you picked.
+- A deal only moves forward. A later "not now" never drags it back, and a stage a person set by hand is never overridden.
+- A deal in a closed stage (won and lost by default) is left alone. With no open deal, a new one opens at that stage, named after the company and linked to the person and company.
+
+This needs a deal type in your [customer records](/docs/guides/customer-records/): a record type with a status field for its stages, and a field that points at a person or a company. Rules on automatic labels such as auto-reply and out of office can't move deals. Through the API, add a `deal` to a label's rule:
+
+```sh
+curl -X PUT https://outflare.example.com/v1/workspaces/$WS/reply-rules \
+  -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" \
+  -d '{"rules": {"interested": {"deal": {"type": "deal", "field": "stage", "stage": "qualified", "closed": ["won", "lost"]}}}}'
+```
+
+Each move is recorded on the deal's history and as an `inbox.rule_applied` event with the action `deal`.
+
 ## Tags and saved views
 
 Tags have a colour and are listed with how many replies carry each. Manage them under **Tags** in the inbox, or with `GET`, `POST`, `PATCH` and `DELETE` on `/v1/workspaces/{ws}/inbox-tags`. Renaming a tag renames it on every reply; deleting one takes it off them.
 
 Save a set of filters as a view from the **Views** menu, or with `POST /v1/workspaces/{ws}/inbox-views` and a name and `filters` (the same names as the list's filters). A view is yours alone unless you share it. Views an API token or agent saves are shared, so everyone sees what an agent set up. Agents use `list_inbox_views`, `create_inbox_view` and the tag tools.
+
+## Alerts for hot replies
+
+A reply labelled interested, meeting booked or question raises an [alert](/docs/guides/alerts/): it shows under **Settings → Alerts**, goes to the `alert.raised` webhook, is emailed to the person the reply is assigned to (else whoever made the sequence) and, if you choose, is posted to a Slack channel.
 
 ## Send labels to other systems
 

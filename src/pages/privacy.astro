@@ -2,7 +2,7 @@
 import Marketing from '../layouts/Marketing.astro';
 import { site } from '../data/project';
 
-const updated = '25 October 2026';
+const updated = '28 October 2026';
 ---
 
 <Marketing title="Privacy policy · Outflare" description="What Outflare collects on outflare.ai and in the hosted app at app.outflare.ai, how Google user data is accessed, used, stored, shared and deleted, and how to exercise your rights.">
@@ -18,7 +18,7 @@ const updated = '25 October 2026';
 		<div class="legal">
 			<h2>Who we are</h2>
 			<p>
-				Outflare is open-source software for running cold email and go-to-market work, used by people and their AI agents. This policy covers the website at outflare.ai and the hosted app at app.outflare.ai (together, "Outflare", "we", "us"). Questions about it go to
+				Outflare is open-source marketing software, used by people and their AI agents, made by the Outflare team. This policy covers the website at outflare.ai and the hosted app at app.outflare.ai (together, "Outflare", "we", "us"). Questions about it go to
 				<a href={`mailto:${site.email}`}>{site.email}</a>.
 			</p>
 			<p>
@@ -33,50 +33,65 @@ const updated = '25 October 2026';
 				<li><strong>Google user data:</strong> only when you choose to connect a Google account, as described in full in the next section.</li>
 				<li><strong>Data from other tools you connect:</strong> for example analytics, calendars, CRMs or mailbox suppliers, read with the access you grant.</li>
 				<li><strong>Usage and device data:</strong> sign-in times, IP address, browser, the pages of the app you use and the actions you take, and a daily count of what each workspace used.</li>
-				<li><strong>Messages to us:</strong> what you send to {site.email} or through a request-access form.</li>
+				<li><strong>Messages to us:</strong> what you send to {site.email}.</li>
 			</ul>
 
-			<h2>Google user data</h2>
-			<p>Outflare only accesses Google user data when you click a "Continue with Google" or "Connect with Google" button and approve Google's consent screen. Each feature asks only for the access it needs.</p>
+			<h2 id="google-user-data">Google user data</h2>
+			<p>This section applies to the Outflare app at app.outflare.ai, which appears as "Outflare" on Google's sign-in and consent screens. It explains what Google user data Outflare accesses, how it is used, who it is shared with, how it is protected, and how long it is kept and how it is deleted.</p>
+			<p>Outflare only accesses Google user data after you click a "Continue with Google" or "Connect" button and approve Google's consent screen. Each feature asks separately for only the access it needs, and you can disconnect it at any time.</p>
 
-			<h3 class="pt-2 font-semibold text-foreground">What we access</h3>
+			<h3 class="pt-2 font-semibold text-foreground">Data accessed</h3>
 			<ul>
 				<li><strong>Sign in with Google</strong> (<code>openid</code>, <code>email</code>, <code>profile</code>): your Google account ID, email address, name and profile picture.</li>
-				<li><strong>Gmail mailboxes</strong> (<code>https://mail.google.com/</code>): access to the mailbox you connect, used over Gmail's SMTP and IMAP. We send the emails in your sequences from it, and read new mail arriving in its inbox from the day before you connect it onward, so replies, bounces and out-of-office messages appear in your Outflare inbox. Older mail is not imported.</li>
-				<li><strong>Google Analytics</strong> (<code>analytics.readonly</code>): the list of your Analytics properties and read-only reports on them, such as visitors, pages, traffic sources and events.</li>
-				<li><strong>Google Search Console</strong> (<code>webmasters.readonly</code>): the list of your verified sites and read-only search performance, such as queries, clicks, impressions and positions.</li>
-				<li><strong>Google Calendar</strong> (<code>calendar.events.readonly</code>): event titles, times and attendee email addresses, so meetings booked with your leads can be counted.</li>
+				<li><strong>Google Analytics</strong> (<code>https://www.googleapis.com/auth/analytics.readonly</code>): the list of Analytics accounts and properties you can access, and read-only report data for the property you choose, such as visitors, sessions, pages, traffic sources and events. Outflare cannot change anything in your Analytics account.</li>
+				<li><strong>Google Search Console</strong> (<code>https://www.googleapis.com/auth/webmasters.readonly</code>): the list of sites you have verified, and read-only search performance for the site you choose, such as queries, pages, clicks, impressions and average position. Outflare cannot change anything in Search Console.</li>
+				<li><strong>Gmail mailboxes</strong> (<code>https://mail.google.com/</code>), only if you connect a Gmail mailbox: Outflare sends the emails you write and schedule from that mailbox and reads new mail arriving in its inbox from the day before you connect it, so replies appear in your Outflare inbox. Older mail is not imported and mail is never deleted.</li>
+				<li><strong>Google Calendar</strong> (<code>calendar.events.readonly</code>), only if you connect a calendar: event titles, times, status and attendee email addresses, read only, so meetings with your contacts can be counted in your reports.</li>
 			</ul>
+			<p>Outflare does not access your Google contacts, Drive files or any other Google data.</p>
 
-			<h3 class="pt-2 font-semibold text-foreground">How we use it</h3>
+			<h3 class="pt-2 font-semibold text-foreground">How Google user data is used</h3>
 			<ul>
-				<li>Sign-in data identifies you and links your Google account to your Outflare account.</li>
-				<li>Gmail access sends the emails you schedule, keeps them in the same thread, and brings new inbox mail into your Outflare inbox so you can answer it there and sequences stop when someone replies.</li>
-				<li>Analytics and Search Console data is shown in your workspace's reports and compared across tools, and is available to you and the AI agents you connect to your workspace.</li>
-				<li>Calendar data is matched against your leads to report meetings booked and cost per meeting.</li>
+				<li>Sign-in data is used to create your Outflare account, sign you in and show your name and picture in the app.</li>
+				<li>Google Analytics and Search Console data is used to show your website's traffic and search performance in your workspace's reports and charts, to compare periods and sources, and to answer your questions about it when you ask an AI assistant connected to your own workspace.</li>
+				<li>Gmail access is used only to send the emails you write and to show replies in your Outflare inbox.</li>
+				<li>Calendar data is used only to count meetings in your reports.</li>
 			</ul>
 			<p>
-				We use Google user data only to provide and improve these user-facing features. We do not use it for advertising, we do not sell it, and we do not use it to develop, improve or train generalised or non-personalised AI or machine-learning models. Outflare's use and transfer of information received from Google APIs adheres to the
+				Google user data is used only to provide and improve these features for you. It is not used for advertising, it is not sold, it is not used to build profiles for anyone else, and it is not used to develop, improve or train generalised or non-personalised AI or machine-learning models. Outflare's use and transfer to any other app of information received from Google APIs will adhere to the
 				<a href="https://developers.google.com/terms/api-services-user-data-policy">Google API Services User Data Policy</a>, including the Limited Use requirements.
 			</p>
 
-			<h3 class="pt-2 font-semibold text-foreground">How we store and protect it</h3>
-			<p>Google user data is stored in our database hosted by Railway in the United States. OAuth tokens are encrypted at rest with a key held only by the service, all traffic is encrypted in transit, and access to production systems is limited to the people who run the service. People at Outflare do not read your Google data unless you ask us to for support, it is needed to investigate abuse or a security issue, or the law requires it.</p>
-
-			<h3 class="pt-2 font-semibold text-foreground">How we share it</h3>
-			<p>We do not share, transfer or disclose Google user data to third parties, except to the infrastructure providers listed below that host and run the service for us under contract, when you direct us to (for example by connecting an AI agent to your workspace), or when required by law. It is never shared with advertisers or data brokers.</p>
-
-			<h3 class="pt-2 font-semibold text-foreground">Retention and deletion</h3>
+			<h3 class="pt-2 font-semibold text-foreground">Sharing, transfer and disclosure of Google user data</h3>
+			<p>Outflare does not sell, rent or share Google user data with advertisers, data brokers or other third parties. It is disclosed only:</p>
 			<ul>
-				<li>Tokens are kept until you disconnect the account in Outflare or revoke access in your <a href="https://myaccount.google.com/permissions">Google account permissions</a>, and are deleted when you do.</li>
-				<li>Emails sent through a Gmail mailbox and inbox mail read from it are kept as part of your workspace until you delete them, the mailbox or the workspace.</li>
-				<li>Analytics, Search Console and Calendar data is kept as history for your reports until you disconnect the tool or delete the workspace.</li>
-				<li>When you delete a workspace or close your account, its data, including Google user data, is deleted within 30 days. Encrypted backups roll off within a further 30 days.</li>
+				<li>to the service providers that host and run Outflare for us under contract and only to provide the service: Railway (application hosting and database, United States) and Cloudflare (network and email delivery);</li>
+				<li>to people and AI assistants you choose to give access to your workspace, such as teammates you invite;</li>
+				<li>when required by law, or to protect the safety and security of our users and the service, with notice to you where the law allows.</li>
 			</ul>
-			<p>To ask us to delete your Google user data at any time, email <a href={`mailto:${site.email}`}>{site.email}</a>.</p>
+
+			<h3 class="pt-2 font-semibold text-foreground">Storage and data protection</h3>
+			<ul>
+				<li>Google user data is stored in our production database in the United States.</li>
+				<li>OAuth access and refresh tokens are encrypted at rest with AES-256-GCM, using a key held only by the running service and never stored in the database or source code.</li>
+				<li>All traffic between your browser, Outflare and Google is encrypted in transit with TLS.</li>
+				<li>Every workspace's data is kept separate, and every request is checked against the workspace it belongs to.</li>
+				<li>Access to production systems is limited to the people who run the service. Apart from support access, people at Outflare do not read your Google data unless you ask us to for support, it is needed to investigate a security issue or abuse, or the law requires it.</li>
+				<li>While support access is on (see <a href="#support-access">Support access</a> below), Outflare staff helping you can view your account read-only, including your Google Analytics, Search Console and Calendar reports. A view never shows your Gmail inbox, the replies you receive or the content of emails you send. You can turn support access off at any time under Your account, Support access.</li>
+			</ul>
+
+			<h3 class="pt-2 font-semibold text-foreground">Retention and deletion of Google user data</h3>
+			<ul>
+				<li>OAuth tokens are kept only while the connection is active. When you disconnect a Google tool in Outflare, or revoke access in your <a href="https://myaccount.google.com/permissions">Google account permissions</a>, its tokens are deleted.</li>
+				<li>Analytics, Search Console and Calendar report data is kept as history for your reports until you disconnect the tool or delete the workspace.</li>
+				<li>Emails sent through a Gmail mailbox and replies read from it are kept in your workspace until you delete them, the mailbox or the workspace.</li>
+				<li>When you delete a workspace or close your account, all of its data, including Google user data, is deleted within 30 days, and encrypted backups roll off within a further 30 days.</li>
+				<li>You can ask us to delete your Google user data at any time by emailing <a href={`mailto:${site.email}`}>{site.email}</a>. We do it within 30 days.</li>
+			</ul>
 
 			<h2>How we use information</h2>
 			<p>We use the information above to provide the service you asked for: to sign you in, send and receive the email you set up, run your sequences, show your reports, keep the service secure and prevent abuse, understand how the product is used so we can improve it, and contact you about your account. We do not sell personal data.</p>
+			<p id="support-access"><strong>Support access.</strong> Unless you turn it off under Your account, Support access, Outflare staff can view your account read-only to help you, to investigate abuse or a security issue, or where the law requires it. A view shows what you see in the app, including reports from tools you connect such as Google Analytics, Google Search Console and Google Calendar. It never shows your inbox, the replies you receive or the content of emails you send, and staff can't change anything while viewing. Each view lasts at most an hour, is recorded in our staff log, and is listed for you under Support access with when it started and ended. Turning support access off ends a view straight away.</p>
 
 			<h2>Who we share it with</h2>
 			<ul>
@@ -90,8 +105,8 @@ const updated = '25 October 2026';
 
 			<h2>Cookies and analytics</h2>
 			<ul>
-				<li><strong>This website</strong> measures visits with PostHog in cookieless mode, and may use Google Analytics through Google Tag Manager with Google's consent mode (no analytics cookies in the EEA, UK and Switzerland) and Cloudflare Web Analytics, which sets no cookies.</li>
-				<li><strong>The app</strong> uses a session cookie to keep you signed in, and PostHog to understand which features are used. Text on the page, form inputs and element attributes are masked, and URLs are reduced to the page name, so the content of your workspace is not sent.</li>
+				<li><strong>This website</strong> measures visits with PostHog in cookieless mode, and may use Google Analytics through Google Tag Manager with Google's consent mode (no analytics cookies in the EEA, UK and Switzerland), Cloudflare Web Analytics, which sets no cookies, and Outflare's own website tracking. Outflare's tracking keeps a random visitor id in an <code>of_aid</code> cookie for up to a year, shared with app.outflare.ai, except in Europe or when your browser sends Global Privacy Control, where it sets no cookie.</li>
+				<li><strong>The app</strong> uses a session cookie to keep you signed in, and PostHog to understand which features are used. Text on the page, form inputs and element attributes are masked, and URLs are reduced to the page name, so the content of your workspace is not sent to PostHog. Outflare's own website tracking also counts the app's pages, with the same visitor id as on this website; it records each page's address and title, which can include your workspace's name, and keeps them in Outflare's own database.</li>
 			</ul>
 
 			<h2>International transfers</h2>

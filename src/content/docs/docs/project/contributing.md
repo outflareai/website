@@ -3,13 +3,14 @@ title: Contributing
 description: How to contribute to Outflare. Issues, pull requests, the CLA, and the conventions the codebase follows.
 ---
 
-Outflare is developed in the open at [outflareai/outflare](https://github.com/outflareai/outflare). Contributions of code, docs, bug reports and design feedback are welcome.
+The open-source engine is published at [outflareai/outflare](https://github.com/outflareai/outflare). Contributions of code, docs, bug reports and design feedback are welcome.
 
 ## Ways to help
 
 - **Try it and report what breaks.** [Open an issue](https://github.com/outflareai/outflare/issues) with what you did, what you expected and the `request_id` from any error.
-- **Review the design of upcoming features.** The [roadmap](/docs/project/roadmap/) and the planned pages in these docs describe what is coming. Comment on the pull requests.
+- **Suggest what to build next.** [Open an issue](https://github.com/outflareai/outflare/issues) with what you're trying to do and what's missing.
 - **Tell us your reseller's CSV format** if it does not import cleanly.
+- **Add your service as a connector.** A short YAML manifest, no Go needed: see [Build a connector](/docs/integrations/build-a-connector/).
 - **Improve the docs.** Every page here has an "Edit page" link to [outflareai/website](https://github.com/outflareai/website).
 
 ## Before you write code
@@ -31,8 +32,10 @@ Outflare is developed in the open at [outflareai/outflare](https://github.com/ou
 
 ## Pull requests
 
+Outflare's maintainers work in a private repository, and each release is published to `outflareai/outflare` as one commit. Pull requests there are welcome all the same: a maintainer brings yours into the private repository with you credited as its author, it goes through the same checks, and it ships in the next release. Your pull request is then closed with a link to that release. The full steps are in [`CONTRIBUTING.md`](https://github.com/outflareai/outflare/blob/main/CONTRIBUTING.md).
+
 Keep each pull request to one change. `make test` and `pnpm -r build` must pass, and CI runs both. Go code is formatted with `gofmt`.
 
 ## Contributor License Agreement
 
-Contributions require agreeing to a CLA. It will be published, with an automated check on pull requests, before external contributions are accepted.
+Contributions require agreeing to the [Contributor License Agreement](https://github.com/outflareai/outflare/blob/main/CLA.md). You keep your copyright. On your first pull request a bot asks you to sign by replying with one sentence, and that covers all your later contributions.

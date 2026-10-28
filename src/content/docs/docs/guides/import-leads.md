@@ -53,7 +53,7 @@ Leads are unique by email within a workspace, ignoring case.
 `POST /v1/workspaces/{ws}/leads` with JSON upserts one lead by email, with the same rules. Optional `list_id` adds it to a list.
 
 ```json
-{ "email": "ana@acme.io", "first_name": "Ana", "company": "Acme", "custom": { "icp_tier": "A" } }
+{ "email": "ana@acme.example", "first_name": "Ana", "company": "Acme", "custom": { "icp_tier": "A" } }
 ```
 
 ## Lists
@@ -68,7 +68,7 @@ Lists group leads for a sequence, for example one per campaign or segment. A lea
 
 The suppression list holds addresses and whole domains that must never be emailed: people who unsubscribed or complained, hard bounces, customers, competitors, anyone who asked not to be contacted. A suppressed domain blocks every address at it.
 
-- **Add** entries under **Suppression** (paste or upload one per line) or with `POST /suppressions` and `{"values": ["bob@acme.com", "competitor.com"], "reason": "do_not_contact"}`. Domains are also accepted as `@acme.com` or a URL. Reasons are `manual`, `do_not_contact`, `unsubscribed`, `bounced` and `complained`. Up to 100,000 values per request.
+- **Add** entries under **Suppression** (paste or upload one per line) or with `POST /suppressions` and `{"values": ["bob@acme.example", "competitor.example"], "reason": "do_not_contact"}`. Domains are also accepted as `@acme.example` or a URL. Reasons are `manual`, `do_not_contact`, `unsubscribed`, `bounced`, `complained`, `competitor`, `customer`, `partner` and `legal`. Up to 100,000 values per request. Each entry records why, how and from which tool it was added, and the list is kept in step with your sequencers ([the opt-out list](/docs/guides/who-can-be-emailed/#the-opt-out-list)).
 - **Remove** an entry only with the `suppressions.manage` scope, which owners and admins have and operators do not, because removing one can mean emailing someone who opted out. Removals are in the audit log.
 - Suppressed leads still import and are flagged, so your data stays complete, but they are never emailed. An unsubscribe also withdraws the person's consent to all marketing email ([how unsubscribes work](/docs/guides/customer-records/#unsubscribes)). Every send goes through the [policy check](/docs/concepts/policy-check/), and you can run the same recipient check yourself before enrolling anyone with `POST /recipients/check`.
 

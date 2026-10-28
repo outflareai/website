@@ -2,8 +2,22 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import tailwindcss from '@tailwindcss/vite';
+import { writeFile } from 'node:fs/promises';
+import social from './src/data/social.json' with { type: 'json' };
 
 const repo = 'https://github.com/outflareai/outflare';
+
+// Short links such as outflare.ai/x, one per profile in src/data/social.json,
+// written to Cloudflare Pages' _redirects so the list lives in one place.
+const shortLinks = {
+	name: 'outflare-short-links',
+	hooks: {
+		'astro:build:done': async ({ dir }) => {
+			const lines = social.profiles.flatMap((p) => [`/${p.short} ${p.url} 302`, `/${p.short}/ ${p.url} 302`]);
+			await writeFile(new URL('_redirects', dir), `${lines.join('\n')}\n`);
+		},
+	},
+};
 
 export default defineConfig({
 	// Canonical URLs and the sitemap use https://outflare.ai; SITE_URL overrides it (for previews).
@@ -13,6 +27,7 @@ export default defineConfig({
 	// docs keep Starlight's CSS mapped onto the same tokens.
 	vite: { plugins: [tailwindcss()] },
 	integrations: [
+		shortLinks,
 		starlight({
 			title: 'Outflare',
 			description:
@@ -60,6 +75,7 @@ export default defineConfig({
 					items: [
 						{ label: 'Introduction', link: '/docs/' },
 						{ label: 'Quickstart', link: '/docs/quickstart/' },
+						{ label: 'Open source and Cloud', link: '/docs/project/open-source-and-cloud/' },
 						{ label: 'Status and roadmap', link: '/docs/project/roadmap/' },
 					],
 				},
@@ -84,6 +100,7 @@ export default defineConfig({
 					label: 'Project',
 					items: [
 						{ label: 'Status and roadmap', link: '/docs/project/roadmap/' },
+						{ label: 'Open source and Cloud', link: '/docs/project/open-source-and-cloud/' },
 						{ label: 'Open source and licensing', link: '/docs/project/license/' },
 						{ label: 'Contributing', link: '/docs/project/contributing/' },
 						{ label: 'Security', link: '/docs/project/security/' },
