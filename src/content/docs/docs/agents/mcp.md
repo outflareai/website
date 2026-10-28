@@ -75,7 +75,7 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | Tool | What it does | Changes data |
 | --- | --- | --- |
 | `get_context` | Start here: what Outflare knows about the company, its memories and projects, and what is blocked. See [Memory and status](/docs/agents/memory/) | |
-| `get_onboarding` | The [Get started](/docs/guides/getting-started/) steps (website, goal, AI, tools, first mission, then team), each done or skipped, with the tool that does it | |
+| `get_onboarding` | The [Get started](/docs/guides/getting-started/) steps (one brand, AI key, goal, website and DNS, tools, star and follow, first mission, then team), each done or skipped, with the tool that does it | |
 | `update_onboarding` | Pick what to do first, skip Get started steps, bring them back, or close the walk-through in the app | Yes |
 | `get_status` | Everything stopping the workspace, worst first, with the tool that fixes each and who must act | |
 | `list_memories` | Search the preferences, decisions and facts people and agents saved | |
