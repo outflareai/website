@@ -2,7 +2,7 @@
 	"version": "2026.10.28",
 	"date": "2026-10-28",
 	"status": "in-progress",
-	"updated": "2026-10-28T23:06:53Z",
+	"updated": "2026-10-28T23:28:56Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -234,7 +234,14 @@
 			"edition": "open-source",
 			"text": "Partners: run referral, affiliate and influencer programs. Partners get ref codes, short links, promo codes and a portal (or a widget in your app); your backend reports sign-ups, sales and refunds by API or postback URL (each also counted in attribution); rewards (cash, fees, or actions your own system grants, for one or both sides) wait out a hold, then are approved and marked paid.",
 			"at": "2026-10-28T22:56:23Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Partners: import a program from Tolt with your own Tolt API key. Partners keep their link codes, so shared links keep working, and their promo codes, referred customers, sales and commissions (paid ones as paid payouts) come over too. Run it again until the day you switch: each run adds only what's new.",
+			"at": "2026-10-28T23:28:56Z"
 		}
 	],
-	"through": "42bed35+8274b0b"
+	"through": "329b15a+fb2b1a2"
 }
