@@ -47,6 +47,8 @@ DNS is the fiddly part, so the brand's records are batched into one step instead
 
 **Add them all** adds every missing record at once. With your own Cloudflare connected it's one request; at a DNS provider that supports Domain Connect, you approve one group, come back and the next one opens by itself. The other tabs give a developer message, an AI coding tool prompt, or the records to add by hand, all for the whole list.
 
+Added them yourself, or had someone else do it? Press **I've added them, check now** under the list. Outflare looks for every missing record straight away and marks each one **Found** or **Not found yet**; sending domains are checked with your email provider a few seconds later. New records can take a few minutes to show up, so if one isn't found yet, wait a moment and press **Check again**. Outflare keeps checking on its own either way.
+
 ## When something goes out of date
 
 Outflare is new and moves fast: the website script gets new versions, API operations are replaced and connections expire. Install health watches what you have installed and tells you when something needs you:
@@ -73,4 +75,5 @@ Problems show at the top of the brand's setup page with a **Fix** button, and on
 - `POST .../setup/check` (`check_brand_setup`): look for the DNS record now.
 - `GET /v1/workspaces/{ws}/brands/{brand}/dns` (`get_brand_dns`): every DNS record the brand needs, grouped, each `in_place` or `missing`, with the developer message and AI prompt for the whole list.
 - `POST .../brands/{brand}/dns` (`add_brand_dns`): add every missing record through one of the workspace's Cloudflare connections, queued. Answers `409 nothing_to_add` when nothing is missing.
+- `POST .../brands/{brand}/dns/check` (`check_brand_dns`): look for every missing record now, after adding them by hand, and get the list back with each record `in_place` or still `missing`. Sending domains are checked a few seconds later, so read the list again shortly.
 - `GET /v1/workspaces/{ws}/install-health` (`get_install_health`): every problem above, worst first, each with the tool or page that fixes it. They also appear in `GET /status` as `install_broken` and `install_outdated`, and as the `install.issue_opened` and `install.issue_resolved` [webhooks](/docs/api/webhooks/).
