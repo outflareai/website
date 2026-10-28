@@ -2808,8 +2808,8 @@ paths:
       operationId: addSendingDomainDNS
       x-outflare-access: { scope: mailboxes.manage }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
-      summary: Add a domain's missing SPF or DMARC record in one click
-      description: "Scope: mailboxes.manage. Adds the records the domain's issues ask for (`issues[].record`) through the workspace's own DNS host connection (such as Cloudflare), in the background. It only adds records, never changes or deletes one. Poll the domain: `dns_install` says how it went, and the domain is checked again once they're in. 400 when nothing is missing."
+      summary: Add a domain's missing mail records in one click
+      description: "Scope: mailboxes.manage. Adds the records the domain's issues ask for (`issues[].record`: a missing MX, SPF or DMARC record) and, with `dkim`, its DKIM key, through the workspace's own DNS host connection (such as Cloudflare), in the background. It only adds records, never changes or deletes one, so an SPF record missing its mail host's include (`spf_provider`) is left to the approval link or to you. Poll the domain: `dns_install` says how it went, and the domain is checked again once they're in. 400 when nothing is missing or `dkim` isn't a key from the domain's mail host."
       tags: [domains]
       requestBody:
         required: true
@@ -2820,6 +2820,7 @@ paths:
               required: [integration_id]
               properties:
                 integration_id: { type: string, format: uuid, description: "One of `dns_connections`: a connection that can add DNS records (capability dns.write)." }
+                dkim: { $ref: "#/components/schemas/SendingDomainDKIM" }
       responses:
         "202":
           description: "Queued. Inside a mission, a MissionHeld answer when the call was held for approval or dry-run instead."
@@ -2837,17 +2838,19 @@ paths:
     get:
       operationId: getSendingDomainDNSApproval
       x-outflare-access: { scope: mailboxes.manage }
-      summary: Get a one-off approval link for a domain's missing SPF or DMARC record
-      description: "Scope: mailboxes.manage. Looks up the domain's DNS provider. When it supports Domain Connect and has Outflare's template, `url` takes the person to the provider's own screen to approve exactly these records once; Outflare keeps no access afterwards. Otherwise `reason` says why, and .../dns with a DNS host connection is the way."
+      summary: Get a one-off approval link for a domain's missing mail records
+      description: "Scope: mailboxes.manage. Looks up the domain's DNS provider. When it supports Domain Connect and has Outflare's template, `url` takes the person to the provider's own screen to approve exactly these records once; Outflare keeps no access afterwards. The records are the ones the domain's issues ask for, including an include added to its SPF record (the provider merges it), and its DKIM key with `dkim`. One record goes through a general template, several through the mail host's (Google Workspace, Microsoft 365). Otherwise `reason` says why, and .../dns with a DNS host connection is the way. 400 when `dkim` isn't a key from the domain's mail host."
       tags: [domains]
       parameters:
         - { name: return, in: query, description: "The app path the provider sends the browser back to, such as /acme/domains. Default: /.", schema: { type: string } }
+        - { name: dkim, in: query, style: form, explode: true, allowReserved: true, description: "The domain's DKIM key, as in addSendingDomainDNS: repeat it for Microsoft 365's two targets.", schema: { $ref: "#/components/schemas/SendingDomainDKIM" } }
       responses:
         "200":
           description: Whether the provider can, and the link.
           content:
             application/json:
               schema: { $ref: "#/components/schemas/DNSApproval" }
+        "400": { $ref: "#/components/responses/Error" }
         "403": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
@@ -8547,7 +8550,7 @@ paths:
       operationId: listRankings
       x-outflare-access: { scope: seo.read, brand_limited: true }
       summary: List the keywords a site tracks and where it ranks
-      description: "Scope: seo.read. Each tracked keyword with the site's latest position in the top 100 (null when it is not there), the page that ranks, the position the check before and the best so far, and the page that targets the keyword. `connection` is the SERP connection checks use by default (DataForSEO for Google), or null when none is connected."
+      description: "Scope: seo.read. Each tracked keyword with the site's latest position in the top 100 (null when it is not there), the page that ranks, the position the check before and the best so far, and the page that targets the keyword. `connection` is the SERP connection checks use by default (DataForSEO before Geonode, both for Google), or null when none is connected; `connections` lists every connected one, the default first, for choosing one per keyword with `integration_id`."
       tags: [seo]
       responses:
         "200":
@@ -8556,18 +8559,14 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [data, connection]
+                required: [data, connection, connections]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/TrackedKeyword" } }
                   connection:
                     oneOf:
                       - type: "null"
-                      - type: object
-                        required: [integration_id, name, connector]
-                        properties:
-                          integration_id: { type: string, format: uuid }
-                          name: { type: string }
-                          connector: { type: string, example: dataforseo }
+                      - $ref: "#/components/schemas/RankConnection"
+                  connections: { type: array, items: { $ref: "#/components/schemas/RankConnection" } }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
     post:
@@ -8575,7 +8574,7 @@ paths:
       x-outflare-access: { scope: seo.manage, brand_limited: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Track keywords for a site
-      description: "Scope: seo.manage. Adds up to 100 keywords (and, with `from_targets`, every page's target keyword) for one country and device; keywords already tracked there are skipped. Each is checked weekly by default, or daily, through the workspace's own SERP connection within its monthly budget (about $0.02 a check with DataForSEO), and the first check starts now."
+      description: "Scope: seo.manage. Adds up to 100 keywords (and, with `from_targets`, every page's target keyword) for one country and device; keywords already tracked there are skipped. Each is checked weekly by default, or daily, through the workspace's own SERP connection within its monthly budget (about $0.02 a check with DataForSEO, $0.005 with Geonode), and the first check starts now."
       tags: [seo]
       requestBody:
         required: true
@@ -8589,7 +8588,7 @@ paths:
                 country: { type: string, example: US, default: US }
                 device: { type: string, enum: [desktop, mobile], default: desktop }
                 frequency: { type: string, enum: [daily, weekly], default: weekly }
-                integration_id: { type: string, format: uuid, description: "The SERP connection to check with; the workspace's first by default." }
+                integration_id: { type: string, format: uuid, description: "The SERP connection to check with (one of `connections` from listRankings); the default connection when left out." }
       responses:
         "201":
           description: What it added.
@@ -12309,6 +12308,96 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/Classification" }
         "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/domain-lookups/{domain}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: domain, in: path, required: true, schema: { type: string }, example: proton.me }
+    get:
+      operationId: getDomainLookup
+      x-outflare-access: { scope: leads.read }
+      summary: What kind of email domain this is
+      description: |
+        Scope: leads.read. The same answer as GET /email-domains/{domain},
+        under a name that can't be mistaken for Lifecycle's email domains.
+      tags: [classification]
+      responses:
+        "200":
+          description: The classification.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Classification" }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/domains:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listDomains
+      x-outflare-access: { scope: workspace.read, brand_limited: true }
+      summary: List the workspace's own domains
+      description: |
+        Scope: workspace.read. Every domain the workspace has set up for
+        something, once, by registrable domain (`www.acme.example` and
+        `mail.acme.example` are both `acme.example`): a brand's website, an
+        SEO site, a site tracking origin, a cold email sending domain, a
+        Lifecycle email domain and a tracking domain for links. Each use says
+        its host and status, and `needs_attention` lists the uses still
+        pending or failing. `record_id` is the company record with this
+        domain, when there is one. With `brand`, only that brand's uses; a
+        brand-limited caller sees its brands' uses and the shared ones.
+      tags: [brands]
+      parameters:
+        - { $ref: "#/components/parameters/Brand" }
+        - name: purpose
+          in: query
+          description: Only domains set up for this.
+          schema: { $ref: "#/components/schemas/DomainPurpose" }
+      responses:
+        "200":
+          description: The domains, by name.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/WorkspaceDomain" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/connections:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listConnections
+      x-outflare-access: { scope: integrations.read, brand_limited: true }
+      summary: List every connected account
+      description: |
+        Scope: integrations.read. Every account the workspace has connected,
+        in one shape: connector integrations (GET /integrations) and the
+        Google and Microsoft sign-ins for mailboxes (GET /oauth-connections).
+        `kind` says which, and its id opens it there. With `brand`, only the
+        connections that brand uses, as GET /integrations. Mailbox sign-ins
+        belong to the whole workspace, so they are left out when a brand is
+        picked or the caller is limited to brands.
+      tags: [integrations]
+      parameters:
+        - { $ref: "#/components/parameters/Brand" }
+        - name: category
+          in: query
+          description: Only this connector category (mailboxes includes the mailbox sign-ins).
+          schema: { type: string }
+      responses:
+        "200":
+          description: The connections, oldest first.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/Connection" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/outcomes/report:
     parameters:
@@ -24196,6 +24285,14 @@ components:
         clicks: { type: [integer, "null"], description: "Search Console clicks to the page over the same days; null when it showed none or no property covers the site." }
         impressions: { type: [integer, "null"] }
         position: { type: [number, "null"], description: Average position, weighted by impressions. }
+    RankConnection:
+      type: object
+      description: A connection that can check rankings.
+      required: [integration_id, name, connector]
+      properties:
+        integration_id: { type: string, format: uuid }
+        name: { type: string }
+        connector: { type: string, example: dataforseo, description: "dataforseo or geonode today." }
     TrackedKeyword:
       type: object
       required: [id, keyword, country, device, engine, frequency, status, integration_id, position, url, previous_position, best_position, last_checked_at, last_error, target_url, created_at]
@@ -26276,6 +26373,47 @@ components:
       oneOf:
         - { type: boolean }
         - { type: string, enum: [unknown] }
+    DomainPurpose:
+      type: string
+      enum: [website, seo, site_tracking, cold_email, lifecycle_email, tracking_links]
+    WorkspaceDomain:
+      type: object
+      required: [domain, brand_ids, uses, purposes, needs_attention, record_id]
+      properties:
+        domain: { type: string, example: acme.example }
+        brand_ids: { type: array, items: { type: string, format: uuid } }
+        uses:
+          type: array
+          items:
+            type: object
+            required: [purpose, host, status, brand_id, id]
+            properties:
+              purpose: { $ref: "#/components/schemas/DomainPurpose" }
+              host: { type: string, description: "The host set up, which can be a subdomain.", example: mail.acme.example }
+              status:
+                type: string
+                enum: [verified, pending, failed, active]
+                description: "active where there is nothing to verify (a brand's website, a site tracking origin)."
+              brand_id: { type: [string, "null"], format: uuid }
+              id: { type: string, description: "What opens it in its own module: the brand, SEO site, site key, Lifecycle or tracking domain id, or the sending domain's name." }
+        purposes: { type: array, items: { $ref: "#/components/schemas/DomainPurpose" } }
+        needs_attention:
+          type: array
+          description: Purposes with a use still pending or failing.
+          items: { $ref: "#/components/schemas/DomainPurpose" }
+        record_id: { type: [string, "null"], format: uuid, description: "The company record with this domain." }
+    Connection:
+      type: object
+      required: [kind, id, connector, name, category, status, brand_id, created_at]
+      properties:
+        kind: { type: string, enum: [integration, mailbox_oauth] }
+        id: { type: string, format: uuid }
+        connector: { type: string, description: "The connector, or google or microsoft for a mailbox sign-in.", example: hubspot }
+        name: { type: string }
+        category: { type: string, example: crm }
+        status: { type: string }
+        brand_id: { type: [string, "null"], format: uuid }
+        created_at: { type: string, format: date-time }
     Classification:
       type: object
       required: [scope, normalized_domain, registrable_domain, taxonomy_version, intelligence_version, global, effective, analysis]
@@ -27081,7 +27219,7 @@ components:
         created_at: { type: string, format: date-time }
     SendingDomain:
       type: object
-      required: [domain, status, daily_limit, notes, source, health, issues, mx_provider, mx_hosts, spf, spf_record, dkim, dkim_selector, dmarc, dmarc_record, dmarc_policy, blocklists, checked_at, mailboxes, mailbox_counts, daily_capacity, sent_24h, sent_7d, replies_7d, contacted_leads_7d, replied_leads_7d, bounces_7d, warmup, created_at, updated_at]
+      required: [domain, status, daily_limit, notes, source, health, issues, mx_provider, mail_host, mx_hosts, spf, spf_record, dkim, dkim_selector, dmarc, dmarc_record, dmarc_policy, blocklists, checked_at, mailboxes, mailbox_counts, daily_capacity, sent_24h, sent_7d, replies_7d, contacted_leads_7d, replied_leads_7d, bounces_7d, warmup, created_at, updated_at]
       properties:
         domain: { type: string, example: acme-com.example }
         status: { type: string, enum: [active, paused], description: "paused: no sequence or test sends from the domain's mailboxes." }
@@ -27096,6 +27234,7 @@ components:
           description: What to fix, most severe first.
           items: { $ref: "#/components/schemas/DomainIssue" }
         mx_provider: { type: [string, "null"], enum: [google, microsoft, other, none, null] }
+        mail_host: { type: [string, "null"], enum: [google, microsoft, null], description: "The mail host every mailbox on the domain is on, or null when they differ or there are none. The fixes use it while the domain has no MX record." }
         mx_hosts: { type: array, items: { type: string }, description: MX hosts by preference. }
         spf: { type: string, enum: [pass, missing, invalid, pending] }
         spf_record: { type: [string, "null"] }
@@ -27141,7 +27280,7 @@ components:
         - type: object
           required: [daily, dns_install, dns_connections]
           properties:
-            dns_install: { oneOf: [{ $ref: "#/components/schemas/EmailDomainDNSInstall" }, { type: "null" }], description: The last one-click run that added the domain's missing SPF or DMARC record (addSendingDomainDNS). }
+            dns_install: { oneOf: [{ $ref: "#/components/schemas/EmailDomainDNSInstall" }, { type: "null" }], description: The last one-click run that added the domain's missing mail records (addSendingDomainDNS). }
             dns_connections: { type: array, items: { type: string, format: uuid }, description: "The workspace's connections that can add the domain's records, such as Cloudflare." }
             daily:
               type: array
@@ -27172,7 +27311,13 @@ components:
           properties:
             type: { type: string, example: TXT }
             host: { type: string, description: "Relative to the domain: @ is the domain itself.", example: _dmarc }
-            value: { type: string, example: "v=DMARC1; p=none" }
+            value: { type: string, example: "v=DMARC1; p=none;" }
+            priority: { type: integer, description: An MX record's preference. }
+    SendingDomainDKIM:
+      type: array
+      description: "The domain's DKIM key, copied from its mail host's admin: for Google Workspace the one TXT value shown for google._domainkey (v=DKIM1; k=rsa; p=...), for Microsoft 365 the two CNAME targets shown for selector1 and selector2, in that order. Use it when the domain has the dkim_missing issue."
+      maxItems: 2
+      items: { type: string, maxLength: 2048 }
     SendingServer:
       type: object
       required: [id, host, name, ips, ips_source, status, paused_by, status_reason, pause_on_listing, daily_limit, notes, health, issues, blocklists, checked_at, mailboxes, mailbox_counts, domains, daily_capacity, sent_24h, sent_7d, replies_7d, contacted_leads_7d, replied_leads_7d, bounces_7d, created_at, updated_at]

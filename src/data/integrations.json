@@ -4,14 +4,15 @@
 		"name": "Google Ads",
 		"category": "ads",
 		"summary": "Spend, clicks and conversions per campaign from your Google Ads accounts.",
-		"description": "Signs in with Google and reads every Google Ads account the sign-in can see, including accounts under a manager account. Google also asks for a developer token: create one in your own Google Ads manager account (Admin, API Center) and add it after signing in. Read-only: nothing changes in your accounts.",
+		"description": "Signs in with Google and reads every Google Ads account the sign-in can see, including accounts under a manager account. Google also asks for a developer token: create one in your own Google Ads manager account (Admin, API Center) and add it after signing in. It never changes your campaigns; it sends conversions only to the conversion actions you choose under Paid ads.",
 		"website": "https://ads.google.com",
 		"docs_url": "https://developers.google.com/google-ads/api/docs/start",
 		"auth_methods": [
 			"oauth2"
 		],
 		"capabilities": [
-			"ads.read"
+			"ads.read",
+			"ads.conversions"
 		],
 		"status": "available",
 		"pricing": "Free API; ad spend stays on your own account"
@@ -38,7 +39,7 @@
 		"name": "Meta Ads",
 		"category": "ads",
 		"summary": "Spend, clicks and conversions per campaign from your Facebook and Instagram ad accounts.",
-		"description": "Reads every ad account a token can see, with read-only access. The simplest way: in your Meta Business Settings, Users, System users, create a system user, give it the ad accounts, and generate a token with the ads_read permission. Conversions are Meta's standard events (purchases, leads, registrations, trials, subscriptions).",
+		"description": "Reads every ad account a token can see, with read-only access. The simplest way: in your Meta Business Settings, Users, System users, create a system user, give it the ad accounts, and generate a token with the ads_read permission. Conversions are Meta's standard events (purchases, leads, registrations, trials, subscriptions). To send conversions back through the Conversions API, also assign the system user to your pixel (Business Settings, Data sources, Datasets).",
 		"website": "https://www.facebook.com/business/ads",
 		"docs_url": "https://developers.facebook.com/docs/marketing-api/insights",
 		"auth_methods": [
@@ -46,7 +47,8 @@
 			"oauth2"
 		],
 		"capabilities": [
-			"ads.read"
+			"ads.read",
+			"ads.conversions"
 		],
 		"status": "available",
 		"pricing": "Free API; ad spend stays on your own account"
@@ -56,14 +58,15 @@
 		"name": "Microsoft Advertising",
 		"category": "ads",
 		"summary": "Spend, clicks and conversions per campaign from your Microsoft Advertising (Bing) accounts.",
-		"description": "Signs in with Microsoft and reads every Microsoft Advertising account the sign-in can see. Microsoft also asks for a developer token: get your own from the Microsoft Advertising developer portal (Account, Request token) and add it after signing in. Read-only.",
+		"description": "Signs in with Microsoft and reads every Microsoft Advertising account the sign-in can see. Microsoft also asks for a developer token: get your own from the Microsoft Advertising developer portal (Account, Request token) and add it after signing in. It never changes your campaigns; it sends offline conversions only to the goals you choose under Paid ads.",
 		"website": "https://ads.microsoft.com",
 		"docs_url": "https://learn.microsoft.com/advertising/guides/get-started",
 		"auth_methods": [
 			"oauth2"
 		],
 		"capabilities": [
-			"ads.read"
+			"ads.read",
+			"ads.conversions"
 		],
 		"status": "available",
 		"pricing": "Free API; ad spend stays on your own account"
@@ -73,14 +76,15 @@
 		"name": "Reddit Ads",
 		"category": "ads",
 		"summary": "Spend, impressions and clicks per campaign from your Reddit ad accounts.",
-		"description": "Signs in with Reddit and reads every ad account of every business the account belongs to, with read-only access. Separate from organic Reddit, which posts and listens from your brand's own account.",
+		"description": "Signs in with Reddit and reads every ad account of every business the account belongs to, with read-only access; add a Conversions API token to send conversions back. Separate from organic Reddit, which posts and listens from your brand's own account.",
 		"website": "https://ads.reddit.com",
 		"docs_url": "https://ads-api.reddit.com/docs/v3/",
 		"auth_methods": [
 			"oauth2"
 		],
 		"capabilities": [
-			"ads.read"
+			"ads.read",
+			"ads.conversions"
 		],
 		"status": "available",
 		"pricing": "Free API; ad spend stays on your own account"
@@ -480,7 +484,7 @@
 		"name": "HubSpot",
 		"category": "crm",
 		"summary": "Count meetings and deals from outreach, and log booked meetings on the contact.",
-		"description": "Reads deals (stage, amount, close date) and meetings, and ties each to the lead and campaign that started it. Optionally writes meetings booked from outreach onto the HubSpot contact (off by default, since HubSpot may already log them from its own calendar sync). Deals are never changed.",
+		"description": "Reads deals (stage, amount, close date) and meetings, and ties each to the lead and campaign that started it. Optionally writes meetings booked from outreach onto the HubSpot contact (off by default, since HubSpot may already log them from its own calendar sync), and replies with the labels you pick as a note on the contact, with a task to follow up. Deals are never changed.",
 		"website": "https://www.hubspot.com",
 		"docs_url": "https://developers.hubspot.com/docs/api/crm/deals",
 		"auth_methods": [
@@ -490,7 +494,8 @@
 		"capabilities": [
 			"deals.sync",
 			"meetings.sync",
-			"crm.push"
+			"crm.push",
+			"crm.push_replies"
 		],
 		"status": "available",
 		"pricing": "Works on every HubSpot plan, including free"
@@ -585,10 +590,11 @@
 		],
 		"capabilities": [
 			"data.search_people",
-			"data.enrich_person"
+			"data.enrich_person",
+			"data.reveal_company"
 		],
 		"status": "available",
-		"pricing": "One credit per person returned"
+		"pricing": "One credit per person returned; one per company found from a website visitor's address"
 	},
 	{
 		"id": "prospeo",
@@ -607,6 +613,23 @@
 		],
 		"status": "available",
 		"pricing": "One credit per email found"
+	},
+	{
+		"id": "snitcher",
+		"name": "Snitcher",
+		"category": "data",
+		"summary": "Find the companies behind your website's visitors with your own Snitcher IP to Company key.",
+		"description": "Outflare sends Snitcher the address of each new visitor who accepted your site's cookies, once a day at most, and adds the company to your CRM. Addresses of homes, phones, data centres and VPNs name nobody. Checking the key looks up one public address.",
+		"website": "https://www.snitcher.com",
+		"docs_url": "https://docs.snitcher.com/powered-by-snitcher/ip2company/introduction",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"data.reveal_company"
+		],
+		"status": "available",
+		"pricing": "Per lookup, on your Snitcher plan"
 	},
 	{
 		"id": "cloudflare",
@@ -854,6 +877,24 @@
 		"pricing": "Pay per token, billed by Claude"
 	},
 	{
+		"id": "deepseek",
+		"name": "DeepSeek",
+		"category": "model",
+		"summary": "Plan and run missions from a goal you type, with your own DeepSeek API key. DeepSeek's low-cost models, hosted in China.",
+		"description": "Outflare sends the model the goal, the project brief and a summary of the workspace (mailbox capacity, lead counts, campaigns, connectors) to plan, and the mission's progress and API answers while Outflare's agent runs it. Your key is encrypted, only ever sent to DeepSeek's own API, and never shown again, logged or given to the model. Usage is billed to your DeepSeek account; set a monthly limit under Settings → AI model.",
+		"website": "https://www.deepseek.com/",
+		"docs_url": "https://api-docs.deepseek.com/",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"plan",
+			"llm.sample"
+		],
+		"status": "available",
+		"pricing": "Pay per token, billed by DeepSeek"
+	},
+	{
 		"id": "gemini",
 		"name": "Gemini",
 		"category": "model",
@@ -929,6 +970,80 @@
 		"dark_logo": true
 	},
 	{
+		"id": "requesty",
+		"name": "Requesty",
+		"category": "model",
+		"summary": "Plan and run missions from a goal you type, with your own Requesty API key. Models from many vendors with one Requesty key, with its own spending limits and fallbacks.",
+		"description": "Outflare sends the model the goal, the project brief and a summary of the workspace (mailbox capacity, lead counts, campaigns, connectors) to plan, and the mission's progress and API answers while Outflare's agent runs it. Your key is encrypted, only ever sent to Requesty's own API, and never shown again, logged or given to the model. Usage is billed to your Requesty account; set a monthly limit under Settings → AI model.",
+		"website": "https://www.requesty.ai/",
+		"docs_url": "https://docs.requesty.ai/quickstart",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"plan",
+			"llm.sample"
+		],
+		"status": "available",
+		"pricing": "Pay per token, billed by Requesty"
+	},
+	{
+		"id": "vercel_ai_gateway",
+		"name": "Vercel AI Gateway",
+		"category": "model",
+		"summary": "Plan and run missions from a goal you type, with your own Vercel AI Gateway API key. Models from many vendors with one Vercel key, billed to your Vercel team.",
+		"description": "Outflare sends the model the goal, the project brief and a summary of the workspace (mailbox capacity, lead counts, campaigns, connectors) to plan, and the mission's progress and API answers while Outflare's agent runs it. Your key is encrypted, only ever sent to Vercel AI Gateway's own API, and never shown again, logged or given to the model. Usage is billed to your Vercel AI Gateway account; set a monthly limit under Settings → AI model.",
+		"website": "https://vercel.com/ai-gateway",
+		"docs_url": "https://vercel.com/docs/ai-gateway",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"plan",
+			"llm.sample"
+		],
+		"status": "available",
+		"pricing": "Pay per token, billed by Vercel AI Gateway",
+		"dark_logo": true
+	},
+	{
+		"id": "xai",
+		"name": "xAI",
+		"category": "model",
+		"summary": "Plan and run missions from a goal you type, with your own xAI API key. xAI's Grok models.",
+		"description": "Outflare sends the model the goal, the project brief and a summary of the workspace (mailbox capacity, lead counts, campaigns, connectors) to plan, and the mission's progress and API answers while Outflare's agent runs it. Your key is encrypted, only ever sent to xAI's own API, and never shown again, logged or given to the model. Usage is billed to your xAI account; set a monthly limit under Settings → AI model.",
+		"website": "https://x.ai/api",
+		"docs_url": "https://docs.x.ai/docs/overview",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"plan",
+			"llm.sample"
+		],
+		"status": "available",
+		"pricing": "Pay per token, billed by xAI",
+		"dark_logo": true
+	},
+	{
+		"id": "slack",
+		"name": "Slack",
+		"category": "notification",
+		"summary": "Post alerts, such as hot replies and hot website visitors, to a Slack channel.",
+		"description": "Posts each alert you choose to a channel in your own Slack workspace, with a link to it in Outflare. Outflare only posts; it never reads your messages.",
+		"website": "https://slack.com",
+		"docs_url": "https://api.slack.com/methods/chat.postMessage",
+		"auth_methods": [
+			"oauth2",
+			"api_key"
+		],
+		"capabilities": [
+			"notify.post"
+		],
+		"status": "available",
+		"pricing": "Works on every Slack plan, including free"
+	},
+	{
 		"id": "stripe",
 		"name": "Stripe",
 		"category": "payments",
@@ -986,8 +1101,8 @@
 		"id": "geonode",
 		"name": "Geonode",
 		"category": "seo",
-		"summary": "Searches the web, finds your brands' social links, reads public X follower counts, and reads your own site's pages when a firewall blocks OutflareBot.",
-		"description": "Runs web searches for finding companies and pages, through Geonode's Search API. Reads each brand's homepage to suggest its social profiles and app store listings, and the public X profile in each brand's links once a day for its follower count. For sites you have proved you own, and only for pages robots.txt allows: when a page answers with a firewall block or a challenge, OutflareBot reads it through Geonode's Scraper API instead. Searches and pages cost Geonode tokens on your account.",
+		"summary": "Searches the web, tracks where your pages rank on Google, finds your brands' social links, reads public X follower counts, and reads your own site's pages when a firewall blocks OutflareBot.",
+		"description": "Runs web searches for finding companies and pages, through Geonode's Search API. Checks where your pages rank on Google for the keywords you track, through Geonode's Google Search Light API (one credit per results page; a check reads 10 pages), within the monthly budget you set on the connection. Reads each brand's homepage to suggest its social profiles and app store listings, and the public X profile in each brand's links once a day for its follower count. For sites you have proved you own, and only for pages robots.txt allows: when a page answers with a firewall block or a challenge, OutflareBot reads it through Geonode's Scraper API instead. Searches and pages cost Geonode tokens on your account.",
 		"website": "https://geonode.com",
 		"docs_url": "https://docs.geonode.com/docs/scraper-api",
 		"auth_methods": [
@@ -996,10 +1111,11 @@
 		"capabilities": [
 			"crawl.fetch",
 			"web.search",
+			"serp.read",
 			"hooks.receive"
 		],
 		"status": "available",
-		"pricing": "Tokens per search and per page, on your Geonode plan",
+		"pricing": "Tokens per search and per page, and a credit per Google results page, on your Geonode plan",
 		"dark_logo": true
 	},
 	{
@@ -1067,6 +1183,57 @@
 			"blocklist.sync"
 		],
 		"status": "available"
+	},
+	{
+		"id": "rb2b",
+		"name": "RB2B",
+		"category": "signals",
+		"summary": "People visiting your website, by name, from your own RB2B account.",
+		"description": "Connect it, then paste the webhook address from Visitors → Settings into RB2B's webhook integration. Each person RB2B names becomes a person in your CRM marked for review and tagged as from RB2B. Nobody is emailed until you approve them.",
+		"website": "https://www.rb2b.com",
+		"docs_url": "https://support.rb2b.com",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"data.reveal_person"
+		],
+		"status": "available",
+		"pricing": "On your RB2B plan"
+	},
+	{
+		"id": "vector",
+		"name": "Vector",
+		"category": "signals",
+		"summary": "Contacts who visit your website, from your own Vector account.",
+		"description": "Connect it, then add the webhook address from Visitors → Settings in Vector for the contact.visited event. Each person Vector names becomes a person in your CRM marked for review and tagged as from Vector. Nobody is emailed until you approve them.",
+		"website": "https://www.vector.co",
+		"docs_url": "https://learn.vector.co",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"data.reveal_person"
+		],
+		"status": "available",
+		"pricing": "On your Vector plan"
+	},
+	{
+		"id": "warmly",
+		"name": "Warmly",
+		"category": "signals",
+		"summary": "Identified contacts on your website, from your own Warmly account.",
+		"description": "Connect it, then add the webhook address from Visitors → Settings in Warmly's webhook settings. Each person Warmly names becomes a person in your CRM marked for review and tagged as from Warmly. Nobody is emailed until you approve them.",
+		"website": "https://www.warmly.ai",
+		"docs_url": "https://help.warmly.ai",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"data.reveal_person"
+		],
+		"status": "available",
+		"pricing": "On your Warmly plan"
 	},
 	{
 		"id": "linkedin",
@@ -1601,18 +1768,6 @@
 		"category": "signals",
 		"summary": "Hiring, news and technology changes at target companies.",
 		"website": "https://predictleads.com",
-		"auth_methods": [
-			"api_key"
-		],
-		"capabilities": [],
-		"status": "planned"
-	},
-	{
-		"id": "rb2b",
-		"name": "RB2B",
-		"category": "signals",
-		"summary": "People visiting your website, by name.",
-		"website": "https://www.rb2b.com",
 		"auth_methods": [
 			"api_key"
 		],

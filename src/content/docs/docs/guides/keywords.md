@@ -42,7 +42,9 @@ Targets work without Search Console. Suggestions and the numbers need it.
 
 Search Console gives an average position over every search a page was shown for. **Rankings** answers a narrower question: where does your site rank on Google today for the keywords you care about. Type the keywords, or press **Track every target keyword**, and choose desktop or mobile. Each keyword is checked weekly, or daily if you switch it.
 
-Checks read Google's top 100 results through your own [DataForSEO](/docs/integrations/seo/) connection, never an account of Outflare's, so rank tracking stays off until you connect one. A check costs about $0.02 on your DataForSEO account. It counts towards the connection's monthly budget and stops when the budget is spent, and every check is recorded in [Outcomes](/docs/guides/outcomes/) with its cost.
+Checks read Google's top 100 results through your own [DataForSEO or Geonode](/docs/integrations/seo/#rank-tracking) connection, never an account of Outflare's, so rank tracking stays off until you connect one. A check costs about $0.02 on your DataForSEO account, or 10 credits (about $0.005) on your Geonode account. It counts towards the connection's monthly budget and stops when the budget is spent, and every check is recorded in [Outcomes](/docs/guides/outcomes/) with its cost.
+
+With both connected, DataForSEO checks by default. Choose **Check with Geonode** when you add keywords, or switch a single keyword with the picker on its row. If Geonode stops before the 10th page of results and your site wasn't on the pages it read, the check is marked incomplete and runs again next time, rather than counting your site as outside the top 100.
 
 Each keyword shows its position and how it moved since the check before, its best position, and the page that ranks. When a page other than the keyword's target ranks, you see the target beside it. The history keeps every check with the top 10 results, so you can see who outranks you.
 
