@@ -2,7 +2,7 @@
 	"version": "2026.10.28",
 	"date": "2026-10-28",
 	"status": "in-progress",
-	"updated": "2026-10-28T21:21:11Z",
+	"updated": "2026-10-28T22:14:01Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -213,7 +213,14 @@
 			"edition": "open-source",
 			"text": "Link building checks each prospect's page for you: whether it's up, whether it already links to you, which of its links are broken (with what the Internet Archive kept), what your own AI makes of it, which of your pages to offer, and who to contact. Lost links can be added as prospects to win back in one click.",
 			"at": "2026-10-28T21:21:11Z"
+		},
+		{
+			"kind": "fix",
+			"area": "social",
+			"edition": "open-source",
+			"text": "Reviews now reads G2 and Capterra: G2 pages are always read in a browser to get past its bot check, and Capterra reviews are kept with their dates and the vendor's replies instead of only the score.",
+			"at": "2026-10-28T22:14:01Z"
 		}
 	],
-	"through": "4b2582d+c637479"
+	"through": "6038cf9+eb54239"
 }
