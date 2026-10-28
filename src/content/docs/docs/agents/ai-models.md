@@ -1,17 +1,17 @@
 ---
 title: AI models
-description: Choose the AI model that plans missions and runs Outflare's own agent (Claude, OpenAI, Gemini, Mistral, xAI, or a router such as OpenRouter) with your own API key, and how that key and your spend are kept safe.
+description: Choose the AI model that plans missions and runs Outflare's own agent (Claude, OpenAI, Gemini, Mistral, xAI, DeepSeek, or a router such as OpenRouter) with your own API key, and how that key and your spend are kept safe.
 sidebar:
   order: 4
 ---
 
-<span class="pill shipped">Shipped</span> Claude, OpenAI, Gemini, Mistral, xAI and three routers (OpenRouter, Vercel AI Gateway, Requesty), a model picker, and a monthly AI limit.
+<span class="pill shipped">Shipped</span> Claude, OpenAI, Gemini, Mistral, xAI, DeepSeek and three routers (OpenRouter, Vercel AI Gateway, Requesty), a model picker, and a monthly AI limit.
 
 Outflare plans [missions](/docs/agents/missions/) from a goal and runs its own agent with an AI model you connect, using **your own API key**. Usage is billed by the provider, to your account. Every workspace brings its own key: Outflare never supplies, pays for or shares one. You don't need one to use Outflare: your own agent over [MCP](/docs/agents/mcp/) or the API needs no model here at all.
 
 ## Pick a provider and a model
 
-1. Open **Connectors** and connect one of the AI providers with its API key: **Claude** (Anthropic), **OpenAI**, **Gemini** (Google AI Studio), **Mistral**, **xAI** (Grok), or a router: **OpenRouter**, **Vercel AI Gateway** or **Requesty**, each one key for many vendors' models. The key is checked with the provider before it is saved. OpenRouter also lets you sign in instead: you approve on OpenRouter's page and it makes a key on your own account for Outflare, so there's nothing to copy.
+1. Open **Connectors** and connect one of the AI providers with its API key: **Claude** (Anthropic), **OpenAI**, **Gemini** (Google AI Studio), **Mistral**, **xAI** (Grok), **DeepSeek** (hosted in China), or a router: **OpenRouter**, **Vercel AI Gateway** or **Requesty**, each one key for many vendors' models. The key is checked with the provider before it is saved. OpenRouter also lets you sign in instead: you approve on OpenRouter's page and it makes a key on your own account for Outflare, so there's nothing to copy.
 2. Open **Settings**, **General**, and find **AI model**. Choose the provider and pick a model. The list comes live from the provider, with only the chat models your key can use.
 3. Save. The Missions page then says which model it uses, with a link to change it.
 
@@ -29,6 +29,7 @@ On the Connectors page, AI models carry tags:
 
 - **Router**: OpenRouter, Vercel AI Gateway and Requesty reach models from many vendors (Claude, GPT, Gemini, Llama and more) with one key, billed by the router. They're the quickest way to try several models.
 - **ChatGPT plan sign-in soon** (OpenAI) and **SuperGrok sign-in soon** (xAI): these providers let some apps use a ChatGPT Plus or Pro plan, or a SuperGrok or X Premium+ plan, instead of an API key. Outflare doesn't offer that sign-in yet, so connect an API key for now.
+- **Hosted in China** (DeepSeek): DeepSeek processes what Outflare sends it, including customer and lead details in prompts, on servers in China. To keep data outside China, use DeepSeek's models through a router such as OpenRouter.
 
 Anthropic and Google don't let other apps use a Claude or Google AI plan, so Claude and Gemini take an API key only. To use a Claude or ChatGPT plan you already pay for today, [connect Claude or ChatGPT to Outflare](/docs/agents/mcp/) and run Outflare from that app: it needs no key here.
 

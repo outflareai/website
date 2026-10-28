@@ -58,7 +58,7 @@ Built-in rules label the clear cases as they arrive. What they can't place is le
 
 ### AI labelling with your own key
 
-Connect an AI model under Connectors (Claude, OpenAI, Gemini, Mistral, xAI, or a router such as OpenRouter, with your own API key) and choose it under **Settings → AI model**. Replies the rules leave unlabelled are then read by that model in the background. Outflare never uses a key of its own: without your connection, only the rules run.
+Connect an AI model under Connectors (Claude, OpenAI, Gemini, Mistral, xAI, DeepSeek, or a router such as OpenRouter, with your own API key) and choose it under **Settings → AI model**. Replies the rules leave unlabelled are then read by that model in the background. Outflare never uses a key of its own: without your connection, only the rules run.
 
 - **Sure (80% or more):** the AI labels the reply on its own. Automatic mail is marked done.
 - **Unsure:** the label is set and the reply is flagged `needs_review`, so a person checks it.
