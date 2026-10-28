@@ -46,7 +46,18 @@ estimate from search rankings, not your real visits; real visits come from
 the [analytics connectors](/docs/integrations/analytics/). Country defaults to the US; set
 another two-letter country per connection or per call.
 
-DataForSEO also reads Google's live results for one keyword, which is how [rank tracking](/docs/guides/keywords/#track-your-rankings) checks where your pages rank: about $0.02 for the top 100, within the same budget.
+## Rank tracking
+
+[Rank tracking](/docs/guides/keywords/#track-your-rankings) reads Google's live top 100 results for each keyword you track, through either of two connections on your own account:
+
+| Tool | Cost of one check (top 100) | Budget |
+| --- | --- | --- |
+| DataForSEO | About $0.02 | The DataForSEO connection's monthly budget |
+| Geonode | 10 credits (one per page of 10 results), about $0.005 | A monthly budget you set on the Geonode connection |
+
+Geonode reads Google through its Google Search Light API with the API key you connect (Geonode dashboard → Scraper API → API keys). It searches from the keyword's country, in that country's language, on desktop or an Android phone, and covers the same countries as DataForSEO. Pages Geonode doesn't return aren't charged.
+
+With both connected, DataForSEO is the default, and each keyword can name the connection that checks it (`integration_id` when you track it or with `PATCH`). `GET .../rankings` lists every connection that can check under `connections`.
 
 ## Cost and budget
 
