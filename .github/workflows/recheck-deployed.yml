@@ -8,9 +8,15 @@
 #   marking a draft ready first.
 # A pull request labelled `unfinished` or `hold` is left alone. It runs no
 # pull request code.
+#
+# GitHub runs schedules late or skips them when busy, so Cloud's Deploy also
+# sends a `production-deployed` dispatch as soon as a production deploy passes
+# its smoke test; the schedule is the fallback.
 name: Recheck deployed
 
 on:
+  repository_dispatch:
+    types: [production-deployed]
   schedule:
     - cron: "7,22,37,52 * * * *"
   workflow_dispatch:
