@@ -10,6 +10,7 @@ The open-source engine is published at [outflareai/outflare](https://github.com/
 - **Try it and report what breaks.** [Open an issue](https://github.com/outflareai/outflare/issues) with what you did, what you expected and the `request_id` from any error.
 - **Suggest what to build next.** [Open an issue](https://github.com/outflareai/outflare/issues) with what you're trying to do and what's missing.
 - **Tell us your reseller's CSV format** if it does not import cleanly.
+- **Add your service as a connector.** A short YAML manifest, no Go needed: see [Build a connector](/docs/integrations/build-a-connector/).
 - **Improve the docs.** Every page here has an "Edit page" link to [outflareai/website](https://github.com/outflareai/website).
 
 ## Before you write code

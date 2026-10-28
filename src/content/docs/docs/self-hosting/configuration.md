@@ -31,6 +31,8 @@ The engine is configured only through environment variables. When you use the bu
 | `OUTFLARE_LOG_RETENTION_DAYS` | no | `30` | Days to keep [request logs](/docs/api/logs/) (the Logs page), from 1 to 3650. Older calls are deleted every hour. |
 | `OUTFLARE_CRAWL_ALLOW_PRIVATE` | no | `false` | `true` lets [site audits](/docs/guides/site-audits/) crawl private addresses and other ports, to audit an intranet or a site in development. Leave it off on a server other people use. |
 | `OUTFLARE_CONNECTORS_ALLOW_PRIVATE` | no | `false` | `true` lets connectors with an address you type (a self-hosted Matomo, Umami, Plausible, PostHog, EmailBison or Cal.com) and mailboxes' SMTP and IMAP servers be on private, loopback and link-local addresses. Off, they only reach the public internet. Leave it off on a server other people use. |
+| `OUTFLARE_COMMUNITY_LINKS` | no | `on` | `off` hides the optional **Star us on GitHub** and **Follow us on X** items on Home and Get started ([Getting started](/docs/guides/getting-started/#help-outflare-grow)). |
+| `OUTFLARE_FOLLOW_URL` | no | `https://x.com/outflareai` | The `https://` X profile **Follow us on X** opens. `off` leaves that item out. |
 | `OUTFLARE_TELEMETRY` | no | on | `off` stops the anonymous daily usage report and update check. See [Usage stats and update checks](/docs/self-hosting/telemetry/). |
 | `DO_NOT_TRACK` | no | none | `1` does the same as `OUTFLARE_TELEMETRY=off`. |
 | `OUTFLARE_POSTHOG_KEY` | no | none | Your own PostHog project key (`phc_...`). Turns on product analytics: the web app's usage through `/ingest/` on your server, and the server's own events (every action, API and MCP call, and error), with ids and error codes but never customer data. See [Product analytics](#product-analytics). |

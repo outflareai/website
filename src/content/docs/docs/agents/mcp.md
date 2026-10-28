@@ -13,7 +13,7 @@ There are two ways in. The MCP server is the quickest one for Claude, ChatGPT, C
 
 ## The MCP server <span class="pill shipped">Shipped</span>
 
-[`@outflare/mcp`](https://github.com/outflareai/outflare/tree/main/mcp) is an [MCP](https://modelcontextprotocol.io) server that gives an agent 446 tools over the API (3 more in agency mode): run [missions](/docs/agents/missions/) toward a goal with approvals, read and update the brief of the project it works on, check sending domains and mailbox warm-up, import leads, check them against the suppression list, build, preview and start sequences, see and change which mailboxes each sequence sends from, and read and answer replies.
+[`@outflare/mcp`](https://github.com/outflareai/outflare/tree/main/mcp) is an [MCP](https://modelcontextprotocol.io) server that gives an agent 536 tools over the API (3 more in agency mode): run [missions](/docs/agents/missions/) toward a goal with approvals, read and update the brief of the project it works on, check sending domains and mailbox warm-up, import leads, check them against the suppression list, build, preview and start sequences, see and change which mailboxes each sequence sends from, and read and answer replies.
 
 It calls the same API with a scoped token, so:
 
@@ -75,7 +75,7 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | Tool | What it does | Changes data |
 | --- | --- | --- |
 | `get_context` | Start here: what Outflare knows about the company, its memories and projects, and what is blocked. See [Memory and status](/docs/agents/memory/) | |
-| `get_onboarding` | The [Get started](/docs/guides/getting-started/) steps (website, goal, AI, tools, first mission, then team), each done or skipped, with the tool that does it | |
+| `get_onboarding` | The [Get started](/docs/guides/getting-started/) steps (one brand, AI key, goal, website and DNS, tools, star and follow, first mission, then team), each done or skipped, with the tool that does it | |
 | `update_onboarding` | Pick what to do first, skip Get started steps, bring them back, or close the walk-through in the app | Yes |
 | `get_status` | Everything stopping the workspace, worst first, with the tool that fixes each and who must act | |
 | `list_memories` | Search the preferences, decisions and facts people and agents saved | |
@@ -105,6 +105,9 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `list_list_runs`, `get_list_run` | Builds, refreshes and enrichments: found, added, left out by reason, credits spent | |
 | `get_lead_sources` | Which data provider a lead came from | |
 | `check_recipients` | Ask the send policy whether addresses may be emailed, without sending | |
+| `email_pattern` | The address shape a company domain uses, learned from this workspace's own data, with a confidence. Free | |
+| `find_emails` | Propose the most likely work address for each person (name + company domain), with a confidence and a code. Free; up to 50 a call | |
+| `verify_addresses` | Check a small batch cheapest tier first, rolling up to the workspace's own verifier only when needed; a per-address code matched by ref, up to 50 a call | Yes, *provider* |
 | `list_suppressions` | Emails and domains that are never emailed | |
 | `list_sequences`, `get_sequence` | Sequences with steps and counts | |
 | `preview_sequence` | Render every step for one lead, with missing variables | |
@@ -198,7 +201,7 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `list_members`, `triage_inbox_message` | Workspace members; label, assign, snooze, tag, close or flag a reply for review | Yes |
 | `create_inbox_tag`, `update_inbox_tag`, `delete_inbox_tag` | Add, rename, recolour or delete a reply tag | Yes |
 | `create_inbox_view`, `update_inbox_view`, `delete_inbox_view` | Save, change or delete a shared set of inbox filters | Yes |
-| `set_reply_rules` | Choose what happens for a not now, an out-of-office or a referral, for the workspace, a project or a sequence | Yes |
+| `set_reply_rules` | Choose what happens for a not now, an out-of-office or a referral, and which deal stage a labelled reply moves its deal to, for the workspace, a project or a sequence | Yes |
 | `add_reply_referral` | Add the person a reply refers you to as a lead, and optionally enrol them | Yes |
 | `list_alerts` | What needs someone now: hot replies, hot website visitors, with the page that has each | |
 | `get_alert_settings` | Who gets each kind of alert by email, and the kinds you muted | |
@@ -223,6 +226,10 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `list_fixes`, `update_fix` | The workspace's shared fixes list (site audits' and AI visibility's fixes): take a fix, mark it done (the next crawl or run checks), ignore it, or leave a note | Yes |
 | `list_deploy_options`, `list_deploy_targets`, `add_deploy_target`, `update_deploy_target`, `remove_deploy_target`, `check_deploys`, `list_deploys` | Watch a [GitHub repository or Vercel project](/docs/integrations/deploys/) for production deploys, tied to the site it serves, and see when each website went live | Yes |
 | `get_fix_prompt`, `verify_fix` | Hand a fix to a coding agent as a prompt, then report it live so a fresh crawl confirms it or opens it again | Yes |
+| `list_fix_tickets`, `get_fix_ticket`, `get_fix_ticket_prompt` | Fixes grouped into tickets, one per problem and site with every page behind it: the AI-written brief (summary, why, the change, done when), search impact, related tickets and guidelines, and the ticket as a Markdown issue for a coding agent. See [Fix tickets](/docs/guides/site-audits/#fix-tickets) | |
+| `write_fix_ticket`, `review_fix_ticket` | Have your own AI model write or rewrite a ticket (with feedback), then approve, reject or reopen it, saving the reason as a guideline | Yes |
+| `list_fix_guidelines`, `create_fix_guideline`, `delete_fix_guideline` | The rules every ticket follows, for the workspace, a brand or a site | Yes |
+| `get_site_indexability`, `list_indexability_pages` | A site's [indexability](/docs/guides/site-audits/#indexability): every page from the crawl, sitemaps, Search Console and an SEO tool, whether it can be indexed and whether Google indexed it, the issues and 90 days of history | |
 | `start_fix`, `get_fix_autonomy`, `update_fix_autonomy` | [Fix autonomy](/docs/guides/fix-autonomy/): take a fix before changing the site, and choose how far agents in a mission may go on their own (copilot, rules or autonomous); redirect, canonical, indexing and robots fixes always wait for a person | Yes |
 | `get_ai_visibility` | How often AI answers name each brand: mention rate, share of voice against competitors, position, cited pages, by model and week. See [AI visibility](/docs/guides/ai-visibility/) | |
 | `get_ai_visibility_settings`, `update_ai_visibility_settings` | Which models AI visibility asks (on your own AI connections), answers per prompt, and its monthly limit | Yes |

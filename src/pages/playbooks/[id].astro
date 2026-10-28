@@ -173,6 +173,18 @@ const nothingNeeded = p.needs.data.length + p.needs.connections.length === 0;
 					</ul>
 					<p class="mt-3 text-xs text-muted-foreground">Every connection is your own account. Outflare never lends its keys.</p>
 				</div>
+				{
+					p.kit && (
+						<div class="px-4 py-3">
+							<h2 class="text-xs text-muted-foreground">What it sets up</h2>
+							<p class="mt-2">{p.kit.summary}</p>
+							<ul class="mt-2 list-disc space-y-1 pl-4 text-muted-foreground">
+								{p.kit.adds.map((a) => <li>{a}</li>)}
+							</ul>
+							<p class="mt-3 text-xs text-muted-foreground">Shown first and added only with your OK. <a href="/docs/agents/playbooks/#setup-kits" class="underline underline-offset-4 hover:text-foreground">How setup kits work</a></p>
+						</div>
+					)
+				}
 				<dl class="divide-y">
 					<div class="px-4 py-3"><dt class="text-xs text-muted-foreground">Kind</dt><dd class="mt-0.5 font-medium">{tierLabel(p.tier)}</dd></div>
 					<div class="px-4 py-3">
