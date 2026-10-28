@@ -15,6 +15,10 @@ Moving from Attio? [Import it once](/docs/guides/move-from-attio/) and its peopl
 
 Every lead you import or add is a person record too. A new lead joins the person who already has its email, or gets a record of its own marked as a prospect, with its name, job title and LinkedIn filled in. Its email stays unverified, so it never takes over an address someone later proves they own. Each lead in the API has a `record_id` that points at its person.
 
+A lead's details live on its person, and stay up to date. Whenever a lead is added, imported, edited or enriched, its name, job title, LinkedIn, phone and company go onto the person. The company is found or added by the lead's website, or by its email domain when that's a company's own, never a personal mailbox such as Gmail. A lead fills what's empty and updates what a lead put there before, but never replaces something you typed on the record, a CRM sync or enrichment.
+
+Cold email reads the person back. Fix someone's job title or first name on their record, and that's what the next email says. The person's other text fields work as merge tags too, by their field key.
+
 Cold email, replies, meetings and deals are linked to the person as well: through their lead, or else through the address (a reply's sender, a meeting's attendee). Merging two records moves all of it to the one you keep.
 
 ## The catalog
