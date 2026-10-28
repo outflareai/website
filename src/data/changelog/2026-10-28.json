@@ -2,7 +2,7 @@
 	"version": "2026.10.28",
 	"date": "2026-10-28",
 	"status": "in-progress",
-	"updated": "2026-10-28T15:08:14Z",
+	"updated": "2026-10-28T15:17:39Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -108,7 +108,14 @@
 			"edition": "open-source",
 			"text": "A lead's name, job title, LinkedIn, phone and company now live on its person record, kept up to date as leads are imported, edited or enriched, without overwriting anything you typed. Cold email reads the person back, so a correction made in the CRM is what goes out.",
 			"at": "2026-10-28T14:58:50Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "See every domain your workspace has set up in one list, with what each is used for (website, SEO, site tracking, cold email, Lifecycle email, tracked links) and what still needs a step, through `GET /domains` and the `list_workspace_domains` MCP tool. `GET /connections` (MCP `list_connections`) lists every connected account, mailbox sign-ins included.",
+			"at": "2026-10-28T15:17:39Z"
 		}
 	],
-	"through": "53017ab+cbe3a94"
+	"through": "d9e1d71+c95f367"
 }
