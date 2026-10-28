@@ -11,7 +11,7 @@ sidebar:
 
 ## How visitors are named
 
-Outflare names a visitor it can tie to someone already in your workspace. It has no identity data of its own and never guesses. The one exception is the optional [company lookups](#company-lookups) below, which use your own data provider.
+Outflare names a visitor it can tie to someone already in your workspace. It has no identity data of its own and never guesses. The exceptions are optional and run on your own accounts: [company lookups](#company-lookups) and [people by name](#people-by-name) below.
 
 - **Your product.** When your product tells Outflare who signed up or signed in (see [website tracking](/docs/guides/website-tracking/)), their earlier and later visits join their record.
 - **Email clicks.** When someone clicks a link to your own site in a sequence or lifecycle email you sent them, the link carries a short signed token (`ofvisit`). The snippet sends it with the first page view and removes it from the address bar, and that browser's visits join the person the email went to.
@@ -41,6 +41,26 @@ Visitors nobody knows yet can be matched to a company from their IP address, usi
 - **Old matches.** A company found for visitors who don't come back within 90 days, and that nobody added, is dropped.
 - **Sites behind a proxy.** If your site sends its events through its own domain, Outflare sees your server's address instead of the visitor's. Lookups name nobody in that case unless your proxy passes on the visitor's address with a proxy secret (see [website tracking](/docs/guides/website-tracking/)).
 
+## People by name
+
+[RB2B](https://www.rb2b.com), [Vector](https://www.vector.co) and [Warmly](https://www.warmly.ai) name the people who visit a website. If you have your own account at one of them, Outflare can take in the people it names. Outflare never identifies anyone itself and keeps no identity data: the tool does the matching, on your account, and sends each person to a webhook.
+
+1. **Connect the tool** under **Settings → Connectors**.
+2. **Turn it on.** In the Visitors settings, turn on **Take in the people your tool names** and accept the notice. These tools only name people in the United States. You are responsible for saying so in your site's privacy policy, honouring opt-outs (including Global Privacy Control) and checking the rules where you sell. Never use it for visitors in the EU, UK, Canada or Australia.
+3. **Add the webhook.** Copy the connection's webhook address from the settings into the tool's webhook settings. Keep it private: anyone who has it can add people to your review list. Removing the connection turns the address off.
+
+What happens to each person the tool sends:
+
+- **Already in your CRM.** If your CRM already has their email address, nothing about them changes. The visit is added to their history.
+- **Someone new.** They become a person record: a prospect tagged with the tool, with their name, job title and LinkedIn profile.
+  - People without an email address are skipped.
+  - People at a domain you leave out are skipped.
+- **Held for review.** New people stay off your people list, and no email of any kind goes to them until someone approves them.
+- **People to review.** The Visitors page lists them under **People to review**.
+  - **Approve** adds them to your lists like anyone else. They stay third-party prospects: cold email only, and never marketing email without their own consent.
+  - **Reject** archives the record.
+- **Switched off.** While the setting is off, Outflare ignores anything the tool sends and keeps nothing.
+
 ## Companies and people
 
 Switch between companies and people for the last 7, 30 or 90 days. Each row shows pages viewed, key pages viewed, visits, the last page and a score. People are grouped under their company in your CRM, or under the company whose domain matches their email. Open a person to see their recent pages.
@@ -62,4 +82,6 @@ Add your own company's domains under **Leave out these domains** so your team do
 - `GET /v1/workspaces/{ws}/visitors` (scope `customers.read`): `view` (`companies` or `people`), `days`, `hot`, `limit` and `brand`.
 - `GET` and `PUT /v1/workspaces/{ws}/visitors/settings` (`customers.read`, `customers.manage`). Company lookups are `reveal_companies`, `reveal_daily_limit` and `not_companies`.
 - `POST /v1/workspaces/{ws}/visitors/companies` (`customers.manage`): add a looked-up company to your CRM.
-- MCP tools: `list_website_visitors`, `get_visitor_settings`, `update_visitor_settings`, `add_visitor_company`.
+- `POST /v1/workspaces/{ws}/records/{record}/review` (`customers.manage`): approve or reject a person held for review. `GET .../records` lists held people only with `review=needs_review`.
+- People by name settings are `reveal_people` and `accept_people_notice`. Each connection's webhook address is in `people_connections`.
+- MCP tools: `list_website_visitors`, `get_visitor_settings`, `update_visitor_settings`, `add_visitor_company`, `review_record`.
