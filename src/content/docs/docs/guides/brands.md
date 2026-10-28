@@ -70,6 +70,18 @@ With one brand picked, Connectors lists what that brand uses and marks each one 
 
 In the API, every connection has `brand_id` (set on a brand's own) and `brand_ids` (the brands a shared one is shared with; empty means every brand). `GET /v1/workspaces/{ws}/integrations?brand=repocket` lists what a brand uses. Set who uses a connection with `brand_id` or `brand_ids` on `POST` or `PATCH /integrations`, or `?brand=` on the sign-in link. The MCP tools are `list_integrations` and `update_integration`.
 
+## See every domain in one list
+
+A workspace sets up domains in several places: each brand's website, SEO sites, website tracking, cold email sending domains, Lifecycle email domains and tracking domains for links. `GET /v1/workspaces/{ws}/domains` lists each domain once, by its registrable name, so `www.acme.example` and `mail.acme.example` both show under `acme.example`. Each entry has:
+
+- `uses`: every place the domain is set up, with its `purpose` (`website`, `seo`, `site_tracking`, `cold_email`, `lifecycle_email` or `tracking_links`), the exact `host`, its `status` and the `id` that opens it in its own part of the app.
+- `needs_attention`: the purposes with a use still pending or failing, such as a sending domain whose DNS records aren't in place yet.
+- `record_id`: the company record with this domain, when there is one.
+
+Add `?brand=repocket` for one brand's domains, or `?purpose=cold_email` for one kind. Someone kept to some brands sees their brands' domains and the shared ones. It needs scope `workspace.read`; the MCP tool is `list_workspace_domains`.
+
+To look up a domain someone else owns (is it free mail, a disposable address, a company?), use `GET /v1/workspaces/{ws}/domain-lookups/{domain}`. It is the same lookup as before, under a clearer name.
+
 ## Analytics by brand
 
 Each site in your analytics tools, such as a GA4 property, a Search Console site or a PostHog project, counts as a brand's when its domain is one of the brand's domains. Subdomains count too, so app.repocket.com is Repocket's. A site read through a brand's own connection always counts for that brand. For a site named after an app rather than a domain, pick its brand yourself (`PUT /v1/workspaces/{ws}/analytics/{id}/site-brand`), or mark it as shared.
