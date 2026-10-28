@@ -61,6 +61,10 @@ DataForSEO also reads Google's live results for one keyword, which is how [rank 
 - The budget runs per calendar month (UTC). Before each live call Outflare
   estimates its cost and refuses with `402 budget_reached` if it would go
   over; raise the budget in the connection's SEO settings to carry on.
+  The budget is the connection's monthly [usage limit](/docs/guides/usage-limits/):
+  the connection's page under Connectors can also set a daily limit, shows
+  usage by day, and owners and admins are emailed at 80% and when a limit
+  is reached.
 - Every live call is recorded in Outcomes (category `data`, provider
   `dataforseo` or `ahrefs`), so SEO spend shows next to the rest of your
   cost per meeting. Calls that fail after the provider charged are recorded

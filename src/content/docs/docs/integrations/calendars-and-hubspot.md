@@ -26,6 +26,8 @@ Each connection takes these settings as `config` with `PATCH /v1/workspaces/{ws}
 - `own_domains`: your own email domains, so colleagues on an invite are never taken for prospects.
 - `calendar_id` (Google, Outlook): which calendar to read. The primary one by default.
 - `push_meetings` (HubSpot): write meetings booked from outreach into HubSpot, creating or updating the contact by email. Off by default.
+- `push_replies` (HubSpot): reply labels to write into HubSpot, such as `["interested", "meeting_request"]`, or `["hot"]` for every hot label. Each matching reply creates or updates the contact and adds a note with the reply and a link to it in Outflare, once, when it is labelled. Empty by default.
+- `reply_tasks` (HubSpot): with `push_replies`, also add a high-priority task to follow up within a day, for the HubSpot user with the same email as the reply's owner in Outflare. Assigning it needs the `crm.objects.owners.read` scope; without it the task is unassigned.
 - `paused`: stop syncing without disconnecting.
 
 ## OAuth apps for self-hosting

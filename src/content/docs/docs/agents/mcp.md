@@ -13,7 +13,7 @@ There are two ways in. The MCP server is the quickest one for Claude, ChatGPT, C
 
 ## The MCP server <span class="pill shipped">Shipped</span>
 
-[`@outflare/mcp`](https://github.com/outflareai/outflare/tree/main/mcp) is an [MCP](https://modelcontextprotocol.io) server that gives an agent 446 tools over the API (3 more in agency mode): run [missions](/docs/agents/missions/) toward a goal with approvals, read and update the brief of the project it works on, check sending domains and mailbox warm-up, import leads, check them against the suppression list, build, preview and start sequences, see and change which mailboxes each sequence sends from, and read and answer replies.
+[`@outflare/mcp`](https://github.com/outflareai/outflare/tree/main/mcp) is an [MCP](https://modelcontextprotocol.io) server that gives an agent 513 tools over the API (3 more in agency mode): run [missions](/docs/agents/missions/) toward a goal with approvals, read and update the brief of the project it works on, check sending domains and mailbox warm-up, import leads, check them against the suppression list, build, preview and start sequences, see and change which mailboxes each sequence sends from, and read and answer replies.
 
 It calls the same API with a scoped token, so:
 
@@ -99,6 +99,8 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `get_lead` | One lead: fields, custom fields, lists, verification and suppression | |
 | `list_lead_lists`, `get_lead_list` | Lead lists with sizes, search settings and the latest build | |
 | `list_lead_list_members` | A list's leads with their fit score and reasons, best first | |
+| `list_smart_lists`, `get_smart_list`, `list_smart_list_members` | Smart lists with their rules and size, and who is in one now | |
+| `preview_smart_list` | How many people a smart list's rules pick, with a sample; nothing saved | |
 | `list_data_providers` | Connected data providers that search, find emails or enrich, and the filters each understands | |
 | `list_list_runs`, `get_list_run` | Builds, refreshes and enrichments: found, added, left out by reason, credits spent | |
 | `get_lead_sources` | Which data provider a lead came from | |
@@ -110,6 +112,7 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `list_messages` | Every send attempt, including ones the policy blocked and why | |
 | `list_inbox`, `get_inbox_message` | Replies from every mailbox and connected sequencer, filtered by label group (hot, later, closed, automatic), source, tag or review, and the whole conversation with a lead | |
 | `list_inbox_tags`, `list_inbox_views` | Reply tags with counts, and the inbox views people saved | |
+| `get_reply_rules` | What happens when a reply gets a label, for the workspace, a project or a sequence | |
 | `list_webhook_event_types`, `list_webhooks`, `list_webhook_deliveries` | The events webhooks can send; the workspace's webhooks and their health; what was sent to one and how the receiver answered | |
 | `list_events` | What happened since the last call: replies, bounces, opt-outs, paused mailboxes, held mission writes. Keep `next_after` and pass it back as `after` | |
 | `list_logs`, `get_log` | Every API call in the workspace with status, duration, error code and who made it; filter by level, source, operation, tool and time, or look one up by the `request_id` an error returned. Needs `audit.read`. See [Logs](/docs/api/logs/) | |
@@ -155,6 +158,8 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `create_lead_list`, `update_lead_list` | A manual list, or one built from a search with an email waterfall, fit scores, dedupe and credit caps | Yes, provider |
 | `run_lead_list` | Build, refresh or enrich a list, within its caps | Yes, provider |
 | `cancel_list_run` | Stop a run; leads already added stay | Yes |
+| `create_smart_list`, `update_smart_list`, `refresh_smart_list` | Make or change a smart list, or update who is in it now | Yes |
+| `delete_smart_list` | Delete a smart list; the people stay | Yes |
 | `create_sequence`, `replace_sequence_steps` | Build a draft sequence and its steps | Yes |
 | `update_sequence` | Change settings, or start, pause or archive | Yes, sends |
 | `enroll_leads` | Add leads or a list to a sequence | Yes, sends |
@@ -193,6 +198,13 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `list_members`, `triage_inbox_message` | Workspace members; label, assign, snooze, tag, close or flag a reply for review | Yes |
 | `create_inbox_tag`, `update_inbox_tag`, `delete_inbox_tag` | Add, rename, recolour or delete a reply tag | Yes |
 | `create_inbox_view`, `update_inbox_view`, `delete_inbox_view` | Save, change or delete a shared set of inbox filters | Yes |
+| `set_reply_rules` | Choose what happens for a not now, an out-of-office or a referral, for the workspace, a project or a sequence | Yes |
+| `add_reply_referral` | Add the person a reply refers you to as a lead, and optionally enrol them | Yes |
+| `list_alerts` | What needs someone now: hot replies, hot website visitors, with the page that has each | |
+| `get_alert_settings` | Who gets each kind of alert by email, and the kinds you muted | |
+| `set_alert_settings` | Choose who gets a kind of alert by email and the Slack channel it posts to, for the workspace or a brand | Yes |
+| `list_alert_channels` | The Slack channels your Slack can post alerts to | |
+| `mute_alerts` | Mute or unmute a kind of alert for yourself | Yes |
 | `list_tracking_domains`, `add_tracking_domain`, `check_tracking_domain` | Optional own domain for unsubscribe and click links, verified by CNAME | Yes |
 | `list_analytics`, `get_analytics_summary` | Connected website analytics tools, and traffic across all of them for a period | |
 | `get_analytics_report` | One tool's traffic, pages, sources, search queries or events report | |
@@ -211,6 +223,10 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `list_fixes`, `update_fix` | The workspace's shared fixes list (site audits' and AI visibility's fixes): take a fix, mark it done (the next crawl or run checks), ignore it, or leave a note | Yes |
 | `list_deploy_options`, `list_deploy_targets`, `add_deploy_target`, `update_deploy_target`, `remove_deploy_target`, `check_deploys`, `list_deploys` | Watch a [GitHub repository or Vercel project](/docs/integrations/deploys/) for production deploys, tied to the site it serves, and see when each website went live | Yes |
 | `get_fix_prompt`, `verify_fix` | Hand a fix to a coding agent as a prompt, then report it live so a fresh crawl confirms it or opens it again | Yes |
+| `list_fix_tickets`, `get_fix_ticket`, `get_fix_ticket_prompt` | Fixes grouped into tickets, one per problem and site with every page behind it: the AI-written brief (summary, why, the change, done when), search impact, related tickets and guidelines, and the ticket as a Markdown issue for a coding agent. See [Fix tickets](/docs/guides/site-audits/#fix-tickets) | |
+| `write_fix_ticket`, `review_fix_ticket` | Have your own AI model write or rewrite a ticket (with feedback), then approve, reject or reopen it, saving the reason as a guideline | Yes |
+| `list_fix_guidelines`, `create_fix_guideline`, `delete_fix_guideline` | The rules every ticket follows, for the workspace, a brand or a site | Yes |
+| `get_site_indexability`, `list_indexability_pages` | A site's [indexability](/docs/guides/site-audits/#indexability): every page from the crawl, sitemaps, Search Console and an SEO tool, whether it can be indexed and whether Google indexed it, the issues and 90 days of history | |
 | `start_fix`, `get_fix_autonomy`, `update_fix_autonomy` | [Fix autonomy](/docs/guides/fix-autonomy/): take a fix before changing the site, and choose how far agents in a mission may go on their own (copilot, rules or autonomous); redirect, canonical, indexing and robots fixes always wait for a person | Yes |
 | `get_ai_visibility` | How often AI answers name each brand: mention rate, share of voice against competitors, position, cited pages, by model and week. See [AI visibility](/docs/guides/ai-visibility/) | |
 | `get_ai_visibility_settings`, `update_ai_visibility_settings` | Which models AI visibility asks (on your own AI connections), answers per prompt, and its monthly limit | Yes |

@@ -9,7 +9,7 @@ sidebar:
 
 A lead list is a group of leads you can add to a sequence. Make one by hand (CSV, API, an agent), or let Outflare build it from a search at a data provider you already pay for. Outflare never sells or stores contact data of its own: every person comes from your own provider account, and the provider bills you directly.
 
-Everything here works the same from the web app (**Lead lists**), the REST API and the MCP server.
+Everything here works the same from the web app (**Lists**), the REST API and the MCP server. For a list that fills itself from your customer records, see [Smart lists](/docs/guides/smart-lists/).
 
 ![The Lead lists page: each list's source, project, size, last run and refresh schedule](/screens/lead-lists.png)
 

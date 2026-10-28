@@ -23,20 +23,31 @@ A connection's URL is named after what it connects, not what you called it: `/ge
 
 ## Roles
 
-Each member has one role in each workspace. Roles grant scopes, and every API endpoint states the scope it needs.
+Each member has one role in each workspace, and the role decides what they can do. Every workspace starts with four:
 
-| Role | Can do |
+| Role | What it's for |
 | --- | --- |
-| `owner` | Everything, including managing admins. |
-| `admin` | Everything: members, invites, API tokens, the audit log, mailboxes, leads, the suppression list and sequences. Cannot act on an owner. |
-| `operator` | Read the workspace and members; read and manage projects, missions, mailboxes, leads, sequences and the inbox; add to (but not remove from) the suppression list. |
-| `viewer` | Read the workspace, members, projects, missions, mailboxes, leads, the suppression list, sequences, messages and the inbox. |
+| **Owner** | Everything, including removing people and managing owners. Fixed: it can't be changed. |
+| **Admin** | Everything except removing people or reducing their access. The role for your own team. |
+| **Member** | All the marketing work, and connecting tools. No settings, people, API tokens or audit log. Stored and sent in the API as `operator`. |
+| **Viewer** | Sees everything, changes nothing. |
 
-Managers cannot change or remove someone ranked above them (owner, then admin, then operator, then viewer).
+Change what Admin, Member or Viewer allows, or add roles of your own (a "Content writer" with only SEO and Social, say), under **Settings → Members → Roles**. Each role is a list of areas set to None, View or Edit, plus switches for actions that need their own say: sending email, posting to social accounts, approving missions and spending, the unsubscribe list, shared fields, webhooks, settings, API tokens, the audit log, inviting people, removing people and editing roles. A changed starting role can be reset to its defaults.
+
+- **You can't give what you don't have.** Every permission in a role you create or edit, or a role you give someone, must be one you hold.
+- **You can't change someone who can do more than you.** Only owners make, change or remove owners, and a workspace always keeps at least one.
+- **Taking access away is its own permission.** Removing someone, moving them to a role that can do less, or taking brands away from them needs **Remove people** (`members.remove`). Only owners have it by default; an owner can switch it on for any role.
+- **Changes apply at once**, and API tokens a person made lose the permissions their role no longer has. Every change is in the audit log (`role.created`, `role.updated`, `role.deleted`, `member.role_changed`).
+- **Deleting a role in use** asks where its people and pending invites should move.
+- **Anyone can leave** a workspace under Settings → Members, except its last owner.
+
+API tokens never hold more than the person who made them, and never `members.remove` or `roles.manage`. Connected AI apps never get people, roles, tokens, workspace settings or approvals, whatever the role allows.
+
+In the API: `GET /v1/workspaces/{ws}/roles` lists the roles with their scopes (MCP: `list_roles`); `POST /roles`, `PATCH /roles/{role}` and `DELETE /roles/{role}` (`?move_to=` when it's in use) need `roles.manage`. Members and invites take `role` (a starting role) or `role_id` (one of the workspace's own roles).
 
 ## Invites
 
-Admins and owners invite people by email from **Members**, choosing `admin`, `operator` or `viewer`. The invite link starts with `ofi_` and expires. Pending invites can be revoked. Invite links use your instance's `PUBLIC_URL`, so set it when you run behind a domain.
+Admins and owners invite people by email from **Settings → Members**, picking any role they could give themselves (Admin by default; only owners invite owners). For a role without workspace-wide permissions, you can also keep the person to some brands. **Send invite** emails them a link to join, through the instance's account email service, and shows you the link once so you can share it another way too (an instance with no email service only shows it). The link starts with `ofi_`, works once and expires after 7 days. A new invite to the same address replaces a pending one, and someone already in the workspace can't be invited again. Pending invites can be revoked. Invite links use your instance's `PUBLIC_URL`, so set it when you run behind a domain.
 
 ## Signing in
 
@@ -87,7 +98,9 @@ The scopes are:
 | `workspace.read` | Read the workspace. |
 | `workspace.manage` | Rename the workspace and change its URL (slug). Owners and admins only by default. |
 | `members.read` | List members. |
-| `members.manage` | Change roles, remove members, manage invites. |
+| `members.manage` | Change roles and manage invites. |
+| `members.remove` | Remove members or reduce their access. Owners only by default; never on an API token. |
+| `roles.manage` | Create, change and delete roles. Never on an API token. |
 | `tokens.manage` | Create and revoke API tokens. |
 | `audit.read` | Read the audit log. |
 | `mailboxes.read` | List mailboxes, pools and sending-domain health. |

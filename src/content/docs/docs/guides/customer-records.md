@@ -5,7 +5,7 @@ sidebar:
   order: 1.5
 ---
 
-<span class="pill shipped">Shipped</span> Records, identities, links, the shared catalog, product events, duplicates and merges, timelines and consent, through the REST API and the MCP server. Segments and the customer pages come next.
+<span class="pill shipped">Shipped</span> Records, identities, links, the shared catalog, product events, duplicates and merges, timelines and consent, through the REST API and the MCP server. [Smart lists](/docs/guides/smart-lists/) group records by rules. The customer pages come next.
 
 Outflare keeps one record of each person and company your business knows, plus anything else you track, such as deals, subscriptions or partners. The customer data platform, the CRM and lifecycle email all use the same records, so nobody types the same detail twice and nothing ends up in a separate copy.
 

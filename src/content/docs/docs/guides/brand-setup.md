@@ -13,15 +13,16 @@ A step is done when the workspace has it, however it got there. Connect Stripe o
 
 ## The steps
 
-1. **Add the website script.** One line on every page that records visits, sign-ups and where they came from ([website tracking](/docs/guides/website-tracking/)). Ticks off when the first visit arrives.
-2. **Add your DNS records.** Every record the brand needs on its domain, in one list and added in one go: the one that proves the site is yours, so Outflare can [audit every page](/docs/guides/site-audits/), plus your sending domains' and tracking domain's records once you set those up. Outflare checks for them every minute for the first 15 minutes, then every hour for three days.
-3. **Connect your analytics**, such as Google Analytics, PostHog or Plausible, so reports start with your history.
-4. **Connect Search Console** (or Bing Webmaster Tools) for what people search to find you.
-5. **Set up email** with your own sending provider.
-6. **Connect payments**, so each channel shows the revenue it brings.
-7. **Connect your ad accounts.**
-8. **Connect your social accounts.**
-9. **Connect your CRM.**
+1. **Say what the brand does.** Pick the closest of about 40 business models, grouped (B2B SaaS, online store, marketplace, agency, bookings, courses, publisher and more), and, if you like, how customers pay: subscription, one-off, usage-based, commission, advertising, donations or free. It decides which reports and funnels suit the brand. Change either any time.
+2. **Add the website script.** One line on every page that records visits, sign-ups and where they came from ([website tracking](/docs/guides/website-tracking/)). Ticks off when the first visit arrives.
+3. **Add your DNS records.** Every record the brand needs on its domain, in one list and added in one go: the one that proves the site is yours, so Outflare can [audit every page](/docs/guides/site-audits/), plus your sending domains' and tracking domain's records once you set those up. Outflare checks for them every minute for the first 15 minutes, then every hour for three days.
+4. **Connect your analytics**, such as Google Analytics, PostHog or Plausible, so reports start with your history.
+5. **Connect Search Console** (or Bing Webmaster Tools) for what people search to find you.
+6. **Set up email** with your own sending provider.
+7. **Connect payments**, so each channel shows the revenue it brings.
+8. **Connect your ad accounts.**
+9. **Connect your social accounts.**
+10. **Connect your CRM.**
 
 Any step can be left for later (**Do this later**) and brought back. Nothing else depends on it.
 
@@ -65,6 +66,7 @@ Problems show at the top of the brand's setup page with a **Fix** button, and on
 ## For agents and the API
 
 - `GET /v1/workspaces/{ws}/brands/{brand}/setup` (MCP `get_brand_setup`): the steps, each `todo`, `waiting`, `done` or `skipped`, with `next_step`. The two install steps carry `install`: the snippet or DNS record, `ai_prompt`, the `developer` message and the brand's Tag Manager or Cloudflare connections.
+- `GET /v1/business-models` (`list_business_models`): the business models, grouped, and the ways customers pay. Set a brand's with `PATCH .../brands/{brand}` (`update_brand`), fields `business_model` and `revenue_models`; each change is recorded as `brand.business_model_changed`.
 - `PATCH .../setup` (`update_brand_setup`): skip or bring back steps, or close the checklist.
 - `POST .../setup/prepare` (`prepare_brand_setup`): make the brand's site key or add its site, so the step has something to install.
 - `POST .../setup/install` (`install_brand_setup`): the one-click install, queued. `GET .../setup/tag-containers` (`list_tag_containers`) lists the containers to pick from.
