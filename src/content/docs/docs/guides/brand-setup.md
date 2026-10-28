@@ -7,7 +7,7 @@ sidebar:
 
 <span class="pill shipped">Shipped</span> In the web app, the REST API and the MCP server.
 
-Each [brand](/docs/guides/brands/) has its own setup checklist under **Company → Brand setup**. It goes in order, starting with what every brand needs and ending with the tools fewer brands use. Leave whenever you like: Home shows **Continue setting up Acme · 3 of 9** until every step is done or you close it, and you pick up where you left off.
+Each [brand](/docs/guides/brands/) has its own setup checklist under **Company → Brand setup**. It goes in order, starting with what every brand needs and ending with the tools fewer brands use. Leave whenever you like: Home shows **Continue setting up Acme · 3 of 10** until every step is done or you close it, and you pick up where you left off.
 
 A step is done when the workspace has it, however it got there. Connect Stripe on the Connectors page, or ask Claude to do it over MCP, and the payments step ticks off here too.
 
@@ -15,7 +15,7 @@ A step is done when the workspace has it, however it got there. Connect Stripe o
 
 1. **Say what the brand does.** Pick the closest of about 40 business models, grouped (B2B SaaS, online store, marketplace, agency, bookings, courses, publisher and more), and, if you like, how customers pay: subscription, one-off, usage-based, commission, advertising, donations or free. It decides which reports and funnels suit the brand. Change either any time.
 2. **Add the website script.** One line on every page that records visits, sign-ups and where they came from ([website tracking](/docs/guides/website-tracking/)). Ticks off when the first visit arrives.
-3. **Add your DNS records.** Every record the brand needs on its domain, in one list and added in one go: the one that proves the site is yours, so Outflare can [audit every page](/docs/guides/site-audits/), plus your sending domains' and tracking domain's records once you set those up. Outflare checks for them every minute for the first 15 minutes, then every hour for three days.
+3. **Add your DNS records.** Every record the brand needs on its domain, in one list and added in one go: the one that proves the site is yours, so Outflare can [audit every page](/docs/guides/site-audits/), plus your email domain's and tracking domain's records once you set those up. Outflare checks for them every minute for the first 15 minutes, then every hour for three days.
 4. **Connect your analytics**, such as Google Analytics, PostHog or Plausible, so reports start with your history.
 5. **Connect Search Console** (or Bing Webmaster Tools) for what people search to find you.
 6. **Set up email** with your own sending provider.
@@ -28,7 +28,7 @@ Any step can be left for later (**Do this later**) and brought back. Nothing els
 
 ## Every way to do it
 
-The first two steps change your website, so each offers every way to get it done, quickest first:
+The website script and DNS steps change your website, so each offers every way to get it done, quickest first:
 
 - **One click with your own tools.** Sign in with the Google account that runs your Google Tag Manager container, pick the container, and Outflare adds one Custom HTML tag named "Outflare" on all pages and publishes it. It works in a Tag Manager workspace of its own, so nobody else's unpublished changes go live with it, and it never edits your other tags. Untick **Publish it now** to review the change in Tag Manager first. For verification, connect the Cloudflare account your domain is on and Outflare adds the TXT record. It only ever adds records, each with the comment "Added by Outflare"; it never changes or deletes one.
 - **Send to a developer.** A ready message with the snippet or DNS record and what to do with it, to copy or open in your own email.
