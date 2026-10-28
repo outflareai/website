@@ -105,6 +105,9 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `list_list_runs`, `get_list_run` | Builds, refreshes and enrichments: found, added, left out by reason, credits spent | |
 | `get_lead_sources` | Which data provider a lead came from | |
 | `check_recipients` | Ask the send policy whether addresses may be emailed, without sending | |
+| `email_pattern` | The address shape a company domain uses, learned from this workspace's own data, with a confidence. Free | |
+| `find_emails` | Propose the most likely work address for each person (name + company domain), with a confidence and a code. Free; up to 50 a call | |
+| `verify_addresses` | Check a small batch cheapest tier first, rolling up to the workspace's own verifier only when needed; a per-address code matched by ref, up to 50 a call | Yes, *provider* |
 | `list_suppressions` | Emails and domains that are never emailed | |
 | `list_sequences`, `get_sequence` | Sequences with steps and counts | |
 | `preview_sequence` | Render every step for one lead, with missing variables | |
