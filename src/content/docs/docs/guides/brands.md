@@ -39,7 +39,13 @@ A brand's mailboxes only send for that brand's sequences, so Repocket never emai
 
 ## See one brand at a time
 
-Like a project in PostHog, you work on one brand at a time. The brand picker sits at the top of the sidebar, under your workspace (on a phone, in the top bar), and narrows every page to that brand: projects, sequences, lead lists, mailboxes, domains, missions, connectors and analytics. Outflare opens on the brand you picked last, or your first brand. The link keeps the choice (`?brand=repocket`), so a link you share opens on the same brand.
+Like a project in PostHog, you work on one brand at a time. The brand picker sits at the top of the sidebar, under your workspace (on a phone, in the top bar), and narrows every page to that brand: projects, sequences, lead lists, mailboxes, domains, missions, connectors, SEO, analytics, ad platforms, site audits and search. Outflare opens on the brand you picked last, or your first brand.
+
+The brand is part of every link, after the workspace: `app.outflare.ai/acme/repocket/seo`, or `app.outflare.ai/acme/all/seo` for every brand. A link you share opens on the same brand, and older links ending in `?brand=repocket` still work. Pages for the whole workspace, such as Members and API tokens, have no brand in their link. Because handles sit in links, a brand's handle can't be the name of a page, such as `seo` or `members`.
+
+Switching brand reloads the page you're on with that brand's records. If you had something open that belongs to the other brand, such as a site audit or a sequence, you go back to that page's list for the new brand.
+
+SEO and analytics read through a connection every brand shares, such as Ahrefs or Google Search Console, count each website for the brand whose domains include it. So a brand only sees the keywords and traffic of its own websites.
 
 To compare brands side by side, pick **All brands** at the bottom of the picker. Each record then shows the brand it belongs to.
 
