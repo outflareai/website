@@ -108,7 +108,9 @@ There are two ways to get rid of a record:
 - **Archive** hides it from lists and keeps everything, so it can be restored. Use it for anyone you just don't want to see.
 - **Delete for good** erases it, for example when someone asks to be forgotten. It can't be undone.
 
-Deleting a person erases their record, every record merged into it, and everything about them: their emails, phones and ids, field history, links, consent, their leads (including any lead with one of their email addresses, so a later sync can't bring them back), the cold email sent to them and their replies, meetings, lifecycle email sent to them alone, product events, website visits, journeys, list memberships and, if they were a partner, their partner data and rewards. Deals and payments stay, without their name, because they are your business's revenue.
+Deleting a person erases their record, every record merged into it, and everything about them: their emails, phones and ids, field history, links, consent, their leads (including any lead with one of their email addresses, so a later sync can't bring them back), the cold email sent to them and their replies, meetings, lifecycle email sent to them alone, product events, website visits, journeys, list memberships and, if they were a partner, the customers they referred and their partner portal sign-ins. Deals and payments stay, without their name, because they are your business's revenue.
+
+If they were a partner, what they earned and were paid stays too, so commission totals and payout history still add up: their rewards and payouts move to an archived record named "Erased partner", with no name, email or payout details. The partner is suspended, so their old links earn nothing more.
 
 Deleting a company erases the company's record, fields and history. Its people and deals stay, no longer linked to it.
 
