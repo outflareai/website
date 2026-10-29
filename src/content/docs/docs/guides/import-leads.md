@@ -74,4 +74,6 @@ The suppression list holds addresses and whole domains that must never be emaile
 
 ### Erasure requests
 
-To honour a request to be forgotten, delete the lead with `?suppress=true` (or choose OK when deleting in the web app). The lead is deleted and its address is added to the suppression list with reason `do_not_contact`, so a later import cannot put the person back into a sequence.
+To honour a request to be forgotten, delete the person, not just the lead: open them under **CRM → People** and choose **Delete for good → Delete and never contact**, or send `DELETE /records/{record}?suppress=true`. That erases their record and everything about them, their leads included, and adds their addresses to the suppression list with reason `do_not_contact`, so a later import cannot put them back into a sequence. See [Deleting a record](/docs/guides/customer-records/#deleting-a-record).
+
+Deleting only the lead (`DELETE /leads/{id}?suppress=true`) takes it out of every list and sequence and suppresses its address, but keeps the person's record and the emails already sent to them.
