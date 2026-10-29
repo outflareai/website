@@ -5,11 +5,29 @@ sidebar:
   order: 1.5
 ---
 
-<span class="pill shipped">Shipped</span> Records, identities, links, the shared catalog, product events, duplicates and merges, timelines and consent, through the REST API and the MCP server. [Smart lists](/docs/guides/smart-lists/) group records by rules. The customer pages come next.
+<span class="pill shipped">Shipped</span> Records, identities, links, the shared catalog, product events, duplicates and merges, timelines, consent and deleting a record for good, in the web app (**CRM → People**), the REST API and the MCP server. [Smart lists](/docs/guides/smart-lists/) group records by rules.
 
 Outflare keeps one record of each person and company your business knows, plus anything else you track, such as deals, subscriptions or partners. The customer data platform, the CRM and lifecycle email all use the same records, so nobody types the same detail twice and nothing ends up in a separate copy.
 
 Moving from Attio? [Import it once](/docs/guides/move-from-attio/) and its people, companies and deals become records here.
+
+## In the web app
+
+Open **CRM → People** (or press `g` then `h`). It has three tabs:
+
+- **People** and **Companies** list every record of that type, newest first. Search by name, email, phone or id, and narrow the list with a filter for each choice field, such as lifecycle stage, seniority, country, industry or company size. The brand picked in the sidebar applies here as everywhere else. **Held for review** shows the people a visitor identification tool named, waiting for someone to approve them, and **Archived** shows the records you archived.
+- **Duplicates** lists pairs that may be the same person or company, side by side, to merge, link or dismiss. See [Duplicates](#duplicates).
+
+Click a record to open it. Its page shows its fields, what may be sent to it and why ([who can be emailed](/docs/guides/who-can-be-emailed/)), its emails and ids, the companies, people and deals it's linked to, its consent, its [timeline](#timeline) and the history of every field. A company's timeline includes its people's.
+
+With permission to manage customers, you can also:
+
+- **Add** a person or company by hand, with **Add person** or **Add company**.
+- **Edit** a record's name and fields, including the companies a person works at. Fields only Outflare works out (such as revenue from Stripe) or only their source may write aren't in the editor. If someone else changed the record while you were editing, your save is refused and you're asked to look again, so nobody's change is lost.
+- **Add or remove** emails, phone numbers and ids, and **record consent** someone gave or took back, such as on a call.
+- **Approve or reject** someone held for review.
+- **Archive** a record to hide it and keep its history, or **restore** it.
+- **Delete** a record for good: see [Deleting a record](#deleting-a-record).
 
 ## Leads are people
 
@@ -73,15 +91,30 @@ Traits that match a field in the catalog fill in the record: `firstName` is firs
 
 ## Duplicates
 
-When two records share an email or phone number, they might be the same person. Outflare lists each such pair once, with both records side by side, so someone can decide. This includes pairs you already had before the upgrade.
+When two records share an email or phone number, they might be the same person. Outflare lists each such pair once, with both records side by side, so someone can decide: in the web app under **CRM → People → Duplicates**, which marks the fields where the two disagree, and on each record's page. This includes pairs you already had before the upgrade.
 
-- **Merge** keeps one record. The other one's emails and ids, links, product events, consent, leads and outreach move to the kept record, and its details fill in whatever the kept record is missing. The usual "which value wins" order still applies, so a CRM value never replaces one someone typed. The merged record stays in the archive, so its history and any old links still lead to the record you kept.
+- **Merge** keeps one record (choose **Keep this one** on the record to keep). The other one's emails and ids, links, product events, consent, leads and outreach move to the kept record, and its details fill in whatever the kept record is missing. The usual "which value wins" order still applies, so a CRM value never replaces one someone typed. The merged record stays in the archive, so its history and any old links still lead to the record you kept.
 - **Link** keeps both records but marks them as the same person, for example one person with two accounts in your product.
 - **Dismiss** says they are different people. You won't be asked about the pair again.
 
 Two records that each have their own user id from your product are two accounts, so they are never merged. You can only link or dismiss them.
 
 Outflare merges on its own in one case only. If your product reports that someone proved they own an email, and that email is held by a record with no user id of its own (for example one from an import or a CRM sync), that record is merged into theirs.
+
+## Deleting a record
+
+There are two ways to get rid of a record:
+
+- **Archive** hides it from lists and keeps everything, so it can be restored. Use it for anyone you just don't want to see.
+- **Delete for good** erases it, for example when someone asks to be forgotten. It can't be undone.
+
+Deleting a person erases their record, every record merged into it, and everything about them: their emails, phones and ids, field history, links, consent, their leads (including any lead with one of their email addresses, so a later sync can't bring them back), the cold email sent to them and their replies, meetings, lifecycle email sent to them alone, product events, website visits, journeys, list memberships and, if they were a partner, their partner data and rewards. Deals and payments stay, without their name, because they are your business's revenue.
+
+Deleting a company erases the company's record, fields and history. Its people and deals stay, no longer linked to it.
+
+Choose **Delete and never contact** (or send `suppress=true`) to also add the person's email addresses, or the company's domains, to the [opt-out list](/docs/guides/who-can-be-emailed/#the-opt-out-list) first. That entry is kept as proof they asked, so a later import or sync can never email them again.
+
+From the API, `DELETE /v1/workspaces/{ws}/records/{record}?suppress=true` returns how many rows it erased, by table. Agents use `delete_record`, and must send the record's `version` as they read it, as for any change. Deals are deleted from [outcomes](/docs/guides/outcomes/) instead.
 
 ## Timeline
 
@@ -111,7 +144,7 @@ Only the person opting in again clears it, for example by creating an account an
 | Permission | Allows | Roles |
 | --- | --- | --- |
 | Read customers | See records, their identities, links, history, timeline and consent, product events, and the catalog | Everyone |
-| Manage customers | Add and change records, identities and links, merge duplicates, send product events and record consent | Owners, admins and operators |
+| Manage customers | Add, change, archive and delete records, identities and links, merge duplicates, send product events and record consent | Owners, admins and operators |
 | Manage catalog | Add and change record types, fields, option lists and events | Owners and admins |
 
 People and tokens kept to some brands see only their brands' records and the ones every brand shares.
@@ -139,6 +172,13 @@ curl -X POST https://app.outflare.ai/v1/workspaces/$WS/customer-events \
          "properties": {"total": 42}}]}'
 ```
 
-To find a record or anything in its history by its words, or to count and add up across records, see [Query and search](/docs/guides/query-and-search/). Agents use `track_customer_events`, `get_record_timeline`, `list_record_consents`, `record_consent`, `list_record_duplicates` and `merge_records`.
+List records filtered by their fields with `attribute=key:value`, repeated for more: values of one field are alternatives, different fields must all match. For example, customers and trials at one company:
+
+```sh
+curl "https://app.outflare.ai/v1/workspaces/$WS/records?type=person&attribute=lifecycle_stage:customer&attribute=lifecycle_stage:trial&attribute=companies:$COMPANY_ID" \
+  -H "Authorization: Bearer $OUTFLARE_TOKEN"
+```
+
+To find a record or anything in its history by its words, or to count and add up across records, see [Query and search](/docs/guides/query-and-search/). Agents use `list_records` (with the same `attribute` filters), `track_customer_events`, `get_record_timeline`, `list_record_consents`, `record_consent`, `list_record_duplicates`, `merge_records` and `delete_record`.
 
 The full reference is under [API](/docs/api/), at `/v1/workspaces/{ws}/catalog`, `/v1/workspaces/{ws}/records` and `/v1/workspaces/{ws}/customer-events`.

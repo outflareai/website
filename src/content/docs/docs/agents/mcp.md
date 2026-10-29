@@ -156,6 +156,7 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `update_mailbox` | Pause or resume a mailbox, or change its name, daily limit, minimum gap or pool | Yes |
 | `add_leads_to_list`, `remove_lead_from_list` | Put existing leads in a list, or take one out | Yes |
 | `delete_lead` | Delete a lead; with `suppress: true` its address also goes on the suppression list (erasure requests) | Yes |
+| `delete_record` | Erase a person or company for good, with their activity (erasure requests); with `suppress: true` their addresses go on the opt-out list first. Needs the record's `version` | Yes |
 | `add_suppressions` | Never email these emails or domains again | Yes |
 | `preview_lead_search` | One page of a people search at a data provider, nothing saved | Yes, provider |
 | `create_lead_list`, `update_lead_list` | A manual list, or one built from a search with an email waterfall, fit scores, dedupe and credit caps | Yes, provider |
