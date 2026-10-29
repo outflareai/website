@@ -2,7 +2,7 @@
 	"version": "2026.10.29",
 	"date": "2026-10-29",
 	"status": "in-progress",
-	"updated": "2026-10-29T21:48:23Z",
+	"updated": "2026-10-29T22:00:11Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -521,7 +521,21 @@
 			"edition": "open-source",
 			"text": "Feedback and What's new: the Feedback button in the top bar turns a bug, idea or question into a GitHub issue or discussion under your own account, and a post on X, with links to good first issues for anyone who wants to build it. What's new lists every release, day by day.",
 			"at": "2026-10-29T21:48:23Z"
+		},
+		{
+			"kind": "launch",
+			"area": "lifecycle",
+			"edition": "open-source",
+			"text": "Journeys can create or update people in your HubSpot. A \"Create or update in your CRM\" step sends their name, company and website, plus any HubSpot properties you fill from their details, through your own HubSpot connection. Deals aren't touched.",
+			"at": "2026-10-29T22:00:11Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Visitors who haven't consented to analytics keep one id for their whole visit, in the tab's session storage and never in a cookie, so every page counts as the same visitor and shows them the same A/B test version. It is gone when the tab closes.",
+			"at": "2026-10-29T22:00:11Z"
 		}
 	],
-	"through": "074f130+a42039a"
+	"through": "2a96595+16d2186"
 }
