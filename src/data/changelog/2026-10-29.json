@@ -2,7 +2,7 @@
 	"version": "2026.10.29",
 	"date": "2026-10-29",
 	"status": "in-progress",
-	"updated": "2026-10-29T17:12:28Z",
+	"updated": "2026-10-29T17:28:49Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -332,7 +332,42 @@
 			"edition": "open-source",
 			"text": "Link building has a starter sequence for pitches, ready in one click, with your AI's opener in the first email and one follow-up. Pitches waiting for your approval now show as a count on Link building and its Pitches tab.",
 			"at": "2026-10-29T17:12:28Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Make your own attribution models and define your conversions in the web app, under Analytics → Channels: windows per channel, channels left out and weights for a model, and for a conversion its event, conditions, value and each ad network's name for it, or start from a preset.",
+			"at": "2026-10-29T17:28:49Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "lifecycle",
+			"edition": "open-source",
+			"text": "Journeys can send a transactional email, record a person's consent to a topic, assign an owner (one member, or spread evenly across several), and open or move their deal to a stage. A deal only ever moves forward, never over a stage a person set.",
+			"at": "2026-10-29T17:28:49Z"
+		},
+		{
+			"kind": "fix",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Partners: the Tolt import also brings over partners Tolt leaves out of its partner list (those who haven't finished onboarding or were only invited), reading each one that a link, customer or commission names.",
+			"at": "2026-10-29T17:28:49Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "A/B tests: a checklist before you start says what would stop a test measuring anything, such as pages that don't show the flag yet, and one click ships the winner to everyone and ends the test.",
+			"at": "2026-10-29T17:28:49Z"
+		},
+		{
+			"kind": "fix",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Partners: a program's figures count every partner, not just the first 500, and the partner, conversion, reward and payout lists load 100 at a time with Load more.",
+			"at": "2026-10-29T17:28:49Z"
 		}
 	],
-	"through": "a54c192+5cb1115"
+	"through": "d39c7da+adce69d"
 }
