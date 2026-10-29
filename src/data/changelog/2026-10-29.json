@@ -2,7 +2,7 @@
 	"version": "2026.10.29",
 	"date": "2026-10-29",
 	"status": "in-progress",
-	"updated": "2026-10-29T17:58:51Z",
+	"updated": "2026-10-29T18:05:10Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -367,7 +367,21 @@
 			"edition": "open-source",
 			"text": "Partners: a program's figures count every partner, not just the first 500, and the partner, conversion, reward and payout lists load 100 at a time with Load more.",
 			"at": "2026-10-29T17:28:49Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Feature flags and A/B tests: a page your server renders can hand its flag decisions to the website script, so visitors see their version in the first paint with no flash of the original. The SDKs build the tag. The A/B test checklist now shows how long visitors waited for their version, and says what to do when some may have seen the original first.",
+			"at": "2026-10-29T18:05:10Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "self-hosting",
+			"edition": "open-source",
+			"text": "The last of projects is gone from the database: briefs, daily caps, reply rules and tokens moved to brands and sequences in an earlier release, and nothing has read projects since.",
+			"at": "2026-10-29T18:05:10Z"
 		}
 	],
-	"through": "df95b5e+c036e72"
+	"through": "bf52189+0dba6ed"
 }
