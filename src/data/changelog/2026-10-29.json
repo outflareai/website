@@ -2,7 +2,7 @@
 	"version": "2026.10.29",
 	"date": "2026-10-29",
 	"status": "in-progress",
-	"updated": "2026-10-29T23:14:29Z",
+	"updated": "2026-10-29T23:37:19Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -584,7 +584,14 @@
 			"edition": "open-source",
 			"text": "Support inbox: mark a connected mailbox for support and customers' emails become conversations your team assigns, tags, notes, answers in the same thread and closes, with first-reply and resolution times. Suggest a reply drafts an answer from your knowledge, only when you ask.",
 			"at": "2026-10-29T23:10:05Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "A/B tests: preview links show you each version on the pages that run the test, without counting you, and you can mark each version as looking right or broken. A broken version stops the test passing its checklist, and a check expires when the version's content changes.",
+			"at": "2026-10-29T23:37:19Z"
 		}
 	],
-	"through": "fed39a5+69fca15"
+	"through": "ed674f6+010e48c"
 }
