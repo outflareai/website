@@ -2,7 +2,7 @@
 	"version": "2026.10.29",
 	"date": "2026-10-29",
 	"status": "in-progress",
-	"updated": "2026-10-29T07:57:07Z",
+	"updated": "2026-10-29T11:57:38Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -45,7 +45,98 @@
 			"edition": "open-source",
 			"text": "Pitch link prospects from Outflare: your own AI writes an opener for each page, you approve it, and the contact goes into one of your sequences. Replies are read for you, agreed links are checked until they're live, and results show live links per pitch.",
 			"at": "2026-10-29T07:42:22Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "general",
+			"edition": "open-source",
+			"text": "News searches, competitor looks, SEO sites' weekly competitor and backlink reads, and scheduled lead list refreshes that fail are now tried again soon (after 15 minutes, then 1, 2 and 4 hours) instead of waiting for their next scheduled run.",
+			"at": "2026-10-29T11:57:38Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Snapchat Ads: sign in with Snapchat to read each ad account's campaigns and daily spend, impressions, swipes and purchases, and send your conversions back to a Snap Pixel through the Conversions API.",
+			"at": "2026-10-29T11:57:38Z"
+		},
+		{
+			"kind": "launch",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Knowledge: one place for what your business knows. Write articles and quick answers (a question and its answer) in folders, per brand or shared, say who may see each one (public, customers through AI, or your team only), and get every version back. Agents can search and add to it over the API and MCP.",
+			"at": "2026-10-29T11:57:38Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "TikTok Ads: sign in with TikTok For Business to read each ad account's campaigns and daily spend, impressions, clicks and conversions, and send your conversions back to a TikTok pixel through the Events API.",
+			"at": "2026-10-29T11:57:38Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "A/B tests: add guardrails a winner mustn't hurt, get an alert when a test is safe to stop, its split breaks or a guardrail is hurt, freeze a test so new visitors stop joining, and duplicate a test. Visitors from your own company are left out.",
+			"at": "2026-10-29T11:57:38Z"
+		},
+		{
+			"kind": "launch",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Eight link building playbooks, one for each way of earning links: competitors' links, broken links, lost links, competitors' dead pages, resource pages, promoting a new page, unlinked mentions, and partners. Outflare can also now search Google on your own DataForSEO or Geonode.",
+			"at": "2026-10-29T11:57:38Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "outreach",
+			"edition": "open-source",
+			"text": "Projects are leaving Outflare: everything now sits in a brand and its sequences. Each project's brief was added to its brand's context (or the company's), sequences in paused projects were paused, and a project's daily cap was split over its sequences, which now have their own daily send limit. Lead lists pick an ideal customer profile to score against.",
+			"at": "2026-10-29T11:57:38Z"
+		},
+		{
+			"kind": "launch",
+			"area": "records",
+			"edition": "open-source",
+			"text": "People and Companies in the web app (CRM → People): search and filter records by brand and field, see each one's timeline, history, emails, links and consent, edit them, and merge or dismiss duplicates. Deleting a person now erases them and their activity for good, for erasure requests (also `DELETE .../records/{record}` and `delete_record`).",
+			"at": "2026-10-29T11:57:38Z"
+		},
+		{
+			"kind": "launch",
+			"area": "lifecycle",
+			"edition": "open-source",
+			"text": "Journeys can now act, not just email: update a field, add or remove a tag, put people in or out of a static list, start or leave another journey, add them to a sequence or stop their whole company's sequences, suppress or unsubscribe them, and alert their owner. Exit criteria end a run at once. People and companies get tags and an owner.",
+			"at": "2026-10-29T11:57:38Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Define your own conversions: any event, filtered on its properties (a call over a minute, a Pro plan payment), with a fixed value or one from the event, and each ad network's name for it. Start from a preset for SaaS, booked calls, e-commerce or lead generation. Attribution credits channels with them.",
+			"at": "2026-10-29T11:57:38Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Agency accounts are gone for now, to keep Outflare simple: a workspace is one company, with its brands inside it. The Agency page, the `/v1/agencies` API, agency tokens (`ofa_`), the MCP tools `list_clients`, `use_client` and `create_client`, and agency white label are removed. Client workspaces stay, with their direct members and data.",
+			"at": "2026-10-29T11:57:38Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Meetings are now events on each person's timeline: meeting.booked, meeting.held, meeting.no_show and meeting.canceled, from your calendars, CRM, the app or the API. Add meeting.booked or meeting.held to your conversion events to credit booked or held calls to the channels that brought them, or start a journey on one.",
+			"at": "2026-10-29T11:57:38Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Tracking templates: paste one into Google, Meta, Microsoft, LinkedIn, Reddit, TikTok, Snapchat, Pinterest, Taboola or Outbrain (Paid ads → Tracking templates) so each paid click lands with its campaign, ad set and ad ids. Website tracking now reads TikTok, Snapchat, Pinterest, Taboola, Outbrain, Quora and Impact click ids, and with consent the Meta and Google pixel cookies.",
+			"at": "2026-10-29T11:57:38Z"
 		}
 	],
-	"through": "7d899a3+78d4ad5"
+	"through": "568cd2a+3370ee7"
 }
