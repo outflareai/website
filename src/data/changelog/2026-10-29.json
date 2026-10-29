@@ -2,7 +2,7 @@
 	"version": "2026.10.29",
 	"date": "2026-10-29",
 	"status": "in-progress",
-	"updated": "2026-10-29T13:21:04Z",
+	"updated": "2026-10-29T13:44:19Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -164,7 +164,14 @@
 			"edition": "open-source",
 			"text": "Monitoring now shows how well paid ad clicks are tracked on each network: with the network's click id, with only the tracking template's ad ids, or with neither, plus template macros a network left unfilled. Two new info alerts flag a network whose ads mostly arrive untracked or whose macros don't fill in.",
 			"at": "2026-10-29T13:21:04Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Taboola Ads: paste your own Backstage API client id and secret to read each advertiser account's campaigns and daily spend, impressions, clicks and conversions, and send your conversions back to Taboola's event-based conversions as server-to-server actions, matched on its click id.",
+			"at": "2026-10-29T13:44:19Z"
 		}
 	],
-	"through": "dcfefe6+de777b8"
+	"through": "a761f77+f81b064"
 }
