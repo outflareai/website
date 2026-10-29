@@ -2,7 +2,7 @@
 	"version": "2026.10.29",
 	"date": "2026-10-29",
 	"status": "in-progress",
-	"updated": "2026-10-29T20:42:59Z",
+	"updated": "2026-10-29T20:59:16Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -479,7 +479,14 @@
 			"edition": "open-source",
 			"text": "Journeys can add people to a Smartlead, Instantly or EmailBison campaign, with their name, company and campaign variables. People who are suppressed, already in the campaign or left out by the sequencer are skipped, and the run history says why.",
 			"at": "2026-10-29T20:42:59Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "New partner setting, for every program: \"Clear payout notes when a partner is deleted\" (Partners → Payouts, on by default). When a partner's record is deleted for good, their payouts stay, but each payout's note and reference, which can hold their name or email, are cleared too. A deleted partner's links keep leading to your site.",
+			"at": "2026-10-29T20:59:16Z"
 		}
 	],
-	"through": "31ba5c4+0dcafdd"
+	"through": "2200c00+68f2081"
 }
