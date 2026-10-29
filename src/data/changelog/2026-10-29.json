@@ -2,7 +2,7 @@
 	"version": "2026.10.29",
 	"date": "2026-10-29",
 	"status": "in-progress",
-	"updated": "2026-10-29T22:44:07Z",
+	"updated": "2026-10-29T22:52:03Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -563,7 +563,14 @@
 			"edition": "open-source",
 			"text": "A/B tests are registered when they start: the hypothesis, goals, plan and the flag's versions and shares are kept as they were, and the hypothesis can no longer change. If the flag is changed while its test runs, the results say exactly what changed, so a test can't quietly measure two different things.",
 			"at": "2026-10-29T22:27:04Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "A/B tests reach an answer sooner: new tests adjust for what each visitor did in the 28 days before they joined (variance reduction, known as CUPED), which removes noise without changing the expected result. Each comparison says how much noise was taken out.",
+			"at": "2026-10-29T22:52:03Z"
 		}
 	],
-	"through": "554fdca+53b06c7"
+	"through": "64bfa79+9faf856"
 }
