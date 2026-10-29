@@ -2,7 +2,7 @@
 	"version": "2026.10.29",
 	"date": "2026-10-29",
 	"status": "in-progress",
-	"updated": "2026-10-29T13:17:16Z",
+	"updated": "2026-10-29T13:21:04Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -150,7 +150,21 @@
 			"edition": "open-source",
 			"text": "Partners: the Tolt import keeps Tolt's own customer id (`cus_...`) on each referred customer, so renewals your backend reports with it still credit the partner (run the import again to add it to customers already imported). An import whose pages don't advance now stops with `pagination_stuck` instead of reading the first page forever.",
 			"at": "2026-10-29T13:06:02Z"
+		},
+		{
+			"kind": "fix",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Tracking templates now match each ad network's own docs: Quora's template carries its campaign, ad set and ad ids, Outbrain's adds campaign and ad names, Taboola's no longer repeats the click id Taboola adds itself, and LinkedIn's explains that its values are chosen as dynamic values on the campaign.",
+			"at": "2026-10-29T13:21:04Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "self-hosting",
+			"edition": "open-source",
+			"text": "Monitoring now shows how well paid ad clicks are tracked on each network: with the network's click id, with only the tracking template's ad ids, or with neither, plus template macros a network left unfilled. Two new info alerts flag a network whose ads mostly arrive untracked or whose macros don't fill in.",
+			"at": "2026-10-29T13:21:04Z"
 		}
 	],
-	"through": "3aac64b+02661ac"
+	"through": "dcfefe6+de777b8"
 }
