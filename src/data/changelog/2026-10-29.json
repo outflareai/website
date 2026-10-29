@@ -2,7 +2,7 @@
 	"version": "2026.10.29",
 	"date": "2026-10-29",
 	"status": "in-progress",
-	"updated": "2026-10-29T13:44:19Z",
+	"updated": "2026-10-29T13:57:19Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -171,7 +171,14 @@
 			"edition": "open-source",
 			"text": "Taboola Ads: paste your own Backstage API client id and secret to read each advertiser account's campaigns and daily spend, impressions, clicks and conversions, and send your conversions back to Taboola's event-based conversions as server-to-server actions, matched on its click id.",
 			"at": "2026-10-29T13:44:19Z"
+		},
+		{
+			"kind": "fix",
+			"area": "api",
+			"edition": "open-source",
+			"text": "Pages and API responses built from several lookups now always show one consistent moment. Before, a cookie scan could briefly show as finished with none of its cookies listed.",
+			"at": "2026-10-29T13:57:19Z"
 		}
 	],
-	"through": "a761f77+f81b064"
+	"through": "ce360cd+f3bad46"
 }
