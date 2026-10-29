@@ -2,7 +2,7 @@
 	"version": "2026.10.29",
 	"date": "2026-10-29",
 	"status": "in-progress",
-	"updated": "2026-10-29T06:44:31Z",
+	"updated": "2026-10-29T07:06:18Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -10,7 +10,14 @@
 			"edition": "open-source",
 			"text": "Journeys now open in a visual flow builder: the trigger at the top, steps running down, checks splitting side by side, live numbers on every step, and problems marked before you go live. Live journeys change through a draft you publish, and people already in one can finish on their version. A new Rules page reads each rule as a sentence, dry-runs it, and starts a journey from it.",
 			"at": "2026-10-29T06:35:11Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Analytics, Search Console, conversions, ads and SEO snapshot syncs, weekly dead-page link reads, scheduled crawls and AI visibility runs that fail are now tried again within minutes to hours (15 minutes, then 1, 2 and every 4 hours), instead of at their next scheduled time.",
+			"at": "2026-10-29T07:06:18Z"
 		}
 	],
-	"through": "b03afb8+0e88959"
+	"through": "a91c811+244fad5"
 }
