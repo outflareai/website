@@ -2,7 +2,7 @@
 	"version": "2026.10.29",
 	"date": "2026-10-29",
 	"status": "in-progress",
-	"updated": "2026-10-29T19:57:05Z",
+	"updated": "2026-10-29T20:10:25Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -458,7 +458,14 @@
 			"edition": "open-source",
 			"text": "Exclusions: journeys, broadcasts and sequences can leave out people on chosen lists, with chosen tags, or at a tagged company, such as \"Competitors\" or \"Active deal: hands off\". Excluded people are skipped with the reason, and a broadcast shows how many it leaves out before you send.",
 			"at": "2026-10-29T19:57:05Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Partners: a Groups tab to add, rename and remove a program's groups, give a group its own commission rate, and pick the default group new partners join. Move partners between groups in bulk from the Partners tab, or through the API and MCP.",
+			"at": "2026-10-29T20:10:25Z"
 		}
 	],
-	"through": "f0652b4+dedb6f5"
+	"through": "db37e93+2aa470a"
 }
