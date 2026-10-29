@@ -2,7 +2,7 @@
 	"version": "2026.10.29",
 	"date": "2026-10-29",
 	"status": "in-progress",
-	"updated": "2026-10-29T16:21:52Z",
+	"updated": "2026-10-29T16:34:38Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -304,7 +304,14 @@
 			"edition": "open-source",
 			"text": "Outbrain Ads: connect your own Outbrain login with Amplify API access to read each marketer's campaigns and daily spend, impressions, clicks and conversions. It only reads; Outbrain's API has no way to send conversions back.",
 			"at": "2026-10-29T16:10:01Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "CRM → Lead finder can send the people it finds into a campaign. Pick one when you start a run: it is saved for that ideal customer profile. People then wait under \"Ready for campaign\" with an \"Add all to campaign\" button, or go in by themselves once you turn on \"Add people without asking\". Unconfirmed emails always wait for you.",
+			"at": "2026-10-29T16:34:38Z"
 		}
 	],
-	"through": "9f550a2+dfecffb"
+	"through": "dd6db78+df104e3"
 }
