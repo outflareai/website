@@ -2,7 +2,7 @@
 	"version": "2026.10.29",
 	"date": "2026-10-29",
 	"status": "in-progress",
-	"updated": "2026-10-29T20:59:16Z",
+	"updated": "2026-10-29T21:14:09Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -486,7 +486,21 @@
 			"edition": "open-source",
 			"text": "New partner setting, for every program: \"Clear payout notes when a partner is deleted\" (Partners → Payouts, on by default). When a partner's record is deleted for good, their payouts stay, but each payout's note and reference, which can hold their name or email, are cleared too. A deleted partner's links keep leading to your site.",
 			"at": "2026-10-29T20:59:16Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Change a page for one version of a split without code: Edit visually opens a page of your site with that version and an editor over it, where you click anything to change its text, hide it, or change a link or an image. Visitors in the version see the changes, and seeing them counts the visitor in the version's A/B test.",
+			"at": "2026-10-29T21:14:09Z"
+		},
+		{
+			"kind": "launch",
+			"area": "lifecycle",
+			"edition": "open-source",
+			"text": "Journeys can ask your own AI model about a person: sort them into choices such as hot, warm or cold, or write a short note. Later steps branch on the answer or use it in emails and webhooks. It uses your own key and AI spend limits.",
+			"at": "2026-10-29T21:14:09Z"
 		}
 	],
-	"through": "2200c00+68f2081"
+	"through": "2156d4d+902d193"
 }
