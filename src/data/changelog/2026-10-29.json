@@ -2,7 +2,7 @@
 	"version": "2026.10.29",
 	"date": "2026-10-29",
 	"status": "in-progress",
-	"updated": "2026-10-29T18:57:43Z",
+	"updated": "2026-10-29T19:05:30Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -409,7 +409,21 @@
 			"edition": "open-source",
 			"text": "A/B tests: when a test ends, your own AI model writes what it taught, and a Learnings library lists every finished test, searchable, with questions answered over them, such as \"what have we learned about headlines?\".",
 			"at": "2026-10-29T18:57:43Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Partners: partners who haven't given payout details are easy to find (\"No payout details\" on the Partners tab, and a `payout_details` filter in the API), and the portal asks them to add theirs. Imported partners (Tolt's API has no payout details) keep their balance until they do, instead of getting a payout nobody can send.",
+			"at": "2026-10-29T19:05:30Z"
+		},
+		{
+			"kind": "launch",
+			"area": "lifecycle",
+			"edition": "open-source",
+			"text": "Playbooks can now set up a whole automation for you: its email drafts, lists, rules and journeys, all as drafts you check and turn on. Four to start: activate new trials, save failed payments and win back cancelled customers, hand off warm prospects the moment they say yes, and catch key accounts at risk. Tell it which events to use, and the journey builder shows where each draft came from.",
+			"at": "2026-10-29T19:05:30Z"
 		}
 	],
-	"through": "90c9ad5+1036389"
+	"through": "7eaca4e+361920c"
 }
