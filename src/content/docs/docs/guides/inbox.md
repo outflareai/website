@@ -41,7 +41,7 @@ The **Inbox** tab lists replies and auto-replies from every mailbox, newest firs
 curl "https://outflare.example.com/v1/workspaces/$WS/inbox?unread=true" -H "Authorization: Bearer $OUTFLARE_TOKEN"
 ```
 
-Filter with `kind` (`reply`, `auto_reply`, `bounce`, `other` or `all`), `unread`, `mailbox_id`, `lead_id`, `sequence_id`, `project_id`, `brand` and `q` (sender, subject or text), and page with `before`. The response includes `unread_replies`. `GET /inbox/{id}` returns the message and its `thread`; `PATCH /inbox/{id}` with `{"read": true}` marks it read.
+Filter with `kind` (`reply`, `auto_reply`, `bounce`, `other` or `all`), `unread`, `mailbox_id`, `lead_id`, `sequence_id`, `brand` and `q` (sender, subject or text), and page with `before`. The response includes `unread_replies`. `GET /inbox/{id}` returns the message and its `thread`; `PATCH /inbox/{id}` with `{"read": true}` marks it read.
 
 ## Labels and working through replies
 
@@ -114,7 +114,7 @@ Once a reply has a label Outflare is sure of, a reply rule acts on it. "Sure" me
 | Out of office | **Wait**: the lead's next email moves to the day after the return date the AI read. Or keep the sequence as it is. |
 | Referral, and wrong person naming someone else | **Offer to add them**: the reply shows an "Add … as a lead" button. **Add them** as a lead on the referrer's lists, marked `referred_by`. Or **add and enrol** them in a sequence you pick. Someone on the opt-out list is never enrolled. |
 
-Choose the workspace's rules under **Rules** in the inbox. A project or a sequence can have its own rules for some labels, which win for its replies, through the API or MCP:
+Choose the workspace's rules under **Rules** in the inbox. A sequence can have its own rules for some labels, which win label by label for its replies, through the API or MCP. Rules set with `project_id` are refused with a 400: projects were removed, and a project's rules became its sequences' rules.
 
 ```sh
 curl -X PUT https://outflare.example.com/v1/workspaces/$WS/reply-rules \

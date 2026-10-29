@@ -32,7 +32,7 @@ curl -X POST https://outflare.example.com/v1/workspaces/$WS/sequences \
   }'
 ```
 
-A new sequence is a `draft` and sends nothing, and has no mailboxes yet. Outflare allocates mailboxes when you start it, enough for `daily_new_limit` new leads a day times its steps, or for `target_daily` sends a day if you set that instead. `team_id`, `priority` and the other allocation settings are explained in [Mailbox allocation](/docs/guides/mailbox-allocation/). Defaults are UTC, Monday to Friday, 09:00 to 17:00 and no cap on new leads per day. Replace the steps later with `PUT /v1/workspaces/{ws}/sequences/{id}/steps`.
+A new sequence is a `draft` and sends nothing, and has no mailboxes yet. Outflare allocates mailboxes when you start it, enough for `daily_new_limit` new leads a day times its steps, or for `target_daily` sends a day if you set that instead. `team_id`, `priority` and the other allocation settings are explained in [Mailbox allocation](/docs/guides/mailbox-allocation/). Defaults are UTC, Monday to Friday, 09:00 to 17:00 and no cap on new leads per day. To cap everything a sequence sends, follow-ups included, set `daily_send_limit` (1 to 1,000,000, or null for no cap): it counts every step in any 24 hours, on top of each mailbox's and domain's own limits. Replace the steps later with `PUT /v1/workspaces/{ws}/sequences/{id}/steps`.
 
 ## Steps and templates
 
@@ -84,8 +84,7 @@ A scheduler looks for leads whose next step is due every few seconds and queues 
 | `no_mailbox_allocated` | No ready mailbox is allocated to the sequence yet. The [Allocation](/docs/guides/mailbox-allocation/) page says why: usually not enough free ready mailboxes. |
 | `sender_mailbox_gone` | The mailbox that started this lead's thread was removed. Follow-ups wait until you cancel them or hand them to another mailbox. |
 | `token_daily_budget` | The sequence was created by an API token whose daily send budget is used up. |
-| `project_paused` | The sequence's [project](/docs/guides/projects/) is paused or archived. |
-| `project_daily_limit` | The project's daily send limit, shared by all its sequences, is used up. |
+| `sequence_daily_send_limit` | The sequence's `daily_send_limit` is used up: it has sent that many emails in the last 24 hours, every step counted. |
 
 New leads go to the least-used mailbox allocated to the sequence. Follow-ups always come from the mailbox that started the thread, even after that mailbox is moved to another sequence: it keeps sending the follow-ups it owes there. If the mailbox is deleted, the follow-ups wait for you to cancel them or hand them to another mailbox, which starts a new thread.
 

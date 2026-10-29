@@ -1,13 +1,13 @@
 ---
 title: Missions
-description: Give an agent a goal inside a project, with a brief, a mode, limits and approvals, and see every call it makes.
+description: Give an agent a goal, with your brand's context, a mode, limits and approvals, and see every call it makes.
 sidebar:
   order: 3
 ---
 
 <span class="pill shipped">Shipped</span> Missions in the REST API, the MCP server and the web app.
 
-A **mission** is a goal an agent works toward inside a [project](/docs/guides/projects/), such as "book 10 meetings with fintech CFOs in Australia by 30 November". Type the goal in plain words and the AI model you chose drafts the plan, or let your own agent start one. Either way the agent reads the project's brief, rehearses, sends you its plan, and works within the mode and limits you approve. You see every call it made and why, approve or reject its changes, answer its questions, and pause or stop it at any time, from the dashboard or over the API.
+A **mission** is a goal an agent works toward, such as "book 10 meetings with fintech CFOs in Australia by 30 November". Type the goal in plain words and the AI model you chose drafts the plan, or let your own agent start one. Either way the agent reads your company's context, rehearses, sends you its plan, and works within the mode and limits you approve. You see every call it made and why, approve or reject its changes, answer its questions, and pause or stop it at any time, from the dashboard or over the API. A mission can belong to a [brand](/docs/guides/brands/); the agent then also reads that brand's context.
 
 ![The Missions list: status, how changes run, progress toward the goal, and what needs you](/screens/missions-list.png)
 
@@ -17,7 +17,7 @@ You don't need an agent of your own. Connect an [AI model](/docs/agents/ai-model
 
 ![The goal box on the Missions page](/screens/goal-box.png)
 
-The model drafts the mission from a summary of your workspace: mailbox counts and capacity, lead and suppression counts, sequence names, the project brief and which connectors are connected. **Lead lists, email addresses and credentials are never sent.** The draft holds a name, a goal to track, the steps, instructions, email and spend limits, an end date, the connectors it needs (as connect requests) and its questions. It is saved waiting for your approval, so nothing runs yet.
+The model drafts the mission from a summary of your workspace: mailbox counts and capacity, lead and suppression counts, sequence names, the company context and which connectors are connected. **Lead lists, email addresses and credentials are never sent.** The draft holds a name, a goal to track, the steps, instructions, email and spend limits, an end date, the connectors it needs (as connect requests) and its questions. It is saved waiting for your approval, so nothing runs yet.
 
 ![A planned mission: its question and the connector it needs, waiting for approval](/screens/planned-mission.png)
 
@@ -45,7 +45,7 @@ When you approve a mission, choose who carries it out.
 ## How a mission runs
 
 1. **The mission is created**, by Outflare from your goal or by your agent. It starts as a draft or waiting for approval. Nothing it changes in a draft runs: every write is a dry run.
-2. **It reads the brief and rehearses.** `GET /v1/workspaces/{ws}/missions/{id}` returns the mission, the project brief, the limits, progress, open requests and your latest notes.
+2. **It reads the context and rehearses.** `GET /v1/workspaces/{ws}/missions/{id}` returns the mission, its brand's context (`brand`, null for a mission every brand shares), the limits, progress, open requests and your latest notes.
 3. **It asks for the tools it needs.** If it needs an email verifier or a data provider that isn't connected, it posts a connect request. You connect it (paste the key or sign in), or press **Send a link** to get a one-time link for whoever holds the key; they don't need an Outflare account. The request closes by itself once the tool is connected, and Outflare's agent carries on straight away. If the tool is already connected, the request is refused with `already_connected`, so an agent never asks twice.
 4. **It submits its plan.** You approve it and choose how its changes run.
 5. **It works**, posting progress and questions. Your messages reach it at its next check-in.
@@ -129,7 +129,7 @@ When you create the agent's token, choose **Can make changes**: it includes `mis
 | Endpoint | What |
 | --- | --- |
 | `GET`, `POST /v1/workspaces/{ws}/missions` | List and create |
-| `GET`, `PATCH .../missions/{id}` | Check in (with the brief and notes); change |
+| `GET`, `PATCH .../missions/{id}` | Check in (with the brand's context and notes); change |
 | `POST /v1/workspaces/{ws}/missions/plan` | Draft a mission from a goal with your AI model |
 | `POST .../missions/{id}/submit`, `/approve` | Send the plan; approve and choose the mode and who runs it |
 | `POST .../missions/{id}/pause`, `/resume`, `/stop`, `/complete` | Control it; finish with a report |

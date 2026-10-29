@@ -29,9 +29,9 @@ Authorization: Bearer oft_...
 Rules that keep tokens safe to hand to automation:
 
 - A token is bound to one workspace. It cannot read any other workspace.
-- A token can also be bound to one [project](/docs/guides/projects/#agents-and-project-tokens) with `"project_id"`. It then sees only that project's records, and endpoints that can't yet keep it inside the project refuse it with a 403.
+- A token can also be kept to one [brand](/docs/guides/brands/#keep-people-and-tokens-to-some-brands) with `"brand"` (its handle or id) when you create it. It then sees that brand's records plus shared ones, changes only its brand's, and gets a 403 from endpoints that need every brand. Tokens can no longer be bound to a project: a new token sent with `"project_id"` is refused with a 400, and tokens that were bound to a project became workspace tokens with the same scopes ([Projects were removed](/docs/guides/projects/)).
 - A token holds only the scopes it was given, and never more than the person who created it has. Any scope in an area includes reading it, so `leads.manage` can list leads too; it cannot read mailboxes.
-- `GET /v1/whoami` tells a token its workspace (ID, slug and name), project, scopes and expiry, so a script holding only a token can find everything else.
+- `GET /v1/whoami` tells a token its workspace (ID, slug and name), brand, scopes and expiry, so a script holding only a token can find everything else.
 - Actions taken with a token are recorded in the audit log under the token's name.
 - Rename a token or change its scopes with `PATCH /v1/workspaces/{ws}/api-tokens/{id}` (`name`, `scopes`). Adding a scope needs the caller to have it; taking one away is always allowed; a token can't change itself.
 - A `403` for a missing scope says how to get it, with a link to the token (or, for a connected AI app, to its switches).

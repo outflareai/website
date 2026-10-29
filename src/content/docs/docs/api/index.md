@@ -47,7 +47,7 @@ Every operation in the contract says who may call it in `x-outflare-access`, so 
 | `x-outflare-access` | Who may call it |
 | --- | --- |
 | `{ scope: leads.manage }` | A member or workspace API token with that scope |
-| `{ scope: leads.read, project_tokens: true }` | The same, and project tokens (which only see their project) |
+| `{ scope: leads.read, brand_limited: true }` | The same, including people and tokens kept to some brands (who see only their brands' records and shared ones) |
 | `{ agency_role: admin, agency_tokens: true }` | Agency members with that role or above, and the agency's tokens |
 | `{ signed_in: true }` | Only a signed-in person, never an API token |
 | (none) | Anyone: the endpoint is public |

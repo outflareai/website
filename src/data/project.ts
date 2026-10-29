@@ -131,9 +131,9 @@ export const milestones: Milestone[] = [
 	},
 	{
 		step: 14,
-		title: 'Projects',
+		title: 'Projects (removed)',
 		status: 'shipped',
-		summary: 'One go-to-market motion per project: a versioned brief people and agents work from, the domains, mailboxes, lead lists and sequences that run it, one pause switch, one daily limit, and API tokens that stay inside it.',
+		summary: 'One go-to-market motion per project with a versioned brief. Shipped, then removed in favour of brands and sequences: briefs moved to brand context, and each sequence got its own daily send limit.',
 		docs: '/docs/guides/projects/',
 	},
 	{
@@ -161,14 +161,14 @@ export const milestones: Milestone[] = [
 		step: 18,
 		title: 'Lead lists from data providers',
 		status: 'shipped',
-		summary: "Search the customer's own Apollo or People Data Labs account into a lead list, find emails through a waterfall of providers with a cache and credit caps, score fit against the project's ideal customer, leave out anyone suppressed or already contacted, and refresh on a schedule.",
+		summary: "Search the customer's own Apollo or People Data Labs account into a lead list, find emails through a waterfall of providers with a cache and credit caps, score fit against an ideal customer profile, leave out anyone suppressed or already contacted, and refresh on a schedule.",
 		docs: '/docs/guides/lead-lists/',
 	},
 	{
 		step: 19,
 		title: 'Outcomes and cost',
 		status: 'shipped',
-		summary: 'Meetings from Google Calendar, Outlook, Calendly, Cal.com and HubSpot, deals from HubSpot, a spend ledger tagged by project and by who spent it, and cost per meeting by project and sequence, with warehouse export.',
+		summary: 'Meetings from Google Calendar, Outlook, Calendly, Cal.com and HubSpot, deals from HubSpot, a spend ledger tagged by sequence and by who spent it, and cost per meeting by sequence and brand, with warehouse export.',
 		docs: '/docs/guides/outcomes/',
 	},
 	{

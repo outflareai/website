@@ -88,7 +88,7 @@ An app that can't sign in can send an [API token](/docs/api/authentication/) ins
 When an app connects, Outflare shows who is asking, the workspace it will work in (pick one if you are in more than one) and a switch for each thing it may do. Everything starts on except spending:
 
 - **See your workspace**: always on. It reads leads, sequences, replies, mailboxes and results.
-- **Company context and memories**, **Leads and lists**, **Sequences and projects**, **Replies**, **Mailboxes, domains and connectors**, **SEO** and **Missions**: turn off anything you don't want it to change. **Read only** turns them all off at once.
+- **Company context and memories**, **Leads and lists**, **Sequences and customer profiles**, **Replies**, **Mailboxes, domains and connectors**, **SEO** and **Missions**: turn off anything you don't want it to change. **Read only** turns them all off at once.
 - **Spend money**: off unless you switch it on. Left off, every purchase of domains or mailboxes waits for you to approve it in Outflare.
 
 You only see the switches your role allows; viewers can only give read access.

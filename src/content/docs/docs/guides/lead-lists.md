@@ -1,6 +1,6 @@
 ---
 title: Lead lists
-description: Build lead lists from your own Apollo, People Data Labs or MoltSets account, find emails through a waterfall of providers with a cache and credit caps, score fit against the project's ideal customer, and refresh on a schedule.
+description: Build lead lists from your own Apollo, People Data Labs or MoltSets account, find emails through a waterfall of providers with a cache and credit caps, score fit against an ideal customer profile, and refresh on a schedule.
 sidebar:
   order: 6.5
 ---
@@ -11,7 +11,7 @@ A lead list is a group of leads you can add to a sequence. Make one by hand (CSV
 
 Everything here works the same from the web app (**Lists**), the REST API and the MCP server. For a list that fills itself from your customer records, see [Smart lists](/docs/guides/smart-lists/).
 
-![The Lead lists page: each list's source, project, size, last run and refresh schedule](/screens/lead-lists.png)
+![The Lead lists page: each list's source, size, last run and refresh schedule](/screens/lead-lists.png)
 
 ## Connect a data provider
 
@@ -33,7 +33,7 @@ Paste an API key in **Connectors** (or from the Lead lists page). See [Connector
 
 ![A new list: the search, a free preview of ten people, then the email waterfall and guard rails](/screens/lead-list-preview.png)
 
-1. **Pick who to find.** Job titles, seniority, company size, industries, person and company location, company domains and keywords. A list in a project can copy the project's ideal customer profile into its search in one click.
+1. **Pick who to find.** Job titles, seniority, company size, industries, person and company location, company domains and keywords. A list with an [ideal customer profile](/docs/guides/ideal-customers/) can copy the profile's filters into its search in one click.
 2. **Preview.** Ten people from the search, with the total number of matches. Nothing is saved and no credits are spent.
 3. **Choose how to find emails.** The waterfall: providers are asked in order until one returns an email, so you only pay the next provider for people the first one missed. Results are cached for 180 days, so a refresh never pays twice for the same person.
 4. **Set the guard rails.**
@@ -54,7 +54,7 @@ curl -X POST "https://outflare.example.com/v1/workspaces/$WS/lead-lists/preview"
 # Create the list and build it
 curl -X POST "https://outflare.example.com/v1/workspaces/$WS/lead-lists" \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" \
-  -d '{"name": "AU growth leaders", "project_id": "'$PROJECT'", "search_integration_id": "'$APOLLO'",
+  -d '{"name": "AU growth leaders", "profile_id": "'$PROFILE'", "search_integration_id": "'$APOLLO'",
        "filters": {"titles": ["Head of Growth"], "locations": ["Australia"], "employee_ranges": ["51-200"]},
        "enrich_integration_ids": ["'$APOLLO'", "'$PROSPEO'"], "max_leads": 300, "credit_cap": 400,
        "min_score": 40, "refresh_every_days": 7, "build": true}'
@@ -74,7 +74,7 @@ An *enrich* run (`{"kind": "enrich"}`) fills empty fields (name, title, company,
 
 ## Fit score
 
-Every lead in a searched list gets a 0 to 100 fit score, with the reasons. It is scored against the project's ideal customer profile, where any part the list's own search sets wins; a list outside a project is scored against its search. The parts: title (35), seniority (20), company size (15), industry (15) and location (15). Only the parts the profile sets count, and seniority is guessed from the title when the provider does not say. It is plain rules, so the same lead always gets the same score.
+Every lead in a searched list gets a 0 to 100 fit score, with the reasons. It is scored against the list's [ideal customer profile](/docs/guides/ideal-customers/) (`profile_id`), where any part the list's own search sets wins; a list without one is scored against its search. The parts: title (35), seniority (20), company size (15), industry (15) and location (15). Only the parts the profile sets count, and seniority is guessed from the title when the provider does not say. It is plain rules, so the same lead always gets the same score.
 
 ## Where a lead came from
 
@@ -86,7 +86,7 @@ Anything that can send an HTTP request can add leads: a Clay HTTP API column, Za
 
 ## Permissions
 
-Reading lists and runs needs `leads.read`; creating, editing, running and deleting needs `leads.manage` (see [Workspaces and access](/docs/guides/workspaces-and-access/)). A project token sees only its project's lists, and creates lists inside its project.
+Reading lists and runs needs `leads.read`; creating, editing, running and deleting needs `leads.manage` (see [Workspaces and access](/docs/guides/workspaces-and-access/)). A brand token sees only its brand's lists and the shared ones, and creates lists in its brand.
 
 ## Agents
 

@@ -316,11 +316,13 @@ Every type is also in the API document, under `webhooks:` and in the `WebhookEve
 
 ### Projects
 
+Projects were removed ([Projects were removed](/docs/guides/projects/)). These events stay in the list so existing webhooks keep working, but they are never sent.
+
 | Event | When |
 | --- | --- |
-| `project.created` | A project was created. |
-| `project.updated` | A project's brief or settings changed. |
-| `project.deleted` | A project was deleted. |
+| `project.created` | Never sent. |
+| `project.updated` | Never sent. |
+| `project.deleted` | Never sent. |
 
 ### Missions
 
