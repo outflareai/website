@@ -2,7 +2,7 @@
 	"version": "2026.10.29",
 	"date": "2026-10-29",
 	"status": "in-progress",
-	"updated": "2026-10-29T18:05:10Z",
+	"updated": "2026-10-29T18:17:18Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -381,7 +381,14 @@
 			"edition": "open-source",
 			"text": "The last of projects is gone from the database: briefs, daily caps, reply rules and tokens moved to brands and sequences in an earlier release, and nothing has read projects since.",
 			"at": "2026-10-29T18:05:10Z"
+		},
+		{
+			"kind": "launch",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "Knowledge answers: ask your knowledge base a question and get a short answer from your own AI model with the articles it used, for your team or for customers (who only ever hear what you've marked for them). Agents and missions now check your knowledge before stating facts, and find it by meaning as well as by words.",
+			"at": "2026-10-29T18:17:18Z"
 		}
 	],
-	"through": "bf52189+0dba6ed"
+	"through": "9ea2a25+d655a1a"
 }
