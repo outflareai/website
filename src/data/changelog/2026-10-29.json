@@ -2,7 +2,7 @@
 	"version": "2026.10.29",
 	"date": "2026-10-29",
 	"status": "in-progress",
-	"updated": "2026-10-29T22:17:16Z",
+	"updated": "2026-10-29T22:27:04Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -542,7 +542,28 @@
 			"edition": "open-source",
 			"text": "Send a conversion you've defined back to an ad platform, not only a raw event: only the events that meet its conditions go (a call over a minute, an order over $100), worth what it says and named as that network expects.",
 			"at": "2026-10-29T22:17:16Z"
+		},
+		{
+			"kind": "fix",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Partners: the Tolt import shows how many of each kind it read beside how many Tolt reports, asks Tolt once more when a list seems to stop early, and says how many partners Tolt's list left out and whether any of them has referrals. A promo code whose partner the import can't find is listed with its field names, and a partner Tolt won't give by id with Tolt's answer.",
+			"at": "2026-10-29T22:27:04Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Tracking health on the Paid ads page shows, for your workspace, how each network's paid clicks arrive (with their click id, only the template's ad ids, or untracked), which campaigns spend without a tracked visit, and which platform is refusing the conversions you send back, each with what to fix.",
+			"at": "2026-10-29T22:27:04Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "A/B tests are registered when they start: the hypothesis, goals, plan and the flag's versions and shares are kept as they were, and the hypothesis can no longer change. If the flag is changed while its test runs, the results say exactly what changed, so a test can't quietly measure two different things.",
+			"at": "2026-10-29T22:27:04Z"
 		}
 	],
-	"through": "475aeef+85592da"
+	"through": "095117e+3b04563"
 }
