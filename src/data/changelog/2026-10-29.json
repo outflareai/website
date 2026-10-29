@@ -2,7 +2,7 @@
 	"version": "2026.10.29",
 	"date": "2026-10-29",
 	"status": "in-progress",
-	"updated": "2026-10-29T18:36:43Z",
+	"updated": "2026-10-29T18:42:10Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -388,14 +388,7 @@
 			"edition": "open-source",
 			"text": "Knowledge answers: ask your knowledge base a question and get a short answer from your own AI model with the articles it used, for your team or for customers (who only ever hear what you've marked for them). Agents and missions now check your knowledge before stating facts, and find it by meaning as well as by words.",
 			"at": "2026-10-29T18:17:18Z"
-		},
-		{
-			"kind": "improvement",
-			"area": "partners",
-			"edition": "open-source",
-			"text": "Partners: reward webhooks now carry the sale behind them (its amount, the charge id your backend sent, and the customer's own user id), plus when the hold ends, and `partner_payout.paid` lists the rewards it paid. A backend that handled Tolt's commission webhooks finds the same facts without extra calls.",
-			"at": "2026-10-29T18:36:43Z"
 		}
 	],
-	"through": "224ed63+7bfb074"
+	"through": "63706b2+2f3ed1b"
 }
