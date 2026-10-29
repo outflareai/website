@@ -2,7 +2,7 @@
 	"version": "2026.10.29",
 	"date": "2026-10-29",
 	"status": "in-progress",
-	"updated": "2026-10-29T14:36:25Z",
+	"updated": "2026-10-29T14:51:12Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -213,7 +213,21 @@
 			"edition": "open-source",
 			"text": "Test a journey before it reaches anyone: pick a person, and the flow lights up the path they would take, with each step saying what it would do, the subject of every email they'd get or why they'd be skipped. Nothing is sent or saved. Send any check the other way to see that path too. Also over the API and MCP.",
 			"at": "2026-10-29T14:25:28Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Partners: program settings have an Install section with the website snippet for HTML, Next.js and Google Tag Manager, with your site key filled in, and the backend calls that report sign-ups and sales.",
+			"at": "2026-10-29T14:51:12Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "Projects are gone from the API and the MCP server: brands and sequences replace them. A brand's mailboxes now send for any of its sequences, a project's reply rules became its sequences' rules, and outcome reports group by sequence or brand. Older clients that still send `project_id` keep working; it is ignored, except on new API tokens and reply rules, where it is refused.",
+			"at": "2026-10-29T14:51:12Z"
 		}
 	],
-	"through": "62e125e+c904707"
+	"through": "5de4302+84bf1ae"
 }
