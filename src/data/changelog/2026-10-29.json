@@ -2,7 +2,7 @@
 	"version": "2026.10.29",
 	"date": "2026-10-29",
 	"status": "in-progress",
-	"updated": "2026-10-29T19:49:22Z",
+	"updated": "2026-10-29T19:57:05Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -444,7 +444,21 @@
 			"edition": "open-source",
 			"text": "CRM → Lead finder is rebuilt for big runs: a front page with what needs you and each search's results, and runs whose companies and people load a page at a time with filters and bulk actions. You can also pause a run and keep people out of its campaign.",
 			"at": "2026-10-29T19:49:22Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "self-hosting",
+			"edition": "open-source",
+			"text": "Removes the database tables left over from agency accounts, which were removed in v0.26.0.",
+			"at": "2026-10-29T19:57:05Z"
+		},
+		{
+			"kind": "launch",
+			"area": "lifecycle",
+			"edition": "open-source",
+			"text": "Exclusions: journeys, broadcasts and sequences can leave out people on chosen lists, with chosen tags, or at a tagged company, such as \"Competitors\" or \"Active deal: hands off\". Excluded people are skipped with the reason, and a broadcast shows how many it leaves out before you send.",
+			"at": "2026-10-29T19:57:05Z"
 		}
 	],
-	"through": "75e8fd7+23c691f"
+	"through": "f0652b4+dedb6f5"
 }
