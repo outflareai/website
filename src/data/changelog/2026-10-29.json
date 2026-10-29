@@ -2,7 +2,7 @@
 	"version": "2026.10.29",
 	"date": "2026-10-29",
 	"status": "in-progress",
-	"updated": "2026-10-29T15:58:12Z",
+	"updated": "2026-10-29T16:10:01Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -276,7 +276,35 @@
 			"edition": "open-source",
 			"text": "Deleting a partner's record now keeps what they earned and were paid: their rewards and payouts move to an archived \"Erased partner\" record with no name, email or payout details, so commission totals and payout history still add up. Their referrals and portal sign-ins are still erased.",
 			"at": "2026-10-29T15:41:37Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Conversions sent back to TikTok and Snapchat now also match on their pixels' own cookies (`_ttp` and `_scid`), read only once the visitor allows marketing, and the tracking templates for TikTok, Snapchat and Pinterest show which connector sends their conversions.",
+			"at": "2026-10-29T16:10:01Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Apple Ads (formerly Apple Search Ads): connect your own Apple Ads API user to read each ad account's campaigns and daily spend, impressions, taps and installs, for App Store and Apple Maps campaigns. It only reads; installs are measured in your app, so nothing is sent back.",
+			"at": "2026-10-29T16:10:01Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Amazon Ads: sign in with Amazon to read each advertising profile's Sponsored Products campaigns and daily spend, impressions, clicks, purchases and sales, in every marketplace and region the sign-in reaches.",
+			"at": "2026-10-29T16:10:01Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Outbrain Ads: connect your own Outbrain login with Amplify API access to read each marketer's campaigns and daily spend, impressions, clicks and conversions. It only reads; Outbrain's API has no way to send conversions back.",
+			"at": "2026-10-29T16:10:01Z"
 		}
 	],
-	"through": "125a662+6c4619e"
+	"through": "72185d1+d17ce3b"
 }
