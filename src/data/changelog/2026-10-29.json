@@ -2,7 +2,7 @@
 	"version": "2026.10.29",
 	"date": "2026-10-29",
 	"status": "in-progress",
-	"updated": "2026-10-29T07:30:22Z",
+	"updated": "2026-10-29T07:42:22Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -17,7 +17,35 @@
 			"edition": "open-source",
 			"text": "Analytics, Search Console, conversions, ads and SEO snapshot syncs, weekly dead-page link reads, scheduled crawls and AI visibility runs that fail are now tried again within minutes to hours (15 minutes, then 1, 2 and every 4 hours), instead of at their next scheduled time.",
 			"at": "2026-10-29T07:06:18Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Partners: affiliates can get each conversion sent to their own tracker with a postback URL (set on the portal or by your team), and due payouts download as CSV with each partner's payout details for your payout tool.",
+			"at": "2026-10-29T07:42:22Z"
+		},
+		{
+			"kind": "launch",
+			"area": "outreach",
+			"edition": "open-source",
+			"text": "Journalists: the news watch now reads each new article's byline, finds the author's address at the outlet with the free email finder, and keeps them as a person record with what they wrote. Make a media list of the journalists who cover a topic as a smart list that keeps itself up to date.",
+			"at": "2026-10-29T07:42:22Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "A/B tests: break results down by device, source, country, or new and returning visitors, corrected so a lucky group doesn't mislead, and see each version's lift over the original day by day.",
+			"at": "2026-10-29T07:42:22Z"
+		},
+		{
+			"kind": "launch",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Pitch link prospects from Outflare: your own AI writes an opener for each page, you approve it, and the contact goes into one of your sequences. Replies are read for you, agreed links are checked until they're live, and results show live links per pitch.",
+			"at": "2026-10-29T07:42:22Z"
 		}
 	],
-	"through": "950ccb7+27931cd"
+	"through": "6bc60b5+884abf5"
 }
