@@ -2,7 +2,7 @@
 	"version": "2026.10.29",
 	"date": "2026-10-29",
 	"status": "in-progress",
-	"updated": "2026-10-29T22:52:03Z",
+	"updated": "2026-10-29T22:58:25Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -570,7 +570,14 @@
 			"edition": "open-source",
 			"text": "A/B tests reach an answer sooner: new tests adjust for what each visitor did in the 28 days before they joined (variance reduction, known as CUPED), which removes noise without changing the expected result. Each comparison says how much noise was taken out.",
 			"at": "2026-10-29T22:52:03Z"
+		},
+		{
+			"kind": "launch",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Partners: `outflare.signup(email)` in the website script credits a partner with a sign-up straight from the browser, for sites whose backend reports nothing. It pays no sign-up reward unless the program allows it. Your backend can also credit a sign-up by the visitor's `anonymous_id`.",
+			"at": "2026-10-29T22:58:25Z"
 		}
 	],
-	"through": "64bfa79+9faf856"
+	"through": "2bec3b4+23f8626"
 }
