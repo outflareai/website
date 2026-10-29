@@ -2,7 +2,7 @@
 	"version": "2026.10.29",
 	"date": "2026-10-29",
 	"status": "in-progress",
-	"updated": "2026-10-29T15:08:19Z",
+	"updated": "2026-10-29T15:13:24Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -248,7 +248,28 @@
 			"edition": "open-source",
 			"text": "Partners: the Tolt import now reads Tolt's customers list. A kind it can't read is noted as `unreadable`, with Tolt's HTTP status and the shape of its answer, instead of stopping the run, so transactions and commissions still come over.",
 			"at": "2026-10-29T15:08:19Z"
+		},
+		{
+			"kind": "fix",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Partners: the Tolt import reads Tolt's current API (v2), so referred customers come over, and partners of every status (pending, rejected and suspended too) are read. Tolt's API has no payout details, so partners give theirs on the portal.",
+			"at": "2026-10-29T15:13:24Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Partners: Import from Tolt lists the programs in your Tolt account to pick from, instead of asking for a program id, and picks the only active one by itself.",
+			"at": "2026-10-29T15:13:24Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Pinterest Ads: sign in with Pinterest to read each ad account's campaigns and daily spend, impressions, clicks and conversions, and send your conversions back through Pinterest's Conversions API with your own conversion access token.",
+			"at": "2026-10-29T15:13:24Z"
 		}
 	],
-	"through": "1045061+93fd40f"
+	"through": "2985481+8b260e3"
 }
