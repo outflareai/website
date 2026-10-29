@@ -30,7 +30,7 @@ The preview updates as you type and saves nothing. It shows every domain and mai
 
 ![A new plan with its live preview](/screens/infrastructure-new-plan.png)
 
-Save it as a draft. A draft buys nothing and can be edited or deleted. If the plan belongs to a [project](/docs/guides/projects/), its domains and mailboxes join that project.
+Save it as a draft. A draft buys nothing and can be edited or deleted. If the plan belongs to a [brand](/docs/guides/brands/) (`brand_id`), its domains and mailboxes join that brand.
 
 ## Approve and build
 

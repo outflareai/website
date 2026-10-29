@@ -51,8 +51,9 @@ When a person or company is deleted, merged or archived, or a reply, meeting or 
 | `leads`, `sequences`, `enrollments`, `messages`, `replies` | Outreach and the mail it got back, without email bodies |
 | `deals`, `meetings`, `spend` | Outcomes, and what you spent |
 | `emails`, `email_events`, `broadcasts` | Lifecycle email and what happened to it |
-| `visits`, `social_posts`, `brands`, `projects` | Website visits, your social posts, brands and projects |
+| `visits`, `social_posts`, `brands` | Website visits, your social posts and brands |
 
+- Projects were removed, so there is no `projects` view. `sequences`, `deals`, `meetings` and `spend` keep a `project_id` column that is always null, so saved queries that name it still run.
 - A query is one `SELECT`. It never changes anything, so an agent kept to missions can run it without one.
 - Up to 100 rows come back by default, and at most 1,000. A query running over 15 seconds is stopped, so count and group rather than list.
 

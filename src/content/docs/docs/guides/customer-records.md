@@ -57,7 +57,7 @@ Every deal is one record, wherever it came from: made in the CRM, opened by a [r
 - **Fields.** A deal has a stage (lead, qualified, meeting booked, proposal, negotiation, won, lost), a value, a close date, its people and its company. They match Attio's, so deals from Attio fit as they are. If you made your own Deal type before, it's kept, and gets any of these fields it didn't have, plus won and lost stages.
 - **Won and lost** close a deal and count as won or lost in outcomes. Every other stage is open.
 - **People and company.** A deal logged for a lead is linked to that person, and to their company when the deal has none.
-- **Outreach.** A deal made in the CRM is credited to the outreach that reached its person, the same way a HubSpot deal is: the sequence and project that emailed them, and their latest meeting.
+- **Outreach.** A deal made in the CRM is credited to the outreach that reached its person, the same way a HubSpot deal is: the sequence that emailed them, and their latest meeting.
 - **HubSpot** stays the source of truth for the deals it syncs: the next sync of a deal writes its name, stage, value and close date again.
 - **Archiving** a deal takes it out of outcomes and reports.
 

@@ -17,7 +17,7 @@ Outflare remembers the business, not the conversation.
 | --- | --- |
 | **Company context**: your company, website, what you do, goals, voice and rules | The conversation itself |
 | **Memories**: short preferences, decisions, facts and feedback, such as "Never mention pricing in a first email" | Drafts you haven't accepted |
-| **Project briefs**: each motion's offer, audience, market and ideal customer | The agent's reasoning |
+| **Brand context and ideal customers**: each brand's offer, audience and voice, and who you sell to | The agent's reasoning |
 | **History**: every change, mission and call, in the audit log and events feed | |
 
 Chat transcripts are never stored. When you tell an agent something lasting, it saves it as a one-line memory and tells you, so you can correct it. Memories are notes for agents, never permissions: your limits, token scopes and the send policy still decide what runs.
@@ -35,7 +35,7 @@ Until the company name, what you do, goals and voice are filled in, agents ask f
 
 ## In Claude, ChatGPT and Cursor
 
-The MCP server tells every agent to start with `get_context`. One call returns the company context, pinned and recent memories, your projects and the workspace status. The agent asks only for what is missing, saves your answers with `update_context`, and saves anything lasting you say with `remember`.
+The MCP server tells every agent to start with `get_context`. One call returns the company context, pinned and recent memories, your brands and the workspace status. The agent asks only for what is missing, saves your answers with `update_context`, and saves anything lasting you say with `remember`.
 
 Try these in any connected client:
 

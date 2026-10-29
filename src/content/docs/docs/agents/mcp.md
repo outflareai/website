@@ -13,7 +13,7 @@ There are two ways in. The MCP server is the quickest one for Claude, ChatGPT, C
 
 ## The MCP server <span class="pill shipped">Shipped</span>
 
-[`@outflare/mcp`](https://github.com/outflareai/outflare/tree/main/mcp) is an [MCP](https://modelcontextprotocol.io) server that gives an agent 542 tools over the API (3 more in agency mode): run [missions](/docs/agents/missions/) toward a goal with approvals, read and update the brief of the project it works on, check sending domains and mailbox warm-up, import leads, check them against the suppression list, build, preview and start sequences, see and change which mailboxes each sequence sends from, and read and answer replies.
+[`@outflare/mcp`](https://github.com/outflareai/outflare/tree/main/mcp) is an [MCP](https://modelcontextprotocol.io) server that gives an agent 536 tools over the API (3 more in agency mode): run [missions](/docs/agents/missions/) toward a goal with approvals, read and update the context of the brand it works on, check sending domains and mailbox warm-up, import leads, check them against the suppression list, build, preview and start sequences, see and change which mailboxes each sequence sends from, and read and answer replies.
 
 It calls the same API with a scoped token, so:
 
@@ -23,7 +23,7 @@ It calls the same API with a scoped token, so:
 
 ### Run it on your computer
 
-The hosted server at `/mcp` is the easy way ([Connect your AI](/docs/agents/connect/)). Run the server yourself instead when your app only starts local servers, or to pin it to one project or mission. It is not on npm yet. Build it from the repository (Node 18 or later):
+The hosted server at `/mcp` is the easy way ([Connect your AI](/docs/agents/connect/)). Run the server yourself instead when your app only starts local servers, or to pin it to one brand or mission. It is not on npm yet. Build it from the repository (Node 18 or later):
 
 ```sh
 git clone https://github.com/outflareai/outflare.git
@@ -37,7 +37,7 @@ Then configure it:
 1. In the web app, open **API tokens** and create a token for the agent:
     - A reporting agent needs `workspace.read`, `mailboxes.read`, `leads.read`, `sequences.read` and `inbox.read`.
     - An agent that runs outreach also needs `leads.manage`, `sequences.manage` and `inbox.manage`, and `mailboxes.manage` to pause domains or change their limits.
-    - To keep an agent inside one motion, create the token **for a project** (the project's page has a button for this) and add `projects.read`, plus `projects.manage` if it may edit the brief. It sees only that project and its records. See [Projects](/docs/guides/projects/#agents-and-project-tokens).
+    - To keep an agent inside one brand, choose that brand under **Which brands** when you create the token. It sees that brand's records plus anything shared, and changes only its brand's. See [Brands](/docs/guides/brands/#keep-people-and-tokens-to-some-brands).
     - To let it run [missions](/docs/agents/missions/), add `missions.read` and `missions.run` (set **Missions** to **Change**). Never give it `missions.approve`.
     - For an outreach agent, also set its **sending limits**: a daily send budget across all the sequences it creates, the highest priority it may give a sequence, and whether it may take mailboxes from other sequences (off by default). See [Mailbox allocation](/docs/guides/mailbox-allocation/#agents).
 2. Add the server to your client. The token already says which workspace it belongs to.
@@ -74,21 +74,22 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 
 | Tool | What it does | Changes data |
 | --- | --- | --- |
-| `get_context` | Start here: what Outflare knows about the company, its memories and projects, and what is blocked. See [Memory and status](/docs/agents/memory/) | |
+| `get_context` | Start here: what Outflare knows about the company, its memories and brands, and what is blocked. Pass `brand` to add that brand's context and memories. See [Memory and status](/docs/agents/memory/) | |
 | `get_onboarding` | The [Get started](/docs/guides/getting-started/) steps (one brand, AI key, goal, website and DNS, tools, star and follow, first mission, then team), each done or skipped, with the tool that does it | |
 | `update_onboarding` | Pick what to do first, skip Get started steps, bring them back, or close the walk-through in the app | Yes |
 | `get_status` | Everything stopping the workspace, worst first, with the tool that fixes each and who must act | |
 | `list_memories` | Search the preferences, decisions and facts people and agents saved | |
 | `update_context`, `remember`, `update_memory`, `forget` | Save the company context, remember something lasting, correct or forget a memory | Yes |
-| `list_projects` | Projects (one motion each: offer, ideal customer, market), with status, limits, what they own and sends | |
-| `get_project_brief` | A project's offer, audience, market, ideal customer filters and brief, plus all of it as Markdown for a prompt | |
-| `get_outcomes_report` | Cost per reply, meeting and won deal, for the workspace or by project or sequence, with what is estimated or unpriced | |
-| `list_meetings`, `list_deals` | Meetings and deals, with which sequence and project each counts for | |
+| `list_brands` | The brands the company markets, each with its website, domains, platforms and what it owns. Empty for a one-brand company | |
+| `get_brand_context`, `update_brand_context` | Read or save what is true for one brand: about, audience, goals, voice, rules (added to the company's) and notes | Yes |
+| `list_ideal_customer_profiles`, `get_ideal_customer_profile` | Who the workspace sells to: each profile's description, filters and brand | |
+| `get_outcomes_report` | Cost per reply, meeting and won deal, for the workspace or by sequence or brand, with what is estimated or unpriced | |
+| `list_meetings`, `list_deals` | Meetings and deals, with which sequence each counts for | |
 | `list_spend`, `list_recurring_spend`, `list_spend_rates` | The spend ledger, recurring costs, and unit prices with usage still unpriced | |
 | `list_outcome_syncs` | Each calendar and CRM source: last run and last error | |
 | `get_overview` | Mailbox health and capacity, sends, replies, bounces, unread replies | |
 | `list_mailboxes` | Sending mailboxes with status, daily limit, pool, and warm-up with its sequencer's score | |
-| `get_mailbox` | One mailbox: status and last error, limits, pool, project, stage, warm-up and sender | |
+| `get_mailbox` | One mailbox: status and last error, limits, pool, brand, stage, warm-up and sender | |
 | `list_supplier_mailboxes` | A connected supplier's mailboxes (such as Cheap Inboxes), with import progress and why any failed | |
 | `list_domains`, `get_domain` | Sending domains with health, issues and their fixes, DNS and blocklist results, settings and sending stats | |
 | `list_sending_servers`, `get_sending_server` | Sending servers (shared SMTP host and IPs, such as an SMTP vendor's box or your own mail server) with IP blocklist results, health, shared limit and sending stats | |
@@ -115,7 +116,7 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `list_messages` | Every send attempt, including ones the policy blocked and why | |
 | `list_inbox`, `get_inbox_message` | Replies from every mailbox and connected sequencer, filtered by label group (hot, later, closed, automatic), source, tag or review, and the whole conversation with a lead | |
 | `list_inbox_tags`, `list_inbox_views` | Reply tags with counts, and the inbox views people saved | |
-| `get_reply_rules` | What happens when a reply gets a label, for the workspace, a project or a sequence | |
+| `get_reply_rules` | What happens when a reply gets a label, for the workspace or a sequence | |
 | `list_webhook_event_types`, `list_webhooks`, `list_webhook_deliveries` | The events webhooks can send; the workspace's webhooks and their health; what was sent to one and how the receiver answered | |
 | `list_events` | What happened since the last call: replies, bounces, opt-outs, paused mailboxes, held mission writes. Keep `next_after` and pass it back as `after` | |
 | `list_logs`, `get_log` | Every API call in the workspace with status, duration, error code and who made it; filter by level, source, operation, tool and time, or look one up by the `request_id` an error returned. Needs `audit.read`. See [Logs](/docs/api/logs/) | |
@@ -130,12 +131,12 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `list_allocation_changes` | Mailbox assignment history with reasons | |
 | `list_senders`, `list_teams` | Who mailboxes send as, and the teams that own sequences and senders | |
 | `use_mission` | Act inside a mission from now on (every call carries it), or stop | |
-| `list_missions`, `get_mission` | Missions; check in on one: brief, what changes do now, limits, progress, requests and notes | |
+| `list_missions`, `get_mission` | Missions; check in on one: its brand's context, what changes do now, limits, progress, requests and notes | |
 | `list_mission_actions`, `get_mission_action` | Changes held or dry-run in a mission, with decisions and results | |
 | `list_mission_calls`, `list_pending_approvals` | Every call in a mission; every change waiting for a person | |
-| `create_project` | Start a new motion with its brief | Yes |
-| `update_project` | Edit the brief (with `brief_version` so no edit is overwritten), pause, archive or cap daily sends | Yes |
-| `add_to_project`, `remove_from_project` | Move domains, mailboxes, lead lists or sequences into a project, or make them shared again | Yes |
+| `create_brand`, `update_brand` | Add a brand (a business with its own website), or change or archive one | Yes |
+| `add_to_brand`, `remove_from_brand` | Move domains, mailboxes, lead lists, sequences or missions into a brand, or make them shared by every brand again | Yes |
+| `create_ideal_customer_profile`, `update_ideal_customer_profile` | Describe an ideal customer once (words and filters) for list scoring and the lead finder | Yes |
 | `log_meeting`, `update_meeting` | Log a meeting, or correct its status, qualification or which sequence it counts for | Yes |
 | `log_deal`, `update_deal` | Log or update a deal (synced deals keep their CRM fields) | Yes |
 | `record_spend`, `delete_spend_entry` | Record a charge in money or units, with a `ref` so retries count once; delete one | Yes |
@@ -202,7 +203,7 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `list_members`, `triage_inbox_message` | Workspace members; label, assign, snooze, tag, close or flag a reply for review | Yes |
 | `create_inbox_tag`, `update_inbox_tag`, `delete_inbox_tag` | Add, rename, recolour or delete a reply tag | Yes |
 | `create_inbox_view`, `update_inbox_view`, `delete_inbox_view` | Save, change or delete a shared set of inbox filters | Yes |
-| `set_reply_rules` | Choose what happens for a not now, an out-of-office or a referral, and which deal stage a labelled reply moves its deal to, for the workspace, a project or a sequence | Yes |
+| `set_reply_rules` | Choose what happens for a not now, an out-of-office or a referral, and which deal stage a labelled reply moves its deal to, for the workspace or a sequence | Yes |
 | `add_reply_referral` | Add the person a reply refers you to as a lead, and optionally enrol them | Yes |
 | `list_alerts` | What needs someone now: hot replies, hot website visitors, with the page that has each | |
 | `get_alert_settings` | Who gets each kind of alert by email, and the kinds you muted | |
@@ -249,11 +250,11 @@ The tools that make email go out, the ones that can spend data provider credits 
 
 A typical run looks like this:
 
-1. `get_project_brief` for the motion it works on
+1. `get_context`, with `brand` for the brand it works on
 2. `get_overview`
 3. `import_leads_csv` into a list
 4. `check_recipients`
-5. `create_sequence` with the project's `project_id`
+5. `create_sequence`
 6. `preview_sequence` for a real lead
 7. `enroll_leads`
 8. `update_sequence` with `status: "active"`

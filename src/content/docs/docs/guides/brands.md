@@ -1,6 +1,6 @@
 ---
 title: Brands
-description: Market several businesses from one workspace, each with its own website, context, projects and mailboxes, without reconnecting tools or re-inviting people.
+description: Market several businesses from one workspace, each with its own website, context, sequences and mailboxes, without reconnecting tools or re-inviting people.
 sidebar:
   order: 1.4
 ---
@@ -9,7 +9,7 @@ sidebar:
 
 Many companies market more than one business. Geonode runs geonode.com and repocket.com, and also makes games, on the web, on phones and on TVs. Separate workspaces would mean connecting every tool twice and inviting every person twice, and nobody could see everything at once. So a workspace can hold **brands** instead.
 
-Each brand has its own website (its point of truth), its own context for agents, and its own projects, domains and mailboxes. Your connectors, people, API tokens, leads and suppression list stay shared, and nobody switches accounts or keys. You can also keep a person or an API token to some brands, so a brand's agency or contractor sees only that brand.
+Each brand has its own website (its point of truth), its own context for agents, and its own sequences, lead lists, domains and mailboxes. Your connectors, people, API tokens, leads and suppression list stay shared, and nobody switches accounts or keys. You can also keep a person or an API token to some brands, so a brand's agency or contractor sees only that brand.
 
 ![The Brands page: each brand with its website, platforms and what belongs to it](/screens/brands-list.png)
 
@@ -29,17 +29,19 @@ Each brand's page has **About**: what it is, who it's for, goals, voice, rules a
 - The other fields win over the company's where you fill them in, such as a friendlier voice for a consumer app.
 - **How our brands relate**, on the Company page, says what the brands share and when one may mention another.
 
-Memories can belong to the company, to a brand or to a project. An agent working on Repocket reads the company's memories and Repocket's, never Geonode's. See [Memory and status](/docs/agents/memory/).
+Memories belong to the company or to a brand. An agent working on Repocket reads the company's memories and Repocket's, never Geonode's. See [Memory and status](/docs/agents/memory/).
 
 ## Decide what belongs to each brand
 
-On a brand's page, turn on the projects and sending domains that are its own. A project brings everything in it, and a domain brings its mailboxes. Anything you leave off belongs to no brand: its mailboxes can still send for any brand, but it only shows under **All brands**. Records inside a project always follow the project's brand, so move the project rather than its parts.
+Move sending domains, mailboxes, lead lists, sequences and missions into a brand from **Company → Brands** (see [Records in no brand](#records-in-no-brand)), or with `POST /brands/{brand}/add`. A domain brings its mailboxes. Anything you leave out belongs to no brand: its mailboxes can still send for any brand, but it only shows under **All brands**.
 
-A brand's mailboxes only send for that brand's sequences, so Repocket never emails from a Geonode domain. Shared mailboxes can still send for any brand.
+A brand's mailboxes send for any of that brand's sequences, and never for another brand's, so Repocket never emails from a Geonode domain. Shared mailboxes can send for any sequence.
+
+What a brand is for (its offer, its audience) goes in its context, who it sells to in [ideal customer profiles](/docs/guides/ideal-customers/), and each sequence has its own switch and daily send limit. Outflare used to have projects between a brand and its sequences; they were removed ([Projects were removed](/docs/guides/projects/)).
 
 ## See one brand at a time
 
-Like a project in PostHog, you work on one brand at a time. The brand picker sits at the top of the sidebar, under your workspace (on a phone, in the top bar), and narrows every page to that brand: projects, sequences, lead lists, mailboxes, domains, missions, connectors, SEO, analytics, ad platforms, site audits and search. Outflare opens on the brand you picked last, or your first brand.
+Like a project in PostHog, you work on one brand at a time. The brand picker sits at the top of the sidebar, under your workspace (on a phone, in the top bar), and narrows every page to that brand: sequences, lead lists, mailboxes, domains, missions, connectors, SEO, analytics, ad platforms, site audits and search. Outflare opens on the brand you picked last, or your first brand.
 
 The brand is part of every link, after the workspace: `app.outflare.ai/acme/repocket/seo`, or `app.outflare.ai/acme/all/seo` for every brand. A link you share opens on the same brand, and older links ending in `?brand=repocket` still work. Pages for the whole workspace, such as Members and API tokens, have no brand in their link. Because handles sit in links, a brand's handle can't be the name of a page, such as `seo` or `members`.
 
@@ -53,9 +55,7 @@ With one brand picked you see only that brand. Home, infrastructure, warm-up, ma
 
 ### Records in no brand
 
-Under **All brands**, Home tells you when projects, domains, mailboxes, lead lists or sequences belong to no brand. **Company → Brands** lists them under **Not in a brand**: tick what belongs together, choose the brand and move them in one go. A project brings everything in it, and a domain brings its mailboxes. Agents do the same with `add_to_brand`.
-
-![Projects with All brands picked: each one shows its brand](/screens/brands-badges.png)
+Under **All brands**, Home tells you when domains, mailboxes, lead lists or sequences belong to no brand. **Company → Brands** lists them under **Not in a brand**: tick what belongs together, choose the brand and move them in one go. A domain brings its mailboxes. Agents do the same with `add_to_brand`.
 
 ## Connect a tool once for every brand
 
@@ -108,9 +108,9 @@ Owners and admins always see every brand. An operator or viewer can be kept to s
 
 Someone kept to some brands:
 
-- sees those brands' projects, sequences, lists, mailboxes, domains, inbox, overview and analytics, plus anything shared;
+- sees those brands' sequences, lists, mailboxes, domains, inbox, overview and analytics, plus anything shared;
 - changes only their brands' records, so shared records are read-only to them;
-- makes new records in their brand (or the brand of the project they work in);
+- makes new records in their brand;
 - can't use what needs every brand, such as workspace settings, webhooks, missions and connecting tools. The app hides those pages, and the API answers `403`. In the [API reference](/docs/api/), these endpoints aren't marked `brand_limited`.
 
 Changing someone's brands is in the audit log as `member.brands_changed`.

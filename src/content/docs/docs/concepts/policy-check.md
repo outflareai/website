@@ -22,9 +22,9 @@ The check runs inside the send job, just before the SMTP connection is used, in 
 | Recipient | The address is invalid, or it or its domain is on the suppression list. That includes unsubscribes, opt-out replies and bounces, which are added automatically. The lead is **blocked** and never emailed. |
 | Sending window | Outside the sequence's days and hours in its time zone. The send **waits** for the window. |
 | New leads per day | The sequence's `daily_new_limit` is used up. A first email **waits** for tomorrow. |
+| Sequence send limit | The sequence's `daily_send_limit` is used up: it has sent that many emails in the last 24 hours, every step counted. The send **waits** (`sequence_daily_send_limit`). |
 | Content | A template variable is missing with no fallback. The lead is **blocked**. |
 | Domain | The mailbox's domain is paused, or its [daily cap](/docs/guides/sending-domains/#settings) across all its mailboxes is used up. The send **waits** (`domain_paused`, `domain_daily_limit`). |
-| Project | The sequence's [project](/docs/guides/projects/) is paused or archived, or the project's daily send limit across all its sequences is used up. The send **waits** (`project_paused`, `project_daily_limit`). |
 | Agent budget | The sequence was created by an API token with a daily send budget, and the token's sequences have used it up. The send **waits** (`token_daily_budget`). |
 | Mailbox | No mailbox [allocated to the sequence](/docs/guides/mailbox-allocation/) is active, at the [ready stage](/docs/guides/infrastructure/#mailbox-stages) (`mailbox_not_ready` otherwise), on a domain that is not paused, under its daily limit and past its minimum gap. The send **waits** for the soonest one (`no_mailbox_allocated` when there is none). Follow-ups only ever use the mailbox that started the thread. |
 

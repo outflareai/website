@@ -63,7 +63,7 @@ export const modules: Module[] = [
 	},
 	{
 		name: 'Outcomes and cost',
-		summary: 'Meetings, deals and spend from your calendar and CRM, so you can see what each project and campaign costs and returns.',
+		summary: 'Meetings, deals and spend from your calendar and CRM, so you can see what each brand and sequence costs and returns.',
 		status: 'live',
 		docs: '/docs/guides/outcomes/',
 		icon: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',

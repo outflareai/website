@@ -20,7 +20,7 @@ Open **Logs** in the sidebar (owners and admins).
 
 ## What is kept, and for how long
 
-Logs keep only what describes a call: the method, path, operation, status, duration, error code (with the field or scope it named), source, client, MCP tool, agent app, mission, who made it, the brand and project it was about, the request ID and the **names** of query parameters. They never keep request or response bodies, query values (so searches and email addresses stay out), headers, API keys or IP addresses.
+Logs keep only what describes a call: the method, path, operation, status, duration, error code (with the field or scope it named), source, client, MCP tool, agent app, mission, who made it, the brand it was about, the request ID and the **names** of query parameters. They never keep request or response bodies, query values (so searches and email addresses stay out), headers, API keys or IP addresses.
 
 Logs are kept for **30 days**. On a self-hosted server, set `OUTFLARE_LOG_RETENTION_DAYS` to change that (see [Configuration](/docs/self-hosting/configuration/)).
 
@@ -48,7 +48,7 @@ curl "https://app.outflare.ai/v1/workspaces/$WS/logs/$REQUEST_ID" -H "Authorizat
 | `operation` | `createLead` | Operation ids from the [endpoint reference](/docs/api/reference/) |
 | `error_code` | `rate_limited` | Error codes (`GET /v1/error-codes`) |
 | `mcp_tool` | `create_lead` | Calls one MCP tool made |
-| `request_id`, `actor_id`, `token_id`, `mission_id`, `project_id`, `brand` | | One call, person, token, mission, project or brand |
+| `request_id`, `actor_id`, `token_id`, `mission_id`, `brand` | | One call, person, token, mission or brand |
 | `q` | `leads` | Text in the path, operation, error code, request ID, tool or client |
 | `since`, `until` | `24h`, `2026-10-26T09:00:00Z` | A time, or how long ago (`15m`, `24h`, `7d`) |
 

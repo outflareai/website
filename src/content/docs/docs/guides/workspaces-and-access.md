@@ -17,7 +17,7 @@ Each workspace has a short name for its URL, made from its name when it is creat
 
 Changing the URL doesn't break links: the old one keeps leading to the workspace until another workspace takes it. Links from before workspace URLs existed (`/w/<workspace id>/...`) still work and switch to the new address.
 
-Sequences, projects, lead lists, missions, sending servers, infrastructure plans, API tokens and webhooks get readable URLs too, made from their names: `/geonode/sequences/q3-founders`, `/geonode/projects/fintech-au`. Two with the same name become `q3-founders` and `q3-founders-2`. Renaming one gives it a new URL, and its old URL still opens it, so shared links keep working.
+Sequences, lead lists, missions, sending servers, infrastructure plans, API tokens and webhooks get readable URLs too, made from their names: `/geonode/sequences/q3-founders`. Two with the same name become `q3-founders` and `q3-founders-2`. Renaming one gives it a new URL, and its old URL still opens it, so shared links keep working.
 
 A connection's URL is named after what it connects, not what you called it: `/geonode/connectors/posthog`, and `posthog-2` for a second PostHog account. The same URL opens the dialog to connect PostHog when nothing is connected yet, so you can share one link for "connect PostHog" or "our PostHog".
 
@@ -116,13 +116,13 @@ The scopes are:
 | `integrations.manage` | Connect, change and disconnect connectors, which means handling their API keys. |
 | `outcomes.read` | Read meetings, deals, spend and cost reports; export them. |
 | `outcomes.manage` | Log and correct meetings, deals and spend; set unit prices and recurring costs; sync now. |
-| `projects.read` | List projects and read their briefs. |
+| `projects.read` | Read [ideal customer profiles](/docs/guides/ideal-customers/). The name is from before projects were removed; tokens keep it. |
 | `infrastructure.read` | See infrastructure plans and mailbox stages; preview a plan. |
 | `infrastructure.manage` | Draft, change and cancel plans; move mailboxes between stages. |
 | `infrastructure.approve` | Approve a plan, which buys domains and mailboxes on your accounts. Owners and admins only by default. |
-| `projects.manage` | Create, change, pause and delete projects; move records in and out (with each record's own manage scope). |
+| `projects.manage` | Create and change ideal customer profiles; move records between brands (with each record's own manage scope). |
 | `analytics.read` | Read reports from connected analytics and SEO tools. |
-| `missions.read` | List missions and read their brief, calls, held changes and updates. |
+| `missions.read` | List missions and read their context, calls, held changes and updates. |
 | `missions.run` | Create and change missions, submit a plan, post updates and connector requests, pause, stop and complete. What an agent needs. |
 | `missions.approve` | Approve a mission's plan, resume it, and approve or reject held changes. Never give this to the agent that runs the mission. |
 | `seo.read` | See [SEO sites](/docs/guides/site-audits/), their crawls and the pages they found. |
