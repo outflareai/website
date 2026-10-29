@@ -2,7 +2,7 @@
 	"version": "2026.10.29",
 	"date": "2026-10-29",
 	"status": "in-progress",
-	"updated": "2026-10-29T13:57:19Z",
+	"updated": "2026-10-29T14:06:08Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -178,7 +178,35 @@
 			"edition": "open-source",
 			"text": "Pages and API responses built from several lookups now always show one consistent moment. Before, a cookie scan could briefly show as finished with none of its cookies listed.",
 			"at": "2026-10-29T13:57:19Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Partners: approve or reject many held rewards at once. Pick them on Rewards or approve every pending one in a program; through the API and MCP, by ids or for a whole program or partner.",
+			"at": "2026-10-29T14:06:08Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Partners: give one partner their own commission rate (Commission rate in their menu, or a reward rule with `partner_id`). It replaces the program's rate and their group's for them.",
+			"at": "2026-10-29T14:06:08Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Partners: a person's record page, and their panel in Visitors and Leads, show the partner programs they are in (code, status, sales and what is due) and the partner who referred them.",
+			"at": "2026-10-29T14:06:08Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Partners: people and API tokens limited to some brands can now run their brands' partner programs, with their partners, rewards and payouts. They read programs shared by every brand without changing them, and never see another brand's.",
+			"at": "2026-10-29T14:06:08Z"
 		}
 	],
-	"through": "ce360cd+f3bad46"
+	"through": "8e4e29b+4f3ffc9"
 }
