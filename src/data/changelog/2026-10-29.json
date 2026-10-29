@@ -2,7 +2,7 @@
 	"version": "2026.10.29",
 	"date": "2026-10-29",
 	"status": "in-progress",
-	"updated": "2026-10-29T22:00:11Z",
+	"updated": "2026-10-29T22:17:16Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -535,7 +535,14 @@
 			"edition": "open-source",
 			"text": "Visitors who haven't consented to analytics keep one id for their whole visit, in the tab's session storage and never in a cookie, so every page counts as the same visitor and shows them the same A/B test version. It is gone when the tab closes.",
 			"at": "2026-10-29T22:00:11Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Send a conversion you've defined back to an ad platform, not only a raw event: only the events that meet its conditions go (a call over a minute, an order over $100), worth what it says and named as that network expects.",
+			"at": "2026-10-29T22:17:16Z"
 		}
 	],
-	"through": "2a96595+16d2186"
+	"through": "475aeef+85592da"
 }
