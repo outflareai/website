@@ -2,7 +2,7 @@
 	"version": "2026.10.30",
 	"date": "2026-10-30",
 	"status": "in-progress",
-	"updated": "2026-10-30T08:51:58Z",
+	"updated": "2026-10-30T09:03:34Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -318,7 +318,21 @@
 			"edition": "open-source",
 			"text": "Pipelines that verify an address a person already has no longer stall when your email verifier checked it recently: the recent check is used, at no credit. Each check that does spend a credit is now reported to the feature that asked for it.",
 			"at": "2026-10-30T08:51:58Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "The permissions for ideal customer profiles and moving records between brands are now called `profiles.read` and `profiles.manage`, and the API reference lists those endpoints under \"profiles\" instead of \"projects\". The old names `projects.read` and `projects.manage` still work: tokens, roles and apps that hold them keep their access, and requests may still send them.",
+			"at": "2026-10-30T09:03:34Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "inbox",
+			"edition": "open-source",
+			"text": "Support inbox: forward your support@ address to your brand's support address (such as northpeak-support@) instead of connecting the mailbox. Each email becomes a conversation, and replies go out through your email provider from the address the customer wrote to. On Outflare Cloud.",
+			"at": "2026-10-30T09:03:34Z"
 		}
 	],
-	"through": "1adb41a+50bea3e"
+	"through": "e3fb2eb+cff9a5a"
 }
