@@ -2,7 +2,7 @@
 	"version": "2026.10.30",
 	"date": "2026-10-30",
 	"status": "in-progress",
-	"updated": "2026-10-30T20:29:25Z",
+	"updated": "2026-10-30T20:33:09Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -563,7 +563,14 @@
 			"edition": "open-source",
 			"text": "Privacy export: from a person's or company's page, or the API and MCP, download everything a brand holds about them as one file (their fields, history, ids, links, events, consent, emails, replies, meetings, deals and payments), only from that brand and never with secrets. The link works for 7 days, and every export and download is in the audit log.",
 			"at": "2026-10-30T20:06:12Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Partner programs can read other link parameters besides ref and via, such as aff for links made on another platform. The Tolt import adds the ones its links use.",
+			"at": "2026-10-30T20:33:09Z"
 		}
 	],
-	"through": "b8688ae+2d385df"
+	"through": "6b4f3dc+dbf0770"
 }
