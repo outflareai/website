@@ -2,7 +2,7 @@
 	"version": "2026.10.30",
 	"date": "2026-10-30",
 	"status": "in-progress",
-	"updated": "2026-10-30T08:45:27Z",
+	"updated": "2026-10-30T08:51:58Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -311,7 +311,14 @@
 			"edition": "open-source",
 			"text": "Redirect links: the website tracking snippet ties each click on a redirect link to the visit it started, and every link and campaign shows how many of its clicks reached your site.",
 			"at": "2026-10-30T08:23:23Z"
+		},
+		{
+			"kind": "fix",
+			"area": "deliverability",
+			"edition": "open-source",
+			"text": "Pipelines that verify an address a person already has no longer stall when your email verifier checked it recently: the recent check is used, at no credit. Each check that does spend a credit is now reported to the feature that asked for it.",
+			"at": "2026-10-30T08:51:58Z"
 		}
 	],
-	"through": "98f173e+ffd7e4a"
+	"through": "1adb41a+50bea3e"
 }
