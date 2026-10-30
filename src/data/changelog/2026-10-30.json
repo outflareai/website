@@ -2,7 +2,7 @@
 	"version": "2026.10.30",
 	"date": "2026-10-30",
 	"status": "in-progress",
-	"updated": "2026-10-30T10:12:36Z",
+	"updated": "2026-10-30T10:21:55Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -374,7 +374,14 @@
 			"edition": "open-source",
 			"text": "The last numbers from Outflare's old built-in warm-up are gone: `GET /mailboxes/{id}/warmup`, the 7-day warm-up counts and inbox rates on mailboxes, domains, stats, reports, mailbox health and the infrastructure overview, and the ignored `daily_target` and `reply_rate` settings. Warm-up runs in a connected sequencer, and its score is on each mailbox's `warmup.platform`.",
 			"at": "2026-10-30T09:57:04Z"
+		},
+		{
+			"kind": "launch",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "Help centre: publish the knowledge you mark for it as a public site customers can read and search, one per brand and on your own domain if you like. Style it to match your brand with a live preview, and see what readers read and what they searched for but didn't find.",
+			"at": "2026-10-30T10:21:55Z"
 		}
 	],
-	"through": "9d226b1+f296a3d"
+	"through": "fda6c69+059a6b4"
 }
