@@ -2,7 +2,7 @@
 	"version": "2026.10.30",
 	"date": "2026-10-30",
 	"status": "in-progress",
-	"updated": "2026-10-30T09:19:40Z",
+	"updated": "2026-10-30T09:29:22Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -353,7 +353,14 @@
 			"edition": "open-source",
 			"text": "Multivariate A/B tests: add up to two more flags to a test, and see every combination of their versions against the original, the best combination, each change's own effect, and whether the changes affect each other.",
 			"at": "2026-10-30T09:19:40Z"
+		},
+		{
+			"kind": "fix",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "The Tolt import also brings over partners Tolt lists as invited (as pending), with the customers they referred.",
+			"at": "2026-10-30T09:29:22Z"
 		}
 	],
-	"through": "7717989+5a59edb"
+	"through": "422d761+8ddc944"
 }
