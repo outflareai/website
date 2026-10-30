@@ -2,7 +2,7 @@
 	"version": "2026.10.30",
 	"date": "2026-10-30",
 	"status": "in-progress",
-	"updated": "2026-10-30T15:28:48Z",
+	"updated": "2026-10-30T15:47:52Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -451,7 +451,14 @@
 			"edition": "open-source",
 			"text": "Every workspace now starts with a brand, named after the workspace, and workspaces without one got one. Brands are becoming the owner of all their data, so two brands in one workspace never mix: their own API calls live under `/v1/brands/{brand}/`, starting with reading the brand itself.",
 			"at": "2026-10-30T15:24:13Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "records",
+			"edition": "open-source",
+			"text": "Brands keep their customer data apart: every person, company and record, with their details, history and consent, and the fields and types you add to the catalog, now belong to one brand. People with no brand go to your first brand, and duplicates are only found and merged within a brand.",
+			"at": "2026-10-30T15:47:52Z"
 		}
 	],
-	"through": "1c3a4b9+1a29cb4"
+	"through": "5c65f08+8276483"
 }
