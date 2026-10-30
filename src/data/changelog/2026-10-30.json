@@ -2,7 +2,7 @@
 	"version": "2026.10.30",
 	"date": "2026-10-30",
 	"status": "in-progress",
-	"updated": "2026-10-30T15:20:51Z",
+	"updated": "2026-10-30T15:24:13Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -444,7 +444,14 @@
 			"edition": "open-source",
 			"text": "Playbooks can now run by themselves, on a schedule or when something happens, such as a lost backlink. You approve each automation once, with spend limits per run and per month; if a limit is reached or a connection goes missing, it stops and tells you why.",
 			"at": "2026-10-30T13:09:12Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Every workspace now starts with a brand, named after the workspace, and workspaces without one got one. Brands are becoming the owner of all their data, so two brands in one workspace never mix: their own API calls live under `/v1/brands/{brand}/`, starting with reading the brand itself.",
+			"at": "2026-10-30T15:24:13Z"
 		}
 	],
-	"through": "3680e32+59e9bc3"
+	"through": "495a8f2+f7876d3"
 }
