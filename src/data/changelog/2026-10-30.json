@@ -2,7 +2,7 @@
 	"version": "2026.10.30",
 	"date": "2026-10-30",
 	"status": "in-progress",
-	"updated": "2026-10-30T09:08:59Z",
+	"updated": "2026-10-30T09:19:40Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -332,7 +332,28 @@
 			"edition": "open-source",
 			"text": "Support inbox: forward your support@ address to your brand's support address (such as northpeak-support@) instead of connecting the mailbox. Each email becomes a conversation, and replies go out through your email provider from the address the customer wrote to. On Outflare Cloud.",
 			"at": "2026-10-30T09:03:34Z"
+		},
+		{
+			"kind": "launch",
+			"area": "connectors",
+			"edition": "open-source",
+			"text": "Engain connector: connect your Engain account with your own API key to run Reddit campaigns through Engain's accounts. Connecting shows your projects and credits left.",
+			"at": "2026-10-30T09:19:40Z"
+		},
+		{
+			"kind": "launch",
+			"area": "lifecycle",
+			"edition": "open-source",
+			"text": "Journeys can add people to your ad audiences, or take them out. An \"Add to an ad audience\" step puts the person in a Meta custom audience or a Google Ads Customer Match list on one of your ad accounts, through your own connection. Only their hashed email and phone number reach the platform, and adding follows your ad consent setting.",
+			"at": "2026-10-30T09:19:40Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Multivariate A/B tests: add up to two more flags to a test, and see every combination of their versions against the original, the best combination, each change's own effect, and whether the changes affect each other.",
+			"at": "2026-10-30T09:19:40Z"
 		}
 	],
-	"through": "b980508+b2a5b6c"
+	"through": "7717989+5a59edb"
 }
