@@ -27,6 +27,12 @@ A new flag is off until you turn it on. While it's off, every visitor gets `fals
 
 The version comes from the flag and the visitor's own id, so the same visitor sees the same version on every page and every visit, and your servers agree with the page. Nothing extra is stored about them. Changing the split of a flag that's on moves some visitors to another version, and the page warns you before you do. Changes reach visitors within 10 seconds.
 
+## Exclusion groups
+
+Two A/B tests running at once on the same pages can share visitors, and one change can alter the other's effect. Put their flags in one **exclusion group**, such as `homepage`, to keep them apart. Each flag takes its share of the group's visitors (half by default) and is off for everyone else in the group, so no visitor is in two of the group's tests and each test measures its own change cleanly. Which share a visitor falls in comes from the group's name and their id, so it's the same on every page and server.
+
+A group holds 100% of its visitors: a flag asking for more than is free is refused, and you can give it a smaller share or take a flag out. A flag's group and share are fixed while its A/B test runs, since changing them would change who the test measures.
+
 ## On your website
 
 Add `data-flags` to your tracking script's tag:
@@ -60,16 +66,39 @@ To see which version wins, run an [A/B test](/docs/guides/ab-tests/) on the flag
 
 ### No flicker
 
-So visitors don't see the original for a moment before their version, put this first in your `<head>`. The page stays hidden until the flags arrive, and never longer than one and a half seconds:
+The script loads without holding up your page, so the original can show for a moment before a version replaces it. There are two ways to prevent that.
+
+**Decide on your server (best).** Your server asks for the visitor's flags ([below](#on-your-servers)), renders their version, and hands the same answer to the page in a tag the script reads first. The visitor sees their version in the first paint, and the test still counts them.
+
+```html
+<script type="application/json" id="outflare-flags">{"anonymousId":"the visitor's id","flags":{"pricing-headline":"faster"},"payloads":{}}</script>
+```
+
+Decide for the visitor's `of_aid` cookie when they have one; otherwise make an id (8 to 64 letters, digits and dashes) and the script keeps it for the visit. The SDKs build the tag for you, escaped so content in a version can't break out of it: `flagsBootstrapTag` in TypeScript and `flags_bootstrap_tag` in Python. The same works at the edge, such as a Cloudflare Worker in front of a static site. Keep your API token on the server.
+
+**Hide the page until the flags arrive.** On a static site with no server of your own, put this first in your `<head>`. The page stays hidden until the flags arrive, and never longer than one and a half seconds:
 
 ```html
 <script>document.documentElement.classList.add("of-wait"); setTimeout(function () { document.documentElement.classList.remove("of-wait"); }, 1500);</script>
 <style>.of-wait body { opacity: 0 }</style>
 ```
 
+Within a visit, the next page starts with the last answer at once. An [A/B test's checklist](/docs/guides/ab-tests/#before-you-start) shows how long visitors actually waited for their version.
+
 ### See a version yourself
 
 Add `?of_flag=pricing-headline:faster` to any page's address to see that version, even before the flag is on. It lasts for the rest of your visit and only in your browser. Several go in one parameter: `?of_flag=pricing-headline:faster,chat-widget:on`.
+
+### Change a page without code
+
+For a version of a split, open the flag in **Analytics → Feature flags**, enter a page of your site under **Page to edit on**, and choose **Edit visually** next to the version. The page opens in a new tab with that version and an editor over it: click anything to change its text, hide it, or change a link or an image. **Save** in the editor, and visitors who get that version see the changes within a minute. The page needs the tracking script with `data-flags`.
+
+- Each change applies to every element like the one you clicked.
+- Text goes in as text, never HTML, and links and images only go to `https://` addresses or paths on your site.
+- Showing a visitor the changes counts them in the flag's [A/B test](/docs/guides/ab-tests/).
+- A version holds up to 50 changes. They're kept in its content as `changes`, so you can also write or review them there.
+
+The editor link works for two hours, only for that version, and only while you can still change flags. It carries a secret, so don't share it.
 
 ## On your servers
 
