@@ -2,7 +2,7 @@
 	"version": "2026.10.30",
 	"date": "2026-10-30",
 	"status": "in-progress",
-	"updated": "2026-10-30T11:06:41Z",
+	"updated": "2026-10-30T11:32:37Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -395,7 +395,14 @@
 			"edition": "open-source",
 			"text": "The API drops everything left from projects and agency accounts: `project_id` fields, the `project.*` webhook events, the old scope names `projects.read` and `projects.manage` (use `profiles.read` and `profiles.manage`) and the whoami token `kind`. Inbox filters use `tag` (not `label`), and report rows use `name`.",
 			"at": "2026-10-30T11:00:44Z"
+		},
+		{
+			"kind": "launch",
+			"area": "social",
+			"edition": "open-source",
+			"text": "Reddit campaigns page: brand mentions and links placed and still live, cost and median lifespan, results by subreddit or tactic, every action with its status and timeline, experiments, and each brand's Reddit limits.",
+			"at": "2026-10-30T11:32:37Z"
 		}
 	],
-	"through": "5353f0b+76216e0"
+	"through": "4228a14+3d1ebb2"
 }
