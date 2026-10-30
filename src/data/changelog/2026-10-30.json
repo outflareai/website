@@ -2,7 +2,7 @@
 	"version": "2026.10.30",
 	"date": "2026-10-30",
 	"status": "in-progress",
-	"updated": "2026-10-30T07:57:26Z",
+	"updated": "2026-10-30T08:06:39Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -10,7 +10,14 @@
 			"edition": "open-source",
 			"text": "Exclusion groups for feature flags: flags in one group split its visitors, so no visitor is in two of their A/B tests at once. The A/B test checklist warns when another test runs at the same time outside the group, and a new interactions check shows whether two overlapping tests changed each other's results.",
 			"at": "2026-10-30T07:57:26Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Partners: reward rules are now flows, as in Tolt. Each has AND/OR conditions on the partner, the customer and the transaction, its own approval (automatic, after N days or manual), whether it adds to other cash flows or competes with them, other rates for some partners or plans, and can move the partner to another group. A Flows tab edits them. Existing rules keep working unchanged.",
+			"at": "2026-10-30T08:06:39Z"
 		}
 	],
-	"through": "d3e6a4d+fc21f4a"
+	"through": "c973a09+e8f5c3d"
 }
