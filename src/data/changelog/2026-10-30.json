@@ -2,7 +2,7 @@
 	"version": "2026.10.30",
 	"date": "2026-10-30",
 	"status": "in-progress",
-	"updated": "2026-10-30T18:33:59Z",
+	"updated": "2026-10-30T18:43:03Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -500,7 +500,21 @@
 			"edition": "open-source",
 			"text": "Stories can now use your own AI model to suggest story ideas from your coverage, your experts' topics and the news, and to draft a press release from a story's sourced facts and approved quotes only. Every draft goes through the same check as any release, and a person still approves it.",
 			"at": "2026-10-30T17:26:12Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Partners: each program can turn the self-referral block off (it stays on by default), and the partner portal shows \"Powered by Outflare\" at its foot, which any program can hide.",
+			"at": "2026-10-30T18:43:03Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Partners: the Tolt import brings over clicks on partners' links, so each partner's click count carries over. A second run doesn't count them twice.",
+			"at": "2026-10-30T18:43:03Z"
 		}
 	],
-	"through": "2da67e2+1070c25"
+	"through": "5609fd8+485c2d0"
 }
