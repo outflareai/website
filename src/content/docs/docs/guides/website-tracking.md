@@ -130,7 +130,7 @@ Under **More**, **Rotate key** gives the script a new key, and the old one keeps
 
 ## Consent
 
-The visitor's id is kept in a first-party cookie, but only with consent. By default, visitors in the EEA, Switzerland and the UK, and anyone with Global Privacy Control on, get no cookie: their id lasts only for the page they're on. Once they accept analytics cookies in your banner, call `outflare.consent(true)` and the id is kept for a year.
+The visitor's id is kept in a first-party cookie, but only with consent. By default, visitors in the EEA, Switzerland and the UK, and anyone with Global Privacy Control on, get no cookie. Until they consent, their id lasts for the visit: it's kept in the browser tab's session storage, so every page of the visit counts as the same visitor and shows the same [feature flag](/docs/guides/feature-flags/) versions, and it's gone when the tab closes. Separate visits aren't linked. Once they accept analytics cookies in your banner, call `outflare.consent(true)` and the same id is kept in the cookie for a year.
 
 You can change this on the script tag:
 
