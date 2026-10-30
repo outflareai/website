@@ -1,0 +1,16 @@
+{
+	"version": "2026.10.30",
+	"date": "2026-10-30",
+	"status": "in-progress",
+	"updated": "2026-10-30T07:57:26Z",
+	"items": [
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Exclusion groups for feature flags: flags in one group split its visitors, so no visitor is in two of their A/B tests at once. The A/B test checklist warns when another test runs at the same time outside the group, and a new interactions check shows whether two overlapping tests changed each other's results.",
+			"at": "2026-10-30T07:57:26Z"
+		}
+	],
+	"through": "d3e6a4d+fc21f4a"
+}
