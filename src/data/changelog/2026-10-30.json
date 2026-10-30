@@ -2,7 +2,7 @@
 	"version": "2026.10.30",
 	"date": "2026-10-30",
 	"status": "in-progress",
-	"updated": "2026-10-30T16:35:06Z",
+	"updated": "2026-10-30T16:39:13Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -465,7 +465,14 @@
 			"edition": "open-source",
 			"text": "Product events sent to a brand are saved first and answered at once with a receipt per event. Each event then shows whether it was accepted, a duplicate, rejected (with what to fix) or held for an unapproved name, on the brand's new Events page, and rejected or held events can be fixed and replayed for 90 days.",
 			"at": "2026-10-30T16:19:43Z"
+		},
+		{
+			"kind": "launch",
+			"area": "lifecycle",
+			"edition": "open-source",
+			"text": "Marketing email guardrails: by default each person gets at most 1 marketing email a day and 3 a week, and nothing between 8pm and 8am in their time zone (held until morning). Change them per workspace. Every capped or held send says why on the journey step and the person's timeline.",
+			"at": "2026-10-30T16:39:13Z"
 		}
 	],
-	"through": "91f6363+7d1695f"
+	"through": "d80c706+f18c7cc"
 }
