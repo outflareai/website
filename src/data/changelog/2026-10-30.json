@@ -2,7 +2,7 @@
 	"version": "2026.10.30",
 	"date": "2026-10-30",
 	"status": "in-progress",
-	"updated": "2026-10-30T12:39:30Z",
+	"updated": "2026-10-30T12:51:08Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -423,7 +423,14 @@
 			"edition": "open-source",
 			"text": "Partners: the Tolt import also brings Tolt's groups (with each partner in theirs, and the default group) and flows (rates, duration, conditions, approval and custom rates). A flow with something Outflare can't map yet isn't imported and is listed for you to add on the Flows tab.",
 			"at": "2026-10-30T12:39:30Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "lifecycle",
+			"edition": "open-source",
+			"text": "The automation map can now show what reaches one person: pick someone, and it marks the events they did, the lists they're in and the journeys they went through, and lights up what those set off next. You can also narrow it to everything that leads to one sequence, list or tag.",
+			"at": "2026-10-30T12:51:08Z"
 		}
 	],
-	"through": "8703f7a+e7b1c4b"
+	"through": "06bbe50+2a19a86"
 }
