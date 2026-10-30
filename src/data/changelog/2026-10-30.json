@@ -2,7 +2,7 @@
 	"version": "2026.10.30",
 	"date": "2026-10-30",
 	"status": "in-progress",
-	"updated": "2026-10-30T16:45:40Z",
+	"updated": "2026-10-30T17:08:56Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -472,7 +472,28 @@
 			"edition": "open-source",
 			"text": "Marketing email guardrails: by default each person gets at most 1 marketing email a day and 3 a week, and nothing between 8pm and 8am in their time zone (held until morning). Change them per workspace. Every capped or held send says why on the journey step and the person's timeline.",
 			"at": "2026-10-30T16:39:13Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Partner programs can set a lead expiration: a referred customer who hasn't bought within that many days no longer credits the partner.",
+			"at": "2026-10-30T17:08:56Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Link building playbooks can now start by themselves when a competitor gains a link, a page you could pitch gets a broken link, you publish a page worth promoting, or the news names your brand.",
+			"at": "2026-10-30T17:08:56Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "lifecycle",
+			"edition": "open-source",
+			"text": "Journey email steps can send even over the frequency cap, for email a person must get such as a sign-in link, and can skip rather than hold an email due in quiet hours. Skipped emails are logged with the reason, like capped ones.",
+			"at": "2026-10-30T17:08:56Z"
 		}
 	],
-	"through": "59afb78+41f4583"
+	"through": "65ca51e+c1d05c8"
 }
