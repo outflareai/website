@@ -33,6 +33,10 @@ Two A/B tests running at once on the same pages can share visitors, and one chan
 
 A group holds 100% of its visitors: a flag asking for more than is free is refused, and you can give it a smaller share or take a flag out. A flag's group and share are fixed while its A/B test runs, since changing them would change who the test measures.
 
+### Holdouts
+
+A group can keep a share of its visitors, up to half, out of every flag in it: set its **holdout** under **Exclusion groups** on the Feature flags page. Those visitors see your site as it was wherever the group's tests run. Over weeks, comparing them with everyone else shows what all the group's changes did together, which single tests can't: effects that add up, fade or cancel out. The holdout report counts a goal for every visitor to your site in the period you choose, and shows the lift of everyone else over the holdout.
+
 ## On your website
 
 Add `data-flags` to your tracking script's tag:
@@ -102,7 +106,7 @@ The editor link works for two hours, only for that version, and only while you c
 
 ## On your servers
 
-Ask `POST /v1/workspaces/{ws}/flags/evaluate` with an API token that has `analytics.read`, passing the visitor's id from the page (`outflare.anonymousId()`) as `anonymous_id` so the server agrees with the page. It returns each flag that is on with the visitor's version and why. Agents use the MCP tools `list_flags`, `create_flag`, `update_flag`, `archive_flag` and `evaluate_flags`.
+Ask `POST /v1/workspaces/{ws}/flags/evaluate` with an API token that has `analytics.read`, passing the visitor's id from the page (`outflare.anonymousId()`) as `anonymous_id` so the server agrees with the page. It returns each flag that is on with the visitor's version and why. Agents use the MCP tools `list_flags`, `create_flag`, `update_flag`, `archive_flag` and `evaluate_flags`, and `list_flag_groups`, `set_flag_group_holdout` and `get_flag_group_holdout` for exclusion groups.
 
 ## Who can change them
 

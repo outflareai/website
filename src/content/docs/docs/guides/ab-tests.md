@@ -131,6 +131,18 @@ Outflare checks each running test every few hours and raises an [alert](/docs/gu
 - **Freeze** a running test to stop new visitors joining while those already in keep counting, such as before a launch that would change your traffic. Unfreeze to let them join again.
 - **Duplicate** a test to get a new draft with the same flag, control, goals, guardrails and hypothesis.
 
+## Multivariate tests
+
+To test two or three parts of a page together, such as a headline, a button and an image, give each its own [flag](/docs/guides/feature-flags/) and add up to two of them to a test with **Also test** in the new-test form. Each flag splits visitors on its own, so every combination of versions gets visitors: two flags with two versions each make four combinations, three make eight. The flags can't share an [exclusion group](/docs/guides/feature-flags/#exclusion-groups), since no visitor would see both, and while the test runs none of them can be in another running test.
+
+The test's own results stay as they are. **Every combination** shows the first goal among visitors who saw a version of every flag:
+
+- each combination against the one where every flag shows its control, and the best combination;
+- each flag's own effect, averaged over the others' versions;
+- whether the flags change each other's effect. When they do, ship the best combination, not each flag's winner on its own.
+
+Each combination gets a share of your visitors, so a multivariate test needs several times the traffic of a simple one. Keep it to the changes you expect to matter.
+
 ## Tests at the same time
 
 Two tests running at once on the same pages can share visitors, and one change can alter the other's effect: a bolder button that only helps with the new headline, say. The checklist warns when another test is running on a flag outside this one's [exclusion group](/docs/guides/feature-flags/#exclusion-groups). Either put the flags in one group, so no visitor is in both, or let them overlap and check them.
@@ -157,7 +169,7 @@ The AI is told never to invent facts, numbers, testimonials or prices. Check gen
 
 ## API and agents
 
-Everything here is in the REST API, under `/v1/workspaces/{ws}/ab-tests`: creating and changing tests, the checklist, previews and checks, starting, freezing, ending, shipping and duplicating, results, breakdowns, tests at the same time, the planner, learnings and AI help. Agents use the matching MCP tools, such as `create_ab_test`, `get_ab_test_checklist`, `start_ab_test`, `get_ab_test_results`, `get_ab_test_breakdown`, `get_ab_test_interactions` and `ship_ab_test`. See the [API reference](/docs/api/).
+Everything here is in the REST API, under `/v1/workspaces/{ws}/ab-tests`: creating and changing tests, the checklist, previews and checks, starting, freezing, ending, shipping and duplicating, results, breakdowns, every combination of a multivariate test, tests at the same time, the planner, learnings and AI help. Agents use the matching MCP tools, such as `create_ab_test`, `get_ab_test_checklist`, `start_ab_test`, `get_ab_test_results`, `get_ab_test_breakdown`, `get_ab_test_interactions`, `get_ab_test_factorial` and `ship_ab_test`. See the [API reference](/docs/api/).
 
 ## Who can change them
 
