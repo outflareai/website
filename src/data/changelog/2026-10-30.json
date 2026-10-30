@@ -2,7 +2,7 @@
 	"version": "2026.10.30",
 	"date": "2026-10-30",
 	"status": "in-progress",
-	"updated": "2026-10-30T10:52:18Z",
+	"updated": "2026-10-30T11:00:44Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -388,7 +388,14 @@
 			"edition": "open-source",
 			"text": "Reddit campaigns through Engain: place comments, replies, posts, thread groups and upvotes within a per-brand credit budget, run them as experiments, and see brand mentions and links still live, their cost and how long they lasted. Agents get a guide and a ready prompt over MCP.",
 			"at": "2026-10-30T10:43:10Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "The API drops everything left from projects and agency accounts: `project_id` fields, the `project.*` webhook events, the old scope names `projects.read` and `projects.manage` (use `profiles.read` and `profiles.manage`) and the whoami token `kind`. Inbox filters use `tag` (not `label`), and report rows use `name`.",
+			"at": "2026-10-30T11:00:44Z"
 		}
 	],
-	"through": "2a64668+09efc61"
+	"through": "0488090+80b76b9"
 }
