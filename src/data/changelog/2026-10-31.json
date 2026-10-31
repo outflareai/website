@@ -2,7 +2,7 @@
 	"version": "2026.10.31",
 	"date": "2026-10-31",
 	"status": "in-progress",
-	"updated": "2026-10-31T17:11:28Z",
+	"updated": "2026-10-31T18:25:28Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -10,7 +10,21 @@
 			"edition": "open-source",
 			"text": "Request honest customer reviews by email from Reviews or existing workflows. Configure brand destinations, customize starter emails, preview audiences, schedule campaigns, and track sends and review-link clicks with shared frequency limits.",
 			"at": "2026-10-31T17:05:37Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "AI accounts shows the computers reporting each account and who linked each computer, including the person's name and email. Claude reset credits are read automatically when Claude exposes them, alongside Codex's available resets.",
+			"at": "2026-10-31T18:25:28Z"
+		},
+		{
+			"kind": "fix",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Outflare for desktop detects separate Claude Code profiles and Claude desktop accounts on Mac, adds new account emails without replacing earlier accounts, keeps previous accounts visible with their last-checked time, and detects login changes within seconds. New readings reach the portal without waiting for other tools, and the portal refreshes automatically.",
+			"at": "2026-10-31T18:25:28Z"
 		}
 	],
-	"through": "2f39010+2e4b4f4"
+	"through": "ff0b384+aa1d37e"
 }
