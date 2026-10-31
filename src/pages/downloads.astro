@@ -1,0 +1,39 @@
+---
+import Marketing from '../layouts/Marketing.astro';
+
+const platforms = [
+  { name: 'macOS', file: 'Disk image · Apple silicon and Intel', path: 'macos' },
+  { name: 'Windows', file: 'Installer · x64', path: 'windows' },
+  { name: 'Linux', file: 'AppImage · x64', path: 'linux' },
+];
+---
+
+<Marketing title="Download Outflare for desktop" description="Connect the AI accounts on your computer to Outflare and keep your team's subscription usage in one place.">
+  <section class="border-b">
+    <div class="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
+      <p class="eyebrow">Downloads</p>
+      <h1 class="mt-3 text-4xl font-semibold tracking-tighter sm:text-5xl">Outflare for desktop</h1>
+      <p class="sub max-w-2xl">See the AI accounts used on your computer in your Outflare workspace. The tray app reports account identity, subscription plan and available usage limits while you work.</p>
+      <div class="mt-10 grid gap-5 md:grid-cols-3">
+        {platforms.map(platform => (
+          <article class="card p-6">
+            <h2 class="text-xl font-semibold">{platform.name}</h2>
+            <p class="mt-2 text-sm text-muted-foreground">{platform.file}</p>
+            <a class="btn btn-primary mt-6" href={`/downloads/desktop/${platform.path}/`} data-track="desktop_download_click" data-track-label={platform.path}>Download for {platform.name}</a>
+          </article>
+        ))}
+      </div>
+      <p class="mt-6 text-sm text-muted-foreground">Stable releases check for signed updates automatically. Downloads are public and do not require a GitHub account.</p>
+    </div>
+  </section>
+  <section class="mx-auto grid max-w-6xl gap-8 px-4 py-14 sm:px-6 md:grid-cols-2">
+    <div>
+      <h2 class="text-2xl font-semibold tracking-tight">Connect once</h2>
+      <p class="mt-3 text-muted-foreground">Open Outflare for desktop and link your computer to your workspace. Accounts are discovered from supported tools already signed in on that computer. Claude desktop account detection is currently available on macOS.</p>
+    </div>
+    <div>
+      <h2 class="text-2xl font-semibold tracking-tight">Credentials stay on your computer</h2>
+      <p class="mt-3 text-muted-foreground">Outflare reads supported tools locally and sends account details and usage readings to your workspace. Provider tokens, session cookies, conversations and local file paths are never included in those reports.</p>
+    </div>
+  </section>
+</Marketing>
