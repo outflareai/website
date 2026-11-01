@@ -52,13 +52,37 @@ Paid ads read the same credit. The conversions each ad platform reports about it
 
 Click a channel to see its sources and campaigns: visits, conversions and revenue each, most conversions first. Campaigns made with campaign links show their name.
 
+Tick **Split by content** to split each campaign by the link's content tag (`utm_content`). For a sequence, that is the step a link went out in (`step-1`, `step-2` and so on), so you see which email in the sequence brought the visit and the sale.
+
+## Identified people only
+
+A visit is tied to a person in one of two ways: they identified themselves (for example by signing in or filling in a form), or Outflare only knows their browser. Pick **Identified people only** at the top of the page to count only the first kind: visits on a person's record, and credit only on those visits. Conversions matched by browser alone are left out. Use it when you want numbers you can stand behind, at the cost of missing some visits.
+
+Each conversion's credited visits say how they were matched: `record` (identified), `browser` or `none`.
+
+## New or known people
+
+**New or known people** splits each channel's conversions into people who weren't in Outflare yet when they visited (new to you) and people who already were (a lead you had imported or emailed, a customer coming back). It splits revenue into each person's first payment and their later ones.
+
+**What people are worth, by first channel** takes the people whose first conversion was in the dates you picked, groups them by the channel that first brought them, and shows how many have paid and everything they have paid since, in total and per person. It always uses first touch, whatever model you pick.
+
+## Companies and deals
+
+Credit rolls up from people to their company. **Companies** shows, for each company, how many of its people converted, the conversions and revenue credited to them, the channel that brought the most, and the deals it won in the dates you picked. A person counts toward their first company only.
+
+**Won deals by channel** spreads each deal won in the dates you picked across channels, in proportion to the credit its people earned before it closed. A deal's people are its contacts and everyone at its company. Deals where nobody had a tracked visit are listed apart, never guessed.
+
+## What a journey changed
+
+A journey's random split can hold some people back on purpose (a holdout). On the journey's page, such a split shows each path against the people held back: how many converted within 30 days after the split, what they paid, how much better or worse each path did, and whether the difference is real or too early to tell (it needs at least 30 people on each side). Revenue beyond what as many held-back people paid is shown too.
+
 ## On Home and in your digest
 
 **Home** shows the last 28 days across every channel, below **Needs you**: visits, conversions, revenue and cost, with a link to Channels. It appears once your site has visits, for anyone who can see the reports.
 
 Your [daily or weekly digest](/docs/guides/digests/) has a **Channels** section: visits, conversions, and revenue and cost in each currency, each next to the period before, and the three channels that brought the most conversions. Both use your default model.
 
-[Missions](/docs/agents/missions/) can aim at revenue credited to the campaign links in their sequences, under your default model.
+[Missions](/docs/agents/missions/) can aim at revenue credited to the campaign links in their sequences and broadcasts, and to their social posts and replies, under your default model.
 
 ## Who can do what
 
@@ -66,4 +90,4 @@ Everyone in the workspace can see the reports (`analytics.read`). Owners, admins
 
 ## For agents and scripts
 
-The REST API is under `/v1/workspaces/{ws}/attribution`: `/settings`, `/channels`, `/campaigns` and `/conversions`, each with `from`, `to`, `model` and `brand`; see the [API reference](/docs/api/). The MCP tools are `get_attribution_settings`, `update_attribution_settings`, `get_attribution_channels`, `get_attribution_campaigns` and `list_attribution_conversions`. Ask your agent something like *"Which channel brought the most revenue this month, and what did each sign-up cost us per channel?"*
+The REST API is under `/v1/workspaces/{ws}/attribution`: `/settings`, `/channels`, `/campaigns`, `/conversions`, `/customers`, `/cohorts`, `/accounts` and `/deals`, each with `from`, `to`, `model`, `brand` and `match` (`identified` for identified people only). `/campaigns` also takes `split=content`. A journey's holdout comparison is `GET /v1/brands/{brand}/journeys/{id}/lift?step=`. See the [API reference](/docs/api/). The MCP tools are `get_attribution_settings`, `update_attribution_settings`, `get_attribution_channels`, `get_attribution_campaigns`, `list_attribution_conversions`, `get_attribution_customers`, `get_attribution_cohorts`, `get_attribution_accounts`, `get_attribution_deals` and `get_journey_lift`. Ask your agent something like *"Which channel brought the most revenue this month, and what did each sign-up cost us per channel?"*

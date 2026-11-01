@@ -58,7 +58,7 @@ Some parts of Outflare tag their own links, so you don't make those campaigns by
 
 | Where the link goes out | One campaign per | Channel | Which links |
 | --- | --- | --- | --- |
-| [Sequences](/docs/guides/sequences/) | sequence | Outbound email | Links in each step to your brand's website and domains |
+| [Sequences](/docs/guides/sequences/) | sequence | Outbound email | Links in each step to your brand's website and domains, with the step as the content (`step-1`, `step-2`) |
 | Broadcasts | broadcast | Lifecycle email | Links in the email to your brand's website and domains |
 | Journeys | journey | Lifecycle email | The same |
 | [Social replies](/docs/guides/social/) | watch | Reddit, or Organic social for X and LinkedIn | The watch's landing page, with each reply as the content |
