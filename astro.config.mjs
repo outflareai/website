@@ -14,16 +14,6 @@ const shortLinks = {
 	hooks: {
 		'astro:build:done': async ({ dir }) => {
 			const lines = social.profiles.flatMap((p) => [`/${p.short} ${p.url} 302`, `/${p.short}/ ${p.url} 302`]);
-			const stable = `${repo}/releases/download/desktop-stable`;
-			lines.push(`/downloads/desktop/latest.json ${stable}/latest.json 302`);
-			for (const [platform, file] of Object.entries({
-				macos: 'Outflare-desktop-macos.dmg',
-				windows: 'Outflare-desktop-windows.exe',
-				linux: 'Outflare-desktop-linux.AppImage',
-			})) {
-				lines.push(`/downloads/desktop/${platform}/ ${stable}/${file} 302`);
-				lines.push(`/downloads/desktop/${platform} ${stable}/${file} 302`);
-			}
 			await writeFile(new URL('_redirects', dir), `${lines.join('\n')}\n`);
 		},
 	},

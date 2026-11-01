@@ -1,11 +1,7 @@
 ---
 import Marketing from '../layouts/Marketing.astro';
 
-const platforms = [
-  { name: 'macOS', file: 'Disk image · Apple silicon and Intel', path: 'macos' },
-  { name: 'Windows', file: 'Installer · x64', path: 'windows' },
-  { name: 'Linux', file: 'AppImage · x64', path: 'linux' },
-];
+
 ---
 
 <Marketing title="Download Outflare for desktop" description="Connect the AI accounts on your computer to Outflare and keep your team's subscription usage in one place.">
@@ -14,16 +10,18 @@ const platforms = [
       <p class="eyebrow">Downloads</p>
       <h1 class="mt-3 text-4xl font-semibold tracking-tighter sm:text-5xl">Outflare for desktop</h1>
       <p class="sub max-w-2xl">See the AI accounts used on your computer in your Outflare workspace. The tray app reports account identity, subscription plan and available usage limits while you work.</p>
-      <div class="mt-10 grid gap-5 md:grid-cols-3">
-        {platforms.map(platform => (
-          <article class="card p-6">
-            <h2 class="text-xl font-semibold">{platform.name}</h2>
-            <p class="mt-2 text-sm text-muted-foreground">{platform.file}</p>
-            <a class="btn btn-primary mt-6" href={`/downloads/desktop/${platform.path}/`} data-track="desktop_download_click" data-track-label={platform.path}>Download for {platform.name}</a>
-          </article>
-        ))}
-      </div>
-      <p class="mt-6 text-sm text-muted-foreground">Stable releases check for signed updates automatically. You can also choose Check for updates in the app window or tray menu. Downloads are public and do not require a GitHub account.</p>
+      <article class="card mt-10 max-w-xl p-6">
+        <p class="eyebrow">Automatic update test</p>
+        <h2 class="mt-3 text-xl font-semibold">macOS · Apple silicon and Intel</h2>
+        <p class="mt-2 text-sm text-muted-foreground">This test installer exercises one automatic upgrade. Stable releases for ongoing updates are coming later.</p>
+        <a class="btn btn-primary mt-6" href="https://github.com/outflareai/outflare/releases/download/desktop-update-test/Outflare-desktop-update-test-macos.dmg" rel="noreferrer" data-track="desktop_download_click" data-track-label="macos_update_test">Download for Mac · update test</a>
+        <ol class="mt-6 list-decimal space-y-2 pl-5 text-sm text-muted-foreground">
+          <li>Quit any existing Outflare for desktop app and install this copy into Applications.</li>
+          <li>Open the installed app. Its version starts at 0.78.0-update-test.0.</li>
+          <li>Close its window and leave the menu-bar app running. It should automatically upgrade and restart as 0.78.0.</li>
+        </ol>
+      </article>
+      <p class="mt-6 text-sm text-muted-foreground">You can also choose Check for updates in the app window or tray menu. This public download does not require a GitHub account.</p>
     </div>
   </section>
   <section class="mx-auto grid max-w-6xl gap-8 px-4 py-14 sm:px-6 md:grid-cols-2">
