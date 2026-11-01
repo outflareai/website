@@ -2,7 +2,7 @@
 	"version": "2026.11.01",
 	"date": "2026-11-01",
 	"status": "in-progress",
-	"updated": "2026-11-01T17:13:21Z",
+	"updated": "2026-11-01T17:25:29Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -248,7 +248,35 @@
 			"edition": "open-source",
 			"text": "Analytics → Channels can show identified people only: visits where the person signed in or was named by a form, and the credit on them, leaving out visits known only by a browser cookie. Each credited visit now says how it was matched.",
 			"at": "2026-11-01T17:13:21Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "A connected sequencer account's name is now `integration_name` everywhere, beside `integration_id`: on campaign links (was `platform`), platform accounts (was `name`), a mailbox's assignment and its `platforms` list (was `platform`) and a sequence's assigned mailboxes (was `platform`). `connector` stays the connector's id.",
+			"at": "2026-11-01T17:25:29Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "Your own role in `GET /v1/me` and `GET /v1/workspaces/{ws}` now reads like a member's: `role` is the exact role as `GET /roles` lists it (a starting role's key or your workspace's own role's id), with its name in `role_name`. `role_id` is gone. The workspace switcher shows the role's name.",
+			"at": "2026-11-01T17:25:29Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "Connectors and data providers now say how to connect in one place: `auth_options` lists each way (sign in or API key), whether it works on this server and which is recommended. The repeated `auth` and `auth_methods` fields are gone from the API.",
+			"at": "2026-11-01T17:25:29Z"
+		},
+		{
+			"kind": "launch",
+			"area": "inbox",
+			"edition": "open-source",
+			"text": "Support response times: set how fast your team promises to reply and resolve, in working hours or around the clock, for the workspace or one brand. Each conversation shows when its reply is due, and an Overdue folder collects the ones that ran late.",
+			"at": "2026-11-01T17:25:29Z"
 		}
 	],
-	"through": "8e988c4+4e85cc7"
+	"through": "693a615+e17f0a1"
 }
