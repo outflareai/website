@@ -37,7 +37,7 @@ Besides meetings, replies, emails sent and leads contacted, a mission can aim at
 
 | Goal | What counts |
 | --- | --- |
-| `revenue_attributed`, *USD revenue from its sequences* | Payments credited to the campaign links in the mission's sequences, under your default [attribution model](/docs/guides/attribution/), less refunds |
+| `revenue_attributed`, *USD revenue from its campaigns* | Payments credited to the campaign links in the mission's sequences and broadcasts, and to its social posts and replies, under your default [attribution model](/docs/guides/attribution/), less refunds |
 | `revenue_deals`, *USD in won deals* | Won deals tagged with the mission |
 
 Money in other currencies is left out, never converted. The mission's progress shows both, as `revenue_attributed_cents` and `revenue_deals_cents`, whichever one is its goal.
