@@ -41,6 +41,18 @@ The full catalog, with each connector's status and credential fields, is public 
 
 Every entry has a `logo_url` and a `logo_dark_url`: the company's own mark as a square SVG, or a clean monogram when there is none. They point at `GET /v1/connectors/{id}/logo.svg` (add `?theme=dark` for dark backgrounds), which is public and cacheable, so an `<img>` tag, the SDK, the CLI or an agent can show the same logos as the app. Marks are used unmodified to name each connector; the trademarks belong to their owners.
 
+## Compare tools in a category
+
+Every category has a comparison: what the category is for, what Outflare does with it, and a table of the API abilities that differ between its tools (yes, partly or no). Each integration's page also lists what its vendor's API **can't** do, each point linked to the vendor's own page and dated by when it was last checked:
+
+- **Not in the API**: the vendor's API has no way to do it.
+- **Only in their app**: you have to sign in to the vendor's own app to do it.
+- **Paid plan**: API access, or that part of it, needs a paid plan, add-on or extra credits.
+- **Limits**: rate limits, quotas, data delays or history limits.
+- **Not in Outflare yet**: the vendor can do it, but Outflare doesn't use it yet.
+
+Find them under **Compare** on [Integrations](/integrations/), on the Connectors page in the app (**Compare** on each category, **What it can't do** on each card), in the API (`features`, `limits` and `checked` on each entry of `GET /v1/connectors`, and `GET /v1/connector-categories`) and through MCP (`compare_connectors`). Vendors change their APIs, so anyone can correct a row on GitHub: each category is one file in [`integrations/categories`](https://github.com/outflareai/outflare/tree/main/integrations/categories).
+
 ## Connect in the app
 
 Open **Connectors**, pick a card and click **Connect**. Many services offer two ways in, and you choose:

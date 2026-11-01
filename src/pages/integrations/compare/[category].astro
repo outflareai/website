@@ -1,0 +1,37 @@
+---
+import Marketing from '../../../layouts/Marketing.astro';
+import CompareTable from '../../../components/CompareTable.astro';
+import { categoryOf, compared, guides, guideSource, type Guide } from '../../../data/integrations';
+
+export function getStaticPaths() {
+	return guides.filter((g) => compared(g).length > 1).map((g) => ({ params: { category: g.id }, props: { guide: g } }));
+}
+
+const { guide } = Astro.props as { guide: Guide };
+const cat = categoryOf(guide.id);
+const checked = compared(guide).map((i) => i.checked).filter(Boolean).sort().at(-1);
+---
+
+<Marketing title={`Compare ${cat.label.toLowerCase()} integrations · Outflare`} description={`${guide.summary} How each tool's API compares, and what each one can't do.`}>
+	<section class="border-b">
+		<div class="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
+			<nav aria-label="Breadcrumb" class="text-sm text-muted-foreground">
+				<a href="/integrations/" class="touch inline-flex items-center hover:text-foreground">Integrations</a>
+				<span aria-hidden="true" class="px-1.5">/</span>
+				<a href={`/integrations/#${cat.id}`} class="touch inline-flex items-center hover:text-foreground">{cat.label}</a>
+			</nav>
+			<h1 class="mt-6 text-3xl font-semibold tracking-tighter sm:text-4xl">Compare {cat.label.toLowerCase()}</h1>
+			<p class="sub mt-2 max-w-2xl">{guide.summary}</p>
+			<p class="mt-4 max-w-2xl text-muted-foreground">{guide.outflare}</p>
+		</div>
+	</section>
+	<div class="mx-auto max-w-6xl space-y-6 px-4 py-14 sm:px-6">
+		<CompareTable guide={guide} />
+		<dl class="grid gap-3 text-sm sm:grid-cols-2">
+			{guide.features.map((f) => <div><dt class="font-medium">{f.label}</dt><dd class="text-muted-foreground">{f.help}</dd></div>)}
+		</dl>
+		<p class="text-xs text-muted-foreground">
+			From each vendor's own documentation{checked && `, last checked ${checked}`}. Open an integration to see what its API can't do, with a source for each point. Vendors change their APIs: if something is out of date, <a href={guideSource(guide.id)} rel="noopener" data-track="integration_compare_correct" data-track-label={guide.id} class="underline hover:text-foreground">correct it on GitHub</a>.
+		</p>
+	</div>
+</Marketing>

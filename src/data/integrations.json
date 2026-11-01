@@ -1,10 +1,131 @@
 [
 	{
+		"id": "amazon_ads",
+		"name": "Amazon Ads",
+		"category": "ads",
+		"summary": "Spend, impressions, clicks and sales per Sponsored Products campaign from your Amazon Ads profiles.",
+		"description": "Signs in with Amazon (Login with Amazon) and reads every advertising profile the sign-in can reach, in North America, Europe and the Far East, read-only: Sponsored Products campaigns and their daily numbers from Amazon's reports.",
+		"website": "https://advertising.amazon.com",
+		"docs_url": "https://advertising.amazon.com/API/docs/en-us/",
+		"auth_methods": [
+			"oauth2"
+		],
+		"capabilities": [
+			"ads.read"
+		],
+		"status": "available",
+		"pricing": "Free API; ad spend stays on your own account",
+		"features": [
+			{
+				"id": "oauth_sign_in",
+				"value": "yes",
+				"note": "Login with Amazon."
+			},
+			{
+				"id": "open_access",
+				"value": "no",
+				"note": "Amazon reviews each application before granting access."
+			},
+			{
+				"id": "manage_campaigns",
+				"value": "yes"
+			},
+			{
+				"id": "conversions_api",
+				"value": "partial",
+				"note": "Amazon's conversion events API is in beta."
+			},
+			{
+				"id": "customer_lists",
+				"value": "partial",
+				"note": "Hashed lists go to Amazon DSP and Amazon Marketing Cloud audiences, not Sponsored Products."
+			}
+		],
+		"limits": [
+			{
+				"kind": "login",
+				"text": "The Amazon Ads API needs an application and Amazon's approval before any call works.",
+				"source": "https://advertising.amazon.com/about-api"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare reads Sponsored Products campaigns only, not Sponsored Brands or Sponsored Display.",
+				"source": "https://outflare.ai/docs"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare syncs Amazon campaigns only, not their ad groups or ads.",
+				"source": "https://outflare.ai/docs"
+			}
+		],
+		"checked": "2026-11-01"
+	},
+	{
+		"id": "apple_ads",
+		"name": "Apple Ads",
+		"category": "ads",
+		"summary": "Spend, impressions, taps and installs per campaign from your Apple Ads (formerly Apple Search Ads) accounts.",
+		"description": "Uses your own Apple Ads API user. In Apple Ads, invite a user with an API role (API Account Read Only is enough), sign in as that user, upload a public key under Account Settings, API, and paste the client id, team id and key id Apple shows there, with the private key. Read-only: installs are measured in your app, so there is nothing to send back.",
+		"website": "https://ads.apple.com",
+		"docs_url": "https://developer.apple.com/documentation/apple-ads-platform-api",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"ads.read"
+		],
+		"status": "available",
+		"pricing": "Free API; ad spend stays on your own account",
+		"features": [
+			{
+				"id": "oauth_sign_in",
+				"value": "no",
+				"note": "OAuth client credentials signed with your own key pair."
+			},
+			{
+				"id": "open_access",
+				"value": "yes",
+				"note": "An account admin gives a user an API role; Apple doesn't review the app."
+			},
+			{
+				"id": "manage_campaigns",
+				"value": "yes"
+			},
+			{
+				"id": "conversions_api",
+				"value": "no",
+				"note": "Ads open the App Store; installs are measured in the app."
+			},
+			{
+				"id": "customer_lists",
+				"value": "no"
+			}
+		],
+		"limits": [
+			{
+				"kind": "login",
+				"text": "An account admin invites the API user in the Apple Ads app, and that user pastes the public key there.",
+				"source": "https://developer.apple.com/documentation/apple_ads/implementing-oauth-for-the-apple-search-ads-api"
+			},
+			{
+				"kind": "limits",
+				"text": "Daily report rows reach back at most 90 days; older numbers come only by week or month.",
+				"source": "https://developer.apple.com/documentation/apple_ads/reportingrequest"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare syncs Apple Ads campaigns only, not their ad groups or ads.",
+				"source": "https://outflare.ai/docs"
+			}
+		],
+		"checked": "2026-11-01"
+	},
+	{
 		"id": "google_ads",
 		"name": "Google Ads",
 		"category": "ads",
 		"summary": "Spend, clicks and conversions per campaign from your Google Ads accounts.",
-		"description": "Signs in with Google and reads every Google Ads account the sign-in can see, including accounts under a manager account. Google also asks for a developer token: create one in your own Google Ads manager account (Admin, API Center) and add it after signing in. It never changes your campaigns; it sends conversions only to the conversion actions you choose under Paid ads.",
+		"description": "Signs in with Google and reads every Google Ads account the sign-in can see, including accounts under a manager account. Google also asks for a developer token: create one in your own Google Ads manager account (Admin, API Center) and add it after signing in. It never changes your campaigns; it sends conversions only to the conversion actions you choose under Paid ads, and adds people only to the Customer Match lists your journeys name.",
 		"website": "https://ads.google.com",
 		"docs_url": "https://developers.google.com/google-ads/api/docs/start",
 		"auth_methods": [
@@ -12,10 +133,48 @@
 		],
 		"capabilities": [
 			"ads.read",
-			"ads.conversions"
+			"ads.conversions",
+			"ads.audiences"
 		],
 		"status": "available",
-		"pricing": "Free API; ad spend stays on your own account"
+		"pricing": "Free API; ad spend stays on your own account",
+		"features": [
+			{
+				"id": "oauth_sign_in",
+				"value": "yes"
+			},
+			{
+				"id": "open_access",
+				"value": "partial",
+				"note": "A developer token is needed; Basic and Standard access need an application to Google."
+			},
+			{
+				"id": "manage_campaigns",
+				"value": "yes"
+			},
+			{
+				"id": "conversions_api",
+				"value": "yes"
+			},
+			{
+				"id": "customer_lists",
+				"value": "yes",
+				"note": "Customer Match lists."
+			}
+		],
+		"limits": [
+			{
+				"kind": "limits",
+				"text": "A developer token with Explorer access allows 2,880 operations a day on live accounts; Basic access allows 15,000.",
+				"source": "https://developers.google.com/google-ads/api/docs/api-policy/access-levels"
+			},
+			{
+				"kind": "login",
+				"text": "Basic and Standard access are applied for with a form, and Standard access needs a manual review.",
+				"source": "https://developers.google.com/google-ads/api/docs/api-policy/access-levels"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "linkedin_ads",
@@ -32,14 +191,68 @@
 			"ads.read"
 		],
 		"status": "available",
-		"pricing": "Free API; ad spend stays on your own account"
+		"pricing": "Free API; ad spend stays on your own account",
+		"features": [
+			{
+				"id": "oauth_sign_in",
+				"value": "yes"
+			},
+			{
+				"id": "open_access",
+				"value": "no",
+				"note": "LinkedIn approves each app for the Advertising API."
+			},
+			{
+				"id": "manage_campaigns",
+				"value": "partial",
+				"note": "The Development tier edits up to five ad accounts; Standard has no cap."
+			},
+			{
+				"id": "conversions_api",
+				"value": "yes",
+				"note": "Needs separate approval for the Conversions API."
+			},
+			{
+				"id": "customer_lists",
+				"value": "yes",
+				"note": "Needs separate approval for the Matched Audiences API."
+			}
+		],
+		"limits": [
+			{
+				"kind": "login",
+				"text": "The Advertising API needs an application approved by LinkedIn before an app can read ad accounts.",
+				"source": "https://learn.microsoft.com/en-us/linkedin/marketing/increasing-access"
+			},
+			{
+				"kind": "login",
+				"text": "The Conversions API and the Matched Audiences API each need their own approval from LinkedIn.",
+				"source": "https://learn.microsoft.com/en-us/linkedin/marketing/increasing-access"
+			},
+			{
+				"kind": "limits",
+				"text": "In the Development tier the API can edit at most five ad accounts; the Standard tier is requested with a support ticket.",
+				"source": "https://learn.microsoft.com/en-us/linkedin/marketing/increasing-access"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare reads LinkedIn spend only; it doesn't send conversions or fill audiences yet.",
+				"source": "https://learn.microsoft.com/en-us/linkedin/marketing/increasing-access"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare syncs LinkedIn campaigns only, not their creatives.",
+				"source": "https://outflare.ai/docs"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "meta_ads",
 		"name": "Meta Ads",
 		"category": "ads",
 		"summary": "Spend, clicks and conversions per campaign from your Facebook and Instagram ad accounts.",
-		"description": "Reads every ad account a token can see, with read-only access. The simplest way: in your Meta Business Settings, Users, System users, create a system user, give it the ad accounts, and generate a token with the ads_read permission. Conversions are Meta's standard events (purchases, leads, registrations, trials, subscriptions). To send conversions back through the Conversions API, also assign the system user to your pixel (Business Settings, Data sources, Datasets).",
+		"description": "Reads every ad account a token can see, with read-only access. The simplest way: in your Meta Business Settings, Users, System users, create a system user, give it the ad accounts, and generate a token with the ads_read permission. Conversions are Meta's standard events (purchases, leads, registrations, trials, subscriptions). To send conversions back through the Conversions API, also assign the system user to your pixel (Business Settings, Data sources, Datasets). For journeys to add people to your customer list audiences, give the token ads_management too and accept the Custom Audience terms in your ad account.",
 		"website": "https://www.facebook.com/business/ads",
 		"docs_url": "https://developers.facebook.com/docs/marketing-api/insights",
 		"auth_methods": [
@@ -48,10 +261,47 @@
 		],
 		"capabilities": [
 			"ads.read",
-			"ads.conversions"
+			"ads.conversions",
+			"ads.audiences"
 		],
 		"status": "available",
-		"pricing": "Free API; ad spend stays on your own account"
+		"pricing": "Free API; ad spend stays on your own account",
+		"features": [
+			{
+				"id": "oauth_sign_in",
+				"value": "yes"
+			},
+			{
+				"id": "open_access",
+				"value": "partial",
+				"note": "Standard access covers ad accounts your business owns or was granted; wider use goes through App Review."
+			},
+			{
+				"id": "manage_campaigns",
+				"value": "yes"
+			},
+			{
+				"id": "conversions_api",
+				"value": "yes"
+			},
+			{
+				"id": "customer_lists",
+				"value": "yes"
+			}
+		],
+		"limits": [
+			{
+				"kind": "login",
+				"text": "Customer list audiences work only after Meta's Custom Audience terms are accepted for the ad account.",
+				"source": "https://developers.facebook.com/documentation/ads-commerce/marketing-api/reference/custom-audience"
+			},
+			{
+				"kind": "limits",
+				"text": "Insights reach back 37 months; since January 2026, hourly breakdowns reach back 13 months and frequency 6 months.",
+				"source": "https://developers.facebook.com/blog/post/2025/10/16/ads-insights-api-metric-availability-updates/"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "microsoft_ads",
@@ -69,7 +319,185 @@
 			"ads.conversions"
 		],
 		"status": "available",
-		"pricing": "Free API; ad spend stays on your own account"
+		"pricing": "Free API; ad spend stays on your own account",
+		"features": [
+			{
+				"id": "oauth_sign_in",
+				"value": "yes"
+			},
+			{
+				"id": "open_access",
+				"value": "yes",
+				"note": "A Super Admin requests the developer token in the developer settings."
+			},
+			{
+				"id": "manage_campaigns",
+				"value": "yes"
+			},
+			{
+				"id": "conversions_api",
+				"value": "yes",
+				"note": "Offline conversions."
+			},
+			{
+				"id": "customer_lists",
+				"value": "yes",
+				"note": "Customer Match lists, through the Bulk API."
+			}
+		],
+		"limits": [
+			{
+				"kind": "login",
+				"text": "The developer token is requested by a Super Admin in Microsoft Advertising's developer settings.",
+				"source": "https://learn.microsoft.com/en-us/advertising/guides/get-started"
+			},
+			{
+				"kind": "limits",
+				"text": "Only a limited number of reports can be generating at once; more wait until earlier ones finish.",
+				"source": "https://learn.microsoft.com/en-us/advertising/guides/services-protocol"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare doesn't fill Customer Match lists yet, though the Bulk API takes them.",
+				"source": "https://learn.microsoft.com/en-us/advertising/bulk-service/customer-list"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare syncs Microsoft Advertising campaigns only, not their ad groups or ads.",
+				"source": "https://outflare.ai/docs"
+			}
+		],
+		"checked": "2026-11-01"
+	},
+	{
+		"id": "outbrain_ads",
+		"name": "Outbrain Ads",
+		"category": "ads",
+		"summary": "Spend, impressions, clicks and conversions per campaign from your Outbrain marketers.",
+		"description": "Uses your own Outbrain login, once Outbrain has given it Amplify API access (apply on Outbrain's developer site). Outflare trades the username and password for an API token every few weeks and reads every marketer the login can see, read-only.",
+		"website": "https://www.outbrain.com/advertisers/",
+		"docs_url": "https://developer.outbrain.com/docs/amplify/api/overview/",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"ads.read"
+		],
+		"status": "available",
+		"pricing": "Free API; ad spend stays on your own account",
+		"features": [
+			{
+				"id": "oauth_sign_in",
+				"value": "no",
+				"note": "An Outbrain username and password are traded for a token."
+			},
+			{
+				"id": "open_access",
+				"value": "no",
+				"note": "Amplify API access is requested from Outbrain."
+			},
+			{
+				"id": "manage_campaigns",
+				"value": "yes"
+			},
+			{
+				"id": "conversions_api",
+				"value": "no",
+				"note": "The API manages conversion definitions; the pixel counts conversions."
+			},
+			{
+				"id": "customer_lists",
+				"value": "no",
+				"note": "Segments come from pixel rules or campaign clickers."
+			}
+		],
+		"limits": [
+			{
+				"kind": "login",
+				"text": "Amplify API access is requested from Outbrain with a form before any call works.",
+				"source": "https://developer.outbrain.com/docs/amplify/api/overview/"
+			},
+			{
+				"kind": "api",
+				"text": "The API has no call that takes conversions; it only manages conversion definitions for the pixel.",
+				"source": "https://developer.outbrain.com/docs/amplify/api/multiple-conversions/"
+			},
+			{
+				"kind": "api",
+				"text": "Segments are built from pixel rules or campaign clickers; the API has no customer list upload.",
+				"source": "https://developer.outbrain.com/docs/amplify/api/segments/"
+			},
+			{
+				"kind": "limits",
+				"text": "Performance reporting allows 30 requests a minute per marketer, and its numbers run 10 to 30 minutes behind.",
+				"source": "https://developer.outbrain.com/docs/amplify/api/performance-reporting/"
+			},
+			{
+				"kind": "limits",
+				"text": "Tokens last 30 days, and a user can ask for a new one at most twice an hour.",
+				"source": "https://developer.outbrain.com/docs/amplify/api/authentication/"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare syncs Outbrain campaigns only, not their promoted links.",
+				"source": "https://outflare.ai/docs"
+			}
+		],
+		"checked": "2026-11-01"
+	},
+	{
+		"id": "pinterest_ads",
+		"name": "Pinterest Ads",
+		"category": "ads",
+		"summary": "Spend, impressions, clicks and conversions per campaign from your Pinterest ad accounts.",
+		"description": "Signs in with Pinterest and reads every ad account you can see, read-only; add a conversion access token to send conversions back through the Conversions API.",
+		"website": "https://ads.pinterest.com",
+		"docs_url": "https://developers.pinterest.com/docs/api/v5/",
+		"auth_methods": [
+			"oauth2"
+		],
+		"capabilities": [
+			"ads.read",
+			"ads.conversions"
+		],
+		"status": "available",
+		"pricing": "Free API; ad spend stays on your own account",
+		"features": [
+			{
+				"id": "oauth_sign_in",
+				"value": "yes"
+			},
+			{
+				"id": "open_access",
+				"value": "partial",
+				"note": "New apps get Trial access; Standard access needs an upgrade request."
+			},
+			{
+				"id": "manage_campaigns",
+				"value": "yes"
+			},
+			{
+				"id": "conversions_api",
+				"value": "yes"
+			},
+			{
+				"id": "customer_lists",
+				"value": "yes"
+			}
+		],
+		"limits": [
+			{
+				"kind": "limits",
+				"text": "Trial access is limited to a daily number of calls per app; Standard access needs an upgrade request with a video demo.",
+				"source": "https://developers.pinterest.com/docs/key-concepts/access-tiers/"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare syncs Pinterest campaigns only, not their ad groups or ads.",
+				"source": "https://outflare.ai/docs"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "reddit_ads",
@@ -87,7 +515,209 @@
 			"ads.conversions"
 		],
 		"status": "available",
-		"pricing": "Free API; ad spend stays on your own account"
+		"pricing": "Free API; ad spend stays on your own account",
+		"features": [
+			{
+				"id": "oauth_sign_in",
+				"value": "yes"
+			},
+			{
+				"id": "open_access",
+				"value": "no",
+				"note": "Ads API access is granted to a developer app on request."
+			},
+			{
+				"id": "manage_campaigns",
+				"value": "yes"
+			},
+			{
+				"id": "conversions_api",
+				"value": "yes"
+			},
+			{
+				"id": "customer_lists",
+				"value": "yes"
+			}
+		],
+		"limits": [
+			{
+				"kind": "outflare",
+				"text": "Outflare syncs Reddit campaigns only, not their ad groups or ads.",
+				"source": "https://outflare.ai/docs"
+			}
+		],
+		"checked": "2026-11-01"
+	},
+	{
+		"id": "snapchat_ads",
+		"name": "Snapchat Ads",
+		"category": "ads",
+		"summary": "Spend, impressions and swipes per campaign from your Snapchat ad accounts.",
+		"description": "Signs in with Snapchat and reads every ad account of every organization you belong to, read-only; conversions go back to your Snap Pixel through the Conversions API.",
+		"website": "https://ads.snapchat.com",
+		"docs_url": "https://developers.snap.com/api/marketing-api/Ads-API/introduction",
+		"auth_methods": [
+			"oauth2"
+		],
+		"capabilities": [
+			"ads.read",
+			"ads.conversions"
+		],
+		"status": "available",
+		"pricing": "Free API; ad spend stays on your own account",
+		"features": [
+			{
+				"id": "oauth_sign_in",
+				"value": "yes"
+			},
+			{
+				"id": "open_access",
+				"value": "yes",
+				"note": "The OAuth app is made in Ads Manager under Business Details."
+			},
+			{
+				"id": "manage_campaigns",
+				"value": "yes"
+			},
+			{
+				"id": "conversions_api",
+				"value": "yes"
+			},
+			{
+				"id": "customer_lists",
+				"value": "yes"
+			}
+		],
+		"limits": [
+			{
+				"kind": "outflare",
+				"text": "Outflare syncs Snapchat campaigns only, not their ad squads or ads.",
+				"source": "https://outflare.ai/docs"
+			}
+		],
+		"checked": "2026-11-01"
+	},
+	{
+		"id": "taboola_ads",
+		"name": "Taboola Ads",
+		"category": "ads",
+		"summary": "Spend, impressions, clicks and conversions per campaign from your Taboola advertiser accounts.",
+		"description": "Uses your own Backstage API credentials: ask your Taboola account manager for API access, and paste the client id and secret they issue. A network's credentials read every advertiser account under it. Read-only; conversions go back to your event-based conversions as server-to-server actions, matched on Taboola's click id.",
+		"website": "https://www.taboola.com",
+		"docs_url": "https://developers.taboola.com/backstage-api/reference/welcome",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"ads.read",
+			"ads.conversions"
+		],
+		"status": "available",
+		"pricing": "Free API; ad spend stays on your own account",
+		"features": [
+			{
+				"id": "oauth_sign_in",
+				"value": "no",
+				"note": "OAuth client credentials issued by Taboola."
+			},
+			{
+				"id": "open_access",
+				"value": "partial",
+				"note": "Existing customers make keys on the API Keys page or get them from their account manager."
+			},
+			{
+				"id": "manage_campaigns",
+				"value": "yes"
+			},
+			{
+				"id": "conversions_api",
+				"value": "yes",
+				"note": "Server-to-server events matched on the click id."
+			},
+			{
+				"id": "customer_lists",
+				"value": "yes",
+				"note": "First-party audiences."
+			}
+		],
+		"limits": [
+			{
+				"kind": "login",
+				"text": "API credentials come from Taboola, on the API Keys page or from the account manager; there is no sign-in flow.",
+				"source": "https://developers.taboola.com/backstage-api/reference/welcome"
+			},
+			{
+				"kind": "limits",
+				"text": "Access tokens last 12 hours and come with no refresh token.",
+				"source": "https://developers.taboola.com/backstage-api/reference/client-credentials-flow"
+			},
+			{
+				"kind": "limits",
+				"text": "Accounts made after October 4, 2026 have tiered read and write rate limits; Tier 6 allows the fewest requests.",
+				"source": "https://developers.taboola.com/backstage-api/reference/rate-limits"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare doesn't fill Taboola first-party audiences yet, though the API can add users to them.",
+				"source": "https://developers.taboola.com/backstage-api/reference/create-a-first-party-audience"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare syncs Taboola campaigns only, not their items.",
+				"source": "https://outflare.ai/docs"
+			}
+		],
+		"checked": "2026-11-01"
+	},
+	{
+		"id": "tiktok_ads",
+		"name": "TikTok Ads",
+		"category": "ads",
+		"summary": "Spend, impressions, clicks and conversions per campaign from your TikTok ad accounts.",
+		"description": "Signs in with TikTok For Business and reads the ad accounts you grant, read-only; conversions go back to your TikTok pixel through the Events API. To add more ad accounts later, connect again and grant them.",
+		"website": "https://ads.tiktok.com",
+		"docs_url": "https://business-api.tiktok.com/portal/docs",
+		"auth_methods": [
+			"oauth2"
+		],
+		"capabilities": [
+			"ads.read",
+			"ads.conversions"
+		],
+		"status": "available",
+		"pricing": "Free API; ad spend stays on your own account",
+		"features": [
+			{
+				"id": "oauth_sign_in",
+				"value": "yes"
+			},
+			{
+				"id": "open_access",
+				"value": "no",
+				"note": "TikTok reviews each developer app."
+			},
+			{
+				"id": "manage_campaigns",
+				"value": "yes"
+			},
+			{
+				"id": "conversions_api",
+				"value": "yes",
+				"note": "Events API."
+			},
+			{
+				"id": "customer_lists",
+				"value": "yes"
+			}
+		],
+		"limits": [
+			{
+				"kind": "outflare",
+				"text": "Outflare syncs TikTok campaigns only, not their ad groups or ads.",
+				"source": "https://outflare.ai/docs"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "x_ads",
@@ -104,7 +734,49 @@
 			"ads.read"
 		],
 		"status": "available",
-		"pricing": "Free API; ad spend stays on your own account"
+		"pricing": "Free API; ad spend stays on your own account",
+		"features": [
+			{
+				"id": "oauth_sign_in",
+				"value": "yes",
+				"note": "OAuth 1.0a."
+			},
+			{
+				"id": "open_access",
+				"value": "no",
+				"note": "X approves Ads API access for each developer app."
+			},
+			{
+				"id": "manage_campaigns",
+				"value": "yes"
+			},
+			{
+				"id": "conversions_api",
+				"value": "yes"
+			},
+			{
+				"id": "customer_lists",
+				"value": "yes"
+			}
+		],
+		"limits": [
+			{
+				"kind": "login",
+				"text": "Ads API access is requested separately for each developer app, through X's access form.",
+				"source": "https://docs.x.com/x-ads-api/getting-started/step-by-step-guide"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare reads X spend only; it doesn't send conversions back yet.",
+				"source": "https://docs.x.com/x-ads-api/getting-started/step-by-step-guide"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare syncs X campaigns only, not their line items or ads.",
+				"source": "https://outflare.ai/docs"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "amplitude",
@@ -121,7 +793,52 @@
 			"analytics.read"
 		],
 		"status": "available",
-		"pricing": "Free tier"
+		"pricing": "Free tier",
+		"features": [
+			{
+				"id": "oauth",
+				"value": "no"
+			},
+			{
+				"id": "custom_queries",
+				"value": "yes"
+			},
+			{
+				"id": "raw_export",
+				"value": "yes"
+			},
+			{
+				"id": "search_queries",
+				"value": "no"
+			},
+			{
+				"id": "self_hosted",
+				"value": "no"
+			}
+		],
+		"limits": [
+			{
+				"kind": "limits",
+				"text": "Dashboard REST queries share a budget of 108,000 cost an hour and 5 requests at once across all REST endpoints.",
+				"source": "https://amplitude.com/docs/apis/analytics/dashboard-rest"
+			},
+			{
+				"kind": "limits",
+				"text": "Raw events become available in the Export API about 2 hours after Amplitude receives them.",
+				"source": "https://amplitude.com/docs/apis/analytics/export"
+			},
+			{
+				"kind": "limits",
+				"text": "One export request returns at most 4 GB and covers at most 365 days.",
+				"source": "https://amplitude.com/docs/apis/analytics/export"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare reads dashboard queries, not raw events from the Export API.",
+				"source": "https://amplitude.com/docs/apis/analytics/export"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "bing_webmaster",
@@ -138,7 +855,47 @@
 			"analytics.read"
 		],
 		"status": "available",
-		"pricing": "Free"
+		"pricing": "Free",
+		"features": [
+			{
+				"id": "oauth",
+				"value": "yes"
+			},
+			{
+				"id": "custom_queries",
+				"value": "no"
+			},
+			{
+				"id": "raw_export",
+				"value": "no"
+			},
+			{
+				"id": "search_queries",
+				"value": "yes"
+			},
+			{
+				"id": "self_hosted",
+				"value": "no"
+			}
+		],
+		"limits": [
+			{
+				"kind": "limits",
+				"text": "Search data starts when a site is added to Bing Webmaster Tools; earlier history can't be recovered.",
+				"source": "https://blogs.bing.com/webmaster/October-2024/Bing-Webmaster-Tools-Extends-Search-Performance-Data-to-16-Months"
+			},
+			{
+				"kind": "limits",
+				"text": "URL submission allows up to 10,000 URLs a day per domain, and Bing can set a lower quota for a site.",
+				"source": "https://www4.bing.com/webmasters/help/url-submission-62f2860b"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare doesn't submit URLs to Bing for indexing.",
+				"source": "https://www4.bing.com/webmasters/help/url-submission-62f2860b"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "cloudflare_web_analytics",
@@ -157,7 +914,47 @@
 			"bot_logs.read"
 		],
 		"status": "available",
-		"pricing": "Free"
+		"pricing": "Free",
+		"features": [
+			{
+				"id": "oauth",
+				"value": "yes"
+			},
+			{
+				"id": "custom_queries",
+				"value": "yes"
+			},
+			{
+				"id": "raw_export",
+				"value": "no"
+			},
+			{
+				"id": "search_queries",
+				"value": "no"
+			},
+			{
+				"id": "self_hosted",
+				"value": "no"
+			}
+		],
+		"limits": [
+			{
+				"kind": "limits",
+				"text": "Only 7 days are kept unsampled; older data is aggregated, and query results can be sampled.",
+				"source": "https://developers.cloudflare.com/web-analytics/faq/"
+			},
+			{
+				"kind": "limits",
+				"text": "Sites not proxied through Cloudflare are limited to 10 per account unless support raises it.",
+				"source": "https://developers.cloudflare.com/web-analytics/limits/"
+			},
+			{
+				"kind": "limits",
+				"text": "The GraphQL Analytics API allows 300 queries every 5 minutes by default.",
+				"source": "https://developers.cloudflare.com/analytics/graphql-api/limits/"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "fathom",
@@ -174,7 +971,48 @@
 			"analytics.read"
 		],
 		"status": "available",
-		"pricing": "Paid plans"
+		"pricing": "Paid plans",
+		"features": [
+			{
+				"id": "oauth",
+				"value": "no"
+			},
+			{
+				"id": "custom_queries",
+				"value": "yes"
+			},
+			{
+				"id": "raw_export",
+				"value": "no"
+			},
+			{
+				"id": "search_queries",
+				"value": "partial",
+				"note": "Fathom can show Google Search Console data once it is linked in the Fathom app."
+			},
+			{
+				"id": "self_hosted",
+				"value": "no"
+			}
+		],
+		"limits": [
+			{
+				"kind": "limits",
+				"text": "The included API tier allows 600 requests an hour and 5 at once, across all endpoints.",
+				"source": "https://usefathom.com/docs/api-reference/rate-limits"
+			},
+			{
+				"kind": "plan",
+				"text": "More API capacity needs a paid API tier, from 1,000 up to 16,000 requests an hour.",
+				"source": "https://usefathom.com/changelog/jun2026-api-plans"
+			},
+			{
+				"kind": "api",
+				"text": "Events can't be created over the API; they appear once the site tracks them.",
+				"source": "https://usefathom.com/api/v1/events"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "google_analytics",
@@ -192,7 +1030,53 @@
 			"analytics.read"
 		],
 		"status": "available",
-		"pricing": "Free"
+		"pricing": "Free",
+		"features": [
+			{
+				"id": "oauth",
+				"value": "yes"
+			},
+			{
+				"id": "custom_queries",
+				"value": "yes"
+			},
+			{
+				"id": "raw_export",
+				"value": "partial",
+				"note": "Raw events come only through the BigQuery export, not the reporting API."
+			},
+			{
+				"id": "search_queries",
+				"value": "no"
+			},
+			{
+				"id": "self_hosted",
+				"value": "no"
+			}
+		],
+		"limits": [
+			{
+				"kind": "limits",
+				"text": "A standard property allows 200,000 report tokens a day and 10 requests at once; Analytics 360 allows more.",
+				"source": "https://developers.google.com/analytics/devguides/reporting/data/v1/quotas"
+			},
+			{
+				"kind": "limits",
+				"text": "Reports can take 24 to 48 hours to process new data, so the latest days may still change.",
+				"source": "https://support.google.com/analytics/answer/9333790"
+			},
+			{
+				"kind": "api",
+				"text": "The reporting API has no raw events; the BigQuery export has them, capped at 1 million events a day on standard properties.",
+				"source": "https://support.google.com/analytics/answer/9358801"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare doesn't read the realtime report, which covers the last 30 minutes.",
+				"source": "https://developers.google.com/analytics/devguides/reporting/data/v1/realtime-basics"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "google_search_console",
@@ -210,7 +1094,54 @@
 			"analytics.read"
 		],
 		"status": "available",
-		"pricing": "Free"
+		"pricing": "Free",
+		"features": [
+			{
+				"id": "oauth",
+				"value": "yes"
+			},
+			{
+				"id": "custom_queries",
+				"value": "partial",
+				"note": "A fixed set of dimensions (query, page, country, device, date) and metrics."
+			},
+			{
+				"id": "raw_export",
+				"value": "partial",
+				"note": "Row-level data comes only through the bulk export to BigQuery."
+			},
+			{
+				"id": "search_queries",
+				"value": "yes"
+			},
+			{
+				"id": "self_hosted",
+				"value": "no"
+			}
+		],
+		"limits": [
+			{
+				"kind": "limits",
+				"text": "Search data usually arrives two to three days late.",
+				"source": "https://developers.google.com/webmaster-tools/v1/how-tos/search_analytics"
+			},
+			{
+				"kind": "limits",
+				"text": "The API returns at most 50,000 rows a day per search type, sorted by clicks, so rare queries are left out.",
+				"source": "https://developers.google.com/webmaster-tools/v1/how-tos/all-your-data"
+			},
+			{
+				"kind": "limits",
+				"text": "URL Inspection allows 2,000 checks a day and 600 a minute per property.",
+				"source": "https://developers.google.com/webmaster-tools/limits"
+			},
+			{
+				"kind": "login",
+				"text": "Asking Google to index a page is done in the Search Console app; the Indexing API covers only job postings and livestreams.",
+				"source": "https://developers.google.com/search/apis/indexing-api/v3/using-api"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "matomo",
@@ -227,7 +1158,47 @@
 			"analytics.read"
 		],
 		"status": "available",
-		"pricing": "Free (self-hosted)"
+		"pricing": "Free (self-hosted)",
+		"features": [
+			{
+				"id": "oauth",
+				"value": "no"
+			},
+			{
+				"id": "custom_queries",
+				"value": "yes"
+			},
+			{
+				"id": "raw_export",
+				"value": "yes"
+			},
+			{
+				"id": "search_queries",
+				"value": "no"
+			},
+			{
+				"id": "self_hosted",
+				"value": "yes"
+			}
+		],
+		"limits": [
+			{
+				"kind": "limits",
+				"text": "Self-hosted reports are only as fresh as the last archiving run, which Matomo advises running hourly with cron.",
+				"source": "https://matomo.org/faq/on-premise/how-to-set-up-auto-archiving-of-your-reports/"
+			},
+			{
+				"kind": "limits",
+				"text": "Raw visit exports from the Live API can be slow or time out on large sites; Matomo suggests running them once a day.",
+				"source": "https://matomo.org/faq/how-to/faq_24536/"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare reads aggregated reports, not raw visit details from the Live API.",
+				"source": "https://matomo.org/faq/how-to/faq_24536/"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "microsoft_clarity",
@@ -244,7 +1215,48 @@
 			"analytics.read"
 		],
 		"status": "available",
-		"pricing": "Free"
+		"pricing": "Free",
+		"features": [
+			{
+				"id": "oauth",
+				"value": "no"
+			},
+			{
+				"id": "custom_queries",
+				"value": "partial",
+				"note": "Up to three dimensions from a fixed list, over the last three days."
+			},
+			{
+				"id": "raw_export",
+				"value": "no"
+			},
+			{
+				"id": "search_queries",
+				"value": "no"
+			},
+			{
+				"id": "self_hosted",
+				"value": "no"
+			}
+		],
+		"limits": [
+			{
+				"kind": "limits",
+				"text": "The export API allows 10 requests a day per project.",
+				"source": "https://learn.microsoft.com/en-us/clarity/setup-and-installation/clarity-data-export-api"
+			},
+			{
+				"kind": "limits",
+				"text": "It covers only the last one to three days; older data can't be read over the API.",
+				"source": "https://learn.microsoft.com/en-us/clarity/setup-and-installation/clarity-data-export-api"
+			},
+			{
+				"kind": "limits",
+				"text": "Each request takes at most three dimensions and returns at most 1,000 rows, without paging.",
+				"source": "https://learn.microsoft.com/en-us/clarity/setup-and-installation/clarity-data-export-api"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "mixpanel",
@@ -261,7 +1273,52 @@
 			"analytics.read"
 		],
 		"status": "available",
-		"pricing": "Free tier"
+		"pricing": "Free tier",
+		"features": [
+			{
+				"id": "oauth",
+				"value": "no"
+			},
+			{
+				"id": "custom_queries",
+				"value": "yes"
+			},
+			{
+				"id": "raw_export",
+				"value": "yes"
+			},
+			{
+				"id": "search_queries",
+				"value": "no"
+			},
+			{
+				"id": "self_hosted",
+				"value": "no"
+			}
+		],
+		"limits": [
+			{
+				"kind": "limits",
+				"text": "The Query API allows 60 queries an hour and 5 at once per project.",
+				"source": "https://docs.mixpanel.com/reference/rate-limits"
+			},
+			{
+				"kind": "limits",
+				"text": "The raw event export allows 60 queries an hour and 3 a second per project.",
+				"source": "https://docs.mixpanel.com/reference/rate-limits"
+			},
+			{
+				"kind": "api",
+				"text": "JQL, Mixpanel's custom query language, is in maintenance mode, and its queries time out after 2 minutes.",
+				"source": "https://docs.mixpanel.com/reference/query-jql"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare reads report queries, not the raw event export.",
+				"source": "https://docs.mixpanel.com/reference/raw-event-export"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "plausible",
@@ -278,7 +1335,47 @@
 			"analytics.read"
 		],
 		"status": "available",
-		"pricing": "Paid plans"
+		"pricing": "Paid plans",
+		"features": [
+			{
+				"id": "oauth",
+				"value": "no"
+			},
+			{
+				"id": "custom_queries",
+				"value": "yes"
+			},
+			{
+				"id": "raw_export",
+				"value": "no"
+			},
+			{
+				"id": "search_queries",
+				"value": "no"
+			},
+			{
+				"id": "self_hosted",
+				"value": "yes"
+			}
+		],
+		"limits": [
+			{
+				"kind": "plan",
+				"text": "On Plausible's cloud, the Stats API needs the Business plan or higher; the Growth plan has no API access.",
+				"source": "https://plausible.io/docs/subscription-plans"
+			},
+			{
+				"kind": "limits",
+				"text": "A Stats API key allows 600 requests an hour by default; more capacity is by request to Plausible.",
+				"source": "https://plausible.io/docs/stats-api"
+			},
+			{
+				"kind": "plan",
+				"text": "Creating and managing sites over the API (the Sites API) needs an Enterprise plan.",
+				"source": "https://plausible.io/docs/sites-api"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "posthog",
@@ -297,6 +1394,47 @@
 		],
 		"status": "available",
 		"pricing": "Free tier",
+		"features": [
+			{
+				"id": "oauth",
+				"value": "yes"
+			},
+			{
+				"id": "custom_queries",
+				"value": "yes"
+			},
+			{
+				"id": "raw_export",
+				"value": "yes"
+			},
+			{
+				"id": "search_queries",
+				"value": "no"
+			},
+			{
+				"id": "self_hosted",
+				"value": "partial",
+				"note": "A hobby deployment on one machine, not meant for large volumes."
+			}
+		],
+		"limits": [
+			{
+				"kind": "limits",
+				"text": "The query API allows 2,400 requests an hour, 240 a minute and 3 queries running at once per project.",
+				"source": "https://posthog.com/docs/api/queries"
+			},
+			{
+				"kind": "limits",
+				"text": "Queries made with a personal API key also draw on an hourly read budget and fail until it refills.",
+				"source": "https://posthog.com/docs/api"
+			},
+			{
+				"kind": "api",
+				"text": "Bulk or recurring exports of events and persons aren't supported over the query API; PostHog's batch exports do that.",
+				"source": "https://posthog.com/docs/api/queries"
+			}
+		],
+		"checked": "2026-11-01",
 		"dark_logo": true
 	},
 	{
@@ -314,7 +1452,52 @@
 			"analytics.read"
 		],
 		"status": "available",
-		"pricing": "Paid plans"
+		"pricing": "Paid plans",
+		"features": [
+			{
+				"id": "oauth",
+				"value": "no"
+			},
+			{
+				"id": "custom_queries",
+				"value": "partial"
+			},
+			{
+				"id": "raw_export",
+				"value": "yes"
+			},
+			{
+				"id": "search_queries",
+				"value": "no"
+			},
+			{
+				"id": "self_hosted",
+				"value": "no"
+			}
+		],
+		"limits": [
+			{
+				"kind": "plan",
+				"text": "The Export API for raw page views and events needs a plan that includes it.",
+				"source": "https://docs.simpleanalytics.com/api/export-data-points"
+			},
+			{
+				"kind": "plan",
+				"text": "Adding websites over the Admin API needs a Business or Enterprise plan.",
+				"source": "https://docs.simpleanalytics.com/api/admin"
+			},
+			{
+				"kind": "plan",
+				"text": "The free plan keeps 30 days of history.",
+				"source": "https://www.simpleanalytics.com/pricing"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare reads the aggregated Stats API, not raw data points from the Export API.",
+				"source": "https://docs.simpleanalytics.com/api/export-data-points"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "umami",
@@ -332,6 +1515,46 @@
 		],
 		"status": "available",
 		"pricing": "Free (self-hosted)",
+		"features": [
+			{
+				"id": "oauth",
+				"value": "no"
+			},
+			{
+				"id": "custom_queries",
+				"value": "partial"
+			},
+			{
+				"id": "raw_export",
+				"value": "partial"
+			},
+			{
+				"id": "search_queries",
+				"value": "no"
+			},
+			{
+				"id": "self_hosted",
+				"value": "yes"
+			}
+		],
+		"limits": [
+			{
+				"kind": "plan",
+				"text": "API keys on Umami Cloud need the Pro plan or higher.",
+				"source": "https://docs.umami.is/docs/cloud/api-key"
+			},
+			{
+				"kind": "limits",
+				"text": "Each Umami Cloud API key allows 50 calls every 15 seconds.",
+				"source": "https://docs.umami.is/docs/cloud/api-key"
+			},
+			{
+				"kind": "api",
+				"text": "Some routes, such as user management, aren't available with an Umami Cloud API key.",
+				"source": "https://docs.umami.is/docs/cloud/api-key"
+			}
+		],
+		"checked": "2026-11-01",
 		"dark_logo": true
 	},
 	{
@@ -350,6 +1573,48 @@
 		],
 		"status": "available",
 		"pricing": "Free on Hobby, more events on Pro",
+		"features": [
+			{
+				"id": "oauth",
+				"value": "partial",
+				"note": "Only through a Vercel integration; a direct connection uses an access token."
+			},
+			{
+				"id": "custom_queries",
+				"value": "partial",
+				"note": "One breakdown dimension per query, with filters."
+			},
+			{
+				"id": "raw_export",
+				"value": "no"
+			},
+			{
+				"id": "search_queries",
+				"value": "no"
+			},
+			{
+				"id": "self_hosted",
+				"value": "no"
+			}
+		],
+		"limits": [
+			{
+				"kind": "limits",
+				"text": "Aggregate queries break down by one dimension at a time and return at most 100 rows.",
+				"source": "https://vercel.com/docs/analytics/web-analytics-api"
+			},
+			{
+				"kind": "limits",
+				"text": "Queries reach back only as far as the plan's reporting window.",
+				"source": "https://vercel.com/docs/analytics/web-analytics-api"
+			},
+			{
+				"kind": "limits",
+				"text": "Counts cover production traffic only, from when Web Analytics was turned on.",
+				"source": "https://vercel.com/docs/analytics/web-analytics-api"
+			}
+		],
+		"checked": "2026-11-01",
 		"dark_logo": true
 	},
 	{
@@ -369,6 +1634,42 @@
 		],
 		"status": "available",
 		"pricing": "Free",
+		"features": [
+			{
+				"id": "meetings_api",
+				"value": "yes"
+			},
+			{
+				"id": "webhooks",
+				"value": "yes"
+			},
+			{
+				"id": "book_api",
+				"value": "yes"
+			},
+			{
+				"id": "oauth",
+				"value": "yes"
+			}
+		],
+		"limits": [
+			{
+				"kind": "limits",
+				"text": "API keys are limited to 120 requests a minute; more needs a request to Cal.com support and may cost extra.",
+				"source": "https://cal.com/docs/api-reference/v2/introduction"
+			},
+			{
+				"kind": "login",
+				"text": "A new OAuth client stays pending until Cal.com reviews and approves it.",
+				"source": "https://cal.com/docs/api-reference/v2/oauth"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare reads accepted bookings every 15 minutes and doesn't subscribe to Cal.com webhooks yet.",
+				"source": "https://cal.com/help/webhooks"
+			}
+		],
+		"checked": "2026-11-01",
 		"dark_logo": true
 	},
 	{
@@ -387,7 +1688,50 @@
 			"meetings.sync"
 		],
 		"status": "available",
-		"pricing": "Included with paid Calendly plans"
+		"pricing": "Included with paid Calendly plans",
+		"features": [
+			{
+				"id": "meetings_api",
+				"value": "yes"
+			},
+			{
+				"id": "webhooks",
+				"value": "partial",
+				"note": "Needs a paid Calendly plan on the account that creates the subscription."
+			},
+			{
+				"id": "book_api",
+				"value": "partial",
+				"note": "Through the Scheduling API, which needs a paid Calendly plan."
+			},
+			{
+				"id": "oauth",
+				"value": "yes"
+			}
+		],
+		"limits": [
+			{
+				"kind": "plan",
+				"text": "Webhook subscriptions need a paid Calendly plan (Standard or above) on the account they are made for.",
+				"source": "https://developer.calendly.com/frequently-asked-questions"
+			},
+			{
+				"kind": "plan",
+				"text": "Booking meetings through the Scheduling API needs a paid Calendly plan.",
+				"source": "https://developer.calendly.com/docs/api-guides/schedule-events-with-ai-agents"
+			},
+			{
+				"kind": "limits",
+				"text": "API rate limits are enforced on accounts on the Free plan.",
+				"source": "https://developer.calendly.com/release-notes/2024/1/3"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare reads scheduled events every 15 minutes and doesn't use Calendly webhooks yet.",
+				"source": "https://developer.calendly.com/docs/getting-started/introduction"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "google_calendar",
@@ -404,7 +1748,44 @@
 			"meetings.sync"
 		],
 		"status": "available",
-		"pricing": "Free"
+		"pricing": "Free",
+		"features": [
+			{
+				"id": "meetings_api",
+				"value": "yes"
+			},
+			{
+				"id": "webhooks",
+				"value": "partial",
+				"note": "Push notifications say only that something changed, and each channel expires and must be replaced."
+			},
+			{
+				"id": "book_api",
+				"value": "yes"
+			},
+			{
+				"id": "oauth",
+				"value": "yes"
+			}
+		],
+		"limits": [
+			{
+				"kind": "limits",
+				"text": "Push notification channels expire (after a week by default) and nothing renews them; a new watch call must replace each one.",
+				"source": "https://developers.google.com/workspace/calendar/api/guides/push"
+			},
+			{
+				"kind": "limits",
+				"text": "Requests are limited to 600 a minute per user and 10,000 a minute per project.",
+				"source": "https://developers.google.com/workspace/calendar/api/guides/quota"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare reads one calendar every 15 minutes with sync tokens and doesn't use push notifications yet.",
+				"source": "https://developers.google.com/workspace/calendar/api/guides/push"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "outlook_calendar",
@@ -421,7 +1802,49 @@
 			"meetings.sync"
 		],
 		"status": "available",
-		"pricing": "Free"
+		"pricing": "Free",
+		"features": [
+			{
+				"id": "meetings_api",
+				"value": "yes"
+			},
+			{
+				"id": "webhooks",
+				"value": "partial",
+				"note": "Change notification subscriptions expire after a few days and must be renewed."
+			},
+			{
+				"id": "book_api",
+				"value": "yes"
+			},
+			{
+				"id": "oauth",
+				"value": "yes"
+			}
+		],
+		"limits": [
+			{
+				"kind": "limits",
+				"text": "Change notification subscriptions for calendar events expire after a few days and must be renewed.",
+				"source": "https://learn.microsoft.com/en-us/graph/change-notifications-overview"
+			},
+			{
+				"kind": "limits",
+				"text": "Outlook allows 10,000 requests per app and mailbox in 10 minutes, and 4 at the same time.",
+				"source": "https://learn.microsoft.com/en-us/graph/throttling-limits"
+			},
+			{
+				"kind": "login",
+				"text": "Where an organisation has turned off user consent, an admin must approve the app before anyone can connect.",
+				"source": "https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/configure-user-consent"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare reads calendar changes every 15 minutes with delta queries and doesn't subscribe to change notifications yet.",
+				"source": "https://learn.microsoft.com/en-us/graph/change-notifications-overview"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "github",
@@ -440,6 +1863,48 @@
 		],
 		"status": "available",
 		"pricing": "Works on every GitHub plan, including free",
+		"features": [
+			{
+				"id": "deploys_api",
+				"value": "yes"
+			},
+			{
+				"id": "deploy_webhooks",
+				"value": "yes"
+			},
+			{
+				"id": "start_deploys",
+				"value": "partial",
+				"note": "The API records a deployment; your own CI or host does the actual deploy."
+			},
+			{
+				"id": "oauth",
+				"value": "yes"
+			},
+			{
+				"id": "read_only",
+				"value": "partial",
+				"note": "Fine-grained tokens can read Deployments only; OAuth sign-in has no read-only scope for private repositories."
+			}
+		],
+		"limits": [
+			{
+				"kind": "api",
+				"text": "OAuth apps have no read-only scope for private repositories, so signing in asks for full repo access.",
+				"source": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/scopes-for-oauth-apps"
+			},
+			{
+				"kind": "limits",
+				"text": "A user's token gets 5,000 REST API requests an hour; calls over that fail until the hour resets.",
+				"source": "https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api"
+			},
+			{
+				"kind": "outflare",
+				"text": "GitHub can send deployment_status webhooks; Outflare checks for new deploys every five minutes instead.",
+				"source": "https://docs.github.com/en/webhooks/webhook-events-and-payloads"
+			}
+		],
+		"checked": "2026-11-01",
 		"dark_logo": true
 	},
 	{
@@ -458,6 +1923,54 @@
 		],
 		"status": "available",
 		"pricing": "Works on every Vercel plan, including Hobby",
+		"features": [
+			{
+				"id": "deploys_api",
+				"value": "yes"
+			},
+			{
+				"id": "deploy_webhooks",
+				"value": "partial",
+				"note": "Account webhooks need a Pro or Enterprise plan."
+			},
+			{
+				"id": "start_deploys",
+				"value": "yes"
+			},
+			{
+				"id": "oauth",
+				"value": "partial",
+				"note": "Sign in with Vercel permissions for API requests are in private beta; Outflare uses an access token."
+			},
+			{
+				"id": "read_only",
+				"value": "no",
+				"note": "Tokens can be limited to an account, team or project, not to reading."
+			}
+		],
+		"limits": [
+			{
+				"kind": "api",
+				"text": "Access tokens can be limited to an account, team or project, but not to read-only access.",
+				"source": "https://vercel.com/docs/accounts/access-tokens"
+			},
+			{
+				"kind": "plan",
+				"text": "Account webhooks, including deployment events, need a Pro or Enterprise plan.",
+				"source": "https://vercel.com/docs/webhooks"
+			},
+			{
+				"kind": "login",
+				"text": "Sign in with Vercel API permissions are in private beta, so connecting needs a token made in the Vercel dashboard.",
+				"source": "https://vercel.com/docs/sign-in-with-vercel/scopes-and-permissions"
+			},
+			{
+				"kind": "outflare",
+				"text": "Vercel can send deployment webhooks; Outflare checks for new deploys every five minutes instead.",
+				"source": "https://vercel.com/docs/webhooks"
+			}
+		],
+		"checked": "2026-11-01",
 		"dark_logo": true
 	},
 	{
@@ -477,6 +1990,58 @@
 		],
 		"status": "available",
 		"pricing": "Works on every Attio plan, including Free",
+		"features": [
+			{
+				"id": "all_plans",
+				"value": "yes"
+			},
+			{
+				"id": "oauth",
+				"value": "yes"
+			},
+			{
+				"id": "webhooks",
+				"value": "yes"
+			},
+			{
+				"id": "custom_objects",
+				"value": "partial",
+				"note": "Custom objects need the Pro or Enterprise plan."
+			}
+		],
+		"limits": [
+			{
+				"kind": "limits",
+				"text": "The API allows 100 read and 25 write requests a second, and listing records also counts against a score shared by all apps.",
+				"source": "https://docs.attio.com/rest-api/guides/rate-limiting"
+			},
+			{
+				"kind": "plan",
+				"text": "Custom objects need the Pro or Enterprise plan; the Free plan allows 3 objects and 50,000 records.",
+				"source": "https://attio.com/help/reference/managing-your-data/objects/create-and-manage-custom-objects"
+			},
+			{
+				"kind": "api",
+				"text": "Enriched values can't be overwritten over the API, and some are hidden from it depending on the plan.",
+				"source": "https://docs.attio.com/docs/standard-objects/standard-objects-companies"
+			},
+			{
+				"kind": "plan",
+				"text": "The SQL query endpoint needs an Enterprise plan and is limited to 2 requests a second.",
+				"source": "https://docs.attio.com/rest-api/guides/rate-limiting"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare imports Attio once and doesn't follow later changes or use Attio's webhooks yet.",
+				"source": "https://docs.attio.com/rest-api/guides/webhooks"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare counts list entries, notes and tasks but doesn't import them yet.",
+				"source": "https://docs.attio.com/rest-api/endpoint-reference/entries/list-entries"
+			}
+		],
+		"checked": "2026-11-01",
 		"dark_logo": true
 	},
 	{
@@ -484,7 +2049,7 @@
 		"name": "HubSpot",
 		"category": "crm",
 		"summary": "Count meetings and deals from outreach, and log booked meetings on the contact.",
-		"description": "Reads deals (stage, amount, close date) and meetings, and ties each to the lead and campaign that started it. Optionally writes meetings booked from outreach onto the HubSpot contact (off by default, since HubSpot may already log them from its own calendar sync), and replies with the labels you pick as a note on the contact, with a task to follow up. Deals are never changed.",
+		"description": "Reads deals (stage, amount, close date) and meetings, and ties each to the lead and campaign that started it. Optionally writes meetings booked from outreach onto the HubSpot contact (off by default, since HubSpot may already log them from its own calendar sync), and replies with the labels you pick as a note on the contact, with a task to follow up. Journeys can create or update contacts (a push to CRM step). Deals are never changed.",
 		"website": "https://www.hubspot.com",
 		"docs_url": "https://developers.hubspot.com/docs/api/crm/deals",
 		"auth_methods": [
@@ -495,10 +2060,59 @@
 			"deals.sync",
 			"meetings.sync",
 			"crm.push",
-			"crm.push_replies"
+			"crm.push_replies",
+			"push.contacts"
 		],
 		"status": "available",
-		"pricing": "Works on every HubSpot plan, including free"
+		"pricing": "Works on every HubSpot plan, including free",
+		"features": [
+			{
+				"id": "all_plans",
+				"value": "yes"
+			},
+			{
+				"id": "oauth",
+				"value": "yes"
+			},
+			{
+				"id": "webhooks",
+				"value": "partial",
+				"note": "Public apps manage subscriptions over the API; a private app's are set in its settings in HubSpot."
+			},
+			{
+				"id": "custom_objects",
+				"value": "partial",
+				"note": "Custom objects need an Enterprise subscription."
+			}
+		],
+		"limits": [
+			{
+				"kind": "limits",
+				"text": "Private apps on Free and Starter get 100 requests per 10 seconds and 250,000 a day per account.",
+				"source": "https://developers.hubspot.com/docs/developer-tooling/platform/usage-guidelines"
+			},
+			{
+				"kind": "limits",
+				"text": "CRM search is limited to 5 requests a second and 10,000 results per query, and sends no rate limit headers.",
+				"source": "https://developers.hubspot.com/docs/api-reference/latest/crm/search-the-crm"
+			},
+			{
+				"kind": "plan",
+				"text": "Custom objects and their pipelines need an Enterprise subscription.",
+				"source": "https://knowledge.hubspot.com/records/understand-objects"
+			},
+			{
+				"kind": "login",
+				"text": "A private app's webhook subscriptions are set in its settings in HubSpot; the API can't change them.",
+				"source": "https://developers.hubspot.com/docs/apps/legacy-apps/private-apps/create-and-edit-webhook-subscriptions-in-private-apps"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare reads deals and meetings every 15 minutes and doesn't use HubSpot webhooks yet.",
+				"source": "https://developers.hubspot.com/docs/api-reference/latest/webhooks/guide"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "apollo",
@@ -519,7 +2133,60 @@
 			"observe.mailboxes"
 		],
 		"status": "available",
-		"pricing": "Free search; one credit per revealed email"
+		"pricing": "Free search; one credit per revealed email",
+		"features": [
+			{
+				"id": "search_people",
+				"value": "yes"
+			},
+			{
+				"id": "find_email",
+				"value": "yes"
+			},
+			{
+				"id": "phones",
+				"value": "partial",
+				"note": "Mobile numbers are sent later to a webhook, not in the response, and cost extra credits."
+			},
+			{
+				"id": "bulk",
+				"value": "yes",
+				"note": "Up to 10 people per request."
+			}
+		],
+		"limits": [
+			{
+				"kind": "api",
+				"text": "People search returns no emails or phone numbers; each one needs a separate enrichment call that spends credits.",
+				"source": "https://docs.apollo.io/reference/people-api-search"
+			},
+			{
+				"kind": "limits",
+				"text": "People search shows at most 50,000 records for one search (100 per page, 500 pages).",
+				"source": "https://docs.apollo.io/reference/people-api-search"
+			},
+			{
+				"kind": "api",
+				"text": "Mobile numbers are delivered minutes later to a public HTTPS webhook, not in the response, and cost 8 more credits each.",
+				"source": "https://docs.apollo.io/reference/people-enrichment"
+			},
+			{
+				"kind": "plan",
+				"text": "Free accounts must be registered with a work email address to use people search and enrichment over the API.",
+				"source": "https://docs.apollo.io/reference/bulk-people-enrichment"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare enriches one person per call and doesn't use bulk enrichment, which takes up to 10 people per request.",
+				"source": "https://docs.apollo.io/reference/bulk-people-enrichment"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare doesn't request mobile numbers from Apollo.",
+				"source": "https://docs.apollo.io/docs/retrieve-mobile-phone-numbers-for-contacts"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "findymail",
@@ -538,6 +2205,50 @@
 		],
 		"status": "available",
 		"pricing": "One credit per email found",
+		"features": [
+			{
+				"id": "search_people",
+				"value": "partial",
+				"note": "Finds people by role at one company domain; there is no search across companies."
+			},
+			{
+				"id": "find_email",
+				"value": "yes"
+			},
+			{
+				"id": "phones",
+				"value": "partial",
+				"note": "From a LinkedIn URL, and only for contacts outside the EU."
+			},
+			{
+				"id": "bulk",
+				"value": "partial",
+				"note": "One person per request, but requests can run asynchronously with a webhook, up to 300 at once."
+			}
+		],
+		"limits": [
+			{
+				"kind": "api",
+				"text": "Phone numbers are found only for contacts outside the EU, and cost 10 credits each.",
+				"source": "https://app.findymail.com/docs/"
+			},
+			{
+				"kind": "limits",
+				"text": "Asynchronous jobs can take up to 24 hours to process, depending on Findymail's workload.",
+				"source": "https://app.findymail.com/docs/"
+			},
+			{
+				"kind": "limits",
+				"text": "Finding emails by company domain allows only 5 concurrent requests when used synchronously.",
+				"source": "https://app.findymail.com/docs/"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare finds emails from a name and company domain only; it doesn't use Findymail's LinkedIn, phone or role searches.",
+				"source": "https://www.findymail.com/api/"
+			}
+		],
+		"checked": "2026-11-01",
 		"dark_logo": true
 	},
 	{
@@ -556,7 +2267,44 @@
 			"data.find_email"
 		],
 		"status": "available",
-		"pricing": "One credit per email found"
+		"pricing": "One credit per email found",
+		"features": [
+			{
+				"id": "search_people",
+				"value": "yes"
+			},
+			{
+				"id": "find_email",
+				"value": "yes"
+			},
+			{
+				"id": "phones",
+				"value": "yes"
+			},
+			{
+				"id": "bulk",
+				"value": "yes",
+				"note": "Bulk jobs report back to a webhook when done."
+			}
+		],
+		"limits": [
+			{
+				"kind": "plan",
+				"text": "On the Essential and Growth plans, people search over the API costs 1 credit per person returned.",
+				"source": "https://leadmagic.io/docs/v1/credits"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare uses LeadMagic only to find emails; it doesn't use its people search to build lists.",
+				"source": "https://leadmagic.io/docs/api-reference/profile-search"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare doesn't look up mobile numbers, which cost 5 credits each.",
+				"source": "https://docs.leadmagic.io/reference/mobile-finder"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "moltsets",
@@ -575,7 +2323,50 @@
 			"data.find_email"
 		],
 		"status": "available",
-		"pricing": "Flat monthly plans with fair-use limits; a free tier of 1,000 tokens"
+		"pricing": "Flat monthly plans with fair-use limits; a free tier of 1,000 tokens",
+		"features": [
+			{
+				"id": "search_people",
+				"value": "yes"
+			},
+			{
+				"id": "find_email",
+				"value": "yes"
+			},
+			{
+				"id": "phones",
+				"value": "partial",
+				"note": "Needs the Phone Tokens add-on on a paid plan."
+			},
+			{
+				"id": "bulk",
+				"value": "yes",
+				"note": "Enrichment tools take up to 100 values per call."
+			}
+		],
+		"limits": [
+			{
+				"kind": "limits",
+				"text": "Every plan has fair-use caps on records and requests per 5-hour window and on records per week.",
+				"source": "https://moltsets.com/faq/"
+			},
+			{
+				"kind": "plan",
+				"text": "Mobile numbers need Phone Tokens, a separate monthly add-on to a paid plan.",
+				"source": "https://moltsets.com/pricing/"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare looks up one person per call and doesn't use batch requests or mobile number lookups.",
+				"source": "https://moltsets.com/faq/"
+			},
+			{
+				"kind": "outflare",
+				"text": "MoltSets can name the company behind an IP address; Outflare doesn't use it for website visitors.",
+				"source": "https://moltsets.com/faq/"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "peopledatalabs",
@@ -594,7 +2385,54 @@
 			"data.reveal_company"
 		],
 		"status": "available",
-		"pricing": "One credit per person returned; one per company found from a website visitor's address"
+		"pricing": "One credit per person returned; one per company found from a website visitor's address",
+		"features": [
+			{
+				"id": "search_people",
+				"value": "yes"
+			},
+			{
+				"id": "find_email",
+				"value": "yes"
+			},
+			{
+				"id": "phones",
+				"value": "yes"
+			},
+			{
+				"id": "bulk",
+				"value": "yes",
+				"note": "Bulk enrichment takes up to 100 people per request."
+			}
+		],
+		"limits": [
+			{
+				"kind": "plan",
+				"text": "On the free plan, emails, phone numbers and addresses are hidden; the Pro plan unlocks them.",
+				"source": "https://www.peopledatalabs.com/pricing/person"
+			},
+			{
+				"kind": "limits",
+				"text": "Person Search allows 10 requests per minute by default.",
+				"source": "https://docs.peopledatalabs.com/docs/reference-person-search-api"
+			},
+			{
+				"kind": "plan",
+				"text": "Each person a search returns uses one credit, whether or not it has an email.",
+				"source": "https://support.peopledatalabs.com/hc/en-us/articles/25794271805211-Pricing-credits"
+			},
+			{
+				"kind": "limits",
+				"text": "Free accounts can make 100 Person Enrichment requests per minute; paid accounts get 1,000.",
+				"source": "https://docs.peopledatalabs.com/docs/reference-person-enrichment-api"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare enriches one person per call and doesn't use the bulk enrichment endpoint.",
+				"source": "https://support.peopledatalabs.com/hc/en-us/articles/25794271805211-Pricing-credits"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "prospeo",
@@ -612,7 +2450,59 @@
 			"data.find_email"
 		],
 		"status": "available",
-		"pricing": "One credit per email found"
+		"pricing": "One credit per email found",
+		"features": [
+			{
+				"id": "search_people",
+				"value": "yes"
+			},
+			{
+				"id": "find_email",
+				"value": "yes"
+			},
+			{
+				"id": "phones",
+				"value": "yes"
+			},
+			{
+				"id": "bulk",
+				"value": "yes",
+				"note": "Up to 50 people per request."
+			}
+		],
+		"limits": [
+			{
+				"kind": "limits",
+				"text": "The search API allows 1 request per second, 30 per minute and 1,000 per day on the Starter plan.",
+				"source": "https://prospeo.io/api-docs/rate-limits"
+			},
+			{
+				"kind": "plan",
+				"text": "The free plan has limited API access and 100 credits a month.",
+				"source": "https://help.prospeo.io/en/article/plans-and-pricing-overview-cdloq9/"
+			},
+			{
+				"kind": "plan",
+				"text": "Some search filters, such as job changes, need the Growth plan.",
+				"source": "https://prospeo.io/api-docs/search-person"
+			},
+			{
+				"kind": "plan",
+				"text": "Search costs 1 credit per page of up to 25 results and returns no contact data; verified mobile numbers cost 10 credits.",
+				"source": "https://help.prospeo.io/en/article/how-prospeo-credits-work-yso5gk/"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare uses Prospeo only to find emails; it doesn't use its people search to build lists.",
+				"source": "https://prospeo.io/api-docs/search-person"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare enriches one person per call and doesn't request mobile numbers or use bulk enrichment.",
+				"source": "https://prospeo.io/api-docs/bulk-enrich-person"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "snitcher",
@@ -629,7 +2519,39 @@
 			"data.reveal_company"
 		],
 		"status": "available",
-		"pricing": "Per lookup, on your Snitcher plan"
+		"pricing": "Per lookup, on your Snitcher plan",
+		"features": [
+			{
+				"id": "search_people",
+				"value": "no"
+			},
+			{
+				"id": "find_email",
+				"value": "no"
+			},
+			{
+				"id": "phones",
+				"value": "no"
+			},
+			{
+				"id": "bulk",
+				"value": "no",
+				"note": "One IP address per request."
+			}
+		],
+		"limits": [
+			{
+				"kind": "plan",
+				"text": "The IP to Company API is sold apart from Snitcher's standard plans; an API key comes through Snitcher's sales team.",
+				"source": "https://www.snitcher.com/ip-to-company-api"
+			},
+			{
+				"kind": "api",
+				"text": "The API names companies only; it returns no people, emails or phone numbers.",
+				"source": "https://docs.snitcher.com/powered-by-snitcher/ip2company/introduction"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "cloudflare",
@@ -647,7 +2569,26 @@
 			"dns.write"
 		],
 		"status": "available",
-		"pricing": "Free"
+		"pricing": "Free",
+		"features": [
+			{
+				"id": "add_records",
+				"value": "yes"
+			},
+			{
+				"id": "oauth_signin",
+				"value": "yes"
+			},
+			{
+				"id": "scoped_token",
+				"value": "yes"
+			},
+			{
+				"id": "record_comments",
+				"value": "yes"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "amazon_ses",
@@ -716,7 +2657,43 @@
 			"verify"
 		],
 		"status": "available",
-		"pricing": "Pay per credit"
+		"pricing": "Pay per credit",
+		"features": [
+			{
+				"id": "mailbox_check",
+				"value": "yes"
+			},
+			{
+				"id": "bulk_api",
+				"value": "yes"
+			},
+			{
+				"id": "bulk_callback",
+				"value": "yes"
+			},
+			{
+				"id": "credits_api",
+				"value": "yes"
+			}
+		],
+		"limits": [
+			{
+				"kind": "limits",
+				"text": "Creating batches is limited to 60 a minute, with up to 25 batches processed at once.",
+				"source": "https://docs.usebouncer.com/api-reference/batch/batch-create"
+			},
+			{
+				"kind": "limits",
+				"text": "Reading the credit balance is limited to 10 requests a minute.",
+				"source": "https://docs.usebouncer.com/api-reference/credits/credits"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare checks addresses one at a time and doesn't use Bouncer's batch API yet.",
+				"source": "https://docs.usebouncer.com/api-reference/batch/batch-create"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "debounce",
@@ -733,7 +2710,44 @@
 			"verify"
 		],
 		"status": "available",
-		"pricing": "Pay per credit"
+		"pricing": "Pay per credit",
+		"features": [
+			{
+				"id": "mailbox_check",
+				"value": "yes"
+			},
+			{
+				"id": "bulk_api",
+				"value": "yes"
+			},
+			{
+				"id": "bulk_callback",
+				"value": "partial",
+				"note": "Webhooks are advertised, but the bulk API reference describes checking a list's status by polling."
+			},
+			{
+				"id": "credits_api",
+				"value": "yes"
+			}
+		],
+		"limits": [
+			{
+				"kind": "limits",
+				"text": "A regular API key allows 5 calls at once, or 2 with data enrichment on; more return HTTP 429.",
+				"source": "https://developers.debounce.com/api-concepts/rate-limiting"
+			},
+			{
+				"kind": "limits",
+				"text": "Only one bulk validation job runs per account at a time; further uploads wait in a queue.",
+				"source": "https://developers.debounce.com/api-concepts/rate-limiting"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare checks addresses one at a time and doesn't use DeBounce's bulk API yet.",
+				"source": "https://debounce.com/email-verification-api/"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "emailable",
@@ -750,7 +2764,38 @@
 			"verify"
 		],
 		"status": "available",
-		"pricing": "Pay per credit"
+		"pricing": "Pay per credit",
+		"features": [
+			{
+				"id": "mailbox_check",
+				"value": "yes"
+			},
+			{
+				"id": "bulk_api",
+				"value": "yes"
+			},
+			{
+				"id": "bulk_callback",
+				"value": "yes"
+			},
+			{
+				"id": "credits_api",
+				"value": "yes"
+			}
+		],
+		"limits": [
+			{
+				"kind": "limits",
+				"text": "Each endpoint has its own rate limit, and higher limits need an enterprise account.",
+				"source": "https://emailable.com/docs/api/rate-limits/"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare checks addresses one at a time and doesn't use Emailable's batch API yet.",
+				"source": "https://emailable.com/docs/api"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "hunter",
@@ -769,7 +2814,44 @@
 			"data.find_email"
 		],
 		"status": "available",
-		"pricing": "Monthly plans with search and verification credits"
+		"pricing": "Monthly plans with search and verification credits",
+		"features": [
+			{
+				"id": "mailbox_check",
+				"value": "yes"
+			},
+			{
+				"id": "bulk_api",
+				"value": "no",
+				"note": "The Email Verifier API takes one address per call."
+			},
+			{
+				"id": "bulk_callback",
+				"value": "no"
+			},
+			{
+				"id": "credits_api",
+				"value": "yes"
+			}
+		],
+		"limits": [
+			{
+				"kind": "api",
+				"text": "The Email Verifier API takes one address per call and has no batch endpoint.",
+				"source": "https://help.hunter.io/en/articles/12633706-how-to-verify-emails-via-api-with-code-examples"
+			},
+			{
+				"kind": "limits",
+				"text": "Email verification is limited to 10 requests a second and 300 a minute per API key or IP.",
+				"source": "https://help.hunter.io/en/articles/12633706-how-to-verify-emails-via-api-with-code-examples"
+			},
+			{
+				"kind": "limits",
+				"text": "Greylisted addresses return HTTP 202 and must be checked again later, sometimes hours later.",
+				"source": "https://help.hunter.io/en/articles/12633706-how-to-verify-emails-via-api-with-code-examples"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "millionverifier",
@@ -787,6 +2869,33 @@
 		],
 		"status": "available",
 		"pricing": "Pay per credit",
+		"features": [
+			{
+				"id": "mailbox_check",
+				"value": "yes"
+			},
+			{
+				"id": "bulk_api",
+				"value": "yes"
+			},
+			{
+				"id": "bulk_callback",
+				"value": "no",
+				"note": "No callback is documented; a file's status is checked by polling."
+			},
+			{
+				"id": "credits_api",
+				"value": "yes"
+			}
+		],
+		"limits": [
+			{
+				"kind": "outflare",
+				"text": "Outflare checks addresses one at a time with the single API and doesn't use the bulk file API yet.",
+				"source": "https://help.millionverifier.com/email-verification-api/file-upload-api"
+			}
+		],
+		"checked": "2026-11-01",
 		"dark_logo": true
 	},
 	{
@@ -804,7 +2913,43 @@
 			"verify"
 		],
 		"status": "available",
-		"pricing": "Pay per credit"
+		"pricing": "Pay per credit",
+		"features": [
+			{
+				"id": "mailbox_check",
+				"value": "yes"
+			},
+			{
+				"id": "bulk_api",
+				"value": "yes"
+			},
+			{
+				"id": "bulk_callback",
+				"value": "yes"
+			},
+			{
+				"id": "credits_api",
+				"value": "yes"
+			}
+		],
+		"limits": [
+			{
+				"kind": "limits",
+				"text": "A bulk job held for manual review can take up to one business day to be released.",
+				"source": "https://developers.neverbounce.com/reference/jobs-create"
+			},
+			{
+				"kind": "limits",
+				"text": "Requests larger than 25 MB are refused with HTTP 413.",
+				"source": "https://developers.neverbounce.com/reference/jobs-create"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare checks addresses one at a time and doesn't use NeverBounce's bulk jobs yet.",
+				"source": "https://developers.neverbounce.com/reference/jobs-create"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "reoon",
@@ -821,7 +2966,40 @@
 			"verify"
 		],
 		"status": "available",
-		"pricing": "Pay per credit; unknown results are refunded"
+		"pricing": "Pay per credit; unknown results are refunded",
+		"features": [
+			{
+				"id": "mailbox_check",
+				"value": "yes",
+				"note": "In power mode, which Outflare uses; quick mode skips the deep check."
+			},
+			{
+				"id": "bulk_api",
+				"value": "yes"
+			},
+			{
+				"id": "bulk_callback",
+				"value": "no",
+				"note": "No callback is documented; a task's status is checked by polling."
+			},
+			{
+				"id": "credits_api",
+				"value": "yes"
+			}
+		],
+		"limits": [
+			{
+				"kind": "limits",
+				"text": "Single checks should not run in more than 5 parallel threads continuously.",
+				"source": "https://www.reoon.com/articles/api-documentation-of-reoon-email-verifier/"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare checks addresses one at a time and doesn't use Reoon's bulk verification tasks yet.",
+				"source": "https://www.reoon.com/articles/api-documentation-of-reoon-email-verifier/"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "zerobounce",
@@ -838,7 +3016,43 @@
 			"verify"
 		],
 		"status": "available",
-		"pricing": "Pay per credit"
+		"pricing": "Pay per credit",
+		"features": [
+			{
+				"id": "mailbox_check",
+				"value": "yes"
+			},
+			{
+				"id": "bulk_api",
+				"value": "yes"
+			},
+			{
+				"id": "bulk_callback",
+				"value": "yes"
+			},
+			{
+				"id": "credits_api",
+				"value": "yes"
+			}
+		],
+		"limits": [
+			{
+				"kind": "limits",
+				"text": "The batch endpoint takes up to 200 addresses a call and 5 calls a minute; going over blocks it for 10 minutes.",
+				"source": "https://www.zerobounce.net/docs/email-validation-api-quickstart/v2-batch-validate-emails"
+			},
+			{
+				"kind": "limits",
+				"text": "The credit balance endpoint allows 80,000 requests an hour; going over blocks access for a day.",
+				"source": "https://www.zerobounce.net/docs/email-validation-api-quickstart/v2-credit-balance"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare checks addresses one at a time and doesn't use ZeroBounce's batch or file upload APIs yet.",
+				"source": "https://www.zerobounce.net/docs/email-validation-api-quickstart/v2-send-file"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "cheapinboxes",
@@ -859,11 +3073,47 @@
 		"pricing": "You pay Cheap Inboxes directly"
 	},
 	{
+		"id": "google_mail",
+		"name": "Gmail",
+		"category": "mailbox_provider",
+		"summary": "Add Gmail and Google Workspace mailboxes without passwords.",
+		"description": "Sign in to one mailbox, or connect a service account with domain-wide delegation for https://mail.google.com/ to add any mailbox of your Google Workspace by its address. Mailboxes send and read mail over SMTP and IMAP with OAuth.",
+		"website": "https://workspace.google.com/products/gmail/",
+		"docs_url": "https://developers.google.com/gmail/imap/xoauth2-protocol",
+		"auth_methods": [
+			"oauth2",
+			"api_key"
+		],
+		"capabilities": [
+			"mailboxes.sign_in"
+		],
+		"status": "available",
+		"pricing": "Free"
+	},
+	{
+		"id": "outlook_mail",
+		"name": "Outlook",
+		"category": "mailbox_provider",
+		"summary": "Add Outlook and Microsoft 365 mailboxes without passwords.",
+		"description": "Sign in to one mailbox, or connect an Entra app with the Exchange Online application permissions IMAP.AccessAsApp and SMTP.SendAsApp to add any mailbox of your tenant by its address. Mailboxes send and read mail over SMTP and IMAP with OAuth.",
+		"website": "https://www.microsoft.com/microsoft-365/outlook",
+		"docs_url": "https://learn.microsoft.com/exchange/client-developer/legacy-protocols/how-to-authenticate-an-imap-pop-smtp-application-by-using-oauth",
+		"auth_methods": [
+			"oauth2",
+			"api_key"
+		],
+		"capabilities": [
+			"mailboxes.sign_in"
+		],
+		"status": "available",
+		"pricing": "Free"
+	},
+	{
 		"id": "claude",
 		"name": "Claude",
 		"category": "model",
 		"summary": "Plan and run missions from a goal you type, with your own Claude API key. Anthropic's Claude models.",
-		"description": "Outflare sends the model the goal, the project brief and a summary of the workspace (mailbox capacity, lead counts, campaigns, connectors) to plan, and the mission's progress and API answers while Outflare's agent runs it. Your key is encrypted, only ever sent to Claude's own API, and never shown again, logged or given to the model. Usage is billed to your Claude account; set a monthly limit under Settings → AI model.",
+		"description": "Outflare sends the model the goal, the company context and a summary of the workspace (mailbox capacity, lead counts, campaigns, connectors) to plan, and the mission's progress and API answers while Outflare's agent runs it. Your key is encrypted, only ever sent to Claude's own API, and never shown again, logged or given to the model. Usage is billed to your Claude account; set a monthly limit under Settings → AI model.",
 		"website": "https://www.anthropic.com/api",
 		"docs_url": "https://docs.anthropic.com/en/api/getting-started",
 		"auth_methods": [
@@ -874,14 +3124,55 @@
 			"llm.sample"
 		],
 		"status": "available",
-		"pricing": "Pay per token, billed by Claude"
+		"pricing": "Pay per token, billed by Claude",
+		"features": [
+			{
+				"id": "many_vendors",
+				"value": "no"
+			},
+			{
+				"id": "web_search",
+				"value": "yes"
+			},
+			{
+				"id": "batch",
+				"value": "yes"
+			},
+			{
+				"id": "oauth_signin",
+				"value": "no"
+			}
+		],
+		"limits": [
+			{
+				"kind": "limits",
+				"text": "Each usage tier has a monthly spend cap ($500 on the Start tier); at the cap, API calls fail until the next month.",
+				"source": "https://platform.claude.com/docs/en/api/rate-limits"
+			},
+			{
+				"kind": "limits",
+				"text": "New organisations may start on an Evaluation tier with lower limits, which rise as usage history builds.",
+				"source": "https://platform.claude.com/docs/en/api/rate-limits"
+			},
+			{
+				"kind": "login",
+				"text": "Your own monthly spend limit, below the tier's cap, is set on the Billing page of the Claude Console.",
+				"source": "https://platform.claude.com/docs/en/api/rate-limits"
+			},
+			{
+				"kind": "outflare",
+				"text": "The Message Batches API halves the price of calls that can wait; Outflare sends every call on its own.",
+				"source": "https://platform.claude.com/docs/en/build-with-claude/batch-processing"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "deepseek",
 		"name": "DeepSeek",
 		"category": "model",
 		"summary": "Plan and run missions from a goal you type, with your own DeepSeek API key. DeepSeek's low-cost models, hosted in China.",
-		"description": "Outflare sends the model the goal, the project brief and a summary of the workspace (mailbox capacity, lead counts, campaigns, connectors) to plan, and the mission's progress and API answers while Outflare's agent runs it. Your key is encrypted, only ever sent to DeepSeek's own API, and never shown again, logged or given to the model. Usage is billed to your DeepSeek account; set a monthly limit under Settings → AI model.",
+		"description": "Outflare sends the model the goal, the company context and a summary of the workspace (mailbox capacity, lead counts, campaigns, connectors) to plan, and the mission's progress and API answers while Outflare's agent runs it. Your key is encrypted, only ever sent to DeepSeek's own API, and never shown again, logged or given to the model. Usage is billed to your DeepSeek account; set a monthly limit under Settings → AI model.",
 		"website": "https://www.deepseek.com/",
 		"docs_url": "https://api-docs.deepseek.com/",
 		"auth_methods": [
@@ -892,14 +3183,52 @@
 			"llm.sample"
 		],
 		"status": "available",
-		"pricing": "Pay per token, billed by DeepSeek"
+		"pricing": "Pay per token, billed by DeepSeek",
+		"features": [
+			{
+				"id": "many_vendors",
+				"value": "no"
+			},
+			{
+				"id": "web_search",
+				"value": "partial",
+				"note": "In the Responses API and a separate Search API; Chat Completions takes function tools only."
+			},
+			{
+				"id": "batch",
+				"value": "no",
+				"note": "No batch endpoint in the docs; off-peak hours cost half."
+			},
+			{
+				"id": "oauth_signin",
+				"value": "no"
+			}
+		],
+		"limits": [
+			{
+				"kind": "limits",
+				"text": "Each account has a cap on requests in flight per model (500 for deepseek-v4-pro); calls over it get HTTP 429.",
+				"source": "https://api-docs.deepseek.com/quick_start/rate_limit/"
+			},
+			{
+				"kind": "limits",
+				"text": "Calls on weekdays from 01:00 to 04:00 and 06:00 to 10:00 UTC are billed at peak rates, twice the off-peak price.",
+				"source": "https://api-docs.deepseek.com/quick_start/pricing/"
+			},
+			{
+				"kind": "outflare",
+				"text": "Web search runs in DeepSeek's Responses API or its Search API; Outflare calls Chat Completions, so its DeepSeek calls don't search.",
+				"source": "https://api-docs.deepseek.com/guides/search/"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "gemini",
 		"name": "Gemini",
 		"category": "model",
 		"summary": "Plan and run missions from a goal you type, with your own Gemini API key. Google's Gemini models.",
-		"description": "Outflare sends the model the goal, the project brief and a summary of the workspace (mailbox capacity, lead counts, campaigns, connectors) to plan, and the mission's progress and API answers while Outflare's agent runs it. Your key is encrypted, only ever sent to Gemini's own API, and never shown again, logged or given to the model. Usage is billed to your Gemini account; set a monthly limit under Settings → AI model.",
+		"description": "Outflare sends the model the goal, the company context and a summary of the workspace (mailbox capacity, lead counts, campaigns, connectors) to plan, and the mission's progress and API answers while Outflare's agent runs it. Your key is encrypted, only ever sent to Gemini's own API, and never shown again, logged or given to the model. Usage is billed to your Gemini account; set a monthly limit under Settings → AI model.",
 		"website": "https://ai.google.dev/",
 		"docs_url": "https://ai.google.dev/gemini-api/docs",
 		"auth_methods": [
@@ -910,14 +3239,55 @@
 			"llm.sample"
 		],
 		"status": "available",
-		"pricing": "Pay per token, billed by Gemini"
+		"pricing": "Pay per token, billed by Gemini",
+		"features": [
+			{
+				"id": "many_vendors",
+				"value": "no"
+			},
+			{
+				"id": "web_search",
+				"value": "yes"
+			},
+			{
+				"id": "batch",
+				"value": "yes"
+			},
+			{
+				"id": "oauth_signin",
+				"value": "no"
+			}
+		],
+		"limits": [
+			{
+				"kind": "plan",
+				"text": "On the free tier, Google uses prompts and answers to improve its products; linking a billing account stops that.",
+				"source": "https://ai.google.dev/gemini-api/terms"
+			},
+			{
+				"kind": "plan",
+				"text": "Apps used by people in the EEA, Switzerland or the UK must use only the paid service, with billing linked.",
+				"source": "https://ai.google.dev/gemini-api/terms"
+			},
+			{
+				"kind": "limits",
+				"text": "Tier 1 needs a linked billing account and is capped at $250; at the cap, calls pause until the next billing cycle.",
+				"source": "https://ai.google.dev/gemini-api/docs/rate-limits"
+			},
+			{
+				"kind": "outflare",
+				"text": "Grounding with Google Search lets Gemini search the web; Outflare doesn't turn it on for Gemini yet.",
+				"source": "https://ai.google.dev/gemini-api/docs/google-search"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "mistral",
 		"name": "Mistral",
 		"category": "model",
 		"summary": "Plan and run missions from a goal you type, with your own Mistral API key. Mistral's models, hosted in the EU.",
-		"description": "Outflare sends the model the goal, the project brief and a summary of the workspace (mailbox capacity, lead counts, campaigns, connectors) to plan, and the mission's progress and API answers while Outflare's agent runs it. Your key is encrypted, only ever sent to Mistral's own API, and never shown again, logged or given to the model. Usage is billed to your Mistral account; set a monthly limit under Settings → AI model.",
+		"description": "Outflare sends the model the goal, the company context and a summary of the workspace (mailbox capacity, lead counts, campaigns, connectors) to plan, and the mission's progress and API answers while Outflare's agent runs it. Your key is encrypted, only ever sent to Mistral's own API, and never shown again, logged or given to the model. Usage is billed to your Mistral account; set a monthly limit under Settings → AI model.",
 		"website": "https://mistral.ai/",
 		"docs_url": "https://docs.mistral.ai/",
 		"auth_methods": [
@@ -928,14 +3298,46 @@
 			"llm.sample"
 		],
 		"status": "available",
-		"pricing": "Pay per token, billed by Mistral"
+		"pricing": "Pay per token, billed by Mistral",
+		"features": [
+			{
+				"id": "many_vendors",
+				"value": "no"
+			},
+			{
+				"id": "web_search",
+				"value": "partial",
+				"note": "Conversations and Agents APIs only, not Chat Completions."
+			},
+			{
+				"id": "batch",
+				"value": "yes"
+			},
+			{
+				"id": "oauth_signin",
+				"value": "no"
+			}
+		],
+		"limits": [
+			{
+				"kind": "limits",
+				"text": "Free mode has the lowest rate limits; higher limits need pay-as-you-go billing and grow with total spend.",
+				"source": "https://docs.mistral.ai/admin/billing-usage/usage-limits"
+			},
+			{
+				"kind": "outflare",
+				"text": "Web search needs Mistral's Conversations or Agents API; Outflare calls Chat Completions, so its Mistral calls don't search.",
+				"source": "https://docs.mistral.ai/agents/connectors/websearch/"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "openai",
 		"name": "OpenAI",
 		"category": "model",
 		"summary": "Plan and run missions from a goal you type, with your own OpenAI API key. OpenAI's GPT models.",
-		"description": "Outflare sends the model the goal, the project brief and a summary of the workspace (mailbox capacity, lead counts, campaigns, connectors) to plan, and the mission's progress and API answers while Outflare's agent runs it. Your key is encrypted, only ever sent to OpenAI's own API, and never shown again, logged or given to the model. Usage is billed to your OpenAI account; set a monthly limit under Settings → AI model.",
+		"description": "Outflare sends the model the goal, the company context and a summary of the workspace (mailbox capacity, lead counts, campaigns, connectors) to plan, and the mission's progress and API answers while Outflare's agent runs it. Your key is encrypted, only ever sent to OpenAI's own API, and never shown again, logged or given to the model. Usage is billed to your OpenAI account; set a monthly limit under Settings → AI model.",
 		"website": "https://openai.com/api/",
 		"docs_url": "https://platform.openai.com/docs/overview",
 		"auth_methods": [
@@ -947,6 +3349,47 @@
 		],
 		"status": "available",
 		"pricing": "Pay per token, billed by OpenAI",
+		"features": [
+			{
+				"id": "many_vendors",
+				"value": "no"
+			},
+			{
+				"id": "web_search",
+				"value": "yes"
+			},
+			{
+				"id": "batch",
+				"value": "yes"
+			},
+			{
+				"id": "oauth_signin",
+				"value": "no"
+			}
+		],
+		"limits": [
+			{
+				"kind": "limits",
+				"text": "Monthly usage is capped by tier, starting at $500 a month after the first $5 of credit, and rises as total purchases grow.",
+				"source": "https://developers.openai.com/api/docs/guides/rate-limits"
+			},
+			{
+				"kind": "login",
+				"text": "Some models and features need organisation verification, done in the OpenAI dashboard with a government ID.",
+				"source": "https://help.openai.com/en/articles/10910291-api-organization-verification"
+			},
+			{
+				"kind": "outflare",
+				"text": "Any model can search with the Responses API's web search tool; Outflare uses Chat Completions, where only search models search.",
+				"source": "https://developers.openai.com/api/docs/guides/tools-web-search"
+			},
+			{
+				"kind": "outflare",
+				"text": "The Batch API halves the price of calls that can wait a day; Outflare sends every call on its own.",
+				"source": "https://developers.openai.com/api/docs/guides/batch"
+			}
+		],
+		"checked": "2026-11-01",
 		"dark_logo": true
 	},
 	{
@@ -954,7 +3397,7 @@
 		"name": "OpenRouter",
 		"category": "model",
 		"summary": "Plan and run missions from a goal you type, with your own OpenRouter API key. Hundreds of models from many vendors (OpenAI, Google, Meta, xAI, Perplexity...) with one key; OpenRouter reports what each call cost.",
-		"description": "Outflare sends the model the goal, the project brief and a summary of the workspace (mailbox capacity, lead counts, campaigns, connectors) to plan, and the mission's progress and API answers while Outflare's agent runs it. Your key is encrypted, only ever sent to OpenRouter's own API, and never shown again, logged or given to the model. Usage is billed to your OpenRouter account; set a monthly limit under Settings → AI model.",
+		"description": "Outflare sends the model the goal, the company context and a summary of the workspace (mailbox capacity, lead counts, campaigns, connectors) to plan, and the mission's progress and API answers while Outflare's agent runs it. Your key is encrypted, only ever sent to OpenRouter's own API, and never shown again, logged or given to the model. Usage is billed to your OpenRouter account; set a monthly limit under Settings → AI model.",
 		"website": "https://openrouter.ai/",
 		"docs_url": "https://openrouter.ai/docs/quickstart",
 		"auth_methods": [
@@ -967,6 +3410,42 @@
 		],
 		"status": "available",
 		"pricing": "Pay per token, billed by OpenRouter",
+		"features": [
+			{
+				"id": "many_vendors",
+				"value": "yes"
+			},
+			{
+				"id": "web_search",
+				"value": "yes"
+			},
+			{
+				"id": "batch",
+				"value": "yes"
+			},
+			{
+				"id": "oauth_signin",
+				"value": "yes"
+			}
+		],
+		"limits": [
+			{
+				"kind": "limits",
+				"text": "Free model variants allow 50 requests a day, or 1,000 a day once the account has bought $10 of credits.",
+				"source": "https://openrouter.ai/docs/api_reference/limits"
+			},
+			{
+				"kind": "plan",
+				"text": "Credits are prepaid, with a 5.5% fee added when you buy them on the standard plan.",
+				"source": "https://openrouter.ai/pricing"
+			},
+			{
+				"kind": "outflare",
+				"text": "The Batch API runs calls that can wait at about half the price; Outflare sends every call on its own.",
+				"source": "https://openrouter.ai/docs/guides/features/batch-api"
+			}
+		],
+		"checked": "2026-11-01",
 		"dark_logo": true
 	},
 	{
@@ -974,7 +3453,7 @@
 		"name": "Requesty",
 		"category": "model",
 		"summary": "Plan and run missions from a goal you type, with your own Requesty API key. Models from many vendors with one Requesty key, with its own spending limits and fallbacks.",
-		"description": "Outflare sends the model the goal, the project brief and a summary of the workspace (mailbox capacity, lead counts, campaigns, connectors) to plan, and the mission's progress and API answers while Outflare's agent runs it. Your key is encrypted, only ever sent to Requesty's own API, and never shown again, logged or given to the model. Usage is billed to your Requesty account; set a monthly limit under Settings → AI model.",
+		"description": "Outflare sends the model the goal, the company context and a summary of the workspace (mailbox capacity, lead counts, campaigns, connectors) to plan, and the mission's progress and API answers while Outflare's agent runs it. Your key is encrypted, only ever sent to Requesty's own API, and never shown again, logged or given to the model. Usage is billed to your Requesty account; set a monthly limit under Settings → AI model.",
 		"website": "https://www.requesty.ai/",
 		"docs_url": "https://docs.requesty.ai/quickstart",
 		"auth_methods": [
@@ -985,14 +3464,47 @@
 			"llm.sample"
 		],
 		"status": "available",
-		"pricing": "Pay per token, billed by Requesty"
+		"pricing": "Pay per token, billed by Requesty",
+		"features": [
+			{
+				"id": "many_vendors",
+				"value": "yes"
+			},
+			{
+				"id": "web_search",
+				"value": "partial",
+				"note": "Not described in Requesty's docs."
+			},
+			{
+				"id": "batch",
+				"value": "no",
+				"note": "No batch endpoint in the docs."
+			},
+			{
+				"id": "oauth_signin",
+				"value": "no"
+			}
+		],
+		"limits": [
+			{
+				"kind": "limits",
+				"text": "Requests in flight are capped at your balance in dollars times a tier multiplier; calls over it get HTTP 429.",
+				"source": "https://docs.requesty.ai/features/in-flight-rate-limits"
+			},
+			{
+				"kind": "limits",
+				"text": "Free models allow a new organisation 200 requests a day and 20 a minute.",
+				"source": "https://docs.requesty.ai/features/free-models"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "vercel_ai_gateway",
 		"name": "Vercel AI Gateway",
 		"category": "model",
 		"summary": "Plan and run missions from a goal you type, with your own Vercel AI Gateway API key. Models from many vendors with one Vercel key, billed to your Vercel team.",
-		"description": "Outflare sends the model the goal, the project brief and a summary of the workspace (mailbox capacity, lead counts, campaigns, connectors) to plan, and the mission's progress and API answers while Outflare's agent runs it. Your key is encrypted, only ever sent to Vercel AI Gateway's own API, and never shown again, logged or given to the model. Usage is billed to your Vercel AI Gateway account; set a monthly limit under Settings → AI model.",
+		"description": "Outflare sends the model the goal, the company context and a summary of the workspace (mailbox capacity, lead counts, campaigns, connectors) to plan, and the mission's progress and API answers while Outflare's agent runs it. Your key is encrypted, only ever sent to Vercel AI Gateway's own API, and never shown again, logged or given to the model. Usage is billed to your Vercel AI Gateway account; set a monthly limit under Settings → AI model.",
 		"website": "https://vercel.com/ai-gateway",
 		"docs_url": "https://vercel.com/docs/ai-gateway",
 		"auth_methods": [
@@ -1004,6 +3516,38 @@
 		],
 		"status": "available",
 		"pricing": "Pay per token, billed by Vercel AI Gateway",
+		"features": [
+			{
+				"id": "many_vendors",
+				"value": "yes"
+			},
+			{
+				"id": "web_search",
+				"value": "yes"
+			},
+			{
+				"id": "batch",
+				"value": "partial",
+				"note": "Not confirmed; no batch endpoint found in the AI Gateway docs."
+			},
+			{
+				"id": "oauth_signin",
+				"value": "no"
+			}
+		],
+		"limits": [
+			{
+				"kind": "plan",
+				"text": "The free tier's $5 monthly credit covers only some models, at lower rate limits; buying credits ends it.",
+				"source": "https://vercel.com/docs/ai-gateway/pricing"
+			},
+			{
+				"kind": "outflare",
+				"text": "Search tools such as Perplexity Search are added to a call as server tools; Outflare doesn't use them yet.",
+				"source": "https://vercel.com/docs/ai-gateway/models-and-providers/web-search"
+			}
+		],
+		"checked": "2026-11-01",
 		"dark_logo": true
 	},
 	{
@@ -1011,7 +3555,7 @@
 		"name": "xAI",
 		"category": "model",
 		"summary": "Plan and run missions from a goal you type, with your own xAI API key. xAI's Grok models.",
-		"description": "Outflare sends the model the goal, the project brief and a summary of the workspace (mailbox capacity, lead counts, campaigns, connectors) to plan, and the mission's progress and API answers while Outflare's agent runs it. Your key is encrypted, only ever sent to xAI's own API, and never shown again, logged or given to the model. Usage is billed to your xAI account; set a monthly limit under Settings → AI model.",
+		"description": "Outflare sends the model the goal, the company context and a summary of the workspace (mailbox capacity, lead counts, campaigns, connectors) to plan, and the mission's progress and API answers while Outflare's agent runs it. Your key is encrypted, only ever sent to xAI's own API, and never shown again, logged or given to the model. Usage is billed to your xAI account; set a monthly limit under Settings → AI model.",
 		"website": "https://x.ai/api",
 		"docs_url": "https://docs.x.ai/docs/overview",
 		"auth_methods": [
@@ -1023,6 +3567,32 @@
 		],
 		"status": "available",
 		"pricing": "Pay per token, billed by xAI",
+		"features": [
+			{
+				"id": "many_vendors",
+				"value": "no"
+			},
+			{
+				"id": "web_search",
+				"value": "yes"
+			},
+			{
+				"id": "batch",
+				"value": "yes"
+			},
+			{
+				"id": "oauth_signin",
+				"value": "no"
+			}
+		],
+		"limits": [
+			{
+				"kind": "outflare",
+				"text": "Outflare calls Chat Completions, which xAI has deprecated and which runs function tools only; web search needs the Responses API.",
+				"source": "https://docs.x.ai/developers/model-capabilities/text/comparison"
+			}
+		],
+		"checked": "2026-11-01",
 		"dark_logo": true
 	},
 	{
@@ -1041,14 +3611,70 @@
 			"notify.post"
 		],
 		"status": "available",
-		"pricing": "Works on every Slack plan, including free"
+		"pricing": "Works on every Slack plan, including free",
+		"features": [
+			{
+				"id": "oauth_install",
+				"value": "yes"
+			},
+			{
+				"id": "post_messages",
+				"value": "yes"
+			},
+			{
+				"id": "list_channels",
+				"value": "yes"
+			},
+			{
+				"id": "free_plan",
+				"value": "yes"
+			}
+		],
+		"checked": "2026-11-01"
+	},
+	{
+		"id": "tolt",
+		"name": "Tolt",
+		"category": "partners",
+		"summary": "Move your referral or affiliate program over from Tolt.",
+		"description": "Reads your Tolt program: partners of every status with their link codes, promo codes, referred customers, transactions and commissions, paid or not. Run the import as often as you like until the day you switch: each run brings only what changed. Outflare never changes anything in Tolt.",
+		"website": "https://tolt.com",
+		"docs_url": "https://docs.tolt.com",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"partners.import"
+		],
+		"status": "available",
+		"pricing": "Free: Tolt does not charge for API calls",
+		"features": [
+			{
+				"id": "partners_read",
+				"value": "yes"
+			},
+			{
+				"id": "commissions_read",
+				"value": "yes"
+			},
+			{
+				"id": "promo_codes_read",
+				"value": "yes"
+			},
+			{
+				"id": "groups_read",
+				"value": "partial",
+				"note": "Some accounts' API doesn't list groups or flows."
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "stripe",
 		"name": "Stripe",
 		"category": "payments",
 		"summary": "See who pays you: customers, subscriptions, payments and refunds on each person's record.",
-		"description": "Reads your Stripe customers, subscriptions, payments and refunds, every few minutes. Each customer becomes a person with their plan, monthly revenue, lifetime revenue and billing status, and each payment is an event on their timeline, so the CRM, lifecycle email, missions and partners all use the same numbers. Read-only: Outflare never charges, refunds or changes anything in Stripe.",
+		"description": "Reads your Stripe customers, subscriptions, payments and refunds, every few minutes. Each customer becomes a person with their plan, monthly revenue, lifetime revenue and billing status, and each payment is an event on their timeline, so the CRM, lifecycle email, missions and partners all use the same numbers. Outflare never charges, refunds or changes payments in Stripe; the one thing it can create is a promotion code for a partner, for a coupon you already have, when your key allows it.",
 		"website": "https://stripe.com",
 		"docs_url": "https://docs.stripe.com/api",
 		"auth_methods": [
@@ -1056,10 +3682,30 @@
 			"api_key"
 		],
 		"capabilities": [
-			"payments.read"
+			"payments.read",
+			"promo_codes.write"
 		],
 		"status": "available",
-		"pricing": "Free: Stripe does not charge for API calls"
+		"pricing": "Free: Stripe does not charge for API calls",
+		"features": [
+			{
+				"id": "oauth_signin",
+				"value": "yes"
+			},
+			{
+				"id": "restricted_key",
+				"value": "yes"
+			},
+			{
+				"id": "change_feed",
+				"value": "yes"
+			},
+			{
+				"id": "promo_codes_api",
+				"value": "yes"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "ahrefs",
@@ -1077,7 +3723,147 @@
 			"seo.read"
 		],
 		"status": "available",
-		"pricing": "API units from your Ahrefs plan"
+		"pricing": "API units from your Ahrefs plan",
+		"features": [
+			{
+				"id": "backlinks",
+				"value": "yes"
+			},
+			{
+				"id": "keywords",
+				"value": "yes"
+			},
+			{
+				"id": "live_serp",
+				"value": "partial",
+				"note": "SERP Overview returns the top 100 results from Ahrefs' own data."
+			},
+			{
+				"id": "site_audit",
+				"value": "partial",
+				"note": "Reads projects already set up in the Ahrefs app."
+			},
+			{
+				"id": "field_vitals",
+				"value": "no"
+			},
+			{
+				"id": "page_fetch",
+				"value": "no"
+			},
+			{
+				"id": "webhooks",
+				"value": "no"
+			}
+		],
+		"limits": [
+			{
+				"kind": "plan",
+				"text": "API access needs a Lite plan or higher, and each plan has a fixed number of API units a month.",
+				"source": "https://help.ahrefs.com/en/articles/6559232-about-api-v3"
+			},
+			{
+				"kind": "limits",
+				"text": "Each request costs at least 50 API units, and the cost grows with the rows and fields returned.",
+				"source": "https://docs.ahrefs.com/en/api/docs/limits-consumption"
+			},
+			{
+				"kind": "login",
+				"text": "Site Audit projects are set up only in the Ahrefs app; the API reads existing projects.",
+				"source": "https://docs.ahrefs.com/en/api/reference/site-audit"
+			},
+			{
+				"kind": "limits",
+				"text": "The API allows 60 requests a minute by default and may refuse more when Ahrefs is under high load.",
+				"source": "https://docs.ahrefs.com/en/api/docs/introduction"
+			},
+			{
+				"kind": "plan",
+				"text": "Lite, Standard and Advanced plans have fixed API units per billing cycle; buying more is for Enterprise.",
+				"source": "https://ahrefs.com/faq"
+			},
+			{
+				"kind": "outflare",
+				"text": "Ahrefs can create Rank Tracker projects and return SERP overviews; Outflare doesn't use them yet.",
+				"source": "https://docs.ahrefs.com/en/api/reference/rank-tracker"
+			}
+		],
+		"checked": "2026-11-01"
+	},
+	{
+		"id": "google_crux",
+		"name": "Chrome UX Report",
+		"category": "seo",
+		"summary": "Real-user Core Web Vitals and weekly field history.",
+		"description": "Enable the Chrome UX Report and History APIs in your Google Cloud project and connect your own API key. Low-traffic pages may have no field data.",
+		"website": "https://developer.chrome.com/docs/crux",
+		"docs_url": "https://developer.chrome.com/docs/crux/history-api",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"web_vitals.read"
+		],
+		"status": "available",
+		"pricing": "Your Google Cloud API quota",
+		"features": [
+			{
+				"id": "backlinks",
+				"value": "no"
+			},
+			{
+				"id": "keywords",
+				"value": "no"
+			},
+			{
+				"id": "live_serp",
+				"value": "no"
+			},
+			{
+				"id": "site_audit",
+				"value": "no"
+			},
+			{
+				"id": "field_vitals",
+				"value": "yes"
+			},
+			{
+				"id": "page_fetch",
+				"value": "no"
+			},
+			{
+				"id": "webhooks",
+				"value": "no"
+			}
+		],
+		"limits": [
+			{
+				"kind": "api",
+				"text": "Pages and origins without enough Chrome traffic return no data.",
+				"source": "https://developer.chrome.com/docs/crux/guides/crux-api"
+			},
+			{
+				"kind": "limits",
+				"text": "The API allows 150 queries a minute per Google Cloud project, shared with the History API, and the quota can't be raised.",
+				"source": "https://developer.chrome.com/docs/crux/api/"
+			},
+			{
+				"kind": "limits",
+				"text": "Current data is a rolling 28-day average, so a change takes weeks to show in full.",
+				"source": "https://developer.chrome.com/docs/crux/methodology/tools"
+			},
+			{
+				"kind": "limits",
+				"text": "History updates weekly, on Mondays, and goes back at most 40 weeks.",
+				"source": "https://developer.chrome.com/docs/crux/history-api/"
+			},
+			{
+				"kind": "api",
+				"text": "Each call reads one origin or URL.",
+				"source": "https://developer.chrome.com/docs/crux/guides/crux-api"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "dataforseo",
@@ -1095,7 +3881,58 @@
 			"serp.read"
 		],
 		"status": "available",
-		"pricing": "Pay per call, about $0.01 to $0.05 a report"
+		"pricing": "Pay per call, about $0.01 to $0.05 a report",
+		"features": [
+			{
+				"id": "backlinks",
+				"value": "yes"
+			},
+			{
+				"id": "keywords",
+				"value": "yes"
+			},
+			{
+				"id": "live_serp",
+				"value": "yes"
+			},
+			{
+				"id": "site_audit",
+				"value": "yes"
+			},
+			{
+				"id": "field_vitals",
+				"value": "no",
+				"note": "The OnPage Lighthouse API runs lab tests, not real-user measurements."
+			},
+			{
+				"id": "page_fetch",
+				"value": "partial",
+				"note": "The OnPage API crawls and parses pages for audits."
+			},
+			{
+				"id": "webhooks",
+				"value": "partial",
+				"note": "Task-based calls take a pingback or postback URL; live calls answer directly."
+			}
+		],
+		"limits": [
+			{
+				"kind": "plan",
+				"text": "Calls are paid from a prepaid balance, topped up from $50.",
+				"source": "https://dataforseo.com/faq"
+			},
+			{
+				"kind": "limits",
+				"text": "The API takes up to 2,000 calls a minute and 30 at the same time, unless DataForSEO raises it.",
+				"source": "https://docs.dataforseo.com/v3/dataforseo_labs/overview/"
+			},
+			{
+				"kind": "outflare",
+				"text": "DataForSEO's OnPage API can crawl and audit a site; Outflare doesn't use it yet.",
+				"source": "https://docs.dataforseo.com/v3/on_page-task_post/"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "geonode",
@@ -1116,6 +3953,54 @@
 		],
 		"status": "available",
 		"pricing": "Tokens per search and per page, and a credit per Google results page, on your Geonode plan",
+		"features": [
+			{
+				"id": "backlinks",
+				"value": "no"
+			},
+			{
+				"id": "keywords",
+				"value": "no"
+			},
+			{
+				"id": "live_serp",
+				"value": "yes"
+			},
+			{
+				"id": "site_audit",
+				"value": "no"
+			},
+			{
+				"id": "field_vitals",
+				"value": "no"
+			},
+			{
+				"id": "page_fetch",
+				"value": "yes"
+			},
+			{
+				"id": "webhooks",
+				"value": "yes"
+			}
+		],
+		"limits": [
+			{
+				"kind": "plan",
+				"text": "The free plan allows one request at a time and 1,500 requests a month; more needs a paid plan.",
+				"source": "https://geonode.com/pricing"
+			},
+			{
+				"kind": "limits",
+				"text": "Requests over the plan's concurrency limit fail with a 429 error.",
+				"source": "https://geonode.com/products/scraper-api"
+			},
+			{
+				"kind": "outflare",
+				"text": "Geonode's Crawl API can read a whole site in one job; Outflare reads single pages.",
+				"source": "https://geonode.com/products/crawl-api"
+			}
+		],
+		"checked": "2026-11-01",
 		"dark_logo": true
 	},
 	{
@@ -1134,9 +4019,46 @@
 			"control.mailboxes",
 			"control.warmup",
 			"replies.read",
-			"blocklist.sync"
+			"blocklist.sync",
+			"push.leads"
 		],
 		"status": "available",
+		"features": [
+			{
+				"id": "campaigns_api",
+				"value": "partial",
+				"note": "Campaigns can be created; no endpoint was found to add sequence steps."
+			},
+			{
+				"id": "leads_api",
+				"value": "yes"
+			},
+			{
+				"id": "webhooks",
+				"value": "yes"
+			},
+			{
+				"id": "warmup_api",
+				"value": "yes"
+			},
+			{
+				"id": "replies_api",
+				"value": "yes"
+			},
+			{
+				"id": "buy_mailboxes_api",
+				"value": "no",
+				"note": "No endpoint to buy mailboxes was found in the API docs."
+			}
+		],
+		"limits": [
+			{
+				"kind": "outflare",
+				"text": "Outflare doesn't import EmailBison campaigns and leads yet, though the API lists both.",
+				"source": "https://emailbison.com/developers"
+			}
+		],
+		"checked": "2026-11-01",
 		"dark_logo": true
 	},
 	{
@@ -1157,10 +4079,67 @@
 			"observe.mailboxes",
 			"control.mailboxes",
 			"control.warmup",
-			"blocklist.sync"
+			"blocklist.sync",
+			"push.leads"
 		],
 		"status": "available",
-		"pricing": "Included in Instantly's Hypergrowth plan and above"
+		"pricing": "Included in Instantly's Hypergrowth plan and above",
+		"features": [
+			{
+				"id": "campaigns_api",
+				"value": "yes"
+			},
+			{
+				"id": "leads_api",
+				"value": "yes"
+			},
+			{
+				"id": "webhooks",
+				"value": "partial",
+				"note": "Hypergrowth plan or above."
+			},
+			{
+				"id": "warmup_api",
+				"value": "yes"
+			},
+			{
+				"id": "replies_api",
+				"value": "yes"
+			},
+			{
+				"id": "buy_mailboxes_api",
+				"value": "partial",
+				"note": "API v2 lists done-for-you email account orders; not checked in detail."
+			}
+		],
+		"limits": [
+			{
+				"kind": "plan",
+				"text": "Webhooks need the Hypergrowth plan or above.",
+				"source": "https://help.instantly.ai/en/articles/6261906-how-to-use-webhooks"
+			},
+			{
+				"kind": "limits",
+				"text": "Listing Unibox emails allows 20 requests a minute, fewer than most other endpoints.",
+				"source": "https://developer.instantly.ai/api-reference/email/list-email"
+			},
+			{
+				"kind": "limits",
+				"text": "Turning on warm-up starts a background job that must be polled, and takes at most 100 addresses in a list per call.",
+				"source": "https://developer.instantly.ai/api-reference/account/enable-warmup-for-accounts"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare doesn't read or answer Instantly replies yet, though the API can.",
+				"source": "https://developer.instantly.ai/api-reference/email/reply-to-an-email"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare imports Instantly campaigns but doesn't create them there, though the API can.",
+				"source": "https://developer.instantly.ai/api-reference/groups/campaign"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "smartlead",
@@ -1180,9 +4159,64 @@
 			"observe.mailboxes",
 			"control.mailboxes",
 			"control.warmup",
-			"blocklist.sync"
+			"blocklist.sync",
+			"push.leads"
 		],
-		"status": "available"
+		"status": "available",
+		"features": [
+			{
+				"id": "campaigns_api",
+				"value": "yes"
+			},
+			{
+				"id": "leads_api",
+				"value": "yes"
+			},
+			{
+				"id": "webhooks",
+				"value": "yes"
+			},
+			{
+				"id": "warmup_api",
+				"value": "yes"
+			},
+			{
+				"id": "replies_api",
+				"value": "yes"
+			},
+			{
+				"id": "buy_mailboxes_api",
+				"value": "yes"
+			}
+		],
+		"limits": [
+			{
+				"kind": "plan",
+				"text": "API access and webhooks need the Pro plan or above; the Base plan has neither.",
+				"source": "https://www.smartlead.ai/pricing"
+			},
+			{
+				"kind": "limits",
+				"text": "On the standard tier, a key may make 60 requests a minute and 1,000 an hour across all endpoints.",
+				"source": "https://api.smartlead.ai/guides/rate-limits"
+			},
+			{
+				"kind": "limits",
+				"text": "Lead statistics and lead activity endpoints allow 10 requests every 60 seconds.",
+				"source": "https://api.smartlead.ai/reference/lead-statistics"
+			},
+			{
+				"kind": "api",
+				"text": "Mailboxes can't be added to a domain bought through SmartSenders; only new domains with mailboxes can be ordered.",
+				"source": "https://helpcenter.smartlead.ai/en/articles/256-smartsenders-faqs-and-troubleshooting-everything-you-need-to-know"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare doesn't read or answer Smartlead replies yet, though the API can.",
+				"source": "https://api.smartlead.ai/api-reference/campaigns/reply-email-thread"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "rb2b",
@@ -1199,7 +4233,18 @@
 			"data.reveal_person"
 		],
 		"status": "available",
-		"pricing": "On your RB2B plan"
+		"pricing": "On your RB2B plan",
+		"features": [
+			{
+				"id": "webhooks",
+				"value": "yes"
+			},
+			{
+				"id": "people",
+				"value": "yes"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "vector",
@@ -1216,7 +4261,30 @@
 			"data.reveal_person"
 		],
 		"status": "available",
-		"pricing": "On your Vector plan"
+		"pricing": "On your Vector plan",
+		"features": [
+			{
+				"id": "webhooks",
+				"value": "yes"
+			},
+			{
+				"id": "people",
+				"value": "yes"
+			}
+		],
+		"limits": [
+			{
+				"kind": "login",
+				"text": "Webhook endpoints and the events they send are set up in Vector's app, with up to 10 segments per endpoint.",
+				"source": "https://learn.vector.co/articles/3872661093-understanding-webhooks-endpoints-events-logs-and-more"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare takes only contact.visited events and doesn't use Vector's other webhook events yet.",
+				"source": "https://learn.vector.co/articles/9450733872-how-vector-s-webhooks-work"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "warmly",
@@ -1233,7 +4301,101 @@
 			"data.reveal_person"
 		],
 		"status": "available",
-		"pricing": "On your Warmly plan"
+		"pricing": "On your Warmly plan",
+		"features": [
+			{
+				"id": "webhooks",
+				"value": "partial",
+				"note": "The free plan sends every visitor, unfiltered, to one webhook; filters need a paid plan."
+			},
+			{
+				"id": "people",
+				"value": "yes"
+			}
+		],
+		"limits": [
+			{
+				"kind": "plan",
+				"text": "The free plan sends every person-level visitor, unfiltered, to one webhook; filtering and more destinations need a paid plan.",
+				"source": "https://help.warmly.ai/articles/7839413626-setting-up-webhooks"
+			},
+			{
+				"kind": "outflare",
+				"text": "Outflare takes the people Warmly names and doesn't use its company-level visit events yet.",
+				"source": "https://help.warmly.ai/articles/7839413626-setting-up-webhooks"
+			}
+		],
+		"checked": "2026-11-01"
+	},
+	{
+		"id": "engain",
+		"name": "Engain",
+		"category": "social",
+		"summary": "Run Reddit campaigns through Engain's accounts: comments, replies, posts, threads and upvotes.",
+		"description": "Uses your own Engain API key, so tasks and votes are billed to your Engain credits. Connecting checks the key and shows your projects and credits left. API access needs Engain's Max plan.",
+		"website": "https://engain.io",
+		"auth_methods": [
+			"api_key"
+		],
+		"capabilities": [
+			"reddit.campaigns"
+		],
+		"status": "available",
+		"pricing": "Engain credits: about 5 per comment or reply, 10 per post, 0.1 per upvote",
+		"features": [
+			{
+				"id": "publish",
+				"value": "partial",
+				"note": "Posts go out from Engain's own Reddit accounts, not the brand's."
+			},
+			{
+				"id": "post_metrics",
+				"value": "partial",
+				"note": "Status and votes for the comments and posts Engain placed."
+			},
+			{
+				"id": "followers",
+				"value": "no"
+			},
+			{
+				"id": "search",
+				"value": "partial",
+				"note": "Suggests Reddit threads to join, not a full keyword search."
+			},
+			{
+				"id": "reply",
+				"value": "partial",
+				"note": "Replies go out from Engain's own Reddit accounts."
+			},
+			{
+				"id": "free_api",
+				"value": "no",
+				"note": "Needs the Max plan; tasks and votes spend Engain credits."
+			}
+		],
+		"limits": [
+			{
+				"kind": "plan",
+				"text": "API access needs Engain's Max plan.",
+				"source": "https://engain.featurebase.app/help/articles/9092618-how-do-i-access-the-api"
+			},
+			{
+				"kind": "limits",
+				"text": "An upvote order takes 1 to 20 votes a day and at most 2,000 in total, or 100 at high speed.",
+				"source": "https://help.engain.io/changelog"
+			},
+			{
+				"kind": "plan",
+				"text": "When a post is removed, only the upvotes not yet delivered come back as credits.",
+				"source": "https://www.engain.io/refund-policy"
+			},
+			{
+				"kind": "outflare",
+				"text": "Engain's API returns recommended upvote goals for a Reddit link; Outflare doesn't use them yet.",
+				"source": "https://help.engain.io/changelog"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "linkedin",
@@ -1247,10 +4409,68 @@
 			"oauth2"
 		],
 		"capabilities": [
-			"social.metrics"
+			"social.metrics",
+			"social.publish"
 		],
 		"status": "available",
-		"pricing": "Free"
+		"pricing": "Free",
+		"features": [
+			{
+				"id": "publish",
+				"value": "yes"
+			},
+			{
+				"id": "post_metrics",
+				"value": "partial",
+				"note": "Company page posts; a person's own posts can't be listed without a restricted permission."
+			},
+			{
+				"id": "followers",
+				"value": "yes"
+			},
+			{
+				"id": "search",
+				"value": "no"
+			},
+			{
+				"id": "reply",
+				"value": "partial",
+				"note": "Comments through the Community Management API."
+			},
+			{
+				"id": "free_api",
+				"value": "yes",
+				"note": "Free, but the Community Management API needs LinkedIn's review first."
+			}
+		],
+		"limits": [
+			{
+				"kind": "login",
+				"text": "The Community Management API needs an application LinkedIn reviews, and it must be the only product on its app.",
+				"source": "https://learn.microsoft.com/en-us/linkedin/marketing/community-management/community-management-overview"
+			},
+			{
+				"kind": "limits",
+				"text": "Until an app passes review for the Standard tier, it gets 500 calls a day and 100 per member.",
+				"source": "https://learn.microsoft.com/en-us/linkedin/marketing/integrations/marketing-tiers"
+			},
+			{
+				"kind": "api",
+				"text": "Listing a person's own posts needs r_member_social, a restricted permission given only to approved apps.",
+				"source": "https://learn.microsoft.com/en-us/linkedin/marketing/community-management/shares/posts-api"
+			},
+			{
+				"kind": "api",
+				"text": "Like, comment and share webhook events fire only for public posts.",
+				"source": "https://learn.microsoft.com/en-us/linkedin/marketing/community-management/organizations/organization-social-action-notifications"
+			},
+			{
+				"kind": "outflare",
+				"text": "LinkedIn's API can comment on posts and send comment webhooks; Outflare doesn't use them yet.",
+				"source": "https://learn.microsoft.com/en-us/linkedin/marketing/community-management/shares/comments-api"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "reddit",
@@ -1268,7 +4488,59 @@
 			"social.reply"
 		],
 		"status": "available",
-		"pricing": "Reddit's Data API terms apply to your app"
+		"pricing": "Reddit's Data API terms apply to your app",
+		"features": [
+			{
+				"id": "publish",
+				"value": "yes"
+			},
+			{
+				"id": "post_metrics",
+				"value": "partial",
+				"note": "Scores and comment counts."
+			},
+			{
+				"id": "followers",
+				"value": "partial",
+				"note": "Karma and subreddit subscriber counts."
+			},
+			{
+				"id": "search",
+				"value": "yes"
+			},
+			{
+				"id": "reply",
+				"value": "yes"
+			},
+			{
+				"id": "free_api",
+				"value": "partial",
+				"note": "Free up to 100 queries a minute; commercial use needs Reddit's written approval."
+			}
+		],
+		"limits": [
+			{
+				"kind": "login",
+				"text": "Developers must request access and get Reddit's approval before using the API.",
+				"source": "https://support.reddithelp.com/hc/en-us/articles/42728983564564-Responsible-Builder-Policy"
+			},
+			{
+				"kind": "plan",
+				"text": "Commercial use of the API needs Reddit's written approval and a contract.",
+				"source": "https://support.reddithelp.com/hc/en-us/articles/14945211791892-Developer-Platform-Accessing-Reddit-Data"
+			},
+			{
+				"kind": "limits",
+				"text": "Free use allows 100 queries a minute per OAuth client id, averaged over 10 minutes.",
+				"source": "https://support.reddithelp.com/hc/en-us/articles/16160319875092-Reddit-Data-API-Wiki"
+			},
+			{
+				"kind": "login",
+				"text": "Accounts that post automatically must register as apps and carry Reddit's App label.",
+				"source": "https://support.reddithelp.com/hc/en-us/articles/45376380316052-Apps-on-Reddit-and-how-to-get-a-label-for-your-app"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "x",
@@ -1282,10 +4554,63 @@
 			"api_key"
 		],
 		"capabilities": [
-			"social.metrics"
+			"social.metrics",
+			"social.publish"
 		],
 		"status": "available",
 		"pricing": "X bills your developer account per use",
+		"features": [
+			{
+				"id": "publish",
+				"value": "yes"
+			},
+			{
+				"id": "post_metrics",
+				"value": "partial",
+				"note": "Private metrics such as impressions only for your own posts from the last 30 days."
+			},
+			{
+				"id": "followers",
+				"value": "yes"
+			},
+			{
+				"id": "search",
+				"value": "partial",
+				"note": "Recent search covers the last 7 days; full-archive search is a separate endpoint."
+			},
+			{
+				"id": "reply",
+				"value": "yes"
+			},
+			{
+				"id": "free_api",
+				"value": "no",
+				"note": "Pay per use, billed to the developer app's owner."
+			}
+		],
+		"limits": [
+			{
+				"kind": "plan",
+				"text": "API use is billed per request, such as $0.005 per post read, $0.015 per new post and $0.20 per post with a link.",
+				"source": "https://docs.x.com/x-api/getting-started/pricing"
+			},
+			{
+				"kind": "limits",
+				"text": "Impressions, clicks and other private metrics are only available for posts from the last 30 days.",
+				"source": "https://docs.x.com/x-api/fundamentals/metrics"
+			},
+			{
+				"kind": "limits",
+				"text": "Account Activity webhooks on pay per use allow 3 subscriptions and 1 webhook.",
+				"source": "https://docs.x.com/x-api/account-activity/introduction"
+			},
+			{
+				"kind": "outflare",
+				"text": "X's API can search recent posts and post replies; Outflare doesn't use them yet.",
+				"source": "https://docs.x.com/x-api/posts/search/introduction"
+			}
+		],
+		"checked": "2026-11-01",
 		"dark_logo": true
 	},
 	{
@@ -1303,7 +4628,26 @@
 			"tags.install"
 		],
 		"status": "available",
-		"pricing": "Free"
+		"pricing": "Free",
+		"features": [
+			{
+				"id": "oauth",
+				"value": "yes"
+			},
+			{
+				"id": "create_tags",
+				"value": "yes"
+			},
+			{
+				"id": "publish",
+				"value": "yes"
+			},
+			{
+				"id": "workspaces",
+				"value": "yes"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "hotjar",
@@ -1315,7 +4659,30 @@
 			"api_key"
 		],
 		"capabilities": [],
-		"status": "planned"
+		"status": "planned",
+		"features": [
+			{
+				"id": "oauth",
+				"value": "no"
+			},
+			{
+				"id": "custom_queries",
+				"value": "no"
+			},
+			{
+				"id": "raw_export",
+				"value": "no"
+			},
+			{
+				"id": "search_queries",
+				"value": "no"
+			},
+			{
+				"id": "self_hosted",
+				"value": "no"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "segment",
@@ -1327,7 +4694,31 @@
 			"api_key"
 		],
 		"capabilities": [],
-		"status": "planned"
+		"status": "planned",
+		"features": [
+			{
+				"id": "oauth",
+				"value": "no"
+			},
+			{
+				"id": "custom_queries",
+				"value": "no"
+			},
+			{
+				"id": "raw_export",
+				"value": "partial",
+				"note": "Segment forwards every event to warehouses and other tools; it keeps no traffic reports of its own."
+			},
+			{
+				"id": "search_queries",
+				"value": "no"
+			},
+			{
+				"id": "self_hosted",
+				"value": "no"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "chili_piper",
@@ -1341,7 +4732,34 @@
 		"capabilities": [
 			"meetings.sync"
 		],
-		"status": "planned"
+		"status": "planned",
+		"features": [
+			{
+				"id": "meetings_api",
+				"value": "yes"
+			},
+			{
+				"id": "webhooks",
+				"value": "yes"
+			},
+			{
+				"id": "book_api",
+				"value": "yes"
+			},
+			{
+				"id": "oauth",
+				"value": "partial",
+				"note": "The API uses tokens an admin makes; OAuth is offered for its MCP server, to admins."
+			}
+		],
+		"limits": [
+			{
+				"kind": "login",
+				"text": "API tokens are made by an admin in Chili Piper's Command Center, with permissions chosen per section.",
+				"source": "https://help.chilipiper.com/hc/en-us/articles/35576029581971-Edge-API-References"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "savvycal",
@@ -1356,7 +4774,33 @@
 		"capabilities": [
 			"meetings.sync"
 		],
-		"status": "planned"
+		"status": "planned",
+		"features": [
+			{
+				"id": "meetings_api",
+				"value": "yes"
+			},
+			{
+				"id": "webhooks",
+				"value": "yes"
+			},
+			{
+				"id": "book_api",
+				"value": "yes"
+			},
+			{
+				"id": "oauth",
+				"value": "yes"
+			}
+		],
+		"limits": [
+			{
+				"kind": "login",
+				"text": "Personal access tokens are made in SavvyCal's developer settings, in the app.",
+				"source": "https://savvycal.com/docs/api/authentication/"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "zoom_scheduler",
@@ -1371,7 +4815,43 @@
 		"capabilities": [
 			"meetings.sync"
 		],
-		"status": "planned"
+		"status": "planned",
+		"features": [
+			{
+				"id": "meetings_api",
+				"value": "yes"
+			},
+			{
+				"id": "webhooks",
+				"value": "yes"
+			},
+			{
+				"id": "book_api",
+				"value": "yes"
+			},
+			{
+				"id": "oauth",
+				"value": "yes"
+			}
+		],
+		"limits": [
+			{
+				"kind": "plan",
+				"text": "Zoom Scheduler is a paid add-on for each user, unless the account's Zoom Workplace plan includes it.",
+				"source": "https://zoom.us/pricing/scheduler"
+			},
+			{
+				"kind": "plan",
+				"text": "The free Scheduler Basic leaves Zoom Workplace Basic and Pro from 3 November 2026, except for users who turned it on before 4 September 2026.",
+				"source": "https://support.zoom.com/hc/en/article?id=zm_kb&sysparm_article=KB0088156"
+			},
+			{
+				"kind": "login",
+				"text": "An admin assigns a Scheduler licence to each user in Zoom's admin settings.",
+				"source": "https://support.zoom.com/hc/en/article?id=zm_kb&sysparm_article=KB0080973"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "pipedrive",
@@ -1384,7 +4864,44 @@
 			"api_key"
 		],
 		"capabilities": [],
-		"status": "planned"
+		"status": "planned",
+		"features": [
+			{
+				"id": "all_plans",
+				"value": "yes"
+			},
+			{
+				"id": "oauth",
+				"value": "yes"
+			},
+			{
+				"id": "webhooks",
+				"value": "yes"
+			},
+			{
+				"id": "custom_objects",
+				"value": "no",
+				"note": "Custom fields on deals, people, organisations and products only."
+			}
+		],
+		"limits": [
+			{
+				"kind": "limits",
+				"text": "Each company has a daily token budget (30,000 times a plan multiplier times seats), and each call spends tokens; a search costs 40.",
+				"source": "https://pipedrive.readme.io/docs/core-api-concepts-rate-limiting"
+			},
+			{
+				"kind": "limits",
+				"text": "Bursts are limited per token, from 20 requests per 2 seconds on Lite to 120 on Ultimate, and search to 10 per 2 seconds.",
+				"source": "https://pipedrive.readme.io/docs/core-api-concepts-rate-limiting"
+			},
+			{
+				"kind": "limits",
+				"text": "A user can have at most 40 webhooks.",
+				"source": "https://pipedrive.readme.io/docs/guide-for-webhooks-v2"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "salesforce",
@@ -1396,7 +4913,45 @@
 			"oauth2"
 		],
 		"capabilities": [],
-		"status": "planned"
+		"status": "planned",
+		"features": [
+			{
+				"id": "all_plans",
+				"value": "no",
+				"note": "Group, Essentials and Professional editions don't include API access."
+			},
+			{
+				"id": "oauth",
+				"value": "yes"
+			},
+			{
+				"id": "webhooks",
+				"value": "partial",
+				"note": "Change Data Capture streams changes; without an add-on it covers 5 objects."
+			},
+			{
+				"id": "custom_objects",
+				"value": "yes"
+			}
+		],
+		"limits": [
+			{
+				"kind": "plan",
+				"text": "Group, Essentials and Professional editions don't include API access; Professional needs the Web Services API add-on.",
+				"source": "https://help.salesforce.com/s/articleView?id=000385436&language=en_US&type=1"
+			},
+			{
+				"kind": "limits",
+				"text": "Enterprise edition allows 100,000 API calls plus 1,000 per full licence in a rolling 24 hours.",
+				"source": "https://developer.salesforce.com/docs/platform/salesforce-app-limits-cheatsheet/guide/salesforce-app-limits-platform-api.html"
+			},
+			{
+				"kind": "plan",
+				"text": "Without an add-on, Change Data Capture covers 5 objects and delivers 25,000 events a day in Enterprise edition.",
+				"source": "https://developer.salesforce.com/docs/platform/change-data-capture/guide/cdc-allocations.html"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "bettercontact",
@@ -1410,7 +4965,44 @@
 		"capabilities": [
 			"data.find_email"
 		],
-		"status": "planned"
+		"status": "planned",
+		"features": [
+			{
+				"id": "search_people",
+				"value": "yes"
+			},
+			{
+				"id": "find_email",
+				"value": "yes"
+			},
+			{
+				"id": "phones",
+				"value": "yes"
+			},
+			{
+				"id": "bulk",
+				"value": "yes",
+				"note": "Up to 100 leads per request."
+			}
+		],
+		"limits": [
+			{
+				"kind": "api",
+				"text": "Enrichment is asynchronous; results come to a webhook or by polling, never in the first response.",
+				"source": "https://doc.bettercontact.rocks/api-reference/endpoint/get"
+			},
+			{
+				"kind": "limits",
+				"text": "Each API key allows 100 requests per minute on Starter, free and small plans, and 200 on Pro.",
+				"source": "https://doc.bettercontact.rocks/api-reference/api_rate_limits"
+			},
+			{
+				"kind": "api",
+				"text": "Submitting enrichment isn't idempotent; retrying a request that already succeeded enriches and charges again.",
+				"source": "https://doc.bettercontact.rocks/api-reference/endpoint/get"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "clay",
@@ -1437,7 +5029,50 @@
 			"data.search_people",
 			"data.enrich_person"
 		],
-		"status": "planned"
+		"status": "planned",
+		"features": [
+			{
+				"id": "search_people",
+				"value": "yes"
+			},
+			{
+				"id": "find_email",
+				"value": "yes"
+			},
+			{
+				"id": "phones",
+				"value": "partial",
+				"note": "Which fields come back beyond core contact data depends on the package."
+			},
+			{
+				"id": "bulk",
+				"value": "yes",
+				"note": "Search returns up to 100 records per call; redeem takes up to 20."
+			}
+		],
+		"limits": [
+			{
+				"kind": "plan",
+				"text": "The API needs a Cognism package that includes API access; it sets the fields, search tokens and rate limits.",
+				"source": "https://docs.cognism.com/docs/getting-started"
+			},
+			{
+				"kind": "login",
+				"text": "API credentials are created by signing in to Cognism, under Settings, M2M Connect.",
+				"source": "https://docs.cognism.com/docs/getting-started"
+			},
+			{
+				"kind": "plan",
+				"text": "Each contact redeemed costs 1 credit, and each enriched profile uses 1 from the preview allowance.",
+				"source": "https://help.cognism.com/hc/en-gb/articles/34673553578514-Using-Enrich-and-Redeem-APIs-in-Cognism"
+			},
+			{
+				"kind": "limits",
+				"text": "Redeem takes 1 to 20 records per call, so revealing a large list needs many calls.",
+				"source": "https://help.cognism.com/hc/en-gb/articles/34674998544274-Search-and-Access-Records-Using-the-Cognism-API"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "contactout",
@@ -1629,7 +5264,26 @@
 		"capabilities": [
 			"verify"
 		],
-		"status": "planned"
+		"status": "planned",
+		"features": [
+			{
+				"id": "mailbox_check",
+				"value": "yes"
+			},
+			{
+				"id": "bulk_api",
+				"value": "yes"
+			},
+			{
+				"id": "bulk_callback",
+				"value": "yes"
+			},
+			{
+				"id": "credits_api",
+				"value": "yes"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "briteverify",
@@ -1671,7 +5325,27 @@
 		"capabilities": [
 			"verify"
 		],
-		"status": "planned"
+		"status": "planned",
+		"features": [
+			{
+				"id": "mailbox_check",
+				"value": "yes"
+			},
+			{
+				"id": "bulk_api",
+				"value": "yes"
+			},
+			{
+				"id": "bulk_callback",
+				"value": "no",
+				"note": "No callback is documented; a bulk job's progress is checked by polling."
+			},
+			{
+				"id": "credits_api",
+				"value": "yes"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "kickbox",
@@ -1685,7 +5359,26 @@
 		"capabilities": [
 			"verify"
 		],
-		"status": "planned"
+		"status": "planned",
+		"features": [
+			{
+				"id": "mailbox_check",
+				"value": "yes"
+			},
+			{
+				"id": "bulk_api",
+				"value": "yes"
+			},
+			{
+				"id": "bulk_callback",
+				"value": "yes"
+			},
+			{
+				"id": "credits_api",
+				"value": "yes"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "scrubby",
@@ -1735,7 +5428,44 @@
 			"api_key"
 		],
 		"capabilities": [],
-		"status": "planned"
+		"status": "planned",
+		"features": [
+			{
+				"id": "campaigns_api",
+				"value": "yes"
+			},
+			{
+				"id": "leads_api",
+				"value": "yes"
+			},
+			{
+				"id": "webhooks",
+				"value": "yes"
+			},
+			{
+				"id": "warmup_api",
+				"value": "partial",
+				"note": "No warm-up endpoint was confirmed in the API docs."
+			},
+			{
+				"id": "replies_api",
+				"value": "partial",
+				"note": "Reply webhooks exist; no endpoint to answer replies was confirmed."
+			},
+			{
+				"id": "buy_mailboxes_api",
+				"value": "no",
+				"note": "No endpoint to buy mailboxes was found in the API docs."
+			}
+		],
+		"limits": [
+			{
+				"kind": "plan",
+				"text": "API access and webhooks need the Business plan or above.",
+				"source": "https://plusvibe.ai/plans"
+			}
+		],
+		"checked": "2026-11-01"
 	},
 	{
 		"id": "commonroom",

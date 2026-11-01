@@ -2,7 +2,7 @@
 import Marketing from '../../layouts/Marketing.astro';
 import IntegrationLogo from '../../components/IntegrationLogo.astro';
 import { app } from '../../data/project';
-import { categories, categoryOf, integrations, signIn } from '../../data/integrations';
+import { categories, categoryOf, compared, guideOf, integrations, signIn } from '../../data/integrations';
 
 const available = integrations.filter((i) => i.status === 'available');
 const used = [...new Set(integrations.map((i) => i.category))];
@@ -46,7 +46,10 @@ const groups = [...categories.map((c) => c.id).filter((id) => used.includes(id))
 							<h2 class="text-xl font-semibold tracking-tight">{g.label}</h2>
 							{g.blurb && <p class="mt-1 text-sm text-muted-foreground">{g.blurb}</p>}
 						</div>
-						<a href={g.docs} class="touch inline-flex items-center text-sm text-muted-foreground hover:text-foreground">Docs →</a>
+						<span class="flex gap-4">
+							{(() => { const gd = guideOf(g.id); return gd && compared(gd).length > 1 && <a href={`/integrations/compare/${g.id}/`} data-track="integration_compare_open" data-track-label={g.id} class="touch inline-flex items-center text-sm text-muted-foreground hover:text-foreground">Compare →</a>; })()}
+							<a href={g.docs} class="touch inline-flex items-center text-sm text-muted-foreground hover:text-foreground">Docs →</a>
+						</span>
 					</div>
 					<ul class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
 						{g.items.map((i) => (

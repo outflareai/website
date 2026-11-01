@@ -1,0 +1,653 @@
+{
+	"data": [
+		{
+			"id": "ads",
+			"name": "Ad platforms",
+			"summary": "Ad networks where you pay for clicks and impressions, from search and social to app stores and native ads.",
+			"outflare": "Outflare reads spend, impressions, clicks and the platform's own conversions per campaign every six hours, with ad sets and ads for Meta and Google, and puts spend in the costs ledger. It sends conversions back to most platforms and fills Meta and Google customer lists from journeys. It never changes campaigns, budgets or ads.",
+			"features": [
+				{
+					"id": "oauth_sign_in",
+					"label": "Sign in with OAuth",
+					"help": "A person connects the ad account by signing in, without pasting keys or passwords."
+				},
+				{
+					"id": "open_access",
+					"label": "Open API access",
+					"help": "The API works for your own ad accounts without asking the vendor to approve your app first."
+				},
+				{
+					"id": "manage_campaigns",
+					"label": "Manage campaigns",
+					"help": "Create campaigns and change their status and budgets over the API."
+				},
+				{
+					"id": "conversions_api",
+					"label": "Send conversions",
+					"help": "Send conversions from your own server to the platform over an API."
+				},
+				{
+					"id": "customer_lists",
+					"label": "Customer lists",
+					"help": "Upload hashed emails or phone numbers to an audience over the API."
+				}
+			],
+			"connectors": [
+				"amazon_ads",
+				"apple_ads",
+				"google_ads",
+				"linkedin_ads",
+				"meta_ads",
+				"microsoft_ads",
+				"outbrain_ads",
+				"pinterest_ads",
+				"reddit_ads",
+				"snapchat_ads",
+				"taboola_ads",
+				"tiktok_ads",
+				"x_ads"
+			]
+		},
+		{
+			"id": "analytics",
+			"name": "Analytics",
+			"summary": "Web, product and search analytics tools that count visits, pages, sources, searches and events.",
+			"outflare": "Outflare reads traffic, top pages, sources, search queries and events from each tool, read-only, and answers them in one shape. Every six hours it stores each site's daily numbers, so history can be compared across tools and brands without calling the vendor again. Nothing is changed at the vendor.",
+			"features": [
+				{
+					"id": "oauth",
+					"label": "Sign in with the vendor",
+					"help": "Connect by signing in to the vendor's account (OAuth), not only by pasting a key."
+				},
+				{
+					"id": "custom_queries",
+					"label": "Flexible queries",
+					"help": "Ask for any metric broken down by any dimension over the API, not only fixed reports."
+				},
+				{
+					"id": "raw_export",
+					"label": "Raw event export",
+					"help": "Read individual page views and events over the API, not only totals."
+				},
+				{
+					"id": "search_queries",
+					"label": "Search queries",
+					"help": "Report the search terms people used before they clicked through to the site."
+				},
+				{
+					"id": "self_hosted",
+					"label": "Self-hosted",
+					"help": "The tool can run on your own server, with the same API."
+				}
+			],
+			"connectors": [
+				"amplitude",
+				"bing_webmaster",
+				"cloudflare_web_analytics",
+				"fathom",
+				"google_analytics",
+				"google_search_console",
+				"matomo",
+				"microsoft_clarity",
+				"mixpanel",
+				"plausible",
+				"posthog",
+				"simple_analytics",
+				"umami",
+				"vercel_analytics",
+				"hotjar",
+				"segment"
+			]
+		},
+		{
+			"id": "calendar",
+			"name": "Calendars",
+			"summary": "Calendars and booking tools that hold the meetings leads book with you.",
+			"outflare": "Outflare reads each connected calendar or booking tool every 15 minutes, or on request, and keeps only meetings with a lead or a lead's colleague among the guests, so the Outcomes page can count meetings booked from outreach. It only reads: nothing is booked, changed or cancelled in the tool.",
+			"features": [
+				{
+					"id": "meetings_api",
+					"label": "Read meetings",
+					"help": "Lists booked meetings and their guests over the API."
+				},
+				{
+					"id": "webhooks",
+					"label": "Booking webhooks",
+					"help": "Calls a URL when a meeting is booked, moved or cancelled, so nothing has to poll."
+				},
+				{
+					"id": "book_api",
+					"label": "Book over API",
+					"help": "Books a meeting for a guest over the API, not only through a booking page."
+				},
+				{
+					"id": "oauth",
+					"label": "OAuth sign-in",
+					"help": "People connect by signing in and approving access, instead of copying a key."
+				}
+			],
+			"connectors": [
+				"cal_com",
+				"calendly",
+				"google_calendar",
+				"outlook_calendar",
+				"chili_piper",
+				"savvycal",
+				"zoom_scheduler"
+			]
+		},
+		{
+			"id": "code",
+			"name": "Code and deploys",
+			"summary": "Where your website's code lives and deploys, so Outflare knows when a change goes live.",
+			"outflare": "Outflare reads production deploys of the repository or project behind each website, checking every five minutes, and records each one. Fixes are re-checked once a change ships and experiments start on the real deploy. It only reads: it never pushes code, opens pull requests, deploys, promotes or rolls back.",
+			"features": [
+				{
+					"id": "deploys_api",
+					"label": "List deploys",
+					"help": "Read production deployments and their status over the API."
+				},
+				{
+					"id": "deploy_webhooks",
+					"label": "Deploy webhooks",
+					"help": "The service calls your server when a deploy changes status."
+				},
+				{
+					"id": "start_deploys",
+					"label": "Start deploys",
+					"help": "Create a deployment over the API, not only by pushing code or in the app."
+				},
+				{
+					"id": "oauth",
+					"label": "Sign in with OAuth",
+					"help": "Connect by signing in, without pasting a token."
+				},
+				{
+					"id": "read_only",
+					"label": "Read-only access",
+					"help": "A token or sign-in can be limited to reading."
+				}
+			],
+			"connectors": [
+				"github",
+				"vercel"
+			]
+		},
+		{
+			"id": "crm",
+			"name": "CRMs",
+			"summary": "Customer relationship managers that hold your contacts, companies and deals.",
+			"outflare": "Outflare reads deals and meetings from HubSpot to count what outreach led to, and can write booked meetings, labelled replies (a note with a follow-up task) and contacts from journeys into it; deals are never changed. From Attio it previews and imports a whole workspace once into Outflare's own customer records, read-only, with no ongoing sync.",
+			"features": [
+				{
+					"id": "all_plans",
+					"label": "API on every plan",
+					"help": "The API works on the vendor's lowest plan, including a free one, without an add-on."
+				},
+				{
+					"id": "oauth",
+					"label": "OAuth sign-in",
+					"help": "People connect by signing in and approving access, instead of copying a key."
+				},
+				{
+					"id": "webhooks",
+					"label": "Change webhooks",
+					"help": "Calls a URL when a record changes, with subscriptions managed over the API."
+				},
+				{
+					"id": "custom_objects",
+					"label": "Custom objects",
+					"help": "Reads and writes record types of your own beyond contacts, companies and deals."
+				}
+			],
+			"connectors": [
+				"attio",
+				"hubspot",
+				"pipedrive",
+				"salesforce"
+			]
+		},
+		{
+			"id": "data",
+			"name": "Lead data",
+			"summary": "Databases and finders that search for people, find their work emails and phone numbers, and name the companies behind website visitors.",
+			"outflare": "Outflare builds lead lists from people searches at a provider you pay for, finds emails through a waterfall of providers in the order you choose, caches results for 180 days so it never pays twice, and stops a run at your credit cap. It also names the companies behind consenting website visitors.",
+			"features": [
+				{
+					"id": "search_people",
+					"label": "Search people",
+					"help": "Search the vendor's people database by title, seniority, company or location over the API."
+				},
+				{
+					"id": "find_email",
+					"label": "Find emails",
+					"help": "Return a work email for a named person over the API."
+				},
+				{
+					"id": "phones",
+					"label": "Phone numbers",
+					"help": "Return mobile or direct phone numbers over the API."
+				},
+				{
+					"id": "bulk",
+					"label": "Bulk requests",
+					"help": "Look up many people in one request or bulk job, not only one per call."
+				}
+			],
+			"connectors": [
+				"apollo",
+				"findymail",
+				"leadmagic",
+				"moltsets",
+				"peopledatalabs",
+				"prospeo",
+				"snitcher",
+				"bettercontact",
+				"cognism"
+			]
+		},
+		{
+			"id": "dns",
+			"name": "DNS hosts",
+			"summary": "Services that host a domain's DNS records, where site verification, sending and tracking records are added.",
+			"outflare": "Outflare adds the DNS records it needs (site verification, sending and tracking domains, a cold email domain's missing mail records) through the connected DNS host. It only adds records, each marked \"Added by Outflare\", and never changes or deletes one. Hosts that support Domain Connect can instead approve the records once, with no connection.",
+			"features": [
+				{
+					"id": "add_records",
+					"label": "Add records",
+					"help": "Create DNS records over the API."
+				},
+				{
+					"id": "oauth_signin",
+					"label": "Sign-in",
+					"help": "Connect by signing in to the DNS host instead of pasting a key."
+				},
+				{
+					"id": "scoped_token",
+					"label": "Scoped token",
+					"help": "A key can be limited to DNS on chosen domains only."
+				},
+				{
+					"id": "record_comments",
+					"label": "Record notes",
+					"help": "A record can carry a note saying who added it."
+				}
+			],
+			"connectors": [
+				"cloudflare"
+			]
+		},
+		{
+			"id": "email_verification",
+			"name": "Email verification",
+			"summary": "Services that check whether an email address exists and is safe to send to before it is emailed.",
+			"outflare": "Outflare checks every lead's address before its first email, one address at a time, with the workspace's chosen service or the free built-in checks. Answers become deliverable, undeliverable, risky or unknown, with catch-all, disposable, role and free flags. Undeliverable addresses are never emailed, and if the service fails, the built-in checks take over.",
+			"features": [
+				{
+					"id": "mailbox_check",
+					"label": "Mailbox check",
+					"help": "Checks the mailbox itself on the mail server, not only the address and domain."
+				},
+				{
+					"id": "bulk_api",
+					"label": "Bulk lists by API",
+					"help": "Sends a whole list or batch to verify in one request over the API."
+				},
+				{
+					"id": "bulk_callback",
+					"label": "Done callback",
+					"help": "Calls a URL you give when a bulk list has finished, so nothing has to poll."
+				},
+				{
+					"id": "credits_api",
+					"label": "Credit balance",
+					"help": "Reads the remaining credits over the API."
+				}
+			],
+			"connectors": [
+				"bouncer",
+				"builtin",
+				"debounce",
+				"emailable",
+				"hunter",
+				"millionverifier",
+				"neverbounce",
+				"reoon",
+				"zerobounce",
+				"bounceban",
+				"clearout",
+				"kickbox"
+			]
+		},
+		{
+			"id": "model",
+			"name": "AI models",
+			"summary": "AI model APIs, and routers that reach many vendors' models with one key, that Outflare's agent thinks with.",
+			"outflare": "Outflare uses the model the workspace picks, with the workspace's own key, to plan missions from a goal, run its built-in agent and ask the questions AI visibility samples. The key is encrypted and only ever sent to that vendor's own API. Usage is billed to the workspace's account with the vendor.",
+			"features": [
+				{
+					"id": "many_vendors",
+					"label": "Many vendors",
+					"help": "One key reaches models from several AI companies."
+				},
+				{
+					"id": "web_search",
+					"label": "Web search",
+					"help": "The model can search the web during a call, with the pages it used."
+				},
+				{
+					"id": "batch",
+					"label": "Batch API",
+					"help": "Calls that can wait run in bulk at a lower price."
+				},
+				{
+					"id": "oauth_signin",
+					"label": "Sign-in",
+					"help": "Connect by signing in to the vendor instead of pasting an API key."
+				}
+			],
+			"connectors": [
+				"claude",
+				"deepseek",
+				"gemini",
+				"mistral",
+				"openai",
+				"openrouter",
+				"requesty",
+				"vercel_ai_gateway",
+				"xai"
+			]
+		},
+		{
+			"id": "notification",
+			"name": "Notifications",
+			"summary": "Chat tools where Outflare posts alerts to a channel the workspace picks.",
+			"outflare": "Outflare posts each alert the workspace chooses, such as a hot reply or a hot website visitor, to a channel in the workspace's own chat tool, with a link back to it in Outflare. It only posts; it never reads messages.",
+			"features": [
+				{
+					"id": "oauth_install",
+					"label": "Sign-in",
+					"help": "Connect by installing an app with a sign-in instead of pasting a token."
+				},
+				{
+					"id": "post_messages",
+					"label": "Post messages",
+					"help": "Post a message to a channel over the API."
+				},
+				{
+					"id": "list_channels",
+					"label": "List channels",
+					"help": "List the channels a message can go to."
+				},
+				{
+					"id": "free_plan",
+					"label": "Free plan",
+					"help": "Works on the tool's free plan."
+				}
+			],
+			"connectors": [
+				"slack"
+			]
+		},
+		{
+			"id": "partners",
+			"name": "Partner programs",
+			"summary": "Referral and affiliate program tools, read so a program can move over to Outflare.",
+			"outflare": "Outflare reads a partner program's partners, links, promo codes, referred customers, transactions and commissions into a program of its own, as often as needed until switch-over day. It never changes anything in the partner tool.",
+			"features": [
+				{
+					"id": "partners_read",
+					"label": "Partners",
+					"help": "List partners of every status over the API."
+				},
+				{
+					"id": "commissions_read",
+					"label": "Commissions",
+					"help": "List commissions, paid or not, over the API."
+				},
+				{
+					"id": "promo_codes_read",
+					"label": "Promo codes",
+					"help": "List partners' promotion codes over the API."
+				},
+				{
+					"id": "groups_read",
+					"label": "Groups",
+					"help": "List partner groups and their commission plans over the API."
+				}
+			],
+			"connectors": [
+				"tolt"
+			]
+		},
+		{
+			"id": "payments",
+			"name": "Payments",
+			"summary": "Billing accounts that charge your customers, read so each person's record shows what they pay.",
+			"outflare": "Outflare reads customers, subscriptions, payments and refunds every few minutes. Each customer becomes a person record with their plan and revenue, and each payment is an event on their timeline. It never charges, refunds or changes payments; the one thing it may create is a partner's promotion code, for a coupon the workspace already has, when the key allows it.",
+			"features": [
+				{
+					"id": "oauth_signin",
+					"label": "Sign-in",
+					"help": "Connect by installing an app and signing in instead of pasting a key."
+				},
+				{
+					"id": "restricted_key",
+					"label": "Read-only key",
+					"help": "A key can be limited to reading the objects Outflare needs."
+				},
+				{
+					"id": "change_feed",
+					"label": "Change feed",
+					"help": "The API lists what changed since a point, so syncs read only what is new."
+				},
+				{
+					"id": "promo_codes_api",
+					"label": "Promo codes",
+					"help": "Create a promotion code for an existing coupon over the API."
+				}
+			],
+			"connectors": [
+				"stripe"
+			]
+		},
+		{
+			"id": "seo",
+			"name": "SEO",
+			"summary": "Search data about any domain, Google results, real-user page speed and page reading.",
+			"outflare": "Outflare reads domain rating, backlinks, ranking keywords, competitors and (Ahrefs) site audit issues through DataForSEO or Ahrefs, within a monthly budget. It tracks Google rankings through DataForSEO or Geonode, reads Core Web Vitals from the Chrome UX Report, and uses Geonode for web searches and to read pages a firewall blocks. It only reads.",
+			"features": [
+				{
+					"id": "backlinks",
+					"label": "Backlinks",
+					"help": "Backlinks and referring domains for any domain."
+				},
+				{
+					"id": "keywords",
+					"label": "Ranking keywords",
+					"help": "The keywords a domain ranks for, with positions and search volumes."
+				},
+				{
+					"id": "live_serp",
+					"label": "Live Google results",
+					"help": "Google's results for a keyword, fetched at the time of the call."
+				},
+				{
+					"id": "site_audit",
+					"label": "Site audit",
+					"help": "Technical issues found by crawling a site."
+				},
+				{
+					"id": "field_vitals",
+					"label": "Real-user Web Vitals",
+					"help": "Core Web Vitals measured from real Chrome users."
+				},
+				{
+					"id": "page_fetch",
+					"label": "Page reading",
+					"help": "Fetch any page, with JavaScript or past a firewall."
+				},
+				{
+					"id": "webhooks",
+					"label": "Webhooks",
+					"help": "The service calls your server when a long task finishes."
+				}
+			],
+			"connectors": [
+				"ahrefs",
+				"google_crux",
+				"dataforseo",
+				"geonode"
+			]
+		},
+		{
+			"id": "sequencer",
+			"name": "Sequencers",
+			"summary": "Tools that send cold email sequences from many mailboxes, with warm-up.",
+			"outflare": "Outflare imports campaigns, leads and mailboxes from Instantly and Smartlead so you can switch over, adds and removes mailboxes on campaigns as mailbox allocation decides, turns the tool's own warm-up on and off, syncs the blocklist and pushes leads from journeys. EmailBison replies come into the Outflare inbox.",
+			"features": [
+				{
+					"id": "campaigns_api",
+					"label": "Create campaigns",
+					"help": "Make a campaign over the API, not only in the app."
+				},
+				{
+					"id": "leads_api",
+					"label": "Add leads",
+					"help": "Add leads to a campaign over the API."
+				},
+				{
+					"id": "webhooks",
+					"label": "Webhooks",
+					"help": "The tool calls a URL when something happens, such as a reply or a bounce."
+				},
+				{
+					"id": "warmup_api",
+					"label": "Warm-up control",
+					"help": "Turn warm-up on and off for a mailbox over the API."
+				},
+				{
+					"id": "replies_api",
+					"label": "Read and answer replies",
+					"help": "Read the inbox of replies and answer them over the API."
+				},
+				{
+					"id": "buy_mailboxes_api",
+					"label": "Buy mailboxes",
+					"help": "Order domains and mailboxes from the tool over the API."
+				}
+			],
+			"connectors": [
+				"emailbison",
+				"instantly",
+				"smartlead",
+				"plusvibe"
+			]
+		},
+		{
+			"id": "signals",
+			"name": "Signals",
+			"summary": "Tools that tell you when a person or company does something worth reaching out about, such as visiting your website.",
+			"outflare": "Outflare takes in the people RB2B, Vector or Warmly name on your website, from your own account, through a webhook. Each new person becomes a prospect held for review, and nobody is emailed until someone approves them. These tools name people in the United States only. Outflare never identifies anyone itself.",
+			"features": [
+				{
+					"id": "webhooks",
+					"label": "Webhook push",
+					"help": "Sends each identified person to a URL you give as it happens, so nothing has to poll."
+				},
+				{
+					"id": "people",
+					"label": "Names people",
+					"help": "Names the person behind a visit, not only their company."
+				}
+			],
+			"connectors": [
+				"rb2b",
+				"vector",
+				"warmly"
+			]
+		},
+		{
+			"id": "social",
+			"name": "Social",
+			"summary": "Social networks where a brand posts, replies and grows its following.",
+			"outflare": "Outflare reads followers and your own posts' numbers on X and LinkedIn every day, and publishes posts a person approved from the brand's own account. On Reddit it finds threads where the brand can help and posts approved replies from the brand's account. Through Engain it runs Reddit campaigns within each brand's budget.",
+			"features": [
+				{
+					"id": "publish",
+					"label": "Publish posts",
+					"help": "Post from the brand's own account over the API."
+				},
+				{
+					"id": "post_metrics",
+					"label": "Post metrics",
+					"help": "Read impressions and engagement for your own posts."
+				},
+				{
+					"id": "followers",
+					"label": "Follower counts",
+					"help": "Read how many people follow the account."
+				},
+				{
+					"id": "search",
+					"label": "Search posts",
+					"help": "Search public posts by keyword."
+				},
+				{
+					"id": "reply",
+					"label": "Reply and comment",
+					"help": "Reply to other people's posts over the API."
+				},
+				{
+					"id": "free_api",
+					"label": "Free API",
+					"help": "API use costs nothing beyond the normal account."
+				}
+			],
+			"connectors": [
+				"engain",
+				"linkedin",
+				"reddit",
+				"x"
+			]
+		},
+		{
+			"id": "tags",
+			"name": "Tag managers",
+			"summary": "Tools that load scripts and tags on a website without editing its code.",
+			"outflare": "Outflare puts its website script on your site through your own Google Tag Manager: one Custom HTML tag named Outflare that fires on all pages, added in a Tag Manager workspace of its own and published, so nobody else's unpublished changes go live with it. It never edits or removes your other tags.",
+			"features": [
+				{
+					"id": "oauth",
+					"label": "Sign in with the vendor",
+					"help": "Connect by signing in to the vendor's account (OAuth), not by pasting a key."
+				},
+				{
+					"id": "create_tags",
+					"label": "Create tags",
+					"help": "Add a tag and its trigger over the API."
+				},
+				{
+					"id": "publish",
+					"label": "Publish over the API",
+					"help": "Make a new version live over the API, without opening the vendor's app."
+				},
+				{
+					"id": "workspaces",
+					"label": "Separate drafts",
+					"help": "Work in a draft of its own, so other people's unpublished changes don't go live with it."
+				}
+			],
+			"connectors": [
+				"google_tag_manager"
+			]
+		}
+	],
+	"limit_kinds": {
+		"api": "The vendor's API has no way to do it.",
+		"limits": "Rate limits, quotas, data delays or history limits.",
+		"login": "Only possible by signing in to the vendor's own app.",
+		"outflare": "The vendor can do it, but Outflare doesn't use it yet.",
+		"plan": "Needs a paid plan, add-on or extra credits for API access."
+	}
+}

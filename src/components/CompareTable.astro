@@ -1,0 +1,49 @@
+---
+// A category's comparison: one row per connector, one column per API
+// ability, from the engine's integrations/categories files.
+import IntegrationLogo from './IntegrationLogo.astro';
+import { compared, type Guide } from '../data/integrations';
+
+interface Props {
+	guide: Guide;
+	highlight?: string;
+}
+const { guide, highlight } = Astro.props;
+const rows = compared(guide);
+const word = { yes: 'Yes', partial: 'Partly', no: 'No' } as const;
+---
+
+<div class="overflow-x-auto rounded-lg border">
+	<table class="w-full min-w-[36rem] text-sm">
+		<thead class="bg-muted/40 text-left text-xs text-muted-foreground">
+			<tr>
+				<th scope="col" class="px-3 py-2 font-medium">Integration</th>
+				{guide.features.map((f) => <th scope="col" class="px-3 py-2 font-medium" title={f.help}>{f.label}</th>)}
+			</tr>
+		</thead>
+		<tbody class="divide-y">
+			{
+				rows.map((i) => (
+					<tr class={`align-top ${i.id === highlight ? 'bg-brand/5' : ''}`}>
+						<th scope="row" class="px-3 py-2 text-left font-medium">
+							<a href={`/integrations/${i.id}/`} data-track="integration_open" data-track-label={i.id} class="inline-flex items-center gap-2 hover:underline">
+								<IntegrationLogo integration={i} size={16} class="size-4" />
+								{i.name}
+							</a>
+							{i.status === 'planned' && <span class="badge badge-next ml-1">Planned</span>}
+						</th>
+						{guide.features.map((f) => {
+							const v = i.features?.find((x) => x.id === f.id);
+							return (
+								<td class="px-3 py-2">
+									<span class={v?.value === 'yes' ? 'text-foreground' : 'text-muted-foreground'}>{v ? word[v.value] : '–'}</span>
+									{v?.note && <span class="block text-xs text-muted-foreground">{v.note}</span>}
+								</td>
+							);
+						})}
+					</tr>
+				))
+			}
+		</tbody>
+	</table>
+</div>

@@ -2,6 +2,7 @@
 // engine's public catalog (GET /v1/connectors), refreshed with
 // `npm run sync-integrations`; this file only adds the words the pages use.
 import raw from './integrations.json';
+import rawGuides from './connector-categories.json';
 
 export interface Integration {
 	id: string;
@@ -16,9 +17,43 @@ export interface Integration {
 	status: 'available' | 'planned';
 	pricing?: string;
 	dark_logo?: boolean;
+	// Its row in its category's comparison, and what the vendor's API
+	// can't do, from the engine's integrations/categories files.
+	features?: { id: string; value: 'yes' | 'partial' | 'no'; note?: string }[];
+	limits?: { kind: string; text: string; source: string }[];
+	checked?: string;
 }
 
 export const integrations = raw as Integration[];
+
+// A category's overview and the columns of its comparison
+// (GET /v1/connector-categories).
+export interface Guide {
+	id: string;
+	name: string;
+	summary: string;
+	outflare: string;
+	features: { id: string; label: string; help: string }[];
+	connectors: string[];
+}
+
+export const guides = (rawGuides as { data: Guide[] }).data;
+export const guideOf = (category: string) => guides.find((g) => g.id === category);
+
+// The rows of a category's comparison, in the guide's order.
+export const compared = (g: Guide) => g.connectors.map((id) => integrations.find((i) => i.id === id)).filter((i): i is Integration => !!i);
+
+// Short labels for each kind of limit, and what each means.
+export const limitKinds: Record<string, { label: string; help: string }> = {
+	api: { label: 'Not in the API', help: "The vendor's API has no way to do it." },
+	login: { label: 'Only in their app', help: "Only possible by signing in to the vendor's own app." },
+	plan: { label: 'Paid plan', help: 'Needs a paid plan, add-on or extra credits for API access.' },
+	limits: { label: 'Limits', help: 'Rate limits, quotas, data delays or history limits.' },
+	outflare: { label: 'Not in Outflare yet', help: "The vendor can do it, but Outflare doesn't use it yet." },
+};
+
+// Where anyone can correct a category's comparison.
+export const guideSource = (category: string) => `https://github.com/outflareai/outflare/blob/main/integrations/categories/${category}.yaml`;
 
 // Categories in the order the directory lists them, with the docs page that
 // explains what Outflare does with each.
