@@ -2,7 +2,7 @@
 	"version": "2026.11.01",
 	"date": "2026-11-01",
 	"status": "in-progress",
-	"updated": "2026-11-01T12:47:33Z",
+	"updated": "2026-11-01T13:04:16Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -59,7 +59,28 @@
 			"edition": "open-source",
 			"text": "Partners → Log shows every conversion your backend or tracker reported in the last 30 days, by the API or a postback URL: what it sent, what Outflare answered, and whether it was credited, with the reason when it wasn't. Search it by order id, customer id, ref, promo code or email.",
 			"at": "2026-11-01T12:47:33Z"
+		},
+		{
+			"kind": "security",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Security improvements to the help centre and page reading.",
+			"at": "2026-11-01T13:04:16Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "self-hosting",
+			"edition": "open-source",
+			"text": "Building Outflare from source now needs Go 1.26 or later; the Docker image already has it.",
+			"at": "2026-11-01T13:04:16Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "Webhook deliveries keep every try, not only the last: open a delivery to see its payload and each attempt's status code, error and answer time, and send it again from there. Each endpoint shows its error rate over the last 24 hours, and its deliveries page shows the last 7 days of tries and failures.",
+			"at": "2026-11-01T13:04:16Z"
 		}
 	],
-	"through": "46e41c9+2388b4d"
+	"through": "71c35bd+0e28652"
 }
