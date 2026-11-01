@@ -2,7 +2,7 @@
 	"version": "2026.11.01",
 	"date": "2026-11-01",
 	"status": "in-progress",
-	"updated": "2026-11-01T10:53:41Z",
+	"updated": "2026-11-01T11:22:15Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -31,7 +31,14 @@
 			"edition": "open-source",
 			"text": "Partner programs can block countries: website visits and new customers from them don't credit partners. A website visit's country now comes from the visitor's address, looked up in an IP database that ships with Outflare (IP geolocation by DB-IP), when your own proxy doesn't pass it. The address itself is never stored.",
 			"at": "2026-11-01T10:25:52Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "records",
+			"edition": "open-source",
+			"text": "Each brand now has its own people and its own catalog: the same email or user id in two brands is two separate people, never merged, and record types, fields, option lists and event definitions belong to one brand, with every new brand starting from the default set. Approving a held event name needs only the customers permission.",
+			"at": "2026-11-01T11:22:15Z"
 		}
 	],
-	"through": "bbb4bbf+c93349a"
+	"through": "2b09d28+f5149a3"
 }
