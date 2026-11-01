@@ -2,7 +2,7 @@
 	"version": "2026.11.01",
 	"date": "2026-11-01",
 	"status": "in-progress",
-	"updated": "2026-11-01T22:53:36Z",
+	"updated": "2026-11-01T22:57:04Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -416,7 +416,21 @@
 			"edition": "open-source",
 			"text": "Tracking domains on Cloudflare DNS can now be added with one click: \"Cloudflare (one click)\" opens Cloudflare's approval screen with the CNAME record, instead of asking for an API token.",
 			"at": "2026-11-01T22:30:13Z"
+		},
+		{
+			"kind": "fix",
+			"area": "deliverability",
+			"edition": "open-source",
+			"text": "\"Approve in Cloudflare\" is now a real link you can hover or open in a new tab, and it's the main action on DNS cards. Connecting the Cloudflare API is a secondary option under it. When one-click approval isn't offered, the card says why.",
+			"at": "2026-11-01T22:57:04Z"
+		},
+		{
+			"kind": "launch",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Experts approve their own quotes: on a draft quote, Ask the expert emails them through one of your brand's outreach sequences or gives you a link for Slack. They approve the exact words, suggest a change or decline on a simple page with no account, and you're alerted when they decide.",
+			"at": "2026-11-01T22:57:04Z"
 		}
 	],
-	"through": "81b1a77+5d63c3a"
+	"through": "aec0ea9+89c2d77"
 }
