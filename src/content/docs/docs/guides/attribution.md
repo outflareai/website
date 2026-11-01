@@ -52,6 +52,14 @@ Paid ads read the same credit. The conversions each ad platform reports about it
 
 Click a channel to see its sources and campaigns: visits, conversions and revenue each, most conversions first. Campaigns made with campaign links show their name.
 
+## On Home and in your digest
+
+**Home** shows the last 28 days across every channel, below **Needs you**: visits, conversions, revenue and cost, with a link to Channels. It appears once your site has visits, for anyone who can see the reports.
+
+Your [daily or weekly digest](/docs/guides/digests/) has a **Channels** section: visits, conversions, and revenue and cost in each currency, each next to the period before, and the three channels that brought the most conversions. Both use your default model.
+
+[Missions](/docs/agents/missions/) can aim at revenue credited to the campaign links in their sequences, under your default model.
+
 ## Who can do what
 
 Everyone in the workspace can see the reports (`analytics.read`). Owners, admins and operators can change the default model, the lookback and which events count (`analytics.manage`). Changing the lookback or the events credits every past conversion again within a few minutes.
