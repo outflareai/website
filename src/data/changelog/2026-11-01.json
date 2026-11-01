@@ -2,7 +2,7 @@
 	"version": "2026.11.01",
 	"date": "2026-11-01",
 	"status": "in-progress",
-	"updated": "2026-11-01T14:16:34Z",
+	"updated": "2026-11-01T14:22:45Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -115,7 +115,14 @@
 			"edition": "open-source",
 			"text": "More leftovers are gone: `GET /email-domains/{domain}` (use `/domain-lookups/{domain}`), the `member` role name (use `operator`), the old connector ids `hubspot_private_app` and `posthog_cloud`, the never-set `suggested_sender_id` on mailboxes, the `system` value of a reply's `category_source`, and the ignored `v` on connector logos.",
 			"at": "2026-11-01T14:16:34Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "lifecycle",
+			"edition": "open-source",
+			"text": "Rules, journeys, lifecycle email, alerts and webhooks now belong to one brand, with API routes under `/v1/brands/{brand}/`: a rule or journey acts only on its brand's people, an unsubscribe applies to the brand it came from (an admin can apply one to every brand), and a webhook hears only its brand's events.",
+			"at": "2026-11-01T14:22:45Z"
 		}
 	],
-	"through": "c50f955+4e004a8"
+	"through": "5a4ac10+a689166"
 }
