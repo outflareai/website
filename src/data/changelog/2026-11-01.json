@@ -2,7 +2,7 @@
 	"version": "2026.11.01",
 	"date": "2026-11-01",
 	"status": "in-progress",
-	"updated": "2026-11-01T21:46:20Z",
+	"updated": "2026-11-01T22:02:58Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -374,7 +374,28 @@
 			"edition": "open-source",
 			"text": "The Tolt import no longer marks commissions as paid just because they sit in a Tolt payout. Commissions in payouts Tolt hasn't paid yet (pending or \"not eligible\") keep their own status, and the next import run takes back any it marked paid before, removing the payouts it made for them.",
 			"at": "2026-11-01T21:46:20Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Let approved salespeople connect their own Google account with read-only consent. Select contacts and accounts for private email capture, with internal-mail exclusions, separate sharing controls, draft protection and owner-only disconnect. Deleted copies stay deleted. Administrators manage eligibility; Google Workspace approval remains an external setup step.",
+			"at": "2026-11-01T22:02:58Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Import personal customer emails with private defaults, explicit sharing and internal-email exclusions. Choose activity-only or full content for specific people or the brand. Exclusions revoke access to older imports; record merges reset sharing. Personal mail stays separate from the shared outreach inbox. Provider sync is not included yet.",
+			"at": "2026-11-01T22:02:58Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Manage relationships in a sales workspace with editable tables, pipeline boards, saved views, tasks, notes and sales summaries. Add leads using existing companies and contact details, import Attio list entries and linked history, and create follow-ups from workflows.",
+			"at": "2026-11-01T22:02:58Z"
 		}
 	],
-	"through": "05a7b82+dc1f9cd"
+	"through": "35f91f2+a45f264"
 }
