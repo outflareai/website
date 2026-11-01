@@ -2,7 +2,7 @@
 	"version": "2026.11.01",
 	"date": "2026-11-01",
 	"status": "in-progress",
-	"updated": "2026-11-01T15:45:47Z",
+	"updated": "2026-11-01T15:48:38Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -129,7 +129,42 @@
 			"edition": "open-source",
 			"text": "Mailbox allocation now lists the mailboxes it keeps from each sequence (a declined suggestion, an undone automatic choice, or a campaign the sequencer refused), and you can clear one so that mailbox can be given to the sequence again, in the app, the API and MCP.",
 			"at": "2026-11-01T15:34:12Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "The lead finder page counts data provider and email verifier credits in what results cost, priced at the rates you set in Outcomes, and says which providers still need a price.",
+			"at": "2026-11-01T15:48:38Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Paid ads: Meta Ads and Google Ads now sync ad sets (Google's ad groups) and ads, each with spend, impressions, clicks and conversions per day, and each ad's headline and landing page. Open a campaign to see its numbers by day, its ad sets and its ads, and see every platform's spend by day at the top.",
+			"at": "2026-11-01T15:48:38Z"
+		},
+		{
+			"kind": "fix",
+			"area": "connectors",
+			"edition": "open-source",
+			"text": "Connecting a mailbox supplier such as Cheap Inboxes now reads its mailboxes straight away, and replacing its API key reads them again, without anyone opening the supplier's mailbox list first.",
+			"at": "2026-11-01T15:48:38Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "The API calls a reply's tags `tags`: inbox messages return `tags` instead of `labels`, triaging a reply takes `tags`, the `inbox.updated` event reports changed `tags`, and the MCP tool `triage_inbox_message` takes `tags`. \"Label\" now always means a reply's category, such as interested or not_now.",
+			"at": "2026-11-01T15:48:38Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Public releases of Outflare for desktop check for updates automatically and install verified updates when the app is idle. The app window and tray menu also offer Check for updates.",
+			"at": "2026-11-01T15:48:38Z"
 		}
 	],
-	"through": "85b828b+5c23bef"
+	"through": "8d0697d+09129fe"
 }
