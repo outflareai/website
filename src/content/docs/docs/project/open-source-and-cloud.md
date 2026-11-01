@@ -27,9 +27,10 @@ Two promises come with it:
 | Your data in your own Postgres | Yes | Hosted for you |
 | Hosting and upgrades | You run them | Done for you |
 | Sign up in the browser, nothing to install | | Yes |
+| [Lead finder](/docs/guides/lead-finder/): companies that fit your ideal customer profile, the people to contact there, into your CRM and campaigns | | Yes |
 | Price | Free ([AGPL-3.0](/docs/project/license/)) | Free during early access |
 
-Today everything these docs describe runs in both. When a Cloud-only feature ships, it gets its own page here and joins this table.
+Everything else these docs describe runs in both. When a Cloud-only feature ships, it gets its own page and joins this table.
 
 ## Coming to Cloud
 
