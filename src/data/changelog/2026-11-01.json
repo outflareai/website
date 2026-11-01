@@ -2,7 +2,7 @@
 	"version": "2026.11.01",
 	"date": "2026-11-01",
 	"status": "in-progress",
-	"updated": "2026-11-01T15:59:30Z",
+	"updated": "2026-11-01T16:26:53Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -164,7 +164,56 @@
 			"edition": "open-source",
 			"text": "Public releases of Outflare for desktop check for updates automatically and install verified updates when the app is idle. The app window and tray menu also offer Check for updates.",
 			"at": "2026-11-01T15:48:38Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "inbox",
+			"edition": "open-source",
+			"text": "Support replies can link to your help centre: Articles in the reply box suggests public articles from what the customer wrote, or searches them, and puts the link in your reply. Suggest a reply now offers a link to each article it used.",
+			"at": "2026-11-01T16:26:53Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "lifecycle",
+			"edition": "open-source",
+			"text": "The automation map now shows where events come from (website, your app, Stripe) and what journeys reach outside Outflare: webhooks, Slack, your CRM, ad audiences and review campaigns. Exported kits leave out webhook keys and ask the other workspace for its own URL, channel and audience.",
+			"at": "2026-11-01T16:26:53Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Following Outflare and the builder on X now opens X's one-click follow dialog instead of the whole profile. After posting feedback to X, the Feedback box offers a last step, following the builder, and X suggests following both accounts once the post is up.",
+			"at": "2026-11-01T16:26:53Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Links in sequences now say which step they went out in, and Analytics → Channels can split a campaign by content, so you can see which email in a sequence brought the visit and the sale.",
+			"at": "2026-11-01T16:26:53Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "A lead list's leads now come from one place, `GET /lead-lists/{id}/members`, which also takes the `suppressed` and `verification` filters. `GET /leads` no longer takes `list_id` and says where to look instead.",
+			"at": "2026-11-01T16:26:53Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "Inviting someone and changing a member's role take one `role` field: any role's id from `GET /roles`, a starting role like `admin` or one your workspace made. `role_id` is gone, and members and invites return the same `role` they take.",
+			"at": "2026-11-01T16:26:53Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "A mailbox's `warmup.provider` is now null when no connected sequencer runs its warm-up, and `warmup.platform` is gone: the sequencer's warm-up state and score are its entry in `platforms`. To stop warm-up, set `enabled` to false; the `outflare` provider is no longer accepted.",
+			"at": "2026-11-01T16:26:53Z"
 		}
 	],
-	"through": "8d0697d+6ed9a65"
+	"through": "924c787+9ac13fe"
 }
