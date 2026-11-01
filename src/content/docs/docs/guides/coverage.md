@@ -47,7 +47,7 @@ Search, advanced all/any filters and private or team saved views help teammates 
 
 ## Discover new mentions and links
 
-Discovery reuses your brand's existing news searches, link prospects and [backlink sources](/docs/guides/backlinks/). Configure saved searches inside Coverage or open the existing search and backlink modules. **Refresh discoveries** brings their results into the review list. If another batch remains, refresh again to continue.
+Discovery reuses your brand's existing [news searches](/docs/guides/news-watch/), link prospects and [backlink sources](/docs/guides/backlinks/). Configure saved searches inside Coverage or open the existing search and backlink modules. **Refresh discoveries** brings their results into the review list. If another batch remains, refresh again to continue.
 
 [Geonode, Ahrefs and DataForSEO](/docs/integrations/seo/) run on your workspace's own connected accounts and budgets. No Outflare-provided key or fallback account is used. An integration stays unavailable until the workspace connects what it needs; manual records and available native checks remain usable.
 
