@@ -2,7 +2,7 @@
 	"version": "2026.11.01",
 	"date": "2026-11-01",
 	"status": "in-progress",
-	"updated": "2026-11-01T12:22:49Z",
+	"updated": "2026-11-01T12:47:33Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -52,7 +52,14 @@
 			"edition": "open-source",
 			"text": "People, companies, their history, lists, imports and duplicates now live under each brand, with API routes under `/v1/brands/{brand}/`, and every customer page works inside the brand you pick. Query runs for one brand, and each custom record type is a table of its own.",
 			"at": "2026-11-01T12:22:49Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Partners → Log shows every conversion your backend or tracker reported in the last 30 days, by the API or a postback URL: what it sent, what Outflare answered, and whether it was credited, with the reason when it wasn't. Search it by order id, customer id, ref, promo code or email.",
+			"at": "2026-11-01T12:47:33Z"
 		}
 	],
-	"through": "ecf10b7+94e2c81"
+	"through": "46e41c9+2388b4d"
 }
