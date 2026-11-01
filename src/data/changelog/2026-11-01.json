@@ -2,7 +2,7 @@
 	"version": "2026.11.01",
 	"date": "2026-11-01",
 	"status": "in-progress",
-	"updated": "2026-11-01T22:57:04Z",
+	"updated": "2026-11-01T23:11:08Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -430,7 +430,14 @@
 			"edition": "open-source",
 			"text": "Experts approve their own quotes: on a draft quote, Ask the expert emails them through one of your brand's outreach sequences or gives you a link for Slack. They approve the exact words, suggest a change or decline on a simple page with no account, and you're alerted when they decide.",
 			"at": "2026-11-01T22:57:04Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "The partners table shows each partner's email under their name. The Tolt import skips a promotion that has neither a code nor a partner (a program-wide discount) without listing it as something to check.",
+			"at": "2026-11-01T23:11:08Z"
 		}
 	],
-	"through": "aec0ea9+89c2d77"
+	"through": "80e4ac0+f7c5594"
 }
