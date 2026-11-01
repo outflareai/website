@@ -2,7 +2,7 @@
 	"version": "2026.11.01",
 	"date": "2026-11-01",
 	"status": "in-progress",
-	"updated": "2026-11-01T16:57:26Z",
+	"updated": "2026-11-01T17:13:21Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -234,7 +234,21 @@
 			"edition": "open-source",
 			"text": "Link prospects can now be found through expired domains: a page that still links to a domain that has lapsed is a prospect with the method \"Expired domain\", to offer one of your pages instead.",
 			"at": "2026-11-01T16:57:26Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "records",
+			"edition": "open-source",
+			"text": "Tools that research people and companies can keep what they learned as ordinary fields on the record, created the first time they're needed. They never overwrite a value you set yourself, and every change shows in the record's history.",
+			"at": "2026-11-01T17:13:21Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Analytics → Channels can show identified people only: visits where the person signed in or was named by a form, and the credit on them, leaving out visits known only by a browser cookie. Each credited visit now says how it was matched.",
+			"at": "2026-11-01T17:13:21Z"
 		}
 	],
-	"through": "bee3c76+3e6aa04"
+	"through": "8e988c4+4e85cc7"
 }
