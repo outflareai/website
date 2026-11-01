@@ -27,15 +27,16 @@ Two promises come with it:
 | Your data in your own Postgres | Yes | Hosted for you |
 | Hosting and upgrades | You run them | Done for you |
 | Sign up in the browser, nothing to install | | Yes |
+| [PR autopilot](/docs/guides/pr-autopilot/): reactive PR for a brand every morning, with each quote, release and pitch approved by you | | Yes |
 | Price | Free ([AGPL-3.0](/docs/project/license/)) | Free during early access |
 
-Today everything these docs describe runs in both. When a Cloud-only feature ships, it gets its own page here and joins this table.
+Everything else these docs describe runs in both. Each Cloud-only feature has its own page, marked as below, and a row in this table.
 
 ## Coming to Cloud
 
 These are on the way, and run only in Outflare Cloud:
 
-- **Autopilots:** agents that keep working toward a target you set.
+- **More autopilots:** agents that keep working toward a target you set, like the [PR autopilot](/docs/guides/pr-autopilot/).
 - **Enterprise controls:** single sign-on, SCIM, audit log export and approvals across teams.
 - **Heavy work at scale:** AI visibility across many models, large site crawls and session replay.
 
