@@ -2,7 +2,7 @@
 	"version": "2026.11.01",
 	"date": "2026-11-01",
 	"status": "in-progress",
-	"updated": "2026-11-01T12:08:01Z",
+	"updated": "2026-11-01T12:22:49Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -45,7 +45,14 @@
 			"edition": "open-source",
 			"text": "The partner portal can load your own website script, so partners' visits show in your website analytics, and Google Analytics 4 alongside it, held back until the visitor allows analytics. Pick a site key and, if you like, a measurement id in the portal settings.",
 			"at": "2026-11-01T11:39:02Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "records",
+			"edition": "open-source",
+			"text": "People, companies, their history, lists, imports and duplicates now live under each brand, with API routes under `/v1/brands/{brand}/`, and every customer page works inside the brand you pick. Query runs for one brand, and each custom record type is a table of its own.",
+			"at": "2026-11-01T12:22:49Z"
 		}
 	],
-	"through": "4c9657b+ecf2dab"
+	"through": "ecf10b7+94e2c81"
 }
