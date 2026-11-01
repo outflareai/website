@@ -2,7 +2,7 @@
 	"version": "2026.11.01",
 	"date": "2026-11-01",
 	"status": "in-progress",
-	"updated": "2026-11-01T21:20:37Z",
+	"updated": "2026-11-01T21:33:26Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -360,7 +360,14 @@
 			"edition": "open-source",
 			"text": "Live chat on your website: add a chat button to your site from Support settings. Visitors can search your help centre, then message your team; chats land in the support inbox with email, assignment and response times, and your replies show in their chat within seconds. It shows only on the sites you list, and your site can vouch for signed-in users.",
 			"at": "2026-11-01T21:20:37Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "deliverability",
+			"edition": "open-source",
+			"text": "Approving DNS records at Cloudflare now works for domains on Cloudflare DNS. When a domain already has a DKIM key at the same selector, a DMARC policy or its own MX record, Outflare offers the other ways to add the records instead, so the approval never puts a second record beside one you already have.",
+			"at": "2026-11-01T21:33:26Z"
 		}
 	],
-	"through": "833a36f+07b25e1"
+	"through": "4f82814+0e22659"
 }
