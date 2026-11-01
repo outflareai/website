@@ -52,6 +52,21 @@ https://northpeak.example/pricing?plan=pro&utm_source=linkedin&utm_medium=cpc&ut
 
 Old campaign tags on the page are replaced, and its other parameters and `#section` are kept. Making the same link twice gives back the one you already have.
 
+## Links Outflare tags for you
+
+Some parts of Outflare tag their own links, so you don't make those campaigns by hand. Each makes one campaign per thing it sends, the first time it needs one, and lists it here with the rest:
+
+| Where the link goes out | One campaign per | Channel | Which links |
+| --- | --- | --- | --- |
+| [Sequences](/docs/guides/sequences/) | sequence | Outbound email | Links in each step to your brand's website and domains |
+| Broadcasts | broadcast | Lifecycle email | Links in the email to your brand's website and domains |
+| Journeys | journey | Lifecycle email | The same |
+| [Social replies](/docs/guides/social/) | watch | Reddit, or Organic social for X and LinkedIn | The watch's landing page, with each reply as the content |
+
+For an email with no brand, links to any of your brands' sites count. Links to other companies' sites are never tagged, and a link you tagged yourself (it already has `utm_campaign`) keeps your tags. Test emails and test sends are never tagged.
+
+In a sequence, links are tagged before [click tracking](/docs/guides/tracking-domains/) wraps them, so the person still lands on the tagged page, and your unsubscribe link is left alone. Visits from cold email then show under **Outbound email** in [Channels](/docs/guides/attribution/), by sequence.
+
 ## Who can do what
 
 Everyone in the workspace can see campaigns and links (`analytics.read`). Owners, admins and operators can make and change them (`analytics.manage`).
