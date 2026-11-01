@@ -31,6 +31,17 @@ curl -X POST "$OUTFLARE_URL/v1/workspaces/$WS/missions/plan" \
 
 Without an AI model connected, it answers `409` with `connector_needed`; with no model picked, `ai_model_needed`; past the workspace's monthly AI limit, `ai_budget_reached`.
 
+### Goals in money
+
+Besides meetings, replies, emails sent and leads contacted, a mission can aim at revenue, in whole US dollars:
+
+| Goal | What counts |
+| --- | --- |
+| `revenue_attributed`, *USD revenue from its sequences* | Payments credited to the campaign links in the mission's sequences, under your default [attribution model](/docs/guides/attribution/), less refunds |
+| `revenue_deals`, *USD in won deals* | Won deals tagged with the mission |
+
+Money in other currencies is left out, never converted. The mission's progress shows both, as `revenue_attributed_cents` and `revenue_deals_cents`, whichever one is its goal.
+
 ## Who runs it
 
 When you approve a mission, choose who carries it out.

@@ -1,0 +1,310 @@
+{
+	"version": "2026.11.01",
+	"date": "2026-11-01",
+	"status": "in-progress",
+	"updated": "2026-11-01T19:43:17Z",
+	"items": [
+		{
+			"kind": "improvement",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Partner programs can refuse credit for website visits that came from paid ads or social media, for partners who may not bid on your brand or post on social networks.",
+			"at": "2026-11-01T09:00:17Z"
+		},
+		{
+			"kind": "launch",
+			"area": "records",
+			"edition": "open-source",
+			"text": "Undo a merge, and undo an import: a record's page lists its merges with Undo merge, which puts back everything the merge moved. People → Imports lists every CSV import, CRM import and send of product events; Undo… shows what it made and what changed since, then undoes only what's untouched or everything, restorable for 7 days from Recently deleted.",
+			"at": "2026-11-01T09:26:17Z"
+		},
+		{
+			"kind": "launch",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Four new playbooks assess sign-ups for partnership potential: a review across partnership types, SDK and bandwidth suppliers, integration partners, and resellers or agencies. Each returns evidence, confidence and suggested next steps for review.",
+			"at": "2026-11-01T10:07:19Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Partner programs can block countries: website visits and new customers from them don't credit partners. A website visit's country now comes from the visitor's address, looked up in an IP database that ships with Outflare (IP geolocation by DB-IP), when your own proxy doesn't pass it. The address itself is never stored.",
+			"at": "2026-11-01T10:25:52Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "records",
+			"edition": "open-source",
+			"text": "Each brand now has its own people and its own catalog: the same email or user id in two brands is two separate people, never merged, and record types, fields, option lists and event definitions belong to one brand, with every new brand starting from the default set. Approving a held event name needs only the customers permission.",
+			"at": "2026-11-01T11:22:15Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "The partner portal can load your own website script, so partners' visits show in your website analytics, and Google Analytics 4 alongside it, held back until the visitor allows analytics. Pick a site key and, if you like, a measurement id in the portal settings.",
+			"at": "2026-11-01T11:39:02Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "records",
+			"edition": "open-source",
+			"text": "People, companies, their history, lists, imports and duplicates now live under each brand, with API routes under `/v1/brands/{brand}/`, and every customer page works inside the brand you pick. Query runs for one brand, and each custom record type is a table of its own.",
+			"at": "2026-11-01T12:22:49Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Partners → Log shows every conversion your backend or tracker reported in the last 30 days, by the API or a postback URL: what it sent, what Outflare answered, and whether it was credited, with the reason when it wasn't. Search it by order id, customer id, ref, promo code or email.",
+			"at": "2026-11-01T12:47:33Z"
+		},
+		{
+			"kind": "security",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Security improvements to the help centre and page reading.",
+			"at": "2026-11-01T13:04:16Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "self-hosting",
+			"edition": "open-source",
+			"text": "Building Outflare from source now needs Go 1.26 or later; the Docker image already has it.",
+			"at": "2026-11-01T13:04:16Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "Webhook deliveries keep every try, not only the last: open a delivery to see its payload and each attempt's status code, error and answer time, and send it again from there. Each endpoint shows its error rate over the last 24 hours, and its deliveries page shows the last 7 days of tries and failures.",
+			"at": "2026-11-01T13:04:16Z"
+		},
+		{
+			"kind": "launch",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Create paid or voluntary partner tasks with fixed prices, ranges or custom offers. Partners add channels, verify websites to unlock private proposals, and submit work through a hosted or embedded portal that shares the dashboard's design system. Approved rewards join your existing ledger.",
+			"at": "2026-11-01T13:22:37Z"
+		},
+		{
+			"kind": "launch",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Pitch one partner with a branded website teaser, then reveal their proposal after secure sign-in. Agree on flexible deliverables, cash or product benefits, and held or split payment milestones; partners submit work and brands manually verify it before approving payment.",
+			"at": "2026-11-01T13:33:43Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Partners can submit people they referred on the portal: an email and a note. You approve or reject each one on Partners → Leads, or have them taken at once. An approved lead becomes the partner's referred customer under the program's rules, and a customer another partner referred first stays with that partner.",
+			"at": "2026-11-01T14:04:30Z"
+		},
+		{
+			"kind": "launch",
+			"area": "records",
+			"edition": "open-source",
+			"text": "Query Studio: a Query page for each brand with an SQL editor that completes table and column names, every table and record type beside it, results as a table or a bar, line or area chart, CSV downloads of up to 10,000 rows, and saved queries, private or shared with the brand, with every version kept and restorable.",
+			"at": "2026-11-01T14:04:30Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "More leftovers are gone: `GET /email-domains/{domain}` (use `/domain-lookups/{domain}`), the `member` role name (use `operator`), the old connector ids `hubspot_private_app` and `posthog_cloud`, the never-set `suggested_sender_id` on mailboxes, the `system` value of a reply's `category_source`, and the ignored `v` on connector logos.",
+			"at": "2026-11-01T14:16:34Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "lifecycle",
+			"edition": "open-source",
+			"text": "Rules, journeys, lifecycle email, alerts and webhooks now belong to one brand, with API routes under `/v1/brands/{brand}/`: a rule or journey acts only on its brand's people, an unsubscribe applies to the brand it came from (an admin can apply one to every brand), and a webhook hears only its brand's events.",
+			"at": "2026-11-01T14:22:45Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "outreach",
+			"edition": "open-source",
+			"text": "Mailbox allocation now lists the mailboxes it keeps from each sequence (a declined suggestion, an undone automatic choice, or a campaign the sequencer refused), and you can clear one so that mailbox can be given to the sequence again, in the app, the API and MCP.",
+			"at": "2026-11-01T15:34:12Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "The lead finder page counts data provider and email verifier credits in what results cost, priced at the rates you set in Outcomes, and says which providers still need a price.",
+			"at": "2026-11-01T15:48:38Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Paid ads: Meta Ads and Google Ads now sync ad sets (Google's ad groups) and ads, each with spend, impressions, clicks and conversions per day, and each ad's headline and landing page. Open a campaign to see its numbers by day, its ad sets and its ads, and see every platform's spend by day at the top.",
+			"at": "2026-11-01T15:48:38Z"
+		},
+		{
+			"kind": "fix",
+			"area": "connectors",
+			"edition": "open-source",
+			"text": "Connecting a mailbox supplier such as Cheap Inboxes now reads its mailboxes straight away, and replacing its API key reads them again, without anyone opening the supplier's mailbox list first.",
+			"at": "2026-11-01T15:48:38Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "The API calls a reply's tags `tags`: inbox messages return `tags` instead of `labels`, triaging a reply takes `tags`, the `inbox.updated` event reports changed `tags`, and the MCP tool `triage_inbox_message` takes `tags`. \"Label\" now always means a reply's category, such as interested or not_now.",
+			"at": "2026-11-01T15:48:38Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Public releases of Outflare for desktop check for updates automatically and install verified updates when the app is idle. The app window and tray menu also offer Check for updates.",
+			"at": "2026-11-01T15:48:38Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "inbox",
+			"edition": "open-source",
+			"text": "Support replies can link to your help centre: Articles in the reply box suggests public articles from what the customer wrote, or searches them, and puts the link in your reply. Suggest a reply now offers a link to each article it used.",
+			"at": "2026-11-01T16:26:53Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "lifecycle",
+			"edition": "open-source",
+			"text": "The automation map now shows where events come from (website, your app, Stripe) and what journeys reach outside Outflare: webhooks, Slack, your CRM, ad audiences and review campaigns. Exported kits leave out webhook keys and ask the other workspace for its own URL, channel and audience.",
+			"at": "2026-11-01T16:26:53Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Following Outflare and the builder on X now opens X's one-click follow dialog instead of the whole profile. After posting feedback to X, the Feedback box offers a last step, following the builder, and X suggests following both accounts once the post is up.",
+			"at": "2026-11-01T16:26:53Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Links in sequences now say which step they went out in, and Analytics → Channels can split a campaign by content, so you can see which email in a sequence brought the visit and the sale.",
+			"at": "2026-11-01T16:26:53Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "A lead list's leads now come from one place, `GET /lead-lists/{id}/members`, which also takes the `suppressed` and `verification` filters. `GET /leads` no longer takes `list_id` and says where to look instead.",
+			"at": "2026-11-01T16:26:53Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "Inviting someone and changing a member's role take one `role` field: any role's id from `GET /roles`, a starting role like `admin` or one your workspace made. `role_id` is gone, and members and invites return the same `role` they take.",
+			"at": "2026-11-01T16:26:53Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "A mailbox's `warmup.provider` is now null when no connected sequencer runs its warm-up, and `warmup.platform` is gone: the sequencer's warm-up state and score are its entry in `platforms`. To stop warm-up, set `enabled` to false; the `outflare` provider is no longer accepted.",
+			"at": "2026-11-01T16:26:53Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "The lead finder's results no longer show meetings. Results and cost per result go up to people in campaigns and replies, while a better way to measure outcomes is built.",
+			"at": "2026-11-01T16:57:26Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Desktop release testing can exercise an automatic upgrade through an isolated test channel. Test builds are labelled clearly and keep package and version verification enabled.",
+			"at": "2026-11-01T16:57:26Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Link prospects can now be found through expired domains: a page that still links to a domain that has lapsed is a prospect with the method \"Expired domain\", to offer one of your pages instead.",
+			"at": "2026-11-01T16:57:26Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "records",
+			"edition": "open-source",
+			"text": "Tools that research people and companies can keep what they learned as ordinary fields on the record, created the first time they're needed. They never overwrite a value you set yourself, and every change shows in the record's history.",
+			"at": "2026-11-01T17:13:21Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Analytics → Channels can show identified people only: visits where the person signed in or was named by a form, and the credit on them, leaving out visits known only by a browser cookie. Each credited visit now says how it was matched.",
+			"at": "2026-11-01T17:13:21Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "A connected sequencer account's name is now `integration_name` everywhere, beside `integration_id`: on campaign links (was `platform`), platform accounts (was `name`), a mailbox's assignment and its `platforms` list (was `platform`) and a sequence's assigned mailboxes (was `platform`). `connector` stays the connector's id.",
+			"at": "2026-11-01T17:25:29Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "Your own role in `GET /v1/me` and `GET /v1/workspaces/{ws}` now reads like a member's: `role` is the exact role as `GET /roles` lists it (a starting role's key or your workspace's own role's id), with its name in `role_name`. `role_id` is gone. The workspace switcher shows the role's name.",
+			"at": "2026-11-01T17:25:29Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "Connectors and data providers now say how to connect in one place: `auth_options` lists each way (sign in or API key), whether it works on this server and which is recommended. The repeated `auth` and `auth_methods` fields are gone from the API.",
+			"at": "2026-11-01T17:25:29Z"
+		},
+		{
+			"kind": "launch",
+			"area": "inbox",
+			"edition": "open-source",
+			"text": "Support response times: set how fast your team promises to reply and resolve, in working hours or around the clock, for the workspace or one brand. Each conversation shows when its reply is due, and an Overdue folder collects the ones that ran late.",
+			"at": "2026-11-01T17:25:29Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "Gmail and Outlook mailbox sign-ins are now connections like any other: signing in through the Gmail or Outlook connector adds the mailbox, and an admin connection (a Google service account or a Microsoft Entra app) adds mailboxes by address. The older mailbox sign-in routes are deprecated.",
+			"at": "2026-11-01T18:09:25Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "outreach",
+			"edition": "open-source",
+			"text": "Pipelines that add people to a campaign can now use a campaign that runs in Smartlead, Instantly or EmailBison. People are pushed into it on your own connection, after the same opt-out and exclusion checks, and the sequencer sends.",
+			"at": "2026-11-01T18:23:14Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Analytics → Channels credits companies and deals: what each company's people brought and the deals it won, and the value of won deals per channel, spread by the credit its people earned before the deal closed.",
+			"at": "2026-11-01T18:34:33Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "Google and Microsoft mailboxes connected before mailbox sign-ins were connections now sign in through Gmail and Outlook connections: they are moved automatically, keep sending, and show with your other connections. The older `/oauth-connections` and `/oauth/{provider}/authorize` routes, and `oauth_providers` in `/v1/meta`, are gone.",
+			"at": "2026-11-01T18:52:03Z"
+		}
+	],
+	"through": "e06ab75+c35c6d4"
+}

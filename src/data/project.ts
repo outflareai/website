@@ -182,7 +182,7 @@ export const milestones: Milestone[] = [
 		step: 21,
 		title: 'Agencies and tracking domains',
 		status: 'shipped',
-		summary: 'A workspace per client with an agency team, agency-wide agent tokens and white label; optional tracking domain, click tracking and unsubscribe header settings.',
+		summary: 'A workspace per client with an agency team, agency-wide agent tokens and white label (agencies were later removed); optional tracking domain, click tracking and unsubscribe header settings.',
 		docs: '/docs/guides/agencies/',
 	},
 	{

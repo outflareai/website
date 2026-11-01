@@ -15,7 +15,7 @@ curl https://outflare.example.com/v1/workspaces/$WS/classifications \
   -d '{"email": "jo@proton.me"}'
 ```
 
-Send `email` or `domain`, not both. Sending only the domain keeps the person's address out of the request. `GET /v1/workspaces/{ws}/email-domains/{domain}` is the same lookup. Your token needs the `leads.read` scope. Agents use the MCP tool `classify_email`.
+Send `email` or `domain`, not both. Sending only the domain keeps the person's address out of the request. Your token needs the `leads.read` scope. Agents use the MCP tool `classify_email`.
 
 ## Categories
 

@@ -4,9 +4,13 @@ One file per day for what reached Outflare Cloud, named by the date in UTC. A da
 
 Also at https://outflare.ai/changelog/, as JSON at https://outflare.ai/changelog.json and as RSS at https://outflare.ai/changelog.xml. These files are generated from `src/data/changelog/`; edit those, then run `node scripts/changelog.mjs render`.
 
+## November 2026
+
+- [2026.11.01](2026/2026-11-01.md): 43 changes (in progress)
+
 ## October 2026
 
-- [2026.10.31](2026/2026-10-31.md): 1 change (in progress)
+- [2026.10.31](2026/2026-10-31.md): 6 changes
 - [2026.10.30](2026/2026-10-30.md): 82 changes
 - [2026.10.29](2026/2026-10-29.md): 84 changes
 - [2026.10.28](2026/2026-10-28.md): 34 changes
