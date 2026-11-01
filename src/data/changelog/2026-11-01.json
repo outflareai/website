@@ -2,7 +2,7 @@
 	"version": "2026.11.01",
 	"date": "2026-11-01",
 	"status": "in-progress",
-	"updated": "2026-11-01T18:23:14Z",
+	"updated": "2026-11-01T18:34:33Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -290,7 +290,14 @@
 			"edition": "open-source",
 			"text": "Pipelines that add people to a campaign can now use a campaign that runs in Smartlead, Instantly or EmailBison. People are pushed into it on your own connection, after the same opt-out and exclusion checks, and the sequencer sends.",
 			"at": "2026-11-01T18:23:14Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Analytics → Channels credits companies and deals: what each company's people brought and the deals it won, and the value of won deals per channel, spread by the credit its people earned before the deal closed.",
+			"at": "2026-11-01T18:34:33Z"
 		}
 	],
-	"through": "5a8a81c+f171b13"
+	"through": "965a563+cbcd25a"
 }
