@@ -6,7 +6,7 @@ Also at https://outflare.ai/changelog/, as JSON at https://outflare.ai/changelog
 
 ## November 2026
 
-- [2026.11.01](2026/2026-11-01.md): 15 changes (in progress)
+- [2026.11.01](2026/2026-11-01.md): 16 changes (in progress)
 
 ## October 2026
 
