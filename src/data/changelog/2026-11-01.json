@@ -2,7 +2,7 @@
 	"version": "2026.11.01",
 	"date": "2026-11-01",
 	"status": "in-progress",
-	"updated": "2026-11-01T14:46:42Z",
+	"updated": "2026-11-01T15:45:47Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -122,7 +122,14 @@
 			"edition": "open-source",
 			"text": "Rules, journeys, lifecycle email, alerts and webhooks now belong to one brand, with API routes under `/v1/brands/{brand}/`: a rule or journey acts only on its brand's people, an unsubscribe applies to the brand it came from (an admin can apply one to every brand), and a webhook hears only its brand's events.",
 			"at": "2026-11-01T14:22:45Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "outreach",
+			"edition": "open-source",
+			"text": "Mailbox allocation now lists the mailboxes it keeps from each sequence (a declined suggestion, an undone automatic choice, or a campaign the sequencer refused), and you can clear one so that mailbox can be given to the sequence again, in the app, the API and MCP.",
+			"at": "2026-11-01T15:34:12Z"
 		}
 	],
-	"through": "c539fcc+5dccff4"
+	"through": "85b828b+5c23bef"
 }
