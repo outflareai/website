@@ -2,7 +2,7 @@
 	"version": "2026.11.01",
 	"date": "2026-11-01",
 	"status": "in-progress",
-	"updated": "2026-11-01T22:18:54Z",
+	"updated": "2026-11-01T22:30:13Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -409,7 +409,14 @@
 			"edition": "open-source",
 			"text": "Digital PR: add the journalists you already know, one at a time or from a CSV (with a check first), with their outlet, its tier and the beats they cover. Beats are suggested from the news searches their articles came up in, and the Journalists tab and media lists filter by beat and outlet tier.",
 			"at": "2026-11-01T22:18:54Z"
+		},
+		{
+			"kind": "fix",
+			"area": "deliverability",
+			"edition": "open-source",
+			"text": "Tracking domains on Cloudflare DNS can now be added with one click: \"Cloudflare (one click)\" opens Cloudflare's approval screen with the CNAME record, instead of asking for an API token.",
+			"at": "2026-11-01T22:30:13Z"
 		}
 	],
-	"through": "4980b0d+213cb41"
+	"through": "301de28+cbfa737"
 }
