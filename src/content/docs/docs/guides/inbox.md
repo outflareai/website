@@ -114,7 +114,7 @@ Once a reply has a label Outflare is sure of, a reply rule acts on it. "Sure" me
 | Out of office | **Wait**: the lead's next email moves to the day after the return date the AI read. Or keep the sequence as it is. |
 | Referral, and wrong person naming someone else | **Offer to add them**: the reply shows an "Add … as a lead" button. **Add them** as a lead on the referrer's lists, marked `referred_by`. Or **add and enrol** them in a sequence you pick. Someone on the opt-out list is never enrolled. |
 
-Choose the workspace's rules under **Rules** in the inbox. A sequence can have its own rules for some labels, which win label by label for its replies, through the API or MCP. Rules set with `project_id` are refused with a 400: projects were removed, and a project's rules became its sequences' rules.
+Choose the workspace's rules under **Rules** in the inbox. A sequence can have its own rules for some labels, which win label by label for its replies, through the API or MCP. A project's rules became its sequences' rules when projects were removed.
 
 ```sh
 curl -X PUT https://outflare.example.com/v1/workspaces/$WS/reply-rules \

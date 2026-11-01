@@ -41,7 +41,7 @@ outflare import-leads --data @leads.csv
 | `--curl` | Prints the request as a `curl` command instead of sending it, with the token as `$OUTFLARE_TOKEN`. |
 | `--mission ID` | Acts inside an [agent mission](/docs/agents/missions/). A held write prints its `MissionHeld` answer and says so. |
 | `--idempotency-key K` | Sets the [retry key](/docs/api/#safe-retries). Without it, every write gets a fresh one. |
-| `--workspace ID` | Another workspace, such as an agency client. |
+| `--workspace ID` | Another workspace you belong to. |
 | `--raw` | Prints the answer exactly as the server sent it. |
 
 When a body field has the same name as one of these (a webhook's `--url`), the flag goes to the body; set the server with `OUTFLARE_URL` for that call.

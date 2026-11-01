@@ -314,16 +314,6 @@ Every type is also in the API document, under `webhooks:` and in the `WebhookEve
 | --- | --- |
 | `digest.ready` | A daily or weekly [digest](/docs/guides/digests/) of the workspace is ready. `data` has `frequency`, `trigger` (`scheduled` or `manual`), `period_start`, `period_end`, `sections` (their ids) and `emailed`; `GET .../digests/{id}` has the numbers. |
 
-### Projects
-
-Projects were removed ([Projects were removed](/docs/guides/projects/)). These events stay in the list so existing webhooks keep working, but they are never sent.
-
-| Event | When |
-| --- | --- |
-| `project.created` | Never sent. |
-| `project.updated` | Never sent. |
-| `project.deleted` | Never sent. |
-
 ### Missions
 
 | Event | When |
