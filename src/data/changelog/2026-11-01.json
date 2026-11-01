@@ -2,7 +2,7 @@
 	"version": "2026.11.01",
 	"date": "2026-11-01",
 	"status": "in-progress",
-	"updated": "2026-11-01T18:34:33Z",
+	"updated": "2026-11-01T18:52:03Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -297,7 +297,14 @@
 			"edition": "open-source",
 			"text": "Analytics → Channels credits companies and deals: what each company's people brought and the deals it won, and the value of won deals per channel, spread by the credit its people earned before the deal closed.",
 			"at": "2026-11-01T18:34:33Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "Google and Microsoft mailboxes connected before mailbox sign-ins were connections now sign in through Gmail and Outlook connections: they are moved automatically, keep sending, and show with your other connections. The older `/oauth-connections` and `/oauth/{provider}/authorize` routes, and `oauth_providers` in `/v1/meta`, are gone.",
+			"at": "2026-11-01T18:52:03Z"
 		}
 	],
-	"through": "965a563+cbcd25a"
+	"through": "e06ab75+1609e65"
 }
