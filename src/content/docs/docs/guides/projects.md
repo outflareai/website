@@ -36,8 +36,8 @@ If you never used projects, nothing changed for you.
 ## For agents and the API
 
 - The project endpoints are gone, and so are the MCP tools `list_projects`, `get_project_brief`, `create_project`, `update_project`, `add_to_project` and `remove_from_project`. Agents read the brief with `get_context` (with `brand`) or `get_brand_context`, save it with `update_brand_context`, and move records with `add_to_brand`.
-- Older clients that still send `project_id` on a write keep working: it is ignored. Two places refuse it with `400`, so nothing gets wider access by accident: creating an API token and setting reply rules.
-- The `projects.read` and `projects.manage` scopes keep their names, because tokens hold them. They now cover ideal customer profiles and moving records between brands.
-- `project.*` webhook events stay listed but are never sent.
+- `project_id` and `project_ids` are gone from every request and response. Sending one is refused with a 400 as an unknown field.
+- The `projects.read` and `projects.manage` scopes are now `profiles.read` and `profiles.manage`. They cover ideal customer profiles and moving records between brands. Tokens and roles that held the old names were moved to the new ones.
+- The `project.*` webhook events are gone, and webhooks that listened for them no longer list them.
 
 See [Brands](/docs/guides/brands/), [Sequences](/docs/guides/sequences/) and [Ideal customers](/docs/guides/ideal-customers/).

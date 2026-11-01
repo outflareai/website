@@ -39,7 +39,7 @@ with open("mailboxes.csv") as f:
 
 ## Workspace
 
-Calls go to the token's own workspace, which the client looks up with `GET /v1/whoami` on first use. An agency token, or a person working in several workspaces, passes one:
+Calls go to the token's own workspace, which the client looks up with `GET /v1/whoami` on first use. A person working in several workspaces passes one:
 
 ```python
 client = Outflare(workspace="acme")           # an ID or a slug
