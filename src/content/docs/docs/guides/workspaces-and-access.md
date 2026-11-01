@@ -116,11 +116,11 @@ The scopes are:
 | `integrations.manage` | Connect, change and disconnect connectors, which means handling their API keys. |
 | `outcomes.read` | Read meetings, deals, spend and cost reports; export them. |
 | `outcomes.manage` | Log and correct meetings, deals and spend; set unit prices and recurring costs; sync now. |
-| `projects.read` | Read [ideal customer profiles](/docs/guides/ideal-customers/). The name is from before projects were removed; tokens keep it. |
+| `profiles.read` | Read [ideal customer profiles](/docs/guides/ideal-customers/). Called `projects.read` until projects were removed. |
 | `infrastructure.read` | See infrastructure plans and mailbox stages; preview a plan. |
 | `infrastructure.manage` | Draft, change and cancel plans; move mailboxes between stages. |
 | `infrastructure.approve` | Approve a plan, which buys domains and mailboxes on your accounts. Owners and admins only by default. |
-| `projects.manage` | Create and change ideal customer profiles; move records between brands (with each record's own manage scope). |
+| `profiles.manage` | Create and change ideal customer profiles; move records between brands (with each record's own manage scope). Called `projects.manage` until projects were removed. |
 | `analytics.read` | Read reports from connected analytics and SEO tools. |
 | `missions.read` | List missions and read their context, calls, held changes and updates. |
 | `missions.run` | Create and change missions, submit a plan, post updates and connector requests, pause, stop and complete. What an agent needs. |

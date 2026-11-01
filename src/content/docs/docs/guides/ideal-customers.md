@@ -44,6 +44,6 @@ curl -X PATCH "https://app.outflare.ai/v1/workspaces/$WS/lead-lists/$LIST" \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" -d '{"profile_id": "'$PROFILE'"}'
 ```
 
-Reading profiles needs the `projects.read` scope; making and changing them needs `projects.manage`. The scopes kept their old names because existing tokens hold them.
+Reading profiles needs the `profiles.read` scope; making and changing them needs `profiles.manage`. These were called `projects.read` and `projects.manage` until projects were removed, and tokens and roles that held the old names were moved to the new ones.
 
 MCP tools: `list_ideal_customer_profiles`, `get_ideal_customer_profile`, `create_ideal_customer_profile` and `update_ideal_customer_profile`.
