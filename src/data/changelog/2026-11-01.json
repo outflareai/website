@@ -2,7 +2,7 @@
 	"version": "2026.11.01",
 	"date": "2026-11-01",
 	"status": "in-progress",
-	"updated": "2026-11-01T19:46:30Z",
+	"updated": "2026-11-01T20:01:35Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -304,7 +304,28 @@
 			"edition": "open-source",
 			"text": "Google and Microsoft mailboxes connected before mailbox sign-ins were connections now sign in through Gmail and Outlook connections: they are moved automatically, keep sending, and show with your other connections. The older `/oauth-connections` and `/oauth/{provider}/authorize` routes, and `oauth_providers` in `/v1/meta`, are gone.",
 			"at": "2026-11-01T18:52:03Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Paid ads: Meta and Google conversions by type, Google keywords and search terms, Meta link clicks, page views, video views and frequency, Outflare's own results beside each ad set and ad, and the ads missing the tracking template. Meta purchases reported several ways now count once.",
+			"at": "2026-11-01T20:01:35Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "outreach",
+			"edition": "open-source",
+			"text": "Leads, lead lists, sequences, replies, meetings and deals now belong to one brand, with API routes under `/v1/brands/{brand}/`: a sequence enrols only its brand's leads, and an opt-out applies to the brand it came from, while bounces, complaints and what an admin applies to every brand stop every brand's email.",
+			"at": "2026-11-01T20:01:35Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "AI accounts and Computers include a public Mac installer download for every workspace member. The installer is labelled as a one-upgrade automatic update test.",
+			"at": "2026-11-01T20:01:35Z"
 		}
 	],
-	"through": "e06ab75+f3eb01f"
+	"through": "4b504fd+ddb7ce3"
 }
