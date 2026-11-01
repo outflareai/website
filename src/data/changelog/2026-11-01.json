@@ -2,7 +2,7 @@
 	"version": "2026.11.01",
 	"date": "2026-11-01",
 	"status": "in-progress",
-	"updated": "2026-11-01T16:42:30Z",
+	"updated": "2026-11-01T16:57:26Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -213,7 +213,28 @@
 			"edition": "open-source",
 			"text": "A mailbox's `warmup.provider` is now null when no connected sequencer runs its warm-up, and `warmup.platform` is gone: the sequencer's warm-up state and score are its entry in `platforms`. To stop warm-up, set `enabled` to false; the `outflare` provider is no longer accepted.",
 			"at": "2026-11-01T16:26:53Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "The lead finder's results no longer show meetings. Results and cost per result go up to people in campaigns and replies, while a better way to measure outcomes is built.",
+			"at": "2026-11-01T16:57:26Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Desktop release testing can exercise an automatic upgrade through an isolated test channel. Test builds are labelled clearly and keep package and version verification enabled.",
+			"at": "2026-11-01T16:57:26Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Link prospects can now be found through expired domains: a page that still links to a domain that has lapsed is a prospect with the method \"Expired domain\", to offer one of your pages instead.",
+			"at": "2026-11-01T16:57:26Z"
 		}
 	],
-	"through": "1a409f4+4f12484"
+	"through": "bee3c76+3e6aa04"
 }
