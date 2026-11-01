@@ -2,7 +2,7 @@
 	"version": "2026.11.01",
 	"date": "2026-11-01",
 	"status": "in-progress",
-	"updated": "2026-11-01T10:16:44Z",
+	"updated": "2026-11-01T10:25:52Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -24,7 +24,14 @@
 			"edition": "open-source",
 			"text": "Four new playbooks assess sign-ups for partnership potential: a review across partnership types, SDK and bandwidth suppliers, integration partners, and resellers or agencies. Each returns evidence, confidence and suggested next steps for review.",
 			"at": "2026-11-01T10:07:19Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Partner programs can block countries: website visits and new customers from them don't credit partners. A website visit's country now comes from the visitor's address, looked up in an IP database that ships with Outflare (IP geolocation by DB-IP), when your own proxy doesn't pass it. The address itself is never stored.",
+			"at": "2026-11-01T10:25:52Z"
 		}
 	],
-	"through": "2e79c3c+2835297"
+	"through": "e4799d2+432c50d"
 }
