@@ -2,7 +2,7 @@
 	"version": "2026.11.01",
 	"date": "2026-11-01",
 	"status": "in-progress",
-	"updated": "2026-11-01T21:04:59Z",
+	"updated": "2026-11-01T21:20:37Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -353,7 +353,14 @@
 			"edition": "open-source",
 			"text": "Every list in the API now pages one way: pass `next_cursor` back as `cursor` until it is null. The per-list `before`, `after` and `offset` parameters and their `next_before`, `next_after` and `next_offset` fields are gone. The events feed and following logs start from now with `start=latest`.",
 			"at": "2026-11-01T20:54:03Z"
+		},
+		{
+			"kind": "launch",
+			"area": "inbox",
+			"edition": "open-source",
+			"text": "Live chat on your website: add a chat button to your site from Support settings. Visitors can search your help centre, then message your team; chats land in the support inbox with email, assignment and response times, and your replies show in their chat within seconds. It shows only on the sites you list, and your site can vouch for signed-in users.",
+			"at": "2026-11-01T21:20:37Z"
 		}
 	],
-	"through": "79742e8+fba1409"
+	"through": "833a36f+07b25e1"
 }
