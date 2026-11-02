@@ -76,7 +76,7 @@ Credit rolls up from people to their company. **Companies** shows, for each comp
 
 A [broadcast](/docs/guides/lifecycle-email/#broadcasts) or a [sequence](/docs/guides/sequences/) can hold a share of its audience back on purpose, and shows the people it reached against the people held back, the same way as a journey.
 
-A journey's random split can hold some people back on purpose (a holdout). On the journey's page, such a split shows each path against the people held back: how many converted within 30 days after the split, what they paid, how much better or worse each path did, and whether the difference is real or too early to tell (it needs at least 30 people on each side). Revenue beyond what as many held-back people paid is shown too.
+A [journey's](/docs/guides/journeys/) random split can hold some people back on purpose (a holdout). On the journey's page, such a split shows each path against the people held back: how many converted within 30 days after the split, what they paid, how much better or worse each path did, and whether the difference is real or too early to tell (it needs at least 30 people on each side). Revenue beyond what as many held-back people paid is shown too.
 
 ## On Home and in your digest
 
