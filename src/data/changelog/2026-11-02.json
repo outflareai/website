@@ -2,7 +2,7 @@
 	"version": "2026.11.02",
 	"date": "2026-11-02",
 	"status": "in-progress",
-	"updated": "2026-11-02T22:05:02Z",
+	"updated": "2026-11-02T22:19:53Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -388,7 +388,14 @@
 			"edition": "cloud",
 			"text": "Replay a brand agent's turn: run it again with writes off on today's prompt, or on another of your AI models, and see what it would have done differently, what it would have said, and what it cost, next to the original.",
 			"at": "2026-11-02T22:05:02Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "Channels: Outflare now lists every channel an agent can work on, with what each needs connected, the actions an agent may take and their approval category, how results are measured, and whether the channel is ready for your workspace or brand, so an agent starts on what works today and you see what to connect next.",
+			"at": "2026-11-02T22:19:53Z"
 		}
 	],
-	"through": "c56a2a2+eda013b"
+	"through": "f7e1d54+f353806"
 }
