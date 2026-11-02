@@ -2,7 +2,7 @@
 	"version": "2026.11.02",
 	"date": "2026-11-02",
 	"status": "in-progress",
-	"updated": "2026-11-02T14:27:08Z",
+	"updated": "2026-11-02T14:39:00Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -241,7 +241,28 @@
 			"edition": "open-source",
 			"text": "When a link you won is removed from a page that is still up, the page goes back on your link prospects to win it back, with when the link was live, and its pitch says the page used to link to you. Nothing is sent until you pitch it.",
 			"at": "2026-11-02T14:27:08Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "deliverability",
+			"edition": "open-source",
+			"text": "After you approve DNS records in Cloudflare, the card shows Outflare checking for them with a spinner and moves on by itself, instead of asking you to press Check now. A just-approved tracking domain no longer shows the record, the ways to add it again or an old error while it's being looked for.",
+			"at": "2026-11-02T14:39:00Z"
+		},
+		{
+			"kind": "fix",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "The Tolt import reads more of Tolt's commission flows: percentage rewards however Tolt words them, and the \"Created date is within N years\" condition. A flow it still can't read is listed with its settings, so it can be added by hand or taught to the import.",
+			"at": "2026-11-02T14:39:00Z"
+		},
+		{
+			"kind": "launch",
+			"area": "inbox",
+			"edition": "open-source",
+			"text": "The support assistant's Auto email replies now wait a few minutes you choose, so your team can stop one first, and hand-off topics send each handed-over conversation to the right person and team. Knowledge can learn answers from your past support replies, and imported websites are checked again every day.",
+			"at": "2026-11-02T14:39:00Z"
 		}
 	],
-	"through": "6c7d5e2+c5d019a"
+	"through": "b00aa2c+2eec69f"
 }
