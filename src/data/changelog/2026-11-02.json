@@ -2,7 +2,7 @@
 	"version": "2026.11.02",
 	"date": "2026-11-02",
 	"status": "in-progress",
-	"updated": "2026-11-02T05:00:51Z",
+	"updated": "2026-11-02T05:36:16Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -59,7 +59,14 @@
 			"edition": "open-source",
 			"text": "Agents page: see what your agents changed, approve what waits for you one at a time or in a batch, let changes like one you approve run from then on, and set what each agent may do on its own. Mark a token as an agent under API tokens.",
 			"at": "2026-11-02T04:37:43Z"
+		},
+		{
+			"kind": "launch",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "A playbook can run as an agent run: Outflare's agent carries it out in turns on the action layer, and the mode you choose (copilot, autonomous with a spend cap, or dry run) sets what it may change on its own. Its changes show on the Agents page, and you write to the run and it answers in its next turn.",
+			"at": "2026-11-02T05:36:16Z"
 		}
 	],
-	"through": "8a42684+cb28e94"
+	"through": "8ea723a+6a3cc3c"
 }
