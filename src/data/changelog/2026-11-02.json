@@ -2,7 +2,7 @@
 	"version": "2026.11.02",
 	"date": "2026-11-02",
 	"status": "in-progress",
-	"updated": "2026-11-02T14:16:29Z",
+	"updated": "2026-11-02T14:27:08Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -234,7 +234,14 @@
 			"edition": "open-source",
 			"text": "Missions are being retired for agent runs on the action layer: nothing starts a new one. Starting a playbook, the Get started step and automations run as agent runs, the web app and MCP no longer create missions, and an AI app connected with OAuth now has each change held for your approval on the Agents page instead of needing a mission. Missions made before keep working until they end.",
 			"at": "2026-11-02T14:16:29Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "When a link you won is removed from a page that is still up, the page goes back on your link prospects to win it back, with when the link was live, and its pitch says the page used to link to you. Nothing is sent until you pitch it.",
+			"at": "2026-11-02T14:27:08Z"
 		}
 	],
-	"through": "bfb97ae+8873805"
+	"through": "6c7d5e2+c5d019a"
 }
