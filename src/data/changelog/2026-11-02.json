@@ -2,7 +2,7 @@
 	"version": "2026.11.02",
 	"date": "2026-11-02",
 	"status": "in-progress",
-	"updated": "2026-11-02T14:58:07Z",
+	"updated": "2026-11-02T15:24:38Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -262,7 +262,14 @@
 			"edition": "open-source",
 			"text": "The support assistant's Auto email replies now wait a few minutes you choose, so your team can stop one first, and hand-off topics send each handed-over conversation to the right person and team. Knowledge can learn answers from your past support replies, and imported websites are checked again every day.",
 			"at": "2026-11-02T14:39:00Z"
+		},
+		{
+			"kind": "fix",
+			"area": "deliverability",
+			"edition": "open-source",
+			"text": "A verified tracking domain no longer flips to \"not pointing here\" because of one stale DNS answer: it stays in use unless its record has been missing for over an hour. Its HTTPS certificate is also checked every two minutes at first, so the page shows it sooner.",
+			"at": "2026-11-02T15:24:38Z"
 		}
 	],
-	"through": "b00aa2c+2633a8c"
+	"through": "268edf0+76e31ec"
 }
