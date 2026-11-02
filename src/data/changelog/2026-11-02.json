@@ -2,7 +2,7 @@
 	"version": "2026.11.02",
 	"date": "2026-11-02",
 	"status": "in-progress",
-	"updated": "2026-11-02T09:44:39Z",
+	"updated": "2026-11-02T10:05:03Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -115,7 +115,21 @@
 			"edition": "open-source",
 			"text": "New `agents.read` and `agents.run` scopes cover Outflare's agent: its runs, the playbooks it runs and writing to a run. Tokens and roles with the mission scopes keep working as before while missions are retired. Extensions can start agent runs for the caller.",
 			"at": "2026-11-02T09:44:39Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "inbox",
+			"edition": "open-source",
+			"text": "Website chat: visitors can say whether the support assistant's answer helped. \"No\" hands the chat to your team right away, and the chat shows when the assistant is typing a reply.",
+			"at": "2026-11-02T10:05:03Z"
+		},
+		{
+			"kind": "launch",
+			"area": "api",
+			"edition": "open-source",
+			"text": "Extensions can set a quota that decides whether a workspace may add more brands, mailboxes, tracking domains or records, or send more email. Refused additions answer `402 quota_exceeded`; refused emails wait and try again. Self-hosted servers have no quota and nothing changes.",
+			"at": "2026-11-02T10:05:03Z"
 		}
 	],
-	"through": "731b0d1+80bb4ff"
+	"through": "9be62cb+9c8cb82"
 }
