@@ -2,7 +2,7 @@
 	"version": "2026.11.02",
 	"date": "2026-11-02",
 	"status": "in-progress",
-	"updated": "2026-11-02T10:28:00Z",
+	"updated": "2026-11-02T10:32:10Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -136,7 +136,14 @@
 			"edition": "open-source",
 			"text": "The link and PR autopilot pages open an autopilot's agent run on the Agents page, where you write to it, pause or stop it; autopilots started earlier still open their mission.",
 			"at": "2026-11-02T10:28:00Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "inbox",
+			"edition": "open-source",
+			"text": "The support assistant's report in Support settings now shows how often it answered, left conversations to your team, had drafts sent as written and was rated helpful, against the 30 days before, with the commonest reasons it handed off. You're alerted once a day when answers it found wait for review, and the digest has a Support section.",
+			"at": "2026-11-02T10:32:10Z"
 		}
 	],
-	"through": "48ad3af+ed45b75"
+	"through": "62f49e7+fd4e8c2"
 }
