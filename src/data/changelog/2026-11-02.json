@@ -2,7 +2,7 @@
 	"version": "2026.11.02",
 	"date": "2026-11-02",
 	"status": "in-progress",
-	"updated": "2026-11-02T13:57:17Z",
+	"updated": "2026-11-02T14:16:29Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -227,7 +227,14 @@
 			"edition": "open-source",
 			"text": "Import your website into Knowledge: Outflare reads your site's pages and keeps each as an article that support answers use, updating them when you run it again. The support assistant also finds Slack answers by meaning, not just matching words, when you have an embedding model connected.",
 			"at": "2026-11-02T13:57:17Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "Missions are being retired for agent runs on the action layer: nothing starts a new one. Starting a playbook, the Get started step and automations run as agent runs, the web app and MCP no longer create missions, and an AI app connected with OAuth now has each change held for your approval on the Agents page instead of needing a mission. Missions made before keep working until they end.",
+			"at": "2026-11-02T14:16:29Z"
 		}
 	],
-	"through": "94a1b57+a197c95"
+	"through": "bfb97ae+8873805"
 }
