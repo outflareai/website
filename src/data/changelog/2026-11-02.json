@@ -2,7 +2,7 @@
 	"version": "2026.11.02",
 	"date": "2026-11-02",
 	"status": "in-progress",
-	"updated": "2026-11-02T03:09:45Z",
+	"updated": "2026-11-02T03:33:23Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -17,7 +17,21 @@
 			"edition": "open-source",
 			"text": "Agent actions: turn on the action layer for an API token and set what that agent may change on its own. Everything else waits for a person, who approves changes one at a time or in batches. Every change the agent made is kept.",
 			"at": "2026-11-02T01:37:31Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "Agent actions: approve a pattern once. When you approve an agent's held change, you can let changes like it run on their own from then on, within a daily limit. Held, approved and rejected agent changes can also go to webhooks.",
+			"at": "2026-11-02T03:33:23Z"
+		},
+		{
+			"kind": "launch",
+			"area": "lifecycle",
+			"edition": "open-source",
+			"text": "Broadcasts and sequences can hold back a share of their audience on purpose, and then show what they added: who converted and what they paid in the 30 days after, against the people held back, and whether the difference is real. Set it when you draft a broadcast or in a sequence's settings.",
+			"at": "2026-11-02T03:33:23Z"
 		}
 	],
-	"through": "9f1a94c+d729f59"
+	"through": "3a4c89d+fe09d0f"
 }
