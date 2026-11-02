@@ -2,7 +2,7 @@
 	"version": "2026.11.02",
 	"date": "2026-11-02",
 	"status": "in-progress",
-	"updated": "2026-11-02T18:48:40Z",
+	"updated": "2026-11-02T21:02:20Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -325,7 +325,42 @@
 			"edition": "open-source",
 			"text": "Campaigns on Microsoft Advertising, LinkedIn and TikTok can now be paused, resumed and re-budgeted from Outflare too, as Google Ads and Meta campaigns can, by you or by an agent within its grants.",
 			"at": "2026-11-02T18:48:40Z"
+		},
+		{
+			"kind": "fix",
+			"area": "deliverability",
+			"edition": "open-source",
+			"text": "A tracking domain no longer stays on \"Setting up HTTPS\" for good when its certificate checks stop: \"Check now\" and a server restart start them again.",
+			"at": "2026-11-02T21:02:20Z"
+		},
+		{
+			"kind": "launch",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "Findings: agents and people can record what they learned about a brand's marketing, with the evidence, how sure they are, where it holds and when to review it. The brand's context carries its active findings, so every agent working on the brand starts from what was learned.",
+			"at": "2026-11-02T21:02:20Z"
+		},
+		{
+			"kind": "fix",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Analytics syncs are scheduled again when a connected analytics account has never synced: one such account stopped the scheduler from queueing syncs for every analytics connection on the server.",
+			"at": "2026-11-02T21:02:20Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "lifecycle",
+			"edition": "open-source",
+			"text": "Trying an event rule replays up to a year of events when the ClickHouse event store is set up, not only what Postgres keeps.",
+			"at": "2026-11-02T21:02:20Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "Give a rule its own webhook: pick rules on a webhook endpoint, and events about a rule (such as rule.fired) reach it only for those rules.",
+			"at": "2026-11-02T21:02:20Z"
 		}
 	],
-	"through": "f4b9f25+8414c8b"
+	"through": "5d3b46b+3818382"
 }
