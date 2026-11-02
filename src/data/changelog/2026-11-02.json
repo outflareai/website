@@ -2,7 +2,7 @@
 	"version": "2026.11.02",
 	"date": "2026-11-02",
 	"status": "in-progress",
-	"updated": "2026-11-02T06:30:32Z",
+	"updated": "2026-11-02T07:29:45Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -73,7 +73,14 @@
 			"edition": "open-source",
 			"text": "Start a playbook from the app and Outflare's agent runs it: pick copilot, autonomous with a budget, or a dry run. The Agents page's Runs view shows each run's turns and changes, lets you write to it, and pauses or stops it; an automation's last run opens there too.",
 			"at": "2026-11-02T06:30:32Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "A grant that lets an agent run paid ads changes on its own gets spend caps of $50 a day and $500 a month unless you set your own, so a first autonomous grant on ad spend can't surprise you.",
+			"at": "2026-11-02T07:29:45Z"
 		}
 	],
-	"through": "d2ac814+d382427"
+	"through": "dd1db5b+2f33287"
 }
