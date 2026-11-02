@@ -2,7 +2,7 @@
 	"version": "2026.11.02",
 	"date": "2026-11-02",
 	"status": "in-progress",
-	"updated": "2026-11-02T09:08:33Z",
+	"updated": "2026-11-02T09:44:39Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -108,7 +108,14 @@
 			"edition": "open-source",
 			"text": "Analytics → Channels can count only people who signed in on your own product, leaving out browsers known only from a click on an email link, and each credited visit now says whether it was tied to the person by a sign-in or an email click.",
 			"at": "2026-11-02T08:55:30Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "New `agents.read` and `agents.run` scopes cover Outflare's agent: its runs, the playbooks it runs and writing to a run. Tokens and roles with the mission scopes keep working as before while missions are retired. Extensions can start agent runs for the caller.",
+			"at": "2026-11-02T09:44:39Z"
 		}
 	],
-	"through": "ba0c0c8+e502a2f"
+	"through": "731b0d1+80bb4ff"
 }
