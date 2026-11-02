@@ -2,7 +2,7 @@
 	"version": "2026.11.02",
 	"date": "2026-11-02",
 	"status": "in-progress",
-	"updated": "2026-11-02T21:15:31Z",
+	"updated": "2026-11-02T21:24:39Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -360,7 +360,14 @@
 			"edition": "open-source",
 			"text": "Give a rule its own webhook: pick rules on a webhook endpoint, and events about a rule (such as rule.fired) reach it only for those rules.",
 			"at": "2026-11-02T21:02:20Z"
+		},
+		{
+			"kind": "fix",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "The Tolt import now reads commission flows as Tolt's API sends them, so a program's flows come over with their conditions, approval and partner overrides. Tolt's \"number of customer transactions\" counts the payment itself, and the import adjusts for that, so a \"first payment\" flow still pays only on the first payment. Paused flows stay behind.",
+			"at": "2026-11-02T21:24:39Z"
 		}
 	],
-	"through": "77f8fff+5be96b8"
+	"through": "24a0f35+2d9aff9"
 }
