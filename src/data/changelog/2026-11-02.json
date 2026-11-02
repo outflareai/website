@@ -2,7 +2,7 @@
 	"version": "2026.11.02",
 	"date": "2026-11-02",
 	"status": "in-progress",
-	"updated": "2026-11-02T01:20:34Z",
+	"updated": "2026-11-02T01:37:31Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -10,7 +10,14 @@
 			"edition": "open-source",
 			"text": "Products and lifecycle stages: list the products each brand sells, and Outflare keeps every company and person in a stage per product (trial, active, at risk, churned), so a customer who cancels one product but keeps another is never treated as churned. Each move is an event journeys can start on. Find it under People → Products.",
 			"at": "2026-11-02T00:43:14Z"
+		},
+		{
+			"kind": "launch",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "Agent actions: turn on the action layer for an API token and set what that agent may change on its own. Everything else waits for a person, who approves changes one at a time or in batches. Every change the agent made is kept.",
+			"at": "2026-11-02T01:37:31Z"
 		}
 	],
-	"through": "9c9e64c+8713268"
+	"through": "9e8a3f4+8752b09"
 }
