@@ -2,7 +2,7 @@
 	"version": "2026.11.02",
 	"date": "2026-11-02",
 	"status": "in-progress",
-	"updated": "2026-11-02T11:34:20Z",
+	"updated": "2026-11-02T12:19:29Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -164,7 +164,21 @@
 			"edition": "open-source",
 			"text": "Metrics: live totals for every company and person, such as spend in the last 30 days, usage this week and last seen, also per product. Rules, journeys and smart lists can act on them. Turning metrics on fills them from your history without sending anything for the past.",
 			"at": "2026-11-02T11:34:20Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "Extensions can limit how many website and product events a workspace stores: past a quota, the event APIs and the website snippet answer 402 quota_exceeded and store nothing. Self-hosted servers have no quota and store everything.",
+			"at": "2026-11-02T12:19:29Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "Extensions can add their own kinds of alert, shown in Settings → Alerts and emailed, posted to Slack and sent as webhooks like the engine's own.",
+			"at": "2026-11-02T12:19:29Z"
 		}
 	],
-	"through": "dd79976+e589ff8"
+	"through": "2384b5e+60aeac2"
 }
