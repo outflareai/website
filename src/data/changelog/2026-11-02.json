@@ -2,7 +2,7 @@
 	"version": "2026.11.02",
 	"date": "2026-11-02",
 	"status": "in-progress",
-	"updated": "2026-11-02T10:53:48Z",
+	"updated": "2026-11-02T10:58:37Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -150,7 +150,14 @@
 			"edition": "open-source",
 			"text": "The one-click DNS approval (\"Approve in Cloudflare\") now finds a domain's DNS provider on hosted installs whose resolver didn't answer cleanly for a subdomain, where it answered \"lookup failed\" and offered only the API connection.",
 			"at": "2026-11-02T10:45:29Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "The analytics summary answers people and tokens kept to some brands with their brands' sites, like the other analytics reports.",
+			"at": "2026-11-02T10:58:37Z"
 		}
 	],
-	"through": "e0decda+b9ccbd3"
+	"through": "47b19ae+5ff9bca"
 }
