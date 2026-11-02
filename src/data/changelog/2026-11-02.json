@@ -2,7 +2,7 @@
 	"version": "2026.11.02",
 	"date": "2026-11-02",
 	"status": "in-progress",
-	"updated": "2026-11-02T10:21:14Z",
+	"updated": "2026-11-02T10:28:00Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -129,7 +129,14 @@
 			"edition": "open-source",
 			"text": "Extensions can set a quota that decides whether a workspace may add more brands, mailboxes, tracking domains or records, or send more email. Refused additions answer `402 quota_exceeded`; refused emails wait and try again. Self-hosted servers have no quota and nothing changes.",
 			"at": "2026-11-02T10:05:03Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "The link and PR autopilot pages open an autopilot's agent run on the Agents page, where you write to it, pause or stop it; autopilots started earlier still open their mission.",
+			"at": "2026-11-02T10:28:00Z"
 		}
 	],
-	"through": "9be62cb+ad03de9"
+	"through": "48ad3af+ed45b75"
 }
