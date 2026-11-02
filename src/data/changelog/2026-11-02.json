@@ -2,7 +2,7 @@
 	"version": "2026.11.02",
 	"date": "2026-11-02",
 	"status": "in-progress",
-	"updated": "2026-11-02T13:00:43Z",
+	"updated": "2026-11-02T13:15:42Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -213,7 +213,14 @@
 			"edition": "open-source",
 			"text": "Create another workspace from the app: the workspace menu at the top of the sidebar (and the command palette) now has \"New workspace\", and the menu lists all your workspaces even when you only have one, so you can switch between them in one place.",
 			"at": "2026-11-02T12:57:45Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "agents",
+			"edition": "cloud",
+			"text": "Link building and press coverage are now objectives of your brand's agent: the Link building and Reactive PR pages give it the objective and show where it stands. Autopilots set up before keep running until they end; the old set-up routes answer 410.",
+			"at": "2026-11-02T13:15:42Z"
 		}
 	],
-	"through": "b29df04+6f0adbb"
+	"through": "b29df04+9bd0e6b"
 }
