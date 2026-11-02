@@ -2,7 +2,7 @@
 	"version": "2026.11.02",
 	"date": "2026-11-02",
 	"status": "in-progress",
-	"updated": "2026-11-02T15:56:05Z",
+	"updated": "2026-11-02T17:08:23Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -276,7 +276,21 @@
 			"edition": "open-source",
 			"text": "Published query endpoints: owners and admins can publish a saved query as an endpoint that a BI tool or script calls with a brand API token, with parameters, a row cap, a rate limit and every call logged.",
 			"at": "2026-11-02T15:56:05Z"
+		},
+		{
+			"kind": "fix",
+			"area": "records",
+			"edition": "open-source",
+			"text": "Static lists now open as static lists, with their member count and a Remove button for each person, instead of as a smart list stuck on \"filling\". The owner and other member fields show the member's name on a record's page, timeline and history instead of an id.",
+			"at": "2026-11-02T17:08:23Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Link prospects and backlinks are tables in Query, so you or an agent can answer questions like \"live links by method this quarter\" or \"lost links from strong sites\" in SQL, for the brands you can see.",
+			"at": "2026-11-02T17:08:23Z"
 		}
 	],
-	"through": "4a1e8f7+7c84592"
+	"through": "69b0b1d+9030f25"
 }
