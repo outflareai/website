@@ -2,7 +2,7 @@
 	"version": "2026.11.02",
 	"date": "2026-11-02",
 	"status": "in-progress",
-	"updated": "2026-11-02T15:24:38Z",
+	"updated": "2026-11-02T15:56:05Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -269,7 +269,14 @@
 			"edition": "open-source",
 			"text": "A verified tracking domain no longer flips to \"not pointing here\" because of one stale DNS answer: it stays in use unless its record has been missing for over an hour. Its HTTPS certificate is also checked every two minutes at first, so the page shows it sooner.",
 			"at": "2026-11-02T15:24:38Z"
+		},
+		{
+			"kind": "launch",
+			"area": "api",
+			"edition": "open-source",
+			"text": "Published query endpoints: owners and admins can publish a saved query as an endpoint that a BI tool or script calls with a brand API token, with parameters, a row cap, a rate limit and every call logged.",
+			"at": "2026-11-02T15:56:05Z"
 		}
 	],
-	"through": "268edf0+76e31ec"
+	"through": "4a1e8f7+7c84592"
 }
