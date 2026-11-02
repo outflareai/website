@@ -36,7 +36,14 @@ In **Draft**, the assistant drafts a reply to each new customer message. It appe
 
 ### Auto
 
-<span class="pill cloud">Outflare Cloud</span> In **Auto**, a reply that passes every check below is sent on its own, signed as the assistant. Anything it hands off waits for your team; on chat it tells the visitor once that a person will reply. Auto is part of Outflare Cloud: on a self-hosted server the assistant drafts.
+<span class="pill cloud">Outflare Cloud</span> In **Auto**, a reply that passes every check below is sent on its own, signed as the assistant. Anything it hands off waits for your team; on chat it tells the visitor once that a person will reply, and the chat shows it typing while it writes. Auto is part of Outflare Cloud: on a self-hosted server the assistant drafts.
+
+- **By email, it waits first.** An Auto email answer waits a few minutes before it goes (5 by default; choose 0 to 60 under **Wait before sending an email**). The conversation shows when it goes, with **Stop** (it stays a draft), **Edit** and **Discard**. It never goes if someone on your team replies first, the customer writes again, the conversation is closed or Auto is turned off.
+- **On chat, visitors say whether it helped.** Each answer has **Did this help? Yes / No** under it. **No** hands the chat to your team, tells the visitor a person will reply, and the assistant stops answering there.
+
+## Hand-off topics
+
+Under **Hand-off topics** in Support settings, list what your conversations are about, such as Billing, Bugs or Sales, with a line on what belongs in each. The assistant tags each conversation with the topic it fits, so you can filter the inbox by topic. When it hands one to your team and nobody has it yet, it goes to the topic's person and team. Tick **Always hand it to your team** for a topic the assistant should never answer. Topics for all brands apply everywhere; a brand's own topic of the same name replaces it.
 
 ## What keeps it safe
 
@@ -53,16 +60,23 @@ These rules are part of Outflare, not instructions to the AI, so no message can 
 The conversation is marked as one your knowledge couldn't answer, and the assistant looks for the answer itself:
 
 - **On your website**: the pages most likely to answer it, such as your FAQ, help, support, pricing and docs pages. It reads them politely, as OutflareBot.
-- **In Slack**: only the channels you pick, through a **Slack (knowledge)** connection. It reads, never posts, and is separate from the Slack connection that posts [alerts](/docs/guides/alerts/). Connect it under **Connectors**, then pick the channels in Support settings. Invite it to a private channel before picking it.
+- **In Slack**: only the channels you pick, from the last year, through a **Slack (knowledge)** connection. With an embedding model connected on your own key and meaning-based search on, it also finds threads that answer in other words. It reads, never posts, and is separate from the Slack connection that posts [alerts](/docs/guides/alerts/). Connect it under **Connectors**, then pick the channels in Support settings. Invite it to a private channel before picking it.
+
+When answers wait in **Knowledge → Review**, owners and admins get an [alert](/docs/guides/alerts/) at most once a day, and the [digest](/docs/guides/digests/) has a Support section.
 
 What it finds goes to **Knowledge → Review** with where it came from and the exact words: "Is this correct, and can it be used for support from now on?" When your teammate answers the customer instead, their reply is offered there as well. Nothing is used until a person approves it, and an answer you reject isn't suggested again. You can switch off either source in Support settings.
 
+## Teach it from what you already have
+
+- **Your website.** **Import website** on the Knowledge page reads your site (the pages in your sitemaps, including those your robots.txt lists, else the pages your home page links to) and keeps each page with enough words as an article in a **Website** folder. After that, your site is checked again every day: changed pages are updated, new ones added, and pages taken off the site are unpublished, then published again if they come back.
+- **Your past replies.** **Learn from past replies** in Knowledge → Review reads the support conversations closed in the last 90 days, with your own AI key. It suggests one general answer for each question your team answered, leaving out anything about one customer. Nothing is used until you approve it.
+
 ## See how it's doing
 
-Support settings show how often it answered or handed off in the last 30 days, and how many drafts went out as written. Over the API:
+Support settings show the last 30 days against the 30 before: how often it answered or handed off and why, how many drafts went out as written, and what chat visitors said. Over the API:
 
 - `GET /v1/workspaces/{ws}/support/assistant/stats`: its answers, questions, hand-offs and their reasons.
 - `GET /v1/workspaces/{ws}/support/conversations/{id}/assistant`: what it decided on a conversation.
 - `POST /v1/workspaces/{ws}/support/assistant/test`: try a question.
 
-Agents can do the same through the [MCP server](/docs/agents/mcp/): `draft_support_reply`, `try_support_assistant` and `get_support_assistant`.
+Agents can do the same through the [MCP server](/docs/agents/mcp/): `draft_support_reply`, `try_support_assistant`, `get_support_assistant`, `stop_support_assistant_reply`, the hand-off topic tools (`list_handoff_topics` and the rest), `import_website_to_knowledge` and `learn_knowledge_from_replies`.
