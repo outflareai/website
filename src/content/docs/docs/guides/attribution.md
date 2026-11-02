@@ -72,7 +72,9 @@ Credit rolls up from people to their company. **Companies** shows, for each comp
 
 **Won deals by channel** spreads each deal won in the dates you picked across channels, in proportion to the credit its people earned before it closed. A deal's people are its contacts and everyone at its company. Deals where nobody had a tracked visit are listed apart, never guessed.
 
-## What a journey changed
+## What a journey, broadcast or sequence changed
+
+A [broadcast](/docs/guides/lifecycle-email/#broadcasts) or a [sequence](/docs/guides/sequences/) can hold a share of its audience back on purpose, and shows the people it reached against the people held back, the same way as a journey.
 
 A journey's random split can hold some people back on purpose (a holdout). On the journey's page, such a split shows each path against the people held back: how many converted within 30 days after the split, what they paid, how much better or worse each path did, and whether the difference is real or too early to tell (it needs at least 30 people on each side). Revenue beyond what as many held-back people paid is shown too.
 
@@ -90,4 +92,4 @@ Everyone in the workspace can see the reports (`analytics.read`). Owners, admins
 
 ## For agents and scripts
 
-The REST API is under `/v1/workspaces/{ws}/attribution`: `/settings`, `/channels`, `/campaigns`, `/conversions`, `/customers`, `/cohorts`, `/accounts` and `/deals`, each with `from`, `to`, `model`, `brand` and `match` (`identified` for identified people only). `/campaigns` also takes `split=content`. A journey's holdout comparison is `GET /v1/brands/{brand}/journeys/{id}/lift?step=`. See the [API reference](/docs/api/). The MCP tools are `get_attribution_settings`, `update_attribution_settings`, `get_attribution_channels`, `get_attribution_campaigns`, `list_attribution_conversions`, `get_attribution_customers`, `get_attribution_cohorts`, `get_attribution_accounts`, `get_attribution_deals` and `get_journey_lift`. Ask your agent something like *"Which channel brought the most revenue this month, and what did each sign-up cost us per channel?"*
+The REST API is under `/v1/workspaces/{ws}/attribution`: `/settings`, `/channels`, `/campaigns`, `/conversions`, `/customers`, `/cohorts`, `/accounts` and `/deals`, each with `from`, `to`, `model`, `brand` and `match` (`identified` for identified people only). `/campaigns` also takes `split=content`. The holdout comparisons are `GET /v1/brands/{brand}/journeys/{id}/lift?step=`, `.../email-broadcasts/{id}/lift` and `.../sequences/{id}/lift`. See the [API reference](/docs/api/). The MCP tools are `get_attribution_settings`, `update_attribution_settings`, `get_attribution_channels`, `get_attribution_campaigns`, `list_attribution_conversions`, `get_attribution_customers`, `get_attribution_cohorts`, `get_attribution_accounts`, `get_attribution_deals`, `get_journey_lift`, `get_email_broadcast_lift` and `get_sequence_lift`. Ask your agent something like *"Which channel brought the most revenue this month, and what did each sign-up cost us per channel?"*

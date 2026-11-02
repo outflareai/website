@@ -71,6 +71,8 @@ curl -X PATCH https://outflare.example.com/v1/workspaces/$WS/sequences/$SEQ \
 
 The enrollment response counts what was added and what was skipped: leads already in the sequence, suppressed leads, and leads active in another sequence (so nobody gets two sequences at once; send `"skip_active_elsewhere": false` to allow it). Activating needs at least one step, and either `daily_new_limit`, `target_daily` or mailboxes you assigned by hand, so Outflare knows how many mailboxes the sequence needs. It allocates them straight away, and the response's `allocation` shows how many sends a day it got. Pausing holds every lead where it is, and activating again carries on. Stop one lead with `POST .../enrollments/{id}/stop`.
 
+To measure what a sequence adds, set **Hold out** in its settings (`holdout_percent`, 5 to 50). That share of leads, picked at random, is enrolled but never emailed: they show as stopped, with the reason `holdout`. The sequence then shows **Against the people held out**: who converted in the 30 days after they were enrolled, what they paid, and whether the leads it emailed did better. Leads with no customer record are left out of that comparison.
+
 ## How sending works
 
 A scheduler looks for leads whose next step is due every few seconds and queues a send job for each. The job runs the policy check, picks a mailbox, sends over SMTP and records the result. When a check says "not yet", the lead is rescheduled and its `status_reason` says why:
