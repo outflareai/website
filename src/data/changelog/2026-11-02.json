@@ -2,7 +2,7 @@
 	"version": "2026.11.02",
 	"date": "2026-11-02",
 	"status": "in-progress",
-	"updated": "2026-11-02T17:21:32Z",
+	"updated": "2026-11-02T17:30:43Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -297,7 +297,14 @@
 			"edition": "open-source",
 			"text": "Edit lifecycle stages and the moves between them in the app: rename, add and remove stages, and change which event, usage or time without usage moves a company or person from one stage to another. The Products page's buttons now show only to people who can change the catalog.",
 			"at": "2026-11-02T17:18:41Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Outflare now manages campaigns on your own Google Ads and Meta accounts: pause or resume one, set its daily budget, or pause every campaign of a brand at once, from the Paid ads page, the API or MCP. Each change is read back from the platform. An agent's change goes through the action layer: a budget raise past a fifth always waits for you, and so does anything over its spend caps.",
+			"at": "2026-11-02T17:30:43Z"
 		}
 	],
-	"through": "ebf7e4a+cae3ec3"
+	"through": "ed9b665+893874f"
 }
