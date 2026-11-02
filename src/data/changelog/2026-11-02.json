@@ -2,7 +2,7 @@
 	"version": "2026.11.02",
 	"date": "2026-11-02",
 	"status": "in-progress",
-	"updated": "2026-11-02T12:54:40Z",
+	"updated": "2026-11-02T12:57:45Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -192,7 +192,28 @@
 			"edition": "open-source",
 			"text": "Bulk edits: owners can change many people or companies at once (from a list, a saved query or by hand): set an owner or a field, add or remove tags, move them in or out of a static list, or archive them, after a preview and with undo for 7 days. Every change is in each record's own history.",
 			"at": "2026-11-02T12:46:23Z"
+		},
+		{
+			"kind": "fix",
+			"area": "connectors",
+			"edition": "open-source",
+			"text": "\"Approve in Cloudflare\" now appears for subdomains, such as a tracking domain, on servers whose DNS resolver answers a missing subdomain record with an error instead of \"not found\".",
+			"at": "2026-11-02T12:57:45Z"
+		},
+		{
+			"kind": "fix",
+			"area": "connectors",
+			"edition": "open-source",
+			"text": "Connecting Google Calendar no longer fails with \"refused the API key (HTTP 403)\" right after signing in with Google.",
+			"at": "2026-11-02T12:57:45Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Create another workspace from the app: the workspace menu at the top of the sidebar (and the command palette) now has \"New workspace\", and the menu lists all your workspaces even when you only have one, so you can switch between them in one place.",
+			"at": "2026-11-02T12:57:45Z"
 		}
 	],
-	"through": "793f0d0+f3ac2c0"
+	"through": "b29df04+cf0cb93"
 }
