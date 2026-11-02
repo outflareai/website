@@ -2,7 +2,7 @@
 	"version": "2026.11.02",
 	"date": "2026-11-02",
 	"status": "in-progress",
-	"updated": "2026-11-02T08:41:17Z",
+	"updated": "2026-11-02T08:55:30Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -101,7 +101,14 @@
 			"edition": "open-source",
 			"text": "Smart lists keep their history and can hold companies: see who joined and left a list and when (also on each person's timeline), make a list of companies from their fields, events and product stage, and exclude a list of companies to leave out everyone who works there. Lists can now pick people by lifecycle stage per product.",
 			"at": "2026-11-02T08:41:17Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Analytics → Channels can count only people who signed in on your own product, leaving out browsers known only from a click on an email link, and each credited visit now says whether it was tied to the person by a sign-in or an email click.",
+			"at": "2026-11-02T08:55:30Z"
 		}
 	],
-	"through": "e7fe898+d73fcd4"
+	"through": "ba0c0c8+2ff5ed4"
 }
