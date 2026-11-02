@@ -2,7 +2,7 @@
 	"version": "2026.11.02",
 	"date": "2026-11-02",
 	"status": "in-progress",
-	"updated": "2026-11-02T10:32:10Z",
+	"updated": "2026-11-02T10:45:29Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -143,7 +143,14 @@
 			"edition": "open-source",
 			"text": "The support assistant's report in Support settings now shows how often it answered, left conversations to your team, had drafts sent as written and was rated helpful, against the 30 days before, with the commonest reasons it handed off. You're alerted once a day when answers it found wait for review, and the digest has a Support section.",
 			"at": "2026-11-02T10:32:10Z"
+		},
+		{
+			"kind": "fix",
+			"area": "connectors",
+			"edition": "open-source",
+			"text": "The one-click DNS approval (\"Approve in Cloudflare\") now finds a domain's DNS provider on hosted installs whose resolver didn't answer cleanly for a subdomain, where it answered \"lookup failed\" and offered only the API connection.",
+			"at": "2026-11-02T10:45:29Z"
 		}
 	],
-	"through": "62f49e7+fd4e8c2"
+	"through": "e0decda+4fc8b66"
 }
