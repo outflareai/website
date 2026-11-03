@@ -2,7 +2,7 @@
 	"version": "2026.11.03",
 	"date": "2026-11-03",
 	"status": "in-progress",
-	"updated": "2026-11-03T11:24:33Z",
+	"updated": "2026-11-03T11:59:04Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -80,7 +80,14 @@
 			"edition": "open-source",
 			"text": "Google Ads: connecting no longer asks for a developer token, which Google retired in September 2026; signing in with Google is enough.",
 			"at": "2026-11-03T10:43:36Z"
+		},
+		{
+			"kind": "fix",
+			"area": "connectors",
+			"edition": "open-source",
+			"text": "Connectors: Google Ads, Gmail, Slack, Meta, TikTok, Pinterest, Snapchat, Apple, Amazon, Microsoft, LinkedIn, Reddit and X Ads, Ghost, WordPress, Chrome UX Report, Tolt, Postmark, Requesty, Engain, Outbrain, Taboola, Snitcher, Vector, Warmly and others now show the company's own logo instead of initials.",
+			"at": "2026-11-03T11:59:04Z"
 		}
 	],
-	"through": "1329969+d899d10"
+	"through": "777b2e9+2edfafe"
 }
