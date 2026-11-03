@@ -2,7 +2,7 @@
 	"version": "2026.11.03",
 	"date": "2026-11-03",
 	"status": "in-progress",
-	"updated": "2026-11-03T13:47:10Z",
+	"updated": "2026-11-03T13:57:55Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -143,7 +143,21 @@
 			"edition": "open-source",
 			"text": "Field labels: every field, built in or your own, and every product event now says how sensitive it is, who on your team owns it, how long its data is meant to be kept and where it may be sent. They're labels for your team and block nothing. Set them from Edit labels in the CRM settings, the API or MCP.",
 			"at": "2026-11-03T13:47:10Z"
+		},
+		{
+			"kind": "fix",
+			"area": "lifecycle",
+			"edition": "open-source",
+			"text": "Sending an email through the API no longer fails with a server error when a link is very long or the content holds a NUL character. Links over 2,000 characters are sent as written without click tracking, and a NUL character in the subject, body, tags, metadata or data is refused with a clear message.",
+			"at": "2026-11-03T13:57:55Z"
+		},
+		{
+			"kind": "fix",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Setup health now opens its alerts for workspaces where more than one app or token calls the same deprecated API route. Before, the check failed for those workspaces and no install problems, including broken connections and silent website scripts, reached the status page.",
+			"at": "2026-11-03T13:57:55Z"
 		}
 	],
-	"through": "b3d488c+67db4d9"
+	"through": "4f03ec3+6d16967"
 }
