@@ -2,7 +2,7 @@
 	"version": "2026.11.03",
 	"date": "2026-11-03",
 	"status": "in-progress",
-	"updated": "2026-11-03T15:06:58Z",
+	"updated": "2026-11-03T15:56:53Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -164,7 +164,14 @@
 			"edition": "open-source",
 			"text": "Paid ads: Outflare can add the tracking template to every Google Ads ad for you. Tracking health shows each URL suffix it would change (the account's, and any campaign, ad group or ad suffix that overrides it without the template), then changes them when you confirm, keeping the parameters already there. Also by API and with the `plan_ad_tracking` and `add_ad_tracking` agent tools.",
 			"at": "2026-11-03T15:06:58Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Paid ads is split into tabs: Overview, Campaigns, Tracking, Send conversions and Accounts, each with its own address, so each part is one click away instead of one long page.",
+			"at": "2026-11-03T15:56:53Z"
 		}
 	],
-	"through": "e92b352+d6a16c4"
+	"through": "c50256a+7b61053"
 }
