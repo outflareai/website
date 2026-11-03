@@ -17,6 +17,7 @@ Each rule is a card you read as a sentence: "**When** someone does **signed_up**
 
 - **Dry run**: what it would have done over the last 7, 30 or 90 days.
 - **Where its event goes**: the journeys that start or end on its event.
+- **Who it fired for**: the last 50 people or companies it fired for, each linking to their page.
 - **When this fires, do…**: pick a first step, and a draft journey that starts on the rule's event opens in the journey builder.
 
 A rule is a draft until you activate it. Pause it to change it.

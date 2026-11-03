@@ -5,7 +5,7 @@ sidebar:
   order: 9.54
 ---
 
-<span class="pill shipped">Shipped</span> In the REST API, the MCP server and Query, and on each company and person in the web app.
+<span class="pill shipped">Shipped</span> In the web app (**CRM → People → Metrics**, and on each company and person), the REST API, the MCP server and Query.
 
 A metric is a number Outflare keeps up to date for each company and person, such as their spend in the last 30 days or how often they used your product this week. [Rules](/docs/guides/rules/), [journeys](/docs/guides/journeys/), [smart lists](/docs/guides/smart-lists/) and Query read metrics like any field, so you can act on totals, not only on single events: "a company spent over $1,000 this month", or "usage this week fell below half of last week's".
 
@@ -43,6 +43,8 @@ So a change rule on `metrics.spend_30d` greater than `100000` fires when a compa
 When metrics are turned on, a metric is added, or what it counts changes, Outflare fills it from the events it already has, in the background, so the numbers are right straight away. A fill never sets anything off: no rule, journey, email or webhook reacts to it. A company already over $1,000 before the fill counts as having crossed already, so it doesn't get a "you reached $1,000" email on its next payment. `POST .../metrics/{metric}/backfill` refills one metric, also quietly.
 
 ## Making your own
+
+In the web app, **CRM → People → Metrics** turns metrics on and lists them. **New metric** adds one, and each metric has **Edit**, **Refill** (fill it again from stored events) and **Archive**. Changing metrics needs permission to manage the catalog.
 
 `POST /v1/brands/{brand}/metrics` (MCP `create_metric`):
 
