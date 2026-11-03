@@ -52,7 +52,7 @@ The catalog lists everything a record can hold, and every feature uses the same 
 - **Fields.** First and last name, job title, seniority, companies, country, city, time zone, LinkedIn and lifecycle stage for people. Website, industry, company size, country, LinkedIn and lifecycle stage for companies. Add your own fields with a value type: text, number, currency, date, checkbox, a choice from a list, rating, email, phone, URL, location, or a link to another record or a teammate.
 - **Option lists.** Choices shared across fields, such as country, industry, company size, seniority and lifecycle stage. Add your own, such as deal stages. Options are archived, never deleted, so old records keep their meaning.
 - **Product events.** Define the events your product sends, such as `product.activated`, with their properties.
-- **Field labels.** Every field, built in or your own, and every product event says how sensitive it is (public, internal, confidential or restricted), which teammate owns it, how long its data is meant to be kept (forever by default) and where it may be sent: webhooks, exports, AI, published queries and email (all of them by default). They're labels for your team: nothing is blocked or deleted because of them. Set them with **Edit labels** on a field in the CRM settings, `PATCH .../catalog/types/{type}/fields/{field}` or `PATCH .../catalog/events/{event}` (`owner_id`, `retention_days`, `destinations`), or the MCP tools `update_field` and `update_event_definition`.
+- **Field labels.** Every field, built in or your own, and every product event says how sensitive it is (public, internal, confidential or restricted), which teammate owns it, how long its data is meant to be kept (forever by default) and where it may be sent: webhooks, exports, AI, published queries and email (all of them by default). They're labels for your team: nothing is blocked or deleted because of them. Set them with **Edit labels** on a field, or on an event under **Product events**, in the CRM settings, `PATCH .../catalog/types/{type}/fields/{field}` or `PATCH .../catalog/events/{event}` (`owner_id`, `retention_days`, `destinations`), or the MCP tools `update_field` and `update_event_definition`.
 
 Agents read the catalog with `get_catalog` before writing anything, and reuse a field before adding a new one.
 
@@ -128,7 +128,7 @@ There are three ways to get rid of a record:
 
 ### Recently deleted
 
-You can delete a person or company, one field's value, one email or id, one link, one product event or one [transaction](/docs/guides/transactions/). Each delete can be restored in one step for 7 days:
+You can delete a person or company, one field's value, one email or id, one link, one product event or one [transaction](/docs/guides/transactions/). On a record's page, **Delete value** next to a field, and **Delete** next to an email, an id or a link, delete just that one thing. Each delete can be restored in one step for 7 days:
 
 - **Hidden everywhere at once.** A deleted record is gone from lists, search, Query, smart lists, rules, journeys and sends, and its journeys end. Its emails and ids are free again while it's deleted, so a sync with the same email makes a new person.
 - **Deleting events changes reports.** Reports, attribution and test results that counted a deleted event change while it's deleted. Nothing already sent because of it is taken back. The delete screen says so.

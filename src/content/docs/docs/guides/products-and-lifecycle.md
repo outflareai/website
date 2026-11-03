@@ -20,7 +20,7 @@ A product is something the brand sells, such as "Residential proxies". Each has:
 - **A churn mode.** `cancellation` (the default): a customer churns when they cancel. `inactivity`: a customer churns after no usage for `churn_days` (30 by default), which suits pay-as-you-go products nobody ever cancels.
 - **`at_risk_days`** (14 by default): no usage for this long moves an active customer to *at risk*.
 
-`POST /v1/brands/{brand}/products` adds one (MCP `create_product`), `PATCH .../products/{product}` changes it, and `POST .../archive` and `.../restore` archive and bring it back. An archived product keeps its history, but its events no longer move anyone. Changing products needs permission to manage the catalog.
+`POST /v1/brands/{brand}/products` adds one (MCP `create_product`), `PATCH .../products/{product}` changes it (in the web app, **Edit** on its row), and `POST .../archive` and `.../restore` archive and bring it back. An archived product keeps its history, but its events no longer move anyone. Changing products needs permission to manage the catalog.
 
 ### Which product an event is about
 
