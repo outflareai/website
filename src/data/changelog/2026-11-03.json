@@ -2,7 +2,7 @@
 	"version": "2026.11.03",
 	"date": "2026-11-03",
 	"status": "in-progress",
-	"updated": "2026-11-03T01:43:59Z",
+	"updated": "2026-11-03T02:14:24Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -38,7 +38,14 @@
 			"edition": "open-source",
 			"text": "Accounts: when a brand's agent meets MFA, a CAPTCHA, a passkey or a consent screen, it asks for a person, who takes the account over for a few minutes and hands it back with the identity checked. Offboarding archives a brand's accounts, empties their vault, revokes the agent's grants and lists what the owner still has to do at each platform.",
 			"at": "2026-11-03T01:43:59Z"
+		},
+		{
+			"kind": "launch",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "Browser workers: for sites with no API, a brand's agent queues a bounded task that runs in a real browser on your own servers, within the hosts, account and ceilings you set. It signs in from the vault without the model ever seeing a secret, asks a person at MFA or a CAPTCHA, and logs every step.",
+			"at": "2026-11-03T02:14:24Z"
 		}
 	],
-	"through": "43dd1a8+1ed9286"
+	"through": "14121ff+452f358"
 }
