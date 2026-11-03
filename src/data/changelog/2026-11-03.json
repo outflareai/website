@@ -2,7 +2,7 @@
 	"version": "2026.11.03",
 	"date": "2026-11-03",
 	"status": "in-progress",
-	"updated": "2026-11-03T15:56:53Z",
+	"updated": "2026-11-03T16:09:12Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -171,7 +171,14 @@
 			"edition": "open-source",
 			"text": "Paid ads is split into tabs: Overview, Campaigns, Tracking, Send conversions and Accounts, each with its own address, so each part is one click away instead of one long page.",
 			"at": "2026-11-03T15:56:53Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Website and analytics now belong to one brand: site scripts, consent banners, flags, A/B tests, visitors, analytics, and tracking domains, so each brand's emails use its own (move one from the Domains page). Each connection is one brand's, split by site or ad account, or shared; anything unassigned shows in no brand until you assign it.",
+			"at": "2026-11-03T16:09:12Z"
 		}
 	],
-	"through": "c50256a+7b61053"
+	"through": "46bb800+2a71833"
 }
