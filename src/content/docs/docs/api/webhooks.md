@@ -344,6 +344,13 @@ Every type is also in the API document, under `webhooks:` and in the `WebhookEve
 | `infra.plan_ready` | A plan's mailboxes finished warming up and are ready to send. |
 | `infra.plan_cancelled` | An infrastructure plan was cancelled. |
 
+### Content
+
+| Event | When |
+| --- | --- |
+| `content.approved` | A post or page was approved. data carries the whole page, ready to put on your site; see [Content](/docs/guides/content/). |
+| `content.delivered` | A page was reported live on the brand's site. data has its `url` and `revision`. |
+
 ### Workspace
 
 | Event | When |
