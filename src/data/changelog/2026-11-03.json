@@ -2,7 +2,7 @@
 	"version": "2026.11.03",
 	"date": "2026-11-03",
 	"status": "in-progress",
-	"updated": "2026-11-03T12:59:44Z",
+	"updated": "2026-11-03T13:06:37Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -115,7 +115,14 @@
 			"edition": "open-source",
 			"text": "Security improvements to the container images.",
 			"at": "2026-11-03T12:51:40Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "agents",
+			"edition": "cloud",
+			"text": "Your brand's agent can now work on sites with no API: it records the brand's account there, asks you to put the password in the vault, and queues a bounded task that runs in a real browser on Outflare's own workers, never seeing a secret and asking a person when a site wants a code or a CAPTCHA.",
+			"at": "2026-11-03T13:06:37Z"
 		}
 	],
-	"through": "c2c0d55+fc787b2"
+	"through": "c2c0d55+64c8a9a"
 }
