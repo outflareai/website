@@ -5,7 +5,7 @@ sidebar:
   order: 1.6
 ---
 
-<span class="pill shipped">Shipped</span> In the REST API and the MCP server. Not in the web app yet, except the meaning-based search switch under Settings.
+<span class="pill shipped">Shipped</span> Query in the web app (**CRM → Query**), the REST API and the MCP server. Search in the REST API and the MCP server, with the meaning-based search switch under Settings.
 
 Search and Query read the same data you see everywhere else in Outflare: [customer records](/docs/guides/customer-records/), outreach, replies, meetings, deals, lifecycle email and website visits. Search finds things by their words, or by what they mean. Query answers questions with SQL, such as "win rate by source this quarter", in one exact answer instead of many pages of lists. Both run inside your Outflare database, so there is no other service and nothing to sync.
 
@@ -41,7 +41,7 @@ When a person or company is deleted, merged or archived, or a reply, meeting or 
 
 ## Query
 
-`POST /v1/workspaces/{ws}/query` with `{"sql": "select stage, count(*) from deals group by stage"}`, or ask your agent (MCP `run_query`). `GET .../query/tables` (MCP `list_query_tables`) lists the tables and their columns.
+A query belongs to one brand. Open **CRM → Query**, send `POST /v1/brands/{brand}/query` with `{"sql": "select stage, count(*) from deals group by stage"}`, or ask your agent (MCP `run_query`). `GET .../query/tables` (MCP `list_query_tables`) lists the tables and their columns. The older `/v1/workspaces/{ws}/query` still works for now.
 
 | Tables | What they hold |
 | --- | --- |
@@ -52,10 +52,36 @@ When a person or company is deleted, merged or archived, or a reply, meeting or 
 | `deals`, `meetings`, `spend` | Outcomes, and what you spent |
 | `emails`, `email_events`, `broadcasts` | Lifecycle email and what happened to it |
 | `visits`, `social_posts`, `brands` | Website visits, your social posts and brands |
+| `transactions` | Payments, refunds, chargebacks and credits ([Transactions](/docs/guides/transactions/)) |
+| `products`, `lifecycle_states`, `lifecycle_moves`, `lifecycle_overall` | Products and where each company and person stands with each ([Products and lifecycle stages](/docs/guides/products-and-lifecycle/)) |
+| `metrics`, `metric_values` | Live totals per company and person ([Metrics](/docs/guides/metrics/)) |
+| `bulk_edits` | [Bulk edits](/docs/guides/bulk-edits/) and what they changed |
 
 - Projects were removed, so there is no `projects` view and no `project_id` column. A saved query that names either needs to drop it.
 - A query is one `SELECT`. It never changes anything, so an agent kept to missions can run it without one.
 - Up to 100 rows come back by default, and at most 1,000. A query running over 15 seconds is stopped, so count and group rather than list.
+
+### Query Studio
+
+**CRM → Query** is an editor for the brand picked in the sidebar. It lists your saved queries, the tables with their columns, and each record type's fields, and it completes table and column names as you type. Cmd/Ctrl+Enter runs the query. Results come back as a table or as a bar, line or area chart, and anyone who can run queries can download them as CSV (up to 10,000 rows).
+
+### Saved queries
+
+Save a query to run it again. A saved query is private to you until you share it with the brand. Every change to its SQL or chart is a new version, and every version is kept, so you can open, run or restore an old one. Use `GET`/`POST /v1/brands/{brand}/queries` and `POST .../queries/{saved_query}/run`, or the MCP tools `list_saved_queries`, `get_saved_query`, `run_saved_query` and `save_query`. Saving needs permission to manage customers.
+
+### Published endpoints
+
+Owners and admins can publish a saved query as an endpoint that another system, such as a BI tool or a warehouse job, calls with an API token made for the brand that holds only `query.endpoints`:
+
+```sh
+curl -X POST https://app.outflare.ai/v1/brands/$BRAND/query-endpoints/new-signups/run \
+  -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" \
+  -d '{"params": {"country": "DE"}}'
+```
+
+- Publish with `POST /v1/brands/{brand}/query-endpoints`, giving the saved query, a `slug`, its `params` (bound in order as `$1`, `$2`, …, never written into the SQL), a `row_cap` (up to 10,000) and a `rate_per_minute` per token.
+- It reads what its publisher could read, and never another brand. It stays on the version it was published with until you move it.
+- Every call is logged, allowed or refused, for 90 days (`GET .../query-endpoints/{endpoint}/calls`). Over the rate limit it answers `429` with `Retry-After`.
 
 ## Who sees what
 
