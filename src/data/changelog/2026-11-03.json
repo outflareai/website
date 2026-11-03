@@ -2,7 +2,7 @@
 	"version": "2026.11.03",
 	"date": "2026-11-03",
 	"status": "in-progress",
-	"updated": "2026-11-03T02:14:24Z",
+	"updated": "2026-11-03T02:55:51Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -45,7 +45,14 @@
 			"edition": "open-source",
 			"text": "Browser workers: for sites with no API, a brand's agent queues a bounded task that runs in a real browser on your own servers, within the hosts, account and ceilings you set. It signs in from the vault without the model ever seeing a secret, asks a person at MFA or a CAPTCHA, and logs every step.",
 			"at": "2026-11-03T02:14:24Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "Five more channels for your brand's agent: newsletters (broadcasts to your subscribers), website conversion (A/B tests, experiments, flags), competitor watch, and, through accounts and browser workers, listings and marketplaces and forums and launch sites. Each shows what it needs before it is ready.",
+			"at": "2026-11-03T02:55:51Z"
 		}
 	],
-	"through": "14121ff+452f358"
+	"through": "e6aaba3+f8a948e"
 }
