@@ -2,7 +2,7 @@
 	"version": "2026.11.03",
 	"date": "2026-11-03",
 	"status": "in-progress",
-	"updated": "2026-11-03T16:09:12Z",
+	"updated": "2026-11-03T17:00:07Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -178,7 +178,14 @@
 			"edition": "open-source",
 			"text": "Website and analytics now belong to one brand: site scripts, consent banners, flags, A/B tests, visitors, analytics, and tracking domains, so each brand's emails use its own (move one from the Domains page). Each connection is one brand's, split by site or ad account, or shared; anything unassigned shows in no brand until you assign it.",
 			"at": "2026-11-03T16:09:12Z"
+		},
+		{
+			"kind": "fix",
+			"area": "self-hosting",
+			"edition": "open-source",
+			"text": "Background jobs no longer stall for up to five minutes when the server restarts or deploys: running jobs are stopped and handed straight back to the queue, and a restart no longer uses up one of a job's retries.",
+			"at": "2026-11-03T17:00:07Z"
 		}
 	],
-	"through": "46bb800+2a71833"
+	"through": "05d472b+0cb6f3a"
 }
