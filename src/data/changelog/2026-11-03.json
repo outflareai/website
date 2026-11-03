@@ -2,7 +2,7 @@
 	"version": "2026.11.03",
 	"date": "2026-11-03",
 	"status": "in-progress",
-	"updated": "2026-11-03T18:27:51Z",
+	"updated": "2026-11-03T18:45:42Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -192,7 +192,35 @@
 			"edition": "open-source",
 			"text": "Find links no longer gives up silently on a brand website that shows a bot check or loads slowly: Outflare tries once more with JavaScript on, then tells you under Links why it couldn't read the site, without retrying and spending more Geonode tokens.",
 			"at": "2026-11-03T18:27:51Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "records",
+			"edition": "open-source",
+			"text": "A rule's page lists who it fired for. On a record you can delete one field value, email or id, or link, and find it under Recently deleted. Bulk edits now start from picked people on the People page, every person shown, or a saved query, as well as from a list.",
+			"at": "2026-11-03T18:45:42Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "records",
+			"edition": "open-source",
+			"text": "CRM settings now list your product events, so you can give each one a label, a description, a sensitivity, an owner, how long it's kept and where it may be sent, the same way as for fields.",
+			"at": "2026-11-03T18:45:42Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "records",
+			"edition": "open-source",
+			"text": "Metrics have their own tab under People: turn them on, add your own, change what one counts, refill it from stored events, or archive it. Products can now be edited after they're added, including their name, aliases and when a customer counts as at risk or churned.",
+			"at": "2026-11-03T18:45:42Z"
+		},
+		{
+			"kind": "fix",
+			"area": "records",
+			"edition": "open-source",
+			"text": "CRM settings now save new objects, attributes, choices and field labels to the brand picked in the switcher. Before, they always went to the workspace's first brand.",
+			"at": "2026-11-03T18:45:42Z"
 		}
 	],
-	"through": "3465b2c+027d258"
+	"through": "730188b+6864e5d"
 }
