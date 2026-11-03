@@ -2,7 +2,7 @@
 	"version": "2026.11.03",
 	"date": "2026-11-03",
 	"status": "in-progress",
-	"updated": "2026-11-03T00:41:52Z",
+	"updated": "2026-11-03T00:59:01Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -24,7 +24,14 @@
 			"edition": "open-source",
 			"text": "A workspace setting lets only owners and admins edit people, companies and other records; everyone else can still see them. Imports and syncs keep running.",
 			"at": "2026-11-03T00:04:02Z"
+		},
+		{
+			"kind": "launch",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "Accounts: record every external account your brand's agent may act through (social profiles, community and review sites, partner platforms, sites with no API), how each signs in and what it depends on. Every use is tracked with its outcome, failures become incidents with an owner and a next try, and secrets live in a sealed vault that is never read back and that only a person can fill.",
+			"at": "2026-11-03T00:59:01Z"
 		}
 	],
-	"through": "3f25327+d4f297f"
+	"through": "543422c+ca86a75"
 }
