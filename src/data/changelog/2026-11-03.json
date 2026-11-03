@@ -2,7 +2,7 @@
 	"version": "2026.11.03",
 	"date": "2026-11-03",
 	"status": "in-progress",
-	"updated": "2026-11-03T09:47:47Z",
+	"updated": "2026-11-03T10:43:36Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -73,7 +73,14 @@
 			"edition": "open-source",
 			"text": "Missions are retired. What each mission did stays readable on the Missions page, and changing one, or sending a change with the `Outflare-Mission` header, now answers that missions are retired. Agents make changes with their own token on the action layer, and playbooks run as agent runs on the Agents page.",
 			"at": "2026-11-03T09:47:47Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Google Ads: connecting no longer asks for a developer token, which Google retired in September 2026; signing in with Google is enough.",
+			"at": "2026-11-03T10:43:36Z"
 		}
 	],
-	"through": "c23813d+081fbbe"
+	"through": "1329969+8574aa3"
 }
