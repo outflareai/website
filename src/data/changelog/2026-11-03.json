@@ -2,7 +2,7 @@
 	"version": "2026.11.03",
 	"date": "2026-11-03",
 	"status": "in-progress",
-	"updated": "2026-11-03T13:06:37Z",
+	"updated": "2026-11-03T13:15:54Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -122,7 +122,14 @@
 			"edition": "cloud",
 			"text": "Your brand's agent can now work on sites with no API: it records the brand's account there, asks you to put the password in the vault, and queues a bounded task that runs in a real browser on Outflare's own workers, never seeing a secret and asking a person when a site wants a code or a CAPTCHA.",
 			"at": "2026-11-03T13:06:37Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Link pitches sent without approval now go out at most 10 a day per sequence (1 to 200, in Link building's settings); the rest go out on later days. Pitches your AI is unsure about, or to sites with a spam score of 30 or more, still wait for you.",
+			"at": "2026-11-03T13:15:54Z"
 		}
 	],
-	"through": "c2c0d55+64c8a9a"
+	"through": "ab3556c+2e0b967"
 }
