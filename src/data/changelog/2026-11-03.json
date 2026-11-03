@@ -2,7 +2,7 @@
 	"version": "2026.11.03",
 	"date": "2026-11-03",
 	"status": "in-progress",
-	"updated": "2026-11-03T14:21:49Z",
+	"updated": "2026-11-03T15:06:58Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -157,7 +157,14 @@
 			"edition": "open-source",
 			"text": "Setup health now opens its alerts for workspaces where more than one app or token calls the same deprecated API route. Before, the check failed for those workspaces and no install problems, including broken connections and silent website scripts, reached the status page.",
 			"at": "2026-11-03T13:57:55Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Paid ads: Outflare can add the tracking template to every Google Ads ad for you. Tracking health shows each URL suffix it would change (the account's, and any campaign, ad group or ad suffix that overrides it without the template), then changes them when you confirm, keeping the parameters already there. Also by API and with the `plan_ad_tracking` and `add_ad_tracking` agent tools.",
+			"at": "2026-11-03T15:06:58Z"
 		}
 	],
-	"through": "b33d37c+4bee0be"
+	"through": "e92b352+d6a16c4"
 }
