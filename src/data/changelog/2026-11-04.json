@@ -2,7 +2,7 @@
 	"version": "2026.11.04",
 	"date": "2026-11-04",
 	"status": "in-progress",
-	"updated": "2026-11-04T09:31:22Z",
+	"updated": "2026-11-04T11:58:47Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -66,7 +66,28 @@
 			"edition": "open-source",
 			"text": "The notice that some connections or accounts have no brand shows once at the top of the page again. Moving between pages could add another copy each time, pushing the page down.",
 			"at": "2026-11-04T09:31:22Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Paid ads: Fix tracking links shows its progress while it runs, then how many URL suffixes it changed and each one Google refused with its reason, or why it failed. Also by API and with the `get_ad_tracking_run` agent tool.",
+			"at": "2026-11-04T11:58:47Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "A conversion sent only from your server, for someone your website never saw, now takes its country from the event itself (`context.location.country` or `context.ip`), so it is no longer skipped as \"country unknown\".",
+			"at": "2026-11-04T11:58:47Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Visitors now lists everyone on your site, anonymous visitors included, and opens each one's journey: visits, pages and events. A person's timeline shows when and how they went from anonymous to known, visitor links join a phone where they never sign in, and Website tracking walks you through serving the script from your own domain and checks it works.",
+			"at": "2026-11-04T11:58:47Z"
 		}
 	],
-	"through": "b842c75+f4afb5d"
+	"through": "898d9d1+b95b3c1"
 }
