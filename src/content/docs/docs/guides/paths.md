@@ -1,6 +1,6 @@
 ---
 title: Paths
-description: Where people go step by step: the pages they view and the things they do, from a start, on the way to an end, or from whatever they did first.
+description: Where people go step by step, from a start, on the way to an end, or from whatever they did first.
 sidebar:
   order: 9.8
 ---
