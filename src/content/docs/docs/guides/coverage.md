@@ -47,9 +47,25 @@ Search, advanced all/any filters and private or team saved views help teammates 
 
 ## Discover new mentions and links
 
-Discovery reuses your brand's existing [news searches](/docs/guides/news-watch/), link prospects and [backlink sources](/docs/guides/backlinks/). Configure saved searches inside Presence or open the existing search and backlink modules. **Refresh discoveries** brings their results into the review list. If another batch remains, refresh again to continue.
+Presence looks for new finds by itself once a day, from:
 
-[Geonode, Ahrefs and DataForSEO](/docs/integrations/seo/) run on your workspace's own connected accounts and budgets. No Outflare-provided key or fallback account is used. An integration stays unavailable until the workspace connects what it needs; manual records and available native checks remain usable.
+- your brand's [news searches](/docs/guides/news-watch/),
+- [backlink sources](/docs/guides/backlinks/) and link prospects,
+- posts your social watches found,
+- pages that AI answers cite when they name your brand, from [AI visibility](/docs/guides/ai-visibility/),
+- the brand's **web searches**, which read Google results.
+
+Select **Refresh discoveries** to bring finds in straight away. If another batch remains, refresh again to continue.
+
+Each find gets a type from its address: a YouTube video, a forum thread such as a Reddit post, an influencer post, a review site, an MCP directory, an app store listing, a comparison or a roundup. When the address doesn't say, the type is left empty for you to pick. Confirming the find makes a placement of that type.
+
+### Web searches
+
+Web searches sit at the top of **Discovery**. Each one reads the Google results for a query every day, week or month. Every result that isn't one of your brand's own pages becomes a find. A search for your brand's name, in quotes, is added on the first day, and you can add more, such as `"Your brand" alternatives` or `"Your brand" review`. **Run now** runs a search straight away, and **Pause** stops it.
+
+Web searches run on your workspace's own [DataForSEO or Geonode connection](/docs/integrations/seo/), within that connection's budget. Until you connect one, each search shows **Needs a search results connection** and nothing is spent. News searches stay separate: they find recent articles, while web searches find the pages that rank.
+
+[Geonode, Ahrefs and DataForSEO](/docs/integrations/seo/) always run on your workspace's own connected accounts and budgets. No Outflare-provided key or fallback account is used. An integration stays unavailable until the workspace connects what it needs; manual records and available native checks remain usable.
 
 Review each candidate, choose its publisher, and confirm or dismiss it. Matching pages are deduplicated, while source history is retained. A discovered page is not automatically classified as earned or counted as a newly published article.
 
@@ -111,6 +127,6 @@ Save an immutable snapshot for a weekly review or export the displayed report. S
 
 ## API and agents
 
-The brand-scoped API starts at `/v1/brands/{brand}/coverage`. The TypeScript and Python SDKs expose the same operations, and MCP provides Presence tools for records, checks, discovery, reviews, reports and commercial extraction. The people and companies on a placement are the `parties` resource; remove one with `delete_coverage_parties`.
+The brand-scoped API starts at `/v1/brands/{brand}/coverage`. The TypeScript and Python SDKs expose the same operations, and MCP provides Presence tools for records, checks, discovery, reviews, reports and commercial extraction. The people and companies on a placement are the `parties` resource; remove one with `delete_coverage_parties`. Web searches are the `searches` resource, and `run_coverage_search` runs one now.
 
 Use `get_coverage_schema` to inspect available fields. Base records use `coverage.read` and `coverage.manage`; commercial data has separate finance scopes, and agreement approval requires `coverage.approve` and a human principal. Existing CRM, Knowledge and analytics access rules still apply.
