@@ -19,6 +19,7 @@ Choose a [brand](/docs/guides/brands/), then open **Outreach → Presence**. Its
 | Publishers | Connect websites to CRM companies and review their placements and relationship context. |
 | Commercial | Manage agreements, deliverables, invoices, payments, rate cards, budgets and documents. |
 | Discovery | Review existing search and backlink discoveries before confirming placements. |
+| Competitors | See where your competitors appear and which of those sites you're not on yet. |
 | Reports | Review growth, retention, delivery and recorded referral outcomes; save report snapshots. |
 
 **Automations** configures maintenance rules and owners. **Settings** explains the source connections, Knowledge and permissions used by the module.
@@ -68,6 +69,20 @@ Web searches run on your workspace's own [DataForSEO or Geonode connection](/doc
 [Geonode, Ahrefs and DataForSEO](/docs/integrations/seo/) always run on your workspace's own connected accounts and budgets. No Outflare-provided key or fallback account is used. An integration stays unavailable until the workspace connects what it needs; manual records and available native checks remain usable.
 
 Review each candidate, choose its publisher, and confirm or dismiss it. Matching pages are deduplicated, while source history is retained. A discovered page is not automatically classified as earned or counted as a newly published article.
+
+## See where competitors appear
+
+**Competitors** scans each competitor you track on the [Competitors page](/docs/guides/competitors/). A scan reads:
+
+- the Google results for the competitor's name,
+- who links to the competitor's site,
+- pages that AI answers cite when they name the competitor, from [AI visibility](/docs/guides/ai-visibility/).
+
+Each page shows its type, the site's domain rating and traffic, and which of these found it. **Likely paid** appears only when there's a reason, such as a link marked sponsored, an affiliate code in the link, or "sponsored" in the page's address or title; hover over it to see which. Without one, it shows **Unknown**, because nobody outside the deal can know for sure. **Only sites we're not on** keeps the sites where your brand has no publisher yet: the places to go after.
+
+Your top 10 competitors, by the keywords you share, are scanned weekly and the rest monthly. Change how many count as top and how often each group is scanned at the top of the tab, or give one competitor its own cadence. **Scan now** scans a competitor straight away.
+
+Search results and links run on your workspace's own [DataForSEO, Geonode or Ahrefs connection](/docs/integrations/seo/), within that connection's budget. Until you connect one, the competitor says which connection each part needs, and nothing is spent. AI answers need no connection of their own.
 
 ## Check publication, links and accuracy
 
@@ -133,6 +148,6 @@ Save an immutable snapshot for a weekly review or export the displayed report. S
 
 ## API and agents
 
-The brand-scoped API starts at `/v1/brands/{brand}/coverage`. The TypeScript and Python SDKs expose the same operations, and MCP provides Presence tools for records, checks, discovery, reviews, reports and commercial extraction. The people and companies on a placement are the `parties` resource; remove one with `delete_coverage_parties`. Web searches are the `searches` resource, and `run_coverage_search` runs one now.
+The brand-scoped API starts at `/v1/brands/{brand}/coverage`. The TypeScript and Python SDKs expose the same operations, and MCP provides Presence tools for records, checks, discovery, reviews, reports and commercial extraction. The people and companies on a placement are the `parties` resource; remove one with `delete_coverage_parties`. Web searches are the `searches` resource, and `run_coverage_search` runs one now. Competitor scans are `/coverage/competitors` and `/coverage/competitor_placements`; `list_coverage_competitor_placements` with `gap` lists the sites to go after, and `scan_coverage_competitor` scans one now.
 
 Use `get_coverage_schema` to inspect available fields. Base records use `coverage.read` and `coverage.manage`; commercial data has separate finance scopes, and agreement approval requires `coverage.approve` and a human principal. Existing CRM, Knowledge and analytics access rules still apply.
