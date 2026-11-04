@@ -93,6 +93,7 @@ Send what people do in your product to a brand, in Segment's format: `track`, `i
 - **Names.** `Order Completed` is stored as `order_completed`, and dotted names such as `product.activated` stay as they are. A name the brand hasn't approved yet is held, and drives nothing until someone approves it.
 - **Products.** Name the [product](/docs/guides/products-and-lifecycle/) an event is about with `properties.product_id` or `properties.product`.
 - **Retries.** Send a `messageId` with each event, so a retry is stored once.
+- **Orders are payments.** An `Order Completed` event from your server, for a known person, with `revenue` (or `total`, or `value`) in dollars and a `currency`, is also saved as a [transaction](/docs/guides/transactions/) and counted as a payment. Put the payment's id in `order_id`: if the same payment also arrives as a transaction with that `source_id`, or from a billing connection, it counts once ([One payment, counted once](/docs/guides/transactions/#one-payment-counted-once)).
 
 Each event is matched to a person in that brand only:
 
