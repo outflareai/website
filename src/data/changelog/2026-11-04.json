@@ -2,7 +2,7 @@
 	"version": "2026.11.04",
 	"date": "2026-11-04",
 	"status": "in-progress",
-	"updated": "2026-11-04T20:40:20Z",
+	"updated": "2026-11-04T20:58:58Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -346,7 +346,14 @@
 			"edition": "open-source",
 			"text": "The Tolt import now brings over flows with a \"Lead date\" condition, such as \"first year after sign-up\", and reads condition operators however Tolt words them, instead of skipping those flows.",
 			"at": "2026-11-04T20:40:20Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "A Lifecycle view on the Retention page shows, per day, week or month, how many active people were new, returning or resurrected and how many went dormant. Funnels can run in any order, what converters did differently now includes people's properties, and trend tiles on dashboards carry the brand's notes.",
+			"at": "2026-11-04T20:58:58Z"
 		}
 	],
-	"through": "1851b3d+c7a457a"
+	"through": "9626be3+7a0136f"
 }
