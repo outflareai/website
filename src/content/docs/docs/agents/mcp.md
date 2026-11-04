@@ -212,6 +212,7 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `mute_alerts` | Mute or unmute a kind of alert for yourself | Yes |
 | `list_tracking_domains`, `add_tracking_domain`, `check_tracking_domain` | Optional own domain for unsubscribe and click links, verified by CNAME | Yes |
 | `list_analytics`, `get_analytics_summary` | Connected website analytics tools, and traffic across all of them for a period | |
+| `get_site_analytics` | Your own tag's traffic for a brand: visitors, visits, page views, by day, with top pages, sources, websites, countries and devices | |
 | `get_analytics_report` | One tool's traffic, pages, sources, search queries or events report | |
 | `get_analytics_changes`, `get_analytics_catalog` | Start here: what changed on each website (headlines, period on period, movers, unusual days, SEO moves, gaps) and what each website can be asked. See [Analytics for agents](/docs/agents/analytics/) | |
 | `get_analytics_overview`, `query_analytics_history`, `compare_analytics_tools` | Stored analytics history: every website across tools, history by day, tool or page/query, and one website's tools day by day | |
