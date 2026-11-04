@@ -1,13 +1,13 @@
 ---
-title: Manage coverage and placements
-description: Track brand mentions, backlinks, paid placements and publisher relationships, with publication checks, commercial delivery, maintenance work and growth reports.
+title: Manage your brand's presence
+description: Track where your brand appears online (articles, backlinks, influencer posts, YouTube videos, forums, MCP directories, app listings and paid placements) with the partners behind them, publication checks, commercial delivery, maintenance work and growth reports.
 sidebar:
   order: 15
 ---
 
-Coverage brings your external presence and publisher relationships together. Use it for earned articles, comparisons, profiles, case studies, backlinks, paid editorial, newsletters and advertising.
+Presence shows everywhere your brand appears online, and the publishers, agencies, partners and creators behind it. Use it for earned articles, comparisons, profiles, case studies, backlinks, influencer posts, YouTube videos, forum threads, MCP directory and app store listings, paid editorial, newsletters and advertising. It was called Coverage before, and the API still uses that name.
 
-Choose a [brand](/docs/guides/brands/), then open **Outreach → Coverage**. Its records belong to that brand. CRM permissions still control which contacts and conversations you can see.
+Choose a [brand](/docs/guides/brands/), then open **Outreach → Presence**. Its records belong to that brand. CRM permissions still control which contacts and conversations you can see.
 
 ## Find the right screen
 
@@ -29,7 +29,7 @@ A publisher website links to a CRM company. One company can own several websites
 
 1. Select **Add placement** and enter a title.
 2. Choose the publisher, or create the publisher and its CRM company without leaving the form.
-3. Choose the format, such as **Blog**, **Comparison**, **Case study** or **Display ad**. Record the arrangement separately: earned, paid, exchange, affiliate or unknown.
+3. Choose the format, such as **Blog**, **Comparison**, **Influencer post**, **YouTube video**, **Forum thread**, **MCP directory**, **App store listing** or **Banner**. Record the arrangement separately: paid, earned, organic (free and unprompted), exchange, affiliate or unknown. Under **Who delivered it**, choose in-house, agency or partner.
 4. Set the owner, stage and promised dates. Add the page URL when it exists. For a future article, newsletter or ad slot, you can start without a URL and describe its inventory location.
 5. Link a contact or agreement when relevant. Under content and monitoring, set the expected brand wording, target URL, expected link attributes and checking cadence.
 
@@ -47,7 +47,7 @@ Search, advanced all/any filters and private or team saved views help teammates 
 
 ## Discover new mentions and links
 
-Discovery reuses your brand's existing [news searches](/docs/guides/news-watch/), link prospects and [backlink sources](/docs/guides/backlinks/). Configure saved searches inside Coverage or open the existing search and backlink modules. **Refresh discoveries** brings their results into the review list. If another batch remains, refresh again to continue.
+Discovery reuses your brand's existing [news searches](/docs/guides/news-watch/), link prospects and [backlink sources](/docs/guides/backlinks/). Configure saved searches inside Presence or open the existing search and backlink modules. **Refresh discoveries** brings their results into the review list. If another batch remains, refresh again to continue.
 
 [Geonode, Ahrefs and DataForSEO](/docs/integrations/seo/) run on your workspace's own connected accounts and budgets. No Outflare-provided key or fallback account is used. An integration stays unavailable until the workspace connects what it needs; manual records and available native checks remain usable.
 
@@ -71,6 +71,12 @@ Changed or withdrawn Knowledge invalidates old assessments. You can also enable 
 
 AI can also suggest a placement format or prepare an editable thank-you, link request, correction or follow-up. A thank-you and a link request are separate purposes.
 
+## Link the CRM deal and partners
+
+A placement and its deal in the CRM pipeline are the same piece of work. Edit a placement and choose its **CRM deal** under relationship and campaign; the deal must belong to the same brand. The placement's **Relationship** tab then shows **Open deal**, which opens the deal in a new tab.
+
+Under **People and companies** on the same tab, add the CRM companies and people involved, each with a role: agency, partner, creator, author, editor, owner, account manager or other. Search finds both companies and people. The same record can hold several roles, and removing one keeps it in the placement's history. Seeing these records needs CRM read access.
+
 ## Maintain the relationship
 
 Before contacting a publisher, open **Relationship** and review the accessible CRM history, relationship owner and contact preferences. The timeline can provide context from earlier conversations, including conversations unrelated to this placement. No accessible conversation is not proof that nobody has spoken to the publisher.
@@ -91,7 +97,7 @@ For contracts, invoices or media kits, add a document link and paste the source 
 
 For advertising and other inventory, add dated delivery reports with their source and evidence. Unknown impressions, clicks or conversions remain unknown. A publisher's delivery report and Outflare's recorded attribution are different measurements.
 
-Separate commercial work tracks upcoming renewals, cancellation notices, invoices due and overdue delivery. Finance access does not follow automatically from ordinary Coverage access.
+Separate commercial work tracks upcoming renewals, cancellation notices, invoices due and overdue delivery. Finance access does not follow automatically from ordinary Presence access.
 
 ## Review growth over time
 
@@ -105,6 +111,6 @@ Save an immutable snapshot for a weekly review or export the displayed report. S
 
 ## API and agents
 
-The brand-scoped API starts at `/v1/brands/{brand}/coverage`. The TypeScript and Python SDKs expose the same operations, and MCP provides Coverage tools for records, checks, discovery, reviews, reports and commercial extraction.
+The brand-scoped API starts at `/v1/brands/{brand}/coverage`. The TypeScript and Python SDKs expose the same operations, and MCP provides Presence tools for records, checks, discovery, reviews, reports and commercial extraction. The people and companies on a placement are the `parties` resource; remove one with `delete_coverage_parties`.
 
 Use `get_coverage_schema` to inspect available fields. Base records use `coverage.read` and `coverage.manage`; commercial data has separate finance scopes, and agreement approval requires `coverage.approve` and a human principal. Existing CRM, Knowledge and analytics access rules still apply.
