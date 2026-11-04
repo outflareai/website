@@ -7,7 +7,7 @@ sidebar:
 
 <span class="pill shipped">Shipped</span> Suggested and tracked competitors, their weekly numbers and a feed of what changed, in the app, through the API and for agents.
 
-Outflare keeps a list of the sites you compete with in search for each of your websites, and tells you what changes at them. Each week your [Ahrefs or DataForSEO connection](/docs/integrations/seo/) suggests the domains that rank for the same keywords as your site. Track the ones that matter, and Outflare follows their numbers and what they publish.
+Outflare keeps one list of the sites you compete with for each of your websites, and tells you what changes at them. The same list is used everywhere: [Presence](/docs/guides/coverage/) scans where they appear, [AI visibility](/docs/guides/ai-visibility/) counts them in AI answers, and agents read it. Every day Outflare suggests new ones; say yes or no. Track the ones that matter, and Outflare follows their numbers and what they publish.
 
 In the app, open **SEO** in the sidebar, then **Competitors**.
 
@@ -18,8 +18,8 @@ In the app, open **SEO** in the sidebar, then **Competitors**.
 
 ## Suggested, tracked and dismissed
 
-- **Suggested.** Each weekly snapshot asks your connection for the 10 domains sharing the most keywords with your site. They show with how many keywords you share. Your own subdomains are never suggested.
-- **Tracked.** Press **Track** on a suggestion, or type a domain at the top of the page. A site tracks at most 20 competitors.
+- **Suggested.** Every day your connection is asked for the 10 domains sharing the most keywords with your site, and they show with how many keywords you share. That is one read a site a day on your own account, within its monthly budget. Sites that rank in the top results beside you for at least two of your [tracked keywords](/docs/guides/keywords/) in the last week are suggested too, at no cost. Your own site and subdomains, and platforms such as YouTube or Reddit, are never suggested. At the top of the page, **Are these competitors?** lists them: select **Yes** to track one, **No** to dismiss it, or **Yes to all**.
+- **Tracked.** Select **Yes** on a suggestion, or type one or several domains, separated by commas, at the top of the page and select **Add**. There is no limit. A competitor with a website that you add to an AI visibility cohort is tracked here too.
 - **Dismissed.** A dismissed suggestion stays away when the connection suggests it again. Removing a competitor instead deletes it with its history, and the connection may suggest it again.
 
 When your workspace has a customer record with the competitor's domain, the competitor is linked to it.
