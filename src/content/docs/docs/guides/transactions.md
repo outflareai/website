@@ -13,6 +13,9 @@ A brand's transactions are the money it takes and gives back: payments, refunds,
 
 - **A billing connection.** Connect [Stripe](/docs/guides/revenue-from-stripe/) or another billing tool on your own account, and each charge and refund it reads after its first full read becomes a transaction of the brand. Transactions start when the connection does: nothing from before is rebuilt.
 - **Your own billing**, from the API: `POST /v1/brands/{brand}/transactions`, or MCP `record_transaction`.
+- **Order Completed events** with revenue, sent from your servers ([product events](/docs/guides/customer-records/)).
+
+However a payment arrives, it is kept once and counted once: see [One payment, counted once](#one-payment-counted-once).
 
 ```sh
 curl -X POST https://app.outflare.ai/v1/brands/$BRAND/transactions \
@@ -23,8 +26,40 @@ curl -X POST https://app.outflare.ai/v1/brands/$BRAND/transactions \
 
 - `kind` is `payment`, `refund`, `chargeback` or `credit`. `amount_minor` is in the currency's smallest unit (cents) and never negative: the kind says which way the money went. A refund or chargeback can name the payment it gives back with `refund_of` (that payment's `source_id`).
 - `source_id` is your own id for it. Sending the same one again never adds it twice: the answer is the transaction already saved (200 instead of 201), with its `status` updated if it changed (`succeeded`, `pending`, `failed` or `reversed`).
-- `record_id` is the person or company who paid, and `product` one of the brand's [products](/docs/guides/products-and-lifecycle/) by id or key. Both are optional.
+- `record_id` is the person or company who paid. If you don't have it, send `user_id` instead: your own id for them, the `userId` your events send, and Outflare finds the person. `product` is one of the brand's [products](/docs/guides/products-and-lifecycle/) by id or key. All three are optional, but send `record_id` or `user_id` with every payment: without a person, a payment can't count toward revenue by channel or your ad networks.
 - `occurred_at` is when it happened. It defaults to now.
+
+## One payment, counted once
+
+Revenue, attribution and the [conversions sent back to your ad networks](/docs/integrations/paid-media/#sending-conversions-back) count each payment as a `payment.succeeded` event, and each refund as `payment.refunded`. Every payment becomes exactly one, whichever way it arrives:
+
+- **A transaction from the API.** A `succeeded` payment with a person counts. A `pending` one counts when you send it again as `succeeded`. A refund or chargeback comes off the payment it names in `refund_of`. Credits never count.
+- **An Order Completed event**, sent from your server for a known person, with `revenue` (or `total`, or `value`) above zero in dollars, not cents (`49.00`), and a `currency` (the brand's if left out). It is saved as a transaction and counted as a payment. Events from the website snippet never count as money, because anyone can send them.
+- **A billing connection**, such as Stripe.
+
+**If the same payment arrives twice**, from two of these, Outflare keeps it once. It takes them as one payment when:
+
+1. **They share an id.** The event's `order_id` is the transaction's `source_id` (or the billing tool's charge id). This is the reliable way, so **put the same id in both**.
+2. **Or, with no shared id,** the same person paid the same amount in the same currency within 15 minutes.
+
+Whichever arrives second is answered as the first. The API returns the transaction already saved (200), a billing sync skips the charge, and the order event gets an `outflare_payment` property naming the payment it counts as. A transaction sent without a person picks them up from its order event.
+
+To count each payment once in reports and ad networks, use **`payment.succeeded`**, valued at `amount_minor`, in conversion definitions and in **Send conversions back** rules on the Paid ads page, not `order_completed`.
+
+An Order Completed event, from your server to `POST /v1/brands/{brand}/events`:
+
+```json
+{"type": "track", "userId": "u_123", "event": "Order Completed", "messageId": "order-ch_1042",
+ "properties": {"order_id": "ch_1042", "revenue": 49.00, "currency": "USD"}}
+```
+
+The same payment as a transaction, counted once with the event above:
+
+```json
+{"kind": "payment", "amount_minor": 4900, "currency": "USD", "source_id": "ch_1042", "user_id": "u_123"}
+```
+
+Send every payment that brings money in. Topping up a prepaid balance is a payment; spending that balance on a plan is not, or the same money would count twice.
 
 ## Currencies
 

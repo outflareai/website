@@ -9,6 +9,18 @@ sidebar:
 
 Outflare reads the analytics tools already on your website, so a person, a script or an agent can ask "how is the site doing?" without caring which tool answers. Every provider answers the same five reports in the same shape. Outflare only reads: nothing changes at the provider. A sync stores each tool's daily numbers, so you can look back months, line one website up across tools and compare them without calling the providers again. **Nothing else in Outflare needs analytics connected.** For domain rating, backlinks and keyword rankings, see [SEO](/docs/integrations/seo/); its figures join the same websites by domain. Agents should start with [Analytics for agents](/docs/agents/analytics/): one call says what changed on each website.
 
+## Outflare's own tracking
+
+If your site has Outflare's [website tracking](/docs/guides/website-tracking/) tag, **Analytics → Website analytics** shows its numbers before you connect any tool. You get visitors, visits, page views, bounce rate and average visit length, one point per day. It also lists the top pages, sources, websites, countries and devices. The numbers are counted live from your own visits, so today counts too. They sit above any connected tool, so you can compare them with GA4 or PostHog. Bots and crawlers are left out. A visitor who doesn't allow cookies counts once per visit.
+
+```sh
+# The last 28 days, or any range up to a year
+curl -H "Authorization: Bearer $OUTFLARE_TOKEN" \
+  "https://app.outflare.ai/v1/brands/$BRAND/analytics/tracking?from=2026-10-01&to=2026-10-31"
+```
+
+Agents use `get_site_analytics`.
+
 ## Connect
 
 Open **Connectors** and pick the **Analytics** category, or go straight to **Analytics → Website analytics** and click **Choose a tool**. Google tools connect with a read-only Google sign-in, and one sign-in connects both Google Analytics and Search Console. They also take a service account key. PostHog and Cloudflare offer a sign-in or a key, and you choose. The rest take an API key. An agent can ask for a connection with `request_connection`: you get a one-time link to paste the key into or sign in from, so the key never passes through the chat.

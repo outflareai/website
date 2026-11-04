@@ -8,11 +8,13 @@
 //   PUBLIC_POSTHOG_KEY     PostHog project key, cookieless on this site, sent
 //   PUBLIC_POSTHOG_REGION  through /ingest (functions/ingest) on our own domain.
 // Cloudflare Web Analytics needs no code: Pages injects it when it is enabled.
-// Outflare's own website tracking (app.outflare.ai/site.js) comes first, as
-// its setup asks, with the key copied exactly from our workspace's Website
-// tracking settings. The key is public by design. It loads with the IDs above,
-// so forks and local builds send nothing to it either. Its consent mode is the
-// default (auto): no cookie in Europe, the UK or with Global Privacy Control.
+// Outflare's own website tracking comes first, as its setup asks, served
+// through our own domain at /ofx/ (functions/ofx forwards it to
+// app.outflare.ai, so Safari keeps the visitor cookie past seven days), with
+// the key copied exactly from our workspace's Website tracking settings. The key is public by design. It loads with the IDs above,
+// so forks and local builds send nothing to it either. Consent is granted for
+// everyone (the owner's choice): the visitor cookie is set in every region,
+// and the privacy page says how to opt out.
 //
 // Every click on a sign-up, sign-in, GitHub or contact link (or element with data-track) and
 // every script error is an event, sent to both (track below). AGENTS.md has
@@ -27,7 +29,7 @@ const phKey = /^phc_[A-Za-z0-9_-]{10,80}$/.test(posthogKey) ? posthogKey : '';
 ---
 
 {(gtmId || phKey) && (
-	<script async src="https://app.outflare.ai/site.js" data-key="ofk_8lJEvAQToOsRy0K4j8ncItMM93_Es__S" is:inline></script>
+	<script async src="/ofx/site.js" data-key="ofk_8lJEvAQToOsRy0K4j8ncItMM93_Es__S" data-consent="granted" is:inline></script>
 )}
 
 {gtmId && (
