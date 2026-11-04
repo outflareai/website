@@ -7,7 +7,7 @@ sidebar:
 
 <span class="pill shipped">Shipped</span> In the web app, the REST API and the MCP server.
 
-A **dashboard** is one page of your saved [funnels](/docs/guides/funnels/) and [trends](/docs/guides/trends/), all run over the same dates. Build one per question: the weekly numbers, a launch, a channel.
+A **dashboard** is one page of your saved [funnels](/docs/guides/funnels/), [trends](/docs/guides/trends/), [retention](/docs/guides/retention/) and [paths](/docs/guides/paths/) questions, all run over the same dates. Build one per question: the weekly numbers, a launch, a channel.
 
 In the app, open **Analytics** in the sidebar, then **Dashboards**. Type a name and press **Create** to start one.
 

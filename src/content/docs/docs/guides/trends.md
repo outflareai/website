@@ -33,6 +33,10 @@ Filter any series the same way as a funnel step: by the visit's network, channel
 
 Hover any point for its value. Save a trend for everyone in the brand with a name; a saved trend keeps only its series and settings, so every view counts again and it is never out of date. Saved trends can go on a [dashboard](/docs/guides/dashboards/).
 
+## Notes on the chart
+
+Under the chart, **Notes on these dates** lists what happened when: a launch, a campaign, an outage, a price change. **Add a note** marks a day; it shows as a marker on every chart of the brand and in the hover, so a jump or a dip has its reason beside it. Owners, admins and operators add and remove notes (`analytics.manage`); everyone sees them.
+
 ## Alert on a number
 
 Under a saved trend, **Alert on this number** sets a line: when the number **goes above** or **below** a value, or **rises** or **falls by more than** a percentage against the period before. The number is the formula's total, else the first series', over the trend's own dates; it is checked every hour, and an alert is raised once when it crosses the line, and again only after it came back. Alerts reach the app, email, Slack and webhooks like every other [alert](/docs/guides/alerts/) (kind `insight.threshold`), to whoever set it up.
@@ -43,4 +47,4 @@ Everyone in the workspace can run trends (`analytics.read`). Owners, admins and 
 
 ## For agents and scripts
 
-The REST API is `POST /v1/brands/{brand}/insights/trend` to run a trend and `/v1/brands/{brand}/insights` for saved funnels and trends. See the [API reference](/docs/api/). Alerts on a number are `/v1/brands/{brand}/insight-alerts`. The MCP tools are `run_trend`, `list_insights`, `get_insight`, `save_insight`, `update_insight`, `delete_insight`, `create_insight_alert`, `list_insight_alerts` and `delete_insight_alert`. Ask your agent something like *"Plot visits, sign-ups and ad spend by week for the last 90 days, and the cost per sign-up."*
+The REST API is `POST /v1/brands/{brand}/insights/trend` to run a trend and `/v1/brands/{brand}/insights` for saved funnels and trends. See the [API reference](/docs/api/). Alerts on a number are `/v1/brands/{brand}/insight-alerts`; notes are `/v1/brands/{brand}/annotations`. The MCP tools are `run_trend`, `list_insights`, `get_insight`, `save_insight`, `update_insight`, `delete_insight`, `create_insight_alert`, `list_insight_alerts`, `delete_insight_alert`, `list_annotations`, `create_annotation` and `delete_annotation`. Ask your agent something like *"Plot visits, sign-ups and ad spend by week for the last 90 days, and the cost per sign-up."*
