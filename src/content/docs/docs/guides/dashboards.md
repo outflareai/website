@@ -13,7 +13,7 @@ In the app, open **Analytics** in the sidebar, then **Dashboards**. Type a name 
 
 ## Tiles
 
-**Add tile** puts a saved funnel or trend on the dashboard, or a note (a few lines of text, for what the page is for or what to look at first). A funnel tile takes the full width; a trend tile half of it. A trend saved as a number shows its totals, with the change on the period before.
+**Add tile** puts a saved funnel, trend, retention, paths or lifecycle question on the dashboard, or a note (a few lines of text, for what the page is for or what to look at first). A funnel tile takes the full width; the others half of it. A trend saved as a number shows its totals, with the change on the period before. A trend tile carries the brand's [notes on these dates](/docs/guides/trends/) as markers, so a jump or a dip on the dashboard has its reason beside it; a dashboard shared by link shows the numbers without the notes.
 
 Every tile runs its insight again when you open the page, with the dashboard's dates in place of its own, so nothing on a dashboard is ever out of date. Choose the dates at the top: a moving range such as the last 30 days, fixed dates, or **each tile's own dates** to let every insight keep what it was saved with. **Settings** renames the dashboard, sets its description and turns on **against the period before** for every trend.
 
