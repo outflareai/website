@@ -2,7 +2,7 @@
 	"version": "2026.11.04",
 	"date": "2026-11-04",
 	"status": "in-progress",
-	"updated": "2026-11-04T07:44:47Z",
+	"updated": "2026-11-04T08:10:55Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -10,7 +10,14 @@
 			"edition": "open-source",
 			"text": "A GitHub Action for sites kept in a repository: it opens a pull request for each page approved in Outflare and reports the page live once merged, from your own repository and token.",
 			"at": "2026-11-04T07:44:47Z"
+		},
+		{
+			"kind": "fix",
+			"area": "social",
+			"edition": "open-source",
+			"text": "Find links waits long enough for a brand website behind a bot check: the second read runs as a Geonode job for up to a few minutes, and a read that still doesn't get through is shown as blocked or too slow instead of a Geonode outage.",
+			"at": "2026-11-04T08:10:55Z"
 		}
 	],
-	"through": "d6f012b+eae7073"
+	"through": "e3b5c29+d2fdb7b"
 }
