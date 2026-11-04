@@ -83,7 +83,9 @@ or with nginx:
 location /ofx/ { proxy_pass https://app.outflare.ai/; proxy_set_header Host app.outflare.ai; proxy_ssl_server_name on; }
 ```
 
-Cloudflare Workers, Vercel and Netlify rewrites work the same way.
+Cloudflare Workers, Vercel and Netlify rewrites work the same way. In the app, **Website tracking** has the steps for each, ready to copy with your key: choose **Set up own domain** under your script.
+
+The same place tells you whether it works, from the last 7 days of visits: how many came through your own domain, and how many came from Safari or an iPhone or iPad straight to Outflare (visitors those browsers forget after 7 days). The status is **working** once nearly all visits come through your domain. A subdomain pointed at Outflare doesn't count: Safari still keeps its cookies for only 7 days, because the server answering isn't yours.
 
 ### Keep the visitor's address
 
