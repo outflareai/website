@@ -2,7 +2,7 @@
 	"version": "2026.11.04",
 	"date": "2026-11-04",
 	"status": "in-progress",
-	"updated": "2026-11-04T22:01:27Z",
+	"updated": "2026-11-04T22:14:11Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -388,7 +388,21 @@
 			"edition": "open-source",
 			"text": "Competitors is now its own menu. Overview ranks your brand against every competitor you track with a score out of 100, shows where you lead or trail and whether you're gaining share, and says when you pass the one ahead. Each competitor has its own page.",
 			"at": "2026-11-04T22:01:27Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Flags, conversion definitions and attribution models are found by key within their brand, and an ad conversion rule uses its ad account's brand's conversion definitions. Visitor, ad and attribution settings are read for the brand, ready for each brand to have its own.",
+			"at": "2026-11-04T22:14:11Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Each brand has its own conversion definitions and attribution models. Attribution credits a brand's conversions with its own definitions, models and visits only, and a refund only nets against a payment in the same brand. Conversion definitions and attribution models have brand routes; the workspace routes are deprecated.",
+			"at": "2026-11-04T22:14:11Z"
 		}
 	],
-	"through": "143bf0a+6f9b2d0"
+	"through": "43371d0+14217f3"
 }
