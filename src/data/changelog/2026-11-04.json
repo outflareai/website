@@ -2,7 +2,7 @@
 	"version": "2026.11.04",
 	"date": "2026-11-04",
 	"status": "in-progress",
-	"updated": "2026-11-04T22:14:11Z",
+	"updated": "2026-11-04T22:44:04Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -402,7 +402,14 @@
 			"edition": "open-source",
 			"text": "Each brand has its own conversion definitions and attribution models. Attribution credits a brand's conversions with its own definitions, models and visits only, and a refund only nets against a payment in the same brand. Conversion definitions and attribution models have brand routes; the workspace routes are deprecated.",
 			"at": "2026-11-04T22:14:11Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Partner flows now say which sales they pay on, such as \"10% on the first sale, within 1 year of sign-up\", instead of \"on every sale\" when their conditions narrow it.",
+			"at": "2026-11-04T22:44:04Z"
 		}
 	],
-	"through": "43371d0+14217f3"
+	"through": "8ef9a6d+7f94cff"
 }
