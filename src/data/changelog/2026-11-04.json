@@ -2,7 +2,7 @@
 	"version": "2026.11.04",
 	"date": "2026-11-04",
 	"status": "in-progress",
-	"updated": "2026-11-04T14:03:38Z",
+	"updated": "2026-11-04T14:10:17Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -108,7 +108,14 @@
 			"edition": "open-source",
 			"text": "Paid ads suggests changes to your campaigns: raise or lower a daily budget, pause a campaign that spends without converting, or resume one that did well, each with why. Nothing changes until you approve it; approved changes are measured long enough to judge and marked Worked, Didn't work or Not sure.",
 			"at": "2026-11-04T13:48:23Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Conversions sent from both the website and your server count once even when the two copies don't share a `messageId`: they are matched on the event name, the person and the time (within 15 minutes), and the server's copy is sent. Paid ads → Tracking health warns when this happens, with the one-line fix.",
+			"at": "2026-11-04T14:10:17Z"
 		}
 	],
-	"through": "5c8cbbf+217f8de"
+	"through": "14ded84+c949029"
 }
