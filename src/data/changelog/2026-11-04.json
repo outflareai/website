@@ -2,7 +2,7 @@
 	"version": "2026.11.04",
 	"date": "2026-11-04",
 	"status": "in-progress",
-	"updated": "2026-11-04T08:42:32Z",
+	"updated": "2026-11-04T08:55:01Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -38,7 +38,14 @@
 			"edition": "open-source",
 			"text": "Opt-out syncing with EmailBison, Instantly and Smartlead keeps going when reading their blocklist fails: your opt-outs still go out, their list is read every 6 hours instead of every few minutes, and a failed try waits 30 minutes. Website tracking no longer answers with an error when a company lookup for a visitor fails.",
 			"at": "2026-11-04T08:42:32Z"
+		},
+		{
+			"kind": "fix",
+			"area": "general",
+			"edition": "open-source",
+			"text": "When the app can't reach Outflare (offline, a dropped connection), pages now say so instead of loading forever, and the SEO overview keeps checking back on a first SEO read. A brand's link search that fails because the page reader is out of credits or down now says which.",
+			"at": "2026-11-04T08:55:01Z"
 		}
 	],
-	"through": "5b38da4+7255b37"
+	"through": "3a567d0+100d1af"
 }
