@@ -77,8 +77,15 @@ server has a tool for each (`list_ad_accounts`, `list_ad_campaigns`,
 ## Sending conversions back
 
 A conversion rule sends one customer event (such as `signed_up` or
-`order_completed`, from the website snippet, the API or a connected tool) to one
+`payment.succeeded`, from the website snippet, the API or a connected tool) to one
 conversion on one ad account:
+
+For purchases, send **`payment.succeeded`**, valued at `amount_minor` (cents).
+Every payment becomes one, whether it arrives as a
+[transaction](/docs/guides/transactions/), an `Order Completed` event or from a
+billing connection, and a payment sent more than one way counts once
+([One payment, counted once](/docs/guides/transactions/#one-payment-counted-once)).
+A rule on `order_completed` sends only the payments that arrive as orders.
 
 | Platform | Where it goes | Matched on | Also needs |
 | --- | --- | --- | --- |
