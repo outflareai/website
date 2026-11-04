@@ -13,6 +13,7 @@ An alert says something needs a person now. Outflare raises one once for each th
 | --- | --- | --- |
 | Hot replies (`reply.hot`) | A reply is labelled interested, meeting booked or question, by the built-in rules, a person, or [your own AI model](/docs/guides/inbox/#ai-labelling-with-your-own-key) at 80% or more. A label waiting for review alerts once someone confirms it. | The person the reply is assigned to, else whoever made the sequence. |
 | Hot website visitors (`visitor.hot`) | A known person or company reaches your hot score on the website, at most once a week each ([website visitors](/docs/guides/website-visitors/)). | The owners and admins. |
+| A number crossed a line (`insight.threshold`) | A saved trend's number went over a line you set under [Trends](/docs/guides/trends/#alert-on-a-number), once per crossing. | Whoever set the alert up, else the owners and admins. |
 
 Each alert is:
 
