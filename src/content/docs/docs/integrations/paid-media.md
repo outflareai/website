@@ -107,6 +107,16 @@ How it works:
   Reddit's event id). On the website, `outflare.track()` returns it: pass it to
   the browser pixel as its event id (`fbq('track', 'Purchase', {}, {eventID:
   id})`) and the platform counts a conversion once when both send it.
+- **Sent from both the website and your server.** Give the event the same
+  message id on both sides: `outflare.track("Signed Up", {}, {messageId:
+  "signup-" + userId})` on the website, and `messageId: "signup-<userId>"` on
+  your server's event. Outflare sends it once, and prefers the server's copy,
+  since it names the person: the website's copy waits 15 minutes for it.
+- **If the ids don't match** (the website call left out `messageId`), the two
+  copies are still matched: the same event for the same person, or the same
+  browser, within 15 minutes is one conversion, and the server's copy is the
+  one sent. **Tracking health** on the Paid ads page then warns that the website
+  and the server send that event without a shared id, with the fix.
 - The value comes from an event property (in major units, 12.50, or minor units,
   1250) or a fixed value; the currency from the rule, the event's `currency`
   property or the account's.
