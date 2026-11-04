@@ -2,7 +2,7 @@
 	"version": "2026.11.04",
 	"date": "2026-11-04",
 	"status": "in-progress",
-	"updated": "2026-11-04T20:00:12Z",
+	"updated": "2026-11-04T20:40:20Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -297,7 +297,56 @@
 			"edition": "open-source",
 			"text": "Brands keep their tracking apart: exclusion groups and their holdouts, holdout reports, ad conversion rules and the conversions sent to ad networks now show and count only the selected brand's data.",
 			"at": "2026-11-04T20:00:12Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Competitors are one list per brand with no limit. New ones are suggested every day, from your SEO connection and from sites ranking beside you, and you say yes or no with one click. Competitors you add in AI visibility join the list.",
+			"at": "2026-11-04T20:40:20Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "Missions leaves the sidebar now that agent runs replaced it; old links still open its history. The Agents page has a slot for a brand's own agent, which opens first where the server provides one, and G then A opens Agents.",
+			"at": "2026-11-04T20:40:20Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "Agents cost much less on Claude: each step of a turn now reads the conversation so far from Anthropic's prompt cache, at a tenth of the price, instead of paying full price for it again.",
+			"at": "2026-11-04T20:40:20Z"
+		},
+		{
+			"kind": "fix",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "An API token kept to one brand, such as a brand's agent, can now read the link building settings and the brand's SEO connections instead of being refused.",
+			"at": "2026-11-04T20:40:20Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Partner programs read the events and payments you already send: a sign-up or an event a reward rule names credits the partner, sales come from transactions, and the partner API counts the same customer once.",
+			"at": "2026-11-04T20:40:20Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "A brand's partner program can take its sales from the payments you already send Outflare (the transactions API or Order Completed events): turn on \"Also take this brand's payments and refunds sent to Outflare\" in the program's settings, and each payment credits the partner once, with no extra call from your backend.",
+			"at": "2026-11-04T20:40:20Z"
+		},
+		{
+			"kind": "fix",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "The Tolt import now brings over flows with a \"Lead date\" condition, such as \"first year after sign-up\", and reads condition operators however Tolt words them, instead of skipping those flows.",
+			"at": "2026-11-04T20:40:20Z"
 		}
 	],
-	"through": "28a7dce+23cc456"
+	"through": "1851b3d+c7a457a"
 }
