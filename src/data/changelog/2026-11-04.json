@@ -2,7 +2,7 @@
 	"version": "2026.11.04",
 	"date": "2026-11-04",
 	"status": "in-progress",
-	"updated": "2026-11-04T15:09:32Z",
+	"updated": "2026-11-04T15:17:28Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -171,7 +171,28 @@
 			"edition": "open-source",
 			"text": "Inbox sync handles bursts of new mail on slow mail servers: it reads new messages a few at a time and keeps what it has read, so replies and bounces no longer arrive late when one sync runs out of time.",
 			"at": "2026-11-04T15:09:32Z"
+		},
+		{
+			"kind": "fix",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Tolt imports no longer stop over one object Outflare can't store, or over a Tolt page that fails: the object is listed under issues and the rest come over, a failing page is asked for again in smaller pieces, and the import waits longer between attempts while Tolt is down.",
+			"at": "2026-11-04T15:17:28Z"
+		},
+		{
+			"kind": "fix",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "Connected AI apps no longer get \"the MCP server is starting\" errors during updates and restarts, and leads or unsubscribes that weren't linked to their person records because of an update are now linked.",
+			"at": "2026-11-04T15:17:28Z"
+		},
+		{
+			"kind": "fix",
+			"area": "self-hosting",
+			"edition": "open-source",
+			"text": "The database no longer grows with every tracked website visit: finished background work that runs once per batch of events is now cleaned up after 14 days like other finished work, and the events workspace keeps successful API and MCP calls once an hour per person instead of every one.",
+			"at": "2026-11-04T15:17:28Z"
 		}
 	],
-	"through": "e8a07e2+004d2c9"
+	"through": "f9b0316+64094e7"
 }
