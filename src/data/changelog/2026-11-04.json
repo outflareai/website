@@ -2,7 +2,7 @@
 	"version": "2026.11.04",
 	"date": "2026-11-04",
 	"status": "in-progress",
-	"updated": "2026-11-04T14:18:09Z",
+	"updated": "2026-11-04T14:26:29Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -115,7 +115,42 @@
 			"edition": "open-source",
 			"text": "Conversions sent from both the website and your server count once even when the two copies don't share a `messageId`: they are matched on the event name, the person and the time (within 15 minutes), and the server's copy is sent. Paid ads → Tracking health warns when this happens, with the one-line fix.",
 			"at": "2026-11-04T14:10:17Z"
+		},
+		{
+			"kind": "fix",
+			"area": "lifecycle",
+			"edition": "open-source",
+			"text": "Journeys, rules and lifecycle stages react to an event only when the event's own brand has approved its name. Approving a name in one brand no longer lets it drive automations in another.",
+			"at": "2026-11-04T14:26:29Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "self-hosting",
+			"edition": "open-source",
+			"text": "Your own server's events can be kept under one brand of your events workspace, the one whose website tag is on your site, so each person who uses Outflare joins the visits they made before signing in, even if they signed in long ago.",
+			"at": "2026-11-04T14:26:29Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Outflare tracking on Website analytics now shows which website each page is on, with a picker to see one website (such as your app's subdomain) on its own. Visitors opens on Everyone, so anonymous visitors show first.",
+			"at": "2026-11-04T14:26:29Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "On Google search campaigns, Paid ads suggests keywords to add (searches that convert), negative keywords (searches that cost money and never convert), and keywords worth an ad group of their own, and shows Google Ads' own recommendations for an account. Each waits for your approval and is measured like other suggestions.",
+			"at": "2026-11-04T14:26:29Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Funnels: follow people from an ad click or website visit through product events and conversions to a first payment, with a time limit on any step, and see where they drop off, broken down by campaign or source, over time, and the people behind every step. Save funnels for the team, and agents can run them too.",
+			"at": "2026-11-04T14:26:29Z"
 		}
 	],
-	"through": "14ded84+c6e3d54"
+	"through": "c5903c1+1701b7b"
 }
