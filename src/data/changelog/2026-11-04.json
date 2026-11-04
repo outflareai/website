@@ -2,7 +2,7 @@
 	"version": "2026.11.04",
 	"date": "2026-11-04",
 	"status": "in-progress",
-	"updated": "2026-11-04T08:27:04Z",
+	"updated": "2026-11-04T08:42:32Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -24,7 +24,21 @@
 			"edition": "open-source",
 			"text": "Browser tasks that can't start the browser now stop within their time limit with a clear error, instead of waiting for good and holding a browser worker.",
 			"at": "2026-11-04T08:27:04Z"
+		},
+		{
+			"kind": "fix",
+			"area": "inbox",
+			"edition": "open-source",
+			"text": "A mailbox whose mail server keeps refusing its sign-in now asks you to connect it again after 5 failed syncs in a row, instead of failing quietly every two minutes. A mailbox that keeps failing is tried less often, and a server that is only busy no longer counts against it.",
+			"at": "2026-11-04T08:42:32Z"
+		},
+		{
+			"kind": "fix",
+			"area": "deliverability",
+			"edition": "open-source",
+			"text": "Opt-out syncing with EmailBison, Instantly and Smartlead keeps going when reading their blocklist fails: your opt-outs still go out, their list is read every 6 hours instead of every few minutes, and a failed try waits 30 minutes. Website tracking no longer answers with an error when a company lookup for a visitor fails.",
+			"at": "2026-11-04T08:42:32Z"
 		}
 	],
-	"through": "d85e64d+03d4f56"
+	"through": "5b38da4+7255b37"
 }
