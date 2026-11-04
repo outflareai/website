@@ -10636,7 +10636,7 @@ paths:
         - { name: connector, in: query, description: "One network, such as google_ads.", schema: { type: string } }
         - { name: account_id, in: query, schema: { type: string, format: uuid } }
         - { name: campaign_id, in: query, schema: { type: string, format: uuid } }
-        - { name: status, in: query, schema: { type: string, enum: [open, dismissed, expired, measuring, judged] } }
+        - { name: status, in: query, schema: { type: string, enum: [open, dismissed, expired, measuring, testing, judged] } }
         - { name: limit, in: query, description: "1 to 500. Default 100.", schema: { type: integer, minimum: 1, maximum: 500 } }
         - { $ref: "#/components/parameters/Fields" }
         - { $ref: "#/components/parameters/Brand" }
@@ -10681,9 +10681,22 @@ paths:
         agents change campaigns with pauseAdCampaign, resumeAdCampaign and
         updateAdCampaign, which follow their grants). Makes the change as
         those calls do (its change_id is in listAdChanges) and starts its
-        measuring window. 409 `not_active` when it isn't open, the campaign
-        is already that way, or a change of the kind is queued.
+        measuring window. With `{"test": true}`, a budget suggestion is
+        tested inside the network instead (createAdTest; the trial gets the
+        suggested budget), its status is testing and test_id names the
+        test, and it is judged when the test is kept or rolled back. 409
+        `not_active` when it isn't open, the campaign is already that way,
+        or a change of the kind is queued (or the campaign has a test).
       tags: [ads]
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                test: { type: boolean, description: "Test the change inside the network first (budget suggestions, on networks whose tests try a budget)." }
       responses:
         "202":
           description: The change is queued and the suggestion is measuring.
@@ -10712,6 +10725,140 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/AdSuggestion" }
         "202": { $ref: "#/components/responses/MissionHeld" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/ads/tests:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+    get:
+      operationId: listAdTests
+      x-outflare-access: { scope: analytics.read, brand_limited: true }
+      summary: Tests inside the ad networks, and how they did
+      description: |
+        Scope: analytics.read. Each test splits one campaign's traffic
+        (Google Ads experiments) or audience (Meta split tests) between the
+        campaign as it is (control) and a trial that tries a different
+        target cost per conversion (bidding, Google) or daily budget
+        (budget, Meta), on the same days. Outflare reads both arms after
+        each sync (result: control and trial with spend_micros,
+        conversions, clicks, impressions and days, z, through) and, once
+        the test has run and three more days have passed for late
+        conversions, gives a verdict: worked, did_not_work or not_sure
+        (bidding at 95% on conversions for the money; budget against the
+        target). A trial over twice the target three days running is
+        judged early. Judged first, then running, then ended.
+      tags: [ads]
+      parameters:
+        - { name: connector, in: query, description: "One network, such as google_ads.", schema: { type: string } }
+        - { name: account_id, in: query, schema: { type: string, format: uuid } }
+        - { name: campaign_id, in: query, schema: { type: string, format: uuid } }
+        - { name: status, in: query, schema: { type: string, enum: [starting, running, judged, ending, kept, rolled_back, failed] } }
+        - { name: limit, in: query, description: "1 to 500. Default 100.", schema: { type: integer, minimum: 1, maximum: 500 } }
+        - { $ref: "#/components/parameters/Fields" }
+        - { $ref: "#/components/parameters/Brand" }
+      responses:
+        "200":
+          description: The tests.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/AdTest" } }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createAdTest
+      x-outflare-access: { scope: ads.manage, brand_limited: true }
+      summary: Start a test inside the ad network
+      description: |
+        Scope: ads.manage, from a person's session (403 for an API token).
+        Starts tomorrow on the campaign's own account: a Google Ads custom
+        experiment on a search or display campaign whose trial bids to
+        target_cpa_micros (kind bidding), or a Meta split test against a
+        copy of the campaign with daily_budget_micros (kind budget; the ad
+        account must belong to a business). split_percent is the trial's
+        share (10 to 90, default 50). It runs long enough for about 30
+        conversions in the smaller arm after the trial settles, two to six
+        weeks (window_note). 409 `not_active` when the campaign isn't
+        running or already has a test; 422 `connector_invalid` when its
+        network can't run that kind of test.
+      tags: [ads]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [campaign_id, kind]
+              properties:
+                campaign_id: { type: string, format: uuid }
+                kind: { type: string, enum: [budget, bidding] }
+                daily_budget_micros: { type: integer, format: int64, minimum: 10000, description: "The trial's daily budget (budget)." }
+                target_cpa_micros: { type: integer, format: int64, minimum: 10000, description: "The cost per conversion the trial bids to (bidding)." }
+                split_percent: { type: integer, minimum: 10, maximum: 90, description: "The trial's share. Default 50." }
+                name: { type: string, maxLength: 200 }
+      responses:
+        "202":
+          description: The test is queued to start.
+          content:
+            application/json:
+              schema: { oneOf: [{ $ref: "#/components/schemas/AdTest" }, { $ref: "#/components/schemas/MissionHeld" }] }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "422": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/ads/tests/{id}/keep:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: keepAdTest
+      x-outflare-access: { scope: ads.manage, brand_limited: true }
+      summary: Keep a test's trial
+      description: |
+        Scope: ads.manage, from a person's session. Applies the trial's
+        change to the campaign (Google promotes the experiment; on Meta the
+        campaign gets the trial's budget and the copy is paused) and ends
+        the test. A suggestion it tested is judged with the test's verdict.
+        409 `not_active` unless it is running or judged.
+      tags: [ads]
+      responses:
+        "202":
+          description: The test is ending.
+          content:
+            application/json:
+              schema: { oneOf: [{ $ref: "#/components/schemas/AdTest" }, { $ref: "#/components/schemas/MissionHeld" }] }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/ads/tests/{id}/roll-back:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: rollBackAdTest
+      x-outflare-access: { scope: ads.manage, brand_limited: true }
+      summary: Roll a test back
+      description: |
+        Scope: ads.manage, from a person's session. Ends the test and
+        leaves the campaign as it was (Google ends the experiment; on Meta
+        the copy is paused). A suggestion it tested is judged with the
+        test's verdict. 409 `not_active` unless it is running or judged.
+      tags: [ads]
+      responses:
+        "202":
+          description: The test is ending.
+          content:
+            application/json:
+              schema: { oneOf: [{ $ref: "#/components/schemas/AdTest" }, { $ref: "#/components/schemas/MissionHeld" }] }
         "403": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
@@ -31665,9 +31812,8 @@ paths:
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Define a product event for a brand
       description: |
-        Scope: catalog.manage. Names are lowercase words joined by dots, such as product.activated. For now an event
-        name is defined in one brand of a workspace at a time: a name another brand defines is refused with 409
-        event_name_in_other_brand.
+        Scope: catalog.manage. Names are lowercase words joined by dots, such as product.activated. Each brand has
+        its own catalog, so another brand of the workspace can define the same name.
       tags: [catalog]
       requestBody:
         required: true
@@ -31726,8 +31872,8 @@ paths:
         Scope: customers.manage. Approves a track name for the brand, defining it when the brand has only held it,
         so its held events can be replayed (POST /v1/brands/{brand}/events/replay). It changes nothing else about the
         event: labels, properties and deprecating need catalog.manage (PATCH .../catalog/events/{event}). Approving
-        is part of fixing the brand's data, so customers.manage is enough. 409 event_name_in_other_brand when another
-        brand of the workspace defines the name.
+        is part of fixing the brand's data, so customers.manage is enough. Another brand defining the same name
+        changes nothing: each brand approves its own.
       tags: [catalog]
       responses:
         "200":
@@ -32859,6 +33005,214 @@ paths:
                   has_more: { type: boolean }
         "400": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/insights/trend:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    post:
+      operationId: runTrend
+      x-outflare-access: { scope: analytics.read, brand: true }
+      summary: Run a trend
+      description: |
+        Scope: analytics.read. One to six series over time from website visits, page views, product events, saved conversions,
+        payments and the ad networks' daily numbers (clicks, impressions, spend, conversions), each counted as rows, people,
+        a sum or an average, by day, week or month. Optional: a breakdown by a field of each series' rows, a formula between
+        series ("A / B" for cost per sign-up), and the period just before (compare). A number tile is a trend read by its totals.
+        Runs for at most 30 seconds (query_timeout).
+      tags: [insights]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/TrendSpec" }
+      responses:
+        "200":
+          description: The trend.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TrendResult" }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/insights/retention:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    post:
+      operationId: runRetention
+      x-outflare-access: { scope: analytics.read, brand: true }
+      summary: Run a retention question
+      description: |
+        Scope: analytics.read. Of the people who first did the start in each day, week or month of the dates (the cohort),
+        how many did the return in that period and each period after, as a triangle of cohorts and the average curve across
+        them. The return is the start again when left out, so "came back and visited" needs only a start. Runs for at most
+        30 seconds (query_timeout).
+      tags: [insights]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/RetentionSpec" }
+      responses:
+        "200":
+          description: The cohorts.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/RetentionResult" }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/dashboards:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    get:
+      operationId: listDashboards
+      x-outflare-access: { scope: analytics.read, brand: true }
+      summary: List dashboards
+      description: "Scope: analytics.read. The brand's dashboards, the latest changed first."
+      tags: [insights]
+      parameters:
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
+      responses:
+        "200":
+          description: Dashboards.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, next_cursor]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/Dashboard" } }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createDashboard
+      x-outflare-access: { scope: analytics.manage, brand: true }
+      summary: Create a dashboard
+      description: "Scope: analytics.manage. An empty dashboard; add tiles with its tiles endpoint. Audited as dashboard.created."
+      tags: [insights]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/DashboardInput" }
+      responses:
+        "201":
+          description: The dashboard.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DashboardDetail" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/dashboards/{dashboard}:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: dashboard, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getDashboard
+      x-outflare-access: { scope: analytics.read, brand: true }
+      summary: Get a dashboard
+      description: "Scope: analytics.read. The dashboard with its tiles, each with its saved insight (and spec) or note. Run each tile with the insight's run endpoint, with the dashboard's date range."
+      tags: [insights]
+      responses:
+        "200":
+          description: The dashboard.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DashboardDetail" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateDashboard
+      x-outflare-access: { scope: analytics.manage, brand: true }
+      summary: Change a dashboard
+      description: "Scope: analytics.manage. Renames it, changes its description or settings, or moves tiles (layout). Audited as dashboard.updated."
+      tags: [insights]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/DashboardInput" }
+      responses:
+        "200":
+          description: The dashboard.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DashboardDetail" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    delete:
+      operationId: deleteDashboard
+      x-outflare-access: { scope: analytics.manage, brand: true }
+      summary: Delete a dashboard
+      description: "Scope: analytics.manage. Deletes it and its tiles; the saved insights stay. Audited as dashboard.deleted."
+      tags: [insights]
+      responses:
+        "204": { description: Deleted. }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/dashboards/{dashboard}/tiles:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: dashboard, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: addDashboardTile
+      x-outflare-access: { scope: analytics.manage, brand: true }
+      summary: Add a tile
+      description: "Scope: analytics.manage. A saved insight of the brand (insight_id) or a note. Placed below everything unless x, y, w and h say where, on a 12-column grid."
+      tags: [insights]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/DashboardTileInput" }
+      responses:
+        "201":
+          description: The dashboard with the tile.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DashboardDetail" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/dashboards/{dashboard}/tiles/{tile}:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: dashboard, in: path, required: true, schema: { type: string, format: uuid } }
+      - { name: tile, in: path, required: true, schema: { type: string, format: uuid } }
+    patch:
+      operationId: updateDashboardTile
+      x-outflare-access: { scope: analytics.manage, brand: true }
+      summary: Change a tile
+      description: "Scope: analytics.manage. Moves or resizes a tile, or changes its note. A tile's insight can't change."
+      tags: [insights]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/DashboardTileInput" }
+      responses:
+        "200":
+          description: The dashboard.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DashboardDetail" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    delete:
+      operationId: removeDashboardTile
+      x-outflare-access: { scope: analytics.manage, brand: true }
+      summary: Remove a tile
+      description: "Scope: analytics.manage. Takes the tile off the dashboard; the saved insight stays."
+      tags: [insights]
+      responses:
+        "204": { description: Removed. }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/insights:
     parameters: [{ $ref: "#/components/parameters/BrandID" }]
     get:
@@ -32868,7 +33222,7 @@ paths:
       description: "Scope: analytics.read. The brand's saved insights, the latest changed first."
       tags: [insights]
       parameters:
-        - { name: kind, in: query, schema: { type: string, enum: [funnel] } }
+        - { name: kind, in: query, schema: { type: string, enum: [funnel, trend, retention] } }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
         - { $ref: "#/components/parameters/Cursor" }
         - { $ref: "#/components/parameters/Fields" }
@@ -32941,7 +33295,7 @@ paths:
               properties:
                 name: { type: string, minLength: 1, maxLength: 120 }
                 description: { type: string, maxLength: 1000 }
-                spec: { $ref: "#/components/schemas/FunnelSpec" }
+                spec: { $ref: "#/components/schemas/InsightSpec" }
       responses:
         "200":
           description: Changed.
@@ -55586,7 +55940,7 @@ components:
     AdSuggestion:
       type: object
       description: One change Outflare suggests for a campaign, and once approved, how it did.
-      required: [id, campaign_id, campaign_name, account_id, account_name, connector, currency, brand_id, kind, status, reason, evidence, proposed, change_id, decided_by, decided_at, measure_from, measure_until, window_note, verdict, verdict_note, result, judged_at, created_at, updated_at]
+      required: [id, campaign_id, campaign_name, account_id, account_name, connector, currency, brand_id, kind, status, reason, evidence, proposed, change_id, test_id, decided_by, decided_at, measure_from, measure_until, window_note, verdict, verdict_note, result, judged_at, created_at, updated_at]
       properties:
         id: { type: string, format: uuid }
         campaign_id: { type: string, format: uuid }
@@ -55597,11 +55951,12 @@ components:
         currency: { type: string }
         brand_id: { type: [string, "null"], format: uuid }
         kind: { type: string, enum: [budget_up, budget_down, pause, resume, keyword_add, negative_add, keyword_split] }
-        status: { type: string, enum: [open, dismissed, expired, measuring, judged], description: "open waits for a person; expired no longer held when the campaign was read again; measuring was approved and made." }
+        status: { type: string, enum: [open, dismissed, expired, measuring, testing, judged], description: "open waits for a person; expired no longer held when the campaign was read again; measuring was approved and made; testing was approved as a test inside the network." }
         reason: { type: string, description: Why, in a sentence. }
         evidence: { type: object, additionalProperties: true, description: "The numbers behind it: days, spend_micros, conversions, cost_per_conversion_micros, target_cost_per_conversion_micros, daily_budget_micros, days_budget_spent." }
         proposed: { type: object, additionalProperties: true, description: "What the change sets: status, or daily_budget_micros." }
         change_id: { type: [string, "null"], format: uuid, description: The change made on approval (listAdChanges). }
+        test_id: { type: [string, "null"], format: uuid, description: "The test it is tested by, when approved as a test (listAdTests)." }
         decided_by: { type: [string, "null"], format: uuid }
         decided_at: { type: [string, "null"], format: date-time }
         measure_from: { type: [string, "null"], format: date, description: The first day measured, after the learning period. }
@@ -55611,6 +55966,51 @@ components:
         verdict_note: { type: string }
         result: { type: object, additionalProperties: true, description: "before and after (spend_micros, conversions, days), and early when the window ended early." }
         judged_at: { type: [string, "null"], format: date-time }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    AdTestSettings:
+      type: object
+      description: What a test arm does.
+      properties:
+        daily_budget_micros: { type: integer, format: int64 }
+        target_cpa_micros: { type: integer, format: int64 }
+    AdTest:
+      type: object
+      description: A test inside an ad network on one campaign, and how it did.
+      required: [id, campaign_id, campaign_name, account_id, account_name, connector, currency, brand_id, suggestion_id, name, kind, status, split_percent, control, trial, platform_test_id, trial_campaign_id, starts_on, ends_on, measure_from, window_note, result, verdict, verdict_note, decision, error, created_by, decided_by, decided_at, checked_at, judged_at, ended_at, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        campaign_id: { type: string, format: uuid }
+        campaign_name: { type: string }
+        account_id: { type: string, format: uuid }
+        account_name: { type: string }
+        connector: { type: string }
+        currency: { type: string }
+        brand_id: { type: [string, "null"], format: uuid }
+        suggestion_id: { type: [string, "null"], format: uuid, description: The suggestion it tests, if any. }
+        name: { type: string }
+        kind: { type: string, enum: [budget, bidding] }
+        status: { type: string, enum: [starting, running, judged, ending, kept, rolled_back, failed], description: "starting until the network has made it; judged waits for a person to keep it or roll it back; failed when the network refused it (error says why)." }
+        split_percent: { type: integer, description: The trial's share of the traffic or audience. }
+        control: { $ref: "#/components/schemas/AdTestSettings" }
+        trial: { $ref: "#/components/schemas/AdTestSettings" }
+        platform_test_id: { type: [string, "null"], description: "The network's id for it (a Google Ads experiment's resource name, a Meta ad study id)." }
+        trial_campaign_id: { type: [string, "null"], description: The network's id of the campaign serving the trial. }
+        starts_on: { type: string, format: date }
+        ends_on: { type: string, format: date }
+        measure_from: { type: string, format: date, description: The first day compared, after the trial settled. }
+        window_note: { type: string }
+        result: { type: object, additionalProperties: true, description: "control and trial (spend_micros, conversions, clicks, impressions, days), z (how many standard errors the trial's conversions for its money are from the campaign's), through, early, and verdict_so_far and note_so_far while it runs." }
+        verdict: { type: string, enum: ["", worked, did_not_work, not_sure] }
+        verdict_note: { type: string }
+        decision: { type: string, enum: ["", keep, roll_back] }
+        error: { type: [string, "null"] }
+        created_by: { type: [string, "null"], format: uuid }
+        decided_by: { type: [string, "null"], format: uuid }
+        decided_at: { type: [string, "null"], format: date-time }
+        checked_at: { type: [string, "null"], format: date-time }
+        judged_at: { type: [string, "null"], format: date-time }
+        ended_at: { type: [string, "null"], format: date-time }
         created_at: { type: string, format: date-time }
         updated_at: { type: string, format: date-time }
     AdRecommendation:
@@ -57242,7 +57642,7 @@ components:
           type: [string, "null"]
           description: >-
             Why the last read failed, in a word: blocked (the site showed a bot check, also in a browser),
-            slow_page (the page took longer than the page reader allows), page_not_found (check the address in the brand's links), not_a_review_page (the site answered but
+            slow_page (the page took longer than the page reader allows), page_failed (the site failed or turned the page reader away in another way), page_not_found (check the address in the brand's links), not_a_review_page (the site answered but
             showed no reviews; Outflare looks into these), save_failed (Outflare's side), or the page reader's own
             (connector_auth, connector_quota, connector_unavailable, connector_invalid). New codes may be added.
         failures:
@@ -57391,7 +57791,8 @@ components:
           type: [string, "null"]
           description: >-
             Why the last read failed, in a word: blocked (the site showed a bot check), slow_page (the page
-            took longer than the page reader allows), page_not_found,
+            took longer than the page reader allows), page_failed (the site failed or turned the page reader
+            away in another way), page_not_found,
             invalid_address (check the link), no_follower_count (the page showed no count: a login wall, a
             suspended account, or the site changed its page), save_failed (Outflare's side), or the connection's
             own (connector_auth, connector_quota, connector_unavailable, connector_invalid). New codes may be added.
@@ -62759,7 +63160,7 @@ components:
         times: { type: array, items: { type: string, format: date-time }, description: When they did each step they reached. }
     InsightsCatalog:
       type: object
-      required: [events, conversions, networks, fields, breakdowns, ops, date_presets]
+      required: [events, conversions, networks, fields, breakdowns, measures, ad_metrics, intervals, ops, date_presets]
       properties:
         events:
           type: array
@@ -62798,18 +63199,187 @@ components:
         breakdowns:
           type: object
           additionalProperties: { type: array, items: { type: string } }
+        measures: { type: array, items: { type: string }, description: Measures of an event, page, visit, conversion or payment series. }
+        ad_metrics: { type: array, items: { type: string }, description: Measures of an ad series. }
+        intervals: { type: array, items: { type: string }, description: Trend intervals. }
         ops: { type: array, items: { type: string } }
         date_presets: { type: array, items: { type: string } }
+    TrendSeries:
+      type: object
+      required: [kind]
+      additionalProperties: false
+      properties:
+        kind: { type: string, enum: [event, page, visit, conversion, payment, ad] }
+        event: { type: string, maxLength: 100, description: For an event series. }
+        conversion: { type: string, maxLength: 100, description: "For a conversion series: the conversion definition's key." }
+        filters: { type: array, maxItems: 10, items: { $ref: "#/components/schemas/InsightFilter" } }
+        first: { type: boolean, description: Only each person's first ever event or payment. }
+        measure: { type: string, enum: [count, people, sum, average, clicks, impressions, spend, conversions], description: "count (default), people, sum or average; for an ad series clicks (default), impressions, spend or conversions." }
+        property: { type: string, maxLength: 200, description: "What sum and average add up: amount for payments, a property for events." }
+        network: { type: string, description: "For an ad series: one ad network, or all when empty." }
+        campaign: { type: string, maxLength: 200, description: "For an ad series: only campaigns whose name contains this." }
+        label: { type: string, maxLength: 80 }
+    TrendSpec:
+      type: object
+      required: [series]
+      additionalProperties: false
+      properties:
+        series: { type: array, minItems: 1, maxItems: 6, items: { $ref: "#/components/schemas/TrendSeries" } }
+        date_range: { $ref: "#/components/schemas/InsightDateRange" }
+        interval: { type: string, enum: [day, week, month], description: "Default: day up to two months, week up to about seven, else month." }
+        breakdown: { type: string, maxLength: 200, description: "A field of each series' rows to split by; network or campaign for ad series." }
+        formula: { type: string, maxLength: 200, description: "A, B, C for the series, with + - * / and brackets, such as A / B." }
+        compare: { type: boolean, description: Adds the period just before. }
+        display: { type: string, enum: [line, bar, number, table], description: How the app draws it; the engine ignores it. }
+    TrendSeriesResult:
+      type: object
+      required: [label, total, points]
+      properties:
+        label: { type: string }
+        total: { type: [number, "null"], description: Over the whole range. }
+        points:
+          type: array
+          items:
+            type: object
+            required: [start, value]
+            properties:
+              start: { type: string, format: date-time }
+              value: { type: [number, "null"] }
+        currency: { type: string, description: "For money: brand for the brand's currency, an ad account's code, or mixed." }
+    TrendResult:
+      type: object
+      required: [series, formula, breakdown, from, to]
+      properties:
+        series: { type: array, items: { $ref: "#/components/schemas/TrendSeriesResult" } }
+        formula: { oneOf: [{ $ref: "#/components/schemas/TrendSeriesResult" }, { type: "null" }] }
+        breakdown:
+          type: array
+          description: Up to 25 values by the first series' total, then $other. Each group's series end with the formula when there is one.
+          items:
+            type: object
+            required: [value, series]
+            properties:
+              value: { type: string }
+              series: { type: array, items: { $ref: "#/components/schemas/TrendSeriesResult" } }
+        previous: { $ref: "#/components/schemas/TrendResult" }
+        from: { type: string, format: date-time }
+        to: { type: string, format: date-time }
+    InsightSpec:
+      description: A funnel's, a trend's or a retention question's spec, by the insight's kind.
+      oneOf:
+        - { $ref: "#/components/schemas/FunnelSpec" }
+        - { $ref: "#/components/schemas/TrendSpec" }
+        - { $ref: "#/components/schemas/RetentionSpec" }
+    RetentionSpec:
+      type: object
+      required: [start]
+      additionalProperties: false
+      properties:
+        start: { $ref: "#/components/schemas/FunnelStep", description: "What puts a person in a cohort, by the period of their first one in the dates. No time limit." }
+        return: { $ref: "#/components/schemas/FunnelStep", description: "What counts as coming back; the start again when left out." }
+        date_range: { $ref: "#/components/schemas/InsightDateRange" }
+        interval: { type: string, enum: [day, week, month], description: "The cohort and return period. Default: week." }
+        periods: { type: integer, minimum: 1, maximum: 24, description: "How many periods after the start to follow. Default: 14 days, 8 weeks or 6 months." }
+    RetentionResult:
+      type: object
+      required: [start_label, return_label, interval, periods, cohorts, average, from, to]
+      properties:
+        start_label: { type: string }
+        return_label: { type: string }
+        interval: { type: string, enum: [day, week, month] }
+        periods: { type: integer }
+        cohorts:
+          type: array
+          items:
+            type: object
+            required: [start, size, counts]
+            properties:
+              start: { type: string, format: date-time }
+              size: { type: integer, description: People whose first start fell in this period. }
+              counts: { type: array, items: { type: [integer, "null"] }, description: "How many came back in the start period (0), the next (1) and so on; null for a period that hasn't begun." }
+        average: { type: array, items: { type: [number, "null"] }, description: The share who came back in each period, over the cohorts whose period had begun. }
+        from: { type: string, format: date-time }
+        to: { type: string, format: date-time }
+    DashboardSettings:
+      type: object
+      additionalProperties: false
+      description: What every tile takes unless it pins its own.
+      properties:
+        date_range: { $ref: "#/components/schemas/InsightDateRange" }
+        compare: { type: boolean }
+    Dashboard:
+      type: object
+      required: [id, brand_id, name, description, settings, tiles, created_by, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        brand_id: { type: string, format: uuid }
+        name: { type: string }
+        description: { type: string }
+        settings: { $ref: "#/components/schemas/DashboardSettings" }
+        tiles: { type: integer, description: How many tiles it has. }
+        created_by: { type: [string, "null"], format: uuid }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    DashboardTile:
+      type: object
+      required: [id, insight_id, insight, note, x, y, w, h]
+      properties:
+        id: { type: string, format: uuid }
+        insight_id: { type: [string, "null"], format: uuid }
+        insight: { oneOf: [{ $ref: "#/components/schemas/Insight" }, { type: "null" }] }
+        note: { type: string, description: Markdown, for a note tile. }
+        x: { type: integer, minimum: 0, maximum: 11 }
+        y: { type: integer, minimum: 0 }
+        w: { type: integer, minimum: 1, maximum: 12 }
+        h: { type: integer, minimum: 1, maximum: 24 }
+    DashboardDetail:
+      allOf:
+        - { $ref: "#/components/schemas/Dashboard" }
+        - type: object
+          required: [tile_list]
+          properties:
+            tile_list: { type: array, items: { $ref: "#/components/schemas/DashboardTile" } }
+    DashboardInput:
+      type: object
+      additionalProperties: false
+      properties:
+        name: { type: string, minLength: 1, maxLength: 120 }
+        description: { type: string, maxLength: 1000 }
+        settings: { $ref: "#/components/schemas/DashboardSettings" }
+        layout:
+          type: array
+          maxItems: 200
+          description: Moves tiles, on a change only.
+          items:
+            type: object
+            required: [id]
+            additionalProperties: false
+            properties:
+              id: { type: string, format: uuid }
+              x: { type: integer, minimum: 0, maximum: 11 }
+              y: { type: integer, minimum: 0, maximum: 10000 }
+              w: { type: integer, minimum: 1, maximum: 12 }
+              h: { type: integer, minimum: 1, maximum: 24 }
+    DashboardTileInput:
+      type: object
+      additionalProperties: false
+      properties:
+        insight_id: { type: string, format: uuid, description: A saved insight of the brand. On a change, can't be set. }
+        note: { type: string, maxLength: 4000 }
+        x: { type: integer, minimum: 0, maximum: 11 }
+        y: { type: integer, minimum: 0, maximum: 10000 }
+        w: { type: integer, minimum: 1, maximum: 12 }
+        h: { type: integer, minimum: 1, maximum: 24 }
     Insight:
       type: object
       required: [id, brand_id, kind, name, description, spec, created_by, created_at, updated_at]
       properties:
         id: { type: string, format: uuid }
         brand_id: { type: string, format: uuid }
-        kind: { type: string, enum: [funnel] }
+        kind: { type: string, enum: [funnel, trend, retention] }
         name: { type: string }
         description: { type: string }
-        spec: { $ref: "#/components/schemas/FunnelSpec" }
+        spec: { $ref: "#/components/schemas/InsightSpec" }
         created_by: { type: [string, "null"], format: uuid }
         created_at: { type: string, format: date-time }
         updated_at: { type: string, format: date-time }
@@ -62818,10 +63388,10 @@ components:
       required: [name, spec]
       additionalProperties: false
       properties:
-        kind: { type: string, enum: [funnel], default: funnel }
+        kind: { type: string, enum: [funnel, trend, retention], default: funnel }
         name: { type: string, minLength: 1, maxLength: 120 }
         description: { type: string, maxLength: 1000 }
-        spec: { $ref: "#/components/schemas/FunnelSpec" }
+        spec: { $ref: "#/components/schemas/InsightSpec" }
     Transaction:
       type: object
       required: [id, brand_id, record_id, kind, status, amount_minor, currency, brand_amount_minor, brand_currency, product_id, source, source_id, refund_of, description, occurred_at, created_at, updated_at]
