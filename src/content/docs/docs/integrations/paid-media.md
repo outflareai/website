@@ -116,7 +116,16 @@ How it works:
   copies are still matched: the same event for the same person, or the same
   browser, within 15 minutes is one conversion, and the server's copy is the
   one sent. **Tracking health** on the Paid ads page then warns that the website
-  and the server send that event without a shared id, with the fix.
+  and the server send that event without a shared id, with the fix. An
+  order's two copies with the same `order_id` are one conversion however far
+  apart they arrive, with no warning.
+- **Refunds.** <a id="refunds"></a>When a payment whose conversion was sent is
+  refunded ([refunds](/docs/guides/transactions/#refunds-counted-once)),
+  Outflare changes that conversion in Google Ads: a partial refund lowers its
+  value to what is left, and a full refund removes it, so bidding learns from
+  the revenue you keep. Google can take a few hours to know a new conversion,
+  so a refused change is tried again for about a day. Other ad networks can't
+  change a conversion after taking it, so their refunds aren't sent.
 - The value comes from an event property (in major units, 12.50, or minor units,
   1250) or a fixed value; the currency from the rule, the event's `currency`
   property or the account's.
