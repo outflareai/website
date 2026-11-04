@@ -166,10 +166,18 @@ Choose a period and placement filters to inspect the mix, publisher concentratio
 
 Where website tracking and [attribution](/docs/guides/attribution/) are available, the recorded-outcomes panel shows publisher referral sessions, credited conversions and revenue by currency. It requires analytics permission and covers the brand's publisher websites; the placement filters above do not change that panel. Referrers and identity can be missing, and recorded attribution does not establish causal lift.
 
+### See momentum and share of voice
+
+The Overview answers whether your placements are increasing or decreasing, and how fast. Momentum compares placements gained and lost in the last 28 days with the 28 days before, and says whether you are accelerating, growing, slowing, flat or shrinking. Its weighted figure counts a placement that links to you, and one that has taken off, for more than a bare mention. Twelve weeks of gained and lost placements show the trend.
+
+Each live placement also gets a traction verdict every day: **Taking off** when AI answers cite it often or it sends many visits, **Steady** when it gets some, **Quiet** when it gets none, and **Too early** in its first two weeks. Citations come from your [AI visibility](/docs/guides/ai-visibility/) prompts and visits from your own website tracking, so traction stays unknown without them.
+
+Share of voice sets your live placements against the sites each tracked competitor appears on.
+
 Save an immutable snapshot for a weekly review or export the displayed report. Snapshots retain their original period and definitions. Privileged live finance and attribution panels are not included in the saved snapshot.
 
 ## API and agents
 
-The brand-scoped API starts at `/v1/brands/{brand}/coverage`. The TypeScript and Python SDKs expose the same operations, and MCP provides Presence tools for records, checks, discovery, reviews, reports and commercial extraction. The people and companies on a placement are the `parties` resource; remove one with `delete_coverage_parties`. Web searches are the `searches` resource, and `run_coverage_search` runs one now. Competitor scans are `/coverage/competitors` and `/coverage/competitor_placements`; `list_coverage_competitor_placements` with `gap` lists the sites to go after, and `scan_coverage_competitor` scans one now. Opportunities are `/coverage/opportunities`; `list_coverage_opportunities` gives agents the next outreach, highest leverage first.
+The brand-scoped API starts at `/v1/brands/{brand}/coverage`. The TypeScript and Python SDKs expose the same operations, and MCP provides Presence tools for records, checks, discovery, reviews, reports and commercial extraction. The people and companies on a placement are the `parties` resource; remove one with `delete_coverage_parties`. Web searches are the `searches` resource, and `run_coverage_search` runs one now. Competitor scans are `/coverage/competitors` and `/coverage/competitor_placements`; `list_coverage_competitor_placements` with `gap` lists the sites to go after, and `scan_coverage_competitor` scans one now. Opportunities are `/coverage/opportunities`; `list_coverage_opportunities` gives agents the next outreach, highest leverage first. Each placement carries `traction`, and the report from `get_coverage_reports` carries `momentum` and `share_of_voice`.
 
 Use `get_coverage_schema` to inspect available fields. Base records use `coverage.read` and `coverage.manage`; commercial data has separate finance scopes, and agreement approval requires `coverage.approve` and a human principal. Existing CRM, Knowledge and analytics access rules still apply.
