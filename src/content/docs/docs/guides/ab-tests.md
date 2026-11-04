@@ -1,6 +1,6 @@
 ---
 title: A/B tests
-description: Find out which version of a page wins. Pick a feature flag, say what counts as success, and Outflare shows how likely each version is to beat the original, by how much, and when it's safe to stop.
+description: Find out which version of a page wins. Pick a page (no code needed) or a feature flag, say what counts as success, and Outflare shows how likely each version is to beat the original, by how much, and when it's safe to stop.
 sidebar:
   order: 9.75
 ---
@@ -11,10 +11,24 @@ An A/B test asks a [feature flag](/docs/guides/feature-flags/) a question: which
 
 A/B tests compare versions shown to visitors. To compare groups of pages for search, use [SEO experiments](/docs/guides/seo-experiments/).
 
-## Set one up
+## Test a page, no code
+
+The quickest test needs nothing from a developer once the [tracking script](/docs/guides/website-tracking/) is on your site.
+
+1. In **Analytics → A/B tests**, choose **New test → Test a page**. Enter the page (end it with `*` for every page under it, such as `/blog/*`), how many new versions to compare with today's page (one to four), and the goal.
+2. **Edit the versions.** On the draft, choose **Edit visually** next to each version. Your page opens with an editor over it: click anything to change it ([what it can change](/docs/guides/feature-flags/#change-a-page-without-code)). Today's page, the control, stays as it is.
+3. **Preview, then start.** Check each version ([below](#preview-and-check-each-version)) and start the test.
+
+Outflare makes a flag for the test behind the scenes: off until the test starts, shown only on that page, split evenly between the control and the new versions. Developers see it under Feature flags like any other.
+
+**Split URL tests.** When the new versions are whole other pages, tick **The versions are other pages** and enter a page for each, such as `/pricing-b`. Visitors who land on the test's page are sent to their version's page, keeping the address's parameters, and count in the test as they're sent. Pages must be on the brand's own domains.
+
+**When the page changes.** If some of a version's changes no longer find their spot (the page was redesigned since), the test's checklist and its page say which version, page and parts to pick again in the editor.
+
+## Set one up from a flag
 
 1. Make a flag with two or more versions, such as `control` and `faster`, and show them on your pages: in code, in CSS, or with the [visual editor](/docs/guides/feature-flags/#change-a-page-without-code).
-2. In **Analytics → A/B tests**, choose **New test**, or choose **A/B test it** from the flag's menu in **Feature flags**. Pick:
+2. In **Analytics → A/B tests**, choose **New test → Use a feature flag**, or choose **A/B test it** from the flag's menu in **Feature flags**. Pick:
    - **The control.** The version the others are compared with, usually what visitors see today.
    - **Goals.** One to five. The first goal decides the winner; the rest are watched alongside it for learning. See [What a goal measures](#what-a-goal-measures).
    - **Guardrails**, if you like: things the winner mustn't make worse ([below](#guardrails)).
@@ -105,6 +119,8 @@ The **winner** is a version at least 95% likely to beat the control and safe to 
 
 **Breakdown** shows the first goal within groups of visitors: by device, by where they came from, by country, or new against returning. Use it to learn where a change works, such as on phones only. Every group is another chance of a lucky difference, so each one needs stronger proof than the whole test, and the winner is always decided on everyone.
 
+
+**In funnels and trends.** In [Funnels](/docs/guides/funnels/) and Trends, choose **Break down by → A/B test version** to see where each version wins or loses people across every step, or filter a trend to one version.
 ## Variance reduction
 
 Tests adjust for what each visitor did before they joined: how they did on the goal in the 28 days before they first saw a version. People who signed up or bought a lot before tend to do so again whatever version they see, and taking that predictable part out leaves the same expected lift with a tighter range and an earlier answer. How much sooner depends on how many of your visitors come back; a site of mostly first-time visitors gains little. The results say how much of the noise was taken out.
@@ -168,6 +184,8 @@ With your own AI model connected (Settings, AI model), Outflare can help at each
 The AI is told never to invent facts, numbers, testimonials or prices. Check generated copy before visitors see it. AI calls are billed to your own AI provider account and appear under AI usage as **A/B tests**.
 
 ## API and agents
+
+**Agents build, people decide.** An agent can make a no-code test and build its versions (`PUT .../ab-tests/{test}/versions/{version}`, MCP `set_ab_test_version`), with the same changes the editor makes, and check them with previews. Anything visitors would see waits for a person, whatever the agent is allowed to do: starting or shipping a test, turning a flag on, and changing a version while it's live. The agent's request is held, and a person approves it under **Actions**.
 
 Everything here is in the REST API, under `/v1/workspaces/{ws}/ab-tests`: creating and changing tests, the checklist, previews and checks, starting, freezing, ending, shipping and duplicating, results, breakdowns, every combination of a multivariate test, tests at the same time, the planner, learnings and AI help. Agents use the matching MCP tools, such as `create_ab_test`, `get_ab_test_checklist`, `start_ab_test`, `get_ab_test_results`, `get_ab_test_breakdown`, `get_ab_test_interactions`, `get_ab_test_factorial` and `ship_ab_test`. See the [API reference](/docs/api/).
 

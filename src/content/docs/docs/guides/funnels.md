@@ -41,7 +41,7 @@ Under the steps, **Leave out people who…** drops from the whole funnel everyon
 
 - Each bar shows the people who reached the step, the share of step 1 and of the step before, and the typical time it took. The striped part is who dropped off.
 - **Ad clicks** puts your ad network's own click count for the same dates in front of step 1. Ad networks report clicks as daily totals, not people, so this bar is for comparison; the people start at the visit the ad brought.
-- **Break down** splits every step by something about step 1, such as the campaign or the ad network, so you can compare campaigns side by side.
+- **Break down** splits every step by something about step 1, such as the campaign or the ad network, so you can compare campaigns side by side. Choose **A/B test version** to split people by the version of an [A/B test](/docs/guides/ab-tests/) they were first shown, and see where each version wins or loses people.
 - **Over time** shows the funnel by the day, week or month people entered.
 - Click any bar, or any count in the breakdown, to see the people behind it: who got there, or who dropped off before it, with when they did each step. Each one opens their profile.
 - In that list, **Save as a list** puts everyone there with a record into a new static [list](/docs/guides/smart-lists/), to mail, score or compare. Visitors not signed in have no record and are skipped; the list says how many. *Signed up, never paid* as a list is a sequence waiting to happen.
