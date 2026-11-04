@@ -19,6 +19,7 @@ Choose a [brand](/docs/guides/brands/), then open **Outreach → Presence**. Its
 | Publishers | Connect websites to CRM companies and review their placements and relationship context. |
 | Commercial | Manage agreements, deliverables, invoices, payments, rate cards, budgets and documents. |
 | Discovery | Review existing search and backlink discoveries before confirming placements. |
+| Opportunities | Work the places worth your team's effort, ranked by SEO and AI answers together. |
 | Competitors | See where your competitors appear and which of those sites you're not on yet. |
 | Reports | Review growth, retention, delivery and recorded referral outcomes; save report snapshots. |
 
@@ -84,6 +85,27 @@ Your top 10 competitors, by the keywords you share, are scanned weekly and the r
 
 Search results and links run on your workspace's own [DataForSEO, Geonode or Ahrefs connection](/docs/integrations/seo/), within that connection's budget. Until you connect one, the competitor says which connection each part needs, and nothing is spent. AI answers need no connection of their own.
 
+## Work the best opportunities first
+
+**Opportunities** lists the places worth your team's effort, with a score from 0 to 100. The score adds up:
+
+- **SEO:** the site's domain rating and traffic.
+- **AI answers:** how often answers to your brand's questions cite the site, from [AI visibility](/docs/guides/ai-visibility/).
+- **Competitors:** how many of your competitors are there.
+- **Page type:** comparisons, roundups, reviews, directories and listings score highest.
+- **Relationship:** a site that already wrote about you is the easiest win.
+
+Each opportunity says why it is there and what to do next:
+
+| Why | Next step |
+| --- | --- |
+| Competitors are here, you aren't | Pitch to be included |
+| AI answers cite it | Pitch to be included |
+| Names you without a link | Ask for a link |
+| Your link was removed | Win the link back |
+
+**Pick** one to take it on, **Dismiss** one that isn't worth it, or mark it **Won**. Opportunities update every day and after each competitor scan, and one is marked won by itself once your brand has a publisher on that site or the link is back. Picking an opportunity contacts nobody: reach out through the [outreach workflow](/docs/guides/sequences/) with its normal approval and sending checks.
+
 ## Check publication, links and accuracy
 
 Open a placement's **Content & links** tab to queue a page check and inspect its observations. Checks retain the page URL, time, available text sample, target links, anchor text and observed rel attributes such as `nofollow`, `sponsored` and `ugc`.
@@ -148,6 +170,6 @@ Save an immutable snapshot for a weekly review or export the displayed report. S
 
 ## API and agents
 
-The brand-scoped API starts at `/v1/brands/{brand}/coverage`. The TypeScript and Python SDKs expose the same operations, and MCP provides Presence tools for records, checks, discovery, reviews, reports and commercial extraction. The people and companies on a placement are the `parties` resource; remove one with `delete_coverage_parties`. Web searches are the `searches` resource, and `run_coverage_search` runs one now. Competitor scans are `/coverage/competitors` and `/coverage/competitor_placements`; `list_coverage_competitor_placements` with `gap` lists the sites to go after, and `scan_coverage_competitor` scans one now.
+The brand-scoped API starts at `/v1/brands/{brand}/coverage`. The TypeScript and Python SDKs expose the same operations, and MCP provides Presence tools for records, checks, discovery, reviews, reports and commercial extraction. The people and companies on a placement are the `parties` resource; remove one with `delete_coverage_parties`. Web searches are the `searches` resource, and `run_coverage_search` runs one now. Competitor scans are `/coverage/competitors` and `/coverage/competitor_placements`; `list_coverage_competitor_placements` with `gap` lists the sites to go after, and `scan_coverage_competitor` scans one now. Opportunities are `/coverage/opportunities`; `list_coverage_opportunities` gives agents the next outreach, highest leverage first.
 
 Use `get_coverage_schema` to inspect available fields. Base records use `coverage.read` and `coverage.manage`; commercial data has separate finance scopes, and agreement approval requires `coverage.approve` and a human principal. Existing CRM, Knowledge and analytics access rules still apply.
