@@ -2,7 +2,7 @@
 	"version": "2026.11.04",
 	"date": "2026-11-04",
 	"status": "in-progress",
-	"updated": "2026-11-04T08:10:55Z",
+	"updated": "2026-11-04T08:27:04Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -17,7 +17,14 @@
 			"edition": "open-source",
 			"text": "Find links waits long enough for a brand website behind a bot check: the second read runs as a Geonode job for up to a few minutes, and a read that still doesn't get through is shown as blocked or too slow instead of a Geonode outage.",
 			"at": "2026-11-04T08:10:55Z"
+		},
+		{
+			"kind": "fix",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "Browser tasks that can't start the browser now stop within their time limit with a clear error, instead of waiting for good and holding a browser worker.",
+			"at": "2026-11-04T08:27:04Z"
 		}
 	],
-	"through": "e3b5c29+d2fdb7b"
+	"through": "d85e64d+03d4f56"
 }
