@@ -77,13 +77,19 @@ A successful page load alone does not verify brand coverage: first verification 
 
 Native checks follow crawl restrictions. The explicit connected reader uses the workspace's Geonode connection and budget. Pausing monitoring also prevents an already queued scheduled check from fetching the placement.
 
+### Watch each placement over time
+
+Every page check also asks two questions, even when you set no target page or wording: does the page link to any of your brand's domains, and does it name your brand? The placement shows **Links to us** or **No link**, and **Mentions us** or **No mention**. When either one was there before and two checks in a row see the page without it, the placement shows **Link removed** or **Mention removed**, with the date. When two checks agree the page is gone, it shows **Offline since** that date. All of these clear when the link, the mention or the page comes back.
+
+A removed mention creates work in the queue, the same as a removed link. Turn either off under **Automations** with a rule. Finding your brand's name or a link to another of your pages doesn't count as first verification for a placement that expects specific wording or a specific target page.
+
 ### Review claims against Knowledge
 
 Publish current customer-facing pricing, features and product facts in **Knowledge**, and configure a [workspace AI model](/docs/agents/ai-models/). After a successful page check, select **Review accuracy**.
 
 The result shows the external quote beside the published Knowledge passage and version. Sentiment is separate from factual accuracy, and findings need human review. Historical statements and opinions should not be treated as incorrect current claims merely because they differ from today's positioning.
 
-Changed or withdrawn Knowledge invalidates old assessments. You can also enable **Monitor accuracy** on a placement for scheduled review, no more often than daily and no more frequently than its page checks. Unchanged page text and Knowledge versions reuse the existing successful analysis. Model calls use the workspace's connection and budget.
+Changed or withdrawn Knowledge invalidates old assessments. You can also enable **Monitor accuracy** on a placement for scheduled review, no more often than daily and no more frequently than its page checks. When your brand's published Knowledge changes, such as new pricing or a renamed product, placements with **Monitor accuracy** on are checked again within a day, so the brand facts on each page are compared with what is true now. Unchanged page text and Knowledge versions reuse the existing successful analysis. Model calls use the workspace's connection and budget.
 
 AI can also suggest a placement format or prepare an editable thank-you, link request, correction or follow-up. A thank-you and a link request are separate purposes.
 
