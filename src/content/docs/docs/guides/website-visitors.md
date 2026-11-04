@@ -27,6 +27,24 @@ The email-click token is safe to sit in a link:
 
 Turn it off with **Know people from email clicks** in the page's settings.
 
+- **Visitor links.** For messages you send yourself, such as your product's own emails, text messages, push notifications or a QR code, make a visitor link for the person (`POST /v1/brands/{brand}/visitors/links`, or the MCP tool `create_visitor_link`) with an address on your site and their `user_id`, `email` or `record_id`. The first browser that opens it joins the person, with its earlier visits. It works like an email click: one browser per link, a sign-in on that browser as someone else takes it back, and it lasts 30 days unless you set `expires_in_days` (up to 365). The token travels in the same `ofvisit` parameter, so your site needs nothing new.
+
+### Other devices
+
+A visitor is one browser, so the same person on a laptop and a phone is two visitors until something joins them. Outflare never guesses: it doesn't fingerprint devices or match people by their address. A browser joins the person when, on that browser, they:
+
+1. **Sign in.** Have your product send `identify` with the user's id and that browser's anonymous id on every sign-up and every sign-in, on every device. This matters most: a sign-in without the anonymous id never joins that browser's visits.
+2. **Click a link in email you sent from Outflare** (above).
+3. **Open a visitor link** you sent them yourself (above).
+
+## When a visitor becomes known
+
+When a browser joins a person, everything it did before (pages, events, visits and consent choices) moves onto their record, and their first and last touch are worked out again. Their timeline shows the moment as **Went from anonymous visitor to known**: when, how (signed in, clicked a link in your email, or opened a visitor link), on which device, when that browser was first seen, and how many visits and events from before joined them. If someone else later signs in on that browser, it goes back to them, and the timeline shows that too.
+
+## Everyone, and each visitor's journey
+
+**Everyone** lists every browser on your site, anonymous visitors included, most recent first, with the company a lookup named, country, device, page views and visits. Open one to see its profile: who it is once known, and its journey, visit by visit, with where each came from (channel, referrer, campaign) and its landing page. Open a visit for its pages and events in order. Each profile has its own address in the app, so you can share it with your team.
+
 ## Company lookups
 
 Visitors nobody knows yet can be matched to a company from their IP address, using your own data provider: [People Data Labs](https://www.peopledatalabs.com) (IP Enrichment) or [Snitcher](https://www.snitcher.com) (IP to Company). Connect one under **Settings → Connectors** with your own key. Outflare never looks anything up on its own account. Lookups are off until you turn on **Look up companies from visitors' addresses** in the page's settings.
@@ -84,4 +102,7 @@ Add your own company's domains under **Leave out these domains** so your team do
 - `POST /v1/workspaces/{ws}/visitors/companies` (`customers.manage`): add a looked-up company to your CRM.
 - `POST /v1/workspaces/{ws}/records/{record}/review` (`customers.manage`): approve or reject a person held for review. `GET .../records` lists held people only with `review=needs_review`.
 - People by name settings are `reveal_people` and `accept_people_notice`. Each connection's webhook address is in `people_connections`.
-- MCP tools: `list_website_visitors`, `get_visitor_settings`, `update_visitor_settings`, `add_visitor_company`, `review_record`.
+- `GET /v1/brands/{brand}/visitors/browsers` (`customers.read`): everyone, with `known` set to `true` or `false` to keep known or anonymous visitors, `days`, `limit` and `cursor`.
+- `GET /v1/brands/{brand}/visitors/browsers/{anonymous_id}` (`customers.read`): one visitor and their visits; `.../events` lists their pages and events, with `session` for one visit's.
+- `POST /v1/brands/{brand}/visitors/links` (`customers.manage`): make a visitor link.
+- MCP tools: `list_website_visitors`, `list_visitor_browsers`, `get_visitor_browser`, `list_visitor_browser_events`, `create_visitor_link`, `get_visitor_settings`, `update_visitor_settings`, `add_visitor_company`, `review_record`.
