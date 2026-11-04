@@ -2,7 +2,7 @@
 	"version": "2026.11.04",
 	"date": "2026-11-04",
 	"status": "in-progress",
-	"updated": "2026-11-04T14:48:04Z",
+	"updated": "2026-11-04T15:09:32Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -150,7 +150,28 @@
 			"edition": "open-source",
 			"text": "Funnels: follow people from an ad click or website visit through product events and conversions to a first payment, with a time limit on any step, and see where they drop off, broken down by campaign or source, over time, and the people behind every step. Save funnels for the team, and agents can run them too.",
 			"at": "2026-11-04T14:26:29Z"
+		},
+		{
+			"kind": "fix",
+			"area": "social",
+			"edition": "open-source",
+			"text": "Reviews: a review page Geonode can't read (the site fails, or puts it behind a login) now shows why on the page and is tried again later the same day, instead of being retried every hour as a Geonode outage or left for a day as a wrong address.",
+			"at": "2026-11-04T15:09:32Z"
+		},
+		{
+			"kind": "fix",
+			"area": "connectors",
+			"edition": "open-source",
+			"text": "One-click DNS approval: a DNS host that fails to answer once is asked again, and a domain whose DNS host doesn't support one-click approval now says so instead of showing a lookup error.",
+			"at": "2026-11-04T15:09:32Z"
+		},
+		{
+			"kind": "fix",
+			"area": "inbox",
+			"edition": "open-source",
+			"text": "Inbox sync handles bursts of new mail on slow mail servers: it reads new messages a few at a time and keeps what it has read, so replies and bounces no longer arrive late when one sync runs out of time.",
+			"at": "2026-11-04T15:09:32Z"
 		}
 	],
-	"through": "c5903c1+0f4432a"
+	"through": "e8a07e2+004d2c9"
 }
