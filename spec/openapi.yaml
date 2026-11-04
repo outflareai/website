@@ -10827,7 +10827,11 @@ paths:
       description: |
         Scope: ads.manage, from a person's session (403 for an API token:
         agents change campaigns with pauseAdCampaign, resumeAdCampaign and
-        updateAdCampaign, which follow their grants). Makes the change as
+        updateAdCampaign, which follow their grants). The one exception: on
+        a server whose extension lets a brand's savings apply on their own
+        (capability `ad_suggestions_auto`), an agent may approve a
+        suggestion that only spends less (`budget_down`, `pause`,
+        `negative_add`) on that brand's campaigns. Makes the change as
         those calls do (its change_id is in listAdChanges) and starts its
         measuring window. With `{"test": true}`, a budget or bidding_target
         suggestion is tested inside the network instead (createAdTest; the
@@ -11068,6 +11072,207 @@ paths:
                   - { $ref: "#/components/schemas/MissionHeld" }
         "403": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/ads/drafts:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+    get:
+      operationId: listAdDrafts
+      x-outflare-access: { scope: analytics.read, brand: true }
+      summary: New ads waiting for a person, and what became of them
+      description: |
+        Scope: analytics.read. The brand's drafts of new ads, those waiting
+        for a person first, then those being made or paused on the platform,
+        then live, failed and dismissed ones. account_id, campaign_id and
+        status narrow it.
+      tags: [ads]
+      parameters:
+        - { name: account_id, in: query, schema: { type: string, format: uuid } }
+        - { name: campaign_id, in: query, schema: { type: string, format: uuid } }
+        - { name: status, in: query, schema: { type: string, enum: [draft, creating, paused, going_live, live, failed, dismissed] } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
+      responses:
+        "200":
+          description: The drafts.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/AdDraft" } }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createAdDraft
+      x-outflare-access: { scope: ads.manage, brand: true }
+      summary: Write a new ad for a person to check
+      description: |
+        Scope: ads.manage. Writes a draft: a new ad in an ad group (ad set
+        on Meta), a new ad group with keywords and an ad in a campaign, or
+        a new search campaign with its daily budget, bidding, countries and
+        an ad group (Google Ads). It is checked against the platform's
+        rules (a Google search ad has 3 to 15 headlines of at most 30
+        characters and 2 to 4 descriptions of at most 90; a Meta ad has one
+        headline, its main text and an image) and waits for a person:
+        nothing is made on the platform until approveAdDraft. Writing one
+        spends nothing, so an agent writes it under its grant.
+      tags: [ads]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AdDraftInput" }
+      responses:
+        "201":
+          description: The draft, waiting for a person.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdDraft" }
+        "202":
+          description: "For an agent, a MissionHeld answer when the action layer held it for a person."
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/MissionHeld" }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "422": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/ads/drafts/{id}:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getAdDraft
+      x-outflare-access: { scope: analytics.read, brand: true }
+      summary: One draft of a new ad
+      description: "Scope: analytics.read."
+      tags: [ads]
+      responses:
+        "200":
+          description: The draft.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdDraft" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateAdDraft
+      x-outflare-access: { scope: ads.manage, brand: true }
+      summary: Rewrite a draft before it is approved
+      description: |
+        Scope: ads.manage. Replaces what the draft makes (its names, link,
+        text, keywords and, for a campaign, budget, bidding and countries),
+        checked as createAdDraft checks it, and its reason when one is
+        sent. Where it goes and its kind stay. Only a draft that waits for
+        a person changes.
+      tags: [ads]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - { $ref: "#/components/schemas/AdDraftContent" }
+                - type: object
+                  properties:
+                    reason: { type: string, maxLength: 2000 }
+      responses:
+        "200":
+          description: The draft.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdDraft" }
+        "202":
+          description: "For an agent, a MissionHeld answer when the action layer held it for a person."
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/MissionHeld" }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "422": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/ads/drafts/{id}/approve:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: approveAdDraft
+      x-outflare-access: { scope: ads.manage, brand: true }
+      summary: Make a new ad on the platform, paused
+      description: |
+        Scope: ads.manage; a person's session only. Makes the draft on the
+        workspace's own ad account, everything paused (on Google in one
+        batch, all or nothing), and answers 202 with the draft as creating.
+        It becomes paused once made, or failed with the platform's reason
+        (approve a failed draft again to retry). Check it on the platform,
+        then turn it on with goLiveAdDraft.
+      tags: [ads]
+      responses:
+        "202":
+          description: "The draft, being made. For an agent, a MissionHeld answer: a person approves it."
+          content:
+            application/json:
+              schema: { oneOf: [{ $ref: "#/components/schemas/AdDraft" }, { $ref: "#/components/schemas/MissionHeld" }] }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "422": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/ads/drafts/{id}/go-live:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: goLiveAdDraft
+      x-outflare-access: { scope: ads.manage, brand: true }
+      summary: Turn on a new ad made paused
+      description: |
+        Scope: ads.manage; a person's session only, since a live ad spends.
+        Turns on what the draft made (the ad, and the ad group and campaign
+        when it made them) and answers 202 with the draft as going_live; it
+        becomes live, or stays paused with the platform's reason.
+      tags: [ads]
+      responses:
+        "202":
+          description: "The draft, being turned on. For an agent, a MissionHeld answer: a person approves it."
+          content:
+            application/json:
+              schema: { oneOf: [{ $ref: "#/components/schemas/AdDraft" }, { $ref: "#/components/schemas/MissionHeld" }] }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/ads/drafts/{id}/dismiss:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: dismissAdDraft
+      x-outflare-access: { scope: ads.manage, brand: true }
+      summary: Leave a draft unmade
+      description: "Scope: ads.manage. Only a draft not yet made (waiting or failed); once made, pause or remove it on the platform."
+      tags: [ads]
+      responses:
+        "200":
+          description: The draft, dismissed.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdDraft" }
+        "202":
+          description: "For an agent, a MissionHeld answer when the action layer held it for a person."
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/MissionHeld" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/findings:
     parameters:
@@ -42187,6 +42392,7 @@ paths:
     get:
       operationId: getCoverageReports
       summary: getCoverageReports
+      description: The coverage report for a period. momentum compares placements gained and lost in the 28 days to `to` with the 28 before (weighted_net counts a link and traction too; trend is shrinking, flat, slowing, growing or accelerating) with twelve weeks of gained and lost; share_of_voice sets the brand's live placements against each tracked competitor's.
       tags:
       - coverage
       x-outflare-access:
@@ -44986,6 +45192,791 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CoverageDeliveryReportsUpdate'
+  /v1/brands/{brand}/coverage/parties:
+    parameters:
+    - name: brand
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: listCoverageParties
+      summary: List parties
+      tags:
+      - coverage
+      x-outflare-access:
+        scope: coverage.read
+        brand: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                - total
+                - next_cursor
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CoverageParties'
+                  total:
+                    type: integer
+                  next_cursor:
+                    $ref: '#/components/schemas/NextCursor'
+        default:
+          $ref: '#/components/responses/Error'
+      parameters:
+      - name: q
+        in: query
+        schema:
+          type: string
+      - name: status
+        in: query
+        schema:
+          type: string
+      - name: stage
+        in: query
+        schema:
+          type: string
+      - name: kind
+        in: query
+        schema:
+          type: string
+      - name: arrangement
+        in: query
+        schema:
+          type: string
+      - name: publisher_id
+        in: query
+        schema:
+          type: string
+      - name: placement_id
+        in: query
+        schema:
+          type: string
+      - name: agreement_id
+        in: query
+        schema:
+          type: string
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 0
+      - name: filters
+        in: query
+        description: 'JSON {mode: all|any, rules: [{field, op: eq|ne|contains|before|after|empty,
+          value}]} with at most 12 rules. Values are strings; dates use YYYY-MM-DD.'
+        schema:
+          type: string
+          maxLength: 8000
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Fields'
+    post:
+      operationId: createCoverageParties
+      summary: Create parties
+      tags:
+      - coverage
+      x-outflare-access:
+        scope: coverage.manage
+        brand: true
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoverageParties'
+        default:
+          $ref: '#/components/responses/Error'
+        '202':
+          $ref: '#/components/responses/MissionHeld'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CoveragePartiesInput'
+
+  /v1/brands/{brand}/coverage/parties/{id}:
+    parameters:
+    - name: brand
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getCoverageParties
+      summary: Get parties
+      tags:
+      - coverage
+      x-outflare-access:
+        scope: coverage.read
+        brand: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoverageParties'
+        default:
+          $ref: '#/components/responses/Error'
+    patch:
+      operationId: updateCoverageParties
+      summary: Update parties using its current version
+      tags:
+      - coverage
+      x-outflare-access:
+        scope: coverage.manage
+        brand: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoverageParties'
+        default:
+          $ref: '#/components/responses/Error'
+        '202':
+          $ref: '#/components/responses/MissionHeld'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CoveragePartiesUpdate'
+    delete:
+      operationId: deleteCoverageParties
+      summary: Remove a party from a placement
+      tags:
+      - coverage
+      x-outflare-access:
+        scope: coverage.manage
+        brand: true
+      responses:
+        '200':
+          description: Removed
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - id
+                - deleted
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  deleted:
+                    type: boolean
+        default:
+          $ref: '#/components/responses/Error'
+        '202':
+          $ref: '#/components/responses/MissionHeld'
+  /v1/brands/{brand}/coverage/searches:
+    parameters:
+    - name: brand
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: listCoverageSearches
+      summary: List the brand's Presence web searches
+      tags:
+      - coverage
+      x-outflare-access:
+        scope: coverage.read
+        brand: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                - total
+                - next_cursor
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CoverageSearches'
+                  total:
+                    type: integer
+                  next_cursor:
+                    $ref: '#/components/schemas/NextCursor'
+        default:
+          $ref: '#/components/responses/Error'
+      parameters:
+      - name: q
+        in: query
+        schema:
+          type: string
+      - name: status
+        in: query
+        schema:
+          type: string
+      - name: stage
+        in: query
+        schema:
+          type: string
+      - name: kind
+        in: query
+        schema:
+          type: string
+      - name: arrangement
+        in: query
+        schema:
+          type: string
+      - name: publisher_id
+        in: query
+        schema:
+          type: string
+      - name: placement_id
+        in: query
+        schema:
+          type: string
+      - name: agreement_id
+        in: query
+        schema:
+          type: string
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 0
+      - name: filters
+        in: query
+        description: 'JSON {mode: all|any, rules: [{field, op: eq|ne|contains|before|after|empty,
+          value}]} with at most 12 rules. Values are strings; dates use YYYY-MM-DD.'
+        schema:
+          type: string
+          maxLength: 8000
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Fields'
+    post:
+      operationId: createCoverageSearches
+      summary: Add a Presence web search
+      tags:
+      - coverage
+      x-outflare-access:
+        scope: coverage.manage
+        brand: true
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoverageSearches'
+        default:
+          $ref: '#/components/responses/Error'
+        '202':
+          $ref: '#/components/responses/MissionHeld'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CoverageSearchesInput'
+
+  /v1/brands/{brand}/coverage/searches/{id}:
+    parameters:
+    - name: brand
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getCoverageSearches
+      summary: Get a Presence web search
+      tags:
+      - coverage
+      x-outflare-access:
+        scope: coverage.read
+        brand: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoverageSearches'
+        default:
+          $ref: '#/components/responses/Error'
+    patch:
+      operationId: updateCoverageSearches
+      summary: Update a Presence web search using its current version
+      tags:
+      - coverage
+      x-outflare-access:
+        scope: coverage.manage
+        brand: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoverageSearches'
+        default:
+          $ref: '#/components/responses/Error'
+        '202':
+          $ref: '#/components/responses/MissionHeld'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CoverageSearchesUpdate'
+  /v1/brands/{brand}/coverage/searches/{id}/run:
+    parameters:
+    - name: brand
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: runCoverageSearch
+      summary: Run a Presence web search now
+      description: Queues the search on the workspace's own search results connection (DataForSEO or Geonode), within its budget. Every result that isn't one of the brand's own pages becomes a find to review. Without a connection the search records connector_needed in last_error.
+      tags:
+      - coverage
+      x-outflare-access:
+        scope: coverage.manage
+        brand: true
+      responses:
+        '202':
+          description: Queued or held for approval
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/Queued'
+                - $ref: '#/components/schemas/MissionHeld'
+        default:
+          $ref: '#/components/responses/Error'
+  /v1/brands/{brand}/coverage/competitors:
+    parameters:
+    - $ref: '#/components/parameters/BrandID'
+    get:
+      operationId: listCoverageCompetitors
+      summary: List the competitors whose presence is scanned
+      description: The brand's tracked SEO competitors, ranked by shared keywords, with how often each is scanned (the brand's top competitors weekly and the rest monthly by default), when it was last scanned and what each source said, and how many live pages it appears on. settings are the brand's scan settings.
+      tags:
+      - coverage
+      x-outflare-access:
+        scope: coverage.read
+        brand: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - settings
+                - data
+                properties:
+                  settings:
+                    $ref: '#/components/schemas/CoverageCompetitorSettings'
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CoverageCompetitor'
+        default:
+          $ref: '#/components/responses/Error'
+  /v1/brands/{brand}/coverage/competitors/settings:
+    parameters:
+    - $ref: '#/components/parameters/BrandID'
+    patch:
+      operationId: updateCoverageCompetitorSettings
+      summary: Change how often competitors are scanned
+      description: How many competitors count as top, and the days between scans for the top ones and for the rest. Set rest_every_days to 7 to scan every competitor weekly.
+      tags:
+      - coverage
+      x-outflare-access:
+        scope: coverage.manage
+        brand: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                top_competitors:
+                  type: integer
+                  minimum: 0
+                  maximum: 1000
+                top_every_days:
+                  type: integer
+                  minimum: 1
+                  maximum: 90
+                rest_every_days:
+                  type: integer
+                  minimum: 1
+                  maximum: 90
+      responses:
+        '200':
+          description: The brand's scan settings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoverageCompetitorSettings'
+        '202':
+          $ref: '#/components/responses/MissionHeld'
+        default:
+          $ref: '#/components/responses/Error'
+  /v1/brands/{brand}/coverage/competitors/{id}:
+    parameters:
+    - $ref: '#/components/parameters/BrandID'
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    patch:
+      operationId: updateCoverageCompetitor
+      summary: Set one competitor's scan cadence
+      description: every_days gives this competitor its own days between scans; null makes it follow the brand's settings again.
+      tags:
+      - coverage
+      x-outflare-access:
+        scope: coverage.manage
+        brand: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required:
+              - every_days
+              properties:
+                every_days:
+                  type:
+                  - integer
+                  - 'null'
+                  minimum: 1
+                  maximum: 90
+      responses:
+        '200':
+          description: The competitor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoverageCompetitor'
+        '202':
+          $ref: '#/components/responses/MissionHeld'
+        default:
+          $ref: '#/components/responses/Error'
+  /v1/brands/{brand}/coverage/competitors/{id}/scan:
+    parameters:
+    - $ref: '#/components/parameters/BrandID'
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: scanCoverageCompetitor
+      summary: Scan where a competitor appears now
+      description: Queues a scan of search results for the competitor's name and of who links to its site, on the workspace's own search results and SEO connections and within their budgets, plus the pages AI answers cite when they name it. A source without its connection records connector_needed in the competitor's outcome.
+      tags:
+      - coverage
+      x-outflare-access:
+        scope: coverage.manage
+        brand: true
+      responses:
+        '202':
+          description: Queued or held for approval
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/Queued'
+                - $ref: '#/components/schemas/MissionHeld'
+        default:
+          $ref: '#/components/responses/Error'
+  /v1/brands/{brand}/coverage/competitor_placements:
+    parameters:
+    - $ref: '#/components/parameters/BrandID'
+    get:
+      operationId: listCoverageCompetitorPlacements
+      summary: List where competitors appear
+      description: Pages where the brand's competitors appear, strongest sites first. gap=true keeps the sites where the brand has no publisher yet; gap=false the ones where it does. Pages a backlinks read reports lost are left out unless include_gone=true.
+      tags:
+      - coverage
+      x-outflare-access:
+        scope: coverage.read
+        brand: true
+      parameters:
+      - name: competitor_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: kind
+        in: query
+        schema:
+          type: string
+      - name: arrangement
+        in: query
+        schema:
+          type: string
+          enum:
+          - likely_paid
+          - unknown
+      - name: gap
+        in: query
+        schema:
+          type: string
+          enum:
+          - 'true'
+          - 'false'
+      - name: include_gone
+        in: query
+        schema:
+          type: string
+          enum:
+          - 'true'
+          - 'false'
+      - name: q
+        in: query
+        schema:
+          type: string
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Fields'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                - total
+                - next_cursor
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CoverageCompetitorPlacement'
+                  total:
+                    type: integer
+                  next_cursor:
+                    $ref: '#/components/schemas/NextCursor'
+        default:
+          $ref: '#/components/responses/Error'
+  /v1/brands/{brand}/coverage/opportunities:
+    parameters:
+    - $ref: '#/components/parameters/BrandID'
+    get:
+      operationId: listCoverageOpportunities
+      summary: List Presence opportunities, highest leverage first
+      description: "Places worth the team's effort, scored 0 to 100 by leverage: SEO (the site's domain rating and traffic) and AI answers (how often answers to the brand's questions cite the site) together, plus how many competitors are there and how well the page type fits. Reasons: competitor_gap (competitors are on the page, the brand isn't), ai_cited, unlinked_mention (a placement names the brand without a link) and link_removed. action says what to do next: pitch, request_link or reclaim_link. state defaults to open."
+      tags:
+      - coverage
+      x-outflare-access:
+        scope: coverage.read
+        brand: true
+      parameters:
+      - name: state
+        in: query
+        schema:
+          type: string
+          enum:
+          - open
+          - picked
+          - dismissed
+          - won
+          - all
+      - name: reason
+        in: query
+        schema:
+          type: string
+          enum:
+          - competitor_gap
+          - ai_cited
+          - unlinked_mention
+          - link_removed
+      - name: action
+        in: query
+        schema:
+          type: string
+          enum:
+          - pitch
+          - request_link
+          - reclaim_link
+      - name: kind
+        in: query
+        schema:
+          type: string
+      - name: min_score
+        in: query
+        schema:
+          type: number
+          minimum: 0
+          maximum: 100
+      - name: q
+        in: query
+        schema:
+          type: string
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Fields'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                - total
+                - next_cursor
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PlacementOpportunity'
+                  total:
+                    type: integer
+                  next_cursor:
+                    $ref: '#/components/schemas/NextCursor'
+        default:
+          $ref: '#/components/responses/Error'
+  /v1/brands/{brand}/coverage/opportunities/refresh:
+    parameters:
+    - $ref: '#/components/parameters/BrandID'
+    post:
+      operationId: refreshCoverageOpportunities
+      summary: Suggest Presence opportunities now
+      description: Suggests opportunities from where competitors appear and from the brand's placements, refreshes their scores, and marks won the ones the brand has reached (a publisher on the site, or the link back). It also runs every day with discovery and after each competitor scan. It calls no connection.
+      tags:
+      - coverage
+      x-outflare-access:
+        scope: coverage.manage
+        brand: true
+      responses:
+        '200':
+          description: How many were new and how many were won
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - added
+                - won
+                properties:
+                  added:
+                    type: integer
+                  won:
+                    type: integer
+        '202':
+          $ref: '#/components/responses/MissionHeld'
+        default:
+          $ref: '#/components/responses/Error'
+  /v1/brands/{brand}/coverage/opportunities/{id}:
+    parameters:
+    - $ref: '#/components/parameters/BrandID'
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    patch:
+      operationId: updateCoverageOpportunity
+      summary: Pick, dismiss or win an opportunity
+      description: state picked means someone is on it, dismissed keeps it out of the list even when it is suggested again, won means the brand got there. owner_id sets who owns it (null clears it). Picking contacts nobody.
+      tags:
+      - coverage
+      x-outflare-access:
+        scope: coverage.manage
+        brand: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                state:
+                  type: string
+                  enum:
+                  - open
+                  - picked
+                  - dismissed
+                  - won
+                owner_id:
+                  type:
+                  - string
+                  - 'null'
+                  format: uuid
+      responses:
+        '200':
+          description: The opportunity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlacementOpportunity'
+        '202':
+          $ref: '#/components/responses/MissionHeld'
+        default:
+          $ref: '#/components/responses/Error'
   /v1/brands/{brand}/coverage/report-snapshots:
     parameters:
     - $ref: '#/components/parameters/BrandID'
@@ -50485,6 +51476,18 @@ webhooks:
             schema: { $ref: "#/components/schemas/WebhookEvent" }
       responses:
         "200": { description: Any 2xx answer means received; anything else is retried. }
+  coverage_record.deleted:
+    post:
+      operationId: webhook_coverage_record_deleted
+      summary: Coverage record removed (a party taken off a placement). data names the placement, the CRM record and its role.
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
   workspace.updated:
     post:
       operationId: webhook_workspace_updated
@@ -51689,7 +52692,7 @@ components:
       required: [id, type, created_at, workspace_id, actor, target, request_id, data]
       properties:
         id: { type: string, description: "Unique per event, and the webhook-id header. Use it to ignore repeats.", example: evt_48213 }
-        type: { type: string, enum: [lead.replied, lead.unsubscribed, inbox.replied, inbox.updated, inbox.classified, lead.bounced, mailbox.auto_paused, lead.created, lead.updated, lead.deleted, leads.imported, suppressions.added, suppression.removed, lead_list.created, lead_list.leads_added, lead_list.run_started, lead_list.build_done, lead_list.build_failed, lead_list.refresh_done, lead_list.refresh_failed, lead_list.enrich_done, lead_list.enrich_failed, import.done, import.failed, sequence.created, sequence.updated, sequence.activated, sequence.paused, sequence.archived, sequence.deleted, sequence.steps_updated, sequence.leads_enrolled, enrollment.stopped, mailbox.imported, mailbox.updated, mailbox.paused, mailbox.resumed, mailbox.stage_changed, mailbox.deleted, domain.added, domain.paused, domain.resumed, domain.removed, email.queued, email.sent, email.delivered, email.bounced, email.complained, email.failed, email.suppressed, email.cancelled, email.unsubscribed, email.opened, email.clicked, email.preferences_changed, email_domain.verified, email_domain.verification_failed, email_provider.events_failed, email_template.published, meeting.created, meeting.updated, meeting.deleted, deal.created, deal.updated, deal.deleted, spend.recorded, integration.connected, integration.updated, integration.disconnected, connect_request.created, deploy.detected, deploy.failed, digest.ready, ai_budget.warned, ai_budget.reached, connection_limit.warned, connection_limit.reached, ad_campaign.paused, ad_campaign.resumed, ad_campaign.budget_changed, ads.paused_all, experiment.started, experiment.concluded, mission.created, mission.updated, mission.submitted, mission.approved, mission.paused, mission.resumed, mission.stopped, mission.completed, mission.action_held, mission.action_approved, mission.action_rejected, agent_run.created, agent_run.updated, agent_run.paused, agent_run.resumed, agent_run.stopped, agent_run.completed, action.held, action.approved, action.rejected, playbook.started, playbook_automation.created, playbook_automation.updated, playbook_automation.approved, playbook_automation.paused, playbook_automation.held, playbook_automation.ran, playbook_automation.deleted, infra.plan_created, infra.plan_approved, infra.ordered, infra.order_failed, infra.domains_bought, infra.mailbox_joined, infra.plan_warming, infra.plan_ready, infra.plan_cancelled, fix.found, fix.updated, fix.started, fix.verify_requested, fix.confirmed, fix.reopened, record.created, record.bulk_created, record.bulk_updated, record.updated, record.merged, identity.verified, identity.closed, relationship.added, relationship.ended, consent.granted, consent.withdrawn, consent.bulk_withdrawn, privacy_export.ready, record.soft_deleted, deletion.restored, record.unmerged, batch.undone, brand.created, brand.updated, knowledge.created, knowledge.updated, knowledge.deleted, knowledge.restored, content.approved, content.delivered, email_broadcast.created, email_broadcast.started, email_broadcast.sent, email_broadcast.failed, email_broadcast.cancelled, journey.created, journey.updated, journey_run.entered, journey_run.exited, rule.created, rule.updated, rule.activated, rule.paused, rule.archived, rule.fired, lifecycle.moved, transaction.created, transaction.updated, transaction.deleted, brand_setup.installed, brand_setup.install_failed, install.issue_opened, install.issue_resolved, seo_site.created, seo_site.verified, seo_site.unverified, seo_site.deleted, crawl.started, crawl.stopped, crawl.done, link_pitch.drafted, link_pitch.approved, link_pitch.rejected, link_prospect.overdue, backlink.new, backlink.lost, backlink.regained, competitor.page_removed, competitor_link.new, outbound_link.broken, asset.published, mention.found, link_prospect.found, link_prospect.checked, link_prospect.excluded, link_prospect.pitched, link_prospect.replied, link_prospect.agreed, link_prospect.live, link_prospect.declined, link_prospect.removed, link_prospect.reopened, link_prospect.updated, link_prospect.deleted, social_action.drafted, social_action.approved, social_action.rejected, social_action.done, social_action.failed, review.posted, review.replied, review.reply_drafted, review_momentum.changed, alert.raised, visitor.became_hot, partner_program.created, partner_program.updated, partner_program.rules_updated, partner.created, partner.updated, partner_referral.created, partner_conversion.created, partner_reward.created, partner_reward.approved, partner_reward.rejected, partner_reward.reversed, partner_reward.fulfilled, partner_payout.created, partner_payout.paid, partner_payout.canceled, coverage_record.created, coverage_record.updated, coverage_record.imported, coverage_record.check_queued, coverage_record.checked, coverage_record.review_queued, coverage_record.reviewed, coverage_record.approved, coverage_record.discovered, coverage_record.confirmed, workspace.updated, webhook.test] }
+        type: { type: string, enum: [lead.replied, lead.unsubscribed, inbox.replied, inbox.updated, inbox.classified, lead.bounced, mailbox.auto_paused, lead.created, lead.updated, lead.deleted, leads.imported, suppressions.added, suppression.removed, lead_list.created, lead_list.leads_added, lead_list.run_started, lead_list.build_done, lead_list.build_failed, lead_list.refresh_done, lead_list.refresh_failed, lead_list.enrich_done, lead_list.enrich_failed, import.done, import.failed, sequence.created, sequence.updated, sequence.activated, sequence.paused, sequence.archived, sequence.deleted, sequence.steps_updated, sequence.leads_enrolled, enrollment.stopped, mailbox.imported, mailbox.updated, mailbox.paused, mailbox.resumed, mailbox.stage_changed, mailbox.deleted, domain.added, domain.paused, domain.resumed, domain.removed, email.queued, email.sent, email.delivered, email.bounced, email.complained, email.failed, email.suppressed, email.cancelled, email.unsubscribed, email.opened, email.clicked, email.preferences_changed, email_domain.verified, email_domain.verification_failed, email_provider.events_failed, email_template.published, meeting.created, meeting.updated, meeting.deleted, deal.created, deal.updated, deal.deleted, spend.recorded, integration.connected, integration.updated, integration.disconnected, connect_request.created, deploy.detected, deploy.failed, digest.ready, ai_budget.warned, ai_budget.reached, connection_limit.warned, connection_limit.reached, ad_campaign.paused, ad_campaign.resumed, ad_campaign.budget_changed, ads.paused_all, experiment.started, experiment.concluded, mission.created, mission.updated, mission.submitted, mission.approved, mission.paused, mission.resumed, mission.stopped, mission.completed, mission.action_held, mission.action_approved, mission.action_rejected, agent_run.created, agent_run.updated, agent_run.paused, agent_run.resumed, agent_run.stopped, agent_run.completed, action.held, action.approved, action.rejected, playbook.started, playbook_automation.created, playbook_automation.updated, playbook_automation.approved, playbook_automation.paused, playbook_automation.held, playbook_automation.ran, playbook_automation.deleted, infra.plan_created, infra.plan_approved, infra.ordered, infra.order_failed, infra.domains_bought, infra.mailbox_joined, infra.plan_warming, infra.plan_ready, infra.plan_cancelled, fix.found, fix.updated, fix.started, fix.verify_requested, fix.confirmed, fix.reopened, record.created, record.bulk_created, record.bulk_updated, record.updated, record.merged, identity.verified, identity.closed, relationship.added, relationship.ended, consent.granted, consent.withdrawn, consent.bulk_withdrawn, privacy_export.ready, record.soft_deleted, deletion.restored, record.unmerged, batch.undone, brand.created, brand.updated, knowledge.created, knowledge.updated, knowledge.deleted, knowledge.restored, content.approved, content.delivered, email_broadcast.created, email_broadcast.started, email_broadcast.sent, email_broadcast.failed, email_broadcast.cancelled, journey.created, journey.updated, journey_run.entered, journey_run.exited, rule.created, rule.updated, rule.activated, rule.paused, rule.archived, rule.fired, lifecycle.moved, transaction.created, transaction.updated, transaction.deleted, brand_setup.installed, brand_setup.install_failed, install.issue_opened, install.issue_resolved, seo_site.created, seo_site.verified, seo_site.unverified, seo_site.deleted, crawl.started, crawl.stopped, crawl.done, link_pitch.drafted, link_pitch.approved, link_pitch.rejected, link_prospect.overdue, backlink.new, backlink.lost, backlink.regained, competitor.page_removed, competitor_link.new, outbound_link.broken, asset.published, mention.found, link_prospect.found, link_prospect.checked, link_prospect.excluded, link_prospect.pitched, link_prospect.replied, link_prospect.agreed, link_prospect.live, link_prospect.declined, link_prospect.removed, link_prospect.reopened, link_prospect.updated, link_prospect.deleted, social_action.drafted, social_action.approved, social_action.rejected, social_action.done, social_action.failed, review.posted, review.replied, review.reply_drafted, review_momentum.changed, alert.raised, visitor.became_hot, partner_program.created, partner_program.updated, partner_program.rules_updated, partner.created, partner.updated, partner_referral.created, partner_conversion.created, partner_reward.created, partner_reward.approved, partner_reward.rejected, partner_reward.reversed, partner_reward.fulfilled, partner_payout.created, partner_payout.paid, partner_payout.canceled, coverage_record.created, coverage_record.updated, coverage_record.imported, coverage_record.check_queued, coverage_record.checked, coverage_record.review_queued, coverage_record.reviewed, coverage_record.approved, coverage_record.discovered, coverage_record.confirmed, coverage_record.deleted, workspace.updated, webhook.test] }
         created_at: { type: string, format: date-time }
         workspace_id: { type: string, format: uuid }
         actor: { $ref: "#/components/schemas/WebhookRef" }
@@ -56442,6 +57445,82 @@ components:
               name: { type: string }
         countries: { type: array, items: { type: string }, description: "Countries it shows in, ISO 3166 alpha-2." }
         notes: { type: array, items: { type: string }, description: "What is there but is changed on the platform itself: regions, cities, exclusions, ad sets that differ." }
+    AdDraftContent:
+      type: object
+      description: "What a draft makes. A Google search ad: final_url, 3 to 15 headlines (at most 30 characters), 2 to 4 descriptions (at most 90), optional path1 and path2 (at most 15). A Meta ad: final_url, one headline, at most one description, primary_text, image_url, call_to_action, and page_id (the account's first page when empty). A new ad group or campaign adds name and keywords; a new campaign adds daily_budget_micros, countries and bidding (maximize_conversions when empty)."
+      properties:
+        kind: { type: string, enum: [ad, ad_group, campaign] }
+        name: { type: string, maxLength: 255 }
+        final_url: { type: string, format: uri }
+        headlines: { type: array, items: { type: string }, maxItems: 15 }
+        descriptions: { type: array, items: { type: string }, maxItems: 4 }
+        path1: { type: string, maxLength: 15 }
+        path2: { type: string, maxLength: 15 }
+        primary_text: { type: string, maxLength: 2000 }
+        image_url: { type: string, format: uri }
+        call_to_action: { type: string, description: "Meta: learn_more (when empty), sign_up, shop_now, subscribe, contact_us, download, get_quote, apply_now, get_offer, order_now or book_now." }
+        page_id: { type: string, description: The Facebook page a Meta ad runs as. }
+        keywords:
+          type: array
+          maxItems: 50
+          items:
+            type: object
+            required: [text]
+            properties:
+              text: { type: string, maxLength: 80 }
+              match_type: { type: string, enum: [exact, phrase, broad, ""], description: phrase when empty. }
+        daily_budget_micros: { type: integer, format: int64, minimum: 10000, description: "A new campaign's daily budget in micros of the account's currency." }
+        bidding: { $ref: "#/components/schemas/AdBidding" }
+        countries: { type: array, items: { type: string }, maxItems: 50, description: "A new campaign's countries, ISO 3166 alpha-2." }
+    AdDraftInput:
+      description: "A draft as written: where it goes (account_id for a new campaign, campaign_id for a new ad group, ad_group_id for a new ad), why, and what it makes."
+      allOf:
+        - { $ref: "#/components/schemas/AdDraftContent" }
+        - type: object
+          required: [kind]
+          properties:
+            account_id: { type: string, format: uuid }
+            campaign_id: { type: string, format: uuid }
+            ad_group_id: { type: string, format: uuid }
+            reason: { type: string, maxLength: 2000, description: Why it should do better than what runs now. }
+    AdDraft:
+      type: object
+      description: New ads written by the brand agent or a person, and what became of them on the platform.
+      required: [id, brand_id, account_id, account_name, connector, currency, kind, campaign_id, campaign_name, ad_group_id, ad_group_name, content, reason, status, made, error,
+        created_by, action_id, approved_by, approved_at, made_at, live_by, live_at, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        brand_id: { type: string, format: uuid }
+        account_id: { type: string, format: uuid }
+        account_name: { type: string }
+        connector: { type: string }
+        currency: { type: string }
+        kind: { type: string, enum: [ad, ad_group, campaign] }
+        campaign_id: { type: [string, "null"], format: uuid, description: The campaign it goes in; null for a new campaign. }
+        campaign_name: { type: [string, "null"] }
+        ad_group_id: { type: [string, "null"], format: uuid, description: The ad group a new ad goes in. }
+        ad_group_name: { type: [string, "null"] }
+        content: { $ref: "#/components/schemas/AdDraftContent" }
+        reason: { type: string }
+        status: { type: string, enum: [draft, creating, paused, going_live, live, failed, dismissed], description: "draft waits for a person; creating and going_live while the job runs; paused once made on the platform; failed with the platform's reason." }
+        made:
+          type: object
+          description: The platform's ids of the campaign, ad group and ad the new ad is in, and which levels the draft made.
+          properties:
+            campaign_id: { type: string }
+            ad_group_id: { type: string }
+            ad_id: { type: string }
+            made: { type: array, items: { type: string, enum: [campaign, ad_group, ad] } }
+        error: { type: string }
+        created_by: { type: [string, "null"], format: uuid }
+        action_id: { type: [string, "null"], format: uuid, description: "The agent's action, when an agent wrote it (listActions)." }
+        approved_by: { type: [string, "null"], format: uuid }
+        approved_at: { type: [string, "null"], format: date-time }
+        made_at: { type: [string, "null"], format: date-time }
+        live_by: { type: [string, "null"], format: uuid }
+        live_at: { type: [string, "null"], format: date-time }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
     AdChange:
       type: object
       description: One change Outflare made, or is making, to a campaign on the workspace's own ad account.
@@ -66333,6 +67412,11 @@ components:
           - newsletter
           - sponsorship
           - custom
+          - influencer
+          - youtube
+          - forum
+          - mcp_directory
+          - app_listing
           default: blog
         arrangement:
           type: string
@@ -66341,6 +67425,7 @@ components:
           - paid
           - exchange
           - affiliate
+          - organic
           - unknown
           default: unknown
         stage:
@@ -66445,6 +67530,21 @@ components:
         baseline:
           type: boolean
           default: false
+        delivered_by:
+          type: string
+          description: Who delivered the placement. The agency or partner itself is a party (coverage parties, role agency or partner).
+          enum:
+          - unknown
+          - in_house
+          - agency
+          - partner
+          default: unknown
+        deal_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: The CRM deal the partnerships team works this placement in. Linking needs outcomes.read.
       required:
       - publisher_id
       - title
@@ -66491,6 +67591,11 @@ components:
           - newsletter
           - sponsorship
           - custom
+          - influencer
+          - youtube
+          - forum
+          - mcp_directory
+          - app_listing
           default: blog
         arrangement:
           type: string
@@ -66499,6 +67604,7 @@ components:
           - paid
           - exchange
           - affiliate
+          - organic
           - unknown
           default: unknown
         stage:
@@ -66603,6 +67709,21 @@ components:
         baseline:
           type: boolean
           default: false
+        delivered_by:
+          type: string
+          description: Who delivered the placement. The agency or partner itself is a party (coverage parties, role agency or partner).
+          enum:
+          - unknown
+          - in_house
+          - agency
+          - partner
+          default: unknown
+        deal_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: The CRM deal the partnerships team works this placement in. Linking needs outcomes.read.
       required:
       - version
     CoveragePlacements:
@@ -66658,6 +67779,11 @@ components:
           - newsletter
           - sponsorship
           - custom
+          - influencer
+          - youtube
+          - forum
+          - mcp_directory
+          - app_listing
           default: blog
         arrangement:
           type: string
@@ -66666,6 +67792,7 @@ components:
           - paid
           - exchange
           - affiliate
+          - organic
           - unknown
           default: unknown
         stage:
@@ -66787,6 +67914,53 @@ components:
         baseline:
           type: boolean
           default: false
+        delivered_by:
+          type: string
+          description: Who delivered the placement. The agency or partner itself is a party (coverage parties, role agency or partner).
+          enum:
+          - unknown
+          - in_house
+          - agency
+          - partner
+          default: unknown
+        deal_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: The CRM deal the partnerships team works this placement in. Linking needs outcomes.read.
+        link_status:
+          type: string
+          enum: [unknown, present, missing, removed]
+          description: Whether the page links to the brand (the target page's site, or any of the brand's domains). removed means it had been there and two checks in a row saw the page without it.
+        mention_status:
+          type: string
+          enum: [unknown, present, missing, removed]
+          description: Whether the page names the brand (the expected wording, or else the brand's name), as link_status.
+        offline_since:
+          type: ['string', 'null']
+          format: date-time
+          description: When two checks agreed the page was gone; null while it is up.
+        link_removed_at:
+          type: ['string', 'null']
+          format: date-time
+        mention_removed_at:
+          type: ['string', 'null']
+          format: date-time
+        accuracy_queued_at:
+          type: ['string', 'null']
+          format: date-time
+          description: When the brand facts on the page were last queued for a check against Knowledge.
+        traction:
+          type: string
+          enum: [unknown, too_early, quiet, steady, taking_off]
+          description: Whether a live placement has taken off, from AI answers that cite it and visits it sends (the brand's own site tracking), refreshed daily. too_early means it has been live under two weeks.
+        traction_at:
+          type: ['string', 'null']
+          format: date-time
+        ai_citations_90d:
+          type: integer
+          description: How many tracked AI answers cited the page in the last 90 days.
       required:
       - id
       - brand_id
@@ -67597,6 +68771,7 @@ components:
           - link_missing
           - link_changed
           - outdated_claim
+          - mention_missing
           - renewal_due
           - invoice_due
           - relationship_followup
@@ -67670,6 +68845,7 @@ components:
           - link_missing
           - link_changed
           - outdated_claim
+          - mention_missing
           - renewal_due
           - invoice_due
           - relationship_followup
@@ -67753,6 +68929,7 @@ components:
           - link_missing
           - link_changed
           - outdated_claim
+          - mention_missing
           - renewal_due
           - invoice_due
           - relationship_followup
@@ -67828,7 +69005,40 @@ components:
           - backlinks
           - link_prospects
           - import
+          - social
+          - ai_citations
+          - web_search
           default: manual
+        kind:
+          type: string
+          description: The placement type discovery guessed from the page's address, empty when it couldn't tell. Confirming the find makes a placement of this type.
+          enum:
+          - ''
+          - blog
+          - comparison
+          - news
+          - profile
+          - directory
+          - review
+          - roundup
+          - case_study
+          - partner
+          - integration
+          - resource
+          - interview
+          - podcast
+          - video
+          - community
+          - display_ad
+          - newsletter
+          - sponsorship
+          - custom
+          - influencer
+          - youtube
+          - forum
+          - mcp_directory
+          - app_listing
+          default: ''
         source_id:
           type: string
           default: ''
@@ -67864,7 +69074,40 @@ components:
           - backlinks
           - link_prospects
           - import
+          - social
+          - ai_citations
+          - web_search
           default: manual
+        kind:
+          type: string
+          description: The placement type discovery guessed from the page's address, empty when it couldn't tell. Confirming the find makes a placement of this type.
+          enum:
+          - ''
+          - blog
+          - comparison
+          - news
+          - profile
+          - directory
+          - review
+          - roundup
+          - case_study
+          - partner
+          - integration
+          - resource
+          - interview
+          - podcast
+          - video
+          - community
+          - display_ad
+          - newsletter
+          - sponsorship
+          - custom
+          - influencer
+          - youtube
+          - forum
+          - mcp_directory
+          - app_listing
+          default: ''
         source_id:
           type: string
           default: ''
@@ -67909,7 +69152,40 @@ components:
           - backlinks
           - link_prospects
           - import
+          - social
+          - ai_citations
+          - web_search
           default: manual
+        kind:
+          type: string
+          description: The placement type discovery guessed from the page's address, empty when it couldn't tell. Confirming the find makes a placement of this type.
+          enum:
+          - ''
+          - blog
+          - comparison
+          - news
+          - profile
+          - directory
+          - review
+          - roundup
+          - case_study
+          - partner
+          - integration
+          - resource
+          - interview
+          - podcast
+          - video
+          - community
+          - display_ad
+          - newsletter
+          - sponsorship
+          - custom
+          - influencer
+          - youtube
+          - forum
+          - mcp_directory
+          - app_listing
+          default: ''
         source_id:
           type: string
           default: ''
@@ -68053,6 +69329,7 @@ components:
           - link_changed
           - publication_overdue
           - outdated_claim
+          - mention_missing
           default: first_live
         enabled:
           type: boolean
@@ -68086,6 +69363,7 @@ components:
           - link_changed
           - publication_overdue
           - outdated_claim
+          - mention_missing
           default: first_live
         enabled:
           type: boolean
@@ -68129,6 +69407,7 @@ components:
           - link_changed
           - publication_overdue
           - outdated_claim
+          - mention_missing
           default: first_live
         enabled:
           type: boolean
@@ -68522,6 +69801,492 @@ components:
       - url
       - notes
       - source_text
+    CoverageSearchesInput:
+      type: object
+      additionalProperties: false
+      properties:
+        query:
+          type: string
+          maxLength: 300
+          description: What to search for, as you'd type it into the search box, such as the brand's name in quotes.
+        country:
+          type: string
+          description: Two-letter country code, such as US; empty for US.
+          default: ''
+        depth:
+          type: integer
+          minimum: 10
+          maximum: 100
+          default: 50
+          description: How many results to read.
+        every_days:
+          type: integer
+          minimum: 1
+          maximum: 30
+          default: 1
+        enabled:
+          type: boolean
+          default: true
+      required:
+      - query
+    CoverageSearchesUpdate:
+      type: object
+      additionalProperties: false
+      properties:
+        version:
+          type: integer
+          minimum: 1
+        query:
+          type: string
+          maxLength: 300
+          description: What to search for, as you'd type it into the search box, such as the brand's name in quotes.
+        country:
+          type: string
+          description: Two-letter country code, such as US; empty for US.
+          default: ''
+        depth:
+          type: integer
+          minimum: 10
+          maximum: 100
+          default: 50
+          description: How many results to read.
+        every_days:
+          type: integer
+          minimum: 1
+          maximum: 30
+          default: 1
+        enabled:
+          type: boolean
+          default: true
+      required:
+      - version
+    PlacementOpportunity:
+      type: object
+      required:
+      - id
+      - brand_id
+      - url
+      - host
+      - title
+      - kind
+      - reason
+      - action
+      - source
+      - evidence
+      - factors
+      - score
+      - state
+      - first_seen_at
+      - last_seen_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        brand_id:
+          type: string
+          format: uuid
+        url:
+          type: string
+        host:
+          type: string
+        title:
+          type: string
+        kind:
+          type: string
+        reason:
+          type: string
+          enum:
+          - competitor_gap
+          - ai_cited
+          - unlinked_mention
+          - link_removed
+        action:
+          type: string
+          enum:
+          - pitch
+          - request_link
+          - reclaim_link
+        source:
+          type: string
+          description: The module that suggested it, such as presence or ai_visibility.
+        evidence:
+          type: object
+          description: Ids and fixed labels behind it, such as competitor_ids, likely_paid or placement_id.
+          additionalProperties: true
+        factors:
+          type: object
+          description: The numbers behind the score (domain_rating, domain_traffic, ai_citations, competitors) and points, each part's share of the score (seo, ai, competitors, fit, relationship).
+          additionalProperties: true
+        score:
+          type: number
+          minimum: 0
+          maximum: 100
+        state:
+          type: string
+          enum:
+          - open
+          - picked
+          - dismissed
+          - won
+        owner_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+        placement_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+        publisher_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: The brand's publisher on this site, when it has one.
+        first_seen_at:
+          type: string
+          format: date-time
+        last_seen_at:
+          type: string
+          format: date-time
+        state_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    CoverageCompetitorSettings:
+      type: object
+      required:
+      - top_competitors
+      - top_every_days
+      - rest_every_days
+      properties:
+        top_competitors:
+          type: integer
+          description: How many competitors, by shared keywords, count as top.
+        top_every_days:
+          type: integer
+          description: Days between scans of a top competitor.
+        rest_every_days:
+          type: integer
+          description: Days between scans of the other competitors.
+    CoverageCompetitor:
+      type: object
+      required:
+      - id
+      - host
+      - name
+      - rank
+      - top
+      - every_days
+      - own_every_days
+      - queued_at
+      - scanned_at
+      - outcome
+      properties:
+        id:
+          type: string
+          format: uuid
+        host:
+          type: string
+        name:
+          type: string
+        rank:
+          type: integer
+          description: Its place among the brand's competitors by shared keywords, from 1.
+        top:
+          type: boolean
+        every_days:
+          type: integer
+          description: Days between its scans, its own or the brand's.
+        own_every_days:
+          type:
+          - integer
+          - 'null'
+          description: Its own cadence; null follows the brand's.
+        queued_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        scanned_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        next_scan_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        outcome:
+          type: object
+          description: What each source said on the last scan, by source (web_search, backlinks, ai_citations); empty when it worked, else an error code such as connector_needed or budget_reached.
+          additionalProperties:
+            type: string
+        placements:
+          type: integer
+          description: Live pages it appears on.
+        likely_paid:
+          type: integer
+          description: Of those, the ones that look paid for.
+    CoverageCompetitorPlacement:
+      type: object
+      required:
+      - id
+      - brand_id
+      - competitor_id
+      - url
+      - host
+      - title
+      - kind
+      - arrangement
+      - evidence
+      - sources
+      - links_to_them
+      - first_seen_at
+      - last_seen_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        brand_id:
+          type: string
+          format: uuid
+        competitor_id:
+          type: string
+          format: uuid
+        competitor_host:
+          type: string
+        competitor_name:
+          type: string
+        url:
+          type: string
+        host:
+          type: string
+        title:
+          type: string
+        kind:
+          type: string
+          description: A placement type from the address, such as youtube, forum, mcp_directory or comparison; empty when the address says nothing.
+        arrangement:
+          type: string
+          enum:
+          - likely_paid
+          - unknown
+          description: likely_paid only with evidence; nobody outside the deal can be sure.
+        evidence:
+          type: array
+          items:
+            type: string
+          description: Why it looks paid for, such as link_sponsored, link_affiliate, address_sponsored or title_sponsored.
+        sources:
+          type: array
+          items:
+            type: string
+            enum:
+            - web_search
+            - backlinks
+            - ai_citations
+        links_to_them:
+          type: boolean
+        nofollow:
+          type:
+          - boolean
+          - 'null'
+        anchor:
+          type: string
+        domain_rating:
+          type:
+          - number
+          - 'null'
+        url_rating:
+          type:
+          - number
+          - 'null'
+        domain_traffic:
+          type:
+          - number
+          - 'null'
+        brand_present:
+          type: boolean
+          description: Whether the brand has a publisher on this site.
+        first_seen_at:
+          type: string
+          format: date-time
+        last_seen_at:
+          type: string
+          format: date-time
+        gone_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    CoverageSearches:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        brand_id:
+          type: string
+          format: uuid
+        version:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        query:
+          type: string
+          maxLength: 300
+          description: What to search for, as you'd type it into the search box, such as the brand's name in quotes.
+        country:
+          type: string
+          description: Two-letter country code, such as US; empty for US.
+          default: ''
+        depth:
+          type: integer
+          minimum: 10
+          maximum: 100
+          default: 50
+          description: How many results to read.
+        every_days:
+          type: integer
+          minimum: 1
+          maximum: 30
+          default: 1
+        enabled:
+          type: boolean
+          default: true
+        next_run_at:
+          type: string
+          format: date-time
+        last_run_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        last_error:
+          type: string
+          description: Why the last run didn't work, as an error code (connector_needed, budget_reached, connector_auth...); empty after a run that worked.
+        last_found:
+          type: integer
+          description: How many new finds the last run added.
+    CoveragePartiesInput:
+      type: object
+      additionalProperties: false
+      properties:
+        placement_id:
+          type: string
+          format: uuid
+        record_id:
+          type: string
+          format: uuid
+          description: A CRM company or person.
+        role:
+          type: string
+          enum:
+          - agency
+          - partner
+          - creator
+          - author
+          - editor
+          - owner
+          - account_manager
+          - other
+          default: other
+        notes:
+          type: string
+          default: ''
+      required:
+      - placement_id
+      - record_id
+    CoveragePartiesUpdate:
+      type: object
+      additionalProperties: false
+      properties:
+        version:
+          type: integer
+          minimum: 1
+        placement_id:
+          type: string
+          format: uuid
+        record_id:
+          type: string
+          format: uuid
+          description: A CRM company or person.
+        role:
+          type: string
+          enum:
+          - agency
+          - partner
+          - creator
+          - author
+          - editor
+          - owner
+          - account_manager
+          - other
+          default: other
+        notes:
+          type: string
+          default: ''
+      required:
+      - version
+    CoverageParties:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        brand_id:
+          type: string
+          format: uuid
+        version:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        placement_id:
+          type: string
+          format: uuid
+        record_id:
+          type: string
+          format: uuid
+          description: A CRM company or person.
+        role:
+          type: string
+          enum:
+          - agency
+          - partner
+          - creator
+          - author
+          - editor
+          - owner
+          - account_manager
+          - other
+          default: other
+        notes:
+          type: string
+          default: ''
     CoverageDeliveryReportsInput:
       type: object
       additionalProperties: false
