@@ -94,6 +94,7 @@ Send what people do in your product to a brand, in Segment's format: `track`, `i
 - **Products.** Name the [product](/docs/guides/products-and-lifecycle/) an event is about with `properties.product_id` or `properties.product`.
 - **Retries.** Send a `messageId` with each event, so a retry is stored once.
 - **Orders are payments.** An `Order Completed` event from your server, for a known person, with `revenue` (or `total`, or `value`) in dollars and a `currency`, is also saved as a [transaction](/docs/guides/transactions/) and counted as a payment. Put the payment's id in `order_id`: if the same payment also arrives as a transaction with that `source_id`, or from a billing connection, it counts once ([One payment, counted once](/docs/guides/transactions/#one-payment-counted-once)).
+- **Refunded orders are refunds.** An `Order Refunded` event from your server, with the order's `order_id`, refunds that payment, counted once with a refund transaction for the same refund ([Refunds, counted once](/docs/guides/transactions/#refunds-counted-once)). **People → Developer setup** checks that sign-ups, orders and refunds arrive and count ([Developer setup](/docs/guides/developer-setup/)).
 
 Each event is matched to a person in that brand only:
 

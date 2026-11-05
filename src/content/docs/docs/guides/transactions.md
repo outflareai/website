@@ -24,7 +24,7 @@ curl -X POST https://app.outflare.ai/v1/brands/$BRAND/transactions \
        "source_id": "inv_1042", "record_id": "…", "product": "pro", "status": "succeeded"}'
 ```
 
-- `kind` is `payment`, `refund`, `chargeback` or `credit`. `amount_minor` is in the currency's smallest unit (cents) and never negative: the kind says which way the money went. A refund or chargeback can name the payment it gives back with `refund_of` (that payment's `source_id`).
+- `kind` is `payment`, `refund`, `chargeback` or `credit`. `amount_minor` is in the currency's smallest unit (cents) and never negative: the kind says which way the money went. A refund or chargeback names the payment it gives back with `refund_of`: see [Refunds, counted once](#refunds-counted-once).
 - `source_id` is your own id for it. Sending the same one again never adds it twice: the answer is the transaction already saved (200 instead of 201), with its `status` updated if it changed (`succeeded`, `pending`, `failed` or `reversed`).
 - `record_id` is the person or company who paid. If you don't have it, send `user_id` instead: your own id for them, the `userId` your events send, and Outflare finds the person. `product` is one of the brand's [products](/docs/guides/products-and-lifecycle/) by id or key. All three are optional, but send `record_id` or `user_id` with every payment: without a person, a payment can't count toward revenue by channel or your ad networks.
 - `occurred_at` is when it happened. It defaults to now.
@@ -60,6 +60,27 @@ The same payment as a transaction, counted once with the event above:
 ```
 
 Send every payment that brings money in. Topping up a prepaid balance is a payment; spending that balance on a plan is not, or the same money would count twice.
+
+## Refunds, counted once
+
+Refunds follow the same rule as payments. Send them as a transaction, as an event, or both, and each one counts once. The transactions API is the simplest single path for money: payments and refunds there, and events for what people do.
+
+- **A refund transaction** has `kind` `refund` (or `chargeback`) and names its payment in `refund_of`. Any id the payment has works: its `source_id` (the order's `order_id`), its Order Completed `messageId` (`order-ch_1042`), or Outflare's transaction id.
+- **An Order Refunded event**, from your server for a known person, refunds the payment its `order_id` names, the same forgiving way. Its amount is `amount` (or `revenue`, `total`, `value`) in dollars, and the whole payment when you leave it out. Its own id is `refund_id`, else its `messageId`.
+- **If the same refund arrives both ways**, it is kept once: the same refund id (the transaction's `source_id` is the event's `refund_id`), or else a refund of the same payment of the same amount within 15 minutes.
+
+A refund counts once Outflare has its payment. One that arrives first waits, and counts when the payment comes. One that names an id no payment has is listed on [Developer setup](/docs/guides/developer-setup/) under **Refunds to match**, to link by hand. A counted refund comes off its payment's revenue and [lowers its conversion in your ad networks](/docs/integrations/paid-media/#refunds).
+
+```json
+{"kind": "refund", "amount_minor": 4900, "currency": "USD", "source_id": "re_2001", "refund_of": "ch_1042", "user_id": "u_123"}
+```
+
+The same refund as an event, counted once with the transaction above:
+
+```json
+{"type": "track", "userId": "u_123", "event": "Order Refunded", "messageId": "refund-re_2001",
+ "properties": {"order_id": "ch_1042", "refund_id": "re_2001", "amount": 49.00, "currency": "USD"}}
+```
 
 ## Currencies
 

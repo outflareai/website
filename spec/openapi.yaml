@@ -8081,7 +8081,46 @@ paths:
       - { $ref: "#/components/parameters/Workspace" }
     get:
       operationId: getAttributionSettings
+      deprecated: true
       x-outflare-access: { scope: analytics.read }
+      summary: Get how conversions are credited to channels
+      description: "Scope: analytics.read. The default model reports use (last non-direct touch unless changed), how many days before a conversion a visit can get credit (30), and which customer events count as conversions. Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step."
+      tags: [analytics]
+      responses:
+        "200":
+          description: The settings.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AttributionSettings" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateAttributionSettings
+      deprecated: true
+      x-outflare-access: { scope: analytics.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Change the default model, the lookback or which events count
+      description: "Scope: analytics.manage. Every model's credits are kept, so changing the model only changes what reports show by default. model can be a built-in model or the key of one of the workspace's own models. Changing the lookback or the events credits every conversion again in the background, within a few minutes. Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step."
+      tags: [analytics]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AttributionSettingsInput" }
+      responses:
+        "200":
+          description: The settings.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AttributionSettings" }
+        "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/attribution/settings:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+    get:
+      operationId: getBrandAttributionSettings
+      x-outflare-access: { scope: analytics.read, brand: true }
       summary: Get how conversions are credited to channels
       description: "Scope: analytics.read. The default model reports use (last non-direct touch unless changed), how many days before a conversion a visit can get credit (30), and which customer events count as conversions."
       tags: [analytics]
@@ -8093,11 +8132,11 @@ paths:
               schema: { $ref: "#/components/schemas/AttributionSettings" }
         default: { $ref: "#/components/responses/Error" }
     patch:
-      operationId: updateAttributionSettings
-      x-outflare-access: { scope: analytics.manage }
+      operationId: updateBrandAttributionSettings
+      x-outflare-access: { scope: analytics.manage, brand: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Change the default model, the lookback or which events count
-      description: "Scope: analytics.manage. Every model's credits are kept, so changing the model only changes what reports show by default. model can be a built-in model or the key of one of the workspace's own models. Changing the lookback or the events credits every conversion again in the background, within a few minutes."
+      description: "Scope: analytics.manage. Every model's credits are kept, so changing the model only changes what reports show by default. model can be a built-in model or the key of one of the brand's own models. Changing the lookback or the events credits every conversion again in the background, within a few minutes."
       tags: [analytics]
       requestBody:
         required: true
@@ -8118,10 +8157,72 @@ paths:
       - { $ref: "#/components/parameters/Workspace" }
     get:
       operationId: listAttributionModels
+      deprecated: true
       x-outflare-access: { scope: analytics.read }
       summary: List attribution models
       description: |
         Scope: analytics.read. The five built-in models, and the workspace's own models at their latest version
+        (archived ones too with archived=true). A workspace's model starts from a built-in one and changes its windows,
+        channels left out, position weights or time-decay half-life. Reports take its key as model.
+        Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step.
+      tags: [analytics]
+      parameters:
+        - { name: archived, in: query, required: false, schema: { type: boolean } }
+      responses:
+        "200":
+          description: The models.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [built_in, data]
+                properties:
+                  built_in:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, spec]
+                      properties:
+                        id: { $ref: "#/components/schemas/AttributionBuiltInModel" }
+                        spec: { $ref: "#/components/schemas/AttributionSpec" }
+                  data: { type: array, items: { $ref: "#/components/schemas/AttributionCustomModel" } }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createAttributionModel
+      deprecated: true
+      x-outflare-access: { scope: analytics.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Make an attribution model
+      description: |
+        Scope: analytics.manage. Makes version 1 of a model, from a built-in one with your own options, such as
+        `{"key": "paid-7-day", "name": "Paid ads 7 days", "spec": {"base": "last_non_direct", "channel_lookback_days": {"paid_ads": 7}}}`.
+        Every conversion is credited again in the background, so the model covers the past too.
+        Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step.
+      tags: [analytics]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AttributionModelInput" }
+      responses:
+        "201":
+          description: The model's first version.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AttributionCustomModel" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "400": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/attribution/models:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+    get:
+      operationId: listBrandAttributionModels
+      x-outflare-access: { scope: analytics.read, brand: true }
+      summary: List attribution models
+      description: |
+        Scope: analytics.read. The five built-in models, and the brand's own models at their latest version
         (archived ones too with archived=true). A workspace's model starts from a built-in one and changes its windows,
         channels left out, position weights or time-decay half-life. Reports take its key as model.
       tags: [analytics]
@@ -8147,8 +8248,8 @@ paths:
                   data: { type: array, items: { $ref: "#/components/schemas/AttributionCustomModel" } }
         default: { $ref: "#/components/responses/Error" }
     post:
-      operationId: createAttributionModel
-      x-outflare-access: { scope: analytics.manage }
+      operationId: createBrandAttributionModel
+      x-outflare-access: { scope: analytics.manage, brand: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Make an attribution model
       description: |
@@ -8177,7 +8278,70 @@ paths:
       - { name: key, in: path, required: true, schema: { type: string } }
     get:
       operationId: getAttributionModel
+      deprecated: true
       x-outflare-access: { scope: analytics.read }
+      summary: Every version of an attribution model
+      description: "Scope: analytics.read. Newest first, with the modules that pin each version. Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step."
+      tags: [analytics]
+      responses:
+        "200":
+          description: The versions.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/AttributionCustomModel" } }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateAttributionModel
+      deprecated: true
+      x-outflare-access: { scope: analytics.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Change an attribution model
+      description: |
+        Scope: analytics.manage. A new spec makes the next version and credits every conversion again; the old version
+        stays credited only while a module pins it. A new name alone keeps the version.
+        Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step.
+      tags: [analytics]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AttributionModelInput" }
+      responses:
+        "200":
+          description: The model's latest version.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AttributionCustomModel" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    delete:
+      operationId: archiveAttributionModel
+      deprecated: true
+      x-outflare-access: { scope: analytics.manage }
+      summary: Archive an attribution model
+      description: "Scope: analytics.manage. Reports can no longer read it, except a version a module pins. The workspace's default model can't be archived. Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step."
+      tags: [analytics]
+      responses:
+        "204": { description: Archived. }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/attribution/models/{key}:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: key, in: path, required: true, schema: { type: string } }
+    get:
+      operationId: getBrandAttributionModel
+      x-outflare-access: { scope: analytics.read, brand: true }
       summary: Every version of an attribution model
       description: "Scope: analytics.read. Newest first, with the modules that pin each version."
       tags: [analytics]
@@ -8194,8 +8358,8 @@ paths:
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
     patch:
-      operationId: updateAttributionModel
-      x-outflare-access: { scope: analytics.manage }
+      operationId: updateBrandAttributionModel
+      x-outflare-access: { scope: analytics.manage, brand: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Change an attribution model
       description: |
@@ -8219,8 +8383,8 @@ paths:
         "409": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
     delete:
-      operationId: archiveAttributionModel
-      x-outflare-access: { scope: analytics.manage }
+      operationId: archiveBrandAttributionModel
+      x-outflare-access: { scope: analytics.manage, brand: true }
       summary: Archive an attribution model
       description: "Scope: analytics.manage. Reports can no longer read it, except a version a module pins. The workspace's default model can't be archived."
       tags: [analytics]
@@ -8556,10 +8720,66 @@ paths:
       - { $ref: "#/components/parameters/Workspace" }
     get:
       operationId: listConversionDefinitions
+      deprecated: true
       x-outflare-access: { scope: analytics.read }
       summary: List conversion definitions
       description: |
         Scope: analytics.read. What the workspace counts as a conversion, defined on the customer events stream and never
+        tied to one integration: a customer event (signed_up, payment.succeeded, meeting.held, call.completed), filters on
+        its properties, what it is worth, and each ad network's own name for it. Attribution credits channels with every
+        definition that has attribution on, besides the events in GET .../attribution/settings. Archived ones too with
+        archived=true.
+        Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step.
+      tags: [analytics]
+      parameters:
+        - { name: archived, in: query, required: false, schema: { type: boolean } }
+      responses:
+        "200":
+          description: The definitions, by key.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/ConversionDefinition" } }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createConversionDefinition
+      deprecated: true
+      x-outflare-access: { scope: analytics.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Define a conversion
+      description: |
+        Scope: analytics.manage. Such as a call over a minute:
+        `{"key": "qualified_call", "name": "Qualified call", "event": "call.completed", "filters": [{"property": "duration_s", "op": "gt", "value": 60}], "value_mode": "fixed", "fixed_value_minor": 5000, "currency": "USD"}`.
+        Every conversion is credited again in the background.
+        Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step.
+      tags: [analytics]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ConversionDefinitionInput" }
+      responses:
+        "201":
+          description: The definition.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ConversionDefinition" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "400": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/conversion-definitions:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+    get:
+      operationId: listBrandConversionDefinitions
+      x-outflare-access: { scope: analytics.read, brand: true }
+      summary: List conversion definitions
+      description: |
+        Scope: analytics.read. What the brand counts as a conversion, defined on the customer events stream and never
         tied to one integration: a customer event (signed_up, payment.succeeded, meeting.held, call.completed), filters on
         its properties, what it is worth, and each ad network's own name for it. Attribution credits channels with every
         definition that has attribution on, besides the events in GET .../attribution/settings. Archived ones too with
@@ -8579,8 +8799,8 @@ paths:
                   data: { type: array, items: { $ref: "#/components/schemas/ConversionDefinition" } }
         default: { $ref: "#/components/responses/Error" }
     post:
-      operationId: createConversionDefinition
-      x-outflare-access: { scope: analytics.manage }
+      operationId: createBrandConversionDefinition
+      x-outflare-access: { scope: analytics.manage, brand: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Define a conversion
       description: |
@@ -8608,7 +8828,28 @@ paths:
       - { $ref: "#/components/parameters/Workspace" }
     get:
       operationId: listConversionPresets
+      deprecated: true
       x-outflare-access: { scope: analytics.read }
+      summary: Starting points for conversion definitions
+      description: "Scope: analytics.read. Sets of definitions a kind of business usually starts from (SaaS, booked calls, e-commerce, lead generation). Adding one copies them; change anything afterwards. Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step."
+      tags: [analytics]
+      responses:
+        "200":
+          description: The presets.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/ConversionPreset" } }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/conversion-definitions/presets:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+    get:
+      operationId: listBrandConversionPresets
+      x-outflare-access: { scope: analytics.read, brand: true }
       summary: Starting points for conversion definitions
       description: "Scope: analytics.read. Sets of definitions a kind of business usually starts from (SaaS, booked calls, e-commerce, lead generation). Adding one copies them; change anything afterwards."
       tags: [analytics]
@@ -8629,7 +8870,33 @@ paths:
       - { name: preset, in: path, required: true, schema: { type: string, example: booked_calls } }
     post:
       operationId: addConversionPreset
+      deprecated: true
       x-outflare-access: { scope: analytics.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Add a preset's conversion definitions
+      description: "Scope: analytics.manage. Adds the preset's definitions whose keys the workspace doesn't use yet, so adding it twice changes nothing. Conversions are credited again when any is added. Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step."
+      tags: [analytics]
+      responses:
+        "200":
+          description: What was added, and the keys already there.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [added, skipped]
+                properties:
+                  added: { type: array, items: { $ref: "#/components/schemas/ConversionDefinition" } }
+                  skipped: { type: array, items: { type: string } }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/conversion-definitions/presets/{preset}:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: preset, in: path, required: true, schema: { type: string, example: booked_calls } }
+    post:
+      operationId: addBrandConversionPreset
+      x-outflare-access: { scope: analytics.manage, brand: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Add a preset's conversion definitions
       description: "Scope: analytics.manage. Adds the preset's definitions whose keys the workspace doesn't use yet, so adding it twice changes nothing. Conversions are credited again when any is added."
@@ -8654,7 +8921,62 @@ paths:
       - { name: key, in: path, required: true, schema: { type: string } }
     get:
       operationId: getConversionDefinition
+      deprecated: true
       x-outflare-access: { scope: analytics.read }
+      summary: Get a conversion definition
+      description: "Scope: analytics.read. Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step."
+      tags: [analytics]
+      responses:
+        "200":
+          description: The definition.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ConversionDefinition" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateConversionDefinition
+      deprecated: true
+      x-outflare-access: { scope: analytics.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Change a conversion definition
+      description: "Scope: analytics.manage. Fields left out keep their values; the key never changes. Switching value_mode clears the other mode's fields. Every conversion is credited again. Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step."
+      tags: [analytics]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ConversionDefinitionInput" }
+      responses:
+        "200":
+          description: The definition.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ConversionDefinition" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    delete:
+      operationId: archiveConversionDefinition
+      deprecated: true
+      x-outflare-access: { scope: analytics.manage }
+      summary: Archive a conversion definition
+      description: "Scope: analytics.manage. It stops counting, and conversions are credited again without it. Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step."
+      tags: [analytics]
+      responses:
+        "204": { description: Archived. }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/conversion-definitions/{key}:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: key, in: path, required: true, schema: { type: string } }
+    get:
+      operationId: getBrandConversionDefinition
+      x-outflare-access: { scope: analytics.read, brand: true }
       summary: Get a conversion definition
       description: "Scope: analytics.read."
       tags: [analytics]
@@ -8667,8 +8989,8 @@ paths:
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
     patch:
-      operationId: updateConversionDefinition
-      x-outflare-access: { scope: analytics.manage }
+      operationId: updateBrandConversionDefinition
+      x-outflare-access: { scope: analytics.manage, brand: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Change a conversion definition
       description: "Scope: analytics.manage. Fields left out keep their values; the key never changes. Switching value_mode clears the other mode's fields. Every conversion is credited again."
@@ -8690,8 +9012,8 @@ paths:
         "409": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
     delete:
-      operationId: archiveConversionDefinition
-      x-outflare-access: { scope: analytics.manage }
+      operationId: archiveBrandConversionDefinition
+      x-outflare-access: { scope: analytics.manage, brand: true }
       summary: Archive a conversion definition
       description: "Scope: analytics.manage. It stops counting, and conversions are credited again without it."
       tags: [analytics]
@@ -12469,7 +12791,50 @@ paths:
       - { $ref: "#/components/parameters/Workspace" }
     get:
       operationId: getAdSettings
+      deprecated: true
       x-outflare-access: { scope: analytics.read }
+      summary: Read the paid media settings
+      description: "Scope: analytics.read. consent_mode decides who conversions are sent for outside the EEA, the UK and Switzerland: opt_out (the default) sends unless the person withdrew consent for ad data, opt_in only when they granted it. Inside those countries, and when a person's country is unknown, a grant is always needed. Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step."
+      tags: [ads]
+      responses:
+        "200":
+          description: The settings.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdSettings" }
+        default: { $ref: "#/components/responses/Error" }
+    put:
+      operationId: setAdSettings
+      deprecated: true
+      x-outflare-access: { scope: integrations.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Change the paid media settings
+      description: "Scope: integrations.manage. Sets consent_mode. Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step."
+      tags: [ads]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [consent_mode]
+              properties:
+                consent_mode: { type: string, enum: [opt_out, opt_in] }
+      responses:
+        "200":
+          description: The settings now.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdSettings" }
+        "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/ads/settings:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+    get:
+      operationId: getBrandAdSettings
+      x-outflare-access: { scope: analytics.read, brand: true }
       summary: Read the paid media settings
       description: "Scope: analytics.read. consent_mode decides who conversions are sent for outside the EEA, the UK and Switzerland: opt_out (the default) sends unless the person withdrew consent for ad data, opt_in only when they granted it. Inside those countries, and when a person's country is unknown, a grant is always needed."
       tags: [ads]
@@ -12481,8 +12846,8 @@ paths:
               schema: { $ref: "#/components/schemas/AdSettings" }
         default: { $ref: "#/components/responses/Error" }
     put:
-      operationId: setAdSettings
-      x-outflare-access: { scope: integrations.manage }
+      operationId: setBrandAdSettings
+      x-outflare-access: { scope: integrations.manage, brand: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Change the paid media settings
       description: "Scope: integrations.manage. Sets consent_mode."
@@ -28704,7 +29069,43 @@ paths:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: getVisitorSettings
+      deprecated: true
       x-outflare-access: { scope: customers.read }
+      summary: Get visitor settings
+      description: "Scope: customers.read. Key pages, the hot score, email click matching and who is left out. Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step."
+      tags: [records]
+      responses:
+        "200":
+          description: The settings.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/VisitorSettings" }
+        default: { $ref: "#/components/responses/Error" }
+    put:
+      operationId: updateVisitorSettings
+      deprecated: true
+      x-outflare-access: { scope: customers.manage }
+      summary: Change visitor settings
+      description: "Scope: customers.manage. Fields left out keep their value. Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step."
+      tags: [records]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/VisitorSettingsInput" }
+      responses:
+        "200":
+          description: The settings.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/VisitorSettings" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/visitors/settings:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    get:
+      operationId: getBrandVisitorSettings
+      x-outflare-access: { scope: customers.read, brand: true }
       summary: Get visitor settings
       description: "Scope: customers.read. Key pages, the hot score, email click matching and who is left out."
       tags: [records]
@@ -28716,8 +29117,8 @@ paths:
               schema: { $ref: "#/components/schemas/VisitorSettings" }
         default: { $ref: "#/components/responses/Error" }
     put:
-      operationId: updateVisitorSettings
-      x-outflare-access: { scope: customers.manage }
+      operationId: updateBrandVisitorSettings
+      x-outflare-access: { scope: customers.manage, brand: true }
       summary: Change visitor settings
       description: "Scope: customers.manage. Fields left out keep their value."
       tags: [records]
@@ -28875,7 +29276,7 @@ paths:
           description: Each flag that is on, with the variant or false.
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/FlagDecisions" }
+              schema: { $ref: "#/components/schemas/SiteFlagDecisions" }
         default: { $ref: "#/components/responses/Error" }
     options:
       operationId: getSiteFlagsPreflight
@@ -28909,8 +29310,10 @@ paths:
       description: |
         Public: the signed edit token is the authority, and its person must still manage analytics on every brand. The
         changes replace the version's payload `changes`; the rest of its payload stays. Each change has a CSS selector and
-        one action: text (set as text, never HTML), hide, href, or src and alt. Links and images go only to https://, http://
-        or a path on the site. Up to 50 changes, within the version's 4 KB payload. Send the JSON as text/plain to skip the
+        one action: text (set as text, never HTML), rich (simple formatting), hide, href, src and alt, style, move or insert,
+        optionally only on phones or wider screens. Links and images go only to https://, http:// or a path on the site. Up to
+        50 changes, within the version's 16 KB payload. css and redirect set the version's own CSS and a page to send its
+        visitors to (only the brand's own domains). Send the JSON as text/plain to skip the
         CORS preflight. Recorded as flag.updated, by the link's person.
       tags: [flags]
       requestBody:
@@ -28925,6 +29328,8 @@ paths:
               properties:
                 token: { type: string }
                 changes: { type: array, maxItems: 50, items: { $ref: "#/components/schemas/FlagChange" } }
+                css: { type: string, maxLength: 8000, description: "The version's own CSS (no url(), @import or fonts); \"\" removes it, absent keeps it." }
+                redirect: { type: string, maxLength: 2000, description: "Send the version's visitors to this page instead: a path such as /pricing-b, or an address on the brand's domains; \"\" removes it, absent keeps it." }
       responses:
         "200":
           description: The version and its saved changes.
@@ -29729,7 +30134,7 @@ paths:
             schema:
               allOf:
                 - { $ref: "#/components/schemas/ABTestInput" }
-                - { required: [flag, goals] }
+                - { required: [goals], oneOf: [{ required: [flag] }, { required: [page] }] }
       responses:
         "201":
           description: The test.
@@ -29778,7 +30183,7 @@ paths:
             schema:
               allOf:
                 - { $ref: "#/components/schemas/ABTestInput" }
-                - { required: [flag, goals] }
+                - { required: [goals], oneOf: [{ required: [flag] }, { required: [page] }] }
       responses:
         "201":
           description: The test.
@@ -30596,7 +31001,7 @@ paths:
                       type: object
                       required: [id, status, text]
                       properties:
-                        id: { type: string, enum: [flag, one_at_a_time, overlap, exposures, delivery, goal, duration, qa, guardrails] }
+                        id: { type: string, enum: [flag, one_at_a_time, overlap, exposures, delivery, changes_found, goal, duration, qa, guardrails] }
                         status: { type: string, enum: [ok, warn, fail] }
                         text: { type: string }
         default: { $ref: "#/components/responses/Error" }
@@ -30633,7 +31038,7 @@ paths:
                       type: object
                       required: [id, status, text]
                       properties:
-                        id: { type: string, enum: [flag, one_at_a_time, overlap, exposures, delivery, goal, duration, qa, guardrails] }
+                        id: { type: string, enum: [flag, one_at_a_time, overlap, exposures, delivery, changes_found, goal, duration, qa, guardrails] }
                         status: { type: string, enum: [ok, warn, fail] }
                         text: { type: string }
         default: { $ref: "#/components/responses/Error" }
@@ -30668,6 +31073,112 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/ABTest" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/ab-tests/{test}/versions/{version}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: test, in: path, required: true, schema: { type: string, format: uuid } }
+      - { name: version, in: path, required: true, schema: { type: string }, description: "One of the test flag's versions, such as b." }
+    get:
+      operationId: getABTestVersion
+      deprecated: true
+      x-outflare-access: { scope: analytics.read }
+      summary: Read a test version's visual changes
+      description: |
+        Scope: analytics.read. The version's visual changes, CSS and redirect, as the visual editor saves them; live is true
+        while visitors can see it (the test runs or its flag is on).
+        Deprecated: use /v1/brands/{brand}/ab-tests/{test}/versions/{version}. This workspace route stays until the brands contract step.
+      tags: [ab-tests]
+      responses:
+        "200":
+          description: The version.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ABTestVersion" }
+        default: { $ref: "#/components/responses/Error" }
+    put:
+      operationId: setABTestVersion
+      deprecated: true
+      x-outflare-access: { scope: analytics.manage }
+      summary: Set a test version's visual changes
+      description: |
+        Scope: analytics.manage. What the visual editor saves, for people and agents: changes replace the version's visual
+        changes (FlagChange), and css and redirect, when sent, replace its CSS and the page it sends visitors to ("" removes
+        them). The rest of its payload stays. The control is today's page and can't be changed; 409 once the test has ended.
+        An agent token can build a draft's versions under its grants, but a change to a version visitors can see (the test
+        runs or its flag is on) always waits for a person (202), as do starting and shipping a test. Recorded as
+        flag.updated.
+        Deprecated: use /v1/brands/{brand}/ab-tests/{test}/versions/{version}. This workspace route stays until the brands contract step.
+      tags: [ab-tests]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                changes: { type: array, maxItems: 50, items: { $ref: "#/components/schemas/FlagChange" } }
+                css: { type: string, maxLength: 8000, description: "The version's own CSS (looks only: no url(), @import or fonts)." }
+                redirect: { type: string, maxLength: 2000, description: "Send the version's visitors to this page: a path such as /pricing-b, or an address on the brand's domains." }
+      responses:
+        "200":
+          description: The version as saved.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ABTestVersion" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/ab-tests/{test}/versions/{version}:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: test, in: path, required: true, schema: { type: string, format: uuid } }
+      - { name: version, in: path, required: true, schema: { type: string }, description: "One of the test flag's versions, such as b." }
+    get:
+      operationId: getBrandABTestVersion
+      x-outflare-access: { scope: analytics.read, brand: true }
+      summary: Read a test version's visual changes
+      description: |
+        Scope: analytics.read. The version's visual changes, CSS and redirect, as the visual editor saves them; live is true
+        while visitors can see it (the test runs or its flag is on).
+      tags: [ab-tests]
+      responses:
+        "200":
+          description: The version.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ABTestVersion" }
+        default: { $ref: "#/components/responses/Error" }
+    put:
+      operationId: setBrandABTestVersion
+      x-outflare-access: { scope: analytics.manage, brand: true }
+      summary: Set a test version's visual changes
+      description: |
+        Scope: analytics.manage. What the visual editor saves, for people and agents: changes replace the version's visual
+        changes (FlagChange), and css and redirect, when sent, replace its CSS and the page it sends visitors to ("" removes
+        them). The rest of its payload stays. The control is today's page and can't be changed; 409 once the test has ended.
+        An agent token can build a draft's versions under its grants, but a change to a version visitors can see (the test
+        runs or its flag is on) always waits for a person (202), as do starting and shipping a test. Recorded as
+        flag.updated.
+      tags: [ab-tests]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                changes: { type: array, maxItems: 50, items: { $ref: "#/components/schemas/FlagChange" } }
+                css: { type: string, maxLength: 8000, description: "The version's own CSS (looks only: no url(), @import or fonts)." }
+                redirect: { type: string, maxLength: 2000, description: "Send the version's visitors to this page: a path such as /pricing-b, or an address on the brand's domains." }
+      responses:
+        "200":
+          description: The version as saved.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ABTestVersion" }
         "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/ab-tests/{test}/ship:
@@ -31407,6 +31918,12 @@ paths:
         amount and currency within 15 minutes) or from a billing connector, the order is counted as that one; either way
         its properties get outflare_payment, the message id of the payment.succeeded it counts as. Count payment.succeeded
         (not Order Completed) in conversion definitions and ad conversion rules, so a payment sent both ways counts once.
+
+        An Order Refunded track event from a known person is a refund of the payment its order_id names (or
+        transaction_id or payment_id: the payment's source_id, its order's messageId or Outflare's transaction id), of
+        amount (or revenue, total, value) in major units, the whole payment when none is given. Its id is refund_id,
+        else its messageId; the same refund sent as a transaction counts once. Its properties get outflare_refund, the
+        refund's transaction id.
       tags: [records]
       requestBody:
         required: true
@@ -34093,6 +34610,11 @@ paths:
         sent to ad networks count. When the same payment is already in, from an Order Completed event with the same
         order_id (or, without one, the same person, amount and currency within 15 minutes) or from a billing connector
         with the same source_id, the answer is that transaction (200) and nothing is added or counted again.
+
+        Refunds work the same way. refund_of names the payment by any id it has (see TransactionInput). A refund already
+        in from an Order Refunded event with the same refund id (its refund_id, else its messageId), or of the same
+        payment and amount within 15 minutes, is that one (200). A refund counts once its payment is known, and lowers
+        the conversion sent to ad networks for that payment (Google: a conversion adjustment).
       tags: [transactions]
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       requestBody:
@@ -34156,6 +34678,63 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/Deletion" }
         "202": { $ref: "#/components/responses/MissionHeld" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/transactions/{transaction}/refund-of:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: transaction, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: linkBrandRefund
+      x-outflare-access: { scope: customers.manage, brand: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Link a refund to its payment
+      description: |
+        Scope: customers.manage. Names the payment a refund or chargeback gives back, for one whose refund_of named a
+        payment Outflare doesn't have (GET .../developer-setup lists them as unmatched_refunds). payment is any id the
+        payment has: its source_id (an order's order_id), its Order Completed event's messageId, or Outflare's
+        transaction id. The refund's refund_of becomes the payment's source_id; a refund saved without an amount takes
+        the payment's. It then counts as payment.refunded, comes off that payment's revenue, and lowers the
+        conversion sent to ad networks. Sends transaction.refund_linked.
+      tags: [transactions]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [payment]
+              properties:
+                payment: { type: string, minLength: 1, maxLength: 200, description: "The payment's order_id or source_id, its order's messageId, or Outflare's transaction id." }
+      responses:
+        "200":
+          description: The refund, linked.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Transaction" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/developer-setup:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    get:
+      operationId: getBrandDeveloperSetup
+      x-outflare-access: { scope: customers.read, brand: true }
+      summary: Check what a brand's developer sends
+      description: |
+        Scope: customers.read. A live checklist of the brand's integration: sign-ups and orders arriving from the
+        server, payments counted once (with a person), refunds finding their payment, the website's copies of sign-ups
+        and orders matching the server's, and refunds reaching ad networks. Each check says ok, warning or missing,
+        what it found and how to fix it. unmatched_refunds are refunds whose payment Outflare doesn't have: link each
+        with POST .../transactions/{transaction}/refund-of.
+      tags: [transactions]
+      responses:
+        "200":
+          description: The checklist.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DeveloperSetup" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/records/{record}/field-values:
@@ -40823,9 +41402,10 @@ paths:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listPartnerPrograms
+      deprecated: true
       x-outflare-access: { scope: partners.read, brand_limited: true }
       summary: List partner programs
-      description: "Scope: partners.read. Referral, affiliate and influencer programs, oldest first, with their reward rules."
+      description: "Scope: partners.read. Referral, affiliate and influencer programs, oldest first, with their reward rules. Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step."
       tags: [partners]
       parameters:
         - { $ref: "#/components/parameters/Brand" }
@@ -40844,7 +41424,58 @@ paths:
         default: { $ref: "#/components/responses/Error" }
     post:
       operationId: createPartnerProgram
+      deprecated: true
       x-outflare-access: { scope: partners.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Create a partner program from a preset
+      description: |
+        Scope: partners.manage. kind picks the preset; every setting it fills in can be changed. referral: two-sided
+        action rewards on the first sale (your system grants them), a 60-day window, a 14-day hold, partners accepted
+        at once. affiliate: 20% of every sale, a 30-day window, a 30-day hold, a $50 minimum payout. influencer: track
+        only (log fees by hand), no hold. The credit rule (window, first or last, codes_win) belongs to the program and
+        never follows the workspace's attribution settings. Pass rules to start with your own.
+        Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step.
+      tags: [partners]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PartnerProgramInput" }
+      responses:
+        "201":
+          description: The program.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PartnerProgram" }
+        "400": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/partner-programs:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    get:
+      operationId: listBrandPartnerPrograms
+      x-outflare-access: { scope: partners.read, brand: true }
+      summary: List partner programs
+      description: "Scope: partners.read. Referral, affiliate and influencer programs, oldest first, with their reward rules."
+      tags: [partners]
+      parameters:
+        - { name: status, in: query, schema: { type: string, enum: [active, paused, archived] } }
+      responses:
+        "200":
+          description: Programs.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/PartnerProgram" } }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createBrandPartnerProgram
+      x-outflare-access: { scope: partners.manage, brand: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Create a partner program from a preset
       description: |
@@ -40875,7 +41506,41 @@ paths:
       - { name: id, in: path, required: true, description: "A program's id or slug.", schema: { type: string } }
     get:
       operationId: getPartnerProgramStats
+      deprecated: true
       x-outflare-access: { scope: partners.read, brand_limited: true }
+      summary: A program's totals
+      description: "Scope: partners.read. The program's figures across all its partners: partners by status, and the sum of every partner's stats. Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step."
+      tags: [partners]
+      responses:
+        "200":
+          description: The totals.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: "#/components/schemas/PartnerStats" }
+                  - type: object
+                    required: [partners]
+                    properties:
+                      partners:
+                        type: object
+                        required: [total, active, pending, suspended, rejected, missing_payout_details]
+                        properties:
+                          total: { type: integer }
+                          active: { type: integer }
+                          pending: { type: integer }
+                          suspended: { type: integer }
+                          rejected: { type: integer }
+                          missing_payout_details: { type: integer, description: "Active partners who haven't given payout details." }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/partner-programs/{id}/stats:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: id, in: path, required: true, description: "A program's id or slug.", schema: { type: string } }
+    get:
+      operationId: getBrandPartnerProgramStats
+      x-outflare-access: { scope: partners.read, brand: true }
       summary: A program's totals
       description: "Scope: partners.read. The program's figures across all its partners: partners by status, and the sum of every partner's stats."
       tags: [partners]
@@ -40908,7 +41573,49 @@ paths:
       - { name: id, in: path, required: true, description: "The program's id or slug.", schema: { type: string } }
     get:
       operationId: getPartnerProgram
+      deprecated: true
       x-outflare-access: { scope: partners.read, brand_limited: true }
+      summary: Get a partner program
+      description: "Scope: partners.read. With its reward rules and groups. Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step."
+      tags: [partners]
+      responses:
+        "200":
+          description: The program.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PartnerProgram" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updatePartnerProgram
+      deprecated: true
+      x-outflare-access: { scope: partners.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Change a partner program's settings, or pause, archive or restore it
+      description: "Scope: partners.manage. Send only what changes. kind and slug can't change; currency can't once there are rewards. A paused program credits nothing new; its links still land. Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step."
+      tags: [partners]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PartnerProgramInput" }
+      responses:
+        "200":
+          description: The program.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PartnerProgram" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/partner-programs/{id}:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: id, in: path, required: true, description: "The program's id or slug.", schema: { type: string } }
+    get:
+      operationId: getBrandPartnerProgram
+      x-outflare-access: { scope: partners.read, brand: true }
       summary: Get a partner program
       description: "Scope: partners.read. With its reward rules and groups."
       tags: [partners]
@@ -40921,8 +41628,8 @@ paths:
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
     patch:
-      operationId: updatePartnerProgram
-      x-outflare-access: { scope: partners.manage, brand_limited: true }
+      operationId: updateBrandPartnerProgram
+      x-outflare-access: { scope: partners.manage, brand: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Change a partner program's settings, or pause, archive or restore it
       description: "Scope: partners.manage. Send only what changes. kind and slug can't change; currency can't once there are rewards. A paused program credits nothing new; its links still land."
@@ -40948,7 +41655,45 @@ paths:
       - { name: id, in: path, required: true, description: "The program's id or slug.", schema: { type: string } }
     put:
       operationId: setPartnerRules
+      deprecated: true
       x-outflare-access: { scope: partners.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Replace a partner program's reward rules
+      description: |
+        Scope: partners.manage. Every action rule a conversion matches gives a reward, but only one cash rule (percent
+        or fixed) pays, whatever the rules' order: a partner's own rule (partner_id) beats their group's, which beats one
+        for everyone; then the highest tier (min_sales) reached; then the narrower recurrence (first, then months, then
+        every); then a rule for named product_ids; then the one paying more. A cash flow with stacking adds pays on top.
+        Flows can also have conditions, their own approval, overrides per partner or product, and kind group (move the
+        partner to a group). [] makes the program track only. Rewards already in the ledger keep what they earned.
+        Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step.
+      tags: [partners]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [rules]
+              properties:
+                rules: { type: array, maxItems: 50, items: { $ref: "#/components/schemas/PartnerRuleInput" } }
+      responses:
+        "200":
+          description: The program.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PartnerProgram" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/partner-programs/{id}/rules:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: id, in: path, required: true, description: "The program's id or slug.", schema: { type: string } }
+    put:
+      operationId: setBrandPartnerRules
+      x-outflare-access: { scope: partners.manage, brand: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Replace a partner program's reward rules
       description: |
@@ -40984,7 +41729,40 @@ paths:
       - { name: id, in: path, required: true, description: "The program's id or slug.", schema: { type: string } }
     post:
       operationId: createPartnerGroup
+      deprecated: true
       x-outflare-access: { scope: partners.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Add a partner group (a tier with its own rates)
+      description: "Scope: partners.manage. Then give the group its own rules (group_id) and move partners into it. Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step."
+      tags: [partners]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name: { type: string, maxLength: 80 }
+                default: { type: boolean, description: New partners join this group. }
+      responses:
+        "201":
+          description: The group.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PartnerGroup" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/partner-programs/{id}/groups:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: id, in: path, required: true, description: "The program's id or slug.", schema: { type: string } }
+    post:
+      operationId: createBrandPartnerGroup
+      x-outflare-access: { scope: partners.manage, brand: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Add a partner group (a tier with its own rates)
       description: "Scope: partners.manage. Then give the group its own rules (group_id) and move partners into it."
@@ -41017,7 +41795,53 @@ paths:
       - { name: group, in: path, required: true, schema: { type: string, format: uuid } }
     delete:
       operationId: deletePartnerGroup
+      deprecated: true
       x-outflare-access: { scope: partners.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Remove a partner group
+      description: "Scope: partners.manage. Its own rules go with it; its partners move to no group. Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step."
+      tags: [partners]
+      responses:
+        "204": { description: Removed. }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updatePartnerGroup
+      deprecated: true
+      x-outflare-access: { scope: partners.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Rename a partner group or make it the default
+      description: "Scope: partners.manage. default: true makes it the group new partners join (when none is given); false stops that. Returns the program. Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step."
+      tags: [partners]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string, minLength: 1, maxLength: 80 }
+                default: { type: boolean }
+      responses:
+        "200":
+          description: The program, with its groups.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PartnerProgram" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/partner-programs/{id}/groups/{group}:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: id, in: path, required: true, description: "The program's id or slug.", schema: { type: string } }
+      - { name: group, in: path, required: true, schema: { type: string, format: uuid } }
+    delete:
+      operationId: deleteBrandPartnerGroup
+      x-outflare-access: { scope: partners.manage, brand: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Remove a partner group
       description: "Scope: partners.manage. Its own rules go with it; its partners move to no group."
@@ -41028,8 +41852,8 @@ paths:
         "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
     patch:
-      operationId: updatePartnerGroup
-      x-outflare-access: { scope: partners.manage, brand_limited: true }
+      operationId: updateBrandPartnerGroup
+      x-outflare-access: { scope: partners.manage, brand: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Rename a partner group or make it the default
       description: "Scope: partners.manage. default: true makes it the group new partners join (when none is given); false stops that. Returns the program."
@@ -41061,7 +41885,43 @@ paths:
       - { name: group, in: path, required: true, description: "The group's id, or none to take partners out of every group.", schema: { type: string } }
     post:
       operationId: assignPartnerGroup
+      deprecated: true
       x-outflare-access: { scope: partners.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Move partners into a group
+      description: "Scope: partners.manage. A partner is in one group at a time; its rules (group_id) apply to them. Partners of other programs are left alone. Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step."
+      tags: [partners]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [partner_ids]
+              properties:
+                partner_ids: { type: array, minItems: 1, maxItems: 1000, items: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: How many moved.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [moved]
+                properties:
+                  moved: { type: integer }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/partner-programs/{id}/groups/{group}/partners:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: id, in: path, required: true, description: "The program's id or slug.", schema: { type: string } }
+      - { name: group, in: path, required: true, description: "The group's id, or none to take partners out of every group.", schema: { type: string } }
+    post:
+      operationId: assignBrandPartnerGroup
+      x-outflare-access: { scope: partners.manage, brand: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Move partners into a group
       description: "Scope: partners.manage. A partner is in one group at a time; its rules (group_id) apply to them. Partners of other programs are left alone."
@@ -41095,7 +41955,33 @@ paths:
       - { name: id, in: path, required: true, description: "A program's id or slug.", schema: { type: string } }
     post:
       operationId: switchOverPartnerProgram
+      deprecated: true
       x-outflare-access: { scope: partners.manage, brand_limited: true }
+      summary: Switch a program over from the platform it was imported from
+      description: |
+        Scope: partners.manage. Say that the platform the program was imported from (Tolt) no longer pays it. Until then,
+        commissions the import brought in keep that platform's status, re-runs bring its changes, and Outflare never approves
+        them after its hold or puts them in a payout, so nobody is paid twice. From now on they are approved and paid here like
+        any other. 409 when it has already switched over.
+        Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step.
+      tags: [partners]
+      responses:
+        "200":
+          description: The program.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PartnerProgram" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/partner-programs/{id}/switch-over:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: id, in: path, required: true, description: "A program's id or slug.", schema: { type: string } }
+    post:
+      operationId: switchOverBrandPartnerProgram
+      x-outflare-access: { scope: partners.manage, brand: true }
       summary: Switch a program over from the platform it was imported from
       description: |
         Scope: partners.manage. Say that the platform the program was imported from (Tolt) no longer pays it. Until then,
@@ -41119,7 +42005,37 @@ paths:
       - { name: id, in: path, required: true, description: "The program's id or slug.", schema: { type: string } }
     post:
       operationId: rotatePartnerPostback
+      deprecated: true
       x-outflare-access: { scope: partners.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Make the program's incoming postback URL
+      description: |
+        Scope: partners.manage. Shown once; making another retires the last. Partners' trackers and backends that can
+        only call a URL report conversions to it (GET or POST /v1/partner-postbacks/{token}). Treat it like a password:
+        anyone with it can report conversions to this program.
+        Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step.
+      tags: [partners]
+      responses:
+        "201":
+          description: The URL.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [url, hint]
+                properties:
+                  url: { type: string, description: The postback URL, with its secret. }
+                  hint: { type: string, description: "The start of the secret, shown later as postback_hint." }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/partner-programs/{id}/postback:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: id, in: path, required: true, description: "The program's id or slug.", schema: { type: string } }
+    post:
+      operationId: rotateBrandPartnerPostback
+      x-outflare-access: { scope: partners.manage, brand: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Make the program's incoming postback URL
       description: |
@@ -41147,7 +42063,68 @@ paths:
       - { name: id, in: path, required: true, description: "A program's id or slug.", schema: { type: string } }
     post:
       operationId: startPartnerImport
+      deprecated: true
       x-outflare-access: { scope: partners.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Import a partner program from Tolt
+      description: |
+        Scope: partners.manage. Queues an import into this program from the workspace's partner platform connection (Tolt,
+        with your own API key). It brings partners with the code of their first link, so old links keep working (a code
+        that is taken or not allowed here gets a new one, noted in the summary), their payout details, promo codes,
+        referred customers, transactions with refunds, and commissions with their status, paid ones in paid payouts.
+        Run it as often as you like until switch-over day: every object is matched by its id there, so a run adds only
+        what is new and brings over status changes. Importing sends no reward webhooks and imported sales are not
+        customer events. One import runs at a time per program (409 conflict); 409 connector_needed when Tolt isn't
+        connected. With no source_program, the account's only program is used, or its only active one
+        (listPartnerImportSources lists them).
+        Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step.
+      tags: [partners]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                integration_id: { type: string, format: uuid, description: "The connection; the first connected partner platform when left out." }
+                source_program: { type: string, description: "The program's id on the platform." }
+      responses:
+        "201":
+          description: Queued.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PartnerImport" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+    get:
+      operationId: listPartnerImports
+      deprecated: true
+      x-outflare-access: { scope: partners.read, brand_limited: true }
+      summary: List a program's imports, newest first
+      description: "Scope: partners.read. The last 50 imports into the program, with what each brought and what it couldn't. Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step."
+      tags: [partners]
+      responses:
+        "200":
+          description: The imports.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/PartnerImport" } }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/partner-programs/{id}/imports:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: id, in: path, required: true, description: "A program's id or slug.", schema: { type: string } }
+    post:
+      operationId: startBrandPartnerImport
+      x-outflare-access: { scope: partners.manage, brand: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Import a partner program from Tolt
       description: |
@@ -41182,8 +42159,8 @@ paths:
         "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
     get:
-      operationId: listPartnerImports
-      x-outflare-access: { scope: partners.read, brand_limited: true }
+      operationId: listBrandPartnerImports
+      x-outflare-access: { scope: partners.read, brand: true }
       summary: List a program's imports, newest first
       description: "Scope: partners.read. The last 50 imports into the program, with what each brought and what it couldn't."
       tags: [partners]
@@ -41205,7 +42182,53 @@ paths:
       - { name: id, in: path, required: true, description: "A program's id or slug.", schema: { type: string } }
     get:
       operationId: listPartnerImportSources
+      deprecated: true
       x-outflare-access: { scope: partners.manage, brand_limited: true }
+      summary: List the programs an import can read
+      description: |
+        Scope: partners.manage. Reads the programs in the connected partner platform account (Tolt, with your own API
+        key), to pick one for startPartnerImport's source_program. suggested is the program an import takes when none
+        is named: the only one, or the only active one; empty when you must choose. 409 connector_needed when Tolt isn't
+        connected. Nothing is changed on the platform.
+        Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step.
+      tags: [partners]
+      parameters:
+        - { name: integration_id, in: query, description: "The connection; the first connected partner platform when left out.", schema: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: The platform's programs.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, integration_id, suggested]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, name, currency, status]
+                      properties:
+                        id: { type: string, description: "The program's id on the platform: pass it as source_program." }
+                        name: { type: string }
+                        currency: { type: string, description: "Upper case, or empty when the platform doesn't say." }
+                        status: { type: string, description: "active, inactive, or empty when the platform doesn't say." }
+                  integration_id: { type: string, format: uuid }
+                  suggested: { type: string, description: "The program an import takes when none is named, or empty." }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "422": { $ref: "#/components/responses/Error" }
+        "429": { $ref: "#/components/responses/Error" }
+        "502": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/partner-programs/{id}/import-sources:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: id, in: path, required: true, description: "A program's id or slug.", schema: { type: string } }
+    get:
+      operationId: listBrandPartnerImportSources
+      x-outflare-access: { scope: partners.manage, brand: true }
       summary: List the programs an import can read
       description: |
         Scope: partners.manage. Reads the programs in the connected partner platform account (Tolt, with your own API
@@ -41250,7 +42273,27 @@ paths:
       - { name: import, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: getPartnerImport
+      deprecated: true
       x-outflare-access: { scope: partners.read, brand_limited: true }
+      summary: Get an import
+      description: "Scope: partners.read. Its status, counts per kind and issues. Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step."
+      tags: [partners]
+      responses:
+        "200":
+          description: The import.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PartnerImport" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/partner-programs/{id}/imports/{import}:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: id, in: path, required: true, description: "A program's id or slug.", schema: { type: string } }
+      - { name: import, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getBrandPartnerImport
+      x-outflare-access: { scope: partners.read, brand: true }
       summary: Get an import
       description: "Scope: partners.read. Its status, counts per kind and issues."
       tags: [partners]
@@ -41268,7 +42311,58 @@ paths:
       - { name: id, in: path, required: true, description: "A program's id or slug.", schema: { type: string } }
     post:
       operationId: createPartnerWidgetSession
+      deprecated: true
       x-outflare-access: { scope: partners.conversions, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Open the referral widget for a customer signed in to your app
+      description: |
+        Scope: partners.conversions. Call it from your backend when a signed-in customer opens the page that shows the
+        widget, and put embed_url in an iframe. The customer becomes a partner in the program if they aren't one (active
+        when the program accepts partners on its own, otherwise pending), identified with customer_id, email or
+        record_id the same way as conversions. The widget shows their link, promo codes and earnings, and uses a session
+        that lasts 12 hours; never cache embed_url or show it to anyone else. The widget posts
+        {type: "outflare:partner-widget", height} to its parent page whenever its height changes.
+        Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step.
+      tags: [partners]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                customer_id: { type: string, description: Your own id for the customer. }
+                email: { type: string, format: email }
+                record_id: { type: string, format: uuid }
+                name: { type: string, description: Set on a new customer record only. }
+      responses:
+        "201":
+          description: The widget session.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [token, embed_url, expires_in_seconds, partner_id, status, code, link]
+                properties:
+                  token: { type: string, description: The session; embed_url carries it. }
+                  embed_url: { type: string }
+                  expires_in_seconds: { type: integer }
+                  partner_id: { type: string, format: uuid }
+                  status: { type: string, enum: [pending, active, suspended, rejected] }
+                  code: { type: string }
+                  link: { type: string }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/partner-programs/{id}/widget-sessions:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: id, in: path, required: true, description: "A program's id or slug.", schema: { type: string } }
+    post:
+      operationId: createBrandPartnerWidgetSession
+      x-outflare-access: { scope: partners.conversions, brand: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Open the referral widget for a customer signed in to your app
       description: |
@@ -41317,7 +42411,46 @@ paths:
       - { name: id, in: path, required: true, description: "The program's id or slug.", schema: { type: string } }
     put:
       operationId: setPartnerPortal
+      deprecated: true
       x-outflare-access: { scope: partners.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Open, close or set up a program's partner portal
+      description: |
+        Scope: partners.manage. The portal is where partners apply, sign in with a link emailed through the workspace's own
+        email provider (settings.email_from), and see their links, codes, masked referred customers, rewards and payouts. It
+        is served at {subdomain}.{the server's partners domain}, on a tracking domain tied to the program
+        (POST .../tracking-domains with partner_program), or at /p/{id}/ on this server. settings, when sent, replace the
+        stored ones; a kind's defaults fill in pages and sign-up.
+        Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step.
+      tags: [partners]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enabled: { type: boolean }
+                subdomain: { type: [string, "null"], description: "Lowercase letters, digits and hyphens; \"\" for none." }
+                settings: { $ref: "#/components/schemas/PartnerPortalSettings" }
+      responses:
+        "200":
+          description: The program.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PartnerProgram" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/partner-programs/{id}/portal:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: id, in: path, required: true, description: "The program's id or slug.", schema: { type: string } }
+    put:
+      operationId: setBrandPartnerPortal
+      x-outflare-access: { scope: partners.manage, brand: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Open, close or set up a program's partner portal
       description: |
@@ -41354,7 +42487,61 @@ paths:
       - { name: id, in: path, required: true, description: "The program's id or slug.", schema: { type: string } }
     get:
       operationId: listPartnerAssets
+      deprecated: true
       x-outflare-access: { scope: partners.read, brand_limited: true }
+      summary: List a program's assets for partners
+      description: "Scope: partners.read. Banners, copy, email swipes and links shown on the portal's Assets page. Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step."
+      tags: [partners]
+      responses:
+        "200":
+          description: Assets.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/PartnerAsset" } }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createPartnerAsset
+      deprecated: true
+      x-outflare-access: { scope: partners.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Add an asset for partners
+      description: "Scope: partners.manage. image: a banner's https address. text: copy or an email swipe. link: a page to promote. Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step."
+      tags: [partners]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [kind, title]
+              properties:
+                kind: { type: string, enum: [image, text, link] }
+                title: { type: string, maxLength: 200 }
+                body: { type: string, maxLength: 10000 }
+                url: { type: string, maxLength: 2000 }
+                position: { type: integer }
+      responses:
+        "201":
+          description: The asset.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PartnerAsset" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/partner-programs/{id}/assets:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: id, in: path, required: true, description: "The program's id or slug.", schema: { type: string } }
+    get:
+      operationId: listBrandPartnerAssets
+      x-outflare-access: { scope: partners.read, brand: true }
       summary: List a program's assets for partners
       description: "Scope: partners.read. Banners, copy, email swipes and links shown on the portal's Assets page."
       tags: [partners]
@@ -41371,8 +42558,8 @@ paths:
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
     post:
-      operationId: createPartnerAsset
-      x-outflare-access: { scope: partners.manage, brand_limited: true }
+      operationId: createBrandPartnerAsset
+      x-outflare-access: { scope: partners.manage, brand: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Add an asset for partners
       description: "Scope: partners.manage. image: a banner's https address. text: copy or an email swipe. link: a page to promote."
@@ -41407,7 +42594,25 @@ paths:
       - { name: asset, in: path, required: true, schema: { type: string, format: uuid } }
     delete:
       operationId: deletePartnerAsset
+      deprecated: true
       x-outflare-access: { scope: partners.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Remove an asset
+      description: "Scope: partners.manage. Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step."
+      tags: [partners]
+      responses:
+        "204": { description: Removed. }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/partner-programs/{id}/assets/{asset}:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: id, in: path, required: true, description: "The program's id or slug.", schema: { type: string } }
+      - { name: asset, in: path, required: true, schema: { type: string, format: uuid } }
+    delete:
+      operationId: deleteBrandPartnerAsset
+      x-outflare-access: { scope: partners.manage, brand: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Remove an asset
       description: "Scope: partners.manage."
@@ -41423,7 +42628,30 @@ paths:
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: listPartnerPostbacks
+      deprecated: true
       x-outflare-access: { scope: partners.read, brand_limited: true }
+      summary: List a partner's postbacks to their tracker
+      description: "Scope: partners.read. The last 50 calls to the partner's postback URL, newest first: queued, sent, or failed with the tracker's answer. A tracker that is down is tried 5 times; one that refuses (4xx) isn't tried again. Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step."
+      tags: [partners]
+      responses:
+        "200":
+          description: The calls.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/PartnerPostbackSend" } }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/partners/{id}/postbacks:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: listBrandPartnerPostbacks
+      x-outflare-access: { scope: partners.read, brand: true }
       summary: List a partner's postbacks to their tracker
       description: "Scope: partners.read. The last 50 calls to the partner's postback URL, newest first: queued, sent, or failed with the tracker's answer. A tracker that is down is tried 5 times; one that refuses (4xx) isn't tried again."
       tags: [partners]
@@ -41445,7 +42673,38 @@ paths:
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: impersonatePartner
+      deprecated: true
       x-outflare-access: { scope: partners.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: See the portal as a partner does
+      description: |
+        Scope: partners.manage. A one-time link that opens the program's portal as the partner sees it, read-only, for an
+        hour, even while the portal is closed. Recorded in the audit log (partner.impersonated).
+        Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step.
+      tags: [partners]
+      responses:
+        "201":
+          description: The link.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [url, read_only, expires_in_seconds]
+                properties:
+                  url: { type: string }
+                  read_only: { type: boolean }
+                  expires_in_seconds: { type: integer, description: How long the link works; the session it opens lasts an hour. }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/partners/{id}/impersonate:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: impersonateBrandPartner
+      x-outflare-access: { scope: partners.manage, brand: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: See the portal as a partner does
       description: |
@@ -41472,9 +42731,10 @@ paths:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listPartners
+      deprecated: true
       x-outflare-access: { scope: partners.read, brand_limited: true }
       summary: List partners, newest first
-      description: "Scope: partners.read. Each partner's membership in one program, with their links, promo codes and totals."
+      description: "Scope: partners.read. Each partner's membership in one program, with their links, promo codes and totals. Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step."
       tags: [partners]
       parameters:
         - { $ref: "#/components/parameters/Brand" }
@@ -41500,7 +42760,65 @@ paths:
         default: { $ref: "#/components/responses/Error" }
     post:
       operationId: createPartner
+      deprecated: true
       x-outflare-access: { scope: partners.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Add a partner to a program
+      description: |
+        Scope: partners.manage. A partner is a customer record: pass record_id, or an email (the person with it, made
+        when nobody has it). code is their ref code; one is made from their name when left out. Each partner gets a
+        tracking campaign (channel affiliates, named after the code), a short link (/r/{code} on your tracking domain)
+        and a campaign link to the program's landing page.
+        Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step.
+      tags: [partners]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PartnerInput" }
+      responses:
+        "201":
+          description: The partner.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Partner" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/partners:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    get:
+      operationId: listBrandPartners
+      x-outflare-access: { scope: partners.read, brand: true }
+      summary: List partners, newest first
+      description: "Scope: partners.read. Each partner's membership in one program, with their links, promo codes and totals."
+      tags: [partners]
+      parameters:
+        - { name: program, in: query, description: "A program's id or slug.", schema: { type: string } }
+        - { name: status, in: query, schema: { type: string, enum: [pending, active, suspended, rejected] } }
+        - { name: record_id, in: query, description: The partner's customer record., schema: { type: string, format: uuid } }
+        - { name: payout_details, in: query, description: "missing lists partners who haven't given payout details (payout_method), set those who have.", schema: { type: string, enum: [missing, set] } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
+      responses:
+        "200":
+          description: Partners.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, next_cursor]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/Partner" } }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createBrandPartner
+      x-outflare-access: { scope: partners.manage, brand: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Add a partner to a program
       description: |
@@ -41531,7 +42849,49 @@ paths:
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     get:
       operationId: getPartner
+      deprecated: true
       x-outflare-access: { scope: partners.read, brand_limited: true }
+      summary: Get a partner
+      description: "Scope: partners.read. Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step."
+      tags: [partners]
+      responses:
+        "200":
+          description: The partner.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Partner" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updatePartner
+      deprecated: true
+      x-outflare-access: { scope: partners.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Approve, suspend or reject a partner, or change their group, payout method or note
+      description: "Scope: partners.manage. Send only what changes. A partner who isn't active earns nothing new; their links still land. The code can't change: add a promo code instead. group_id \"\" is no group. Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step."
+      tags: [partners]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PartnerInput" }
+      responses:
+        "200":
+          description: The partner.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Partner" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/partners/{id}:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getBrandPartner
+      x-outflare-access: { scope: partners.read, brand: true }
       summary: Get a partner
       description: "Scope: partners.read."
       tags: [partners]
@@ -41544,8 +42904,8 @@ paths:
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
     patch:
-      operationId: updatePartner
-      x-outflare-access: { scope: partners.manage, brand_limited: true }
+      operationId: updateBrandPartner
+      x-outflare-access: { scope: partners.manage, brand: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Approve, suspend or reject a partner, or change their group, payout method or note
       description: "Scope: partners.manage. Send only what changes. A partner who isn't active earns nothing new; their links still land. The code can't change: add a promo code instead. group_id \"\" is no group."
@@ -41576,9 +42936,65 @@ paths:
         format: uuid
     post:
       operationId: addPartnerPromoCode
+      deprecated: true
       x-outflare-access:
         scope: partners.manage
         brand_limited: true
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      summary: Tie a promo code to a partner
+      description: 'Scope: partners.manage. The code as customers type it at checkout (matched in any case). A conversion that reports it (promo_code) credits the partner. Make the code in your billing system yourself, or pass coupon to have Outflare make it there (status shows how that went).'
+      tags:
+      - partners
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - code
+              properties:
+                code:
+                  type: string
+                  maxLength: 64
+                rules:
+                  $ref: '#/components/schemas/PartnerPromoRules'
+                coupon:
+                  type: string
+                  maxLength: 200
+                  description: 'A coupon''s id in the workspace''s billing account (Stripe): Outflare makes the code there too, with the workspace''s own key, which needs Write access to Promotion codes. Leave it out when you make the code yourself.'
+      responses:
+        '201':
+          description: The partner.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Partner'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '202':
+          $ref: '#/components/responses/MissionHeld'
+        default:
+          $ref: '#/components/responses/Error'
+  /v1/brands/{brand}/partners/{id}/promo-codes:
+    parameters:
+    - $ref: '#/components/parameters/BrandID'
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: addBrandPartnerPromoCode
+      x-outflare-access:
+        scope: partners.manage
+        brand: true
       parameters:
       - $ref: '#/components/parameters/IdempotencyKey'
       summary: Tie a promo code to a partner
@@ -41636,6 +43052,7 @@ paths:
         type: string
     patch:
       operationId: updatePartnerPromoCode
+      deprecated: true
       x-outflare-access:
         scope: partners.manage
         brand_limited: true
@@ -41667,9 +43084,75 @@ paths:
           $ref: '#/components/responses/Error'
     delete:
       operationId: removePartnerPromoCode
+      deprecated: true
       x-outflare-access:
         scope: partners.manage
         brand_limited: true
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      summary: Remove a partner's promo code
+      description: 'Scope: partners.manage.'
+      tags:
+      - partners
+      responses:
+        '204':
+          description: Removed.
+        '404':
+          $ref: '#/components/responses/Error'
+        '202':
+          $ref: '#/components/responses/MissionHeld'
+        default:
+          $ref: '#/components/responses/Error'
+  /v1/brands/{brand}/partners/{id}/promo-codes/{code}:
+    parameters:
+    - $ref: '#/components/parameters/BrandID'
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    - name: code
+      in: path
+      required: true
+      schema:
+        type: string
+    patch:
+      operationId: updateBrandPartnerPromoCode
+      x-outflare-access:
+        scope: partners.manage
+        brand: true
+      summary: Enable or disable a partner promo code
+      description: Updates attribution immediately and queues the matching checkout change for connected billing codes. Local codes must also be updated in your own checkout.
+      tags:
+      - partners
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - enabled
+              properties:
+                enabled:
+                  type: boolean
+      responses:
+        '200':
+          description: The partner with updated codes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Partner'
+        '202':
+          $ref: '#/components/responses/MissionHeld'
+        default:
+          $ref: '#/components/responses/Error'
+    delete:
+      operationId: removeBrandPartnerPromoCode
+      x-outflare-access:
+        scope: partners.manage
+        brand: true
       parameters:
       - $ref: '#/components/parameters/IdempotencyKey'
       summary: Remove a partner's promo code
@@ -41691,7 +43174,34 @@ paths:
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: addPartnerFee
+      deprecated: true
       x-outflare-access: { scope: partners.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Log a fixed fee for a partner
+      description: "Scope: partners.manage. Such as an influencer's fee for a post or a month. Approved at once, counted toward their next payout and logged as a cost (channel affiliates), so cost per sale works. Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step."
+      tags: [partners]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PartnerLedgerInput" }
+      responses:
+        "201":
+          description: The ledger entry.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PartnerReward" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/partners/{id}/fees:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: addBrandPartnerFee
+      x-outflare-access: { scope: partners.manage, brand: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Log a fixed fee for a partner
       description: "Scope: partners.manage. Such as an influencer's fee for a post or a month. Approved at once, counted toward their next payout and logged as a cost (channel affiliates), so cost per sale works."
@@ -41717,7 +43227,34 @@ paths:
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: addPartnerAdjustment
+      deprecated: true
       x-outflare-access: { scope: partners.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Correct what a partner is owed
+      description: "Scope: partners.manage. Positive adds, negative takes away; it nets in their next payout. note (why) is required. The ledger never edits an entry: corrections are new entries. Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step."
+      tags: [partners]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PartnerLedgerInput" }
+      responses:
+        "201":
+          description: The ledger entry.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PartnerReward" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/partners/{id}/adjustments:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: addBrandPartnerAdjustment
+      x-outflare-access: { scope: partners.manage, brand: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Correct what a partner is owed
       description: "Scope: partners.manage. Positive adds, negative takes away; it nets in their next payout. note (why) is required. The ledger never edits an entry: corrections are new entries."
@@ -41741,7 +43278,44 @@ paths:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listPartnerConversionLog
+      deprecated: true
       x-outflare-access: { scope: partners.read, brand_limited: true }
+      summary: List inbound conversion calls, newest first
+      description: |
+        Scope: partners.read. Every conversion your backend or tracker reported in the last 30 days, by the API
+        (POST .../partner-conversions) or a postback URL, with what it sent, what Outflare answered and the outcome:
+        credited, not_credited (with its reason, such as no_partner), duplicate, rejected (bad input; the reason is
+        the error code) or error. Use it to find out why a sale wasn't credited. The email a call sent is never kept:
+        request shows "(sent)", and q finds the call by the full address.
+        Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step.
+      tags: [partners]
+      parameters:
+        - { $ref: "#/components/parameters/Brand" }
+        - { name: program, in: query, description: "A program's id or slug.", schema: { type: string } }
+        - { name: source, in: query, schema: { type: string, enum: [api, postback] } }
+        - { name: outcome, in: query, schema: { type: string, enum: [credited, not_credited, duplicate, rejected, error] } }
+        - { name: q, in: query, description: "An external_id, customer_id, refund_of, ref, promo code, email address or request id the call sent.", schema: { type: string, maxLength: 200 } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
+      responses:
+        "200":
+          description: Logged calls.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, next_cursor]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/PartnerConversionLogEntry" } }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/partner-conversion-log:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    get:
+      operationId: listBrandPartnerConversionLog
+      x-outflare-access: { scope: partners.read, brand: true }
       summary: List inbound conversion calls, newest first
       description: |
         Scope: partners.read. Every conversion your backend or tracker reported in the last 30 days, by the API
@@ -41751,7 +43325,6 @@ paths:
         request shows "(sent)", and q finds the call by the full address.
       tags: [partners]
       parameters:
-        - { $ref: "#/components/parameters/Brand" }
         - { name: program, in: query, description: "A program's id or slug.", schema: { type: string } }
         - { name: source, in: query, schema: { type: string, enum: [api, postback] } }
         - { name: outcome, in: query, schema: { type: string, enum: [credited, not_credited, duplicate, rejected, error] } }
@@ -41776,9 +43349,10 @@ paths:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listPartnerConversions
+      deprecated: true
       x-outflare-access: { scope: partners.read, brand_limited: true }
       summary: List partner conversions, newest first
-      description: "Scope: partners.read. Leads, sales and refunds credited to partners."
+      description: "Scope: partners.read. Leads, sales and refunds credited to partners. Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step."
       tags: [partners]
       parameters:
         - { $ref: "#/components/parameters/Brand" }
@@ -41803,7 +43377,81 @@ paths:
         default: { $ref: "#/components/responses/Error" }
     post:
       operationId: createPartnerConversion
+      deprecated: true
       x-outflare-access: { scope: partners.conversions }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Report a sign-up, sale, refund or custom conversion from your backend
+      description: |
+        Scope: partners.conversions, the one scope a server-to-server token needs. A shortcut: a brand's programs also
+        read the customer events and transactions your product already sends (a sign-up is a person's first user id or
+        a Signed Up event; a reward rule's trigger names a custom event; sales come from transactions), so you need this
+        call only if you don't send those. Both ways count once: a sign-up is credited once per customer and program, and
+        a sale or refund with external_id and an amount, for a customer of a brand, is saved as that brand's transaction
+        with source_id = external_id, so the same payment sent to the transactions API is the same one. Other
+        conversions become a customer event on the customer's timeline, under the names attribution
+        reads (signed_up; payment.succeeded with payment_id = external_id and amount_minor; payment.refunded; or a custom
+        conversion's event_name), whether or not a partner referred them. Outflare also credits the referred ones. The partner is found from, in order: promo_code (when the program's
+        codes_win is on), ref (the code from the link, such as a cookie you kept), click_id (ref_click from a short link);
+        then a referral already bound to this customer in the program (the first partner keeps them); then the
+        customer's own website visits that carried a ref, inside the program's window, first or last as it says. A visit
+        only proposes a partner: this call binds it. Identify the customer with customer_id (your own user id),
+        email or record_id, the same way each time. external_id (your charge or order id) makes a retry safe and is what
+        a refund's refund_of names. Not credited is not an error: the answer is 200 with credited false and a reason
+        (no_partner, partner_inactive, program_inactive, self_referral, sale_not_found, currency, lead_expired or
+        country_blocked). 201 means it was
+        credited, with the rewards it earned.
+        Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step.
+      tags: [partners]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PartnerConversionInput" }
+      responses:
+        "201":
+          description: Credited.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PartnerConversionResult" }
+        "200":
+          description: Not credited, or already recorded (duplicate).
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PartnerConversionResult" }
+        "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/partner-conversions:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    get:
+      operationId: listBrandPartnerConversions
+      x-outflare-access: { scope: partners.read, brand: true }
+      summary: List partner conversions, newest first
+      description: "Scope: partners.read. Leads, sales and refunds credited to partners."
+      tags: [partners]
+      parameters:
+        - { name: type, in: query, schema: { type: string, enum: [signup, sale, refund, custom] } }
+        - { name: partner_id, in: query, schema: { type: string, format: uuid } }
+        - { name: program, in: query, description: "A program's id or slug.", schema: { type: string } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
+      responses:
+        "200":
+          description: Conversions.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, next_cursor]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/PartnerConversion" } }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createBrandPartnerConversion
+      x-outflare-access: { scope: partners.conversions, brand: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Report a sign-up, sale, refund or custom conversion from your backend
       description: |
@@ -41917,12 +43565,41 @@ paths:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listPartnerReferrals
+      deprecated: true
       x-outflare-access: { scope: partners.read, brand_limited: true }
+      summary: List referred customers, newest first
+      description: "Scope: partners.read. Each customer a partner was credited with, once per program, with their net sales. Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step."
+      tags: [partners]
+      parameters:
+        - { $ref: "#/components/parameters/Brand" }
+        - { name: partner_id, in: query, schema: { type: string, format: uuid } }
+        - { name: record_id, in: query, description: The referred customer., schema: { type: string, format: uuid } }
+        - { name: status, in: query, schema: { type: string, enum: [lead, customer, refunded, rejected] } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
+      responses:
+        "200":
+          description: Referrals.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, next_cursor]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/PartnerReferral" } }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/partner-referrals:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    get:
+      operationId: listBrandPartnerReferrals
+      x-outflare-access: { scope: partners.read, brand: true }
       summary: List referred customers, newest first
       description: "Scope: partners.read. Each customer a partner was credited with, once per program, with their net sales."
       tags: [partners]
       parameters:
-        - { $ref: "#/components/parameters/Brand" }
         - { name: partner_id, in: query, schema: { type: string, format: uuid } }
         - { name: record_id, in: query, description: The referred customer., schema: { type: string, format: uuid } }
         - { name: status, in: query, schema: { type: string, enum: [lead, customer, refunded, rejected] } }
@@ -41946,12 +43623,43 @@ paths:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listPartnerRewards
+      deprecated: true
       x-outflare-access: { scope: partners.read, brand_limited: true }
+      summary: List the reward ledger, newest first
+      description: "Scope: partners.read. Cash, fees, actions and adjustments. status pending is still on hold or waiting for a person; approved cash counts toward the next payout; an approved action waits for your system to fulfil it. Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step."
+      tags: [partners]
+      parameters:
+        - { $ref: "#/components/parameters/Brand" }
+        - { name: status, in: query, schema: { type: string, enum: [pending, approved, rejected, paid, fulfilled] } }
+        - { name: kind, in: query, schema: { type: string, enum: [cash, fee, action, adjustment] } }
+        - { name: partner_id, in: query, schema: { type: string, format: uuid } }
+        - { name: payout_id, in: query, schema: { type: string, format: uuid } }
+        - { name: program, in: query, description: "A program's id or slug.", schema: { type: string } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
+      responses:
+        "200":
+          description: Ledger entries.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, next_cursor]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/PartnerReward" } }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/partner-rewards:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    get:
+      operationId: listBrandPartnerRewards
+      x-outflare-access: { scope: partners.read, brand: true }
       summary: List the reward ledger, newest first
       description: "Scope: partners.read. Cash, fees, actions and adjustments. status pending is still on hold or waiting for a person; approved cash counts toward the next payout; an approved action waits for your system to fulfil it."
       tags: [partners]
       parameters:
-        - { $ref: "#/components/parameters/Brand" }
         - { name: status, in: query, schema: { type: string, enum: [pending, approved, rejected, paid, fulfilled] } }
         - { name: kind, in: query, schema: { type: string, enum: [cash, fee, action, adjustment] } }
         - { name: partner_id, in: query, schema: { type: string, format: uuid } }
@@ -41977,7 +43685,40 @@ paths:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listPartnerLeads
+      deprecated: true
       x-outflare-access: { scope: partners.read, brand_limited: true }
+      summary: List leads partners submitted, newest first
+      description: |
+        Scope: partners.read. The people partners say they referred, submitted on the portal when its
+        lead_submissions setting is on: pending ones wait for you (review), approved ones are referrals via manual,
+        and rejected ones say why (your reason, or why it couldn't be taken, such as already_referred).
+        Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step.
+      tags: [partners]
+      parameters:
+        - { $ref: "#/components/parameters/Brand" }
+        - { name: program, in: query, description: "A program's id or slug.", schema: { type: string } }
+        - { name: status, in: query, schema: { type: string, enum: [pending, approved, rejected] } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
+      responses:
+        "200":
+          description: Submitted leads.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, next_cursor]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/PartnerLead" } }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/partner-leads:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    get:
+      operationId: listBrandPartnerLeads
+      x-outflare-access: { scope: partners.read, brand: true }
       summary: List leads partners submitted, newest first
       description: |
         Scope: partners.read. The people partners say they referred, submitted on the portal when its
@@ -41985,7 +43726,6 @@ paths:
         and rejected ones say why (your reason, or why it couldn't be taken, such as already_referred).
       tags: [partners]
       parameters:
-        - { $ref: "#/components/parameters/Brand" }
         - { name: program, in: query, description: "A program's id or slug.", schema: { type: string } }
         - { name: status, in: query, schema: { type: string, enum: [pending, approved, rejected] } }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
@@ -42010,7 +43750,37 @@ paths:
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: approvePartnerLead
+      deprecated: true
       x-outflare-access: { scope: partners.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Take a submitted lead
+      description: |
+        Scope: partners.manage. Binds the person to the partner as a referral (via manual), under the program's rules
+        and flows like any lead. When the program can't credit it (another partner referred them first, the partner
+        isn't active), the lead is rejected with that reason instead.
+        Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step.
+      tags: [partners]
+      requestBody:
+        content:
+          application/json:
+            schema: { type: object }
+      responses:
+        "200":
+          description: The lead, approved or rejected.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PartnerLead" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/partner-leads/{id}/approve:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: approveBrandPartnerLead
+      x-outflare-access: { scope: partners.manage, brand: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Take a submitted lead
       description: |
@@ -42038,7 +43808,37 @@ paths:
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: rejectPartnerLead
+      deprecated: true
       x-outflare-access: { scope: partners.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Turn down a submitted lead
+      description: "Scope: partners.manage. The partner sees it rejected, with your reason. Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step."
+      tags: [partners]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason: { type: string, maxLength: 500, description: "Why; the partner sees it." }
+      responses:
+        "200":
+          description: The lead.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PartnerLead" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/partner-leads/{id}/reject:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: rejectBrandPartnerLead
+      x-outflare-access: { scope: partners.manage, brand: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Turn down a submitted lead
       description: "Scope: partners.manage. The partner sees it rejected, with your reason."
@@ -42067,7 +43867,33 @@ paths:
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: approvePartnerReward
+      deprecated: true
       x-outflare-access: { scope: partners.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Approve a held reward now
+      description: "Scope: partners.manage. Even before its hold ends. Cash is logged as a cost and counts toward the next payout; an action fires partner_reward.approved for your system. Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step."
+      tags: [partners]
+      requestBody:
+        content:
+          application/json:
+            schema: { type: object }
+      responses:
+        "200":
+          description: The ledger entry.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PartnerReward" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/partner-rewards/{id}/approve:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: approveBrandPartnerReward
+      x-outflare-access: { scope: partners.manage, brand: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Approve a held reward now
       description: "Scope: partners.manage. Even before its hold ends. Cash is logged as a cost and counts toward the next payout; an action fires partner_reward.approved for your system."
@@ -42091,7 +43917,61 @@ paths:
       - { $ref: "#/components/parameters/Workspace" }
     post:
       operationId: bulkPartnerRewards
+      deprecated: true
       x-outflare-access: { scope: partners.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Approve or reject many held rewards
+      description: |
+        Scope: partners.manage. Approves or rejects pending rewards: those in ids, or every pending one of a program
+        (program) or partner (partner_id), optionally of one kind. Each is recorded as if done alone
+        (partner_reward.approved or .rejected, with their webhooks). Up to 1,000 a call: more says there are others,
+        so call again. Rewards that aren't pending, that you can't see, or that are in a program shared by every brand
+        while you are limited to some are listed in skipped with why.
+        Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step.
+      tags: [partners]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action]
+              properties:
+                action: { type: string, enum: [approve, reject] }
+                ids: { type: array, maxItems: 1000, items: { type: string } }
+                program: { type: string, description: "A program's id or slug: all its pending rewards." }
+                partner_id: { type: string, format: uuid, description: "A partner: all their pending rewards." }
+                kind: { type: string, enum: [cash, fee, action, adjustment] }
+                note: { type: string, maxLength: 2000, description: "Reject only: why, for the partner." }
+      responses:
+        "200":
+          description: What changed.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [action, done, skipped, more]
+                properties:
+                  action: { type: string, enum: [approve, reject] }
+                  done: { type: integer, description: How many were approved or rejected. }
+                  skipped:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, reason]
+                      properties:
+                        id: { type: string }
+                        reason: { type: string, description: "not_found, shared_program, or the reward's status (approved, rejected, paid, fulfilled)." }
+                  more: { type: boolean, description: More pending rewards match; call again. }
+        "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/partner-rewards/bulk:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+    post:
+      operationId: bulkBrandPartnerRewards
+      x-outflare-access: { scope: partners.manage, brand: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Approve or reject many held rewards
       description: |
@@ -42144,7 +44024,36 @@ paths:
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: rejectPartnerReward
+      deprecated: true
       x-outflare-access: { scope: partners.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Reject a held reward
+      description: "Scope: partners.manage. Only a pending one; take back an approved one with an adjustment. note says why, for the partner. Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step."
+      tags: [partners]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                note: { type: string, maxLength: 2000 }
+      responses:
+        "200":
+          description: The ledger entry.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PartnerReward" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/partner-rewards/{id}/reject:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: rejectBrandPartnerReward
+      x-outflare-access: { scope: partners.manage, brand: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Reject a held reward
       description: "Scope: partners.manage. Only a pending one; take back an approved one with an adjustment. note says why, for the partner."
@@ -42172,7 +44081,36 @@ paths:
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: fulfilPartnerReward
+      deprecated: true
       x-outflare-access: { scope: partners.conversions, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Report that your system carried out an action reward
+      description: "Scope: partners.conversions. After partner_reward.approved told your system to grant something (credit, a free month), call this so the ledger shows it done. Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step."
+      tags: [partners]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                note: { type: string, maxLength: 2000 }
+      responses:
+        "200":
+          description: The ledger entry.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PartnerReward" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/partner-rewards/{id}/fulfil:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: fulfilBrandPartnerReward
+      x-outflare-access: { scope: partners.conversions, brand: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Report that your system carried out an action reward
       description: "Scope: partners.conversions. After partner_reward.approved told your system to grant something (credit, a free month), call this so the ledger shows it done."
@@ -42198,7 +44136,32 @@ paths:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: exportPartnerPayouts
+      deprecated: true
       x-outflare-access: { scope: partners.manage, brand_limited: true }
+      summary: Download payouts as CSV, with payout details
+      description: |
+        Scope: partners.manage, because the file holds each partner's payout details. Columns: payout_id, program,
+        partner_id, partner_code, partner_name, partner_email, payout_method, amount (a decimal), currency, status, reference,
+        created_at, paid_at, payout_type, payout_token. Due payouts unless status says otherwise; at most 10,000 rows. Pay them from your own account or
+        upload the file to a payout tool, then mark each one paid. Recorded in the audit log (partner_payouts.exported).
+        Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step.
+      tags: [partners]
+      parameters:
+        - { $ref: "#/components/parameters/Brand" }
+        - { name: status, in: query, schema: { type: string, enum: [due, paid, canceled, all], default: due } }
+        - { name: program, in: query, description: "A program's id or slug.", schema: { type: string } }
+      responses:
+        "200":
+          description: The file.
+          content:
+            text/csv: { schema: { type: string } }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/partner-payouts/export:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    get:
+      operationId: exportBrandPartnerPayouts
+      x-outflare-access: { scope: partners.manage, brand: true }
       summary: Download payouts as CSV, with payout details
       description: |
         Scope: partners.manage, because the file holds each partner's payout details. Columns: payout_id, program,
@@ -42207,7 +44170,6 @@ paths:
         upload the file to a payout tool, then mark each one paid. Recorded in the audit log (partner_payouts.exported).
       tags: [partners]
       parameters:
-        - { $ref: "#/components/parameters/Brand" }
         - { name: status, in: query, schema: { type: string, enum: [due, paid, canceled, all], default: due } }
         - { name: program, in: query, description: "A program's id or slug.", schema: { type: string } }
       responses:
@@ -42221,9 +44183,10 @@ paths:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: listPartnerPayouts
+      deprecated: true
       x-outflare-access: { scope: partners.read, brand_limited: true }
       summary: List partner payouts, newest first
-      description: "Scope: partners.read."
+      description: "Scope: partners.read. Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step."
       tags: [partners]
       parameters:
         - { $ref: "#/components/parameters/Brand" }
@@ -42248,7 +44211,72 @@ paths:
         default: { $ref: "#/components/responses/Error" }
     post:
       operationId: createPartnerPayouts
+      deprecated: true
       x-outflare-access: { scope: partners.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Make the payouts that are due
+      description: |
+        Scope: partners.manage. For each partner (one with partner_id, one program, or all) whose approved, unpaid cash,
+        fees and adjustments reach the program's minimum, one payout gathers them and partner_payout.created fires.
+        Outflare never holds or sends money: pay from your own account or payout tool, then mark it paid.
+        An imported partner with no payout details (Tolt's API doesn't give them) waits: their balance stays until they
+        add details on the portal, and waiting_for_details counts them. With a payout term (payout_term_days, Net N),
+        only rewards earned in a month that ended at least N days ago are gathered; the rest wait for a later payout.
+        Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step.
+      tags: [partners]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                partner_id: { type: string, format: uuid }
+                program: { type: string, description: "A program's id or slug." }
+      responses:
+        "200":
+          description: The payouts made now (none when nothing is due).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, waiting_for_details]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/PartnerPayout" } }
+                  waiting_for_details: { type: integer, description: "Imported partners whose balance is due but who haven't given payout details yet." }
+        "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/partner-payouts:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    get:
+      operationId: listBrandPartnerPayouts
+      x-outflare-access: { scope: partners.read, brand: true }
+      summary: List partner payouts, newest first
+      description: "Scope: partners.read."
+      tags: [partners]
+      parameters:
+        - { name: status, in: query, schema: { type: string, enum: [due, paid, canceled] } }
+        - { name: partner_id, in: query, schema: { type: string, format: uuid } }
+        - { name: program, in: query, description: "A program's id or slug.", schema: { type: string } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
+      responses:
+        "200":
+          description: Payouts.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, next_cursor]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/PartnerPayout" } }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createBrandPartnerPayouts
+      x-outflare-access: { scope: partners.manage, brand: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Make the payouts that are due
       description: |
@@ -42287,7 +44315,38 @@ paths:
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: markPartnerPayoutPaid
+      deprecated: true
       x-outflare-access: { scope: partners.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Mark a payout paid
+      description: "Scope: partners.manage. After you paid it from your own account: a note and the payment's reference (a PayPal or Wise transfer id, an invoice number). Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step."
+      tags: [partners]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                note: { type: string, maxLength: 2000 }
+                reference: { type: string, maxLength: 200 }
+                paid_at: { type: string, format: date-time, description: When it was paid; now when left out. }
+      responses:
+        "200":
+          description: The payout.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PartnerPayout" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/partner-payouts/{id}/paid:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: markBrandPartnerPayoutPaid
+      x-outflare-access: { scope: partners.manage, brand: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Mark a payout paid
       description: "Scope: partners.manage. After you paid it from your own account: a note and the payment's reference (a PayPal or Wise transfer id, an invoice number)."
@@ -42317,7 +44376,36 @@ paths:
       - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
     post:
       operationId: cancelPartnerPayout
+      deprecated: true
       x-outflare-access: { scope: partners.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Cancel a due payout
+      description: "Scope: partners.manage. Its rewards go back into the partner's balance. Deprecated: use the same route under /v1/brands/{brand}/. This workspace route stays until the brands contract step."
+      tags: [partners]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                note: { type: string, maxLength: 2000 }
+      responses:
+        "200":
+          description: The payout.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PartnerPayout" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/partner-payouts/{id}/cancel:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: cancelBrandPartnerPayout
+      x-outflare-access: { scope: partners.manage, brand: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Cancel a due payout
       description: "Scope: partners.manage. Its rewards go back into the partner's balance."
@@ -45846,6 +47934,97 @@ paths:
                     $ref: '#/components/schemas/NextCursor'
         default:
           $ref: '#/components/responses/Error'
+  /v1/brands/{brand}/competition:
+    parameters:
+    - $ref: '#/components/parameters/BrandID'
+    get:
+      operationId: getCompetition
+      summary: See who is dominating, and where the brand leads and trails
+      description: "For the brand and each competitor it tracks: its value, share and rank in every area (search visits, keywords in the top 3, linking sites, AI answers, placements, social followers, reviews), an overall score out of 100 and its rank, now and 28 days ago. A score is the weighted mean, over the areas a brand is measured in, of its value against that area's leader, so 100 means it leads every one. standings say for the brand alone whether it leads, is ahead of, level with or behind the median competitor in each area, and whether its share is gaining or losing. catch_ups say when, if the last 12 weeks' trends keep going, the brand passes the competitor just ahead or the one just behind passes it (only within two years, and only with six weekly reads). series is each one's share of every area week by week over the last year. It reads only stored data (SEO snapshots from one connection, so the numbers share a scale, AI visibility answers, Presence, and the daily reads of followed social profiles and review pages), so it costs nothing."
+      tags:
+      - seo
+      x-outflare-access:
+        scope: seo.read
+        brand: true
+      parameters:
+      - name: weights
+        in: query
+        description: How much each area counts in the score, as area:weight pairs from 0 to 10, such as search:2,ai:1. Areas left out count 1.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Competition'
+        default:
+          $ref: '#/components/responses/Error'
+  /v1/brands/{brand}/competition/{competitor}/profiles:
+    parameters:
+    - $ref: '#/components/parameters/BrandID'
+    - { name: competitor, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: listCompetitorProfiles
+      summary: List a competitor's social profiles and review pages
+      description: "The social profiles and review pages followed, suggested or dismissed for one of the brand's competitors, with what the last daily read found. Profiles linked from the competitor's home page are suggested by OutflareBot's weekly look; only confirmed ones are read, through the workspace's own page reader (needs_reader is true until one is connected). Their numbers fill the social and reviews areas of the competition overview and stay out of the brand's own social and review pages."
+      tags: [seo]
+      x-outflare-access: { scope: seo.read, brand: true }
+      responses:
+        '200':
+          description: The competitor's profiles.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CompetitorProfiles' }
+        default: { $ref: '#/components/responses/Error' }
+    post:
+      operationId: addCompetitorProfile
+      summary: Follow a competitor's social profile or review page
+      description: "Adds the profile as confirmed (or confirms a suggested or dismissed one) and reads it now. url is a public social profile (X, LinkedIn, YouTube, Instagram, TikTok, Facebook, a subreddit, GitHub, Discord, Bluesky, Threads, Mastodon, DEV, Docker Hub) or a Trustpilot, G2, Capterra or Google review page. The competitor must be tracked."
+      tags: [seo]
+      x-outflare-access: { scope: seo.manage, brand: true }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [url]
+              properties:
+                url: { type: string, maxLength: 2000 }
+      responses:
+        '200':
+          description: The competitor's profiles.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CompetitorProfiles' }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: '#/components/responses/Error' }
+    patch:
+      operationId: answerCompetitorProfile
+      summary: Say yes or no to one of a competitor's profiles
+      description: "confirmed follows the profile from now on (the competitor must be tracked); dismissed stops following it and keeps it from being suggested again."
+      tags: [seo]
+      x-outflare-access: { scope: seo.manage, brand: true }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [url, state]
+              properties:
+                url: { type: string, maxLength: 2000 }
+                state: { type: string, enum: [confirmed, dismissed] }
+      responses:
+        '200':
+          description: The competitor's profiles.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CompetitorProfiles' }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: '#/components/responses/Error' }
   /v1/brands/{brand}/coverage/opportunities:
     parameters:
     - $ref: '#/components/parameters/BrandID'
@@ -47248,9 +49427,98 @@ paths:
         type: string
     post:
       operationId: createPartnerPortalSession
+      deprecated: true
       x-outflare-access:
         scope: partners.conversions
         brand_limited: true
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      summary: Automatically sign a customer into the hosted partner portal
+      description: 'Scope: partners.conversions. Backend-only automatic provisioning and sign-in for an open portal.
+
+        Supply your stable customer_id and optionally email/name. Returns a single-use sign-in URL valid for 60 seconds.
+
+        Redirect only the authenticated customer to it; never cache it. Existing identity resolution is shared with
+
+        conversions and embedded sessions. Program admission and explicit terms acceptance still apply.
+
+        '
+      tags:
+      - partners
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                customer_id:
+                  type: string
+                  description: Your own id for the customer.
+                email:
+                  type: string
+                  format: email
+                record_id:
+                  type: string
+                  format: uuid
+                name:
+                  type: string
+                  description: Set on a new customer record only.
+      responses:
+        '201':
+          description: The one-use portal handoff.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - sign_in_url
+                - expires_in_seconds
+                - partner_id
+                - status
+                properties:
+                  sign_in_url:
+                    type: string
+                  expires_in_seconds:
+                    type: integer
+                  partner_id:
+                    type: string
+                    format: uuid
+                  status:
+                    type: string
+                    enum:
+                    - pending
+                    - active
+                    - suspended
+                    - rejected
+                  code:
+                    type: string
+                  link:
+                    type: string
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '202':
+          $ref: '#/components/responses/MissionHeld'
+        default:
+          $ref: '#/components/responses/Error'
+  /v1/brands/{brand}/partner-programs/{id}/portal-sessions:
+    parameters:
+    - $ref: '#/components/parameters/BrandID'
+    - name: id
+      in: path
+      required: true
+      description: A program's id or slug.
+      schema:
+        type: string
+    post:
+      operationId: createBrandPartnerPortalSession
+      x-outflare-access:
+        scope: partners.conversions
+        brand: true
       parameters:
       - $ref: '#/components/parameters/IdempotencyKey'
       summary: Automatically sign a customer into the hosted partner portal
@@ -47339,6 +49607,7 @@ paths:
         type: string
     get:
       operationId: listPartnerTasks
+      deprecated: true
       summary: List tasks, custom website proposals and submissions
       tags:
       - partners
@@ -47357,6 +49626,7 @@ paths:
         brand_limited: true
     post:
       operationId: createPartnerTask
+      deprecated: true
       summary: Create a paid or voluntary partner task
       tags:
       - partners
@@ -47375,6 +49645,58 @@ paths:
       x-outflare-access:
         scope: partners.manage
         brand_limited: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PartnerTaskInput'
+  /v1/brands/{brand}/partner-programs/{id}/tasks:
+    parameters:
+    - { $ref: "#/components/parameters/BrandID" }
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      operationId: listBrandPartnerTasks
+      summary: List tasks, custom website proposals and submissions
+      tags:
+      - partners
+      responses:
+        '200':
+          description: Result.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        default:
+          $ref: '#/components/responses/Error'
+      x-outflare-access:
+        scope: partners.read
+        brand: true
+    post:
+      operationId: createBrandPartnerTask
+      summary: Create a paid or voluntary partner task
+      tags:
+      - partners
+      responses:
+        '200':
+          description: Result.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '202':
+          $ref: '#/components/responses/MissionHeld'
+        default:
+          $ref: '#/components/responses/Error'
+      x-outflare-access:
+        scope: partners.manage
+        brand: true
       requestBody:
         required: true
         content:
@@ -47400,6 +49722,7 @@ paths:
         type: string
     post:
       operationId: updatePartnerTask
+      deprecated: true
       summary: Pause or resume a partner task
       tags:
       - partners
@@ -47418,6 +49741,45 @@ paths:
       x-outflare-access:
         scope: partners.manage
         brand_limited: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PartnerTaskAction'
+  /v1/brands/{brand}/partner-programs/{id}/tasks/{task}:
+    parameters:
+    - { $ref: "#/components/parameters/BrandID" }
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: task
+      in: path
+      required: true
+      schema:
+        type: string
+    post:
+      operationId: updateBrandPartnerTask
+      summary: Pause or resume a partner task
+      tags:
+      - partners
+      responses:
+        '200':
+          description: Result.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '202':
+          $ref: '#/components/responses/MissionHeld'
+        default:
+          $ref: '#/components/responses/Error'
+      x-outflare-access:
+        scope: partners.manage
+        brand: true
       requestBody:
         required: true
         content:
@@ -47443,6 +49805,7 @@ paths:
         type: string
     post:
       operationId: reviewPartnerTask
+      deprecated: true
       summary: Offer a price, approve or reject submitted work
       tags:
       - partners
@@ -47467,6 +49830,45 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PartnerTaskAction'
+  /v1/brands/{brand}/partner-programs/{id}/task-submissions/{submission}:
+    parameters:
+    - { $ref: "#/components/parameters/BrandID" }
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: submission
+      in: path
+      required: true
+      schema:
+        type: string
+    post:
+      operationId: reviewBrandPartnerTask
+      summary: Offer a price, approve or reject submitted work
+      tags:
+      - partners
+      responses:
+        '200':
+          description: Result.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '202':
+          $ref: '#/components/responses/MissionHeld'
+        default:
+          $ref: '#/components/responses/Error'
+      x-outflare-access:
+        scope: partners.manage
+        brand: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PartnerTaskAction'
   /v1/workspaces/{ws}/partner-programs/{id}/audiences:
     parameters:
     - name: ws
@@ -47481,6 +49883,7 @@ paths:
         type: string
     get:
       operationId: listPartnerAudiences
+      deprecated: true
       summary: List partner social profiles, websites and communities
       tags:
       - partners
@@ -47497,6 +49900,32 @@ paths:
       x-outflare-access:
         scope: partners.read
         brand_limited: true
+  /v1/brands/{brand}/partner-programs/{id}/audiences:
+    parameters:
+    - { $ref: "#/components/parameters/BrandID" }
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      operationId: listBrandPartnerAudiences
+      summary: List partner social profiles, websites and communities
+      tags:
+      - partners
+      responses:
+        '200':
+          description: Result.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        default:
+          $ref: '#/components/responses/Error'
+      x-outflare-access:
+        scope: partners.read
+        brand: true
   /v1/workspaces/{ws}/partner-programs/{id}/proposals:
     parameters:
     - $ref: '#/components/parameters/Workspace'
@@ -47507,6 +49936,7 @@ paths:
         type: string
     get:
       operationId: listPartnerProposals
+      deprecated: true
       x-outflare-access:
         scope: partners.read
         brand_limited: true
@@ -47531,9 +49961,80 @@ paths:
           $ref: '#/components/responses/Error'
     post:
       operationId: createPartnerProposal
+      deprecated: true
       x-outflare-access:
         scope: partners.manage
         brand_limited: true
+      summary: Draft a proposal for exactly one recipient
+      description: Assign an existing partner_id or supply an email to provision a customer-backed partner. Invite with updatePartnerProposal after reviewing the draft. No outreach is sent automatically.
+      tags:
+      - partners
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - config
+              properties:
+                partner_id:
+                  type: string
+                email:
+                  type: string
+                name:
+                  type: string
+                  maxLength: 200
+                config:
+                  $ref: '#/components/schemas/PartnerProposalConfig'
+      responses:
+        '200':
+          description: The proposal.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartnerProposal'
+        '202':
+          $ref: '#/components/responses/MissionHeld'
+        default:
+          $ref: '#/components/responses/Error'
+  /v1/brands/{brand}/partner-programs/{id}/proposals:
+    parameters:
+    - $ref: '#/components/parameters/BrandID'
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      operationId: listBrandPartnerProposals
+      x-outflare-access:
+        scope: partners.read
+        brand: true
+      summary: List one-to-one partnership proposals
+      tags:
+      - partners
+      responses:
+        '200':
+          description: Proposals and their milestone progress.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PartnerProposal'
+        default:
+          $ref: '#/components/responses/Error'
+    post:
+      operationId: createBrandPartnerProposal
+      x-outflare-access:
+        scope: partners.manage
+        brand: true
       summary: Draft a proposal for exactly one recipient
       description: Assign an existing partner_id or supply an email to provision a customer-backed partner. Invite with updatePartnerProposal after reviewing the draft. No outreach is sent automatically.
       tags:
@@ -47583,9 +50084,74 @@ paths:
         format: uuid
     post:
       operationId: updatePartnerProposal
+      deprecated: true
       x-outflare-access:
         scope: partners.manage
         brand_limited: true
+      summary: Revise, invite, verify a deliverable or approve a milestone
+      description: Manual approval is mandatory. verify anchors a deliverable's required live period; approve creates rewards only after its milestone wait. Accepted agreements cannot be edited. invite returns an unguessable preview URL; the recipient must verify their email to accept.
+      tags:
+      - partners
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - action
+              - version
+              properties:
+                action:
+                  type: string
+                  enum:
+                  - revise
+                  - invite
+                  - verify
+                  - approve
+                  - complete
+                version:
+                  type: integer
+                config:
+                  $ref: '#/components/schemas/PartnerProposalConfig'
+                deliverable_id:
+                  type: string
+                milestone_id:
+                  type: string
+                note:
+                  type: string
+                  maxLength: 4000
+      responses:
+        '200':
+          description: Updated proposal. invitation_url is returned only when a link is generated.
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/PartnerProposal'
+        '202':
+          $ref: '#/components/responses/MissionHeld'
+        default:
+          $ref: '#/components/responses/Error'
+  /v1/brands/{brand}/partner-programs/{id}/proposals/{proposal}:
+    parameters:
+    - $ref: '#/components/parameters/BrandID'
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: proposal
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: updateBrandPartnerProposal
+      x-outflare-access:
+        scope: partners.manage
+        brand: true
       summary: Revise, invite, verify a deliverable or approve a milestone
       description: Manual approval is mandatory. verify anchors a deliverable's required live period; approve creates rewards only after its milestone wait. Accepted agreements cannot be edited. invite returns an unguessable preview URL; the recipient must verify their email to accept.
       tags:
@@ -56488,7 +59054,7 @@ components:
         ignored: { type: string, enum: ["off"], description: "Set when nothing was taken in because the workspace hasn't turned it on." }
     SiteKey:
       type: object
-      required: [id, name, key, brand_id, origins, excluded_params, previous_expires_at, events_today, bots_today, created_at, last_used_at, rotated_at, proxy_secret_at, snippet, own_domain]
+      required: [id, name, key, brand_id, origins, excluded_params, previous_expires_at, events_today, bots_today, created_at, last_used_at, rotated_at, proxy_secret_at, snippet, tests, flicker_guard, own_domain]
       properties:
         id: { type: string, format: uuid }
         name: { type: string, description: Usually the site's domain. }
@@ -56504,6 +59070,8 @@ components:
         rotated_at: { type: [string, "null"], format: date-time }
         proxy_secret_at: { type: [string, "null"], format: date-time, description: "When the key's proxy secret was made (POST .../proxy-secret); null when it has none." }
         snippet: { type: string, description: "The script tag to paste into the site's <head>. Lists the origins' domains in data-domains when there is more than one, so a visit can cross them." }
+        tests: { type: boolean, description: "Run no-code A/B tests: the script asks for each visitor's versions on its own whenever a flag that is on has changes from the visual editor, with no data-flags on the tag. Off leaves flags to the page's own code (data-flags or outflare.flag)." }
+        flicker_guard: { type: string, description: "Optional: a short script for the top of the site's <head>, above everything else. On a returning visitor's next visit it hides just the parts their test versions change, for a second at most, so they never see the original first." }
         own_domain: { $ref: "#/components/schemas/SiteOwnDomain" }
     SiteOwnDomain:
       type: object
@@ -56541,7 +59109,7 @@ components:
       properties:
         key: { type: string, pattern: "^[a-z0-9][a-z0-9_-]{0,63}$", example: control }
         weight: { type: integer, minimum: 0, maximum: 100, description: "Its share is its weight over the total of all weights." }
-        payload: { description: "Any JSON the page or server reads with the variant, such as a headline; null for none. At most 4 KB. An object payload's `changes` are the version's visual changes (FlagChange), made in the visual editor and applied by the website script." }
+        payload: { description: "Any JSON the page or server reads with the variant, such as a headline; null for none. At most 16 KB. An object payload's `changes` are the version's visual changes (FlagChange), made in the visual editor and applied by the website script." }
     FlagRule:
       type: object
       required: [attribute, op]
@@ -56575,6 +59143,37 @@ components:
         href: { type: string, maxLength: 2000, description: "A link's address: https://, http:// or a path." }
         src: { type: string, maxLength: 2000, description: "An image's address: https://, http:// or a path." }
         alt: { type: string, maxLength: 500, description: "An image's alt text." }
+        rich: { type: string, maxLength: 2000, description: "Replaces the elements' text with simple formatting: **bold**, *italic*, [a link](https://…) and new lines. Never HTML." }
+        style:
+          type: object
+          maxProperties: 20
+          additionalProperties: { type: string, maxLength: 100 }
+          description: "CSS properties to set, such as {\"color\": \"#0f766e\", \"font-size\": \"20px\"}: colours, sizes, spacing, borders and layout only. Values can't load anything (no url())."
+        move: { type: string, enum: [before, after, start, end], description: "Moves the elements before or after target, or to the start or end inside it." }
+        target: { type: string, maxLength: 300, description: "For move: the CSS selector of the element to move next to or into." }
+        insert:
+          type: object
+          required: [where, kind]
+          description: "Adds a new element before or after the selected one, once."
+          properties:
+            where: { type: string, enum: [before, after] }
+            kind: { type: string, enum: [text, button, link, image] }
+            text: { type: string, maxLength: 2000 }
+            href: { type: string, maxLength: 2000 }
+            src: { type: string, maxLength: 2000 }
+            alt: { type: string, maxLength: 500 }
+        device: { type: string, enum: [mobile, desktop], description: "Only on phones (up to 767px wide) or only on wider screens; absent: everywhere." }
+    ABTestVersion:
+      type: object
+      required: [test_id, flag_key, version, live, changes, css, redirect]
+      properties:
+        test_id: { type: string, format: uuid }
+        flag_key: { type: string }
+        version: { type: string }
+        live: { type: boolean, description: "Whether visitors can see it now: the test runs or its flag is on." }
+        changes: { type: array, items: { $ref: "#/components/schemas/FlagChange" } }
+        css: { type: string }
+        redirect: { type: string }
     FlagEdits:
       type: object
       required: [flag_key, flag_name, variant, changes, expires_at]
@@ -56583,6 +59182,8 @@ components:
         flag_name: { type: string }
         variant: { type: string }
         changes: { type: array, items: { $ref: "#/components/schemas/FlagChange" } }
+        css: { type: string, description: "The version's own CSS, added to the page for its visitors; \"\" for none." }
+        redirect: { type: string, description: "Where the version sends its visitors (a split URL test): a path on the site or an address on the brand's domains; \"\" for none." }
         expires_at: { type: string, format: date-time, description: "When the edit link stops working." }
     FlagDecisions:
       type: object
@@ -56598,6 +59199,14 @@ components:
           type: object
           additionalProperties: { type: string, enum: [match, rules, group, rollout, off, no_subject] }
           description: Why, by flag key (evaluate only).
+    SiteFlagDecisions:
+      allOf:
+        - { $ref: "#/components/schemas/FlagDecisions" }
+        - type: object
+          required: [tests, hide]
+          properties:
+            tests: { type: boolean, description: "Whether the script should ask on every page by itself: the key runs tests (its tests setting is on) and a flag that is on has changes from the visual editor." }
+            hide: { type: array, items: { type: string }, maxItems: 50, description: "CSS selectors of what the visitor's versions change, for the head guard (the key's flicker_guard) to hide on their next visit until their version shows." }
     ABTestGoal:
       type: object
       required: [kind]
@@ -56656,9 +59265,10 @@ components:
         hint: { type: string, description: What the links can and can't preview. }
     ABTest:
       type: object
-      required: [id, flag_id, flag_key, brand_id, name, hypothesis, status, control, goals, guardrails, min_effect, baselines, started_at, frozen_at, ended_at, decision, created_at, updated_at]
+      required: [id, flag_id, flag_key, brand_id, name, hypothesis, status, control, goals, guardrails, min_effect, baselines, started_at, frozen_at, ended_at, decision, page, created_at, updated_at]
       properties:
         id: { type: string, format: uuid }
+        page: { type: string, description: "The page a no-code test was made for (ending in * for every page under it); empty for a test of a flag made elsewhere. Previews and the visual editor open there." }
         flag_id: { type: string, format: uuid }
         flag_key: { type: string, example: pricing-headline }
         brand_id: { type: [string, "null"], format: uuid, description: The flag's brand when the test was added. }
@@ -56733,7 +59343,21 @@ components:
       type: object
       additionalProperties: false
       properties:
-        flag: { type: string, description: "The flag's id or key. Required when adding; can't change." }
+        flag: { type: string, description: "The flag's id or key. Required when adding, unless page is sent; can't change." }
+        page:
+          type: object
+          additionalProperties: false
+          required: [url]
+          description: "Only when adding, instead of flag: test a page with no code. Outflare adds a flag (off until the test starts) that shows only on this page, split evenly between the control (today's page) and each new version, ready to edit visually (POST .../flags/{flag}/edit-link). The website script runs it with nothing added to the site."
+          properties:
+            url: { type: string, maxLength: 2000, description: "The page, such as https://northpeak.example/pricing. End it with * for every page under it (https://northpeak.example/blog/*)." }
+            versions: { type: integer, minimum: 1, maximum: 4, description: "New versions to compare with the control (b, c, …). Default 1, or one per redirect." }
+            redirects:
+              type: array
+              minItems: 1
+              maxItems: 4
+              items: { type: string, maxLength: 2000 }
+              description: "A split URL test: one page per new version, which sends its visitors there (keeping the query string). A path on the site, such as /pricing-b, or an address on the brand's domains. Not with a url ending in *."
         name: { type: string, maxLength: 200, description: "Default: the flag's name." }
         hypothesis: { type: string, maxLength: 2000 }
         control: { type: string, description: 'One of the flag''s variants. Default: "control" if it has one, else its first.' }
@@ -56960,6 +59584,7 @@ components:
         brand_id: { type: [string, "null"], format: uuid }
         origins: { type: array, maxItems: 20, items: { type: string } }
         excluded_params: { type: array, maxItems: 50, items: { type: string, maxLength: 100 }, description: "Query parameters to leave out of page addresses, such as plan or fb_*." }
+        tests: { type: boolean, description: "Run no-code A/B tests on this site (on by default)." }
     ConnectionHook:
       type: object
       description: A connection's live updates, its own webhook address.
@@ -60775,6 +63400,169 @@ components:
         found_at: { type: string, format: date-time }
         status_changed_at: { type: string, format: date-time }
         updated_at: { type: [string, "null"], format: date-time }
+    CompetitionAreaValue:
+      type: object
+      required: [value, share, share_before, rank]
+      properties:
+        value:
+          type: [number, "null"]
+        share:
+          type: [number, "null"]
+          description: Percent of everyone's total in the area.
+        share_before:
+          type: [number, "null"]
+          description: The share 28 days ago.
+        rank:
+          type: [integer, "null"]
+    CompetitionEntry:
+      type: object
+      required: [id, kind, name, host, score, score_before, rank, rank_before, areas, measured_areas]
+      properties:
+        id:
+          type: string
+          description: '"brand" for the brand itself, else the competitor''s id.'
+        kind:
+          type: string
+          enum: [brand, competitor]
+        name:
+          type: string
+        host:
+          type: string
+        score:
+          type: [number, "null"]
+          description: 0 to 100; null when measured in no area.
+        score_before:
+          type: [number, "null"]
+        rank:
+          type: [integer, "null"]
+        rank_before:
+          type: [integer, "null"]
+        areas:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/CompetitionAreaValue'
+        measured_areas:
+          type: integer
+    Competition:
+      type: object
+      required: [brand_id, as_of, before, areas, entries, standings, catch_ups, series, notes, tracked, no_website]
+      properties:
+        brand_id:
+          type: string
+          format: uuid
+        as_of:
+          type: string
+          format: date
+        before:
+          type: string
+          format: date
+          description: The day the "before" values are from, 28 days earlier.
+        areas:
+          type: array
+          items:
+            type: object
+            required: [key, label, unit, weight, measured, needs, leader_id]
+            properties:
+              key:
+                type: string
+                enum: [search, keywords, links, ai, placements, social, reviews]
+              label:
+                type: string
+              unit:
+                type: string
+              weight:
+                type: number
+              measured:
+                type: boolean
+              needs:
+                type: string
+                description: What fills the area, for one nobody has data in yet.
+              leader_id:
+                type: [string, "null"]
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/CompetitionEntry'
+        standings:
+          type: array
+          items:
+            type: object
+            required: [area, standing, trend, share, share_before]
+            properties:
+              area:
+                type: string
+              standing:
+                type: string
+                enum: [leading, ahead, level, behind, far_behind]
+              trend:
+                type: string
+                enum: [gaining, steady, losing, unknown]
+              share:
+                type: [number, "null"]
+              share_before:
+                type: [number, "null"]
+        catch_ups:
+          type: array
+          items:
+            type: object
+            required: [area, competitor_id, direction, weeks]
+            properties:
+              area:
+                type: string
+              competitor_id:
+                type: string
+              direction:
+                type: string
+                enum: [you_pass, they_pass]
+              weeks:
+                type: number
+        series:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: object
+              required: [day, shares]
+              properties:
+                day:
+                  type: string
+                  format: date
+                shares:
+                  type: object
+                  additionalProperties:
+                    type: number
+        notes:
+          type: array
+          items:
+            type: string
+        tracked:
+          type: integer
+          description: How many competitors the brand tracks.
+        no_website:
+          type: boolean
+          description: The brand has no website or SEO site, so its search numbers can't be read.
+    CompetitorProfiles:
+      type: object
+      required: [competitor_id, profiles, needs_reader]
+      properties:
+        competitor_id: { type: string, format: uuid }
+        needs_reader: { type: boolean, description: "True while the workspace has no page reader connected (Geonode): profiles are kept but not read until one is." }
+        profiles:
+          type: array
+          items:
+            type: object
+            required: [kind, url, state, source, followers, followers_change_28d, score, review_count, last_read_at, last_error]
+            properties:
+              kind: { type: string, description: "The channel (x, linkedin, youtube and others) or review platform (trustpilot, g2, capterra, google)." }
+              url: { type: string }
+              state: { type: string, enum: [suggested, confirmed, dismissed] }
+              source: { type: string, enum: [home_page, manual], description: "home_page: linked from the competitor's home page; manual: added by a person." }
+              followers: { type: ["integer", "null"], description: "A social profile's headline count (followers, subscribers, members) at the last read." }
+              followers_change_28d: { type: ["integer", "null"] }
+              score: { type: ["number", "null"], description: "A review page's rating out of 5 at the last read." }
+              review_count: { type: ["integer", "null"] }
+              last_read_at: { type: ["string", "null"], format: date-time }
+              last_error: { type: ["string", "null"], description: Why the last read failed; it is tried again the same day. }
     SEOCompetitor:
       type: object
       required: [id, site_id, brand_id, host, name, aliases, status, source, common_keywords, record_id, title, description, pages, checked_at, check_error, numbers, created_at, updated_at]
@@ -64668,6 +67456,27 @@ components:
         properties: { type: object, additionalProperties: true, description: "device_token needs platform: ios, android or web." }
         source: { type: string, maxLength: 60, description: "Who said so: api (the default), import, manual or a connector's id." }
         replaces: { type: string, format: uuid, description: "The identity of the same namespace this one replaces, such as the old email." }
+    DeveloperSetup:
+      type: object
+      required: [brand_id, checks, unmatched_refunds]
+      properties:
+        brand_id: { type: string, format: uuid }
+        checks: { type: array, items: { $ref: "#/components/schemas/DeveloperSetupCheck" } }
+        unmatched_refunds:
+          type: array
+          description: Refunds and chargebacks (from the API or Order Refunded events) whose payment Outflare doesn't have, newest first, at most 50.
+          items: { $ref: "#/components/schemas/Transaction" }
+    DeveloperSetupCheck:
+      type: object
+      required: [key, status, title, detail, fix, last_at, count]
+      properties:
+        key: { type: string, enum: [signed_up, order_completed, payments, refunds, website_and_server, refunds_to_ads] }
+        status: { type: string, enum: [ok, warning, missing], description: "ok; warning: it works, but something should be fixed; missing: nothing has arrived yet." }
+        title: { type: string }
+        detail: { type: string, description: What the check found; empty when there is nothing to add. }
+        fix: { type: string, description: What to send, with an example. }
+        last_at: { type: [string, "null"], format: date-time, description: When the last one arrived. }
+        count: { type: integer, description: How many in the last 30 days (the website's copies, 7 days). }
     InsightFilter:
       type: object
       required: [property, op]
@@ -64844,7 +67653,7 @@ components:
             a breakdown needs every step to be of the same kind.
         date_range: { $ref: "#/components/schemas/InsightDateRange" }
         window: { $ref: "#/components/schemas/InsightWindow" }
-        breakdown: { type: string, maxLength: 200, description: "A field of step 1 to split people by (the catalog's breakdowns), or param:<name> or property:<key> for an event step." }
+        breakdown: { type: string, maxLength: 200, description: "A field of step 1 to split people by (the catalog's breakdowns), param:<name> or property:<key> for an event step, or experiment:<flag key> for the version of an A/B test (the catalog's experiments)." }
         interval: { type: string, enum: [day, week, month], description: Adds conversion over time by when people did step 1. }
         ad_clicks:
           type: object
@@ -64915,7 +67724,7 @@ components:
         times: { type: array, items: { type: string, format: date-time }, description: When they did each step they reached. }
     InsightsCatalog:
       type: object
-      required: [events, conversions, networks, fields, breakdowns, measures, ad_metrics, intervals, ops, date_presets]
+      required: [events, conversions, networks, fields, breakdowns, experiments, measures, ad_metrics, intervals, ops, date_presets]
       properties:
         events:
           type: array
@@ -64954,6 +67763,16 @@ components:
         breakdowns:
           type: object
           additionalProperties: { type: array, items: { type: string } }
+        experiments:
+          type: array
+          description: "A/B tests to split or filter by (running, or started in the last 180 days): field (experiment:<flag key>) is the version each person was first shown, or \"\" when they weren't in the test. Works for every step kind but ad."
+          items:
+            type: object
+            required: [field, name, status]
+            properties:
+              field: { type: string, example: "experiment:pricing-headline" }
+              name: { type: string }
+              status: { type: string }
         measures: { type: array, items: { type: string }, description: Measures of an event, page, visit, conversion or payment series. }
         ad_metrics: { type: array, items: { type: string }, description: Measures of an ad series. }
         intervals: { type: array, items: { type: string }, description: Trend intervals. }
@@ -64982,7 +67801,7 @@ components:
         series: { type: array, minItems: 1, maxItems: 6, items: { $ref: "#/components/schemas/TrendSeries" } }
         date_range: { $ref: "#/components/schemas/InsightDateRange" }
         interval: { type: string, enum: [day, week, month], description: "Default: day up to two months, week up to about seven, else month." }
-        breakdown: { type: string, maxLength: 200, description: "A field of each series' rows to split by; network or campaign for ad series." }
+        breakdown: { type: string, maxLength: 200, description: "A field of each series' rows to split by; network or campaign for ad series; experiment:<flag key> for the version of an A/B test (the catalog's experiments)." }
         formula: { type: string, maxLength: 200, description: "A, B, C for the series, with + - * / and brackets, such as A / B." }
         compare: { type: boolean, description: Adds the period just before. }
         display: { type: string, enum: [line, bar, number, table], description: How the app draws it; the engine ignores it. }
@@ -65297,7 +68116,7 @@ components:
         record_id: { type: string, format: uuid, description: The person or company who paid. }
         user_id: { type: string, maxLength: 200, description: "Your own id for the person who paid, the userId your events send, when you don't have record_id. A payment with a person counts as a payment.succeeded event, for revenue, attribution and conversions sent to ad networks." }
         product: { type: string, description: "One of the brand's products, by id or key." }
-        refund_of: { type: string, maxLength: 200, description: "A refund or chargeback: the source_id of the payment it gives back." }
+        refund_of: { type: string, maxLength: 200, description: "A refund or chargeback: the payment it gives back, by any id it has: its source_id (an order's order_id), its Order Completed event's messageId, or Outflare's transaction id. It is saved as the payment's source_id. A refund whose payment isn't in yet waits (Developer setup lists it) and counts when the payment arrives." }
         description: { type: string, maxLength: 500 }
         occurred_at: { type: string, format: date-time, description: "When it happened; now by default." }
     FieldSourceValue:
