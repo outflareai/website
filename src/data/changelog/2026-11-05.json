@@ -2,7 +2,7 @@
 	"version": "2026.11.05",
 	"date": "2026-11-05",
 	"status": "in-progress",
-	"updated": "2026-11-05T11:18:54Z",
+	"updated": "2026-11-05T12:21:58Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -157,7 +157,28 @@
 			"edition": "open-source",
 			"text": "Presence and rank tracking no longer show Google's own redirect links (google.com/goto?url=...) for search results: each result is resolved to the page it leads to, with its real site, and existing finds are fixed on the next daily run. The Presence report now also counts every page and site found.",
 			"at": "2026-11-05T11:18:54Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "PostHog: leave out your project's internal and test users (bots, your team, a crawler with a fake referrer) in Outflare's reports. Tick it for a site on the Analytics page; every report, the daily sync and conversions by landing page then use PostHog's own filters, and the last 90 days are read again.",
+			"at": "2026-11-05T12:21:58Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Presence has a Found tab: every page that links to or mentions your brand, grouped by site. Each page is read once to check it links to you or names your website, so same-name pages about something else stay apart. About us or Not us settles a page or a whole site in one click, and the Overview counts everything found.",
+			"at": "2026-11-05T12:21:58Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Competitors suggests more competitors every day from who ranks for your keyword gaps (read on your own SERP connection), and **Find more competitors** reads a batch now. Click a keyword gap to see everyone who ranks for it, with Yes, No or Track beside each site.",
+			"at": "2026-11-05T12:21:58Z"
 		}
 	],
-	"through": "16c3c9e+246bdbe"
+	"through": "f8bdf3d+e62316a"
 }
