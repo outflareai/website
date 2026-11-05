@@ -30,6 +30,7 @@ Two promises come with it:
 | [PR autopilot](/docs/guides/pr-autopilot/): reactive PR for a brand every morning, with each quote, release and pitch approved by you | | Yes |
 | [Lead finder](/docs/guides/lead-finder/): companies that fit your ideal customer profile, the people to contact there, into your CRM and campaigns | | Yes |
 | [Support assistant Auto](/docs/guides/support-assistant/#auto): it answers customers' chats and emails on its own when every check passes, signed as an AI assistant (drafting is open source) | | Yes |
+| [Paid ads Autopilot](/docs/integrations/paid-media/#paid-ads-autopilot): the brand agent applies the paid ads savings you allow (lower budgets, pauses, negative keywords) on its own, up to a daily limit; suggestions, tests and new ads are open source | | Yes |
 | Price | Free ([AGPL-3.0](/docs/project/license/)) | Free during early access |
 
 Everything else these docs describe runs in both. Each Cloud-only feature has its own page, marked as below, and a row in this table.
