@@ -2,7 +2,7 @@
 	"version": "2026.11.05",
 	"date": "2026-11-05",
 	"status": "in-progress",
-	"updated": "2026-11-05T13:34:01Z",
+	"updated": "2026-11-05T13:48:14Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -248,7 +248,35 @@
 			"edition": "open-source",
 			"text": "Partner and promo codes are unique per brand, so two brands can each give a partner the same code. A program can't move into a brand that already uses its slug or one of its codes; the move says so instead.",
 			"at": "2026-11-05T13:34:01Z"
+		},
+		{
+			"kind": "fix",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "No-code A/B tests now count every visitor on the test's page, including those who see the original, so a running test no longer shows 0 visitors. A page test can't start until at least one new version changes the page.",
+			"at": "2026-11-05T13:48:14Z"
+		},
+		{
+			"kind": "launch",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Connect SE Ranking with your own Data API key to read the keywords a domain ranks for, with position, search volume and ranking page, plus its organic overview and competitors in search. Calls count against the connection's monthly budget like Ahrefs and DataForSEO.",
+			"at": "2026-11-05T13:48:14Z"
+		},
+		{
+			"kind": "fix",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "A keyword's results page no longer shows Google redirect links (google.com/goto): every search resolves them to the real page, keyword gaps are read on Geonode first when it's connected, and pages read before are read again.",
+			"at": "2026-11-05T13:48:14Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "A competitor's page now lists all their placements, keywords beside yours, top pages and linking sites, with **Read their search data** to read any competitor on your own SEO connection. Click a link gap to see the exact pages linking to each competitor.",
+			"at": "2026-11-05T13:48:14Z"
 		}
 	],
-	"through": "af0e184+b920899"
+	"through": "a3534bd+a3f96a7"
 }
