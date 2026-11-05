@@ -2,7 +2,7 @@
 	"version": "2026.11.05",
 	"date": "2026-11-05",
 	"status": "in-progress",
-	"updated": "2026-11-05T11:04:35Z",
+	"updated": "2026-11-05T11:18:54Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -150,7 +150,14 @@
 			"edition": "open-source",
 			"text": "Search insights: the AI referrals report now works without GA4. When no GA4 landing-page outcomes are synced, it counts visits from ChatGPT, Perplexity, Claude and other assistants in the referrers of your PostHog, Plausible or Matomo connection, for the whole site.",
 			"at": "2026-11-05T11:04:35Z"
+		},
+		{
+			"kind": "fix",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Presence and rank tracking no longer show Google's own redirect links (google.com/goto?url=...) for search results: each result is resolved to the page it leads to, with its real site, and existing finds are fixed on the next daily run. The Presence report now also counts every page and site found.",
+			"at": "2026-11-05T11:18:54Z"
 		}
 	],
-	"through": "9368aee+a843afa"
+	"through": "16c3c9e+246bdbe"
 }
