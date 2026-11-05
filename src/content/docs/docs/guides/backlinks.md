@@ -11,7 +11,7 @@ Outflare keeps a history of the links other websites have to yours. Each week yo
 
 In the app, open **SEO** in the sidebar, then **Backlinks**.
 
-To manage the publisher relationship, paid terms, promised publication and ongoing follow-up alongside those links, use [Coverage](/docs/guides/coverage/). Its discovery review can bring existing backlink records into a shared placement history.
+To manage the publisher relationship, paid terms, promised publication and ongoing follow-up alongside those links, use [Presence](/docs/guides/coverage/). Its discovery review can bring existing backlink records into a shared placement history.
 
 ## What you need
 

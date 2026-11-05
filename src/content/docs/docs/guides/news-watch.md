@@ -36,7 +36,7 @@ An article from a coverage search becomes your brand's coverage when its title o
 
 New coverage waits for a person: **Confirm** it or **Dismiss** it. Add an article the watch missed yourself. Each item shows whether the article links to your site once someone has checked. You can also put an item on one of your [stories](/docs/guides/stories/), so the story's results count it.
 
-The news watch's coverage feeds [Coverage](/docs/guides/coverage/)'s discovery list, where you manage placements and publisher relationships in depth.
+The news watch's coverage feeds [Presence](/docs/guides/coverage/)'s discovery list, where you manage placements and publisher relationships in depth.
 
 ## Journalists
 
