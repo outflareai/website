@@ -116,6 +116,8 @@ AI answers can only cite pages AI crawlers may read. Each [site audit](/docs/gui
 
 Pages hidden from AI search or user crawlers, and a site with no `/llms.txt`, go on the fixes list.
 
+### Are AI crawlers visiting?
+
 With a [Cloudflare Web Analytics](/docs/integrations/analytics/) connection, the daily analytics sync also reads your own Cloudflare request logs and counts requests by each AI crawler, per site and day. This needs an API token with **Zone > Zone > Read** and **Zone > Analytics > Read** on the zones that serve your sites, as well as the Web Analytics permission. Without them your traffic reports keep working and the connection says which permission is missing.
 
 ## Fixes
