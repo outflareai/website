@@ -2,7 +2,7 @@
 	"version": "2026.11.05",
 	"date": "2026-11-05",
 	"status": "in-progress",
-	"updated": "2026-11-05T10:48:08Z",
+	"updated": "2026-11-05T11:04:35Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -143,7 +143,14 @@
 			"edition": "open-source",
 			"text": "Support conversations take the brand of the mailbox they came to (or the workspace's only brand), so each brand's inbox shows its own customers. A partner link on a brand's tracking domain or portal, and a conversion reported on a brand's route, only match that brand's partner and promo codes.",
 			"at": "2026-11-05T10:48:08Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Search insights: the AI referrals report now works without GA4. When no GA4 landing-page outcomes are synced, it counts visits from ChatGPT, Perplexity, Claude and other assistants in the referrers of your PostHog, Plausible or Matomo connection, for the whole site.",
+			"at": "2026-11-05T11:04:35Z"
 		}
 	],
-	"through": "803fe41+808963c"
+	"through": "9368aee+a843afa"
 }
