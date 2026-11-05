@@ -2,7 +2,7 @@
 	"version": "2026.11.05",
 	"date": "2026-11-05",
 	"status": "in-progress",
-	"updated": "2026-11-05T11:18:54Z",
+	"updated": "2026-11-05T11:51:47Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -157,7 +157,14 @@
 			"edition": "open-source",
 			"text": "Presence and rank tracking no longer show Google's own redirect links (google.com/goto?url=...) for search results: each result is resolved to the page it leads to, with its real site, and existing finds are fixed on the next daily run. The Presence report now also counts every page and site found.",
 			"at": "2026-11-05T11:18:54Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Competitors suggests more competitors every day from who ranks for your keyword gaps (read on your own SERP connection), and **Find more competitors** reads a batch now. Click a keyword gap to see everyone who ranks for it, with Yes, No or Track beside each site.",
+			"at": "2026-11-05T11:51:47Z"
 		}
 	],
-	"through": "16c3c9e+246bdbe"
+	"through": "d111554+ee4803c"
 }
