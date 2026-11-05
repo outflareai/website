@@ -95,10 +95,24 @@ Add `?of_flag=pricing-headline:faster` to any page's address to see that version
 
 ### Change a page without code
 
-For a version of a split, open the flag in **Analytics → Feature flags**, enter a page of your site under **Page to edit on**, and choose **Edit visually** next to the version. The page opens in a new tab with that version and an editor over it: click anything to change its text, hide it, or change a link or an image. **Save** in the editor, and visitors who get that version see the changes within a minute. The page needs the tracking script with `data-flags`.
+For a version of a split, open the flag in **Analytics → Feature flags** (or a test in **A/B tests**), enter a page of your site under **Page to edit on**, and choose **Edit visually** next to the version. The page opens in a new tab with that version and an editor over it. Click anything, then:
+
+- **Content:** change its text, plain or with simple formatting (`**bold**`, `*italic*`, `[a link](/page)` and new lines), or a link or an image.
+- **Style:** its text colour, background, size, weight, alignment, padding, margin, corners, border, width and more.
+- **Move:** up or down among the elements around it.
+- **Add:** a new piece of text, a button, a link or an image next to it.
+- **Hide it.**
+
+Changes can apply to phones only or wider screens only. **Undo last** takes back the newest change, and **Preview on a phone** opens the page in a phone-sized window. Under **Version settings**, a version can have its own CSS (looks only) and can send its visitors to another page of your site instead, for a split URL test. **Save** in the editor, and visitors who get that version see the changes within a minute.
+
+No developer is needed: the page only needs the tracking script, without `data-flags`. While a test with editor changes runs, the script asks for each visitor's version by itself; a site with no tests makes almost no extra requests. To turn this off for a site, switch off **Run A/B tests on this site** in its tracking settings, or put `data-flags="off"` on the tag.
+
+**No flicker.** The script hides just the parts a visitor's version changes until their version is in, for a second at most. To make sure returning visitors never see the original, paste the optional guard from the site's tracking settings (**Optional: stop A/B tests flashing the original**) once at the very top of your site's `<head>`.
 
 - Each change applies to every element like the one you clicked.
-- Text goes in as text, never HTML, and links and images only go to `https://` addresses or paths on your site.
+- Nothing the editor saves can run code: there's no way to add a script or HTML from the dashboard. Code-level tests stay with your developers.
+- Links, images and redirects only go to `https://` addresses or paths on your site, and redirects only to the brand's own domains.
+- On pages that change without reloading, the script applies the changes again when new content appears.
 - Showing a visitor the changes counts them in the flag's [A/B test](/docs/guides/ab-tests/).
 - A version holds up to 50 changes. They're kept in its content as `changes`, so you can also write or review them there.
 
