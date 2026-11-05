@@ -76,7 +76,20 @@ Gaps compare against what your own connection read for you, so a gap can be a ke
 
 Search numbers all come from one SEO connection so they share a scale, read on your own account. An area nobody has data in says what to connect.
 
-Click a competitor for its own page: its score and rank next to yours, every area head to head, and both shares over the year.
+Beside the scores, each row shows the site at a glance:
+
+| Column | Where it comes from |
+| --- | --- |
+| DR | Domain Rating (0 to 100) from your SEO connection's latest read: Ahrefs' Domain Rating, or the other connection's authority score |
+| Keywords | The keywords it ranks for, from the same read |
+| Domain age | When its domain was first registered, from the public registration record (RDAP), which needs no account |
+| Pages | How many pages a competitor's sitemaps list at OutflareBot's last look |
+
+Under each name it says the day of its latest search numbers, or that it has none yet.
+
+**Refresh all competitors** reads every competitor you track now instead of waiting for the weekly read: their search numbers on your own SEO connection (Ahrefs first, only the ones not read today, within its budget, so a second click the same day costs nothing), OutflareBot's look at their home page, and their followed social profiles and review pages. The numbers fill in within a few minutes, and the page updates itself. Without an SEO connection only their sites and profiles are read, and the page says to connect one.
+
+Click a competitor for its own page: its score and rank next to yours, its Domain Rating, keywords, domain age and pages next to yours, every area head to head, and both shares over the year.
 
 ## Their social profiles and reviews
 
@@ -107,6 +120,9 @@ curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/seo-competitors/g
 # Who is dominating: scores, ranks, standings and time to catch up
 curl -H "Authorization: Bearer $TOKEN" "$URL/v1/brands/$BRAND/competition"
 
+# Read every tracked competitor now
+curl -X POST -H "Authorization: Bearer $TOKEN" "$URL/v1/brands/$BRAND/competition/refresh"
+
 # Follow a competitor's profile, or answer a suggestion
 curl -X POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
   -d '{"url": "https://x.com/rivalhq"}' "$URL/v1/brands/$BRAND/competition/$COMPETITOR/profiles"
@@ -114,4 +130,4 @@ curl -X PATCH -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/js
   -d '{"url": "https://x.com/rivalhq", "state": "dismissed"}' "$URL/v1/brands/$BRAND/competition/$COMPETITOR/profiles"
 ```
 
-Reading needs the `seo.read` scope and changing needs `seo.manage`; a brand's token sees only its brand's sites. Agents use the MCP tools `list_seo_competitors`, `add_seo_competitor`, `update_seo_competitor`, `remove_seo_competitor`, `check_seo_competitor`, `list_competitor_events`, `get_seo_competitor_gaps`, `get_competition`, `list_competitor_profiles`, `follow_competitor_profile` and `answer_competitor_profile`, and can answer things like "what did our competitors publish this month?" "which keywords are we missing?" or "who is winning in search this month?".
+Reading needs the `seo.read` scope and changing needs `seo.manage`; a brand's token sees only its brand's sites. Agents use the MCP tools `list_seo_competitors`, `add_seo_competitor`, `update_seo_competitor`, `remove_seo_competitor`, `check_seo_competitor`, `list_competitor_events`, `get_seo_competitor_gaps`, `get_competition`, `refresh_competition`, `list_competitor_profiles`, `follow_competitor_profile` and `answer_competitor_profile`, and can answer things like "what did our competitors publish this month?" "which keywords are we missing?" or "who is winning in search this month?".
