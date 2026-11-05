@@ -19,6 +19,8 @@ Open **Company → Brands → Add a brand** and give its name, website and where
 
 Also on its page, under **Links**, add everywhere else the brand lives: its App Store and Google Play listings, TV app stores, the Chrome Web Store, Steam, socials and docs. Paste the address and Outflare works out what it is (apps.apple.com is the App Store); add a label such as "Fire TV" where it helps. Agents read the links with the brand's context. With your own Geonode account connected, Outflare also reads the brand's website and suggests the socials and listings it links to, for you to add or dismiss ([Finding a brand's links](/docs/guides/social/#finding-a-brands-links)).
 
+With your own [Geonode](/docs/integrations/connectors/) connection, Outflare also reads the brand's website when you add it (the home page, then up to 40 of the pages it links to: products, pricing, features, integrations, about, use cases, customers and docs) and asks your own AI model what the business does. The result, **What the website says** on the brand's page, is a summary, the industry, and bullets for products, services, features, integrations, capabilities, who it serves and use cases, each linked to the page it came from. Edit any of it, or press **Read the website again** after a redesign. Agents read it with the brand's context, and [AI visibility](/docs/guides/ai-visibility/#set-up-in-three-minutes) drafts its questions from it. Geonode and your AI provider bill your own accounts; without a Geonode connection the brand's page says which connection to add.
+
 The Brands page shows brands as cards or as a table you can sort; it remembers which you picked.
 
 ## Tell agents about it
