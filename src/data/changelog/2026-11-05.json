@@ -2,7 +2,7 @@
 	"version": "2026.11.05",
 	"date": "2026-11-05",
 	"status": "in-progress",
-	"updated": "2026-11-05T15:14:41Z",
+	"updated": "2026-11-05T16:44:50Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -304,7 +304,14 @@
 			"edition": "open-source",
 			"text": "Changes waiting for your OK on the Agents page lead with the yes/no question the agent asks, then say which page or site it is about and why. Without a question they say plainly what the change does (\"Read who links to a page or domain\"). Ids and rule names are gone from the card, and the exact request is one click away.",
 			"at": "2026-11-05T15:03:14Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "Brands are fully separate: the old workspace routes for a brand's data answer 410 `route_moved` with the `/v1/brands/{brand}/` route to call instead. Install health names any token or app still calling an old route, and the SDKs, MCP server and web app use the brand routes.",
+			"at": "2026-11-05T16:44:50Z"
 		}
 	],
-	"through": "654e7f3+b24d269"
+	"through": "6dee200+cf28bec"
 }
