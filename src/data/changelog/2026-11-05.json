@@ -2,7 +2,7 @@
 	"version": "2026.11.05",
 	"date": "2026-11-05",
 	"status": "in-progress",
-	"updated": "2026-11-05T13:05:28Z",
+	"updated": "2026-11-05T13:34:01Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -241,7 +241,14 @@
 			"edition": "open-source",
 			"text": "A brand's website is read for what it offers when you add the brand, through your own Geonode connection and AI model: a summary, the industry and bullets for products, services, features, integrations, capabilities, who it serves and use cases, each linked to its page, on the brand's page for you to edit. AI visibility drafts its questions from it.",
 			"at": "2026-11-05T12:50:55Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Partner and promo codes are unique per brand, so two brands can each give a partner the same code. A program can't move into a brand that already uses its slug or one of its codes; the move says so instead.",
+			"at": "2026-11-05T13:34:01Z"
 		}
 	],
-	"through": "495a2fd+d6cf99a"
+	"through": "af0e184+b920899"
 }
