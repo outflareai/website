@@ -52,6 +52,10 @@ The weekly snapshot also reads the keywords and linking domains of the first fiv
 - **Keyword gaps** lists keywords a competitor ranks in the top 20 for that you don't rank for (**Missing**), or rank 3 places or more below (**Behind**). The ones most competitors share and most people search come first.
 - **Link gaps** lists domains that link to your competitors but not to you, the ones linking to most competitors and strongest first.
 
+Click a link gap to see the exact pages on that site (and its subdomains) that link to each competitor: the page, its title, the competitor's page it links to, the anchor text and whether it's nofollow. Pages come from links already read; **Read their links from this site** reads up to 100 links from that site to each competitor on your own Ahrefs or DataForSEO connection, after showing what it costs. A copy under a day old costs nothing.
+
+Keyword results always show real pages: Google's own redirect links are followed to the page they lead to, and with Geonode connected, keyword results are read on Geonode first. A results page read before this shows a note, and reading it again replaces it.
+
 Gaps compare against what your own connection read for you, so a gap can be a keyword or link outside that read. Opening the tabs costs nothing. The weekly read counts against the connection's budget; set how many rows it reads with `gap_rows` on the connection's settings, or 0 to turn gaps off. Gaps are ideas for content and links: Outflare never contacts a site for you.
 
 ## Who is dominating
@@ -69,7 +73,7 @@ Gaps compare against what your own connection read for you, so a gap can be a ke
 | Reviews | Review counts on your own review pages, and on each competitor's followed ones |
 
 - **Share** is one brand's part of everyone's total in an area.
-- **Score** (0 to 100) compares each brand with the leader of every area it's measured in, so a brand that leads everywhere scores 100. Each area counts once; **Weights** changes how much each one counts, and the page remembers your choice.
+- **Score** (0 to 100) compares each brand with the leader of every area it's measured in, so a brand that leads everywhere scores 100. A brand measured in fewer than half the areas anyone is measured in gets no score or rank until more is read, so one strong area can't put a barely measured competitor on top. Each area counts once; **Weights** changes how much each one counts, and the page remembers your choice.
 - **Rank** shows where each one stands now and 28 days ago.
 - **Where you stand** says, for each area, whether you lead, are ahead, level, behind or far behind the typical competitor, and whether your share is gaining, steady or losing over 28 days.
 - **Time to catch up** says when, at the last 12 weeks' pace, you pass the competitor just ahead, or the one just behind passes you. It needs six weeks of numbers.
@@ -89,7 +93,11 @@ Under each name it says the day of its latest search numbers, or that it has non
 
 **Refresh all competitors** reads every competitor you track now instead of waiting for the weekly read: their search numbers on your own SEO connection (Ahrefs first, only the ones not read today, within its budget, so a second click the same day costs nothing), OutflareBot's look at their home page, and their followed social profiles and review pages. The numbers fill in within a few minutes, and the page updates itself. Without an SEO connection only their sites and profiles are read, and the page says to connect one.
 
-Click a competitor for its own page: its score and rank next to yours, its Domain Rating, keywords, domain age and pages next to yours, every area head to head, and both shares over the year.
+Click a competitor for its own page: its score and rank next to yours, its Domain Rating, keywords, domain age and pages next to yours, every area head to head, and both shares over the year. It also shows:
+
+- **Their placements**: every page Presence found them on, strongest sites first, with its Domain Rating, whether it looks paid for and whether you're on that site too. This is what their Placements number counts, and **Only sites you're not on** narrows it to your openings.
+- **Their search**: their top keywords with your position beside each, their pages that get the most search visits, the sites linking to them (and whether each links to you too) and the newest pages in their sitemap. It shows only what is stored, so it costs nothing.
+- **Read their search data** reads their numbers, top 100 keywords, top 100 linking sites and top 25 pages now, on your own SEO connection (Ahrefs first, else DataForSEO) within its budget. The weekly read covers keywords and linking sites for only five competitors a site, so this fills in the rest. It shows what it would read and about what it costs first, and skips what that connection read in the last six days, so asking twice costs nothing more. Without an SEO connection it says which to add.
 
 ## Their social profiles and reviews
 
@@ -117,11 +125,19 @@ curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/seo-competitors/e
 # Domains that link to competitors but not to you
 curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/seo-competitors/gaps?site_id=$SITE&kind=links"
 
+# The pages on one linking site that link to each competitor (POST reads them, with "estimate_only": true for the cost)
+curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/seo-competitors/gaps/links?site_id=$SITE&domain=reviews.example"
+
 # Who is dominating: scores, ranks, standings and time to catch up
 curl -H "Authorization: Bearer $TOKEN" "$URL/v1/brands/$BRAND/competition"
 
 # Read every tracked competitor now
 curl -X POST -H "Authorization: Bearer $TOKEN" "$URL/v1/brands/$BRAND/competition/refresh"
+
+# One competitor's keywords, top pages, linking sites and new pages, and reading them now
+curl -H "Authorization: Bearer $TOKEN" "$URL/v1/brands/$BRAND/competition/$COMPETITOR/search"
+curl -X POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"estimate_only": true}' "$URL/v1/brands/$BRAND/competition/$COMPETITOR/read"
 
 # Follow a competitor's profile, or answer a suggestion
 curl -X POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
@@ -130,4 +146,4 @@ curl -X PATCH -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/js
   -d '{"url": "https://x.com/rivalhq", "state": "dismissed"}' "$URL/v1/brands/$BRAND/competition/$COMPETITOR/profiles"
 ```
 
-Reading needs the `seo.read` scope and changing needs `seo.manage`; a brand's token sees only its brand's sites. Agents use the MCP tools `list_seo_competitors`, `add_seo_competitor`, `update_seo_competitor`, `remove_seo_competitor`, `check_seo_competitor`, `list_competitor_events`, `get_seo_competitor_gaps`, `get_competition`, `refresh_competition`, `list_competitor_profiles`, `follow_competitor_profile` and `answer_competitor_profile`, and can answer things like "what did our competitors publish this month?" "which keywords are we missing?" or "who is winning in search this month?".
+Reading needs the `seo.read` scope and changing needs `seo.manage`; a brand's token sees only its brand's sites. Agents use the MCP tools `list_seo_competitors`, `add_seo_competitor`, `update_seo_competitor`, `remove_seo_competitor`, `check_seo_competitor`, `list_competitor_events`, `get_seo_competitor_gaps`, `get_seo_link_gap_pages`, `read_seo_link_gap_pages`, `get_competition`, `refresh_competition`, `get_competitor_search`, `read_competitor_search`, `list_competitor_profiles`, `follow_competitor_profile` and `answer_competitor_profile`, and can answer things like "what did our competitors publish this month?" "which keywords are we missing?" or "who is winning in search this month?".
