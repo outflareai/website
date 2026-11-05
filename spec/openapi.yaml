@@ -12547,7 +12547,7 @@ paths:
       - { $ref: "#/components/parameters/Workspace" }
     get:
       operationId: listSEO
-      x-outflare-access: { scope: analytics.read }
+      x-outflare-access: { scope: analytics.read, brand_limited: true }
       summary: List SEO connections
       description: "Scope: analytics.read. DataForSEO and Ahrefs connections with their reports, the domains they follow, the country, the weekly snapshot setting and this month's budget and spend. Empty means none is connected; nothing else needs one."
       tags: [seo]
@@ -13754,7 +13754,7 @@ paths:
       summary: Track a competitor
       description: |
         Scope: seo.manage. Tracks a domain as one of a site's competitors
-        (a suggestion or dismissed one becomes tracked), at most 20 a site,
+        (a suggestion or dismissed one becomes tracked), with no limit,
         and queues OutflareBot's first light look at it. Its numbers come
         with the connection's next weekly snapshot (or POST .../seo/{id}/sync).
         `host` may be a URL; it is kept as the domain without www.
@@ -13881,7 +13881,7 @@ paths:
       x-outflare-access: { scope: seo.manage, brand_limited: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Track, dismiss or name a competitor
-      description: "Scope: seo.manage. `tracked` starts the weekly look and numbers (at most 20 a site); `dismissed` stops them and keeps a suggestion from coming back. `name` and `aliases` say what it is called, for features that look for it by name, such as AI answers."
+      description: "Scope: seo.manage. `tracked` starts the weekly look and numbers; `dismissed` stops them and keeps a suggestion from coming back. `name` and `aliases` say what it is called, for features that look for it by name, such as AI answers."
       tags: [seo]
       requestBody:
         required: true
@@ -13946,7 +13946,7 @@ paths:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: getLinkBuildingSettings
-      x-outflare-access: { scope: seo.read }
+      x-outflare-access: { scope: seo.read, brand_limited: true }
       summary: Get link building settings
       description: "Scope: seo.read. The pitch cool-down and the weekly read of competitors' dead pages, with the defaults until someone changes them."
       tags: [seo]
@@ -33576,6 +33576,32 @@ paths:
               schema: { $ref: "#/components/schemas/RetentionResult" }
         "400": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/insights/lifecycle:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    post:
+      operationId: runLifecycle
+      x-outflare-access: { scope: analytics.read, brand: true }
+      summary: Run a lifecycle question
+      description: |
+        Scope: analytics.read. In each day, week or month of the dates, how many of the people who did the step were doing
+        it for the first time ever (new), had also done it the period before (returning) or came back after a gap
+        (resurrected), and how many who did it the period before did not this time (dormant). New, returning and
+        resurrected add up to everyone active in the period; dormant is the people lost. Runs for at most 30 seconds
+        (query_timeout).
+      tags: [insights]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/LifecycleSpec" }
+      responses:
+        "200":
+          description: The periods.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/LifecycleResult" }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/dashboards:
     parameters: [{ $ref: "#/components/parameters/BrandID" }]
     get:
@@ -33829,6 +33855,8 @@ paths:
                   - { $ref: "#/components/schemas/FunnelResult" }
                   - { $ref: "#/components/schemas/TrendResult" }
                   - { $ref: "#/components/schemas/RetentionResult" }
+                  - { $ref: "#/components/schemas/PathsResult" }
+                  - { $ref: "#/components/schemas/LifecycleResult" }
         "400": { $ref: "#/components/responses/Error" }
         "401": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
@@ -33926,7 +33954,7 @@ paths:
       description: "Scope: analytics.read. The brand's saved insights, the latest changed first."
       tags: [insights]
       parameters:
-        - { name: kind, in: query, schema: { type: string, enum: [funnel, trend, retention, paths] } }
+        - { name: kind, in: query, schema: { type: string, enum: [funnel, trend, retention, paths, lifecycle] } }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
         - { $ref: "#/components/parameters/Cursor" }
         - { $ref: "#/components/parameters/Fields" }
@@ -41779,8 +41807,13 @@ paths:
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Report a sign-up, sale, refund or custom conversion from your backend
       description: |
-        Scope: partners.conversions, the one scope a server-to-server token needs. Report every sign-up, sale, refund
-        and custom conversion. Each one becomes a customer event on the customer's timeline, under the names attribution
+        Scope: partners.conversions, the one scope a server-to-server token needs. A shortcut: a brand's programs also
+        read the customer events and transactions your product already sends (a sign-up is a person's first user id or
+        a Signed Up event; a reward rule's trigger names a custom event; sales come from transactions), so you need this
+        call only if you don't send those. Both ways count once: a sign-up is credited once per customer and program, and
+        a sale or refund with external_id and an amount, for a customer of a brand, is saved as that brand's transaction
+        with source_id = external_id, so the same payment sent to the transactions API is the same one. Other
+        conversions become a customer event on the customer's timeline, under the names attribution
         reads (signed_up; payment.succeeded with payment_id = external_id and amount_minor; payment.refunded; or a custom
         conversion's event_name), whether or not a partner referred them. Outflare also credits the referred ones. The partner is found from, in order: promo_code (when the program's
         codes_win is on), ref (the code from the link, such as a cookie you kept), click_id (ref_click from a short link);
@@ -54090,7 +54123,7 @@ components:
         block_social_clicks: { type: boolean, description: "A website visit with a partner's ref that came from social media (fbclid, or a social network as referrer) doesn't credit the partner." }
         blocked_countries: { type: array, items: { type: string, pattern: "^[A-Z]{2}$" }, description: "Countries the program doesn't credit: a website visit from one (by the site's proxy or the IP database, never the browser's time zone), or a new customer whose conversion call says one in country (reason country_blocked). Sorted; [] for none." }
         terms_url: { type: string }
-        sales_source: { type: string, description: "A billing connector (stripe) whose synced payments and refunds are also partner sales; '' for the API and postbacks only." }
+        sales_source: { type: string, description: "A billing connector (stripe) whose synced payments and refunds are also partner sales, or transactions: the brand's payments and refunds sent to Outflare (transactions API, Order Completed events), each counted once; '' for the API and postbacks only." }
         postback_hint: { type: string, description: "The start of the postback URL's secret; '' when there is none." }
         portal_enabled: { type: boolean, description: The hosted partner portal is open. }
         portal_subdomain: { type: [string, "null"], description: "Its subdomain of the server's partners domain (OUTFLARE_PARTNERS_DOMAIN), if any." }
@@ -54371,7 +54404,7 @@ components:
         block_social_clicks: { type: boolean, description: "Visits from social media don't credit partners. false when left out on create." }
         blocked_countries: { type: array, maxItems: 250, items: { type: string, pattern: "^[A-Za-z]{2}$" }, description: "Two-letter country codes the program doesn't credit, such as [\"BR\", \"IN\"]. [] for none." }
         terms_url: { type: string, maxLength: 2000 }
-        sales_source: { type: string, description: "A billing connector's id (stripe): its synced payments and refunds become partner sales too. \"\" for none." }
+        sales_source: { type: string, description: "A billing connector's id (stripe): its synced payments and refunds become partner sales too. transactions: a brand's program also takes the brand's payments and refunds sent to Outflare (transactions API, Order Completed events). \"\" for none. On create, a brand's program takes transactions when left out; a program shared by every brand takes none." }
         rules: { type: array, maxItems: 50, items: { $ref: "#/components/schemas/PartnerRuleInput" }, description: "Create only: the preset's rules when left out." }
     PartnerStats:
       type: object
@@ -54516,7 +54549,7 @@ components:
         amount_cents: { type: integer, format: int64 }
         currency: { type: string }
         product_id: { type: string }
-        source: { type: string, enum: [api, postback, billing, manual, import, browser], description: "billing: a payment synced from the program's sales_source. browser: a sign-up the website reported with outflare.signup()." }
+        source: { type: string, enum: [api, postback, billing, manual, import, browser, events], description: "billing: a payment synced from the program's sales_source (a billing connector, or the brand's transactions). browser: a sign-up the website reported with outflare.signup(). events: a sign-up or custom conversion taken from the customer events the workspace sends (a Signed Up event, a person's first user id, or an event a reward rule names)." }
         payment_source: { type: string, description: "The payment provider your backend named, such as stripe; '' when it didn't." }
         interval: { type: string, enum: ["", day, week, month, year, one_time], description: "How the sale bills, as your backend said; '' when it didn't." }
         occurred_at: { type: string, format: date-time }
@@ -64698,8 +64731,8 @@ components:
       type: object
       required: [kind, name, converted, dropped, converted_rate, dropped_rate, odds_ratio]
       properties:
-        kind: { type: string, enum: [event, page] }
-        name: { type: string, description: The event's name, or the page's path. }
+        kind: { type: string, enum: [event, page, property] }
+        name: { type: string, description: "The event's name, the page's path, or a property of the person as \"key: value\"." }
         converted: { type: integer, description: How many people who reached the step did it. }
         dropped: { type: integer, description: How many people who dropped off did it. }
         converted_rate: { type: number, description: "0 to 1, of the people who reached the step." }
@@ -64801,6 +64834,14 @@ components:
           description: |
             person when left out. company counts each company once, through the people linked to it: a company reaches a step when any of its
             people does. Browsers nobody has identified belong to no company and drop out.
+        order:
+          type: string
+          enum: [strict, any]
+          description: |
+            strict when left out: people do the steps in this order. any: they do them in any order, so step 1 is whichever they did first in the
+            dates and step N means N of the steps done within the window; the chart counts how many of the steps people got through, and
+            the steps are labelled "1 step", "2 steps" and so on. An any-order funnel takes no exclusions and no per-step time limits, and
+            a breakdown needs every step to be of the same kind.
         date_range: { $ref: "#/components/schemas/InsightDateRange" }
         window: { $ref: "#/components/schemas/InsightWindow" }
         breakdown: { type: string, maxLength: 200, description: "A field of step 1 to split people by (the catalog's breakdowns), or param:<name> or property:<key> for an event step." }
@@ -64979,12 +65020,41 @@ components:
         from: { type: string, format: date-time }
         to: { type: string, format: date-time }
     InsightSpec:
-      description: A funnel's, a trend's, a retention question's or a paths question's spec, by the insight's kind.
+      description: A funnel's, a trend's, a retention question's, a paths question's or a lifecycle question's spec, by the insight's kind.
       oneOf:
         - { $ref: "#/components/schemas/FunnelSpec" }
         - { $ref: "#/components/schemas/TrendSpec" }
         - { $ref: "#/components/schemas/RetentionSpec" }
         - { $ref: "#/components/schemas/PathsSpec" }
+        - { $ref: "#/components/schemas/LifecycleSpec" }
+    LifecycleSpec:
+      type: object
+      required: [step]
+      additionalProperties: false
+      properties:
+        step: { $ref: "#/components/schemas/FunnelStep", description: "What counts as being active. No time limit." }
+        date_range: { $ref: "#/components/schemas/InsightDateRange" }
+        interval: { type: string, enum: [day, week, month], description: "The period. Default: week." }
+    LifecycleResult:
+      type: object
+      required: [label, interval, periods, from, to]
+      properties:
+        label: { type: string }
+        interval: { type: string, enum: [day, week, month] }
+        periods:
+          type: array
+          description: Every period of the dates, in order, even when nobody was active in it.
+          items:
+            type: object
+            required: [start, new, returning, resurrected, dormant]
+            properties:
+              start: { type: string, format: date-time }
+              new: { type: integer, description: Did it for the first time ever in this period. }
+              returning: { type: integer, description: Did it in this period and the one before. }
+              resurrected: { type: integer, description: Did it in this period, not the one before, but some time earlier. }
+              dormant: { type: integer, description: "Did it the period before but not in this one. A loss: not part of the period's active people." }
+        from: { type: string, format: date-time }
+        to: { type: string, format: date-time }
     RetentionSpec:
       type: object
       required: [start]
@@ -65131,7 +65201,7 @@ components:
             required: [id, kind, name, display, note, x, y, w, h]
             properties:
               id: { type: string, format: uuid }
-              kind: { type: [string, "null"], enum: [funnel, trend, retention, paths, null], description: "The insight's kind; null for a note, or a tile whose insight was deleted." }
+              kind: { type: [string, "null"], enum: [funnel, trend, retention, paths, lifecycle, null], description: "The insight's kind; null for a note, or a tile whose insight was deleted." }
               name: { type: [string, "null"] }
               display: { type: [string, "null"], description: "How a trend is drawn (line, bar, number, table)." }
               note: { type: string }
@@ -65177,7 +65247,7 @@ components:
       properties:
         id: { type: string, format: uuid }
         brand_id: { type: string, format: uuid }
-        kind: { type: string, enum: [funnel, trend, retention, paths] }
+        kind: { type: string, enum: [funnel, trend, retention, paths, lifecycle] }
         name: { type: string }
         description: { type: string }
         spec: { $ref: "#/components/schemas/InsightSpec" }
@@ -65189,7 +65259,7 @@ components:
       required: [name, spec]
       additionalProperties: false
       properties:
-        kind: { type: string, enum: [funnel, trend, retention, paths], default: funnel }
+        kind: { type: string, enum: [funnel, trend, retention, paths, lifecycle], default: funnel }
         name: { type: string, minLength: 1, maxLength: 120 }
         description: { type: string, maxLength: 1000 }
         spec: { $ref: "#/components/schemas/InsightSpec" }

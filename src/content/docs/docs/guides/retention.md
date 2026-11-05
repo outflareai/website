@@ -1,6 +1,6 @@
 ---
 title: Retention
-description: Of the people who first did something in a week, how many came back the week after, and the one after that.
+description: Of the people who first did something in a week, how many came back the week after, and the one after that. And each week, how many active people were new, returning or back after a gap.
 sidebar:
   order: 9.75
 ---
@@ -25,10 +25,21 @@ In the app, open **Analytics** in the sidebar, then **Retention**. Retention run
 
 Save a question for everyone in the brand with a name; it keeps only the question, so every view counts again. Saved questions can go on a [dashboard](/docs/guides/dashboards/).
 
+## Lifecycle
+
+The **Lifecycle** view at the top of the page asks the other retention question: is the active base growing, and from where? Pick what counts as **active** (a visit, a page, an event, a conversion or a payment) and a period. Each day, week or month then shows, as one bar:
+
+- **New**: active for the first time ever. Outflare looks at the person's whole history, not only the dates shown.
+- **Returning**: active this period and the one before.
+- **Resurrected**: active this period, not the one before, but some time earlier.
+- **Dormant**, below the line: active the period before and not this one. These are the people lost, so they are not part of the period's active count.
+
+New, returning and resurrected add up to everyone active in the period. A growing bar made of returning people is a product people keep using; a bar that is mostly new with a long dormant tail is a leaky bucket. Hover a bar for the numbers; the table underneath has every period. Lifecycle questions save and go on dashboards like cohorts do.
+
 ## Who can do what
 
 Everyone in the workspace can run retention (`analytics.read`). Owners, admins and operators can save, change and delete questions (`analytics.manage`).
 
 ## For agents and scripts
 
-The REST API is `POST /v1/brands/{brand}/insights/retention`, and `/v1/brands/{brand}/insights` keeps saved questions with funnels and trends. See the [API reference](/docs/api/). The MCP tool is `run_retention`, with `save_insight` and the other saved-insight tools. Ask your agent something like *"Of the people who signed up each week this quarter, what share came back the week after, and which cohort sticks best?"*
+The REST API is `POST /v1/brands/{brand}/insights/retention` for cohorts and `POST /v1/brands/{brand}/insights/lifecycle` for lifecycle, and `/v1/brands/{brand}/insights` keeps saved questions with funnels and trends. See the [API reference](/docs/api/). The MCP tools are `run_retention` and `run_lifecycle`, with `save_insight` and the other saved-insight tools. Ask your agent something like *"Of the people who signed up each week this quarter, what share came back the week after, and which cohort sticks best?"*

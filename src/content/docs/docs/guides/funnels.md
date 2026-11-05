@@ -29,6 +29,10 @@ Add up to ten steps. Each one is:
 
 Give any step a **time limit**: within so many minutes, hours, days or weeks of the step before, or of any earlier step. *A first payment within 3 days of signing up* is a payment step with a 3-day limit from the sign-up step. You can also limit the whole funnel from step 1.
 
+## In any order
+
+Funnels count steps in order: step 2 only counts after step 1. Set **Order** to **In any order** under Options when the order doesn't matter, such as the three things a new account should set up in its first week. Step 1 is then whichever step a person did first in the dates, and each bar after it is how many people had done that many of the steps within the funnel's time limit: *1 step*, *2 steps*, up to *All 3 steps*. An any-order funnel has no exclusions and no per-step time limits, and a breakdown needs every step to be of the same kind, because any step can be the first.
+
 ## Leave people out
 
 Under the steps, **Leave out people who…** drops from the whole funnel everyone who did something between two steps: for example, everyone who contacted support between signing up and paying. Describe it like a step (an event, a page, a conversion, a payment, with filters) and say between which steps. Every bar then counts the same, smaller group, so you can compare a funnel with and without them. Up to five.
@@ -45,7 +49,7 @@ Under the steps, **Leave out people who…** drops from the whole funnel everyon
 - **Over time** shows the funnel by the day, week or month people entered.
 - Click any bar, or any count in the breakdown, to see the people behind it: who got there, or who dropped off before it, with when they did each step. Each one opens their profile.
 - In that list, **Save as a list** puts everyone there with a record into a new static [list](/docs/guides/smart-lists/), to mail, score or compare. Visitors not signed in have no record and are skipped; the list says how many. *Signed up, never paid* as a list is a sequence waiting to happen.
-- **What did people who finished do differently?** compares, for everyone at step 1, the events and pages of the people who reached a step with those who didn't. Each row shows the share of each group who did it and how many times more likely finishing was (over 1 went with finishing, under 1 with dropping off). It runs when you press **Compare**, since it reads every event and page view, and leaves out anything fewer than three people did. For funnels of people, not companies.
+- **What did people who finished do differently?** compares, for everyone at step 1, the events, pages and properties of the people who reached a step with those who didn't. Properties are what your records say about identified people, such as `plan: pro` or `country: AU`, never anything that identifies one person (email, phone, name). Each row shows the share of each group who did or had it and how many times more likely finishing was (over 1 went with finishing, under 1 with dropping off). It runs when you press **Compare**, since it reads every event and page view, and leaves out anything fewer than three people did. For funnels of people, not companies.
 
 ## Save it
 
@@ -57,4 +61,4 @@ Everyone in the workspace can run funnels and the comparison (`analytics.read`);
 
 ## For agents and scripts
 
-The REST API is `POST /v1/brands/{brand}/insights/funnel` to run a funnel (with `exclusions` and `by`), `POST /v1/brands/{brand}/insights/funnel/people` for the people behind a step and `.../people/save` to keep them as a list, `.../funnel/correlation` for what converters did differently, `GET /v1/brands/{brand}/insights/catalog` for the events and fields you can use, and `/v1/brands/{brand}/insights` for saved funnels. See the [API reference](/docs/api/). The MCP tools are `get_insights_catalog`, `run_funnel`, `list_funnel_people`, `save_funnel_people`, `run_funnel_correlation`, `list_insights`, `get_insight`, `save_insight`, `update_insight` and `delete_insight`. Ask your agent something like *"Of the people who came from our Google ads last month, how many signed up, and how many of those paid within 3 days?"*
+The REST API is `POST /v1/brands/{brand}/insights/funnel` to run a funnel (with `exclusions`, `by` and `order`), `POST /v1/brands/{brand}/insights/funnel/people` for the people behind a step and `.../people/save` to keep them as a list, `.../funnel/correlation` for what converters did differently, `GET /v1/brands/{brand}/insights/catalog` for the events and fields you can use, and `/v1/brands/{brand}/insights` for saved funnels. See the [API reference](/docs/api/). The MCP tools are `get_insights_catalog`, `run_funnel`, `list_funnel_people`, `save_funnel_people`, `run_funnel_correlation`, `list_insights`, `get_insight`, `save_insight`, `update_insight` and `delete_insight`. Ask your agent something like *"Of the people who came from our Google ads last month, how many signed up, and how many of those paid within 3 days?"*
