@@ -1,0 +1,23 @@
+{
+	"version": "2026.11.05",
+	"date": "2026-11-05",
+	"status": "in-progress",
+	"updated": "2026-11-05T02:30:22Z",
+	"items": [
+		{
+			"kind": "improvement",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Every partner program belongs to one brand, and its partners, links, conversions, rewards and payouts are that brand's alone. A brand's backend reports conversions to its own brand route, which credits only that brand's partners.",
+			"at": "2026-11-05T02:30:22Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Each brand has its own attribution, ad consent and visitor settings, under `/v1/brands/{brand}/.../settings`, and two brands of one workspace can use the same flag key, exclusion group, conversion key or attribution model key. The workspace settings routes are deprecated and act on the first brand.",
+			"at": "2026-11-05T02:30:22Z"
+		}
+	],
+	"through": "0b26483+2c63375"
+}
