@@ -2,7 +2,7 @@
 	"version": "2026.11.05",
 	"date": "2026-11-05",
 	"status": "in-progress",
-	"updated": "2026-11-05T08:56:49Z",
+	"updated": "2026-11-05T09:37:03Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -108,7 +108,28 @@
 			"edition": "open-source",
 			"text": "AI visibility can now ask ChatGPT and Gemini on their own screens, as a signed-out person in your cohort's country sees them, through your own DataForSEO account (about US$0.004 an answer). Each answer shows the searches the assistant ran, every page it read and whether it cited it, and every brand it named.",
 			"at": "2026-11-05T08:56:49Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Competitors → Overview has a Refresh all competitors button that reads every tracked competitor now on your own connections, and shows each one's Domain Rating, keywords, domain age and sitemap pages.",
+			"at": "2026-11-05T09:37:03Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "outreach",
+			"edition": "open-source",
+			"text": "Every mailbox and sending domain belongs to one brand and sends only for that brand's sequences. Mailboxes that were shared moved to the brand whose sequence they send for (or their domain's, or the workspace's only brand); any left with no brand are listed under Company → Brands to add to one, and send for no brand until then.",
+			"at": "2026-11-05T09:37:03Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Competitors: Yes and No now sit right beside each suggested site, and the daily look asks your SEO connection for 50 competitors instead of 10 (and up to 25 from your rankings), so the list keeps growing. Up to 50 tracked competitors a site get their weekly numbers.",
+			"at": "2026-11-05T09:37:03Z"
 		}
 	],
-	"through": "31f5810+29a5d8c"
+	"through": "6ae4191+2923de7"
 }
