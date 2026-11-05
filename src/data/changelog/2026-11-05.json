@@ -2,7 +2,7 @@
 	"version": "2026.11.05",
 	"date": "2026-11-05",
 	"status": "in-progress",
-	"updated": "2026-11-05T18:17:19Z",
+	"updated": "2026-11-05T22:05:36Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -311,7 +311,28 @@
 			"edition": "open-source",
 			"text": "Brands are fully separate: the old workspace routes for a brand's data answer 410 `route_moved` with the `/v1/brands/{brand}/` route to call instead. Install health names any token or app still calling an old route, and the SDKs, MCP server and web app use the brand routes.",
 			"at": "2026-11-05T16:44:50Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "Each brand has its own knowledge and memories. Items saved with no brand became each brand's own copy, so every brand still has them, and new knowledge and memories always belong to one brand.",
+			"at": "2026-11-05T22:05:36Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "inbox",
+			"edition": "open-source",
+			"text": "Each brand has its own support assistant settings, reply time targets, hand-off topics, chat widget, help centre and alert settings. Settings saved for the whole workspace became each brand's own copy, so nothing changes until you edit one brand.",
+			"at": "2026-11-05T22:05:36Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "About your company is now each brand's own: every brand has its own description, goals, voice, rules, notes, logo and colours, and agents read only the brand they work for. Each brand starts from a copy of what the company had.",
+			"at": "2026-11-05T22:05:36Z"
 		}
 	],
-	"through": "d6b4815+7a8a49f"
+	"through": "3774247+d8ff688"
 }
