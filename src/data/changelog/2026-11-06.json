@@ -2,7 +2,7 @@
 	"version": "2026.11.06",
 	"date": "2026-11-06",
 	"status": "in-progress",
-	"updated": "2026-11-06T09:49:25Z",
+	"updated": "2026-11-06T10:02:58Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -24,7 +24,28 @@
 			"edition": "open-source",
 			"text": "AI visibility counts every competitor on the brand's list, however long, so the setup and every run include them all; before, the list stopped at 25.",
 			"at": "2026-11-06T09:49:25Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "With a brand agent, the Agents page opens straight to its chat. Waiting changes, history, what agents may do and API tokens are in one \"Approvals and history\" menu instead of a row of tabs.",
+			"at": "2026-11-06T10:02:58Z"
+		},
+		{
+			"kind": "fix",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "A payment or refund sent as an order event and as a transaction at the same moment is now kept once, with its person. Before, it could show twice on the Transactions page, and Developer setup could warn about payments with no person.",
+			"at": "2026-11-06T10:02:58Z"
+		},
+		{
+			"kind": "fix",
+			"area": "records",
+			"edition": "open-source",
+			"text": "When your product sends a verified email that only one record holds unverified, such as an import, a lead or an unsubscribe with no user id or other email of its own, that record is now merged into the person instead of being listed as a possible duplicate. Its consent and opt-outs come with it.",
+			"at": "2026-11-06T10:02:58Z"
 		}
 	],
-	"through": "cbdfe2e+bd6b0de"
+	"through": "a667532+6872f94"
 }
