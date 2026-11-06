@@ -2,7 +2,7 @@
 	"version": "2026.11.06",
 	"date": "2026-11-06",
 	"status": "in-progress",
-	"updated": "2026-11-06T12:57:37Z",
+	"updated": "2026-11-06T13:03:05Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -136,7 +136,21 @@
 			"edition": "open-source",
 			"text": "Developer setup now shows when payments sent from your server can't be matched for certain: orders without an order_id, payments joined by a guess or with different amounts both ways, ids reused for renewals, retries under new ids, amounts sent in dollars instead of cents, and payments going quiet. Payments saved twice before can be merged in one click.",
 			"at": "2026-11-06T12:34:11Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Presence Opportunities suggests the English version of a page instead of its translations, so a site with /fr/ and /de/ copies shows up once, on its English page.",
+			"at": "2026-11-06T13:03:05Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "SEO sites, audits, keywords, competitors, backlinks, fixes and deploys now belong to one brand each, under `/v1/brands/{brand}/`. The old workspace routes answer 410 and name the route to call instead. The SEO overview shows one brand, or each brand in turn when all brands are picked.",
+			"at": "2026-11-06T13:03:05Z"
 		}
 	],
-	"through": "355c11b+333c8d4"
+	"through": "a5418ce+b2b7f45"
 }
