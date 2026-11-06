@@ -2,7 +2,7 @@
 	"version": "2026.11.06",
 	"date": "2026-11-06",
 	"status": "in-progress",
-	"updated": "2026-11-06T14:26:54Z",
+	"updated": "2026-11-06T15:02:04Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -171,7 +171,14 @@
 			"edition": "open-source",
 			"text": "Site audits now check whether AI answers can use your pages: quoting blocked (nosnippet, short max-snippet, Bing noarchive), questions with no direct answer, articles without an author or date or not updated in two years, and structured data that doesn't match the page. Googlebot, Bingbot and more AI crawlers join the AI crawler list.",
 			"at": "2026-11-06T14:26:54Z"
+		},
+		{
+			"kind": "fix",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "The indexability report lists every page in a site's sitemaps, including those past the crawl's page limit, and shows each page's full address as a link that opens it.",
+			"at": "2026-11-06T15:02:04Z"
 		}
 	],
-	"through": "c30b34c+6b6aecc"
+	"through": "14b029c+f34bd89"
 }
