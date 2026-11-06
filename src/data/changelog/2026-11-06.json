@@ -2,7 +2,7 @@
 	"version": "2026.11.06",
 	"date": "2026-11-06",
 	"status": "in-progress",
-	"updated": "2026-11-06T15:02:04Z",
+	"updated": "2026-11-06T16:03:45Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -178,7 +178,21 @@
 			"edition": "open-source",
 			"text": "The indexability report lists every page in a site's sitemaps, including those past the crawl's page limit, and shows each page's full address as a link that opens it.",
 			"at": "2026-11-06T15:02:04Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "The AI visibility Sources table now shows each page's address first and its site next, and leaves out ChatGPT's own image links. Click a page to see when answers first cited it, the site's ratings, the links to it, the questions it answers, and whether it links to or only names you and each competitor.",
+			"at": "2026-11-06T16:03:45Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "AI visibility now sorts the brands AI answers name: a product of a listed competitor (\"Zyte API\") counts as that competitor, tools that aren't competitors go under \"Named, not competitors\", and every name it isn't sure of shows its best guess at the website. Each name is sorted once and remembered.",
+			"at": "2026-11-06T16:03:45Z"
 		}
 	],
-	"through": "14b029c+f34bd89"
+	"through": "8668228+fa8f0d2"
 }
