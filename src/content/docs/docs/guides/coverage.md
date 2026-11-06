@@ -86,7 +86,7 @@ Pages are listed by what each link is worth to you, not by how big the site is. 
 
 Filter by how it's got, or sort by Domain Rating or most recent instead. Each page also shows its type, the site's domain rating and traffic, and which of these found it. **Likely paid** appears only when there's a reason, such as a link marked sponsored, an affiliate code in the link, or "sponsored" in the page's address or title; hover over it to see which. Without one, it shows **Unknown**, because nobody outside the deal can know for sure. **Only sites we're not on** keeps the sites where your brand has no publisher yet: the places to go after.
 
-Your top 10 competitors, by the keywords you share, are scanned weekly and the rest monthly. Change how many count as top and how often each group is scanned at the top of the tab, or give one competitor its own cadence. **Scan now** scans a competitor straight away.
+Every competitor is scanned once a month by default, so a long competitor list doesn't spend your search and SEO budgets every week. Your top 10, by the keywords you share, can be scanned more often: change how many count as top and how often each group is scanned at the top of the tab, or give one competitor its own cadence. **Scan now** scans a competitor straight away.
 
 Search results and links run on your workspace's own [DataForSEO, Geonode or Ahrefs connection](/docs/integrations/seo/), within that connection's budget. Until you connect one, the competitor says which connection each part needs, and nothing is spent. AI answers need no connection of their own.
 
