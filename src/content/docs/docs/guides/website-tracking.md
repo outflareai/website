@@ -9,7 +9,7 @@ sidebar:
 
 Website tracking records each visit to your sites as an event in your [customer records](/docs/guides/customer-records/). It keeps what the visitor arrived with, exactly as it came: UTM tags, ad click ids, the referrer and any referral or partner code. Outflare works out channels and attribution from these on the server, never in the browser. Visitors stay anonymous until your own product says who they are.
 
-[Website visitors](/docs/guides/website-visitors/) shows which known companies and people came, and who is ready to talk.
+[Website visitors](/docs/guides/website-visitors/) shows which known companies and people came, and who is ready to talk. [Page speed](#page-speed) shows how fast your pages were for real visitors, and [Right now](#right-now) who is on your site this minute.
 
 ## Set it up
 
@@ -144,3 +144,30 @@ Without consent, the campaign tags a visitor landed with are kept with that firs
 To have Outflare show the banner for you, with each region's rules, Google Consent Mode and the ad platforms' consent signals, and keep a cookie policy that updates itself, turn on the [consent banner](/docs/guides/consent-banner/). `outflare.consent()` then also takes categories (`{analytics: true, marketing: false}`), and every choice is kept as the visitor's consent.
 
 Visits are stored in your workspace with the rest of your customer data and aren't shared with anyone.
+
+## Page speed
+
+**Analytics › Page speed** shows how fast your pages were for real visitors. From version 16, the script measures every page load by itself: how long the biggest part of the page took to show (LCP), how long the page took to react to a click or key (INP), and how much the layout jumped while loading (CLS). It also records the first paint (FCP) and the server's response time (TTFB). Sites that load the script from Outflare get the new version with no change.
+
+Each number is the 75th percentile, the value Google judges a page by: three in four visits were at least this fast. Each one is graded good, needs work or poor with Google's thresholds (LCP 2.5s and 4s, INP 200ms and 500ms, CLS 0.1 and 0.25). The page shows:
+
+- The three numbers for your site, with the period before for comparison, and the share of visits where every measured number was good.
+- A warning for any page that got noticeably slower than the period before, with enough page loads in both to be sure.
+- A table of your pages with their loads, their three numbers and how their loading time changed.
+
+You can narrow it to one website, to phones or computers, and to the last 7, 28 or 90 days. This covers every page your script runs on, including pages too small for Google to have field data for.
+
+A reading carries only the page's address without its query string, the kind of device and the country. It has no visitor id, sets no cookie and isn't an event, so it needs no consent and doesn't count toward your event limits. Readings are deleted after 90 days. To turn the measurement off, add `data-vitals="off"` to the script tag.
+
+In the API it's `GET /v1/brands/{brand}/analytics/page-speed`, and in the MCP server `get_page_speed`.
+
+## Right now
+
+**Analytics › Right now** shows who is on your website this minute, and updates every 5 seconds while it's open. It shows:
+
+- How many visitors are on the site now (active in the last 5 minutes), in the last 30 minutes, and per minute over those 30 minutes.
+- The pages open now, where those visitors came from and their countries.
+- The events in the last hour, such as sign-ups and orders.
+- A feed of the last 30 page views and events as they happen.
+
+It names nobody: a visitor who is already one of your contacts shows as "a known visitor". In the API it's `GET /v1/brands/{brand}/analytics/live`, and in the MCP server `get_site_live`.
