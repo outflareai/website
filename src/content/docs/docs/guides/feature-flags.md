@@ -95,15 +95,19 @@ Add `?of_flag=pricing-headline:faster` to any page's address to see that version
 
 ### Change a page without code
 
-For a version of a split, open the flag in **Analytics → Feature flags** (or a test in **A/B tests**), enter a page of your site under **Page to edit on**, and choose **Edit visually** next to the version. The page opens in a new tab with that version and an editor over it. Click anything, then:
+For a version of a split, open the flag in **Analytics → Feature flags** (or a test in **A/B tests**), enter a page of your site under **Page to edit on**, and choose **Edit visually** next to the version. The page opens in a new tab with that version and an editor over it. A bar along the top switches between versions (today's page is shown but can't be changed), and has **Undo** and **Redo**, whether everything is saved, **Save** and **Close**. Click anything on the page, then:
 
-- **Content:** change its text, plain or with simple formatting (`**bold**`, `*italic*`, `[a link](/page)` and new lines), or a link or an image.
+- **Content:** change its text, plain or with simple formatting (`**bold**`, `*italic*`, `[a link](/page)` and new lines), or a link or an image. Or double-click text and type straight on the page.
 - **Style:** its text colour, background, size, weight, alignment, padding, margin, corners, border, width and more.
-- **Move:** up or down among the elements around it.
+- **Move:** up or down among the elements around it, or drag it by its handle to where it should go.
 - **Add:** a new piece of text, a button, a link or an image next to it.
 - **Hide it.**
 
-Changes can apply to phones only or wider screens only. **Undo last** takes back the newest change, and **Preview on a phone** opens the page in a phone-sized window. Under **Version settings**, a version can have its own CSS (looks only) and can send its visitors to another page of your site instead, for a split URL test. **Save** in the editor, and visitors who get that version see the changes within a minute.
+**Layers** lists the page's headings, text, buttons, links and images, to pick one without hunting for it. **Changes** lists everything the version changes: point at one to see it on the page, or remove it.
+
+**Ask AI**, on a version of an A/B test of a page: describe a change to the whole page, or pick a part first and describe a change to just that part, such as "make this shorter and say Start free". Your own AI model writes it and it shows on the page at once: **Keep** it or **Undo** it. This uses the AI model your workspace connected under **Settings → AI model**, billed to your own AI provider account; without one, the editor says where to connect it.
+
+Changes can apply to phones only or wider screens only. **Preview on a phone** opens the page in a phone-sized window. Under **Settings** in the editor, a version can have its own CSS (looks only) and can send its visitors to another page of your site instead, for a split URL test. **Save** in the editor, and visitors who get that version see the changes within a minute.
 
 No developer is needed: the page only needs the tracking script, without `data-flags`. While a test with editor changes runs, the script asks for each visitor's version by itself; a site with no tests makes almost no extra requests. To turn this off for a site, switch off **Run A/B tests on this site** in its tracking settings, or put `data-flags="off"` on the tag.
 
@@ -116,7 +120,7 @@ No developer is needed: the page only needs the tracking script, without `data-f
 - Showing a visitor the changes counts them in the flag's [A/B test](/docs/guides/ab-tests/).
 - A version holds up to 50 changes. They're kept in its content as `changes`, so you can also write or review them there.
 
-The editor link works for two hours, only for that version, and only while you can still change flags. It carries a secret, so don't share it.
+The editor link works for two hours, only for that flag's versions, and only while you can still change flags. It carries a secret, so don't share it.
 
 ## On your servers
 

@@ -15,9 +15,11 @@ A/B tests compare versions shown to visitors. To compare groups of pages for sea
 
 The quickest test needs nothing from a developer once the [tracking script](/docs/guides/website-tracking/) is on your site.
 
-1. In **Analytics → A/B tests**, choose **New test → Test a page**. Enter the page (end it with `*` for every page under it, such as `/blog/*`), how many new versions to compare with today's page (one to four), and the goal.
-2. **Edit the versions.** On the draft, choose **Edit visually** next to each version. Your page opens with an editor over it: click anything to change it ([what it can change](/docs/guides/feature-flags/#change-a-page-without-code)). Today's page, the control, stays as it is.
-3. **Preview, then start.** Check each version ([below](#preview-and-check-each-version)) and start the test.
+1. In **Analytics → A/B tests**, choose **New test → Test a page**. Enter the page (end it with `*` for every page under it, such as `/blog/*`), how many new versions to compare with today's page (one to four), and the goal. This makes a draft, and the test gets its own page and link, which you can share with your team.
+2. **Make the versions.** On the test's **Versions** step, describe what you want, such as "make the headline shorter and add a Start free button", and your own AI model writes the changes to your page ([AI help](#ai-help)); **Keep** puts them on a version. Or choose **Edit on your page** on a version: your page opens with an editor over it, where you click anything to change it, type on the page, drag parts around, switch between versions, and ask the AI to change the page or the part you picked ([the editor](/docs/guides/feature-flags/#change-a-page-without-code)). **Describe a change** on a version asks the AI for more changes to that one. Today's page, the control, stays as it is. Each version has **Preview** and **On a phone** links.
+3. **Goal, then review and start.** Add more goals or guardrails if you like, check each version ([below](#preview-and-check-each-version)) and start the test. Until the first visitor arrives, the test's overview shows how to check it's counting: open the page in a private window, and your visit appears within a minute.
+
+Once a test starts, its page has tabs for the **Overview** (a plain sentence saying which version is winning, then the details), **Versions**, **Setup**, **Activity** and what it taught (**Learnings**). Each tab has its own link.
 
 Outflare makes a flag for the test behind the scenes: off until the test starts, shown only on that page, split evenly between the control and the new versions. Developers see it under Feature flags like any other.
 
@@ -177,11 +179,12 @@ With your own AI model connected (Settings, AI model), Outflare can help at each
 
 - **Suggest tests.** Ideas from your busiest pages, the goals visitors reach, your brand and the tests you've already run. Each comes with a hypothesis, the page, the change and the goal, plus how long it would take on that page. **Use this** fills in a new test.
 - **Write versions.** Describe what to change, such as "a shorter, more urgent headline for agencies", and get new versions of the flag's headline, call to action or other copy, in your brand's voice. **Add to flag** puts the ones you like into the split.
+- **Change the page.** For a test of a page, describe a change, such as "add a line about premium plans and a Try it button under the header". Your AI model reads the page and writes real changes to it (new text, a button, a style, hiding or moving a part). **Keep** puts them on a version, or discard them. In the editor, you can pick one part of the page first and ask about just that part.
 - **Summarise.** A running or finished test's results in plain English, with next steps. What it recommends is decided by Outflare from the numbers: ship the winner, weigh a guardrail it hurts, keep the original, fix the split, keep it running, stop and try something bolder, or wait. The AI only puts it into words.
 - **Learnings.** When a test ends, Outflare writes what it taught in a headline and a short paragraph, with tags such as `headline` or `pricing`. A test without a clear winner taught that the change made no large difference, and says so.
 - **Ask about past tests.** On the **Learnings** page, ask a question such as "what have we learned about headlines on the pricing page?" and get an answer from your finished tests, with the tests it drew on. The Learnings library of finished tests, and searching it, works without an AI model too.
 
-The AI is told never to invent facts, numbers, testimonials or prices. Check generated copy before visitors see it. AI calls are billed to your own AI provider account and appear under AI usage as **A/B tests**.
+While the AI works, you see how long it has taken and can **Stop** it; it keeps going if you leave the page, and you pick up where it is when you come back. A run that takes longer than two minutes stops by itself and says so. The AI is told never to invent facts, numbers, testimonials or prices. Check generated copy before visitors see it. AI calls are billed to your own AI provider account and appear under AI usage as **A/B tests**.
 
 ## API and agents
 
