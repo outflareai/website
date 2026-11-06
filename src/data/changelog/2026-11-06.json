@@ -2,7 +2,7 @@
 	"version": "2026.11.06",
 	"date": "2026-11-06",
 	"status": "in-progress",
-	"updated": "2026-11-06T12:19:15Z",
+	"updated": "2026-11-06T12:34:11Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -129,7 +129,14 @@
 			"edition": "open-source",
 			"text": "Each competitor's search data is now read at most once a month on an SEO connection, however it is asked for (the weekly snapshot, Refresh all competitors, or one competitor's Read), so many tracked competitors don't spend your Ahrefs or DataForSEO budget every week. Change it under \"Read each competitor at most once every\" in the SEO tool's settings.",
 			"at": "2026-11-06T12:19:15Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Developer setup now shows when payments sent from your server can't be matched for certain: orders without an order_id, payments joined by a guess or with different amounts both ways, ids reused for renewals, retries under new ids, amounts sent in dollars instead of cents, and payments going quiet. Payments saved twice before can be merged in one click.",
+			"at": "2026-11-06T12:34:11Z"
 		}
 	],
-	"through": "2611262+3eb19ab"
+	"through": "51b9b6b+19f91af"
 }
