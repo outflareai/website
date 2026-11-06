@@ -79,7 +79,12 @@ Review each candidate, choose its publisher, and confirm or dismiss it. Matching
 - who links to the competitor's site,
 - pages that AI answers cite when they name the competitor, from [AI visibility](/docs/guides/ai-visibility/).
 
-Each page shows its type, the site's domain rating and traffic, and which of these found it. **Likely paid** appears only when there's a reason, such as a link marked sponsored, an affiliate code in the link, or "sponsored" in the page's address or title; hover over it to see which. Without one, it shows **Unknown**, because nobody outside the deal can know for sure. **Only sites we're not on** keeps the sites where your brand has no publisher yet: the places to go after.
+Pages are listed by what each link is worth to you, not by how big the site is. Each one shows:
+
+- **How it's got**: **Can't buy** (an editorial review, roundup or comparison that only a good product gets into), **Earned** (an article, guide or mention someone chose to write), **Paid** (looks paid for, with evidence), **Free to get** (a profile, directory, listing, forum post, video or social post anyone can make) or **Unknown**.
+- **Value**, from 0 to 100, with the reasons under the page: its authority (the page's own rating, and the site's, except on platforms such as YouTube or Google where anyone can post), its readers, trust (a followed link that isn't paid, on a site with real traffic) and how close it is to what your brand is about (the topics your sites rank for), plus how many competitors the same page features. How it's got weights the total, so a free profile on a huge platform ranks below an earned review on a smaller site.
+
+Filter by how it's got, or sort by Domain Rating or most recent instead. Each page also shows its type, the site's domain rating and traffic, and which of these found it. **Likely paid** appears only when there's a reason, such as a link marked sponsored, an affiliate code in the link, or "sponsored" in the page's address or title; hover over it to see which. Without one, it shows **Unknown**, because nobody outside the deal can know for sure. **Only sites we're not on** keeps the sites where your brand has no publisher yet: the places to go after.
 
 Your top 10 competitors, by the keywords you share, are scanned weekly and the rest monthly. Change how many count as top and how often each group is scanned at the top of the tab, or give one competitor its own cadence. **Scan now** scans a competitor straight away.
 
@@ -87,7 +92,7 @@ Search results and links run on your workspace's own [DataForSEO, Geonode or Ahr
 
 ## Work the best opportunities first
 
-**Opportunities** lists the places worth your team's effort, with a score from 0 to 100. The score adds up:
+**Opportunities** lists the places worth your team's effort, with a score from 0 to 100. It judges links the same way: a link anyone can get for free scores lower, and a big platform gets no credit for its size. The score adds up:
 
 - **SEO:** the site's domain rating and traffic.
 - **AI answers:** how often answers to your brand's questions cite the site, from [AI visibility](/docs/guides/ai-visibility/).
