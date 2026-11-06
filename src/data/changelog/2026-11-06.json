@@ -2,7 +2,7 @@
 	"version": "2026.11.06",
 	"date": "2026-11-06",
 	"status": "in-progress",
-	"updated": "2026-11-06T12:05:29Z",
+	"updated": "2026-11-06T12:19:15Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -122,7 +122,14 @@
 			"edition": "open-source",
 			"text": "The sidebar shows how many agent changes wait for your yes or no next to Agents, for the brand you're in, so you see it from any page. The workspace stats (`GET /v1/workspaces/{ws}/stats`) return the same number as `actions_waiting`.",
 			"at": "2026-11-06T12:05:29Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Each competitor's search data is now read at most once a month on an SEO connection, however it is asked for (the weekly snapshot, Refresh all competitors, or one competitor's Read), so many tracked competitors don't spend your Ahrefs or DataForSEO budget every week. Change it under \"Read each competitor at most once every\" in the SEO tool's settings.",
+			"at": "2026-11-06T12:19:15Z"
 		}
 	],
-	"through": "b174130+f1c245e"
+	"through": "2611262+3eb19ab"
 }
