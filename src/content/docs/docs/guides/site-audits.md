@@ -68,15 +68,15 @@ Each crawl says how many links its patterns and depth left out (`pages_excluded`
 
 ## The audit
 
-When a crawl ends, Outflare checks every page against 61 rules and gives the crawl a **health score** from 0 to 100: the share of its pages with no error. Each issue says why it matters and how to fix it.
+When a crawl ends, Outflare checks every page against 71 rules and gives the crawl a **health score** from 0 to 100: the share of its pages with no error. Each issue says why it matters and how to fix it.
 
 Issues are grouped by **URL template**, the path with the parts that change between sibling pages replaced by `*`, such as `/blog/*`. So 38 blog posts with no meta description show as one fix to one template, not 38 problems.
 
 | Kind | What the rules find |
 | --- | --- |
 | Errors | Broken pages and server errors, links to broken pages, redirect loops and redirects that end on a broken page, a canonical that points to a broken page, a missing title |
-| Warnings | Pages robots.txt hides from AI search, redirect chains, several canonicals or one that points to a noindex page, sitemaps that list noindex, blocked, redirecting, broken or non-canonical pages, invalid, broken or unconfirmed hreflang, content only JavaScript adds, duplicate or extra titles, missing meta descriptions, empty or missing h1s, thin and duplicate content, no viewport tag, orphan pages, pages not on HTTPS, insecure resources on secure pages, links to http pages |
-| Notices | Links to redirects, temporary redirects, canonicals missing or pointing elsewhere, noindex and nofollow pages, nofollow on internal links, links without text, pages with no links out, too many links or only one link in, hreflang without the page itself, long, capitalised, underscored or parameter URLs, titles and descriptions too long or short, duplicate descriptions, extra h1s, no structured data, no Open Graph tags or share image, images without alt text, no language, deep, slow or large pages, no llms.txt |
+| Warnings | Pages robots.txt hides from AI search, pages that keep themselves out of AI answers (`nosnippet`), structured data that doesn't match the page, redirect chains, several canonicals or one that points to a noindex page, sitemaps that list noindex, blocked, redirecting, broken or non-canonical pages, invalid, broken or unconfirmed hreflang, content only JavaScript adds, duplicate or extra titles, missing meta descriptions, empty or missing h1s, thin and duplicate content, no viewport tag, orphan pages, pages not on HTTPS, insecure resources on secure pages, links to http pages |
+| Notices | Links to redirects, temporary redirects, canonicals missing or pointing elsewhere, noindex and nofollow pages, nofollow on internal links, links without text, pages with no links out, too many links or only one link in, hreflang without the page itself, long, capitalised, underscored or parameter URLs, titles and descriptions too long or short, duplicate descriptions, extra h1s, no structured data, no Open Graph tags or share image, images without alt text, no language, deep, slow or large pages, no llms.txt, a `max-snippet` too short for AI answers to quote, `noarchive` or `nocache` (which limit Copilot), question headings with no direct answer under them, articles with no author or date, or not updated in two years |
 
 Duplicates count only among pages meant to be indexed: a page marked `noindex`, or whose canonical points elsewhere, is a declared copy. [The engine docs](https://github.com/outflareai/outflare/blob/main/docs/crawler.md#the-audit) list every rule id.
 
