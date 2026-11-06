@@ -2,7 +2,7 @@
 	"version": "2026.11.06",
 	"date": "2026-11-06",
 	"status": "in-progress",
-	"updated": "2026-11-06T16:03:45Z",
+	"updated": "2026-11-06T16:14:26Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -192,7 +192,14 @@
 			"edition": "open-source",
 			"text": "AI visibility now sorts the brands AI answers name: a product of a listed competitor (\"Zyte API\") counts as that competitor, tools that aren't competitors go under \"Named, not competitors\", and every name it isn't sure of shows its best guess at the website. Each name is sorted once and remembered.",
 			"at": "2026-11-06T16:03:45Z"
+		},
+		{
+			"kind": "fix",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "A/B tests: changes to a page that builds itself in the browser (a React or Next.js site) no longer vanish in the visual editor once the page finishes loading, and the changes your AI model writes from the test's page now point at parts of the page the way the editor does, so they find them on the live page.",
+			"at": "2026-11-06T16:14:26Z"
 		}
 	],
-	"through": "8668228+fa8f0d2"
+	"through": "802011f+8bd5baf"
 }
