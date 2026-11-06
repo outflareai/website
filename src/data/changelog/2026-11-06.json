@@ -2,7 +2,7 @@
 	"version": "2026.11.06",
 	"date": "2026-11-06",
 	"status": "in-progress",
-	"updated": "2026-11-06T17:02:14Z",
+	"updated": "2026-11-06T17:51:34Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -220,7 +220,35 @@
 			"edition": "open-source",
 			"text": "AI visibility, link building, news watch and reviews now belong to one brand each, under `/v1/brands/{brand}/`. The old workspace routes answer 410 and name the route to call instead.",
 			"at": "2026-11-06T16:57:07Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "agents",
+			"edition": "cloud",
+			"text": "The agent's other views (tasks and instructions, activity, turns) are tabs at the top of the Agent page instead of in a More menu.",
+			"at": "2026-11-06T17:51:34Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "agents",
+			"edition": "cloud",
+			"text": "You can maximise the chat on a brand's agent page so it fills the page, with your conversations listed beside it. Changes waiting for your yes or no also show inside the chat, so you can answer them there.",
+			"at": "2026-11-06T17:51:34Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "agents",
+			"edition": "cloud",
+			"text": "Each task on a brand agent's page shows how it is going: what the agent is doing now, which step of its plan it is on, what it has produced so far (with links to the records), how many changes it made and how many wait for you. Each change waiting for your yes or no says which task it is for.",
+			"at": "2026-11-06T17:51:34Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "agents",
+			"edition": "cloud",
+			"text": "On a brand's agent page, everything waiting for your yes or no is in a **Waiting for you** tab next to Tasks, with a badge showing how many are waiting. If the agent is waiting for something else, such as an answer or a connection, the tab says so and has a button to answer in the chat. The chat stays beside the tabs, and the status line says how many tasks the agent is working on.",
+			"at": "2026-11-06T17:51:34Z"
 		}
 	],
-	"through": "7608035+1b99818"
+	"through": "7608035+d0884c7"
 }
