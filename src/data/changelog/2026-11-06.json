@@ -2,7 +2,7 @@
 	"version": "2026.11.06",
 	"date": "2026-11-06",
 	"status": "in-progress",
-	"updated": "2026-11-06T10:02:58Z",
+	"updated": "2026-11-06T10:24:34Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -45,7 +45,21 @@
 			"edition": "open-source",
 			"text": "When your product sends a verified email that only one record holds unverified, such as an import, a lead or an unsubscribe with no user id or other email of its own, that record is now merged into the person instead of being listed as a possible duplicate. Its consent and opt-outs come with it.",
 			"at": "2026-11-06T10:02:58Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Presence is now its own item in the menu. Found and Opportunities are tables you can sort by domain rating, traffic, AI citations or competitors, filter, and scroll through without pages. Opportunities can show one row per site, and both can hide your competitors' own sites.",
+			"at": "2026-11-06T10:24:34Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Website tracking keys, visits, customer events, webhooks and support addresses saved before they had a brand now belong to one brand, so no brand sees another's.",
+			"at": "2026-11-06T10:24:34Z"
 		}
 	],
-	"through": "a667532+6872f94"
+	"through": "0fa6d4e+cfbbda0"
 }
