@@ -2,7 +2,7 @@
 	"version": "2026.11.06",
 	"date": "2026-11-06",
 	"status": "in-progress",
-	"updated": "2026-11-06T13:17:31Z",
+	"updated": "2026-11-06T14:26:54Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -150,7 +150,28 @@
 			"edition": "open-source",
 			"text": "SEO sites, audits, keywords, competitors, backlinks, fixes and deploys now belong to one brand each, under `/v1/brands/{brand}/`. The old workspace routes answer 410 and name the route to call instead. The SEO overview shows one brand, or each brand in turn when all brands are picked.",
 			"at": "2026-11-06T13:03:05Z"
+		},
+		{
+			"kind": "launch",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Your pages in AI visibility can check pages with your own AI model: it reads a page the way an AI answer does and says whether it answers up front, which claims are unclear, and what to change, with a score out of 100. Check competitors' cited pages the same way to compare.",
+			"at": "2026-11-06T14:26:54Z"
+		},
+		{
+			"kind": "launch",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "AI visibility has a new Your pages tab: whether AI assistants can read, quote and trust your own pages, what to fix, and the pages AI answers already cite first.",
+			"at": "2026-11-06T14:26:54Z"
+		},
+		{
+			"kind": "launch",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Site audits now check whether AI answers can use your pages: quoting blocked (nosnippet, short max-snippet, Bing noarchive), questions with no direct answer, articles without an author or date or not updated in two years, and structured data that doesn't match the page. Googlebot, Bingbot and more AI crawlers join the AI crawler list.",
+			"at": "2026-11-06T14:26:54Z"
 		}
 	],
-	"through": "50e31ff+3792e16"
+	"through": "c30b34c+6b6aecc"
 }
