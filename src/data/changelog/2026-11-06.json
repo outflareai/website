@@ -2,7 +2,7 @@
 	"version": "2026.11.06",
 	"date": "2026-11-06",
 	"status": "in-progress",
-	"updated": "2026-11-06T10:37:42Z",
+	"updated": "2026-11-06T11:23:31Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -66,7 +66,42 @@
 			"edition": "open-source",
 			"text": "A competitor's placements and Presence's Where competitors appear now list the most valuable links first, not the biggest sites. Each shows how it's got (can't buy, earned, paid or free), a 0 to 100 value with reasons, and a filter.",
 			"at": "2026-11-06T10:37:42Z"
+		},
+		{
+			"kind": "fix",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Refresh all competitors now reads search numbers even right after Ahrefs refused one report your plan doesn't include, which used to mark the whole connection broken. The page also says how many competitors have their search numbers, domain age and site read so far.",
+			"at": "2026-11-06T11:23:31Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "A/B tests: the visual editor has a bar with a version switcher, undo and redo, and a saved status, plus tabs for the page's parts and the version's changes. Double-click text to type on the page, drag a part to move it, and ask your AI model to change the page or the part you picked, then keep or undo what it wrote.",
+			"at": "2026-11-06T11:23:31Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "AI visibility uses the Competitors page as its one competitor list. Brands that AI answers name next to you wait there for a Yes or No, a competitor added in the AI visibility setup goes there too, and one you said No to stops being suggested.",
+			"at": "2026-11-06T11:23:31Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "A sending domain, mailbox, lead list or sequence can no longer be taken out of a brand to be shared: move it by adding it to the brand it belongs to.",
+			"at": "2026-11-06T11:23:31Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "A/B tests: describe a change to a no-code test's page, such as \"add a line about premium plans and a Try it button under the header\", and your AI model writes real changes to that page for you to keep. A run that takes too long now stops with a clear reason, and you can stop one yourself.",
+			"at": "2026-11-06T11:23:31Z"
 		}
 	],
-	"through": "27fa366+42c4122"
+	"through": "fc26ec1+4427df0"
 }
