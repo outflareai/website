@@ -2,7 +2,7 @@
 	"version": "2026.11.06",
 	"date": "2026-11-06",
 	"status": "in-progress",
-	"updated": "2026-11-06T16:49:19Z",
+	"updated": "2026-11-06T16:57:07Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -206,7 +206,21 @@
 			"edition": "open-source",
 			"text": "The Agent page shows its parts as a row of tabs at the top (Chat, Waiting for you, Everything changed, What agents may do, Runs) instead of hiding them in an \"Approvals and history\" menu.",
 			"at": "2026-11-06T16:49:19Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Social, Reddit campaigns, stories, story pitches, PR experts, journalists and coverage now belong to one brand each, under `/v1/brands/{brand}/`. The old workspace routes answer 410 and name the route to call instead. Their pages ask you to pick a brand.",
+			"at": "2026-11-06T16:57:07Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "AI visibility, link building, news watch and reviews now belong to one brand each, under `/v1/brands/{brand}/`. The old workspace routes answer 410 and name the route to call instead.",
+			"at": "2026-11-06T16:57:07Z"
 		}
 	],
-	"through": "4e9415e+7b01aaf"
+	"through": "a9775fc+9500cbb"
 }
