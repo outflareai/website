@@ -2,7 +2,7 @@
 	"version": "2026.11.06",
 	"date": "2026-11-06",
 	"status": "in-progress",
-	"updated": "2026-11-06T16:14:26Z",
+	"updated": "2026-11-06T16:49:19Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -199,7 +199,14 @@
 			"edition": "open-source",
 			"text": "A/B tests: changes to a page that builds itself in the browser (a React or Next.js site) no longer vanish in the visual editor once the page finishes loading, and the changes your AI model writes from the test's page now point at parts of the page the way the editor does, so they find them on the live page.",
 			"at": "2026-11-06T16:14:26Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "The Agent page shows its parts as a row of tabs at the top (Chat, Waiting for you, Everything changed, What agents may do, Runs) instead of hiding them in an \"Approvals and history\" menu.",
+			"at": "2026-11-06T16:49:19Z"
 		}
 	],
-	"through": "802011f+8bd5baf"
+	"through": "4e9415e+7b01aaf"
 }
