@@ -11,6 +11,8 @@ A partner program pays people who send you customers: affiliates, referrers and 
 
 Open **Partners** in a brand to make a program, add partners and set the rewards (a fixed amount for a sign-up, a percentage of each sale, or a bounty for any event you choose).
 
+**Program settings** (top right of the Partners page) opens a page of its own, in sections: links and credit, the partner portal, rewards and payouts, where sales come from, fraud protection, install, import from Tolt, and pause or archive. Change what you need and press **Save changes** at the foot of the page.
+
 ## Partner links
 
 Every partner has a code, such as `ana`.
@@ -18,7 +20,7 @@ Every partner has a code, such as `ana`.
 - **Short link:** `https://<your tracking domain>/r/ana`. Outflare counts the click and sends the visitor to your landing page with `ref=ana`. Until you add a [tracking domain](/docs/guides/tracking-domains/) it is `https://app.outflare.ai/r/<workspace id>/ana`. Add `?sub=` to keep the partner's own click id, or `?to=/pricing` to land on another page of your site.
 - **Campaign link:** your own page with `?ref=ana` (or `?via=ana`), with no redirect. The website snippet reads the code when the visitor arrives.
 
-Put the [website tracking](/docs/guides/website-tracking/) snippet on every page a partner link can land on, and on your app's sign-up pages. The program's **Settings → Install** has it ready to paste. One visitor id covers your site and its subdomains, so a visit to `www.example.com` still counts when they sign up on `app.example.com`.
+Put the [website tracking](/docs/guides/website-tracking/) snippet on every page a partner link can land on, and on your app's sign-up pages. **Program settings → Install on your website** has it ready to paste. One visitor id covers your site and its subdomains, so a visit to `www.example.com` still counts when they sign up on `app.example.com`.
 
 ## Credit comes from what you already send
 
@@ -43,4 +45,4 @@ If your backend can't send events or transactions, report sign-ups, sales, refun
 
 ## Moving from Tolt
 
-Connect Tolt with your own Tolt API key, then open the program's **Settings → Import from Tolt**. It brings over your partners, codes, customers and commissions, so every link partners have already shared keeps working. Click **Run again** whenever you like: each run brings only what's new or changed. Once the snippet is on your site and your events and payments reach Outflare, you can stop using Tolt.
+Connect Tolt with your own Tolt API key, then open **Program settings → Import from Tolt**. It brings over your partners, codes, customers and commissions, so every link partners have already shared keeps working. Click **Run again** whenever you like: each run brings only what's new or changed. Once the snippet is on your site and your events and payments reach Outflare, you can stop using Tolt.
