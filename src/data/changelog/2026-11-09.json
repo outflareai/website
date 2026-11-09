@@ -2,7 +2,7 @@
 	"version": "2026.11.09",
 	"date": "2026-11-09",
 	"status": "in-progress",
-	"updated": "2026-11-09T14:19:11Z",
+	"updated": "2026-11-09T14:22:51Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -150,7 +150,21 @@
 			"edition": "open-source",
 			"text": "AI accounts now shows the workspace's receipt email address at the top, with a copy button. Outflare makes it by itself the first time anyone opens the page, and admins can press Generate email address if that fails.",
 			"at": "2026-11-09T14:19:11Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Reviews: SourceForge is now a review site. Outflare finds each brand's SourceForge listing for you to confirm, alongside Trustpilot, G2 and Capterra, then reads its rating and reviews every day.",
+			"at": "2026-11-09T14:22:51Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "A partner portal's link can now be readable, such as `/p/northpeak/`, instead of the program's id. Program settings → Portal suggests an address from the program's name; links with the id keep working. The Portal tab can also put the portal on your own domain, such as partners.example.com, with one DNS record.",
+			"at": "2026-11-09T14:22:51Z"
 		}
 	],
-	"through": "08f7b9b+7f1ae59"
+	"through": "b36b8f3+ca3730f"
 }
