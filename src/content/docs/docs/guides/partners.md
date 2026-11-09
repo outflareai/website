@@ -13,6 +13,8 @@ Open **Partners** in a brand to make a program, add partners and set the rewards
 
 **Program settings** (top right of the Partners page) opens a page of its own, in tabs: General, Payouts, Tracking, Fraud, Portal and Import. Change what you need on any tab and press **Save changes** at the foot of the page.
 
+The **Portal** tab opens a hosted page where partners apply, sign in and see their links, rewards and payouts. Its link uses the portal's address, such as `https://app.outflare.ai/p/northpeak/`. Outflare suggests one from the program's name, and you can change it before you press **Save portal**. You can also serve the portal on your own domain from [tracking domains](/docs/guides/tracking-domains/).
+
 ## Partner links
 
 Every partner has a code, such as `ana`.
