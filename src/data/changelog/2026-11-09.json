@@ -2,7 +2,7 @@
 	"version": "2026.11.09",
 	"date": "2026-11-09",
 	"status": "in-progress",
-	"updated": "2026-11-09T15:45:51Z",
+	"updated": "2026-11-09T16:07:48Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -199,7 +199,21 @@
 			"edition": "open-source",
 			"text": "New SEO partnership prospects get the site's domain rating filled in from what your SEO tool already read (backlinks and competitor scans), so you can see who's worth pitching first.",
 			"at": "2026-11-09T15:31:54Z"
+		},
+		{
+			"kind": "fix",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "If Gmail's forwarding confirmation reaches your receipts address before you link the Gmail address in Outflare, linking it now shows the Confirm in Gmail button. You no longer have to ask Gmail to send it again.",
+			"at": "2026-11-09T16:07:48Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "The AI receipts forwarding steps now cover receipts from claude.ai and chatgpt.com, drop GitHub, and say that receipts sent from a stripe.com address need the Gmail filter.",
+			"at": "2026-11-09T16:07:48Z"
 		}
 	],
-	"through": "62ae3c4+058fd78"
+	"through": "45d6114+e3c9c84"
 }
