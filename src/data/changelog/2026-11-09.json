@@ -2,7 +2,7 @@
 	"version": "2026.11.09",
 	"date": "2026-11-09",
 	"status": "in-progress",
-	"updated": "2026-11-09T14:35:00Z",
+	"updated": "2026-11-09T14:42:03Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -178,7 +178,14 @@
 			"edition": "open-source",
 			"text": "Presence's Found list marks sites whose links to you look like spam (Possible spam, Likely spam), using your SEO tool's own spam judgement such as Ahrefs' and Outflare's link checks, with the reasons on hover. Nothing is hidden until you choose Spam site.",
 			"at": "2026-11-09T14:35:00Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Approvals, agent runs and API logs each have brand routes under `/v1/brands/{brand}/` that show only that brand's items. The workspace routes still work for now; next they will keep only the team's own items, such as invites and connections.",
+			"at": "2026-11-09T14:42:03Z"
 		}
 	],
-	"through": "5e385d4+bc2fef5"
+	"through": "86fee6f+e88d1a6"
 }
