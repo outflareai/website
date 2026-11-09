@@ -2,7 +2,7 @@
 	"version": "2026.11.09",
 	"date": "2026-11-09",
 	"status": "in-progress",
-	"updated": "2026-11-09T10:35:44Z",
+	"updated": "2026-11-09T10:58:24Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -52,7 +52,14 @@
 			"edition": "open-source",
 			"text": "Each partner now has their own page, with their numbers, referred customers, conversions, rewards, payouts and history in one place. Searching and sorting the partners list now covers every partner in the program, not only the newest 100, so you can find an older or imported partner by code, email, name or id.",
 			"at": "2026-11-09T10:35:44Z"
+		},
+		{
+			"kind": "launch",
+			"area": "deliverability",
+			"edition": "open-source",
+			"text": "Check any domain's SPF, DKIM, DMARC, MX and domain blocklist standing without an account, with the exact DNS record to add for each problem. It powers the free checkers on outflare.ai and is open to anyone at `GET /v1/tools/domain-check`.",
+			"at": "2026-11-09T10:58:24Z"
 		}
 	],
-	"through": "5c15ecf+3fa4f44"
+	"through": "19ecb6e+b585735"
 }
