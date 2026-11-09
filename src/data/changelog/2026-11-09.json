@@ -2,7 +2,7 @@
 	"version": "2026.11.09",
 	"date": "2026-11-09",
 	"status": "in-progress",
-	"updated": "2026-11-09T18:36:52Z",
+	"updated": "2026-11-09T19:16:12Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -241,7 +241,21 @@
 			"edition": "open-source",
 			"text": "Website visits and redirect link clicks now keep the visitor's region, city and network (internet provider or mobile carrier), their device's maker and model, their system and browser versions, and their language. Break visits down by any of them in Insights, or read them in Query.",
 			"at": "2026-11-09T17:23:21Z"
+		},
+		{
+			"kind": "launch",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Company Telegram chats sync into the CRM, read only. Each is matched to a customer (your own AI suggests, the account's holder confirms in CRM, Telegram), customers waiting four hours alert the holder, and your AI can summarise a chat or an account's chats when it changes hands.",
+			"at": "2026-11-09T19:16:12Z"
+		},
+		{
+			"kind": "launch",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "A team directory in Settings, Team: everyone at the company with their department, team and manager, plus the work accounts the company owns and who holds each. Company Telegram accounts sign in to Outflare as a linked device by QR code, with checks every six hours.",
+			"at": "2026-11-09T19:16:12Z"
 		}
 	],
-	"through": "1edeeb4+b7a7546"
+	"through": "bc63c24+e200ceb"
 }
