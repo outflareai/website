@@ -2,7 +2,7 @@
 	"version": "2026.11.09",
 	"date": "2026-11-09",
 	"status": "in-progress",
-	"updated": "2026-11-09T13:16:52Z",
+	"updated": "2026-11-09T14:08:45Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -136,7 +136,14 @@
 			"edition": "cloud",
 			"text": "The brand agent's alerts now open exactly what they are about, on the right brand: a finished task opens that task's page, and a request for your OK opens the changes waiting for you.",
 			"at": "2026-11-09T13:09:56Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Ideal customer profiles, senders, inbox tags and saved inbox views now belong to one brand each, under `/v1/brands/{brand}/`, and the old workspace routes answer 410. A profile shared by every brand is now copied into each brand, and two brands can use the same profile name.",
+			"at": "2026-11-09T14:08:45Z"
 		}
 	],
-	"through": "3c80c56+6f19d1e"
+	"through": "442c02d+29d3a07"
 }
