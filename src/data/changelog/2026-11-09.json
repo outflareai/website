@@ -2,7 +2,7 @@
 	"version": "2026.11.09",
 	"date": "2026-11-09",
 	"status": "in-progress",
-	"updated": "2026-11-09T14:08:45Z",
+	"updated": "2026-11-09T14:19:11Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -143,7 +143,14 @@
 			"edition": "open-source",
 			"text": "Ideal customer profiles, senders, inbox tags and saved inbox views now belong to one brand each, under `/v1/brands/{brand}/`, and the old workspace routes answer 410. A profile shared by every brand is now copied into each brand, and two brands can use the same profile name.",
 			"at": "2026-11-09T14:08:45Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "AI accounts now shows the workspace's receipt email address at the top, with a copy button. Outflare makes it by itself the first time anyone opens the page, and admins can press Generate email address if that fails.",
+			"at": "2026-11-09T14:19:11Z"
 		}
 	],
-	"through": "442c02d+29d3a07"
+	"through": "08f7b9b+7f1ae59"
 }
