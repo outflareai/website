@@ -11,7 +11,7 @@ Outflare reads how a domain looks from the outside through **DataForSEO**
 and **Ahrefs**: domain rating, backlinks and referring domains, the
 keywords a site ranks for and where, competitors in search, and (Ahrefs)
 site audit issues. Both are paid per call, so every live call is capped by a
-monthly budget, cached for a day and recorded in Outcomes with its cost.
+monthly budget, cached for a day and recorded in the spend ledger with its cost.
 Outflare only reads, and nothing else in Outflare needs SEO connected.
 
 ## Connecting
@@ -76,10 +76,10 @@ With both connected, DataForSEO is the default, and each keyword can name the co
   the connection's page under Connectors can also set a daily limit, shows
   usage by day, and owners and admins are emailed at 80% and when a limit
   is reached.
-- Every live call is recorded in Outcomes (category `data`, provider
-  `dataforseo` or `ahrefs`), so SEO spend shows next to the rest of your
-  cost per meeting. Calls that fail after the provider charged are recorded
-  too.
+- Every live call is recorded in the spend ledger (category `data`, channel
+  `seo`, provider `dataforseo` or `ahrefs`), with the brand it ran for. SEO
+  is not outreach, so it never counts toward cost per meeting in Outcomes.
+  Calls that fail after the provider charged are recorded too.
 - Answers are kept for 24 hours, so asking again the same day is free.
   Pass `fresh=true` to ask again.
 

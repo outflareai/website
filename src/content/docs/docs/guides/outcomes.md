@@ -47,11 +47,19 @@ Every charge is one row: what it was for (lead data, verification, mailboxes, do
 
 ![The Spend tab: unpriced usage, recurring costs and the charges in the period](/screens/outcomes-spend.png)
 
+### Only outreach costs count
+
+Outcomes is about what outreach cost, so it counts only outreach: charges for outbound email, costs shared across channels (mailbox seats, a data subscription) and charges given no channel. Ad spend, searches, rank checks, SEO reports, site crawls, AI answers and the other channels have pages of their own and never raise your cost per meeting. Each charge carries its `channel`, so you can see where it went.
+
+### Brands keep their own costs
+
+A charge with no sequence belongs to the [brand](/docs/guides/brands/) it was booked for: a search or an SEO report run for a brand is that brand's, and a charge you record on the Outcomes page while a brand is picked is that brand's. With a brand picked, the report and the list of charges show only that brand's outreach costs.
+
 ### How costs are shared
 
 - A charge tagged with a sequence counts for it.
 - A charge for a mailbox or a domain follows the sequences that sent from it, split by their emails.
-- Everything else is shared by each sequence's share of emails sent.
+- Everything else is shared by each sequence's share of emails sent. When no emails went out in the period, it isn't shared and shows under "Not in a sequence".
 
 Reports never convert currencies. Pick the currency at the top of the page; spend in other currencies is listed separately so it is never silently dropped.
 
@@ -92,7 +100,7 @@ A new charge returns `201`; one whose `ref` was already recorded returns `200` w
 | POST | `/v1/workspaces/{ws}/outcomes/syncs/{id}/run` | Sync one source now |
 | GET, POST, PATCH, DELETE | `/v1/workspaces/{ws}/meetings` | List, log, correct and delete meetings |
 | GET, POST, PATCH, DELETE | `/v1/workspaces/{ws}/deals` | List, log, update and delete deals |
-| GET, POST, DELETE | `/v1/workspaces/{ws}/spend` | The ledger |
+| GET, POST, DELETE | `/v1/workspaces/{ws}/spend` | The ledger. `brand` keeps the list to one brand and `outreach=true` to the charges the report counts |
 | GET, POST, PUT, DELETE | `/v1/workspaces/{ws}/spend-recurring` | Recurring costs |
 | GET, PUT, DELETE | `/v1/workspaces/{ws}/spend-rates` | Price per unit, and usage still without one |
 
