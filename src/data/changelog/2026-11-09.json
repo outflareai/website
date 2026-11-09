@@ -2,7 +2,7 @@
 	"version": "2026.11.09",
 	"date": "2026-11-09",
 	"status": "in-progress",
-	"updated": "2026-11-09T11:26:13Z",
+	"updated": "2026-11-09T11:29:52Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -80,7 +80,14 @@
 			"edition": "cloud",
 			"text": "The Agent page opens again. Since the last update it showed \"Something broke on this page\" as soon as the agent loaded.",
 			"at": "2026-11-09T11:26:13Z"
+		},
+		{
+			"kind": "fix",
+			"area": "general",
+			"edition": "open-source",
+			"text": "After an update, an open tab or a page your browser kept from before no longer shows a blank screen. The app and the partner portal reload once and open the new version.",
+			"at": "2026-11-09T11:29:52Z"
 		}
 	],
-	"through": "8874dfd+62ab3eb"
+	"through": "89dba35+3f95b45"
 }
