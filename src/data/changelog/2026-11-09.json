@@ -2,7 +2,7 @@
 	"version": "2026.11.09",
 	"date": "2026-11-09",
 	"status": "in-progress",
-	"updated": "2026-11-09T16:24:51Z",
+	"updated": "2026-11-09T17:02:38Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -227,7 +227,14 @@
 			"edition": "open-source",
 			"text": "Program settings → General has a \"Review each application\" switch, so a program can approve each new partner by hand or accept everyone who applies. Every new program, referral programs included, reviews each application by default.",
 			"at": "2026-11-09T16:24:51Z"
+		},
+		{
+			"kind": "fix",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "A Google Workspace rule that copies AI receipts from everyone's inbox now works for the whole company. Receipts sent to any colleague at your company's domain count, not only those sent to Outflare members.",
+			"at": "2026-11-09T17:02:38Z"
 		}
 	],
-	"through": "8ef5da7+40f0400"
+	"through": "0cac454+bd0f271"
 }
