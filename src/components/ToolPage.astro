@@ -1,0 +1,74 @@
+---
+// The frame of a free tool page under /tools/: the tool first, then what it
+// checks, how to read the result and the questions people ask, with
+// WebApplication and FAQPage data.
+import Marketing from '../layouts/Marketing.astro';
+import { app, site } from '../data/project';
+import { faqPage, organizationId, type Faq } from '../lib/schema';
+
+interface Props {
+	title: string;
+	description: string;
+	label: string;
+	h1: string;
+	lede: string;
+	path: string;
+	faqs: Faq[];
+}
+const { title, description, label, h1, lede, path, faqs } = Astro.props;
+const webApp = {
+	'@context': 'https://schema.org',
+	'@type': 'WebApplication',
+	name: `${label} by Outflare`,
+	url: new URL(path, site.url).href,
+	description,
+	applicationCategory: 'UtilitiesApplication',
+	operatingSystem: 'Any (web browser)',
+	isAccessibleForFree: true,
+	offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+	publisher: { '@id': organizationId },
+};
+---
+
+<Marketing title={title} description={description} crumbs={[{ name: 'Free tools', path: '/tools/' }, { name: label, path }]} schema={[webApp, faqPage(faqs)]}>
+	<section class="relative border-b">
+		<div class="grid-bg pointer-events-none absolute inset-0" aria-hidden="true"></div>
+		<div class="relative mx-auto max-w-6xl px-4 pt-10 pb-12 sm:px-6 sm:pt-14">
+			<nav aria-label="Breadcrumb" class="text-sm text-muted-foreground">
+				<ol class="flex flex-wrap items-center gap-1.5">
+					<li><a href="/" class="hover:text-foreground">Outflare</a></li>
+					<li aria-hidden="true">/</li>
+					<li><a href="/tools/" class="hover:text-foreground">Free tools</a></li>
+				</ol>
+			</nav>
+			<h1 class="mt-6 max-w-4xl text-4xl font-semibold tracking-tighter text-balance sm:text-5xl">{h1}</h1>
+			<p class="sub">{lede}</p>
+			<div class="mt-8 max-w-3xl"><slot name="tool" /></div>
+		</div>
+	</section>
+	<div class="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+		<div class="prose-page"><slot /></div>
+		<section class="mt-14 max-w-3xl" aria-labelledby="faq">
+			<h2 id="faq" class="text-2xl font-semibold tracking-tight">Questions people ask</h2>
+			<div class="mt-5 divide-y rounded-xl border">
+				{faqs.map((f) => (
+					<details class="group px-5 py-4">
+						<summary class="flex items-center justify-between gap-4 font-medium [&::-webkit-details-marker]:hidden">
+							{f.q}
+							<span class="text-muted-foreground transition-transform group-open:rotate-45" aria-hidden="true">+</span>
+						</summary>
+						<p class="mt-3 text-[15px] leading-7 text-muted-foreground">{f.a}</p>
+					</details>
+				))}
+			</div>
+		</section>
+		<div class="card mt-14 max-w-3xl p-6 sm:p-8">
+			<h2 class="text-xl font-semibold tracking-tight">Keep every sending domain healthy, automatically.</h2>
+			<p class="mt-2 text-muted-foreground">Outflare re-checks the DNS and blocklists of every domain and mailbox you send from, explains each problem with the exact record to add, and pauses a domain when it gets listed. Open source, and free hosted during early access.</p>
+			<div class="mt-6 flex flex-col gap-3 sm:flex-row">
+				<a href={app.signUp} class="btn btn-primary">Sign up free</a>
+				<a href="/product/deliverability/" class="btn btn-outline">Deliverability in Outflare</a>
+			</div>
+		</div>
+	</div>
+</Marketing>

@@ -2,12 +2,15 @@ import { allDocs, docMarkdownPath } from '../lib/markdown';
 import { playbooks } from '../data/playbooks';
 import { positioning } from '../data/positioning';
 import { app, repo } from '../data/project';
+import { allPages, pathOf, sectionOf } from '../lib/pages';
+import { sections } from '../data/sections';
 
 // An index of the site for LLMs and agents, following https://llmstxt.org.
 // /llms-full.txt has every docs page in full, and each docs page has a
 // Markdown copy at its path plus .md.
 export async function GET({ site }: { site: URL }) {
 	const docs = await allDocs();
+	const pages = await allPages();
 	const abs = (path: string) => new URL(path, site).href;
 	const lines = [
 		'# Outflare',
@@ -30,6 +33,17 @@ export async function GET({ site }: { site: URL }) {
 		'',
 		...docs.map((d) => `- [${d.data.title}](${abs(docMarkdownPath(d))})${d.data.description ? `: ${d.data.description}` : ''}`),
 		`- [Endpoint reference](${abs('/docs/api/reference/')}): Every API endpoint, generated from the OpenAPI contract.`,
+		'',
+		...sections.flatMap((sec) => {
+			const list = pages.filter((p) => sectionOf(p) === sec.id);
+			return list.length
+				? [`## ${sec.label}`, '', ...list.map((p) => `- [${p.data.label}](${abs(pathOf(p))}): ${p.data.answer}`), '']
+				: [];
+		}),
+		'## Free tools',
+		'',
+		`- [SPF, DKIM and DMARC checker](${abs('/tools/dmarc-checker/')}): Check a domain's email authentication and MX, with the DNS record to add for each problem. API: GET ${app.url}/v1/tools/domain-check?domain=acme.example (public).`,
+		`- [Domain blacklist checker](${abs('/tools/blacklist-checker/')}): Check whether a domain is on the Spamhaus DBL or SURBL.`,
 		'',
 		'## Site',
 		'',

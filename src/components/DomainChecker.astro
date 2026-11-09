@@ -1,0 +1,170 @@
+---
+// The free domain checker on /tools/: asks the engine's public
+// GET /v1/tools/domain-check (no account) and shows SPF, DKIM, DMARC, MX and
+// the domain blocklists, with the fix for each problem. `focus` puts the
+// part the page is about first. The domain someone types is never sent to
+// analytics: domain_check_run carries only the tool and the result.
+import { app } from '../data/project';
+
+interface Props {
+	focus: 'auth' | 'blocklists';
+}
+const { focus } = Astro.props;
+const endpoint = `${app.url}/v1/tools/domain-check`;
+---
+
+<div class="card p-5 sm:p-6" data-domain-checker data-endpoint={endpoint} data-focus={focus}>
+	<form class="flex flex-col gap-3 sm:flex-row" novalidate>
+		<label for={`domain-${focus}`} class="sr-only">Domain</label>
+		<input
+			id={`domain-${focus}`}
+			name="domain"
+			type="text"
+			inputmode="url"
+			autocomplete="off"
+			autocapitalize="off"
+			spellcheck="false"
+			placeholder="yourdomain.com"
+			required
+			class="h-10 min-w-0 flex-1 rounded-md border bg-background px-3 text-[15px] shadow-xs outline-none focus-visible:ring-2 focus-visible:ring-ring/50 dark:bg-input/30"
+		/>
+		<button type="submit" class="btn btn-primary btn-lg">Check domain</button>
+	</form>
+	<p class="mt-3 text-xs text-muted-foreground">Free, no sign-up. Reads public DNS only; results may be up to 10 minutes old.</p>
+	<div data-result class="mt-6 hidden" aria-live="polite"></div>
+</div>
+
+<script>
+	type Issue = { code: string; severity: string; title: string; detail: string; record?: { type: string; host: string; value: string; priority?: number } };
+	type Result = {
+		domain: string; health: string; issues: Issue[]; mx_provider: string; mx_hosts: string[];
+		spf: string; spf_record: string | null; dkim: string; dkim_selector: string | null;
+		dmarc: string; dmarc_record: string | null; dmarc_policy: string | null;
+		blocklists: { name: string; zone: string; status: string; detail?: string }[];
+	};
+	const track = (name: string, props: Record<string, string>) => (window as any).outflareTrack?.(name, props);
+
+	function el(tag: string, cls = '', text?: string) {
+		const e = document.createElement(tag);
+		if (cls) e.className = cls;
+		if (text != null) e.textContent = text;
+		return e;
+	}
+	const tone: Record<string, string> = {
+		good: 'border-brand/30 bg-brand/10 text-brand-strong dark:text-brand',
+		warn: 'border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400',
+		bad: 'border-red-500/30 bg-red-500/10 text-red-700 dark:text-red-400',
+		muted: 'border-border bg-muted text-muted-foreground',
+	};
+	const badge = (label: string, t: string) => el('span', `badge shrink-0 ${tone[t]}`, label);
+
+	function row(name: string, status: [string, string], value: string | null, note?: string) {
+		const r = el('div', 'grid gap-2 py-3 sm:grid-cols-[9rem_6.5rem_minmax(0,1fr)] sm:items-start');
+		r.append(el('div', 'font-medium', name));
+		const b = el('div');
+		b.append(badge(status[0], status[1]));
+		r.append(b);
+		const v = el('div', 'min-w-0 text-sm text-muted-foreground');
+		if (value) v.append(el('code', 'block break-all rounded border bg-muted px-2 py-1 font-mono text-[12.5px] text-foreground', value));
+		if (note) v.append(el('p', value ? 'mt-1.5' : '', note));
+		r.append(v);
+		return r;
+	}
+
+	function render(box: HTMLElement, focus: string, d: Result) {
+		box.replaceChildren();
+		const head = el('div', 'flex flex-wrap items-center gap-3');
+		const h = { healthy: ['Healthy', 'good'], warning: ['Needs attention', 'warn'], critical: ['Problems found', 'bad'] }[d.health] ?? ['Checked', 'muted'];
+		head.append(el('h3', 'text-lg font-semibold', d.domain), badge(h[0], h[1]));
+		box.append(head);
+
+		const auth = el('div', 'mt-4 divide-y border-y');
+		auth.append(
+			row('SPF', d.spf === 'pass' ? ['Found', 'good'] : d.spf === 'invalid' ? ['2+ records', 'bad'] : ['Missing', 'bad'], d.spf_record),
+			row('DKIM', d.dkim === 'pass' ? ['Found', 'good'] : ['Not found', 'warn'], null,
+				d.dkim === 'pass' ? `Key found under the "${d.dkim_selector}" selector.` : 'No key under the common selectors. If your mail host uses its own selector, DKIM may still be set up.'),
+			row('DMARC', d.dmarc === 'pass' ? ['p=' + (d.dmarc_policy ?? 'set'), 'good'] : d.dmarc === 'none_policy' ? ['p=none', 'warn'] : ['Missing', 'bad'], d.dmarc_record),
+			row('MX', d.mx_provider === 'none' ? ['Missing', 'warn'] : ['Found', 'good'], d.mx_hosts.join(', ') || null,
+				d.mx_provider === 'google' ? 'Google Workspace' : d.mx_provider === 'microsoft' ? 'Microsoft 365' : undefined),
+		);
+		const lists = el('div', 'mt-4 divide-y border-y');
+		for (const b of d.blocklists) {
+			lists.append(row(b.name, b.status === 'clear' ? ['Not listed', 'good'] : b.status === 'listed' ? ['Listed', 'bad'] : ['Unknown', 'muted'], null,
+				b.status === 'unknown' ? 'The list did not answer this check, so we can’t say either way.' : b.status === 'listed' ? b.detail : undefined));
+		}
+		const authTitle = el('h4', 'mt-6 text-sm font-medium', 'Email authentication');
+		const listTitle = el('h4', 'mt-6 text-sm font-medium', 'Domain blocklists');
+		if (focus === 'blocklists') box.append(listTitle, lists, authTitle, auth);
+		else box.append(authTitle, auth, listTitle, lists);
+
+		const fixes = d.issues.filter((i) => i.severity !== 'info' || i.code === 'dmarc_none');
+		if (fixes.length) {
+			box.append(el('h4', 'mt-6 text-sm font-medium', 'What to fix'));
+			const ul = el('ul', 'mt-3 space-y-3');
+			for (const i of fixes) {
+				const li = el('li', 'rounded-lg border p-4');
+				const t = el('div', 'flex flex-wrap items-center gap-2');
+				t.append(badge(i.severity, i.severity === 'critical' ? 'bad' : i.severity === 'warning' ? 'warn' : 'muted'), el('span', 'font-medium', i.title));
+				li.append(t, el('p', 'mt-2 text-sm text-muted-foreground', i.detail));
+				if (i.record) {
+					const rec = el('dl', 'mt-3 grid grid-cols-[4rem_minmax(0,1fr)] gap-x-3 gap-y-1 text-sm');
+					for (const [k, v] of [['Type', i.record.type], ['Host', i.record.host], ['Value', i.record.value]] as const) {
+						rec.append(el('dt', 'text-muted-foreground', k), el('dd', 'break-all font-mono text-[12.5px]', v));
+					}
+					li.append(rec);
+				}
+				ul.append(li);
+			}
+			box.append(ul);
+		}
+		const cta = el('p', 'mt-6 text-sm text-muted-foreground');
+		const a = el('a', 'font-medium text-foreground underline underline-offset-4', 'Outflare') as HTMLAnchorElement;
+		a.href = 'https://app.outflare.ai/signup';
+		cta.append('Sending cold email from this domain? ', a, ' re-checks every sending domain and mailbox for you, and pauses a domain when it gets listed.');
+		box.append(cta);
+	}
+
+	document.querySelectorAll<HTMLElement>('[data-domain-checker]').forEach((root) => {
+		const form = root.querySelector('form')!;
+		const input = form.querySelector('input')!;
+		const button = form.querySelector('button')!;
+		const box = root.querySelector<HTMLElement>('[data-result]')!;
+		const focus = root.dataset.focus!;
+		const tool = focus === 'blocklists' ? 'blacklist_checker' : 'dmarc_checker';
+		const message = (text: string) => { box.replaceChildren(el('p', 'text-sm text-muted-foreground', text)); box.classList.remove('hidden'); };
+
+		async function run(domain: string) {
+			button.disabled = true;
+			message('Checking ' + domain + '…');
+			try {
+				const res = await fetch(`${root.dataset.endpoint}?domain=${encodeURIComponent(domain)}`);
+				const body = await res.json().catch(() => null);
+				if (!res.ok) {
+					const code = body?.error?.code ?? 'error';
+					message(code === 'rate_limited' ? 'Too many checks from your network. Wait a minute and try again.' : code === 'invalid_request' ? 'That doesn’t look like a domain. Try something like acme.com.' : 'The check didn’t work this time. Try again in a moment.');
+					track('domain_check_run', { tool, outcome: 'failure', error_code: code, page: location.pathname });
+					return;
+				}
+				render(box, focus, body as Result);
+				box.classList.remove('hidden');
+				track('domain_check_run', { tool, outcome: 'success', health: (body as Result).health, page: location.pathname });
+				const url = new URL(location.href);
+				url.searchParams.set('domain', (body as Result).domain);
+				history.replaceState(null, '', url);
+			} catch {
+				message('The check didn’t work this time. Try again in a moment.');
+				track('domain_check_run', { tool, outcome: 'error', error_code: 'network', page: location.pathname });
+			} finally {
+				button.disabled = false;
+			}
+		}
+		form.addEventListener('submit', (e) => {
+			e.preventDefault();
+			const v = input.value.trim();
+			if (v) run(v);
+		});
+		// Shareable results: /tools/dmarc-checker/?domain=acme.com runs on load.
+		const pre = new URLSearchParams(location.search).get('domain');
+		if (pre) { input.value = pre; run(pre); }
+	});
+</script>
