@@ -2,7 +2,7 @@
 	"version": "2026.11.09",
 	"date": "2026-11-09",
 	"status": "in-progress",
-	"updated": "2026-11-09T08:51:34Z",
+	"updated": "2026-11-09T10:14:08Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -17,7 +17,35 @@
 			"edition": "open-source",
 			"text": "A web search an agent asks for now belongs to the brand it searches for: `POST /v1/brands/{brand}/search-results` (MCP `search_web` takes `brand`) replaces the workspace route, so the approval waits under that brand alone on the Agents page, and its cost and event carry the brand. A change that names no brand says \"Every brand\" on its card when a brand is picked.",
 			"at": "2026-11-09T08:51:34Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Outflare for Mac updates itself: when a newer version is ready, an Update button appears at the bottom of the sidebar. One click installs it and reopens the app; nothing else to do.",
+			"at": "2026-11-09T10:14:08Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "Test events you send to a webhook are marked \"Test\" in its delivery list, with the receiver's status code, so you can show that the endpoint works. A failed test no longer counts against the endpoint. It doesn't start a failure streak, raise the error rate or turn the endpoint off on a 410.",
+			"at": "2026-11-09T10:14:08Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Presence's Found list can mark a site as spam (its pages leave the list, and pages found on it later stay hidden) or check a page again in a week, for a site that's offline. Follow-ups, formerly the Work queue tab, are now a view on the Found page.",
+			"at": "2026-11-09T10:14:08Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Presence opens on Found, and the Overview tab is gone (Reports has the same numbers). Found shows every page as its own row with a link that opens it in a new tab, says what the page shows in its own column, and asks \"Yes, track it\" or \"No, hide it\" with a line explaining what each does.",
+			"at": "2026-11-09T10:14:08Z"
 		}
 	],
-	"through": "9376bd1+5095e35"
+	"through": "61803eb+ed8a460"
 }
