@@ -40,6 +40,16 @@ Outflare shows in the account's **Devices** list as *Outflare*, where it can be 
 
 **Lock it down.** Each Telegram account has a checklist so the company never loses it: the number on the company's own account, a two-step password, a company login email, a passkey, the password in your password manager, unknown devices signed out, and account deletion set to its longest. The two-step password and login email are read from Telegram; tick the rest yourself.
 
+## Sync chats into the CRM
+
+Once an account is signed in, its chats can go into one brand's CRM. In the account's **Sign in to Telegram** panel, under **Chats in the CRM**, pick the brand and how far back to copy (the last year by default), then **Start syncing**. Outflare copies the history first, then reads new messages every two minutes. It only reads: nothing is sent, and messages stay unread on the phone.
+
+- **Left out:** Saved Messages, bots and channels people only read. A chat with another company account in your team directory is marked internal and its messages aren't copied.
+- **Kept safe:** names, usernames, phone numbers and message text are encrypted at rest. Files aren't copied, only what was attached (a photo, a voice note, a file's name).
+- **Who sees it:** anyone who can read the brand's customers. Mark a chat **private** and only the account's holder and people who manage the team see it. Mark it **personal** and what was copied is removed, and nothing more is.
+- **One brand per account:** an account's chats stay in the brand they were first synced into.
+- **Pause** stops new messages and keeps what was copied. Start again to carry on, or pick a longer history to copy further back.
+
 ## API and MCP
 
 | What | REST API | MCP tools |
@@ -48,5 +58,7 @@ Outflare shows in the account's **Devices** list as *Outflare*, where it can be 
 | Departments | `GET`/`POST .../departments`, `PATCH`/`DELETE .../departments/{id}` | `list_departments`, `create_department` |
 | Company accounts | `GET`/`POST .../staff-accounts`, `GET`/`PATCH`/`DELETE .../staff-accounts/{id}` | `list_staff_accounts`, `get_staff_account`, `create_staff_account`, `update_staff_account` |
 | Telegram sign-in | `GET`/`PATCH .../staff-accounts/{id}/telegram`, `POST .../telegram/connect`, `.../password`, `.../check`, `.../disconnect` | `get_telegram_session` |
+| Telegram sync | `POST .../staff-accounts/{id}/telegram/sync`, `POST .../telegram/sync/pause` | |
+| Synced chats | `GET /v1/brands/{brand}/telegram-chats`, `GET`/`PATCH .../telegram-chats/{id}`, `GET .../telegram-chats/{id}/messages` | `list_telegram_chats`, `list_telegram_messages`, `update_telegram_chat` |
 
-Reading needs the `members.read` scope and changing needs `members.manage`, which owners and admins have. Every change is in the audit log.
+Reading needs the `members.read` scope and changing needs `members.manage`, which owners and admins have. Synced chats need `customers.read`, and `customers.manage` to sort them. Every change is in the audit log.
