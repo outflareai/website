@@ -112,4 +112,4 @@ A CRM [built with React, shadcn/ui and Supabase](https://github.com/marmelab/ato
 
 AGPL-3.0 lets you run and change the code; if you offer a changed version to others over a network, you share your changes. MIT lets you do almost anything, including closed forks. Check the licence against how you plan to use the CRM.
 
-With Outflare, your data sits in your own Postgres when you self-host. Neither the open-source engine nor Outflare Cloud lends you a data provider or an AI key: each workspace connects its own accounts. See [Open source and Cloud](/docs/project/open-source-and-cloud/).
+With Outflare, your data sits in your own Postgres when you self-host. Neither the open-source engine nor Outflare Cloud lends you a data provider or an AI key: each workspace connects its own accounts. See [Open source and Cloud](/docs/project/open-source-and-cloud/) and [self-hosting Outflare](/developers/open-source/).

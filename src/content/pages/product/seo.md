@@ -49,9 +49,9 @@ order: 45
 | --- | --- | --- |
 | Rank tracking | Where you rank on Google today for the keywords you choose, weekly or daily, desktop or mobile | Your DataForSEO or Geonode account |
 | Domain overview | Domain rating, backlinks, referring domains, ranking keywords, estimated traffic | Your Ahrefs or DataForSEO account |
-| Backlinks | One list from both tools, with links gained, lost and regained | Your Ahrefs or DataForSEO account |
+| Backlinks | One list from both tools, with links gained, lost and regained ([link management](/product/link-building/)) | Your Ahrefs or DataForSEO account |
 | Competitors | Suggested and tracked competitors, their weekly numbers, and a feed of what they change | Your Ahrefs or DataForSEO account, plus OutflareBot |
-| Site audits | A crawl of your site, 61 rules, a health score and a fixes list | OutflareBot, no key needed |
+| Site audits | A crawl of your site, 61 rules, a health score and a [fixes list](/product/fixes/) | OutflareBot, no key needed |
 | Keywords | What Google shows each page for, targets, drops, cannibalisation and indexing | Your own Google Search Console |
 | Experiments | Whether a change to some pages helped, against matched control pages | Your own Google Search Console |
 
@@ -85,7 +85,7 @@ Split pages into a treatment group and a matched control group, change only the 
 
 ## For agents
 
-Every part is in the API and the [MCP server](/product/mcp/). Agents start with `get_seo_overview`, read stored history with `get_seo_history`, and use `get_seo_competitor_gaps` to find keywords and linking domains your competitors have and you don't. Live reports that cost money are hidden when the MCP server runs read-only.
+Every part is in the [API](/developers/api/) and the [MCP server](/product/mcp/). Agents start with `get_seo_overview`, read stored history with `get_seo_history`, and use `get_seo_competitor_gaps` to find keywords and linking domains your competitors have and you don't. Live reports that cost money are hidden when the MCP server runs read-only.
 
 ## What Outflare doesn't do
 

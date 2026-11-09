@@ -97,4 +97,5 @@ The API and MCP server cover the list, the feed, gaps, the Overview and reading 
 
 - It doesn't sell SEO data. Numbers come from your own Ahrefs or DataForSEO account, within the budget you set.
 - It doesn't crawl competitors' sites deeply. OutflareBot reads only robots.txt, sitemaps and the home page.
+- It doesn't estimate competitors' total visits or channels; their organic traffic estimate comes from your SEO connection. For market research, see [the best competitor analysis tools](/best/competitor-analysis-tools/) and [Outflare vs Similarweb](/compare/outflare-vs-similarweb/).
 - It doesn't keep competitors' reviews, only their rating and count.

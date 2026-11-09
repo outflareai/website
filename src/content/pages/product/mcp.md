@@ -95,7 +95,7 @@ Connected apps are listed on the **Connect your AI** page with who connected the
 
 ## Run it on your own computer
 
-The server is [`@outflare/mcp`](https://github.com/outflareai/outflare/tree/main/mcp) in the open-source repository. Build it from source and run it with an [API token](/docs/api/authentication/) when your app only starts local servers, or to keep it to one brand (`OUTFLARE_BRAND`) or one mission (`OUTFLARE_MISSION`). `OUTFLARE_MCP_READ_ONLY=1` registers only the tools that change nothing. See [Agents and MCP](/docs/agents/mcp/).
+The server is [`@outflare/mcp`](https://github.com/outflareai/outflare/tree/main/mcp) in the open-source repository. Build it from source and run it with an [API token](/docs/api/authentication/) when your app only starts local servers, or to keep it to one brand (`OUTFLARE_BRAND`) or one mission (`OUTFLARE_MISSION`). `OUTFLARE_MCP_READ_ONLY=1` registers only the tools that change nothing. See [Agents and MCP](/docs/agents/mcp/). Scripts that don't need MCP can use the [TypeScript and Python SDKs](/developers/sdk/).
 
 ## Things to ask
 

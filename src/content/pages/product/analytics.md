@@ -84,7 +84,7 @@ Each website also shows its latest [SEO](/product/seo/) figures: domain rating, 
 
 ## Dashboards, reports and digests
 
-- **[Dashboards](/docs/guides/dashboards/)** put your saved funnels, trends, retention and paths on one page over the same dates, with notes. Share one by a read-only link, with a password and an expiry.
+- **[Dashboards](/product/dashboards/)** put your saved funnels, trends, retention and paths on one page over the same dates, with notes. Share one by a read-only link, with a password and an expiry.
 - **[Channels](/docs/guides/attribution/)** show visits, sign-ups, revenue and cost for every channel under the attribution model you choose.
 - **[Digests](/docs/guides/digests/)** summarise the workspace daily or weekly, each number next to the period before, in the app, as a webhook, or by email through your own provider.
 
