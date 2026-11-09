@@ -2,7 +2,7 @@
 	"version": "2026.11.09",
 	"date": "2026-11-09",
 	"status": "in-progress",
-	"updated": "2026-11-09T08:40:15Z",
+	"updated": "2026-11-09T08:51:34Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -10,7 +10,14 @@
 			"edition": "open-source",
 			"text": "Outflare for Mac, in testing: the Outflare you use in the browser, in a window of its own, in the dock, signed in once from your browser, with system notifications and a badge. Test builds are unsigned for now; the download page follows.",
 			"at": "2026-11-09T08:40:15Z"
+		},
+		{
+			"kind": "fix",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "A web search an agent asks for now belongs to the brand it searches for: `POST /v1/brands/{brand}/search-results` (MCP `search_web` takes `brand`) replaces the workspace route, so the approval waits under that brand alone on the Agents page, and its cost and event carry the brand. A change that names no brand says \"Every brand\" on its card when a brand is picked.",
+			"at": "2026-11-09T08:51:34Z"
 		}
 	],
-	"through": "6e4e0d5+709f69a"
+	"through": "9376bd1+5095e35"
 }
