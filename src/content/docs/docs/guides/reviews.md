@@ -1,11 +1,11 @@
 ---
 title: Reviews
-description: Every review of your brands on Trustpilot, G2, Capterra and Google in one place, your review score and where it's heading, and answers drafted for you to post.
+description: Every review of your brands on Trustpilot, G2, Capterra, SourceForge and Google in one place, your review score and where it's heading, and answers drafted for you to post.
 sidebar:
   order: 15
 ---
 
-<span class="pill shipped">Shipped</span> Trustpilot, G2, Capterra and Google reviews, read every day, with a review score, its direction and Draft answer, in the app, through the API and for agents.
+<span class="pill shipped">Shipped</span> Trustpilot, G2, Capterra, SourceForge and Google reviews, read every day, with a review score, its direction and Draft answer, in the app, through the API and for agents.
 
 **Reviews** (`/<workspace>/reviews`) has its own place in the menu. It shows what customers say about each brand: every review with its stars, sentiment, date, a link to it and your answer, each site's own score and count day by day, and one review score that tells you whether things are getting better or worse.
 
@@ -15,7 +15,7 @@ The Apple App Store and Google Play come next, on the same page.
 
 Reviews opens on **Your review pages**: each brand's pages on review sites, in one list.
 
-1. **Add them.** Pages already in the brand's links are listed. With Geonode connected, Outflare searches the web for the brand's Trustpilot, G2 and Capterra pages and shows what it finds with **Confirm** and **Not ours**; **Find it** searches again. To add one by hand, paste its address in the box at the bottom. Google places are added by pasting the place's Google Maps link.
+1. **Add them.** Pages already in the brand's links are listed. With Geonode connected, Outflare searches the web for the brand's Trustpilot, G2, Capterra and SourceForge pages and shows what it finds with **Confirm** and **Not ours**; **Find it** searches again. To add one by hand, paste its address in the box at the bottom. Google places are added by pasting the place's Google Maps link.
 2. **Connect Geonode.** Pages are read through your own Geonode account. **Connect Geonode** opens it on Connectors, says what it's for, and brings you back once it's connected.
 3. **Read every day.** A page is read as soon as you add or confirm it, then once a day. The first read brings in the page's earlier reviews too, so the history shows from day one.
 
@@ -24,6 +24,7 @@ Reviews opens on **Your review pages**: each brand's pages on review sites, in o
 | Trustpilot | `trustpilot.com/review/<your domain>` |
 | G2 | `g2.com/products/<product>/reviews` |
 | Capterra | `capterra.com/p/<id>/<product>/` |
+| SourceForge | `sourceforge.net/software/product/<product>/` (business software) or `sourceforge.net/projects/<project>/reviews/` (open source) |
 | Google | The place's Google Maps link |
 
 A page that shows no rating and no reviews (a challenge page, a login wall or a wrong address) shows an error on its row and is tried again the next day. It never reads as zero. For Google, the place's rating and count are read every day; individual reviews are read as far as the public page shows them.

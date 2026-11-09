@@ -101,7 +101,7 @@ Click a competitor for its own page: its score and rank next to yours, its Domai
 
 ## Their social profiles and reviews
 
-On a competitor's page, **Their social profiles and reviews** follows their social profiles (X, LinkedIn company pages, YouTube, Instagram, TikTok, Facebook, a subreddit, GitHub, Discord, Bluesky, Threads, Mastodon, DEV, Docker Hub) and their Trustpilot, G2, Capterra or Google review pages.
+On a competitor's page, **Their social profiles and reviews** follows their social profiles (X, LinkedIn company pages, YouTube, Instagram, TikTok, Facebook, a subreddit, GitHub, Discord, Bluesky, Threads, Mastodon, DEV, Docker Hub) and their Trustpilot, G2, Capterra, SourceForge or Google review pages.
 
 - **Suggested from their website.** OutflareBot's weekly look at their home page suggests the profiles it links to. Press **Follow**, or **Not theirs** to never see it again. You can also paste any profile or review page.
 - **Read every day, on your own Geonode account.** Followed profiles are read with your own, for followers (or the channel's headline count, such as subscribers), and a review page's rating and review count. They need a page reader: [connect Geonode](/docs/integrations/seo/), and until you do, the page says so and nothing is read.
