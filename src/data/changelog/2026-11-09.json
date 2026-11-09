@@ -2,7 +2,7 @@
 	"version": "2026.11.09",
 	"date": "2026-11-09",
 	"status": "in-progress",
-	"updated": "2026-11-09T20:46:43Z",
+	"updated": "2026-11-09T22:26:21Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -262,7 +262,14 @@
 			"edition": "open-source",
 			"text": "A team directory in Settings, Team: everyone at the company with their department, team and manager, plus the work accounts the company owns and who holds each. Company Telegram accounts sign in to Outflare as a linked device by QR code, with checks every six hours.",
 			"at": "2026-11-09T20:46:43Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Partner short links now keep the same details as redirect links: where the visitor is, their device, and a keyed hash of their address. Clicks from link scanners and previews no longer count toward a partner's clicks. The click id a link adds (`ref_click`) is now a 16-character key; ids from older links still work as `click_id`.",
+			"at": "2026-11-09T22:26:21Z"
 		}
 	],
-	"through": "69bfdc7+94dd88d"
+	"through": "c389862+81c9675"
 }
