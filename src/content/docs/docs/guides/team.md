@@ -50,6 +50,16 @@ Once an account is signed in, its chats can go into one brand's CRM. In the acco
 - **One brand per account:** an account's chats stay in the brand they were first synced into.
 - **Pause** stops new messages and keeps what was copied. Start again to carry on, or pick a longer history to copy further back.
 
+## Match chats to customers
+
+Each synced chat is matched to a customer: a person, or a company for a group chat. Once it is, the customer's Telegram conversations sit on their record with everything else.
+
+1. **Outflare looks first.** A customer who already has the chat's Telegram account is linked straight away. Otherwise Outflare looks for a customer with the same phone number or username, an email address the other side wrote in the chat, or, in a group, a company's domain, and suggests them.
+2. **Then your AI.** For the rest, Outflare asks your workspace's own AI (**Settings → AI**, Telegram matching) to pick from customers with a similar name, using the chat's last few messages. It may also say a chat looks personal; that's only a hint. Without an AI connected, these chats wait as **No customer found**.
+3. **You confirm.** **CRM → Telegram → To confirm** lists the chats on your accounts that need you. **Confirm** the suggestion, **Change** to pick another customer or create one, or mark the chat personal or a colleague from its menu.
+
+Confirming gives the customer that Telegram account, so the next chat with them, on any company account, links by itself. Click a chat to read its messages.
+
 ## API and MCP
 
 | What | REST API | MCP tools |
@@ -59,6 +69,6 @@ Once an account is signed in, its chats can go into one brand's CRM. In the acco
 | Company accounts | `GET`/`POST .../staff-accounts`, `GET`/`PATCH`/`DELETE .../staff-accounts/{id}` | `list_staff_accounts`, `get_staff_account`, `create_staff_account`, `update_staff_account` |
 | Telegram sign-in | `GET`/`PATCH .../staff-accounts/{id}/telegram`, `POST .../telegram/connect`, `.../password`, `.../check`, `.../disconnect` | `get_telegram_session` |
 | Telegram sync | `POST .../staff-accounts/{id}/telegram/sync`, `POST .../telegram/sync/pause` | |
-| Synced chats | `GET /v1/brands/{brand}/telegram-chats`, `GET`/`PATCH .../telegram-chats/{id}`, `GET .../telegram-chats/{id}/messages` | `list_telegram_chats`, `list_telegram_messages`, `update_telegram_chat` |
+| Synced chats | `GET /v1/brands/{brand}/telegram-chats` (`match_status` and `mine` for the queue), `GET`/`PATCH .../telegram-chats/{id}`, `GET .../telegram-chats/{id}/messages`, `POST .../telegram-chats/{id}/match` | `list_telegram_chats`, `list_telegram_messages`, `update_telegram_chat`, `match_telegram_chat` |
 
-Reading needs the `members.read` scope and changing needs `members.manage`, which owners and admins have. Synced chats need `customers.read`, and `customers.manage` to sort them. Every change is in the audit log.
+Reading needs the `members.read` scope and changing needs `members.manage`, which owners and admins have. Synced chats need `customers.read`, and `customers.manage` to sort and match them. Every change is in the audit log.
