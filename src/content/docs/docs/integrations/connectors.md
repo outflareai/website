@@ -31,6 +31,7 @@ By category, including what is planned:
 | SEO | [DataForSEO, Ahrefs](/docs/integrations/seo/), paid per call within a monthly budget |
 | Social | [X, LinkedIn](/docs/guides/social/): followers and your own posts' numbers, with your own X app and LinkedIn sign-in |
 | Code and deploys | [GitHub, Vercel](/docs/integrations/deploys/): when each website ships, read only |
+| Messaging | [Telegram](/docs/guides/team/#sign-a-telegram-account-in-to-outflare), with your company's own Telegram app: the company's Telegram accounts sign in by QR code, read only |
 | Knowledge sources | Slack (knowledge), read only: the [support assistant](/docs/guides/support-assistant/#when-your-knowledge-has-no-answer) looks in the channels you pick for answers your team already gave. Separate from the Slack connection that posts [alerts](/docs/guides/alerts/) |
 | Social | [Reddit](/docs/guides/reddit/), with your workspace's own app: find posts and post replies a person approves from the brand's own account |
 | Ad platforms | [Google Ads, Meta Ads, Microsoft Advertising, Reddit Ads, X Ads, LinkedIn Ads](/docs/integrations/paid-media/), read only, with your own ad accounts |
