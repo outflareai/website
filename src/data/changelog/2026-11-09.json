@@ -2,7 +2,7 @@
 	"version": "2026.11.09",
 	"date": "2026-11-09",
 	"status": "in-progress",
-	"updated": "2026-11-09T12:06:28Z",
+	"updated": "2026-11-09T12:15:26Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -94,7 +94,35 @@
 			"edition": "cloud",
 			"text": "The agent's activity and turns are under History on the Agent page, and its tasks and standing instructions are under Settings, so the top row is just Chat, Waiting for you, History and Settings.",
 			"at": "2026-11-09T12:06:28Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "The Agent page's top row is shorter: Chat, Waiting for you, History and Settings. History holds every agent's changes and Outflare agent runs; Settings holds what agents may do. Each picks its view from a row of buttons.",
+			"at": "2026-11-09T12:15:26Z"
+		},
+		{
+			"kind": "fix",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Outcomes counts only outreach costs. Ad spend, searches, rank checks, SEO reports and site crawls stay out of cost per meeting. Searches and SEO reports now count toward the brand they ran for. The list of charges shows only the brand you're looking at. Costs that belong to no single sequence are no longer described as shared out when no emails went out.",
+			"at": "2026-11-09T12:15:26Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Paid ads now belong to one brand each, under `/v1/brands/{brand}/`, and the old workspace routes answer 410 with the route to call instead. The Ads page asks you to pick a brand; connecting ad accounts and assigning them to brands stay on the workspace.",
+			"at": "2026-11-09T12:15:26Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "agents",
+			"edition": "cloud",
+			"text": "The brand agent now tells your team when a task is finished, when it needs your OK on a change, and when it gets stuck. Each one shows in Alerts and is emailed to your owners and admins; choose who gets them in Settings, Alerts.",
+			"at": "2026-11-09T12:15:26Z"
 		}
 	],
-	"through": "f133a61+e8f9841"
+	"through": "00d85c2+29347d4"
 }
