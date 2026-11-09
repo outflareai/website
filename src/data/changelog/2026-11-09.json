@@ -2,7 +2,7 @@
 	"version": "2026.11.09",
 	"date": "2026-11-09",
 	"status": "in-progress",
-	"updated": "2026-11-09T16:07:48Z",
+	"updated": "2026-11-09T16:10:54Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -213,7 +213,14 @@
 			"edition": "open-source",
 			"text": "The AI receipts forwarding steps now cover receipts from claude.ai and chatgpt.com, drop GitHub, and say that receipts sent from a stripe.com address need the Gmail filter.",
 			"at": "2026-11-09T16:07:48Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Approvals, agent runs and API logs now show only the picked brand's on the Agents and Logs pages. The team's own, about no brand (such as invites, members and connections), are on a new Settings page, Team activity, and on the workspace routes, which no longer show a brand's.",
+			"at": "2026-11-09T16:10:54Z"
 		}
 	],
-	"through": "45d6114+e3c9c84"
+	"through": "3ea09fc+60ff2c5"
 }
