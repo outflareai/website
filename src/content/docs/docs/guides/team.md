@@ -60,6 +60,12 @@ Each synced chat is matched to a customer: a person, or a company for a group ch
 
 Confirming gives the customer that Telegram account, so the next chat with them, on any company account, links by itself. Click a chat to read its messages.
 
+## Summaries and alerts
+
+- **Customers waiting.** When a customer writes last in a private chat, the chat shows how long they've waited (**CRM → Telegram → Waiting for an answer**). After four hours the account's holder gets an alert, once per wait, by email or Slack as you choose in **Settings → Alerts**. Old waits from the history import don't alert.
+- **Summaries.** Open a chat and press **Summarise**: your workspace's own AI (**Settings → AI**, Telegram summaries) writes what they want, what was agreed, what's still open and who owes the next message. It says when new messages came in since.
+- **Handovers.** When you give a synced account to someone else in **Settings → Team**, its customer chats from the last 30 days are summarised for them, and they get an alert pointing to the chats.
+
 ## API and MCP
 
 | What | REST API | MCP tools |
@@ -69,6 +75,6 @@ Confirming gives the customer that Telegram account, so the next chat with them,
 | Company accounts | `GET`/`POST .../staff-accounts`, `GET`/`PATCH`/`DELETE .../staff-accounts/{id}` | `list_staff_accounts`, `get_staff_account`, `create_staff_account`, `update_staff_account` |
 | Telegram sign-in | `GET`/`PATCH .../staff-accounts/{id}/telegram`, `POST .../telegram/connect`, `.../password`, `.../check`, `.../disconnect` | `get_telegram_session` |
 | Telegram sync | `POST .../staff-accounts/{id}/telegram/sync`, `POST .../telegram/sync/pause` | |
-| Synced chats | `GET /v1/brands/{brand}/telegram-chats` (`match_status` and `mine` for the queue), `GET`/`PATCH .../telegram-chats/{id}`, `GET .../telegram-chats/{id}/messages`, `POST .../telegram-chats/{id}/match` | `list_telegram_chats`, `list_telegram_messages`, `update_telegram_chat`, `match_telegram_chat` |
+| Synced chats | `GET /v1/brands/{brand}/telegram-chats` (`match_status` and `mine` for the queue, `waiting` for customers waiting), `GET`/`PATCH .../telegram-chats/{id}`, `GET .../telegram-chats/{id}/messages`, `POST .../telegram-chats/{id}/match`, `POST .../telegram-chats/{id}/summary` | `list_telegram_chats`, `list_telegram_messages`, `update_telegram_chat`, `match_telegram_chat`, `summarize_telegram_chat` |
 
 Reading needs the `members.read` scope and changing needs `members.manage`, which owners and admins have. Synced chats need `customers.read`, and `customers.manage` to sort and match them. Every change is in the audit log.
