@@ -2,7 +2,7 @@
 	"version": "2026.11.09",
 	"date": "2026-11-09",
 	"status": "in-progress",
-	"updated": "2026-11-09T15:06:17Z",
+	"updated": "2026-11-09T15:31:54Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -185,7 +185,21 @@
 			"edition": "open-source",
 			"text": "Approvals, agent runs and API logs each have brand routes under `/v1/brands/{brand}/` that show only that brand's items. The workspace routes still work for now; next they will keep only the team's own items, such as invites and connections.",
 			"at": "2026-11-09T14:42:03Z"
+		},
+		{
+			"kind": "fix",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Reviews: SourceForge reviews are now kept with their date, title and text, not only the listing's score and count.",
+			"at": "2026-11-09T15:31:54Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "New SEO partnership prospects get the site's domain rating filled in from what your SEO tool already read (backlinks and competitor scans), so you can see who's worth pitching first.",
+			"at": "2026-11-09T15:31:54Z"
 		}
 	],
-	"through": "86fee6f+d5884d7"
+	"through": "827feda+c5f1ed9"
 }
