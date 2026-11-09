@@ -2,7 +2,7 @@
 	"version": "2026.11.09",
 	"date": "2026-11-09",
 	"status": "in-progress",
-	"updated": "2026-11-09T16:10:54Z",
+	"updated": "2026-11-09T16:24:51Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -220,7 +220,14 @@
 			"edition": "open-source",
 			"text": "Approvals, agent runs and API logs now show only the picked brand's on the Agents and Logs pages. The team's own, about no brand (such as invites, members and connections), are on a new Settings page, Team activity, and on the workspace routes, which no longer show a brand's.",
 			"at": "2026-11-09T16:10:54Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Program settings → General has a \"Review each application\" switch, so a program can approve each new partner by hand or accept everyone who applies. Every new program, referral programs included, reviews each application by default.",
+			"at": "2026-11-09T16:24:51Z"
 		}
 	],
-	"through": "3ea09fc+60ff2c5"
+	"through": "8ef5da7+40f0400"
 }
