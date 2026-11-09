@@ -17,7 +17,7 @@ const related = integrations.filter((o) => o.category === i.category && o.id !==
 const host = (u: string) => new URL(u).hostname.replace(/^www\./, '');
 ---
 
-<Marketing title={`${i.name} integration · Outflare`} description={`${planned ? 'Coming to Outflare' : 'Connect'} ${i.name}${i.summary ? `: ${i.summary.replace(/\.$/, '')}` : ''}.`}>
+<Marketing title={`${i.name} integration · Outflare`} description={`${planned ? 'Coming to Outflare' : 'Connect'} ${i.name}${i.summary ? `: ${i.summary.replace(/\.$/, '')}` : ''}.`} crumbs={[{ name: 'Integrations', path: '/integrations/' }, { name: i.name, path: `/integrations/${i.id}/` }]}>
 	<section class="border-b">
 		<div class="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
 			<nav aria-label="Breadcrumb" class="text-sm text-muted-foreground">

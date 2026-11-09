@@ -1,11 +1,36 @@
 ---
 // Starlight's head plus the site analytics, so the docs count like the home page,
-// and the signed-in check, so the docs header shows Dashboard too.
+// and the signed-in check, so the docs header shows Dashboard too. Each docs
+// page also links its Markdown copy (src/pages/docs/[...slug].md.ts) and says
+// where it sits (BreadcrumbList) and what it is (TechArticle).
 import Default from '@astrojs/starlight/components/Head.astro';
 import Analytics from './Analytics.astro';
 import SignedIn from './SignedIn.astro';
+import { docMarkdownPath } from '../lib/markdown';
+import { breadcrumbs, jsonLd, organizationId } from '../lib/schema';
+
+const route = Astro.locals.starlightRoute;
+const entry = route?.entry;
+// Generated pages (the endpoint reference) have no Markdown source.
+const isDoc = !!entry && !!entry.body && entry.id.startsWith('docs');
+const path = Astro.url.pathname;
+const crumbs = [{ name: 'Docs', path: '/docs/' }];
+if (path !== '/docs/') crumbs.push({ name: entry?.data.title ?? 'Docs', path });
+const article = entry && {
+	'@context': 'https://schema.org',
+	'@type': 'TechArticle',
+	headline: entry.data.title,
+	description: entry.data.description,
+	url: new URL(path, Astro.site).href,
+	dateModified: route.lastUpdated?.toISOString(),
+	publisher: { '@id': organizationId },
+	isPartOf: { '@id': `${Astro.site?.origin}/#website` },
+};
 ---
 
 <Default />
+{isDoc && <link rel="alternate" type="text/markdown" href={docMarkdownPath(entry)} title="This page in Markdown" />}
+<script type="application/ld+json" set:html={jsonLd(breadcrumbs(crumbs))} />
+{article && <script type="application/ld+json" set:html={jsonLd(article)} />}
 <SignedIn />
 <Analytics />

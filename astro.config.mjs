@@ -30,8 +30,9 @@ export default defineConfig({
 		shortLinks,
 		starlight({
 			title: 'Outflare',
+			// Keep in step with src/data/positioning.ts (the config can't import TypeScript).
 			description:
-				'Open-source GTM infrastructure for humans and agents. Self-host a cold-email sequencer with bulk mailbox connection and a policy check on every send.',
+				'Outflare is the open-source AI marketing platform for people and their agents: analytics, SEO, AI visibility, cold email, leads and more, through one API and MCP.',
 			logo: { light: './src/assets/logo-light.svg', dark: './src/assets/logo-dark.svg', alt: 'Outflare', replacesTitle: true },
 			favicon: '/favicon.svg',
 			social: [{ icon: 'github', label: 'GitHub', href: repo }],
@@ -66,7 +67,7 @@ export default defineConfig({
 				{ tag: 'meta', attrs: { property: 'og:image', content: 'https://outflare.ai/brand/social/outflare-social-1200x630.png' } },
 				{ tag: 'meta', attrs: { property: 'og:image:width', content: '1200' } },
 				{ tag: 'meta', attrs: { property: 'og:image:height', content: '630' } },
-				{ tag: 'meta', attrs: { property: 'og:image:alt', content: 'Outflare: the open-source GTM platform for humans and agents' } },
+				{ tag: 'meta', attrs: { property: 'og:image:alt', content: 'Outflare: the open-source AI marketing platform for people and agents' } },
 				{ tag: 'meta', attrs: { name: 'twitter:image', content: 'https://outflare.ai/brand/social/outflare-social-1200x630.png' } },
 			],
 			sidebar: [

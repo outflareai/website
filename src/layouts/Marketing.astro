@@ -6,19 +6,27 @@ import Logo from '../components/Logo.astro';
 import GitHubButton from '../components/GitHubButton.astro';
 import SignedIn from '../components/SignedIn.astro';
 import social from '../data/social.json';
+import { positioning } from '../data/positioning';
+import { breadcrumbs as breadcrumbList, jsonLd, organizationId, type Crumb } from '../lib/schema';
 
 interface Props {
 	title: string;
 	description: string;
+	// Where the page sits, after the home page (BreadcrumbList structured data).
+	crumbs?: Crumb[];
+	// More structured data for this page (lib/schema.ts).
+	schema?: unknown[];
 }
-const { title, description } = Astro.props;
+const { title, description, crumbs, schema = [] } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const ogImage = '/brand/social/outflare-social-1200x630.png';
 // Tells search engines which profiles belong to Outflare (src/data/social.json).
 const organization = {
 	'@context': 'https://schema.org',
 	'@type': 'Organization',
+	'@id': organizationId,
 	name: 'Outflare',
+	description: positioning.tagline,
 	url: site.url,
 	logo: `${site.url}/brand/icons/icon-512.png`,
 	email: site.email,
@@ -104,7 +112,7 @@ const footer = [
 		<meta property="og:image" content={new URL(ogImage, Astro.site)} />
 		<meta property="og:image:width" content="1200" />
 		<meta property="og:image:height" content="630" />
-		<meta property="og:image:alt" content="Outflare: the open-source GTM platform for humans and agents" />
+		<meta property="og:image:alt" content={positioning.short} />
 		<meta name="twitter:card" content="summary_large_image" />
 		<meta name="twitter:image" content={new URL(ogImage, Astro.site)} />
 		<meta name="color-scheme" content="dark light" />
@@ -112,7 +120,9 @@ const footer = [
 			// Dark by default, like the app and the docs. Shares the docs' saved choice.
 			try { document.documentElement.dataset.theme = localStorage.getItem('starlight-theme') === 'light' ? 'light' : 'dark'; } catch {}
 		</script>
-		<script type="application/ld+json" set:html={JSON.stringify(organization)} />
+		<script type="application/ld+json" set:html={jsonLd(organization)} />
+		{crumbs && crumbs.length > 0 && <script type="application/ld+json" set:html={jsonLd(breadcrumbList(crumbs))} />}
+		{schema.map((s) => <script type="application/ld+json" set:html={jsonLd(s)} />)}
 		<slot name="head" />
 		<SignedIn />
 		<Analytics />
@@ -160,7 +170,7 @@ const footer = [
 					<a href="/" class="touch inline-flex items-center text-foreground" aria-label="Outflare home">
 						<Logo class="h-6 w-auto" />
 					</a>
-					<p class="mt-3 max-w-xs text-sm text-muted-foreground">The open-source marketing platform for people and their agents.</p>
+					<p class="mt-3 max-w-xs text-sm text-muted-foreground">{positioning.tagline}</p>
 				</div>
 				{
 					footer.map((col) => (
