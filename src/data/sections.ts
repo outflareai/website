@@ -20,6 +20,14 @@ export const sections: Section[] = [
 		lede: 'Each module shares the same connectors, brand context, customer records and API, so your agents can work across all of them. Use one, or all of them.',
 	},
 	{
+		id: 'developers',
+		label: 'Developers',
+		title: 'Outflare for developers: API, SDKs and open source',
+		description: 'Build on Outflare: an OpenAPI 3.1 REST API with scoped tokens, TypeScript and Python SDKs, an MCP server, and an AGPL-3.0 engine you can self-host.',
+		h1: 'Build on Outflare.',
+		lede: 'Everything the app does is in a documented API, with typed SDKs, an MCP server for agents and an open-source engine you can read, run and change.',
+	},
+	{
 		id: 'solutions',
 		label: 'Solutions',
 		title: 'Solutions · Outflare',

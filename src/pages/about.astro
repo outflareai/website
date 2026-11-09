@@ -1,0 +1,111 @@
+---
+// About Outflare: what it is, what it promises and how to reach the team.
+// No names or photos of people (AGENTS.md, "No real people, including us").
+import Marketing from '../layouts/Marketing.astro';
+import { app, repo, site } from '../data/project';
+import { positioning } from '../data/positioning';
+import { faqPage, organizationId } from '../lib/schema';
+
+const promises = [
+	{ title: 'Open source, for good', body: 'The engine and web app are AGPL-3.0, and the SDKs and MCP server are Apache-2.0. A feature in the open-source engine never becomes paid.' },
+	{ title: 'Your keys, your bills', body: 'Every workspace connects its own AI model and its own accounts for every other tool, and pays those providers directly. Outflare never lends, resells or marks up an API key.' },
+	{ title: 'Your data, your database', body: 'Self-hosted, everything lives in your own Postgres. Export it, query it, back it up or fork the whole project.' },
+	{ title: 'Agents inside limits', body: 'People and AI agents use the same API, through scoped tokens, send and spend limits and approvals you choose. Every action is in the audit log under who did it.' },
+];
+
+const faqs = [
+	{ q: 'What is Outflare?', a: positioning.summary },
+	{ q: 'Who makes Outflare?', a: 'A small team, building it in the open: anyone can contribute a connector, a playbook or a fix on GitHub. Releases of the open-source engine are published to the public outflareai/outflare repository.' },
+	{ q: 'How does Outflare make money?', a: 'It doesn’t yet: self-hosting is free, and Outflare Cloud is free during early access. Cloud will add paid features of its own, such as autopilots, enterprise controls and heavy work at scale. Nothing in the open-source engine moves to paid.' },
+	{ q: 'How do I contact the team?', a: `Email ${site.email}, or open an issue on GitHub. Security reports go through the process on the Security page.` },
+];
+
+const about = {
+	'@context': 'https://schema.org',
+	'@type': 'AboutPage',
+	name: 'About Outflare',
+	url: `${site.url}/about/`,
+	about: { '@id': organizationId },
+};
+---
+
+<Marketing
+	title="About Outflare: the open-source AI marketing platform"
+	description="Why Outflare exists, what it promises (open source, your own keys, your own data, agents inside limits) and how to reach the team behind it."
+	crumbs={[{ name: 'About', path: '/about/' }]}
+	schema={[about, faqPage(faqs)]}
+>
+	<section class="relative border-b">
+		<div class="grid-bg pointer-events-none absolute inset-0" aria-hidden="true"></div>
+		<div class="relative mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
+			<p class="eyebrow">About</p>
+			<h1 class="mt-3 max-w-4xl text-4xl font-semibold tracking-tighter text-balance sm:text-5xl">Marketing that people and their agents run together.</h1>
+			<p class="sub">{positioning.tagline}</p>
+		</div>
+	</section>
+
+	<div class="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+		<div class="prose-page">
+			<h2>Why Outflare exists</h2>
+			<p>
+				Marketing runs on a dozen tools: analytics, search, a CRM, email, ads, social, reviews. Each keeps its own data and its own dashboard, and AI agents can reach
+				them only one account at a time, if at all. Outflare brings them into one workspace with one API, so a person or an agent can ask what is working and act on it,
+				across every tool, with the same view and the same limits.
+			</p>
+			<p>
+				It is open source because the platform that holds your customers, your mailboxes and every reply should be one you can read. You can see exactly what decides
+				whether an email goes out, run it on your own servers, and change it.
+			</p>
+		</div>
+
+		<h2 class="mt-14 text-2xl font-semibold tracking-tight">What we promise</h2>
+		<ul class="mt-6 grid gap-4 sm:grid-cols-2">
+			{promises.map((p) => (
+				<li class="card p-6">
+					<h3 class="font-medium">{p.title}</h3>
+					<p class="mt-2 text-sm text-muted-foreground">{p.body}</p>
+				</li>
+			))}
+		</ul>
+
+		<div class="prose-page mt-14">
+			<h2>Two ways to run it</h2>
+			<ul>
+				<li><strong>Self-hosted:</strong> one Go binary and Postgres, started with Docker Compose. Free under AGPL-3.0. <a href="/docs/quickstart/">Quickstart</a>.</li>
+				<li><strong>Outflare Cloud:</strong> the same engine, hosted at <a href={app.url}>app.outflare.ai</a> and free during early access. <a href="/docs/project/open-source-and-cloud/">What's in each</a>.</li>
+			</ul>
+			<h2>Building in the open</h2>
+			<p>
+				The roadmap, changelog and source are public. What changed each day is on the <a href="/changelog/">changelog</a>, what comes next is on the
+				<a href="/docs/project/roadmap/">roadmap</a>, and anyone can add a connector or a playbook with a pull request
+				(<a href="/docs/project/contributing/">contributing</a>).
+			</p>
+		</div>
+
+		<section class="mt-14 max-w-3xl" aria-labelledby="faq">
+			<h2 id="faq" class="text-2xl font-semibold tracking-tight">Questions people ask</h2>
+			<div class="mt-5 divide-y rounded-xl border">
+				{faqs.map((f) => (
+					<details class="group px-5 py-4">
+						<summary class="flex items-center justify-between gap-4 font-medium [&::-webkit-details-marker]:hidden">
+							{f.q}
+							<span class="text-muted-foreground transition-transform group-open:rotate-45" aria-hidden="true">+</span>
+						</summary>
+						<p class="mt-3 text-[15px] leading-7 text-muted-foreground">{f.a}</p>
+					</details>
+				))}
+			</div>
+		</section>
+
+		<div class="card mt-14 flex max-w-3xl flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
+			<div>
+				<h2 class="text-xl font-semibold tracking-tight">Get in touch</h2>
+				<p class="mt-1 text-muted-foreground">Questions, ideas or help setting it up.</p>
+			</div>
+			<div class="flex flex-col gap-3 sm:flex-row">
+				<a href={`mailto:${site.email}`} class="btn btn-primary">{site.email}</a>
+				<a href={repo.url} class="btn btn-outline">GitHub</a>
+			</div>
+		</div>
+	</div>
+</Marketing>
