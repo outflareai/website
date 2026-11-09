@@ -2,7 +2,7 @@
 	"version": "2026.11.09",
 	"date": "2026-11-09",
 	"status": "in-progress",
-	"updated": "2026-11-09T22:26:21Z",
+	"updated": "2026-11-09T22:41:46Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -269,7 +269,21 @@
 			"edition": "open-source",
 			"text": "Partner short links now keep the same details as redirect links: where the visitor is, their device, and a keyed hash of their address. Clicks from link scanners and previews no longer count toward a partner's clicks. The click id a link adds (`ref_click`) is now a 16-character key; ids from older links still work as `click_id`.",
 			"at": "2026-11-09T22:26:21Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Gmail capture can now save email with every CRM contact and company on a brand, not only the ones each person picked. An owner switches it on; an email is saved only when everyone outside the company in it belongs to one contact or company, and newsletters are skipped.",
+			"at": "2026-11-09T22:41:46Z"
+		},
+		{
+			"kind": "launch",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Team email sharing: an owner can let everyone on a brand read each other's work email with CRM contacts. Everyone is told 48 hours first, your own AI model keeps HR, pay and other private email back, anyone can keep a contact private, Personal or HR-labelled and payroll or banking mail is never saved, and each read of a colleague's email is recorded.",
+			"at": "2026-11-09T22:41:46Z"
 		}
 	],
-	"through": "c389862+81c9675"
+	"through": "de41384+7151e04"
 }
