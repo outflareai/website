@@ -16,8 +16,8 @@
 // everyone (the owner's choice): the visitor cookie is set in every region,
 // and the privacy page says how to opt out.
 //
-// Every click on a sign-up, sign-in, GitHub or contact link (or element with data-track) and
-// every script error is an event, sent to both (track below). AGENTS.md has
+// Every click on a sign-up, sign-in, GitHub or contact link (or element with data-track),
+// every visit an AI assistant sent (ai_referral_landed) and every script error is an event, sent to both (track below). AGENTS.md has
 // the rule and the names.
 const gtm = (import.meta.env.PUBLIC_GTM_ID ?? '').trim();
 const posthogKey = (import.meta.env.PUBLIC_POSTHOG_KEY ?? '').trim();
@@ -107,6 +107,27 @@ const phKey = /^phc_[A-Za-z0-9_-]{10,80}$/.test(posthogKey) ? posthogKey : '';
 			if (a.dataset.trackLabel) props.label = a.dataset.trackLabel;
 			window.outflareTrack(name, props);
 		}, true);
+		// Visits sent by an AI assistant (its link in an answer), named by a
+		// fixed label from the referrer or the utm_source it adds. Only the
+		// landing page has either, so it fires once per visit. GA4 and PostHog also keep the raw referrer.
+		(function () {
+			var hosts = { 'chatgpt.com': 'chatgpt', 'chat.openai.com': 'chatgpt', 'perplexity.ai': 'perplexity', 'claude.ai': 'claude',
+				'gemini.google.com': 'gemini', 'copilot.microsoft.com': 'copilot', 'chat.deepseek.com': 'deepseek', 'meta.ai': 'meta_ai',
+				'grok.com': 'grok', 'chat.mistral.ai': 'mistral', 'you.com': 'you', 'phind.com': 'phind' };
+			function label(host) {
+				host = String(host || '').toLowerCase().replace(/^www\./, '');
+				for (var h in hosts) if (host === h || host.slice(-h.length - 1) === '.' + h) return hosts[h];
+				return '';
+			}
+			var via = 'referrer', source = '';
+			try { source = label(document.referrer && new URL(document.referrer).hostname); } catch (e) {}
+			if (!source) {
+				via = 'utm';
+				try { source = label(new URLSearchParams(location.search).get('utm_source')); } catch (e) {}
+			}
+			if (!source) return;
+			window.outflareTrack('ai_referral_landed', { source: source, via: via, page: location.pathname });
+		})();
 		window.addEventListener('error', function (e) {
 			window.outflareTrack('site_error', { page: location.pathname, message: String(e.message || '').slice(0, 200) });
 		});

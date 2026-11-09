@@ -12,7 +12,7 @@ const groups = [...categories.map((c) => c.id).filter((id) => used.includes(id))
 }));
 ---
 
-<Marketing title="Integrations · Outflare" description={`Connect Outflare to ${available.length} tools today: email verification, lead data, sequencers, website analytics, SEO, calendars, CRM and AI models. Sign in or paste an API key, or let your agent ask for it.`}>
+<Marketing title="Integrations · Outflare" description={`Connect Outflare to ${available.length} tools today: email verification, lead data, sequencers, website analytics, SEO, calendars, CRM and AI models. Sign in or paste an API key, or let your agent ask for it.`} crumbs={[{ name: 'Integrations', path: '/integrations/' }]}>
 	<section class="relative border-b">
 		<div class="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
 			<p class="eyebrow">Integrations</p>

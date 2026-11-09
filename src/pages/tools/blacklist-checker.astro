@@ -1,0 +1,49 @@
+---
+import ToolPage from '../../components/ToolPage.astro';
+import DomainChecker from '../../components/DomainChecker.astro';
+
+const faqs = [
+	{ q: 'How do I know if my domain is blacklisted?', a: 'Type your domain above and choose Check domain. The checker asks the Spamhaus Domain Blocklist (DBL) and SURBL whether your domain is listed, and shows Listed, Not listed or Unknown for each.' },
+	{ q: 'What does "Unknown" mean?', a: 'The blocklist didn’t give a usable answer to this check. Spamhaus, for example, refuses queries that come through large public DNS resolvers. Unknown means we can’t say either way, not that you are listed.' },
+	{ q: 'How do I get my domain removed from a blacklist?', a: 'First stop what got it listed, which is often a bought list, high bounce rates or a compromised site. Then request removal on the list’s own site: Spamhaus has a lookup and removal page, and so does SURBL. Removal is free.' },
+	{ q: 'Does this check IP addresses too?', a: 'No, it checks the domain only. Mail servers are also listed by IP address on IP blocklists; if you run your own mail server or use a dedicated IP, check those too.' },
+	{ q: 'Why would a domain end up on a blocklist?', a: 'Domain blocklists list domains seen in spam, phishing or malware, in links or as the sender. Cold email to unverified or bought lists, sudden volume from new domains and hacked websites are the usual causes.' },
+];
+---
+
+<ToolPage
+	title="Domain blacklist checker (free) · Outflare"
+	description="Free domain blacklist checker. See whether your domain is listed on the Spamhaus DBL or SURBL, what that means for your email, and how to get removed."
+	label="Domain blacklist checker"
+	h1="Domain blacklist checker"
+	lede="See whether your domain is on the domain blocklists that mailbox providers use, and check its SPF, DKIM and DMARC while you're at it."
+	path="/tools/blacklist-checker/"
+	faqs={faqs}
+>
+	<DomainChecker slot="tool" focus="blocklists" />
+
+	<h2>Which blocklists it checks</h2>
+	<table>
+		<thead><tr><th>List</th><th>What it lists</th><th>Removal</th></tr></thead>
+		<tbody>
+			<tr><td><strong>Spamhaus DBL</strong></td><td>Domains found in spam, phishing and malware, used by many mail servers and filters.</td><td><a href="https://check.spamhaus.org/">check.spamhaus.org</a></td></tr>
+			<tr><td><strong>SURBL</strong></td><td>Domains that appear in links inside unwanted messages.</td><td><a href="https://www.surbl.org/">surbl.org</a></td></tr>
+		</tbody>
+	</table>
+	<p>These are domain lists, so they follow your domain wherever you send from. A listed domain gets mail junked or rejected even from a healthy mailbox, and links to it can sink other people's mail too.</p>
+
+	<h2>If your domain is listed</h2>
+	<ol>
+		<li><strong>Stop sending from it</strong> until you know why it was listed.</li>
+		<li><strong>Find the cause.</strong> Common ones: a bought or unverified lead list, a bounce rate over 5%, a sudden jump in volume on a new domain, or a hacked website linking to bad content.</li>
+		<li><strong>Fix the cause</strong>, then request removal on the list's own site. Asking before the cause is fixed usually means being listed again.</li>
+		<li><strong>Check again</strong> here. Lists can take from minutes to a day to update.</li>
+	</ol>
+
+	<h2>Prevent it next time</h2>
+	<ul>
+		<li>Verify every address before its first email, and keep bounces under 2%.</li>
+		<li>Send cold email from separate domains, not your main one, and warm new mailboxes up first (<a href="/glossary/email-warmup/">email warm-up</a>).</li>
+		<li>Keep SPF, DKIM and DMARC in place; the <a href="/tools/dmarc-checker/">SPF, DKIM and DMARC checker</a> shows what's missing.</li>
+	</ul>
+</ToolPage>

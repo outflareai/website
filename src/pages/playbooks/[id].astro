@@ -12,7 +12,7 @@ const related = playbooks.filter((o) => o.id !== p.id && o.goals.some((g) => p.g
 const nothingNeeded = p.needs.data.length + p.needs.connections.length === 0;
 ---
 
-<Marketing title={`${p.title} · Outflare playbook`} description={p.summary}>
+<Marketing title={`${p.title} · Outflare playbook`} description={p.summary} crumbs={[{ name: 'Playbooks', path: '/playbooks/' }, { name: p.title, path: `/playbooks/${p.id}/` }]}>
 	<section class="border-b">
 		<div class="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
 			<nav aria-label="Breadcrumb" class="text-sm text-muted-foreground">

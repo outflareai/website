@@ -3,6 +3,7 @@ import Marketing from '../layouts/Marketing.astro';
 import { app, repo, site } from '../data/project';
 import { modules, moduleStatusLabel } from '../data/modules';
 import { integrations } from '../data/integrations';
+import { softwareApplication, website } from '../lib/schema';
 
 const liveModules = modules.filter((m) => m.status === 'live').length;
 const liveConnectors = integrations.filter((i) => i.status === 'available').length;
@@ -113,8 +114,9 @@ const quickstart = [
 ---
 
 <Marketing
-	title="Outflare: the open-source GTM platform for people and agents"
-	description="One open-source workspace for your go-to-market: connect your analytics, search, CRM and email tools, see what's working, and let your AI agents do the work through one API. Hosted or self-hosted."
+	title="Outflare: the open-source AI marketing platform for people and agents"
+	description="An AI marketing agent you prompt from Claude, ChatGPT or Cursor. Outflare connects your analytics, SEO, CRM and email tools in one open-source workspace and does the work through one API. Hosted or self-hosted."
+	schema={[website(), softwareApplication()]}
 >
 	<!-- Hero -->
 	<section class="relative overflow-hidden">

@@ -7,7 +7,7 @@ const goals = [...new Set(playbooks.flatMap((p) => p.goals))];
 const groups = tiers.map((t) => ({ ...t, items: playbooks.filter((p) => p.tier === t.id) })).filter((g) => g.items.length > 0);
 ---
 
-<Marketing title="Playbooks · Outflare" description={`${playbooks.length} ready-made growth playbooks, from welcoming new sign-ups to getting named in AI answers. Copy the prompt into your AI app, or run it in Outflare on your own accounts. Anyone can add one on GitHub.`}>
+<Marketing title="Playbooks · Outflare" description={`${playbooks.length} ready-made growth playbooks, from welcoming new sign-ups to getting named in AI answers. Copy the prompt into your AI app, or run it in Outflare on your own accounts. Anyone can add one on GitHub.`} crumbs={[{ name: 'Playbooks', path: '/playbooks/' }]}>
 	<section class="relative border-b">
 		<div class="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
 			<p class="eyebrow">Playbooks</p>

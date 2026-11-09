@@ -1,0 +1,53 @@
+---
+import ToolPage from '../../components/ToolPage.astro';
+import DomainChecker from '../../components/DomainChecker.astro';
+
+const faqs = [
+	{ q: 'How do I check my DMARC record?', a: 'Type your domain above and choose Check domain. The checker reads the TXT record at _dmarc.yourdomain.com and shows it with its policy (p=none, quarantine or reject). If there is no record, it gives you one to add.' },
+	{ q: 'What is a good DMARC policy to start with?', a: 'Start with v=DMARC1; p=none; so nothing is rejected while you check that SPF and DKIM pass for all your mail. Once they do, move to p=quarantine, then p=reject.' },
+	{ q: 'Do Google and Yahoo require DMARC?', a: 'Yes, for bulk senders. Since February 2024, Google and Yahoo require anyone sending 5,000 or more messages a day to their users to have SPF, DKIM and a DMARC record (p=none is enough), and they recommend authentication for every sender.' },
+	{ q: 'Why does the checker say DKIM was not found when I have it set up?', a: 'DKIM keys live under a selector your mail host chooses. The checker tries Google Workspace, Microsoft 365 and common selectors. If your provider uses its own, DKIM can be working even though this check can’t see it; check the selector in your provider’s settings.' },
+	{ q: 'Can a domain have two SPF records?', a: 'No. With more than one SPF record, SPF fails everywhere. Merge them into one TXT record that lists every include, ending in ~all or -all.' },
+	{ q: 'Is this checker free?', a: 'Yes. No account and no email address needed. It reads public DNS only, and each network can run 20 checks a minute.' },
+];
+---
+
+<ToolPage
+	title="SPF, DKIM and DMARC checker (free) · Outflare"
+	description="Free SPF, DKIM and DMARC checker. Test your domain's email authentication and MX records, and get the exact DNS record to add for each problem."
+	label="SPF, DKIM and DMARC checker"
+	h1="SPF, DKIM and DMARC checker"
+	lede="Check whether your domain is set up to send email that lands: SPF, DKIM, DMARC and MX in one go, with the exact DNS record to add for anything missing."
+	path="/tools/dmarc-checker/"
+	faqs={faqs}
+>
+	<DomainChecker slot="tool" focus="auth" />
+
+	<h2>What this checker looks at</h2>
+	<table>
+		<thead><tr><th>Record</th><th>Where it lives</th><th>What it proves</th></tr></thead>
+		<tbody>
+			<tr><td><strong>SPF</strong></td><td>TXT record on the domain, starting <code>v=spf1</code></td><td>Which servers may send mail as your domain.</td></tr>
+			<tr><td><strong>DKIM</strong></td><td>TXT record at <code>selector._domainkey.yourdomain.com</code></td><td>That the message was signed by your domain and not changed on the way.</td></tr>
+			<tr><td><strong>DMARC</strong></td><td>TXT record at <code>_dmarc.yourdomain.com</code></td><td>What receivers should do when SPF or DKIM fail, and where to send reports.</td></tr>
+			<tr><td><strong>MX</strong></td><td>MX records on the domain</td><td>That the domain can receive replies. Receivers trust domains that can't receive mail less.</td></tr>
+		</tbody>
+	</table>
+	<p>It also checks the domain against domain blocklists; the <a href="/tools/blacklist-checker/">blacklist checker</a> explains those results.</p>
+
+	<h2>How to read the result</h2>
+	<ul>
+		<li><strong>Healthy</strong>: SPF, DKIM and DMARC are in place and the domain isn't listed.</li>
+		<li><strong>Needs attention</strong>: something works but could be better, such as an SPF record that lets any server send (<code>+all</code>).</li>
+		<li><strong>Problems found</strong>: something that makes Gmail, Yahoo or Outlook junk or reject your mail, such as a missing DMARC record or two SPF records.</li>
+	</ul>
+	<p>Each problem comes with why it matters and, where the fix is a DNS record, the type, host and value to add at your DNS host. <code>@</code> means the domain itself.</p>
+
+	<h2>The minimum setup for sending</h2>
+	<ol>
+		<li><strong>One SPF record</strong> that includes your mail host, for example <code>v=spf1 include:_spf.google.com ~all</code> for Google Workspace.</li>
+		<li><strong>DKIM switched on</strong> in your mail host's admin, with the key it gives you published in DNS.</li>
+		<li><strong>A DMARC record</strong>, starting with <code>v=DMARC1; p=none;</code> and moving to <code>p=quarantine</code> once SPF and DKIM pass.</li>
+	</ol>
+	<p>The <a href="/glossary/spf-dkim-dmarc/">SPF, DKIM and DMARC glossary entry</a> explains each one in more depth.</p>
+</ToolPage>

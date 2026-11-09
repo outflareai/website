@@ -170,6 +170,25 @@
   .legal strong { @apply font-medium text-foreground; }
   .legal a { @apply font-medium text-foreground underline underline-offset-4; }
 
+  /* Long-form marketing pages (src/content/pages): product, compare, best-of, glossary. */
+  .prose-page { @apply max-w-3xl text-[15.5px] leading-7 text-muted-foreground; }
+  .prose-page > * + * { @apply mt-4; }
+  .prose-page h2 { @apply mt-12 scroll-mt-20 text-2xl font-semibold tracking-tight text-balance text-foreground; }
+  .prose-page h3 { @apply mt-8 scroll-mt-20 text-lg font-semibold tracking-tight text-foreground; }
+  .prose-page ul { @apply list-disc space-y-2 pl-5; }
+  .prose-page ol { @apply list-decimal space-y-2 pl-5; }
+  .prose-page li::marker { @apply text-muted-foreground/60; }
+  .prose-page strong { @apply font-medium text-foreground; }
+  .prose-page a { @apply font-medium text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground; }
+  .prose-page code { @apply rounded border bg-muted px-1 py-px text-[13px] text-foreground; }
+  .prose-page pre { @apply overflow-x-auto rounded-xl border bg-card p-4 text-[12.5px] leading-[1.7]; }
+  .prose-page pre code { @apply border-0 bg-transparent p-0; }
+  .prose-page blockquote { @apply border-l-2 border-brand pl-4 text-foreground; }
+  .prose-page table { @apply block w-full overflow-x-auto text-sm sm:table; border-collapse: collapse; }
+  .prose-page th { @apply border-b px-3 py-2 text-left font-medium whitespace-nowrap text-foreground; }
+  .prose-page td { @apply border-b px-3 py-2 align-top; }
+  .prose-page th:first-child, .prose-page td:first-child { @apply pl-0; }
+
   /* Code blocks: the app's quiet panel, with simple token colours. */
   .code-panel { @apply overflow-x-auto p-4 font-mono text-[12.5px] leading-[1.7] text-neutral-800 dark:text-neutral-200; }
   .code-panel .c { @apply text-neutral-400 dark:text-neutral-500; }

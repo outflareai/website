@@ -3,6 +3,7 @@ import Marketing from '../../layouts/Marketing.astro';
 import IntegrationLogo from '../../components/IntegrationLogo.astro';
 import { app } from '../../data/project';
 import { capabilityText, categoryOf, integrations, signIn, type Integration } from '../../data/integrations';
+import { faqPage } from '../../lib/schema';
 
 export function getStaticPaths() {
 	return integrations.map((i) => ({ params: { id: i.id }, props: { i } }));
@@ -15,9 +16,50 @@ const does = (i.capabilities ?? []).map(capabilityText).filter(Boolean);
 const methods = i.auth_methods ?? [];
 const related = integrations.filter((o) => o.category === i.category && o.id !== i.id && o.status === 'available').slice(0, 6);
 const host = (u: string) => new URL(u).hostname.replace(/^www\./, '');
+
+// The product page for what this kind of tool feeds, and a comparison page
+// where one exists, so each integration links into the rest of the site.
+const productFor: Record<string, [string, string]> = {
+	data: ['/product/leads/', 'Leads and lists'],
+	email_verification: ['/product/leads/', 'Leads and lists'],
+	analytics: ['/product/analytics/', 'Website analytics'],
+	seo: ['/product/seo/', 'SEO'],
+	sequencer: ['/product/cold-email/', 'Cold email'],
+	mailbox_provider: ['/product/deliverability/', 'Deliverability'],
+	dns: ['/product/deliverability/', 'Deliverability'],
+	crm: ['/product/customer-data/', 'Customer data'],
+	calendar: ['/product/outcomes/', 'Outcomes and cost'],
+	payments: ['/product/outcomes/', 'Outcomes and cost'],
+	ads: ['/product/paid-media/', 'Paid media'],
+	email_sending: ['/product/lifecycle-email/', 'Lifecycle email'],
+	social: ['/product/social/', 'Social'],
+	model: ['/product/agents/', 'AI agents and missions'],
+};
+const compareFor: Record<string, string> = {
+	instantly: '/compare/outflare-vs-instantly/',
+	smartlead: '/compare/outflare-vs-smartlead/',
+	apollo: '/compare/outflare-vs-apollo/',
+	hubspot: '/compare/outflare-vs-hubspot/',
+	ahrefs: '/compare/outflare-vs-ahrefs/',
+};
+const product = productFor[i.category];
+const compare = compareFor[i.id];
+const connectHow = methods.includes('oauth2') && methods.includes('api_key')
+	? `sign in with ${i.name} or paste an API key`
+	: methods.includes('oauth2') ? `sign in with ${i.name} and approve access` : methods.includes('api_key') ? `paste your ${i.name} API key` : 'turn it on';
+// Questions people ask about connecting a tool to an AI agent, answered from
+// the catalog. Only for integrations that are available today.
+const faqs = planned
+	? []
+	: [
+			{ q: `What can Outflare do with ${i.name}?`, a: does.length ? `${does.join('. ')}.` : (i.summary ?? `Outflare reads from your ${i.name} account.`) },
+			{ q: `How do I connect ${i.name} to Outflare?`, a: `Open Connectors in Outflare, pick ${i.name} and ${connectHow}. Or ask your AI agent to connect it: it sends you a one-time link, so the key never passes through the chat.` },
+			{ q: `Can Claude, ChatGPT or Cursor use ${i.name} through Outflare?`, a: `Yes. Once ${i.name} is connected, any AI app connected to Outflare's MCP server can use what it provides, through the same scoped, audited API as the web app, inside the limits you set.` },
+			{ q: `Whose ${i.name} account does Outflare use?`, a: `Yours. Each workspace connects its own ${i.name} account and pays ${i.name} directly under its own plan. Outflare never supplies or shares a key, and the integration stays off until you connect it.` },
+		];
 ---
 
-<Marketing title={`${i.name} integration · Outflare`} description={`${planned ? 'Coming to Outflare' : 'Connect'} ${i.name}${i.summary ? `: ${i.summary.replace(/\.$/, '')}` : ''}.`}>
+<Marketing title={planned ? `${i.name} integration (planned) · Outflare` : `${i.name} integration for AI agents and MCP · Outflare`} description={`${planned ? 'Coming to Outflare' : 'Connect'} ${i.name}${i.summary ? `: ${i.summary.replace(/\.$/, '')}` : ''}.${planned ? '' : ' Use it from Claude, ChatGPT or Cursor through Outflare.'}`} schema={faqs.length ? [faqPage(faqs)] : []} crumbs={[{ name: 'Integrations', path: '/integrations/' }, { name: i.name, path: `/integrations/${i.id}/` }]}>
 	<section class="border-b">
 		<div class="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
 			<nav aria-label="Breadcrumb" class="text-sm text-muted-foreground">
@@ -90,6 +132,36 @@ const host = (u: string) => new URL(u).hostname.replace(/^www\./, '');
 							</li>
 							<li class="flex gap-3"><span class="font-mono text-foreground">3</span><span>Or ask your agent to connect it. It sends you a one-time link, so the key never passes through the chat.</span></li>
 						</ol>
+					</section>
+				)
+			}
+			{
+				faqs.length > 0 && (
+					<section aria-labelledby="faq">
+						<h2 id="faq" class="text-xl font-semibold tracking-tight">Questions people ask</h2>
+						<div class="mt-4 divide-y rounded-xl border">
+							{faqs.map((f) => (
+								<details class="group px-5 py-4">
+									<summary class="flex items-center justify-between gap-4 font-medium [&::-webkit-details-marker]:hidden">
+										{f.q}
+										<span class="text-muted-foreground transition-transform group-open:rotate-45" aria-hidden="true">+</span>
+									</summary>
+									<p class="mt-3 text-sm leading-6 text-muted-foreground">{f.a}</p>
+								</details>
+							))}
+						</div>
+					</section>
+				)
+			}
+			{
+				(product || compare) && (
+					<section>
+						<h2 class="text-xl font-semibold tracking-tight">Where it fits</h2>
+						<ul class="mt-4 space-y-2 text-sm">
+							{product && <li><a href={product[0]} class="font-medium underline underline-offset-4">{product[1]} in Outflare</a><span class="text-muted-foreground">: what {i.name} feeds.</span></li>}
+							{compare && <li><a href={compare} class="font-medium underline underline-offset-4">Outflare vs {i.name}</a><span class="text-muted-foreground">: how they differ, and how to use both.</span></li>}
+							<li><a href="/product/mcp/" class="font-medium underline underline-offset-4">The Outflare MCP server</a><span class="text-muted-foreground">: use connected tools from your AI app.</span></li>
+						</ul>
 					</section>
 				)
 			}

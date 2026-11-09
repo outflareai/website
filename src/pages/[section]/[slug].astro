@@ -1,0 +1,168 @@
+---
+// One page from src/content/pages/<section>/<slug>.md: the answer first,
+// then the body, the questions people ask, the docs and related pages.
+import { render } from 'astro:content';
+import Marketing from '../../layouts/Marketing.astro';
+import { allPages, pathOf, sectionOf, slugOf, type Page } from '../../lib/pages';
+import { sectionById } from '../../data/sections';
+import { app, repo, site } from '../../data/project';
+import { faqPage, organizationId } from '../../lib/schema';
+
+export async function getStaticPaths() {
+	const pages = await allPages();
+	return pages.map((page) => ({
+		params: { section: sectionOf(page), slug: slugOf(page) },
+		props: { page, related: page.data.related.map((path) => {
+			const hit = pages.find((p) => pathOf(p) === path);
+			if (!hit) throw new Error(`src/content/pages/${page.id}.md: related page ${path} does not exist`);
+			return hit;
+		}) },
+	}));
+}
+
+const { page, related } = Astro.props as { page: Page; related: Page[] };
+const d = page.data;
+const section = sectionById(sectionOf(page))!;
+const path = pathOf(page);
+const { Content, headings } = await render(page);
+const toc = headings.filter((h) => h.depth === 2);
+const fmt = (date: Date) => date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+
+const article = {
+	'@context': 'https://schema.org',
+	'@type': 'Article',
+	headline: d.h1,
+	description: d.description,
+	url: new URL(path, site.url).href,
+	dateModified: d.updated.toISOString().slice(0, 10),
+	author: { '@id': organizationId },
+	publisher: { '@id': organizationId },
+	...(d.term
+		? { about: { '@type': 'DefinedTerm', name: d.term, description: d.answer, inDefinedTermSet: new URL('/glossary/', site.url).href } }
+		: {}),
+};
+const schema: unknown[] = [article];
+if (d.faqs.length) schema.push(faqPage(d.faqs));
+---
+
+<Marketing
+	title={d.title}
+	description={d.description}
+	crumbs={[{ name: section.label, path: `/${section.id}/` }, { name: d.label, path }]}
+	schema={schema}
+>
+	<section class="relative border-b">
+		<div class="grid-bg pointer-events-none absolute inset-0" aria-hidden="true"></div>
+		<div class="relative mx-auto max-w-6xl px-4 pt-10 pb-14 sm:px-6 sm:pt-14 sm:pb-16">
+			<nav aria-label="Breadcrumb" class="text-sm text-muted-foreground">
+				<ol class="flex flex-wrap items-center gap-1.5">
+					<li><a href="/" class="hover:text-foreground">Outflare</a></li>
+					<li aria-hidden="true">/</li>
+					<li><a href={`/${section.id}/`} class="hover:text-foreground">{section.label}</a></li>
+				</ol>
+			</nav>
+			<div class="mt-6 flex flex-wrap items-center gap-2">
+				{d.cloud ? <span class="badge badge-next">Outflare Cloud</span> : <span class="badge badge-live">Open source</span>}
+			</div>
+			<h1 class="mt-3 max-w-4xl text-4xl font-semibold tracking-tighter text-balance sm:text-5xl">{d.h1}</h1>
+			<p class="sub">{d.lede}</p>
+			<div class="mt-8 flex flex-col gap-3 sm:flex-row">
+				<a href={app.signUp} class="btn btn-primary btn-lg">Sign up free</a>
+				{!d.cloud && <a href={repo.url} class="btn btn-outline btn-lg">Self-host on GitHub</a>}
+				{d.docs[0] && <a href={d.docs[0].href} class="btn btn-ghost btn-lg">Read the docs →</a>}
+			</div>
+		</div>
+	</section>
+
+	<div class="mx-auto grid max-w-6xl gap-12 px-4 py-14 sm:px-6 lg:grid-cols-[minmax(0,1fr)_16rem]">
+		<article>
+			<div class="card max-w-3xl p-6 sm:p-7">
+				<p class="eyebrow">In short</p>
+				<p class="mt-3 text-[16px] leading-7 text-pretty text-foreground">{d.answer}</p>
+				{d.points.length > 0 && (
+					<ul class="mt-5 grid gap-2.5 text-sm text-muted-foreground sm:grid-cols-2">
+						{d.points.map((t) => (
+							<li class="flex gap-2">
+								<svg class="mt-0.5 size-4 shrink-0 text-brand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>
+								<span>{t}</span>
+							</li>
+						))}
+					</ul>
+				)}
+			</div>
+
+			<div class="prose-page mt-10">
+				<Content />
+			</div>
+
+			{d.faqs.length > 0 && (
+				<section class="mt-14 max-w-3xl" aria-labelledby="faq">
+					<h2 id="faq" class="text-2xl font-semibold tracking-tight">Questions people ask</h2>
+					<div class="mt-5 divide-y rounded-xl border">
+						{d.faqs.map((f) => (
+							<details class="group px-5 py-4">
+								<summary class="flex items-center justify-between gap-4 font-medium [&::-webkit-details-marker]:hidden">
+									{f.q}
+									<span class="text-muted-foreground transition-transform group-open:rotate-45" aria-hidden="true">+</span>
+								</summary>
+								<p class="mt-3 text-[15px] leading-7 text-muted-foreground">{f.a}</p>
+							</details>
+						))}
+					</div>
+				</section>
+			)}
+
+			<p class="mt-10 max-w-3xl text-xs text-muted-foreground">
+				Updated {fmt(d.updated)}.
+				{d.checked && <> Details about other companies were checked on their own websites on {fmt(d.checked)}; prices and features change, so check before you decide. Spot something out of date? <a class="underline underline-offset-4" href={`mailto:${site.email}`}>Tell us</a>.</>}
+			</p>
+		</article>
+
+		<aside class="space-y-8 text-sm lg:sticky lg:top-20 lg:self-start">
+			{toc.length > 1 && (
+				<nav aria-label="On this page">
+					<p class="eyebrow">On this page</p>
+					<ul class="mt-3 space-y-2">
+						{toc.map((h) => <li><a href={`#${h.slug}`} class="text-muted-foreground hover:text-foreground">{h.text}</a></li>)}
+					</ul>
+				</nav>
+			)}
+			{d.docs.length > 0 && (
+				<div>
+					<p class="eyebrow">Docs</p>
+					<ul class="mt-3 space-y-2">
+						{d.docs.map((l) => <li><a href={l.href} class="text-muted-foreground hover:text-foreground">{l.label} →</a></li>)}
+					</ul>
+				</div>
+			)}
+		</aside>
+	</div>
+
+	{related.length > 0 && (
+		<section class="border-t">
+			<div class="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+				<h2 class="text-xl font-semibold tracking-tight">Related</h2>
+				<ul class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+					{related.map((r) => (
+						<li class="card relative p-5 transition-colors has-[a:hover]:border-foreground/20">
+							<p class="eyebrow">{sectionById(sectionOf(r))!.label}</p>
+							<a href={pathOf(r)} class="mt-2 block font-medium after:absolute after:inset-0">{r.data.label}</a>
+							<p class="mt-1.5 line-clamp-3 text-muted-foreground">{r.data.lede}</p>
+						</li>
+					))}
+				</ul>
+			</div>
+		</section>
+	)}
+
+	<section class="relative overflow-hidden border-t">
+		<div class="mx-auto max-w-6xl px-4 py-16 text-center sm:px-6">
+			<h2 class="h2">Try it on your own accounts.</h2>
+			<p class="sub mx-auto">Free to self-host, and free hosted while we're in early access. You bring your own API keys and pay those providers directly.</p>
+			<div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+				<a href={app.signUp} class="btn btn-primary btn-lg">Sign up free</a>
+				<a href={repo.url} class="btn btn-outline btn-lg">Self-host on GitHub</a>
+			</div>
+		</div>
+	</section>
+</Marketing>

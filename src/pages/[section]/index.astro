@@ -1,0 +1,43 @@
+---
+// The hub of one section of src/content/pages: every page in it.
+import Marketing from '../../layouts/Marketing.astro';
+import { allPages, pathOf, sectionOf, type Page } from '../../lib/pages';
+import { sections, type Section } from '../../data/sections';
+
+export async function getStaticPaths() {
+	const pages = await allPages();
+	return sections
+		.map((section) => ({ section, pages: pages.filter((p) => sectionOf(p) === section.id) }))
+		.filter((s) => s.pages.length > 0)
+		.map(({ section, pages }) => ({ params: { section: section.id }, props: { section, pages } }));
+}
+
+const { section, pages } = Astro.props as { section: Section; pages: Page[] };
+const list = {
+	'@context': 'https://schema.org',
+	'@type': 'ItemList',
+	itemListElement: pages.map((p, i) => ({ '@type': 'ListItem', position: i + 1, name: p.data.label, url: new URL(pathOf(p), Astro.site).href })),
+};
+---
+
+<Marketing title={section.title} description={section.description} crumbs={[{ name: section.label, path: `/${section.id}/` }]} schema={[list]}>
+	<section class="relative border-b">
+		<div class="grid-bg pointer-events-none absolute inset-0" aria-hidden="true"></div>
+		<div class="relative mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
+			<p class="eyebrow">{section.label}</p>
+			<h1 class="mt-3 text-4xl font-semibold tracking-tighter text-balance sm:text-5xl">{section.h1}</h1>
+			<p class="sub">{section.lede}</p>
+		</div>
+	</section>
+	<div class="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+		<ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+			{pages.map((p) => (
+				<li class="card relative flex flex-col p-6 transition-colors has-[a:hover]:border-foreground/20">
+					{p.data.cloud && <span class="badge badge-next mb-3 self-start">Outflare Cloud</span>}
+					<a href={pathOf(p)} class="font-medium after:absolute after:inset-0">{p.data.label}</a>
+					<p class="mt-2 text-sm text-muted-foreground">{p.data.lede}</p>
+				</li>
+			))}
+		</ul>
+	</div>
+</Marketing>
