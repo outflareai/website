@@ -2,7 +2,7 @@
 	"version": "2026.11.10",
 	"date": "2026-11-10",
 	"status": "in-progress",
-	"updated": "2026-11-10T11:30:29Z",
+	"updated": "2026-11-10T13:04:04Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -45,7 +45,14 @@
 			"edition": "open-source",
 			"text": "Tracker conversions by pixel and upload: put a pixel or script on a thank-you page when a network can't send postbacks, or upload a network's report as CSV or through the API. Rows with only a transaction id update conversions already recorded, for approvals and reversals reported later.",
 			"at": "2026-11-10T11:30:29Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "A conversion log for tracker postbacks and pixels: see every call from the last 30 days with what it sent and why it was or wasn't recorded. Recorded and changed conversions are also webhooks, tracker_conversion.created and tracker_conversion.updated.",
+			"at": "2026-11-10T13:04:04Z"
 		}
 	],
-	"through": "9573b2b+e1b8373"
+	"through": "ba8538e+48764bc"
 }
