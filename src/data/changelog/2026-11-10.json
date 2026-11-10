@@ -2,7 +2,7 @@
 	"version": "2026.11.10",
 	"date": "2026-11-10",
 	"status": "in-progress",
-	"updated": "2026-11-10T13:04:04Z",
+	"updated": "2026-11-10T13:56:45Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -52,7 +52,14 @@
 			"edition": "open-source",
 			"text": "A conversion log for tracker postbacks and pixels: see every call from the last 30 days with what it sent and why it was or wasn't recorded. Recorded and changed conversions are also webhooks, tracker_conversion.created and tracker_conversion.updated.",
 			"at": "2026-11-10T13:04:04Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Tracker offers: give each offer a payout (fixed, by country or from the postback) and a daily cap with a fallback offer, and send link clicks to it. Postback sources can start from 21 affiliate-network templates, such as Everflow, CAKE and ClickBank, so their postback URLs come in the network's own macros.",
+			"at": "2026-11-10T13:56:45Z"
 		}
 	],
-	"through": "ba8538e+48764bc"
+	"through": "c23702f+b93dc43"
 }
