@@ -2,7 +2,7 @@
 	"version": "2026.11.10",
 	"date": "2026-11-10",
 	"status": "in-progress",
-	"updated": "2026-11-10T13:56:45Z",
+	"updated": "2026-11-10T14:41:20Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -59,7 +59,14 @@
 			"edition": "open-source",
 			"text": "Tracker offers: give each offer a payout (fixed, by country or from the postback) and a daily cap with a fallback offer, and send link clicks to it. Postback sources can start from 21 affiliate-network templates, such as Everflow, CAKE and ClickBank, so their postback URLs come in the network's own macros.",
 			"at": "2026-11-10T13:56:45Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Tracker landers: send clicks to a review or quiz page before your offers. Each lander's buttons link to /click (an offer by weight) or /click/N (a chosen offer), with no cookies. Every lander click is kept and credits its conversion to the offer it led to.",
+			"at": "2026-11-10T14:41:20Z"
 		}
 	],
-	"through": "c23702f+b93dc43"
+	"through": "8ccb5c6+1a1b618"
 }
