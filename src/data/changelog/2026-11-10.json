@@ -2,7 +2,7 @@
 	"version": "2026.11.10",
 	"date": "2026-11-10",
 	"status": "in-progress",
-	"updated": "2026-11-10T09:01:11Z",
+	"updated": "2026-11-10T09:44:05Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -24,7 +24,14 @@
 			"edition": "open-source",
 			"text": "Rules on redirect links: send the clicks that match a path's conditions (country, device, network, IP range, hour, first or returning visitor, custom fields) to its own pages, in order, with the link's other pages for everyone else.",
 			"at": "2026-11-10T09:01:11Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Redirect links can send people on with a 307 or a meta refresh that hides the referrer, and a tracking domain can send unknown links to a page of your choice. Destinations, rules and these modes now run only on your own tracking domain; on the shared domain, links go to their own page.",
+			"at": "2026-11-10T09:44:05Z"
 		}
 	],
-	"through": "1473147+40dcf98"
+	"through": "370a11c+2ce7d68"
 }
