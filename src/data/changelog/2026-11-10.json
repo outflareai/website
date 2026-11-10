@@ -2,7 +2,7 @@
 	"version": "2026.11.10",
 	"date": "2026-11-10",
 	"status": "in-progress",
-	"updated": "2026-11-10T08:43:24Z",
+	"updated": "2026-11-10T09:01:11Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -17,7 +17,14 @@
 			"edition": "open-source",
 			"text": "Running a partner import again now brings over a partner's new email from Tolt. The new address replaces the old one when that was the only, unverified email on their record, and is added beside a verified one.",
 			"at": "2026-11-10T08:43:24Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Rules on redirect links: send the clicks that match a path's conditions (country, device, network, IP range, hour, first or returning visitor, custom fields) to its own pages, in order, with the link's other pages for everyone else.",
+			"at": "2026-11-10T09:01:11Z"
 		}
 	],
-	"through": "ca7c2fe+780a73c"
+	"through": "1473147+40dcf98"
 }
