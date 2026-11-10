@@ -2,7 +2,7 @@
 	"version": "2026.11.10",
 	"date": "2026-11-10",
 	"status": "in-progress",
-	"updated": "2026-11-10T10:41:30Z",
+	"updated": "2026-11-10T11:30:29Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -38,7 +38,14 @@
 			"edition": "open-source",
 			"text": "Conversions by click id: give each affiliate network a postback URL on your tracking domain, and every conversion it reports is recorded against the redirect click it came from, with its payout and status, even when no person is known. Duplicates, late postbacks and unknown callers are handled per source.",
 			"at": "2026-11-10T10:41:30Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Tracker conversions by pixel and upload: put a pixel or script on a thank-you page when a network can't send postbacks, or upload a network's report as CSV or through the API. Rows with only a transaction id update conversions already recorded, for approvals and reversals reported later.",
+			"at": "2026-11-10T11:30:29Z"
 		}
 	],
-	"through": "58fb978+c5f5f55"
+	"through": "9573b2b+e1b8373"
 }
