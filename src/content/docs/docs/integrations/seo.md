@@ -111,8 +111,18 @@ new brand's website, is read within the hour.
 
 The **SEO overview** page, first in the SEO module, answers that for each
 [brand](/docs/guides/brands/) from what is already stored, so it is free.
-Each brand gets four answers, the last four whole weeks against the four
-before, each marked Growing, Falling or Steady (within 3%):
+Pick the weeks at the top: the last 4 weeks, 12 weeks, 6 months, 12 months,
+2 years, or your own dates. The page sets them against as many weeks just
+before, and marks each number Growing, Falling or Steady (within 3%). The
+dates stay in the page's address, so a link you share shows the same weeks.
+
+Each number has its own row: its value for the weeks picked, the change
+against the weeks before, and a chart with values on the y-axis and each
+week's number when you hover. Branded search, search clicks and visitors are
+counted per week, with the weeks before drawn as a dashed line beside them,
+and the row names the week they rose and the week they fell most. The
+snapshot numbers chart every snapshot in the weeks picked, against the last
+snapshot before them.
 
 - **Branded search:** clicks on searches that name the brand: its name, its
   handle or its domains' names, such as "repocket" for repocket.com. It needs
@@ -132,8 +142,9 @@ used up.
 
 Below them are the brand's audited sites with their [health score](/docs/guides/site-audits/)
 and its open fixes. Websites no brand claims show as shared. Pick a brand in
-the brand switcher to see only that one. An answer reads "Not enough data"
-until its tool has synced eight weeks, or two snapshots four weeks apart.
+the brand switcher to see only that one. A number reads "Not enough data"
+until its tool has synced the weeks before the ones you picked, or has a
+snapshot from before them.
 
 ## Backlinks
 
@@ -151,6 +162,8 @@ curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/seo"
 
 # Is each brand growing in search: free
 curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/seo/overview?brand=repocket&weeks=12"
+# Your own weeks (Monday to Sunday, up to 104), with `period` against the weeks before
+curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/seo/overview?brand=repocket&from=2026-07-01&to=2026-09-30"
 
 # Stored snapshots: free, never calls the provider
 curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/seo/history?report=overview&host=example.com"
@@ -176,7 +189,8 @@ Reading needs `analytics.read`; settings and snapshots need
 ## MCP
 
 - `get_seo_overview`: each brand's search growth (branded search, visitors,
-  domain rating, links) with its trends, site health and open fixes. Free;
+  domain rating, links) with its trends, site health and open fixes, for
+  the last weeks or your own `from` and `to`. Free;
   start here when asked how SEO is going.
 - `list_seo`: connections, domains, budget left and snapshot status.
 - `get_seo_history`: stored snapshots, with each keyword's previous position.
