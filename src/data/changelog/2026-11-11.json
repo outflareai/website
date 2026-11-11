@@ -2,7 +2,7 @@
 	"version": "2026.11.11",
 	"date": "2026-11-11",
 	"status": "in-progress",
-	"updated": "2026-11-11T21:05:56Z",
+	"updated": "2026-11-11T21:45:19Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -283,7 +283,14 @@
 			"edition": "open-source",
 			"text": "New product event names no longer wait for approval: events are usable straight away in segments, lists, journeys and reports. Outflare checks each new name, with your own AI model when one is connected, and asks only when one looks like a typo of a name you already send, such as sign_up for signed_up.",
 			"at": "2026-11-11T19:53:26Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Presence now scans a brand's top 10 competitors every 30 days by default, and the rest every 90 days. Brands still on the previous monthly default for the rest move to 90 days; a cadence you set yourself is left as it is. Change either on the Presence competitors page.",
+			"at": "2026-11-11T21:45:19Z"
 		}
 	],
-	"through": "12b265f+b1381cb"
+	"through": "3dbcc6c+c2a23ef"
 }
