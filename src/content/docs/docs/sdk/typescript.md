@@ -26,6 +26,7 @@ const gtm = createClient({
 });
 
 const ws = process.env.OUTFLARE_WORKSPACE!;
+const brand = process.env.OUTFLARE_BRAND!; // the brand's id, from GET /v1/workspaces/{ws}/brands
 
 // List active mailboxes
 const { data, error } = await gtm.GET('/v1/workspaces/{ws}/mailboxes', {
@@ -58,7 +59,7 @@ const stats = ok(await gtm.GET('/v1/workspaces/{ws}/stats', { params: { path: { 
 console.log(`${stats.sent_24h} sent today of ${stats.mailboxes.daily_capacity}, ${stats.unread_replies} unread replies`);
 
 try {
-	ok(await gtm.DELETE('/v1/workspaces/{ws}/oauth-connections/{id}', { params: { path: { ws, id } } }));
+	ok(await gtm.DELETE('/v1/workspaces/{ws}/integrations/{id}', { params: { path: { ws, id } } }));
 } catch (e) {
 	if (e instanceof OutflareError && e.code === 'conflict') console.log(e.message); // mailboxes still use it
 	else throw e;
@@ -96,7 +97,7 @@ ok(await gtm.POST("/v1/workspaces/{ws}/spend", { params: { path: { ws }, header:
 import { paginate } from '@outflare/sdk';
 
 for await (const lead of paginate((cursor) =>
-	gtm.GET('/v1/workspaces/{ws}/leads', { params: { path: { ws }, query: { q: 'acme', cursor, fields: ['email'] } } }),
+	gtm.GET('/v1/brands/{brand}/leads', { params: { path: { brand }, query: { q: 'acme', cursor, fields: ['email'] } } }),
 )) {
 	console.log(lead.email);
 }
@@ -112,7 +113,7 @@ Inside a [mission](/docs/agents/missions/), a write may be answered `202` with a
 import { createClient, isHeld, ok } from "@outflare/sdk";
 
 const gtm = createClient({ baseUrl, token, mission: missionId });
-const lead = ok(await gtm.POST("/v1/workspaces/{ws}/leads", { params: { path: { ws } }, body: { email } }));
+const lead = ok(await gtm.POST("/v1/brands/{brand}/leads", { params: { path: { brand } }, body: { email } }));
 if (isHeld(lead)) console.log(lead.message, lead.mission_action.id);
 else console.log("created", lead.id);
 ```

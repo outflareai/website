@@ -20,7 +20,7 @@ Every law and framework is on by default, and you can turn each one off per site
 
 Open **Analytics → Website tracking**, press **Consent banner** next to your site, tick **Show the banner** and save. Your site only needs the script you already have. Visitors see the banner on their next page, or within five minutes if they already have the site open.
 
-The same settings are in the API (`PUT /v1/workspaces/{ws}/site-keys/{id}/consent-banner`) and MCP (`update_consent_banner`):
+The same settings are in the API (`PUT /v1/brands/{brand}/site-keys/{id}/consent-banner`) and MCP (`update_consent_banner`):
 
 ```json
 { "enabled": true, "policy_url": "/cookies" }
@@ -97,7 +97,7 @@ Each choice that changes something is saved as consents on the visitor, one per 
 - Global Privacy Control
 - the language and the page
 
-Before the visitor is known, these are kept on their anonymous id. When your product sends `identify` with that id, they join the person's record along with their earlier visits. Read them with `GET /v1/workspaces/{ws}/records/{record}/consents`.
+Before the visitor is known, these are kept on their anonymous id. When your product sends `identify` with that id, they join the person's record along with their earlier visits. Read them with `GET /v1/brands/{brand}/records/{record}/consents`.
 
 ## Asking again
 

@@ -106,7 +106,7 @@ Two different user ids are never merged, and an email someone only typed in neve
 
 Traits that match a field in the catalog fill in the record: `firstName` is first name, `title` is job title. The rest stay on the event, and the response lists them so you can add the fields you want. A `group` call finds or makes the company by its id and adds it to the person's companies.
 
-The older `POST /v1/workspaces/{ws}/customer-events` (MCP `track_customer_events`) still works for now, and answers each event's result while you wait.
+The older `POST /v1/brands/{brand}/customer-events` (MCP `track_customer_events`) still works for now, and answers each event's result while you wait.
 
 ## Duplicates
 

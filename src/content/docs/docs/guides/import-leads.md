@@ -12,7 +12,7 @@ sidebar:
 In the web app open **Leads**, choose the file, optionally name a list to add everyone to, and select **Import**. Or use the API (scope `leads.manage`):
 
 ```sh
-curl -X POST "https://outflare.example.com/v1/workspaces/$WS/leads/import?list=Q4%20founders" \
+curl -X POST "https://outflare.example.com/v1/brands/$BRAND/leads/import?list=Q4%20founders" \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" \
   -H "Content-Type: text/csv" \
   --data-binary @leads.csv
@@ -50,7 +50,7 @@ Leads are unique by email within a workspace, ignoring case.
 
 ### Add or update one lead
 
-`POST /v1/workspaces/{ws}/leads` with JSON upserts one lead by email, with the same rules. Optional `list_id` adds it to a list.
+`POST /v1/brands/{brand}/leads` with JSON upserts one lead by email, with the same rules. Optional `list_id` adds it to a list.
 
 ```json
 { "email": "ana@acme.example", "first_name": "Ana", "company": "Acme", "custom": { "icp_tier": "A" } }
@@ -62,7 +62,7 @@ Lists group leads for a sequence, for example one per campaign or segment. A lea
 
 ## Search
 
-`GET /v1/workspaces/{ws}/leads` lists leads ordered by email, 100 per page (up to 500 with `limit`). Filter with `q` (email, name or company), `list_id` and `suppressed=true|false`. The response includes `total` and `next_cursor`; pass it back as `cursor` for the next page.
+`GET /v1/brands/{brand}/leads` lists leads ordered by email, 100 per page (up to 500 with `limit`). Filter with `q` (email, name or company), `list_id` and `suppressed=true|false`. The response includes `total` and `next_cursor`; pass it back as `cursor` for the next page.
 
 ## The suppression list
 

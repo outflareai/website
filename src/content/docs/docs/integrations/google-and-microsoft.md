@@ -42,7 +42,7 @@ An admin connection gives Outflare access to every mailbox in an organisation, s
 In the web app, click Add mailboxes on the connection and paste one address per line, optionally followed by a comma and a display name. Or use the API, up to 5000 at a time:
 
 ```sh
-curl -X POST "$OUTFLARE_URL/v1/workspaces/$WS/oauth-connections/$CONN/mailboxes" \
+curl -X POST "$OUTFLARE_URL/v1/workspaces/$WS/integrations/$CONN/mailboxes" \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" \
   -d '{"mailboxes":[{"email":"ana@acme.example","display_name":"Ana Smith"},{"email":"bo@acme.example"}],"pool":"Warm"}'
 ```

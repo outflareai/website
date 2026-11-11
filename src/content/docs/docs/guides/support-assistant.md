@@ -75,8 +75,8 @@ What it finds goes to **Knowledge → Review** with where it came from and the e
 
 Support settings show the last 30 days against the 30 before: how often it answered or handed off and why, how many drafts went out as written, and what chat visitors said. Over the API:
 
-- `GET /v1/workspaces/{ws}/support/assistant/stats`: its answers, questions, hand-offs and their reasons.
-- `GET /v1/workspaces/{ws}/support/conversations/{id}/assistant`: what it decided on a conversation.
-- `POST /v1/workspaces/{ws}/support/assistant/test`: try a question.
+- `GET /v1/brands/{brand}/support/assistant/stats`: its answers, questions, hand-offs and their reasons.
+- `GET /v1/brands/{brand}/support/conversations/{id}/assistant`: what it decided on a conversation.
+- `POST /v1/brands/{brand}/support/assistant/test`: try a question.
 
 Agents can do the same through the [MCP server](/docs/agents/mcp/): `draft_support_reply`, `try_support_assistant`, `get_support_assistant`, `stop_support_assistant_reply`, the hand-off topic tools (`list_handoff_topics` and the rest), `import_website_to_knowledge` and `learn_knowledge_from_replies`.

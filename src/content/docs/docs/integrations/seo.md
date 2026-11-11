@@ -158,12 +158,12 @@ Each weekly snapshot also suggests the domains competing with each audited site 
 
 ```sh
 # SEO connections, their domains, budget and snapshot status
-curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/seo"
+curl -H "Authorization: Bearer $TOKEN" "$URL/v1/brands/$BRAND/seo"
 
 # Is each brand growing in search: free
-curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/seo/overview?brand=repocket&weeks=12"
+curl -H "Authorization: Bearer $TOKEN" "$URL/v1/brands/$BRAND/seo/overview?weeks=12"
 # Your own weeks (Monday to Sunday, up to 104), with `period` against the weeks before
-curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/seo/overview?brand=repocket&from=2026-07-01&to=2026-09-30"
+curl -H "Authorization: Bearer $TOKEN" "$URL/v1/brands/$BRAND/seo/overview?from=2026-07-01&to=2026-09-30"
 
 # Stored snapshots: free, never calls the provider
 curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/seo/history?report=overview&host=example.com"

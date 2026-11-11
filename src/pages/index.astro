@@ -64,8 +64,8 @@ const gtm = createClient({
 });
 
 // What moved on each website?
-const { data } = await gtm.GET('/v1/workspaces/{ws}/analytics/changes', {
-  params: { path: { ws } },
+const { data } = await gtm.GET('/v1/brands/{brand}/analytics/changes', {
+  params: { path: { brand: process.env.OUTFLARE_BRAND } },
 });
 
 for (const w of data.websites) console.log(w.host, w.headline.join(' '));`,

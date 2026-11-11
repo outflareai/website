@@ -113,20 +113,20 @@ Only tracked competitors are followed; dismiss or remove one and its reads stop.
 
 ```sh
 # Competitors of one site, tracked first: free, reads what is stored
-curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/seo-competitors?site_id=$SITE"
+curl -H "Authorization: Bearer $TOKEN" "$URL/v1/brands/$BRAND/seo-competitors?site_id=$SITE"
 
 # Track one
 curl -X POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
-  -d '{"site_id": "'$SITE'", "host": "rival.example"}' "$URL/v1/workspaces/$WS/seo-competitors"
+  -d '{"site_id": "'$SITE'", "host": "rival.example"}' "$URL/v1/brands/$BRAND/seo-competitors"
 
 # What changed in the last 30 days
-curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/seo-competitors/events?days=30"
+curl -H "Authorization: Bearer $TOKEN" "$URL/v1/brands/$BRAND/seo-competitors/events?days=30"
 
 # Domains that link to competitors but not to you
-curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/seo-competitors/gaps?site_id=$SITE&kind=links"
+curl -H "Authorization: Bearer $TOKEN" "$URL/v1/brands/$BRAND/seo-competitors/gaps?site_id=$SITE&kind=links"
 
 # The pages on one linking site that link to each competitor (POST reads them, with "estimate_only": true for the cost)
-curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/seo-competitors/gaps/links?site_id=$SITE&domain=reviews.example"
+curl -H "Authorization: Bearer $TOKEN" "$URL/v1/brands/$BRAND/seo-competitors/gaps/links?site_id=$SITE&domain=reviews.example"
 
 # Who is dominating: scores, ranks, standings and time to catch up
 curl -H "Authorization: Bearer $TOKEN" "$URL/v1/brands/$BRAND/competition"

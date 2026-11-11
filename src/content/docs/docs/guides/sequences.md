@@ -14,7 +14,7 @@ A sequence is a list of email steps sent to the leads you add to it, from the ma
 In the web app, open **Sequences**, name the sequence and write its steps. Or with the API:
 
 ```sh
-curl -X POST https://outflare.example.com/v1/workspaces/$WS/sequences \
+curl -X POST https://outflare.example.com/v1/brands/$BRAND/sequences \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" -d '{
     "name": "Founders Q4",
     "timezone": "Australia/Sydney",
@@ -32,7 +32,7 @@ curl -X POST https://outflare.example.com/v1/workspaces/$WS/sequences \
   }'
 ```
 
-A new sequence is a `draft` and sends nothing, and has no mailboxes yet. Outflare allocates mailboxes when you start it, enough for `daily_new_limit` new leads a day times its steps, or for `target_daily` sends a day if you set that instead. `team_id`, `priority` and the other allocation settings are explained in [Mailbox allocation](/docs/guides/mailbox-allocation/). Defaults are UTC, Monday to Friday, 09:00 to 17:00 and no cap on new leads per day. To cap everything a sequence sends, follow-ups included, set `daily_send_limit` (1 to 1,000,000, or null for no cap): it counts every step in any 24 hours, on top of each mailbox's and domain's own limits. Replace the steps later with `PUT /v1/workspaces/{ws}/sequences/{id}/steps`.
+A new sequence is a `draft` and sends nothing, and has no mailboxes yet. Outflare allocates mailboxes when you start it, enough for `daily_new_limit` new leads a day times its steps, or for `target_daily` sends a day if you set that instead. `team_id`, `priority` and the other allocation settings are explained in [Mailbox allocation](/docs/guides/mailbox-allocation/). Defaults are UTC, Monday to Friday, 09:00 to 17:00 and no cap on new leads per day. To cap everything a sequence sends, follow-ups included, set `daily_send_limit` (1 to 1,000,000, or null for no cap): it counts every step in any 24 hours, on top of each mailbox's and domain's own limits. Replace the steps later with `PUT /v1/brands/{brand}/sequences/{id}/steps`.
 
 ## Steps and templates
 
@@ -53,7 +53,7 @@ Variables are written `{{name}}` and are not case sensitive. Add a fallback afte
 If a lead is missing a variable that has no fallback, that lead is **not emailed**: the enrollment ends as `blocked` with the reason `missing_variable: first_name`. Check before you start with the preview, which renders every step for one lead and lists what is missing:
 
 ```sh
-curl -X POST https://outflare.example.com/v1/workspaces/$WS/sequences/$SEQ/preview \
+curl -X POST https://outflare.example.com/v1/brands/$BRAND/sequences/$SEQ/preview \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" -d '{"lead_id": "'$LEAD'"}'
 ```
 
@@ -62,10 +62,10 @@ curl -X POST https://outflare.example.com/v1/workspaces/$WS/sequences/$SEQ/previ
 Add a lead list (or up to 10,000 lead ids), then activate:
 
 ```sh
-curl -X POST https://outflare.example.com/v1/workspaces/$WS/sequences/$SEQ/enrollments \
+curl -X POST https://outflare.example.com/v1/brands/$BRAND/sequences/$SEQ/enrollments \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" -d '{"list_id": "'$LIST'"}'
 
-curl -X PATCH https://outflare.example.com/v1/workspaces/$WS/sequences/$SEQ \
+curl -X PATCH https://outflare.example.com/v1/brands/$BRAND/sequences/$SEQ \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" -d '{"status": "active"}'
 ```
 
@@ -122,7 +122,7 @@ When the receiving server rejects an address outright (a 5xx answer to `RCPT TO`
 Every attempt is recorded: sent, failed (with the SMTP error) and blocked (with the policy reason).
 
 ```sh
-curl "https://outflare.example.com/v1/workspaces/$WS/messages?sequence_id=$SEQ&status=blocked" \
+curl "https://outflare.example.com/v1/brands/$BRAND/messages?sequence_id=$SEQ&status=blocked" \
   -H "Authorization: Bearer $OUTFLARE_TOKEN"
 ```
 

@@ -57,7 +57,7 @@ The reply's score on Reddit and whether a moderator removed it are refreshed wit
 
 ## For agents
 
-The API is under `/v1/workspaces/{ws}/social`, with scopes `social.read` and `social.manage`. Approving needs `social.post` and a signed-in person. The MCP tools are:
+The API is under `/v1/brands/{brand}/social`, with scopes `social.read` and `social.manage`. Approving needs `social.post` and a signed-in person. The MCP tools are:
 
 - `get_social_overview`
 - `create_social_watch`, `list_social_posts`

@@ -56,22 +56,22 @@ curl -s https://app.outflare.ai/v1/workspaces/$WS/integrations/$INTEGRATION/depl
   -H "Authorization: Bearer $OUTFLARE_TOKEN"
 
 # Watch one. Without site_id, the matching site is picked.
-curl -s -X POST https://app.outflare.ai/v1/workspaces/$WS/deploy-targets \
+curl -s -X POST https://app.outflare.ai/v1/brands/$BRAND/deploy-targets \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" \
   -d '{"integration_id": "'$INTEGRATION'", "target": "acme/website"}'
 
 # When each website went live, newest first.
-curl -s "https://app.outflare.ai/v1/workspaces/$WS/deploys?site_id=$SITE" \
+curl -s "https://app.outflare.ai/v1/brands/$BRAND/deploys?site_id=$SITE" \
   -H "Authorization: Bearer $OUTFLARE_TOKEN"
 ```
 
 | Endpoint | Scope |
 | --- | --- |
 | `GET /v1/workspaces/{ws}/integrations/{id}/deploy-options` | `integrations.read` |
-| `GET`, `POST /v1/workspaces/{ws}/deploy-targets` | `integrations.read`, `integrations.manage` |
-| `GET`, `PATCH`, `DELETE /v1/workspaces/{ws}/deploy-targets/{id}` | `integrations.read`, `integrations.manage` |
-| `POST /v1/workspaces/{ws}/deploy-targets/{id}/check` | `integrations.manage` |
-| `GET /v1/workspaces/{ws}/deploys` | `integrations.read` |
+| `GET`, `POST /v1/brands/{brand}/deploy-targets` | `integrations.read`, `integrations.manage` |
+| `GET`, `PATCH`, `DELETE /v1/brands/{brand}/deploy-targets/{id}` | `integrations.read`, `integrations.manage` |
+| `POST /v1/brands/{brand}/deploy-targets/{id}/check` | `integrations.manage` |
+| `GET /v1/brands/{brand}/deploys` | `integrations.read` |
 
 Watched repositories and their deploys take the brand of the site they
 serve, so someone limited to one brand sees only that brand's deploys.

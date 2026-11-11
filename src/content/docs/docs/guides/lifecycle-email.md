@@ -24,7 +24,7 @@ Once you are sending, the page shows the last 30 days: emails sent, how many wer
 Write the email once as a [template](/docs/guides/email-templates/), then send it by its handle:
 
 ```sh
-curl -X POST "https://app.outflare.ai/v1/workspaces/$WS/emails" \
+curl -X POST "https://app.outflare.ai/v1/brands/$BRAND/emails" \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" \
   -H "Idempotency-Key: $(uuidgen)" \
   -d '{"to": "ana@customer.example", "from": "Acme <billing@acme.example>",
@@ -51,7 +51,7 @@ Each topic is one of two kinds:
 
 The unsubscribe link in a lifecycle email opens a preference page with your workspace's name on it. One button leaves the email's topic, a box per topic lets people choose what they get, and one more turns off all marketing email. A mail app's own unsubscribe button leaves just the email's topic. An email with no topic works as before: unsubscribing stops all lifecycle email to that address. Receipts and password resets still go either way.
 
-What people choose is saved on their [customer record](/docs/guides/customer-records/) as a consent, so the CRM and the API see the same answer. Your app can record consent itself, for example from your own settings page, with `POST /v1/workspaces/{ws}/records/{record}/consents` (channel `email`, the topic's key, purpose `marketing`). When someone is skipped, the email shows `suppressed` and why, such as "unsubscribed from Product updates".
+What people choose is saved on their [customer record](/docs/guides/customer-records/) as a consent, so the CRM and the API see the same answer. Your app can record consent itself, for example from your own settings page, with `POST /v1/brands/{brand}/records/{record}/consents` (channel `email`, the topic's key, purpose `marketing`). When someone is skipped, the email shows `suppressed` and why, such as "unsubscribed from Product updates".
 
 A topic's key never changes, because consents point at it. Archive a topic to stop new sends naming it.
 
@@ -74,7 +74,7 @@ A broadcast sends one published template to many people at once, such as a newsl
 - **Hold some people back.** Under **More options** in step 4, hold back 5, 10, 20 or 50% of the audience to measure what the email adds. That share, picked at random among the people who could get it, gets nothing. Once it has gone, the broadcast shows **Against the people held out**: who converted in the 30 days after, what they paid, how much better the people who got it did, and whether the difference is real or too early to tell.
 - **Results.** Delivered, opened, clicked, unsubscribed and bounced, as counts and rates. **See its emails** opens Sent emails filtered to it. Cancel stops a scheduled or sending broadcast; emails that haven't gone yet are cancelled.
 
-Your app or agent can do the same with `POST /v1/workspaces/{ws}/email-broadcasts` and `POST .../email-broadcasts/{id}/send`, or the MCP tools `create_email_broadcast` and `send_email_broadcast`.
+Your app or agent can do the same with `POST /v1/brands/{brand}/email-broadcasts` and `POST .../email-broadcasts/{id}/send`, or the MCP tools `create_email_broadcast` and `send_email_broadcast`.
 
 ## Sent emails
 

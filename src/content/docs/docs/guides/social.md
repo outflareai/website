@@ -97,7 +97,7 @@ X is read once a day and LinkedIn twice a day. **Read now** reads every connecti
 
 | What | API | MCP tool |
 | --- | --- | --- |
-| Growth per channel and followers by day | `GET /v1/workspaces/{ws}/social/growth` | `get_social_growth` |
+| Growth per channel and followers by day | `GET /v1/brands/{brand}/social/growth` | `get_social_growth` |
 | Accounts, with followers and their change today, over 7 and 28 days | `GET .../social/accounts` | `list_social_accounts` |
 | Set an account's brand or pause it | `PATCH .../social/accounts/{id}` | `update_social_account` |
 | An account's counts day by day | `GET .../social/accounts/{id}/days` | `get_social_account_days` |

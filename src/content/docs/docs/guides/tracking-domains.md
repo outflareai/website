@@ -30,9 +30,9 @@ A tracking domain serves only those links (click, open and unsubscribe). The res
 DNS changes can take up to an hour to show. If a verified domain later stops pointing at your instance, it's marked **Not pointing here** and emails go back to `PUBLIC_URL` until you fix it.
 
 ```sh
-curl -X POST https://outflare.example.com/v1/workspaces/$WS/tracking-domains \
+curl -X POST https://outflare.example.com/v1/brands/$BRAND/tracking-domains \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" -d '{"domain": "links.acme.example"}'
-curl -X POST https://outflare.example.com/v1/workspaces/$WS/tracking-domains/$ID/check -H "Authorization: Bearer $OUTFLARE_TOKEN"
+curl -X POST https://outflare.example.com/v1/brands/$BRAND/tracking-domains/$ID/check -H "Authorization: Bearer $OUTFLARE_TOKEN"
 ```
 
 These need scope `mailboxes.manage`, and listing needs `mailboxes.read`. Agents use `list_tracking_domains`, `add_tracking_domain` and `check_tracking_domain`.

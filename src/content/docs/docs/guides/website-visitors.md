@@ -97,10 +97,10 @@ Add your own company's domains under **Leave out these domains** so your team do
 
 ## API and MCP
 
-- `GET /v1/workspaces/{ws}/visitors` (scope `customers.read`): `view` (`companies` or `people`), `days`, `hot`, `limit` and `brand`.
-- `GET` and `PUT /v1/workspaces/{ws}/visitors/settings` (`customers.read`, `customers.manage`). Company lookups are `reveal_companies`, `reveal_daily_limit` and `not_companies`.
+- `GET /v1/brands/{brand}/visitors` (scope `customers.read`): `view` (`companies` or `people`), `days`, `hot`, `limit` and `brand`.
+- `GET` and `PUT /v1/brands/{brand}/visitors/settings` (`customers.read`, `customers.manage`). Company lookups are `reveal_companies`, `reveal_daily_limit` and `not_companies`.
 - `POST /v1/workspaces/{ws}/visitors/companies` (`customers.manage`): add a looked-up company to your CRM.
-- `POST /v1/workspaces/{ws}/records/{record}/review` (`customers.manage`): approve or reject a person held for review. `GET .../records` lists held people only with `review=needs_review`.
+- `POST /v1/brands/{brand}/records/{record}/review` (`customers.manage`): approve or reject a person held for review. `GET .../records` lists held people only with `review=needs_review`.
 - People by name settings are `reveal_people` and `accept_people_notice`. Each connection's webhook address is in `people_connections`.
 - `GET /v1/brands/{brand}/visitors/browsers` (`customers.read`): everyone, with `known` set to `true` or `false` to keep known or anonymous visitors, `days`, `limit` and `cursor`.
 - `GET /v1/brands/{brand}/visitors/browsers/{anonymous_id}` (`customers.read`): one visitor and their visits; `.../events` lists their pages and events, with `session` for one visit's.

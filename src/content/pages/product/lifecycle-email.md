@@ -25,7 +25,7 @@ faqs:
   - q: "What is the difference between transactional and lifecycle email in Outflare?"
     a: "Transactional email (receipts, password resets, sign-in codes) reaches people even after they unsubscribe from updates, because they need it. Lifecycle email (onboarding, tips, newsletters) carries a one-click unsubscribe link and skips anyone who left its topic."
   - q: "How do I send an email from my app?"
-    a: "Publish a template, then POST to /v1/workspaces/{ws}/emails with the recipient, the from address, the template's handle and its data, using an API token with the emails.send scope. Send an Idempotency-Key and a retry never sends twice."
+    a: "Publish a template, then POST to /v1/brands/{brand}/emails with the recipient, the from address, the template's handle and its data, using an API token with the emails.send scope. Send an Idempotency-Key and a retry never sends twice."
   - q: "Can I send a newsletter or launch announcement?"
     a: "Yes, as a broadcast. Pick a published template and its topic, and it goes to everyone on your customer records who may get that topic, each with their own copy. You can hold back 5 to 50% at random to see what the email added."
   - q: "Can I use it for cold email?"
@@ -63,7 +63,7 @@ A template is an email you send many times by its handle, such as `password-rese
 - **Preview** as desktop, phone or plain text while you type, and **Send a test**.
 
 ```sh
-curl -X POST "https://app.outflare.ai/v1/workspaces/$WS/emails" \
+curl -X POST "https://app.outflare.ai/v1/brands/$BRAND/emails" \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" \
   -H "Idempotency-Key: $(uuidgen)" \
   -d '{"to": "ana@customer.example", "from": "Acme <billing@acme.example>",

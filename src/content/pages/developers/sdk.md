@@ -49,7 +49,7 @@ The [API](/developers/api/) is described by one OpenAPI 3.1 file, `api/openapi.y
 | Package | `@outflare/sdk` | `outflare` |
 | Runs on | Node, Deno, Bun, browsers, Cloudflare Workers | Python 3.9 or newer |
 | Built on | `openapi-fetch` | `httpx` |
-| Call style | Typed paths: `client.GET('/v1/workspaces/{ws}/leads', …)` | One method per operation: `client.list_leads(...)` |
+| Call style | Typed paths: `client.GET('/v1/brands/{brand}/leads', …)` | One method per operation: `client.list_leads(...)` |
 | Errors | `{ data, error }`, or `ok()` to throw `OutflareError` | Raises `OutflareError` |
 | Paging | `paginate()` | `client.paginate(...)` |
 | Webhooks | `verifyWebhook()` | `verify_webhook()` |
@@ -78,11 +78,12 @@ import { createClient, ok, paginate } from '@outflare/sdk';
 
 const of = createClient({ baseUrl: 'https://app.outflare.ai', token: process.env.OUTFLARE_TOKEN });
 const ws = process.env.OUTFLARE_WORKSPACE!;
+const brand = process.env.OUTFLARE_BRAND!; // the brand's id
 
 const stats = ok(await of.GET('/v1/workspaces/{ws}/stats', { params: { path: { ws } } }));
 
 for await (const lead of paginate((cursor) =>
-	of.GET('/v1/workspaces/{ws}/leads', { params: { path: { ws }, query: { q: 'acme', cursor, fields: ['email'] } } }),
+	of.GET('/v1/brands/{brand}/leads', { params: { path: { brand }, query: { q: 'acme', cursor, fields: ['email'] } } }),
 )) {
 	console.log(lead.email);
 }

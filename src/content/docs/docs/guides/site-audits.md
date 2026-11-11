@@ -172,28 +172,28 @@ The report only reads what crawls and syncs already stored, so it costs nothing.
 ```sh
 curl -X POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
   -d '{"url": "https://www.example.com", "schedule": "weekly"}' \
-  https://app.outflare.ai/v1/workspaces/$WS/seo-sites
-curl -X POST -H "Authorization: Bearer $TOKEN" https://app.outflare.ai/v1/workspaces/$WS/seo-sites/$SITE/verify
-curl -X POST -H "Authorization: Bearer $TOKEN" https://app.outflare.ai/v1/workspaces/$WS/seo-sites/$SITE/crawls
-curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/workspaces/$WS/crawls/$CRAWL/pages?status=blocked"
-curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/workspaces/$WS/crawls/$CRAWL/pages?http_status=404"
-curl -H "Authorization: Bearer $TOKEN" https://app.outflare.ai/v1/workspaces/$WS/crawls/$CRAWL/pages/$PAGE
-curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/workspaces/$WS/crawls/$CRAWL/issues?severity=error"
-curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/workspaces/$WS/crawls/$CRAWL/issues/link_broken?template=/blog/*"
-curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/workspaces/$WS/fixes?subject_id=$SITE&status=open"
+  https://app.outflare.ai/v1/brands/$BRAND/seo-sites
+curl -X POST -H "Authorization: Bearer $TOKEN" https://app.outflare.ai/v1/brands/$BRAND/seo-sites/$SITE/verify
+curl -X POST -H "Authorization: Bearer $TOKEN" https://app.outflare.ai/v1/brands/$BRAND/seo-sites/$SITE/crawls
+curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/brands/$BRAND/crawls/$CRAWL/pages?status=blocked"
+curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/brands/$BRAND/crawls/$CRAWL/pages?http_status=404"
+curl -H "Authorization: Bearer $TOKEN" https://app.outflare.ai/v1/brands/$BRAND/crawls/$CRAWL/pages/$PAGE
+curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/brands/$BRAND/crawls/$CRAWL/issues?severity=error"
+curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/brands/$BRAND/crawls/$CRAWL/issues/link_broken?template=/blog/*"
+curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/brands/$BRAND/fixes?subject_id=$SITE&status=open"
 curl -X PATCH -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
-  -d '{"status": "in_progress", "assignee_id": "me"}' https://app.outflare.ai/v1/workspaces/$WS/fixes/$FIX
-curl -H "Authorization: Bearer $TOKEN" https://app.outflare.ai/v1/workspaces/$WS/fixes/$FIX/prompt
+  -d '{"status": "in_progress", "assignee_id": "me"}' https://app.outflare.ai/v1/brands/$BRAND/fixes/$FIX
+curl -H "Authorization: Bearer $TOKEN" https://app.outflare.ai/v1/brands/$BRAND/fixes/$FIX/prompt
 curl -X POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
-  -d '{"note": "Fixed the blog template"}' https://app.outflare.ai/v1/workspaces/$WS/fixes/$FIX/verify
-curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/workspaces/$WS/fix-tickets?subject_id=$SITE"
+  -d '{"note": "Fixed the blog template"}' https://app.outflare.ai/v1/brands/$BRAND/fixes/$FIX/verify
+curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/brands/$BRAND/fix-tickets?subject_id=$SITE"
 curl -X POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
-  -d '{"feedback": "Keep titles under 55 characters"}' https://app.outflare.ai/v1/workspaces/$WS/fix-tickets/$TICKET/write
+  -d '{"feedback": "Keep titles under 55 characters"}' https://app.outflare.ai/v1/brands/$BRAND/fix-tickets/$TICKET/write
 curl -X POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
   -d '{"decision": "reject", "note": "Legal pages are written by our lawyers", "guideline": "site"}' \
-  https://app.outflare.ai/v1/workspaces/$WS/fix-tickets/$TICKET/review
-curl -H "Authorization: Bearer $TOKEN" https://app.outflare.ai/v1/workspaces/$WS/seo-sites/$SITE/indexability
-curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/workspaces/$WS/seo-sites/$SITE/indexability/pages?issue=indexable_not_indexed"
+  https://app.outflare.ai/v1/brands/$BRAND/fix-tickets/$TICKET/review
+curl -H "Authorization: Bearer $TOKEN" https://app.outflare.ai/v1/brands/$BRAND/seo-sites/$SITE/indexability
+curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/brands/$BRAND/seo-sites/$SITE/indexability/pages?issue=indexable_not_indexed"
 ```
 
 Reading needs the `seo.read` scope; adding sites, changing their settings, checking ownership, crawling, and writing and reviewing tickets need `seo.manage`. Agents use the MCP tools `add_seo_site`, `update_seo_site`, `verify_seo_site`, `start_crawl`, `get_crawl`, `list_crawl_pages`, `get_crawl_page`, `list_crawl_issues`, `get_crawl_issue`, `list_fixes`, `update_fix`, `get_fix_prompt`, `verify_fix`, `list_fix_tickets`, `get_fix_ticket`, `get_fix_ticket_prompt`, `write_fix_ticket`, `review_fix_ticket`, `list_fix_guidelines`, `create_fix_guideline`, `delete_fix_guideline`, `get_site_indexability` and `list_indexability_pages` (see [MCP](/docs/agents/mcp/)).
