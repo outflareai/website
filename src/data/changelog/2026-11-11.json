@@ -2,7 +2,7 @@
 	"version": "2026.11.11",
 	"date": "2026-11-11",
 	"status": "in-progress",
-	"updated": "2026-11-11T18:53:04Z",
+	"updated": "2026-11-11T18:58:27Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -269,7 +269,14 @@
 			"edition": "open-source",
 			"text": "Importing leads into a list is simpler: **Import leads** on a list's page uploads a CSV straight into that list, and the import on Leads picks a list from a menu (or makes a new one) instead of typing its name.",
 			"at": "2026-11-11T18:53:04Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "A brand's logo and main colour now fill in from its own website: when you add a brand or change its website, and when Company → Logo and colours has no logo yet. Outflare uses the logo the site names, else its icon, and never replaces one you set. The Logo field no longer shows an example address.",
+			"at": "2026-11-11T18:58:27Z"
 		}
 	],
-	"through": "c467c0b+4d2920f"
+	"through": "b0d53e1+3d1348a"
 }
