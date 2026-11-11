@@ -69,7 +69,7 @@ Conversions Outflare sends back to ad platforms use the same choice: marketing d
 ## How it looks
 
 - **Layout:** a bar across the top or bottom, a box in a corner, or a modal in the middle of the page.
-- **Look:** light, dark, or your brand's. The brand look uses the logo and colours under **Company → About your company → Logo and colours**, or a brand's own logo and colours when the script belongs to a brand that has them.
+- **Look:** light, dark, or your brand's. The brand look uses the logo and colours under **Company → About your company → Logo and colours**, or a brand's own logo and colours when the script belongs to a brand that has them. A brand's logo and main colour start out filled in from its website ([Brands](/docs/guides/brands/)).
 - **Changing their mind:** after a choice, a small button in the corner reopens the banner. Any element with `data-outflare-consent-open`, such as a "Cookie settings" link in your footer, does the same.
 - **Words:** Outflare's own come in English, German, French, Spanish, Italian, Dutch and Portuguese, in the visitor's language. Change any of them, in any language, in the settings or the API (`texts`).
 - **Your own design:** add CSS on top of a preset, or replace the banner's HTML entirely. Buttons with `data-of-consent="accept"`, `"reject"`, `"customize"` or `"save"`, and checkboxes with `data-of-category="analytics"`, work as they do in the presets. Any element can also call `outflare.consent(...)`. Your own CSS and HTML run on your website, so only owners and admins can change them.

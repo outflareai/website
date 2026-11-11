@@ -9,7 +9,9 @@ sidebar:
 
 ## Import a CSV
 
-In the web app open **Leads**, choose the file, optionally name a list to add everyone to, and select **Import**. Or use the API (scope `leads.manage`):
+In the web app, open the list under **CRM → Lists** and select **Import leads**: choose the file and everyone in it goes into that list. Or open **Leads**, select **Import leads**, choose the file, pick a list under **Add them to a list** (one of your lists, **New list…**, or **No list**), and select **Import leads**. Lists built from a search fill themselves, so they aren't offered.
+
+Or use the API (scope `leads.manage`):
 
 ```sh
 curl -X POST "https://outflare.example.com/v1/brands/$BRAND/leads/import?list=Q4%20founders" \
