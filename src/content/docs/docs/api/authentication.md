@@ -20,6 +20,8 @@ curl -X POST localhost:8080/v1/workspaces/$WS/api-tokens \
 { "api_token": { "id": "…", "name": "lead-research-agent", "prefix": "oft_AbC", "scopes": ["mailboxes.read"] }, "token": "oft_…" }
 ```
 
+**From any page.** Open **API** in the top right of the web app to see the call behind the page you're on, with your brand, workspace and item ids already filled in. **Create a token for this** makes a read-only token for just that call's scope and brand, valid for 30 days, and puts it straight into the example so you can copy and paste it. It is shown once, there and nowhere else, and is listed with your other tokens to revoke any time. Existing tokens are never shown again; the example uses `$OUTFLARE_TOKEN` until you make one.
+
 The `token` secret is returned once. Store it in your secret manager. Send it on every request:
 
 ```http
