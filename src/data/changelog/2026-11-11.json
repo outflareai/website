@@ -2,7 +2,7 @@
 	"version": "2026.11.11",
 	"date": "2026-11-11",
 	"status": "in-progress",
-	"updated": "2026-11-11T17:34:50Z",
+	"updated": "2026-11-11T18:14:52Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -234,7 +234,14 @@
 			"edition": "open-source",
 			"text": "Desktop app: the account menu at the bottom of the sidebar now shows which version of the Outflare app you have, with Check for updates. A waiting update still shows as Update available in the sidebar.",
 			"at": "2026-11-11T17:34:50Z"
+		},
+		{
+			"kind": "fix",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Desktop app: email previews (in email templates, sent emails and the help centre) show again instead of a blank box.",
+			"at": "2026-11-11T18:14:52Z"
 		}
 	],
-	"through": "e3e26a7+8064407"
+	"through": "4177825+89a05b8"
 }
