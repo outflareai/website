@@ -2,7 +2,7 @@
 	"version": "2026.11.11",
 	"date": "2026-11-11",
 	"status": "in-progress",
-	"updated": "2026-11-11T14:40:02Z",
+	"updated": "2026-11-11T18:14:52Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -101,7 +101,147 @@
 			"edition": "open-source",
 			"text": "Email providers and sending domains that belong to no brand are shared, so every brand's Email providers page now lists them, marked Shared, instead of asking you to connect a provider. Disconnecting the default provider makes the next one the default, so sends always have a sender.",
 			"at": "2026-11-11T14:40:02Z"
+		},
+		{
+			"kind": "launch",
+			"area": "lifecycle",
+			"edition": "open-source",
+			"text": "Broadcasts can go to a saved list, and you can upload a CSV of people (by email or your own user id) into a list from the broadcast editor. A broadcast can also be a service message, which skips marketing choices and the unsubscribe link but never reaches suppressed addresses.",
+			"at": "2026-11-11T15:32:47Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Site audits now count distinct pages with errors, warnings and notices, so a crawl card is no longer inflated by rules that fire once per language pair. Notices are hidden until you choose to show them, and URL templates that differ only by a locale (such as /de and /fr) are rolled up into one row with a locale breakdown.",
+			"at": "2026-11-11T15:32:47Z"
+		},
+		{
+			"kind": "launch",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Business details on About your company: save each brand's legal name, tax or company number and postal address once. Lifecycle email adds the address to its footer (or place it with {{brand_address}}), sequences can use it too, and the brand's help centre, cookie policy and agents show it.",
+			"at": "2026-11-11T15:45:14Z"
+		},
+		{
+			"kind": "fix",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Failed Ahrefs (and other SEO) reads no longer count against the connection's budget, and a refused report is not retried and billed again every hour. Competitor suggestions run weekly with the snapshot, not every day.",
+			"at": "2026-11-11T16:04:58Z"
+		},
+		{
+			"kind": "fix",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "The screen where you approve an AI app, and the API token and connected app settings, now include Lifecycle email (templates, broadcasts, journeys and sending) and Coverage. Before, an app like ChatGPT or Claude could never be given these permissions, so its email template and send tools failed. Turn Lifecycle email on for an app you already connected in Connect your AI.",
+			"at": "2026-11-11T16:09:20Z"
+		},
+		{
+			"kind": "launch",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Delete a brand for good: on the brand's page (Company → Brand), choose Delete brand and type its name. Everything in the brand goes with it, and nothing moves to your other brands. Owners and admins only; your only brand can't be deleted.",
+			"at": "2026-11-11T16:19:50Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "connectors",
+			"edition": "open-source",
+			"text": "Connections with no brand now show what tells whose they are: the account they signed in to, what the provider reports (such as Google Tag Manager's containers and the sites they tag, or Cloudflare's zones), who connected them and when, and a suggested brand you can assign in one click.",
+			"at": "2026-11-11T16:26:47Z"
+		},
+		{
+			"kind": "launch",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Every CRM card now opens with a relationship check: whether the company is already a customer, has an open deal or sits in another pipeline, which teammate has emailed them for a warm intro, and whether the last conversation went quiet.",
+			"at": "2026-11-11T17:01:13Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Google Ads: create a website conversion and copy its tag, manage account callouts and portfolio Target CPA and Target ROAS strategies, remove campaigns, ads and keywords (you only, after a confirmation), see all conversions, keyword bid estimates and search term match types, pick 30 days or any dates, and download every report as CSV.",
+			"at": "2026-11-11T17:17:06Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Paid ads findings are now judged in cost per new paying customer: rules for budgets, pauses, targets, negatives, keywords, ads and exclusions read Outflare's own sign-ups and payers. Every change waits for you to approve it (in Outflare Cloud, savings can apply on their own with an undo), and shadow mode shows what the rules would do first.",
+			"at": "2026-11-11T17:17:06Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Paid ads: one click sets up Outflare's conversion feed on a Google Ads account: three conversion actions (sign-up, first payment, repeat payment) sent through Google's Data Manager API with each person's new or returning customer type, a daily-refreshed Customer Match list of paying customers, and the new customer acquisition goal. Google Ads no longer asks for a developer token.",
+			"at": "2026-11-11T17:17:06Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Paid ads sync every hour and re-read longer windows as the platforms revise their numbers. Outflare alerts you when spend is far off its usual, the month is off pace, a campaign stops serving or brings no sign-ups, ads are disapproved, conversions are refused or tracking breaks, and it keeps Google's own change history beside its changes.",
+			"at": "2026-11-11T17:17:06Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "New ads are written only from a brand knowledge sheet you have reviewed: check what Outflare read from your website and mark it \"Looks right\". A read that can't run says which connection to add, the website is read again daily once an ad account is connected, and each draft lists warnings (a price the sheet lacks, a superlative, a competitor's name, too few headlines).",
+			"at": "2026-11-11T17:17:06Z"
+		},
+		{
+			"kind": "launch",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Admins can now read the team's work email into the CRM through their own Google Workspace connection, so nobody has to sign in one by one. The same filters, sharing rules and AI privacy check apply, and it can start from each mailbox's whole history.",
+			"at": "2026-11-11T17:34:50Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "lifecycle",
+			"edition": "open-source",
+			"text": "Making a broadcast is now a full page in four steps (kind, email, who gets it, name) with a preview of the email beside it. Uploading a CSV of people moved to Lists, New list, with an example file and a check of what was read before anything is saved.",
+			"at": "2026-11-11T17:34:50Z"
+		},
+		{
+			"kind": "fix",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Competitor suggestions are fetched once per weekly cycle: the weekly snapshot still asks the provider, and a second suggest job is no longer queued in the same cycle.",
+			"at": "2026-11-11T17:34:50Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Consent banner: add `data-reopen=\"off\"` to the tracking script to leave out the round button in the corner, when your site has its own \"Cookie settings\" link that calls `outflare.showConsent()`.",
+			"at": "2026-11-11T17:34:50Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "\"All brands\" is gone: the app always shows one brand, and its stats, reports, outcomes, attribution and email pages read only that brand. Every brand, archived brands and records in no brand are under Settings → Brands.",
+			"at": "2026-11-11T17:34:50Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Desktop app: the account menu at the bottom of the sidebar now shows which version of the Outflare app you have, with Check for updates. A waiting update still shows as Update available in the sidebar.",
+			"at": "2026-11-11T17:34:50Z"
+		},
+		{
+			"kind": "fix",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Desktop app: email previews (in email templates, sent emails and the help centre) show again instead of a blank box.",
+			"at": "2026-11-11T18:14:52Z"
 		}
 	],
-	"through": "0c9133b+3aada0c"
+	"through": "4177825+89a05b8"
 }

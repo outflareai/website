@@ -15,7 +15,7 @@ Each brand has its own website (its point of truth), its own context for agents,
 
 ## Add a brand
 
-Open **Company → Brands → Add a brand** and give its name, website and where it ships (web, iOS, Android, TV and so on). Add its other domains on its page, such as an app or help site. A workspace without brands works exactly as before. Anyone but a viewer can add a brand, and so can an API token or connected AI app that can make changes (the `context.manage` scope); only the workspace's own name and URL need `workspace.manage`.
+Open the brand switcher at the top of the sidebar, choose **Add a brand** and give its name, website and where it ships (web, iOS, Android, TV and so on). Add its other domains on its page (**Company → Brand** while you're in it), such as an app or help site. Inside a brand you only see that brand: other brands are in the switcher. A workspace without brands works exactly as before. Anyone but a viewer can add a brand, and so can an API token or connected AI app that can make changes (the `context.manage` scope); only the workspace's own name and URL need `workspace.manage`.
 
 Also on its page, under **Links**, add everywhere else the brand lives: its App Store and Google Play listings, TV app stores, the Chrome Web Store, Steam, socials and docs. Paste the address and Outflare works out what it is (apps.apple.com is the App Store); add a label such as "Fire TV" where it helps. Agents read the links with the brand's context. With your own Geonode account connected, Outflare also reads the brand's website and suggests the socials and listings it links to, for you to add or dismiss ([Finding a brand's links](/docs/guides/social/#finding-a-brands-links)).
 
@@ -72,6 +72,12 @@ With one brand picked, Connectors lists what that brand uses and marks each one 
 
 In the API, every connection has `brand_id` (set on a brand's own) and `brand_ids` (the brands a shared one is shared with; empty means every brand). `GET /v1/workspaces/{ws}/integrations?brand=repocket` lists what a brand uses. Set who uses a connection with `brand_id` or `brand_ids` on `POST` or `PATCH /integrations`, or `?brand=` on the sign-in link. The MCP tools are `list_integrations` and `update_integration`.
 
+### Connections with no brand
+
+A connection that belongs to one brand, such as Google Tag Manager, shows its data in no brand until you say whose it is. **Connectors** lists each one with what tells you whose it is: the account it signed in to, what the provider reports (Tag Manager's accounts, its containers with their GTM ids and the sites they tag, or a Cloudflare account's zones), who connected it and when, and the connection it was signed in together with. When the details point to a brand, Outflare suggests it and says why, for example "a site it tags is on that brand's domain". Pick the brand next to it, or **More** for the other choices. A connection made before Outflare read these details shows **Read its accounts and sites from the provider**, which signs in again and changes nothing at the provider.
+
+In the API, `GET /v1/workspaces/{ws}/connections/unassigned` returns `signed_in_as`, `details`, `connected_at`, `connected_by`, `connected_with`, `suggested_brand_id` and `suggested_because` for each.
+
 ## See every domain in one list
 
 A workspace sets up domains in several places: each brand's website, SEO sites, website tracking, cold email sending domains, Lifecycle email domains and tracking domains for links. `GET /v1/workspaces/{ws}/domains` lists each domain once, by its registrable name, so `www.acme.example` and `mail.acme.example` both show under `acme.example`. Each entry has:
@@ -94,7 +100,7 @@ With one brand picked and no analytics counting for it yet, the Analytics page o
 
 ## Keep brands from emailing the same person
 
-Leads and the suppression list are shared, so one person is one lead, and an unsubscribe from any brand stops every brand. You can go further and keep two brands from cold emailing the same person close together. In **Company → Brands**, turn on **Contacting the same person** and choose how many days to wait (1 to 365).
+Leads and the suppression list are shared, so one person is one lead, and an unsubscribe from any brand stops every brand. You can go further and keep two brands from cold emailing the same person close together. Under **All brands**, open **Company → Brands** and turn on **Contacting the same person** and choose how many days to wait (1 to 365).
 
 With the rule on, a brand's sequence skips anyone another brand emailed within that many days. Their enrollment shows as blocked with the reason `other_brand:geonode`, naming the brand that got there first. The rule checks only first emails, so follow-ups already under way carry on, and sequences shared by every brand don't count. To check before you enroll, call `POST /recipients/check` with `brand`.
 
@@ -116,6 +122,14 @@ Someone kept to some brands:
 - can't use what needs every brand, such as workspace settings, webhooks, missions and connecting tools. The app hides those pages, and the API answers `403`. In the [API reference](/docs/api/), these endpoints aren't marked `brand_limited`.
 
 Changing someone's brands is in the audit log as `member.brands_changed`.
+
+## Archive or delete a brand
+
+On the brand's page (**Company → Brand**), the **⋯** menu has **Archive** and **Delete brand**.
+
+**Archive** hides the brand from the switcher and every picker and keeps all its records.
+
+**Delete brand** asks you to type its name, then deletes the brand and everything in it: its people, lists, sequences, mailboxes, domains, sites, connections made for it, settings and history. Nothing moves to another brand, and it can't be undone. The brand leaves the switcher at once, you move to another brand, and the rest is cleared in the background. Only owners and admins can delete a brand. You can't delete your only brand, or one that a member or invite is limited to: give them another brand first. With the API, `DELETE /v1/workspaces/{ws}/brands/{brand}` (scope `workspace.manage`).
 
 ## API and MCP
 
