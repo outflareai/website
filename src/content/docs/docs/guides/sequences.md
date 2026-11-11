@@ -49,6 +49,7 @@ Variables are written `{{name}}` and are not case sensitive. Add a fallback afte
 | Any custom field | Every extra column from your [lead import](/docs/guides/import-leads/), by its normalised name (for example `{{industry}}`). `{{custom.industry}}` also works. |
 | `sender_name`, `sender_first_name`, `sender_email` | The mailbox sending this email. |
 | `unsubscribe_url` | This lead's unsubscribe link, if you want it in the body as well as the header. |
+| `brand_address`, `brand_legal_name` | The sequence's brand's postal address on one line and legal name, from its [business details](/docs/agents/memory/#business-details). A step that uses one waits until the brand has saved its address. |
 
 If a lead is missing a variable that has no fallback, that lead is **not emailed**: the enrollment ends as `blocked` with the reason `missing_variable: first_name`. Check before you start with the preview, which renders every step for one lead and lists what is missing:
 
