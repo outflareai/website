@@ -119,9 +119,11 @@ Changing someone's brands is in the audit log as `member.brands_changed`.
 
 ## Archive or delete a brand
 
-On the brand's page (**Company → Brand**), the **⋯** menu has **Archive**. An archived brand leaves the switcher and every picker, and keeps all its records; restore it from **All brands → Company → Brands → Archived**.
+On the brand's page (**Company → Brand**), the **⋯** menu has **Archive** and **Delete brand**.
 
-To remove a brand for good, open it under **Archived**, choose **Delete for good** and type its name. This deletes the brand and everything in it: its people, lists, sequences, mailboxes, domains, sites, connections made for it, settings and history. Nothing moves to another brand, and it can't be undone. It runs in the background and the brand disappears once it's done. Only owners and admins can delete a brand, and not while a member or invite can see only that brand: give them another brand first. With the API, `DELETE /v1/workspaces/{ws}/brands/{brand}` (scope `workspace.manage`).
+**Archive** hides the brand from the switcher and every picker and keeps all its records.
+
+**Delete brand** asks you to type its name, then deletes the brand and everything in it: its people, lists, sequences, mailboxes, domains, sites, connections made for it, settings and history. Nothing moves to another brand, and it can't be undone. The brand leaves the switcher at once, you move to another brand, and the rest is cleared in the background. Only owners and admins can delete a brand. You can't delete your only brand, or one that a member or invite is limited to: give them another brand first. With the API, `DELETE /v1/workspaces/{ws}/brands/{brand}` (scope `workspace.manage`).
 
 ## API and MCP
 
