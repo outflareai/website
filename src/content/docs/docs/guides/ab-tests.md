@@ -97,7 +97,7 @@ If your server shows the version itself (a server-rendered page, an email, an ap
 { "type": "track", "event": "Experiment Viewed", "anonymousId": "the visitor's id", "properties": { "flag": "pricing-headline", "variant": "faster" } }
 ```
 
-to `POST /v1/brands/{brand}/customer-events`. A visitor keeps the first version they saw. They convert when they reach a goal after seeing it, before the test ends.
+to `POST /v1/workspaces/{ws}/customer-events`. A visitor keeps the first version they saw. They convert when they reach a goal after seeing it, before the test ends.
 
 ## Reading the results
 
