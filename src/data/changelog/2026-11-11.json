@@ -2,7 +2,7 @@
 	"version": "2026.11.11",
 	"date": "2026-11-11",
 	"status": "in-progress",
-	"updated": "2026-11-11T18:14:52Z",
+	"updated": "2026-11-11T18:25:50Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -241,7 +241,14 @@
 			"edition": "open-source",
 			"text": "Desktop app: email previews (in email templates, sent emails and the help centre) show again instead of a blank box.",
 			"at": "2026-11-11T18:14:52Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "The API panel's examples are ready to paste: they carry the page's real brand, workspace and item ids, and **Create a token for this** puts a new read-only token for just that call and brand into the example, shown once.",
+			"at": "2026-11-11T18:25:50Z"
 		}
 	],
-	"through": "4177825+89a05b8"
+	"through": "05ee0da+1889d54"
 }
