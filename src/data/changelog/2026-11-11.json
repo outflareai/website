@@ -2,7 +2,7 @@
 	"version": "2026.11.11",
 	"date": "2026-11-11",
 	"status": "in-progress",
-	"updated": "2026-11-11T13:48:32Z",
+	"updated": "2026-11-11T13:59:43Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -59,7 +59,21 @@
 			"edition": "open-source",
 			"text": "The SEO overview shows each number on its own row with a full chart: values on the y-axis, each week on hover, the period before drawn beside it, and the biggest weekly rise and drop. Pick any dates, from 4 weeks to 2 years, and the API's `period` compares them with the weeks before.",
 			"at": "2026-11-11T13:48:32Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Sidebar pages are now real links: right-click, Ctrl/Cmd-click or middle-click any of them to open it in a new tab.",
+			"at": "2026-11-11T13:59:43Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Inside a brand, Company → Brand now shows only that brand's own settings, never a list of your other brands. Switch brands, or add a new one, from the brand switcher at the top.",
+			"at": "2026-11-11T13:59:43Z"
 		}
 	],
-	"through": "94f1cb2+e559b86"
+	"through": "c91e064+014c139"
 }
