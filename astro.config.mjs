@@ -2,7 +2,7 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import tailwindcss from '@tailwindcss/vite';
-import { writeFile } from 'node:fs/promises';
+import { appendFile, readdir, rename, rm, writeFile } from 'node:fs/promises';
 import social from './src/data/social.json' with { type: 'json' };
 
 const repo = 'https://github.com/outflareai/outflare';
@@ -15,6 +15,22 @@ const shortLinks = {
 		'astro:build:done': async ({ dir }) => {
 			const lines = social.profiles.flatMap((p) => [`/${p.short} ${p.url} 302`, `/${p.short}/ ${p.url} 302`]);
 			await writeFile(new URL('_redirects', dir), `${lines.join('\n')}\n`);
+		},
+	},
+};
+
+// One sitemap at outflare.ai/sitemap.xml. Starlight's sitemap plugin writes
+// sitemap-index.xml and sitemap-0.xml; this keeps the pages file as
+// sitemap.xml and redirects the old names to it. Runs after Starlight.
+const sitemapFile = {
+	name: 'outflare-sitemap-file',
+	hooks: {
+		'astro:build:done': async ({ dir }) => {
+			const parts = (await readdir(dir)).filter((f) => /^sitemap-\d+\.xml$/.test(f));
+			if (parts.length !== 1) throw new Error(`expected one sitemap file, found ${parts.length}`);
+			await rename(new URL(parts[0], dir), new URL('sitemap.xml', dir));
+			await rm(new URL('sitemap-index.xml', dir), { force: true });
+			await appendFile(new URL('_redirects', dir), '/sitemap-index.xml /sitemap.xml 301\n/sitemap-0.xml /sitemap.xml 301\n');
 		},
 	},
 };
@@ -110,5 +126,6 @@ export default defineConfig({
 				},
 			],
 		}),
+		sitemapFile,
 	],
 });
