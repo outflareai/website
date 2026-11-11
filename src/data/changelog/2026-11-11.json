@@ -2,7 +2,7 @@
 	"version": "2026.11.11",
 	"date": "2026-11-11",
 	"status": "in-progress",
-	"updated": "2026-11-11T15:32:47Z",
+	"updated": "2026-11-11T15:45:14Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -115,7 +115,14 @@
 			"edition": "open-source",
 			"text": "Site audits now count distinct pages with errors, warnings and notices, so a crawl card is no longer inflated by rules that fire once per language pair. Notices are hidden until you choose to show them, and URL templates that differ only by a locale (such as /de and /fr) are rolled up into one row with a locale breakdown.",
 			"at": "2026-11-11T15:32:47Z"
+		},
+		{
+			"kind": "launch",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Business details on About your company: save each brand's legal name, tax or company number and postal address once. Lifecycle email adds the address to its footer (or place it with {{brand_address}}), sequences can use it too, and the brand's help centre, cookie policy and agents show it.",
+			"at": "2026-11-11T15:45:14Z"
 		}
 	],
-	"through": "b9e685d+ec54f0d"
+	"through": "53823f6+63397f4"
 }
