@@ -2,7 +2,7 @@
 	"version": "2026.11.11",
 	"date": "2026-11-11",
 	"status": "in-progress",
-	"updated": "2026-11-11T23:05:46Z",
+	"updated": "2026-11-11T23:26:14Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -318,7 +318,14 @@
 			"edition": "open-source",
 			"text": "The workspace routes for stats, reports, outcomes, lifecycle email, email recipients, attribution and install health are retired and answer 410 `route_moved`: call the same route under `/v1/brands/{brand}/`.",
 			"at": "2026-11-11T22:39:19Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Suspect tracker clicks are flagged: clicks from cloud and hosting networks, an address clicking the same link over and over, and conversions within seconds of their click. Flagged clicks still go on but don't use up your caps. Links show how many there were, and conversions say why they're suspect.",
+			"at": "2026-11-11T23:26:14Z"
 		}
 	],
-	"through": "20d0911+7eff74f"
+	"through": "505e30d+d1c15cc"
 }
