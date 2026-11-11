@@ -2,7 +2,7 @@
 	"version": "2026.11.11",
 	"date": "2026-11-11",
 	"status": "in-progress",
-	"updated": "2026-11-11T18:41:51Z",
+	"updated": "2026-11-11T18:53:04Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -262,7 +262,14 @@
 			"edition": "open-source",
 			"text": "Direct tracking for tracker campaigns: an ad can link straight to your page with the campaign's code, and the site script records the click itself, with the traffic source's click id, cost and fields. outflare.clickId() and {ofclk} in your links pass the click id on to offers, so postbacks still find the click.",
 			"at": "2026-11-11T18:41:51Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Importing leads into a list is simpler: **Import leads** on a list's page uploads a CSV straight into that list, and the import on Leads picks a list from a menu (or makes a new one) instead of typing its name.",
+			"at": "2026-11-11T18:53:04Z"
 		}
 	],
-	"through": "b5e4bd6+891df77"
+	"through": "c467c0b+4d2920f"
 }
