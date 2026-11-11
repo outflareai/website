@@ -34045,6 +34045,41 @@ paths:
         "404": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/brands/{brand}/look/find:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { $ref: "#/components/parameters/BrandRef" }
+    post:
+      operationId: findBrandLook
+      x-outflare-access: { scope: context.manage, brand_limited: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Find a brand's logo and colour on its website
+      description: |
+        Scope: context.manage. Queues OutflareBot reading the brand's home
+        page (obeying robots.txt) for its logo (the organisation logo in its
+        structured data, else its SVG icon, apple-touch-icon, largest icon or
+        /favicon.ico, whichever answers with an image) and its theme colour.
+        They fill in the brand's logo_url and colors.primary only where those
+        are still empty; nothing someone set is replaced. This also happens
+        when a brand is created with a website or its website changes.
+        Answers 400 when the brand has no website.
+      tags: [brands]
+      responses:
+        "202":
+          description: Queued, or held in a mission.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: object
+                    required: [queued]
+                    properties:
+                      queued: { type: boolean, enum: [true] }
+                  - { $ref: "#/components/schemas/MissionHeld" }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/brands/{brand}/link-suggestions:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
