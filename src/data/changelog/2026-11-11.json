@@ -2,7 +2,7 @@
 	"version": "2026.11.11",
 	"date": "2026-11-11",
 	"status": "in-progress",
-	"updated": "2026-11-11T01:56:31Z",
+	"updated": "2026-11-11T07:48:20Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -10,7 +10,14 @@
 			"edition": "open-source",
 			"text": "Brands can now manage a paid-link catalog and place link orders through the API (and the MCP tools that call it). Amounts are the donor price only, in USD or EUR, never summed together. Approving an order and marking it paid is limited to the person set as that brand's approver, and paid only after the link is published and a live-link check has passed. There is no commission or markup.",
 			"at": "2026-11-11T01:56:31Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Paid link orders can now start from the brand's already-saved competitor link gap, stay in sync with live-link checks, and suggest equivalent catalog donors when a link is lost. A passing check is what allows pay (the donor price only; no money is sent).",
+			"at": "2026-11-11T07:48:20Z"
 		}
 	],
-	"through": "423bda3+f01d06d"
+	"through": "14cd569+5fae101"
 }
