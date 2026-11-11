@@ -56,7 +56,7 @@ A workspace without brands works exactly as before. Anything you leave out of a 
 
 ## Add a brand
 
-Open **Company → Brands → Add a brand** and give its name, website and where it ships: web, iOS, Android, TV and so on. Under **Links**, add its app store listings, socials and docs. With your own [Geonode](/docs/integrations/connectors/) connection, Outflare reads the brand's website and suggests the socials and listings it links to, and with your own AI model it also writes **What the website says**: a summary of the business, its products, features and who it serves, each linked to its page.
+Choose **Add a brand** in the brand switcher and give its name, website and where it ships: web, iOS, Android, TV and so on. Under **Links**, add its app store listings, socials and docs. With your own [Geonode](/docs/integrations/connectors/) connection, Outflare reads the brand's website and suggests the socials and listings it links to, and with your own AI model it also writes **What the website says**: a summary of the business, its products, features and who it serves, each linked to its page.
 
 Each brand has a [setup checklist](/docs/guides/brand-setup/): the website script, its DNS records in one go, then analytics, Search Console, email, payments, ads, social and a CRM.
 
