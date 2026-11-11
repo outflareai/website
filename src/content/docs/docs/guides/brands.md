@@ -72,6 +72,12 @@ With one brand picked, Connectors lists what that brand uses and marks each one 
 
 In the API, every connection has `brand_id` (set on a brand's own) and `brand_ids` (the brands a shared one is shared with; empty means every brand). `GET /v1/workspaces/{ws}/integrations?brand=repocket` lists what a brand uses. Set who uses a connection with `brand_id` or `brand_ids` on `POST` or `PATCH /integrations`, or `?brand=` on the sign-in link. The MCP tools are `list_integrations` and `update_integration`.
 
+### Connections with no brand
+
+A connection that belongs to one brand, such as Google Tag Manager, shows its data in no brand until you say whose it is. **Connectors** lists each one with what tells you whose it is: the account it signed in to, what the provider reports (Tag Manager's accounts, its containers with their GTM ids and the sites they tag, or a Cloudflare account's zones), who connected it and when, and the connection it was signed in together with. When the details point to a brand, Outflare suggests it and says why, for example "a site it tags is on that brand's domain". Pick the brand next to it, or **More** for the other choices. A connection made before Outflare read these details shows **Read its accounts and sites from the provider**, which signs in again and changes nothing at the provider.
+
+In the API, `GET /v1/workspaces/{ws}/connections/unassigned` returns `signed_in_as`, `details`, `connected_at`, `connected_by`, `connected_with`, `suggested_brand_id` and `suggested_because` for each.
+
 ## See every domain in one list
 
 A workspace sets up domains in several places: each brand's website, SEO sites, website tracking, cold email sending domains, Lifecycle email domains and tracking domains for links. `GET /v1/workspaces/{ws}/domains` lists each domain once, by its registrable name, so `www.acme.example` and `mail.acme.example` both show under `acme.example`. Each entry has:
