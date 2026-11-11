@@ -27,6 +27,7 @@ Two promises come with it:
 | Your data in your own Postgres | Yes | Hosted for you |
 | Hosting and upgrades | You run them | Done for you |
 | Sign up in the browser, nothing to install | | Yes |
+| [Brand agent](/docs/agents/brand-agent/): one agent per brand that keeps working toward the objectives you set, with every change going through your approvals | | Yes |
 | [PR autopilot](/docs/guides/pr-autopilot/): reactive PR for a brand every morning, with each quote, release and pitch approved by you | | Yes |
 | [Lead finder](/docs/guides/lead-finder/): companies that fit your ideal customer profile, the people to contact there, into your CRM and campaigns | | Yes |
 | [Support assistant Auto](/docs/guides/support-assistant/#auto): it answers customers' chats and emails on its own when every check passes, signed as an AI assistant (drafting is open source) | | Yes |
