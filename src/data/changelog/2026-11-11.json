@@ -2,7 +2,7 @@
 	"version": "2026.11.11",
 	"date": "2026-11-11",
 	"status": "in-progress",
-	"updated": "2026-11-11T22:08:42Z",
+	"updated": "2026-11-11T22:39:19Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -311,7 +311,14 @@
 			"edition": "open-source",
 			"text": "Security improvements to sign-in sessions.",
 			"at": "2026-11-11T22:08:42Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "The workspace routes for stats, reports, outcomes, lifecycle email, email recipients, attribution and install health are retired and answer 410 `route_moved`: call the same route under `/v1/brands/{brand}/`.",
+			"at": "2026-11-11T22:39:19Z"
 		}
 	],
-	"through": "2b01bdc+629a266"
+	"through": "55b87be+07aa19f"
 }
