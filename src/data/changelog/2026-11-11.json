@@ -2,7 +2,7 @@
 	"version": "2026.11.11",
 	"date": "2026-11-11",
 	"status": "in-progress",
-	"updated": "2026-11-11T17:17:06Z",
+	"updated": "2026-11-11T17:34:50Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -192,7 +192,49 @@
 			"edition": "open-source",
 			"text": "New ads are written only from a brand knowledge sheet you have reviewed: check what Outflare read from your website and mark it \"Looks right\". A read that can't run says which connection to add, the website is read again daily once an ad account is connected, and each draft lists warnings (a price the sheet lacks, a superlative, a competitor's name, too few headlines).",
 			"at": "2026-11-11T17:17:06Z"
+		},
+		{
+			"kind": "launch",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Admins can now read the team's work email into the CRM through their own Google Workspace connection, so nobody has to sign in one by one. The same filters, sharing rules and AI privacy check apply, and it can start from each mailbox's whole history.",
+			"at": "2026-11-11T17:34:50Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "lifecycle",
+			"edition": "open-source",
+			"text": "Making a broadcast is now a full page in four steps (kind, email, who gets it, name) with a preview of the email beside it. Uploading a CSV of people moved to Lists, New list, with an example file and a check of what was read before anything is saved.",
+			"at": "2026-11-11T17:34:50Z"
+		},
+		{
+			"kind": "fix",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Competitor suggestions are fetched once per weekly cycle: the weekly snapshot still asks the provider, and a second suggest job is no longer queued in the same cycle.",
+			"at": "2026-11-11T17:34:50Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Consent banner: add `data-reopen=\"off\"` to the tracking script to leave out the round button in the corner, when your site has its own \"Cookie settings\" link that calls `outflare.showConsent()`.",
+			"at": "2026-11-11T17:34:50Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "\"All brands\" is gone: the app always shows one brand, and its stats, reports, outcomes, attribution and email pages read only that brand. Every brand, archived brands and records in no brand are under Settings → Brands.",
+			"at": "2026-11-11T17:34:50Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Desktop app: the account menu at the bottom of the sidebar now shows which version of the Outflare app you have, with Check for updates. A waiting update still shows as Update available in the sidebar.",
+			"at": "2026-11-11T17:34:50Z"
 		}
 	],
-	"through": "e8b4237+94c5e43"
+	"through": "e3e26a7+8064407"
 }
