@@ -2,7 +2,7 @@
 	"version": "2026.11.11",
 	"date": "2026-11-11",
 	"status": "in-progress",
-	"updated": "2026-11-11T13:59:43Z",
+	"updated": "2026-11-11T14:16:47Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -73,7 +73,14 @@
 			"edition": "open-source",
 			"text": "Inside a brand, Company → Brand now shows only that brand's own settings, never a list of your other brands. Switch brands, or add a new one, from the brand switcher at the top.",
 			"at": "2026-11-11T13:59:43Z"
+		},
+		{
+			"kind": "fix",
+			"area": "api",
+			"edition": "open-source",
+			"text": "Sending transactions or customer events at the same time for the same people no longer fails now and then with a 500 error: a write that loses a database deadlock is retried instead.",
+			"at": "2026-11-11T14:16:47Z"
 		}
 	],
-	"through": "c91e064+014c139"
+	"through": "c01300e+e4fa599"
 }
