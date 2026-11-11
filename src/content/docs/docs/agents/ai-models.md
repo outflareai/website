@@ -46,6 +46,7 @@ Not every task needs the strongest model. Under **Model for each task** you can 
 | **Domain research** | Reading an unknown email domain's homepage to classify it | The provider's cheapest model: Claude Haiku 5.5 |
 | **AI visibility** | Reading what AI models answer about your brands, such as checking answers against your brand's facts. The questions themselves go to the models you pick for [AI visibility](/docs/guides/ai-visibility/) | The provider's cheaper model: Claude Sonnet 5.5 under Claude Opus 5.5 |
 | **Email verification** | Checking email addresses the free checks could not settle | The provider's cheapest model: Claude Haiku 5.5 |
+| **Event name check** | Comparing new [event names](/docs/guides/customer-records/#new-event-names) your product sends with the ones it already sends, to ask you only when one looks like a typo | The provider's cheapest model: Claude Haiku 5.5 |
 | **Fix tickets** | Writing [fix tickets](/docs/guides/site-audits/#fix-tickets) from site audits and other findings, for your team or your coding agent | The provider's cheaper model: Claude Sonnet 5.5 under Claude Opus 5.5 |
 | **PR stories** | Suggesting [story](/docs/guides/stories/) ideas, drafting press releases from a story's facts and approved quotes, writing pitch openers and reading journalists' replies | The provider's cheaper model: Claude Sonnet 5.5 under Claude Opus 5.5 |
 

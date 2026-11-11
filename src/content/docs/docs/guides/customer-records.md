@@ -17,7 +17,7 @@ Open **CRM → People** (or press `g` then `h`). It works inside the brand picke
 
 - **People** and **Companies** list every record of that type, newest first. Search by name, email, phone or id, and narrow the list with a filter for each choice field, such as lifecycle stage, seniority, country, industry or company size. The brand picked in the sidebar applies here as everywhere else. **Held for review** shows the people a visitor identification tool named, waiting for someone to approve them, and **Archived** shows the records you archived.
 - **Duplicates** lists pairs that may be the same person or company, side by side, to merge, link or dismiss. See [Duplicates](#duplicates).
-- **Events** shows the product events your brand received, with any that were rejected or held and what to do about each. See [Product events](#product-events).
+- **Events** shows the product events your brand received, with any that were rejected and what to do about each, and asks about any new event name that looks like a typo. See [Product events](#product-events).
 - **Products** lists the brand's products and lifecycle stages. See [Products and lifecycle stages](/docs/guides/products-and-lifecycle/).
 - **Transactions** lists the brand's payments, refunds and credits. See [Transactions](/docs/guides/transactions/).
 - **Imports** lists each import and batch of events, to undo one. See [Undoing a merge or an import](#undoing-a-merge-or-an-import).
@@ -86,9 +86,9 @@ Only a **verified** email or phone counts. If someone signs up on your website w
 Send what people do in your product to a brand, in Segment's format: `track`, `identify`, `page`, `screen`, `group` and `alias`. If your product already sends to Segment, RudderStack or a similar library, it can send the same calls to Outflare. Send them from your servers to `POST /v1/brands/{brand}/events` (MCP `send_brand_events`) with an API token that can manage customers: one event, or `{"batch": [...]}` with up to 500.
 
 - **Saved first.** Every event is saved as sent, and the answer is `202` at once, with a `batch_id` and a receipt `id` per event. Only a malformed request is refused, never an event for its content.
-- **Processed in the background**, in order, usually within seconds. Each event ends as `accepted` (stored, with the person it matched), `duplicate` (a `messageId` already received), `rejected` (with a `code` and a `reason` that says what to fix) or `held` (a new event name waiting for approval).
+- **Processed in the background**, in order, usually within seconds. Each event ends as `accepted` (stored, with the person it matched), `duplicate` (a `messageId` already received), `rejected` (with a `code` and a `reason` that says what to fix) or `held` (an event name someone paused in the catalog). New event names are never held: see [New event names](#new-event-names).
 - **Follow them** on the **Events** tab, or with `GET /v1/brands/{brand}/events` (filter by `status`, `code`, `batch_id` or `name`) and `GET .../events/summary` for the last 24 hours and 7 days.
-- **Fix and replay.** Approve a held name (on the Events tab, or `POST .../catalog/events/{name}/approve`), or fix what a rejection says, then `POST .../events/replay` with the events' `ids` or a filter such as `{"status": "held"}`.
+- **Fix and replay.** Fix what a rejection says, or approve a paused name again (on the Events tab, or `POST .../catalog/events/{name}/approve`), then `POST .../events/replay` with the events' `ids` or a filter such as `{"status": "held"}`.
 - **Kept for a while.** Accepted events stay in this log for 30 days, rejected and held ones for 90. The product events themselves stay on each person's timeline.
 - **Names.** `Order Completed` is stored as `order_completed`, and dotted names such as `product.activated` stay as they are. A name the brand hasn't approved yet is held, and drives nothing until someone approves it.
 - **Products.** Name the [product](/docs/guides/products-and-lifecycle/) an event is about with `properties.product_id` or `properties.product`.
@@ -107,6 +107,21 @@ Two different user ids are never merged, and an email someone only typed in neve
 Traits that match a field in the catalog fill in the record: `firstName` is first name, `title` is job title. The rest stay on the event, and the response lists them so you can add the fields you want. A `group` call finds or makes the company by its id and adds it to the person's companies.
 
 The older `POST /v1/workspaces/{ws}/customer-events` (MCP `track_customer_events`) still works for now, and answers each event's result while you wait.
+
+### New event names
+
+Nobody approves event names. A name your product sends for the first time, such as `signup_started`, is added to the brand's catalog and its events are stored straight away, ready for segments, lists, journeys and reports.
+
+Within a minute, Outflare checks each new name against the names the brand already sends, and asks only when one looks like a typo or a second spelling of another. The **Events** tab then shows **Is this a typo?**, for example "Is `sign_up` a typo of `signed_up`?", with how many events each has:
+
+- **Yes, merge** moves the name's events to the other name, and stores events sent with it later under that name too.
+- **No, keep both** keeps them as two events.
+
+The events are usable either way while the question waits. Agents see the same questions in `get_brand_events_summary` and answer with `answer_event_name_check`; the API is `POST /v1/brands/{brand}/catalog/events/{name}/name-check` with `{"same": true}` or `{"same": false}`.
+
+The check runs on your workspace's own AI connection when it has one ([AI models](/docs/agents/ai-models/), the **Event name check** task, on your provider's cheapest model and within your AI limits). Without one, it compares the spellings instead: other separators, a prefix more or less (`user.signed_up` and `signed_up`), a letter or two added or dropped, or one letter changed. Names that differ only in a number, such as `step_1` and `step_2`, are always separate events.
+
+To stop using a name, deprecate it in the catalog. To pause one, set its status to quarantined: its new events are held until you approve it again and replay them. A brand takes up to 100 new event names a day from its website's snippet.
 
 ## Duplicates
 
