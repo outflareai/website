@@ -15,7 +15,7 @@ Each brand has its own website (its point of truth), its own context for agents,
 
 ## Add a brand
 
-Open **Company → Brands → Add a brand** and give its name, website and where it ships (web, iOS, Android, TV and so on). Add its other domains on its page, such as an app or help site. A workspace without brands works exactly as before. Anyone but a viewer can add a brand, and so can an API token or connected AI app that can make changes (the `context.manage` scope); only the workspace's own name and URL need `workspace.manage`.
+Open the brand switcher at the top of the sidebar, choose **Add a brand** and give its name, website and where it ships (web, iOS, Android, TV and so on). Add its other domains on its page (**Company → Brand** while you're in it), such as an app or help site. Inside a brand you only see that brand: other brands are in the switcher. A workspace without brands works exactly as before. Anyone but a viewer can add a brand, and so can an API token or connected AI app that can make changes (the `context.manage` scope); only the workspace's own name and URL need `workspace.manage`.
 
 Also on its page, under **Links**, add everywhere else the brand lives: its App Store and Google Play listings, TV app stores, the Chrome Web Store, Steam, socials and docs. Paste the address and Outflare works out what it is (apps.apple.com is the App Store); add a label such as "Fire TV" where it helps. Agents read the links with the brand's context. With your own Geonode account connected, Outflare also reads the brand's website and suggests the socials and listings it links to, for you to add or dismiss ([Finding a brand's links](/docs/guides/social/#finding-a-brands-links)).
 
@@ -94,7 +94,7 @@ With one brand picked and no analytics counting for it yet, the Analytics page o
 
 ## Keep brands from emailing the same person
 
-Leads and the suppression list are shared, so one person is one lead, and an unsubscribe from any brand stops every brand. You can go further and keep two brands from cold emailing the same person close together. In **Company → Brands**, turn on **Contacting the same person** and choose how many days to wait (1 to 365).
+Leads and the suppression list are shared, so one person is one lead, and an unsubscribe from any brand stops every brand. You can go further and keep two brands from cold emailing the same person close together. Under **All brands**, open **Company → Brands** and turn on **Contacting the same person** and choose how many days to wait (1 to 365).
 
 With the rule on, a brand's sequence skips anyone another brand emailed within that many days. Their enrollment shows as blocked with the reason `other_brand:geonode`, naming the brand that got there first. The rule checks only first emails, so follow-ups already under way carry on, and sequences shared by every brand don't count. To check before you enroll, call `POST /recipients/check` with `brand`.
 
