@@ -2,7 +2,7 @@
 	"version": "2026.11.11",
 	"date": "2026-11-11",
 	"status": "in-progress",
-	"updated": "2026-11-11T14:16:47Z",
+	"updated": "2026-11-11T14:27:22Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -80,7 +80,14 @@
 			"edition": "open-source",
 			"text": "Sending transactions or customer events at the same time for the same people no longer fails now and then with a 500 error: a write that loses a database deadlock is retried instead.",
 			"at": "2026-11-11T14:16:47Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Kits with smart lists, rules and journeys can now be set up for any brand, and each brand gets its own copies. Two brands can also have smart lists with the same name.",
+			"at": "2026-11-11T14:27:22Z"
 		}
 	],
-	"through": "c01300e+e4fa599"
+	"through": "1caeb44+146615f"
 }
