@@ -2,7 +2,7 @@
 	"version": "2026.11.11",
 	"date": "2026-11-11",
 	"status": "in-progress",
-	"updated": "2026-11-11T21:45:19Z",
+	"updated": "2026-11-11T22:08:42Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -290,7 +290,28 @@
 			"edition": "open-source",
 			"text": "Presence now scans a brand's top 10 competitors every 30 days by default, and the rest every 90 days. Brands still on the previous monthly default for the rest move to 90 days; a cadence you set yourself is left as it is. Change either on the Presence competitors page.",
 			"at": "2026-11-11T21:45:19Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "The \"Won't be emailed\" badge on leads and lists now says why: unsubscribed, bounced, marked as spam, on a blocklist and so on, whether it is the address or its whole domain, and where the entry came from. The API returns the same as `suppression` on each lead.",
+			"at": "2026-11-11T22:08:42Z"
+		},
+		{
+			"kind": "fix",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Campaign links always belong to the brand you are in, so the brand picker on a new campaign is gone, and a few leftover \"All brands\" and \"missions\" labels are corrected. The Python SDK's `is_held` now recognises a change that waits for a person on the Agents page. The demo workspace scripts work with brands again.",
+			"at": "2026-11-11T22:08:42Z"
+		},
+		{
+			"kind": "security",
+			"area": "api",
+			"edition": "open-source",
+			"text": "Security improvements to sign-in sessions.",
+			"at": "2026-11-11T22:08:42Z"
 		}
 	],
-	"through": "3dbcc6c+c2a23ef"
+	"through": "2b01bdc+629a266"
 }
