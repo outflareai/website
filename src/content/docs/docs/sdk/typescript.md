@@ -105,20 +105,20 @@ for await (const lead of paginate((cursor) =>
 
 `fields` trims each item to the fields you read (and `id`). See [Choose the fields](/docs/api/#choose-the-fields).
 
-## Missions
+## Held changes
 
-Inside a [mission](/docs/agents/missions/), a write may be answered `202` with a `MissionHeld` body instead of running: a dry run, or held until a person approves it. `isHeld()` tells the two apart:
+When your token's changes wait for a person ([agent actions](/docs/agents/actions/)), a write may be answered `202` with a `MissionHeld` body instead of running. `isHeld()` tells the two apart:
 
 ```ts
 import { createClient, isHeld, ok } from "@outflare/sdk";
 
-const gtm = createClient({ baseUrl, token, mission: missionId });
+const gtm = createClient({ baseUrl, token, missions: true });
 const lead = ok(await gtm.POST("/v1/brands/{brand}/leads", { params: { path: { brand } }, body: { email } }));
-if (isHeld(lead)) console.log(lead.message, lead.mission_action.id);
+if (isHeld(lead)) console.log("waiting for a person", lead.message);
 else console.log("created", lead.id);
 ```
 
-A client made without `mission` never gets those answers, so its types leave them out.
+A client made without `missions: true` leaves those answers out of its types.
 
 ## Webhooks
 

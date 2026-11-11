@@ -7,7 +7,7 @@ sidebar:
 
 <span class="pill shipped">Shipped</span> Fix autonomy in the app (**SEO → Fixes → Agent autonomy**), through the API, as a webhook and for agents.
 
-Fix autonomy says how far agents may go with the [fixes list](/docs/guides/site-audits/#the-fixes-list) on their own. It works through the same approval gate as every other write an agent makes in a [mission](/docs/agents/missions/): what the setting lets through runs, and everything else waits for a person to approve it.
+Fix autonomy says how far agents may go with the [fixes list](/docs/guides/site-audits/#the-fixes-list) on their own. It works through the same approval gate as every other change an agent makes ([agent actions](/docs/agents/actions/)): what the setting lets through runs, and everything else waits for a person to approve it.
 
 Copilot is the default, so nothing changes until an owner or admin chooses otherwise.
 
@@ -23,7 +23,7 @@ An agent takes a fix before it changes the site: `POST /v1/brands/{brand}/fixes/
 
 Fixes that change redirects, canonicals, indexing, robots.txt or URLs can move or hide a whole site in search, so they **always wait for a person**, in every mode. So does AI visibility's `ai_fact_wrong`, which often means asking another site to correct a page. The list is `always_person` in the setting, and `allowed` can't name one of them.
 
-Outside a mission, a person or an API token takes any fix: the setting only answers what an agent in a mission could do (`autonomy` in the answer, such as `{"run": false, "reason": "always_person"}`).
+A person, or an API token that isn't an agent's, takes any fix: the setting only answers what an agent could do (`autonomy` in the answer, such as `{"run": false, "reason": "always_person"}`).
 
 Changing the setting from inside a mission always waits for a person, so an agent can't give itself more room.
 

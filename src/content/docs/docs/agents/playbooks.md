@@ -1,6 +1,6 @@
 ---
 title: Playbooks
-description: Ready-made growth recipes that say what they need, run as a mission on your own accounts, and wait for your approval. Anyone can add one on GitHub.
+description: Ready-made growth recipes that say what they need, run on your own accounts, and wait for your approval. Anyone can add one on GitHub.
 sidebar:
   order: 4
 ---
@@ -21,9 +21,9 @@ Open one to see what it needs, its steps and the API operations each step uses, 
 
 ## Run one
 
-- **In Outflare:** fill in the blanks and press **Start as a mission**. You get a [mission](/docs/agents/missions/) draft named after the playbook, with the prompt and guardrails as its instructions and the steps as its plan. Nothing runs until you approve it, and its mode decides whether changes are dry runs, wait for your approval or run within limits.
-- **From your own AI app:** copy the prompt into Claude, ChatGPT or Cursor with the [Outflare MCP server](/docs/agents/mcp/) connected. The agent can read the steps with `get_playbook`.
-- **From any agent or script:** call `POST /v1/workspaces/{ws}/playbooks/{id}/runs` with `inputs`, or the MCP tool `start_playbook`. It answers with the mission, or `409 connector_needed` while a required connection is missing.
+- **In Outflare:** fill in the blanks, choose a mode and press **Start**. Outflare's agent carries the playbook out in turns on your own [AI model](/docs/agents/ai-models/), as a [run](/docs/agents/actions/#outflares-agent-runs) you follow on the **Agents** page. The mode is your say on what it may do alone: **copilot** holds every change for you, **autonomous** runs changes within the budget you set, and **dry run** changes nothing and shows what it would have done.
+- **From your own AI app:** copy the prompt into Claude, ChatGPT or Cursor with the [Outflare MCP server](/docs/agents/mcp/) connected. The agent can read the steps with `get_playbook`, and its changes go through [agent actions](/docs/agents/actions/).
+- **From any agent or script:** call `POST /v1/workspaces/{ws}/playbooks/{id}/agent-runs` with `inputs` and a `mode`, or the MCP tool `run_playbook`. It answers with the run, or `409 connector_needed` while a required connection is missing.
 
 Missions started from a playbook carry `playbook_id` and `playbook_version`, so you can compare results per playbook and version.
 
@@ -38,7 +38,7 @@ When you open such a playbook, **What it sets up** lists each part of the kit:
 - **Have**: already there and set up the same way.
 - **Conflict**: you already have something under the same name, set up differently (for example a text field where the kit wants a number).
 
-Tick **Set up what it needs when I start**, and the kit is added in the same step as the mission draft. A kit only ever adds: nothing you already have changes, email drafts arrive unpublished so you read and publish them first, and while anything conflicts it changes nothing and tells you what's in the way. Setting it up again changes nothing.
+Tick **Set up what it needs when I start**, and the kit is added in the same step as the run. A kit only ever adds: nothing you already have changes, email drafts arrive unpublished so you read and publish them first, and while anything conflicts it changes nothing and tells you what's in the way. Setting it up again changes nothing.
 
 The first kit, **Creator partnerships**, adds a Partnerships pipeline (Found, Vetted, Pitched, Negotiating, Agreed, Live, Measured, Renewed or Declined) with the creator, deal type, fee, deliverables, platform, go-live date, post, content rights, tracked link and promo code; creator fields on people (platforms, audience size, topics, rate card, past sponsors); and email drafts for the brief, a go-live reminder, thanks with first results, and an invite for customers who create. The creator playbooks use it.
 

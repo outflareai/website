@@ -21,7 +21,7 @@ Two promises come with it:
 | | Open source | Outflare Cloud |
 | --- | --- | --- |
 | Every module in these docs: analytics, SEO, inbox, leads and lists, email campaigns, lifecycle email, social, customer records, outcomes and cost | Yes | Yes |
-| Missions, the approval gate, send and spend limits, and the built-in agent | Yes | Yes |
+| [Agent actions](/docs/agents/actions/): approvals, limits and spend caps for every agent, and the built-in agent that runs playbooks | Yes | Yes |
 | Teams, custom roles and brands | Yes | Yes |
 | The API, SDKs, MCP server, CLI and every connector | Yes | Yes |
 | Your data in your own Postgres | Yes | Hosted for you |

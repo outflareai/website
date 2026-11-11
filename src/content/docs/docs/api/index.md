@@ -92,7 +92,7 @@ curl "https://outflare.example.com/v1/brands/$BRAND/leads?fields=email,company" 
 
 A name the items don't have answers `400 invalid_request` with `param: "fields"` and a message listing the fields they do have. The CLI takes `--fields email,company`, the Python SDK `fields=["email", "company"]`, and the MCP list tools a `fields` list, which keeps long answers small in an agent's context.
 
-Work that runs in the background answers `202`, always with a JSON body (`{"queued": true}` when there is nothing more to say). Inside a [mission](/docs/agents/missions/), a workspace write can also answer `202` with a `MissionHeld` body instead of running: a dry run, or held until a person approves it. Its `mission_action` tells you what to follow.
+Work that runs in the background answers `202`, always with a JSON body (`{"queued": true}` when there is nothing more to say). A write from an agent whose changes wait for a person ([agent actions](/docs/agents/actions/)) can also answer `202` with a `MissionHeld` body instead of running. Its `action` tells you what to follow.
 
 ## Safe retries
 

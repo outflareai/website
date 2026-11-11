@@ -88,18 +88,18 @@ An app that can't sign in can send an [API token](/docs/api/authentication/) ins
 When an app connects, Outflare shows who is asking, the workspace it will work in (pick one if you are in more than one) and a switch for each thing it may do. Everything starts on except spending:
 
 - **See your workspace**: always on. It reads leads, sequences, replies, mailboxes and results.
-- **Company context and memories**, **Leads and lists**, **Sequences and customer profiles**, **Replies**, **Mailboxes, domains and connectors**, **SEO** and **Missions**: turn off anything you don't want it to change. **Read only** turns them all off at once.
+- **Company context and memories**, **Leads and lists**, **Sequences and customer profiles**, **Replies**, **Mailboxes, domains and connectors**, **SEO** and **Agents**: turn off anything you don't want it to change. **Read only** turns them all off at once.
 - **Spend money**: off unless you switch it on. Left off, every purchase of domains or mailboxes waits for you to approve it in Outflare.
 
 You only see the switches your role allows; viewers can only give read access.
 
-Whatever you choose, a connected app can never invite or remove people, change the workspace, create API tokens, manage webhooks, edit the suppression list or approve its own missions. Every email still goes through the [policy check](/docs/concepts/policy-check/), and every change is in the audit log under the app's name.
+Whatever you choose, a connected app can never invite or remove people, change the workspace, create API tokens, manage webhooks, edit the suppression list or approve its own changes. Every email still goes through the [policy check](/docs/concepts/policy-check/), and every change is in the audit log under the app's name.
 
 If Outflare doesn't recognise the app, the screen says so and shows where it will send you back. Only continue if you started connecting from there. Outflare recognises Claude, ChatGPT, Cursor, VS Code and apps on your own computer. Any other app may only read until the person who runs your Outflare server checks it (`outflare verify-app <client_id>`, with the id shown on the app's page).
 
-### Changes happen inside missions
+### Every change waits for you
 
-A connected app reads freely, but it makes changes only inside a [mission](/docs/agents/missions/) you approved. Asked to change something outside one, it is told to start a mission, which waits for you to approve its plan; then its changes follow the mission's mode (dry run, approve each change, or autonomous). To let an app change things directly, open it on the **Connect your AI** page and turn off **Only inside missions**.
+A connected app reads freely. Each change it makes is held on the **Agents** page until you approve it, so you see it first: one at a time, in a batch, or as a pattern that lets changes like it through from then on. [Agent actions](/docs/agents/actions/) has the rules you can set for each app. To let an app change things directly, open it on the **Connect your AI** page and turn off **Every change waits for you**.
 
 ## Change or disconnect apps
 
