@@ -2,7 +2,7 @@
 	"version": "2026.11.11",
 	"date": "2026-11-11",
 	"status": "in-progress",
-	"updated": "2026-11-11T11:16:16Z",
+	"updated": "2026-11-11T12:57:18Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -38,7 +38,14 @@
 			"edition": "open-source",
 			"text": "In a keyword gap's \"who ranks\" panel, sites marked \"Not a competitor\" now have a Track button too, so one click makes any ranking site a competitor.",
 			"at": "2026-11-11T11:16:16Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Paid link orders can now be queried as `coverage_link_orders` and `coverage_donor_profiles` (with `coverage.read`), and the product guide is in the docs. Catalog import is CSV only; a Google Sheet is not imported. SE Ranking does not feed referring-domain candidates.",
+			"at": "2026-11-11T12:57:18Z"
 		}
 	],
-	"through": "5f6cefe+7809c8c"
+	"through": "e6451ca+787406f"
 }
