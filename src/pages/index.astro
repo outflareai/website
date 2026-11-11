@@ -81,14 +81,14 @@ $ curl "$GTM/v1/workspaces/$WS/seo/history?report=keywords" \\
 ];
 
 const endpoints = [
-	{ m: 'GET', path: '/analytics/overview', id: 'getAnalyticsOverview', what: 'Every website, every tool' },
-	{ m: 'GET', path: '/analytics/changes', id: 'getAnalyticsChanges', what: 'What changed, and where' },
+	{ m: 'GET', path: '/analytics/overview', id: 'getBrandAnalyticsOverview', what: 'Every website, every tool' },
+	{ m: 'GET', path: '/analytics/changes', id: 'getBrandAnalyticsChanges', what: 'What changed, and where' },
 	{ m: 'GET', path: '/seo/history', id: 'getSEOHistory', what: 'Rankings, backlinks, audits' },
-	{ m: 'POST', path: '/missions', id: 'createMission', what: 'Give an agent a goal' },
+	{ m: 'POST', path: '/playbooks/{id}/agent-runs', id: 'runPlaybook', what: 'Run a playbook with the agent' },
 	{ m: 'GET', path: '/integrations', id: 'listIntegrations', what: 'Connected tools' },
-	{ m: 'GET', path: '/inbox', id: 'listInbox', what: 'Every conversation' },
-	{ m: 'POST', path: '/leads/import', id: 'importLeads', what: 'Import up to 100,000 leads' },
-	{ m: 'POST', path: '/sequences', id: 'createSequence', what: 'Create an email campaign' },
+	{ m: 'GET', path: '/inbox', id: 'listBrandInbox', what: 'Every conversation' },
+	{ m: 'POST', path: '/leads/import', id: 'importBrandLeads', what: 'Import up to 100,000 leads' },
+	{ m: 'POST', path: '/sequences', id: 'createBrandSequence', what: 'Create an email campaign' },
 ];
 const methodColor: Record<string, string> = {
 	GET: 'text-sky-700 dark:text-sky-400 border-sky-500/30 bg-sky-500/10',
@@ -100,7 +100,7 @@ const moduleTag: Record<string, string> = { live: 'badge-live', building: 'badge
 
 const principles = [
 	{ title: 'Connect what you already use', body: 'Sign in once with OAuth or paste a key, and Outflare reads from your analytics, search, CRM, calendar and data tools. No connector is required to start.' },
-	{ title: 'Ask, or hand over a goal', body: 'Ask a question from Claude, ChatGPT or Cursor, or give an agent a mission. It reads your company and brand context first, so you never explain twice.' },
+	{ title: 'Ask, or hand over a goal', body: 'Ask a question from Claude, ChatGPT or Cursor, or hand the agent a goal. It reads your company and brand context first, so you never explain twice.' },
 	{ title: 'Stay in control', body: 'Agents work through scoped tokens, within send and spend limits, and wait for your approval where you choose. Every action is logged under who did it.' },
 ];
 
