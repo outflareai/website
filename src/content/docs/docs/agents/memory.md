@@ -64,7 +64,7 @@ Outflare's own mission agent reads the same context and pinned memories every tu
 | Analytics sites with no brand, brands no analytics tool reads | You map the site or connect the tool |
 | Email sending domains the provider wouldn't verify, broadcasts that stopped | You add the DNS records; the agent finds out why a broadcast stopped |
 | Social replies waiting for approval | You approve or reject them: nothing posts without you |
-| Possible duplicate people, new product event names held for review | The agent merges, links or dismisses, and approves the event names |
+| Possible duplicate people, new product event names that look like a typo | The agent merges, links or dismisses the people, and asks you whether each event name is a typo |
 | CRM imports that failed | The agent runs the import again |
 
 Each blocker names the tool an agent calls next, the dashboard page that fixes it, and whether the agent or a person has to act. Home's **Needs you** list shows the same list, so there is one place for every module's to-dos.
