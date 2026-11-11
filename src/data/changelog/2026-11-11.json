@@ -2,7 +2,7 @@
 	"version": "2026.11.11",
 	"date": "2026-11-11",
 	"status": "in-progress",
-	"updated": "2026-11-11T16:04:58Z",
+	"updated": "2026-11-11T16:09:20Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -129,7 +129,14 @@
 			"edition": "open-source",
 			"text": "Failed Ahrefs (and other SEO) reads no longer count against the connection's budget, and a refused report is not retried and billed again every hour. Competitor suggestions run weekly with the snapshot, not every day.",
 			"at": "2026-11-11T16:04:58Z"
+		},
+		{
+			"kind": "fix",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "The screen where you approve an AI app, and the API token and connected app settings, now include Lifecycle email (templates, broadcasts, journeys and sending) and Coverage. Before, an app like ChatGPT or Claude could never be given these permissions, so its email template and send tools failed. Turn Lifecycle email on for an app you already connected in Connect your AI.",
+			"at": "2026-11-11T16:09:20Z"
 		}
 	],
-	"through": "26477fe+969e6f4"
+	"through": "d573d80+20ad039"
 }
