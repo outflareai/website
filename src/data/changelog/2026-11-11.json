@@ -2,7 +2,7 @@
 	"version": "2026.11.11",
 	"date": "2026-11-11",
 	"status": "in-progress",
-	"updated": "2026-11-11T19:49:18Z",
+	"updated": "2026-11-11T19:53:26Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -276,7 +276,14 @@
 			"edition": "open-source",
 			"text": "A brand's logo and main colour now fill in from its own website: when you add a brand or change its website, and when Company → Logo and colours has no logo yet. Outflare uses the logo the site names, else its icon, and never replaces one you set. The Logo field no longer shows an example address.",
 			"at": "2026-11-11T18:58:27Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "New product event names no longer wait for approval: events are usable straight away in segments, lists, journeys and reports. Outflare checks each new name, with your own AI model when one is connected, and asks only when one looks like a typo of a name you already send, such as sign_up for signed_up.",
+			"at": "2026-11-11T19:53:26Z"
 		}
 	],
-	"through": "b0d53e1+687383c"
+	"through": "12b265f+55069c0"
 }
