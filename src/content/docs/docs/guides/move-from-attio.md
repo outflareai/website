@@ -49,7 +49,7 @@ curl "https://outflare.example.com/v1/workspaces/$WS/integrations/$ID/crm-import
 curl -X POST "https://outflare.example.com/v1/workspaces/$WS/integrations/$ID/crm-imports" -H "Authorization: Bearer $OUTFLARE_TOKEN" -d '{}'
 
 # Follow it
-curl "https://outflare.example.com/v1/workspaces/$WS/crm-imports/$IMPORT" -H "Authorization: Bearer $OUTFLARE_TOKEN"
+curl "https://outflare.example.com/v1/brands/$BRAND/crm-imports/$IMPORT" -H "Authorization: Bearer $OUTFLARE_TOKEN"
 ```
 
 Importing needs the `catalog.manage` and `customers.manage` scopes; reading imports needs `customers.read`. Agents use `preview_crm_import`, `start_crm_import` and `get_crm_import`.

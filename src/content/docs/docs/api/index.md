@@ -7,7 +7,7 @@ Everything in Outflare is available through one REST API. The web app uses it, t
 
 ## Base URL
 
-Your instance serves the API under `/v1`, for example `http://localhost:8080/v1` or `https://outflare.example.com/v1`. Workspace resources live under `/v1/workspaces/{ws}/...`, where `{ws}` is the workspace ID or its slug (the name in its app URL, so `/v1/workspaces/geonode/mailboxes` works). A slug can be changed under Settings → General (`PATCH /v1/workspaces/{ws}`), so store the ID in scripts and integrations; it never changes. An old slug keeps working until another workspace takes it. The app's item URLs (`/geonode/sequences/q3-founders`) use readable slugs too; `GET /v1/workspaces/{ws}/links/{kind}/{ref}` turns one into the item's ID, but the rest of the API takes IDs.
+Your instance serves the API under `/v1`, for example `http://localhost:8080/v1` or `https://outflare.example.com/v1`. Workspace resources live under `/v1/workspaces/{ws}/...`, where `{ws}` is the workspace ID or its slug (the name in its app URL, so `/v1/workspaces/geonode/mailboxes` works). A slug can be changed under Settings → General (`PATCH /v1/workspaces/{ws}`), so store the ID in scripts and integrations; it never changes. An old slug keeps working until another workspace takes it. The app's item URLs (`/geonode/sequences/q3-founders`) use readable slugs too; `GET /v1/brands/{brand}/links/{kind}/{ref}` turns one into the item's ID, but the rest of the API takes IDs.
 
 ## The contract
 
@@ -42,6 +42,12 @@ curl localhost:8080/v1/workspaces/$WS/mailboxes -H "Authorization: Bearer oft_..
 
 Tokens are scoped to one workspace and a list of scopes. See [Authentication](/docs/api/authentication/).
 
+## Workspace and brand routes
+
+A brand owns its data, so most routes sit under the brand: `/v1/brands/{brand}/...` for leads, sequences, the inbox, SEO, ads, analytics and the rest. `{brand}` is the brand's id, from `GET /v1/workspaces/{ws}/brands`. What the whole team shares stays under the workspace, `/v1/workspaces/{ws}/...`: members, API tokens, connections, mailboxes and sending domains. In the examples in these docs, `$WS` is your workspace and `$BRAND` is the brand's id.
+
+The older workspace routes for brand data answer `410` with the code `route_moved` and name the route to call instead.
+
 Every operation in the contract says who may call it in `x-outflare-access`, so a client or agent can check before calling:
 
 | `x-outflare-access` | Who may call it |
@@ -68,9 +74,9 @@ API answers are never cached (`Cache-Control: no-store`), and every answer carri
 Every list that can grow large pages the same way. It answers `next_cursor`; pass it back as `cursor` for the next page, and stop when it is `null`. `limit` sets the page size.
 
 ```sh
-curl "https://outflare.example.com/v1/workspaces/$WS/leads?limit=200" -H "Authorization: Bearer $OUTFLARE_TOKEN"
+curl "https://outflare.example.com/v1/brands/$BRAND/leads?limit=200" -H "Authorization: Bearer $OUTFLARE_TOKEN"
 # → { "data": [...], "next_cursor": "YWZ0ZXI6Ni4uLg" }
-curl "https://outflare.example.com/v1/workspaces/$WS/leads?limit=200&cursor=YWZ0ZXI6Ni4uLg" -H "Authorization: Bearer $OUTFLARE_TOKEN"
+curl "https://outflare.example.com/v1/brands/$BRAND/leads?limit=200&cursor=YWZ0ZXI6Ni4uLg" -H "Authorization: Bearer $OUTFLARE_TOKEN"
 ```
 
 Cursors are opaque: don't build or decode them. A cursor the API did not give out answers `400 invalid_cursor`. The CLI's `--all` and the MCP tools page this way for you. (Lists also answer the older `next_before`, `next_after` or `next_offset` beside `next_cursor`, and those parameters keep working.)
@@ -80,20 +86,20 @@ Cursors are opaque: don't build or decode them. A cursor the API did not give ou
 Add `fields` to any `GET` to get back only what you read. A list trims each item in `data` and keeps its paging fields; a single object trims itself. `id` always comes back.
 
 ```sh
-curl "https://outflare.example.com/v1/workspaces/$WS/leads?fields=email,company" -H "Authorization: Bearer $OUTFLARE_TOKEN"
+curl "https://outflare.example.com/v1/brands/$BRAND/leads?fields=email,company" -H "Authorization: Bearer $OUTFLARE_TOKEN"
 # → { "data": [{ "id": "…", "email": "ana@acme.example", "company": "Acme" }], "next_cursor": null, … }
 ```
 
 A name the items don't have answers `400 invalid_request` with `param: "fields"` and a message listing the fields they do have. The CLI takes `--fields email,company`, the Python SDK `fields=["email", "company"]`, and the MCP list tools a `fields` list, which keeps long answers small in an agent's context.
 
-Work that runs in the background answers `202`, always with a JSON body (`{"queued": true}` when there is nothing more to say). Inside a [mission](/docs/agents/missions/), a workspace write can also answer `202` with a `MissionHeld` body instead of running: a dry run, or held until a person approves it. Its `mission_action` tells you what to follow.
+Work that runs in the background answers `202`, always with a JSON body (`{"queued": true}` when there is nothing more to say). A write from an agent whose changes wait for a person ([agent actions](/docs/agents/actions/)) can also answer `202` with a `MissionHeld` body instead of running. Its `action` tells you what to follow.
 
 ## Safe retries
 
 Every workspace write accepts an `Idempotency-Key` header. Send any unique string (a UUID is ideal) and you can retry the call as often as you need: a repeat from the same caller within 24 hours gets the first answer back, marked `Idempotent-Replayed: true`, instead of creating a second lead or recording spend twice.
 
 ```sh
-curl -X POST https://outflare.example.com/v1/workspaces/$WS/leads \
+curl -X POST https://outflare.example.com/v1/brands/$BRAND/leads \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" \
   -H "Idempotency-Key: 6f1c2f9e-2b1d-4c43-9a51-5c1f0d6e7a20" \
   -H "Content-Type: application/json" \

@@ -7,13 +7,13 @@ sidebar:
 
 <span class="pill shipped">Shipped</span> Fix autonomy in the app (**SEO → Fixes → Agent autonomy**), through the API, as a webhook and for agents.
 
-Fix autonomy says how far agents may go with the [fixes list](/docs/guides/site-audits/#the-fixes-list) on their own. It works through the same approval gate as every other write an agent makes in a [mission](/docs/agents/missions/): what the setting lets through runs, and everything else waits for a person to approve it.
+Fix autonomy says how far agents may go with the [fixes list](/docs/guides/site-audits/#the-fixes-list) on their own. It works through the same approval gate as every other change an agent makes ([agent actions](/docs/agents/actions/)): what the setting lets through runs, and everything else waits for a person to approve it.
 
 Copilot is the default, so nothing changes until an owner or admin chooses otherwise.
 
 ## How it works
 
-An agent takes a fix before it changes the site: `POST /v1/workspaces/{ws}/fixes/{fix}/start` (MCP `start_fix`). That marks the fix in progress, assigns it to the agent and answers with the prompt to work from. Inside a mission, the gate decides first:
+An agent takes a fix before it changes the site: `POST /v1/brands/{brand}/fixes/{fix}/start` (MCP `start_fix`). That marks the fix in progress, assigns it to the agent and answers with the prompt to work from. Inside a mission, the gate decides first:
 
 | Mode | What happens when an agent takes a fix |
 | --- | --- |
@@ -23,7 +23,7 @@ An agent takes a fix before it changes the site: `POST /v1/workspaces/{ws}/fixes
 
 Fixes that change redirects, canonicals, indexing, robots.txt or URLs can move or hide a whole site in search, so they **always wait for a person**, in every mode. So does AI visibility's `ai_fact_wrong`, which often means asking another site to correct a page. The list is `always_person` in the setting, and `allowed` can't name one of them.
 
-Outside a mission, a person or an API token takes any fix: the setting only answers what an agent in a mission could do (`autonomy` in the answer, such as `{"run": false, "reason": "always_person"}`).
+A person, or an API token that isn't an agent's, takes any fix: the setting only answers what an agent could do (`autonomy` in the answer, such as `{"run": false, "reason": "always_person"}`).
 
 Changing the setting from inside a mission always waits for a person, so an agent can't give itself more room.
 
@@ -35,9 +35,9 @@ Owners, admins and anyone with `seo.manage` change it on **Fixes → Agent auton
 | --- | --- | --- |
 | `GET /v1/workspaces/{ws}/fix-autonomy` | `get_fix_autonomy` | The workspace's setting |
 | `PUT /v1/workspaces/{ws}/fix-autonomy` | `update_fix_autonomy` | Change it; fields left out keep their value |
-| `GET/PUT /v1/workspaces/{ws}/seo-sites/{site}/fix-autonomy` | the same tools with `site_id` | A site's own setting, or the workspace's when it has none (`inherited`) |
-| `DELETE /v1/workspaces/{ws}/seo-sites/{site}/fix-autonomy` | | Put the site back on the workspace's setting |
-| `POST /v1/workspaces/{ws}/fixes/{fix}/start` | `start_fix` | Take a fix before changing the site |
+| `GET/PUT /v1/brands/{brand}/seo-sites/{site}/fix-autonomy` | the same tools with `site_id` | A site's own setting, or the workspace's when it has none (`inherited`) |
+| `DELETE /v1/brands/{brand}/seo-sites/{site}/fix-autonomy` | | Put the site back on the workspace's setting |
+| `POST /v1/brands/{brand}/fixes/{fix}/start` | `start_fix` | Take a fix before changing the site |
 
 ```sh
 curl -X PUT "$OUTFLARE_URL/v1/workspaces/$WS/fix-autonomy" \

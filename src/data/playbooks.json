@@ -64,8 +64,8 @@
 			{
 				"say": "Look at the events new users send in their first week and pick the one that best marks activation, unless one was given.",
 				"tools": [
-					"listEventDefinitions",
-					"listCustomerEvents"
+					"listBrandEventDefinitions",
+					"listBrandCustomerEvents"
 				]
 			},
 			{
@@ -168,26 +168,26 @@
 			{
 				"say": "List replies from the last day that nobody has answered yet.",
 				"tools": [
-					"listInbox"
+					"listBrandInbox"
 				]
 			},
 			{
 				"say": "Read each conversation and keep the ones that are interested or ask a question.",
 				"tools": [
-					"getInboundMessage"
+					"getBrandInboundMessage"
 				]
 			},
 			{
 				"say": "Tag them so the team sees them.",
 				"tools": [
-					"listInboxTags",
-					"updateInboundMessage"
+					"listBrandInboxTags",
+					"updateBrandInboundMessage"
 				]
 			},
 			{
 				"say": "Draft a short reply in the same thread that answers the question and offers the booking link.",
 				"tools": [
-					"replyToInboundMessage"
+					"replyBrandToInboundMessage"
 				]
 			}
 		],
@@ -208,6 +208,120 @@
 		"prompt": "Run the \"Answer interested replies\" playbook. Go through replies from the last 24 hours that nobody has answered. Keep the ones that show interest or ask a question, and tag them \"Interested\". For each one, draft a short, friendly answer in the same thread that answers their question and offers a time to talk with {{booking_link}}. Leave out-of-office, unsubscribe and not-interested replies alone. Hold every reply for my approval.",
 		"example": "Of 140 replies one morning, 9 were interested. Each got a three-line answer drafted with the booking link; the team approved them in a few minutes and 4 booked a call the same day.",
 		"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/answer-interested-replies/playbook.yaml"
+	},
+	{
+		"id": "answer-every-review",
+		"version": 1,
+		"title": "Answer every review, and ask happy customers for one",
+		"summary": "Read the brand's review pages every day, draft a reply to each new review for a person to approve, and ask recent happy customers for a review.",
+		"description": "Buyers read the replies as closely as the reviews. A thoughtful answer to a bad review often does more than a good one, and a steady flow of recent reviews keeps the score honest. This playbook finds the brand's review pages, drafts a reply to every new review in the brand's voice for a person to approve, and sends a review request to customers who recently had a good outcome.",
+		"tier": "obvious",
+		"goals": [
+			"customers",
+			"retention"
+		],
+		"publisher": "outflare",
+		"author": {
+			"github": "outflareai"
+		},
+		"needs": {
+			"data": [
+				{
+					"check": "records",
+					"label": "Customer records, for who to ask for a review"
+				}
+			],
+			"connections": [
+				{
+					"capability": "web.search",
+					"label": "A web search connection, to find and read review pages",
+					"optional": false,
+					"recommended": [
+						"geonode"
+					],
+					"recommended_names": [
+						"Geonode"
+					]
+				},
+				{
+					"capability": "plan",
+					"label": "An AI model, unless you run this from your own AI app",
+					"optional": true,
+					"recommended": [
+						"claude",
+						"openai"
+					],
+					"recommended_names": [
+						"Claude",
+						"OpenAI"
+					]
+				}
+			]
+		},
+		"inputs": [
+			{
+				"name": "brand",
+				"label": "Brand",
+				"example": "Northpeak",
+				"optional": false
+			}
+		],
+		"steps": [
+			{
+				"say": "Read the brand's context and its review guide, and find its review pages.",
+				"tools": [
+					"getBrandContext",
+					"getReviewGuide",
+					"discoverReviewPages",
+					"listBrandReviewPages"
+				]
+			},
+			{
+				"say": "Read new reviews and draft a reply to each, held for a person.",
+				"tools": [
+					"listBrandReviews",
+					"getBrandReview",
+					"draftBrandReviewReply"
+				]
+			},
+			{
+				"say": "Mark each review replied once the person posts the answer.",
+				"tools": [
+					"markBrandReviewReplied"
+				]
+			},
+			{
+				"say": "Set up a review request to customers with a recent good outcome, and preview it.",
+				"tools": [
+					"createReviewRequestCampaign",
+					"previewReviewRequestCampaign"
+				]
+			},
+			{
+				"say": "Read the review score and volume each week.",
+				"tools": [
+					"getBrandReviewsSummary"
+				]
+			}
+		],
+		"guardrails": [
+			"Every reply and every review request waits for a person's approval.",
+			"Never offers anything in return for a review, and never asks only happy customers where a site's rules forbid it.",
+			"Never writes a review, and never argues with a reviewer."
+		],
+		"measure": [
+			{
+				"metric": "Reviews answered",
+				"how": "New reviews with a reply, and how long they waited."
+			},
+			{
+				"metric": "Review score and volume",
+				"how": "Across the brand's review pages, this month against last."
+			}
+		],
+		"prompt": "Find {{brand}}'s review pages, draft a reply to every new review for me to approve, and set up a review request to customers who recently had a good outcome.",
+		"example": "Northpeak had 14 unanswered reviews across three sites. All were answered in a week, and the review request brought 22 new reviews in a month.",
+		"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/answer-every-review/playbook.yaml"
 	},
 	{
 		"id": "seo-quick-wins",
@@ -258,28 +372,28 @@
 			{
 				"say": "Find the site and crawl it.",
 				"tools": [
-					"listSEOSites",
-					"startCrawl",
-					"getCrawl"
+					"listBrandSEOSites",
+					"startBrandCrawl",
+					"getBrandCrawl"
 				]
 			},
 			{
 				"say": "Read what the audit found and how the site does in search.",
 				"tools": [
-					"listCrawlIssues",
-					"getSiteSearch"
+					"listBrandCrawlIssues",
+					"getBrandSiteSearch"
 				]
 			},
 			{
 				"say": "Rank the fixes by the clicks they are likely to bring and keep the top ten.",
 				"tools": [
-					"listFixes"
+					"listBrandFixes"
 				]
 			},
 			{
 				"say": "Turn each one into a prompt a coding agent can work from.",
 				"tools": [
-					"getFixPrompt"
+					"getBrandFixPrompt"
 				]
 			}
 		],
@@ -369,58 +483,58 @@
 			{
 				"say": "Find the site and its tracked competitors, and read the sites that link to competitors but not to you.",
 				"tools": [
-					"listSEOSites",
-					"listSEOCompetitors",
-					"getSEOCompetitorGaps"
+					"listBrandSEOSites",
+					"listBrandSEOCompetitors",
+					"getBrandSEOCompetitorGaps"
 				]
 			},
 			{
 				"say": "For the strongest gap sites, read which of their pages link to each competitor, after showing the cost and the budget.",
 				"tools": [
-					"readLinks",
-					"getLinkRead"
+					"readBrandLinks",
+					"getBrandLinkRead"
 				]
 			},
 			{
 				"say": "Add those pages as competitor gap prospects, with the competitor they link to as evidence. Sites that already link to you, competitors and opted-out sites are kept out on their own.",
 				"tools": [
-					"addLinkProspects"
+					"addBrandLinkProspects"
 				]
 			},
 			{
 				"say": "Check each new prospect's page with OutflareBot (free apart from the AI read) for whether it is up, already links, its broken links, what it is about and who to contact.",
 				"tools": [
-					"checkLinkProspects",
-					"listLinkProspects"
+					"checkBrandLinkProspects",
+					"listBrandLinkProspects"
 				]
 			},
 			{
 				"say": "Keep the ones that fit and choose your page to offer for each.",
 				"tools": [
-					"updateLinkProspect",
-					"deleteLinkProspect"
+					"updateBrandLinkProspect",
+					"deleteBrandLinkProspect"
 				]
 			},
 			{
 				"say": "Pick a sequence for the pitches whose first step uses {{custom.opener}}, or create the starter sequence (a draft with the opener and one follow-up) if none does.",
 				"tools": [
-					"listLinkSequences",
-					"createLinkSequence",
-					"previewSequence"
+					"listBrandLinkSequences",
+					"createBrandLinkSequence",
+					"previewBrandSequence"
 				]
 			},
 			{
 				"say": "Start a pitch for each prospect worth asking, to its best contact. The workspace's AI writes an opener about their page, and each pitch waits for a person to approve it.",
 				"tools": [
-					"startLinkPitch",
-					"listLinkPitches"
+					"startBrandLinkPitch",
+					"listBrandLinkPitches"
 				]
 			},
 			{
 				"say": "Report what was pitched and, later, what replied, agreed and went live.",
 				"tools": [
-					"getLinkResults",
-					"listLinkProspects"
+					"getBrandLinkResults",
+					"listBrandLinkProspects"
 				]
 			}
 		],
@@ -497,44 +611,44 @@
 			{
 				"say": "List partner and customer companies with a website, and leave out the ones whose sites already link to you.",
 				"tools": [
-					"listSEOSites",
-					"listRecords",
-					"listBacklinks"
+					"listBrandSEOSites",
+					"listBrandRecords",
+					"listBrandBacklinks"
 				]
 			},
 			{
 				"say": "Add each one's partners, integrations or customers page (or home page) as a partner prospect.",
 				"tools": [
-					"addLinkProspects"
+					"addBrandLinkProspects"
 				]
 			},
 			{
 				"say": "Check each new prospect's page with OutflareBot (free apart from the AI read) for whether it is up, already links, its broken links, what it is about and who to contact.",
 				"tools": [
-					"checkLinkProspects",
-					"listLinkProspects"
+					"checkBrandLinkProspects",
+					"listBrandLinkProspects"
 				]
 			},
 			{
 				"say": "Pick a sequence for the pitches whose first step uses {{custom.opener}}, or create the starter sequence (a draft with the opener and one follow-up) if none does.",
 				"tools": [
-					"listLinkSequences",
-					"createLinkSequence",
-					"previewSequence"
+					"listBrandLinkSequences",
+					"createBrandLinkSequence",
+					"previewBrandSequence"
 				]
 			},
 			{
 				"say": "Start a pitch for each prospect worth asking, to its best contact. The workspace's AI writes an opener about their page, and each pitch waits for a person to approve it.",
 				"tools": [
-					"startLinkPitch",
-					"listLinkPitches"
+					"startBrandLinkPitch",
+					"listBrandLinkPitches"
 				]
 			},
 			{
 				"say": "Report what was pitched and, later, what replied, agreed and went live.",
 				"tools": [
-					"getLinkResults",
-					"listLinkProspects"
+					"getBrandLinkResults",
+					"listBrandLinkProspects"
 				]
 			}
 		],
@@ -630,50 +744,50 @@
 			{
 				"say": "Search Google for resource pages on the topic, such as \"useful resources\", \"best tools\" and intitle:resources, after showing what the searches cost.",
 				"tools": [
-					"listSEOSites",
-					"readSearchResults"
+					"listBrandSEOSites",
+					"readBrandSearchResults"
 				]
 			},
 			{
 				"say": "Add the results as resource page prospects.",
 				"tools": [
-					"addLinkProspects"
+					"addBrandLinkProspects"
 				]
 			},
 			{
 				"say": "Check each new prospect's page with OutflareBot (free apart from the AI read) for whether it is up, already links, its broken links, what it is about and who to contact.",
 				"tools": [
-					"checkLinkProspects",
-					"listLinkProspects"
+					"checkBrandLinkProspects",
+					"listBrandLinkProspects"
 				]
 			},
 			{
 				"say": "Keep the pages the AI read as lists of resources on your topic, and delete the rest.",
 				"tools": [
-					"getLinkProspect",
-					"deleteLinkProspect"
+					"getBrandLinkProspect",
+					"deleteBrandLinkProspect"
 				]
 			},
 			{
 				"say": "Pick a sequence for the pitches whose first step uses {{custom.opener}}, or create the starter sequence (a draft with the opener and one follow-up) if none does.",
 				"tools": [
-					"listLinkSequences",
-					"createLinkSequence",
-					"previewSequence"
+					"listBrandLinkSequences",
+					"createBrandLinkSequence",
+					"previewBrandSequence"
 				]
 			},
 			{
 				"say": "Start a pitch for each prospect worth asking, to its best contact. The workspace's AI writes an opener about their page, and each pitch waits for a person to approve it.",
 				"tools": [
-					"startLinkPitch",
-					"listLinkPitches"
+					"startBrandLinkPitch",
+					"listBrandLinkPitches"
 				]
 			},
 			{
 				"say": "Report what was pitched and, later, what replied, agreed and went live.",
 				"tools": [
-					"getLinkResults",
-					"listLinkProspects"
+					"getBrandLinkResults",
+					"listBrandLinkProspects"
 				]
 			}
 		],
@@ -696,6 +810,115 @@
 		"prompt": "Run the \"Get listed on resource pages\" playbook for {{site}} on {{topic}}. Search Google for resource pages on the topic (show me the cost first), check them, keep the real lists that fit, and pitch each with an opener that says which of our pages belongs on it and why. Every pitch waits for my approval.",
 		"example": "Eight searches for backpacking resource pages cost 0.16 USD and found 70 pages; 34 were real lists that fit, 30 had a contact, and 6 added Northpeak's gear checklist.",
 		"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/link-resource-pages/playbook.yaml"
+	},
+	{
+		"id": "get-listed-where-buyers-look",
+		"version": 1,
+		"title": "Get listed where buyers look",
+		"summary": "Find the directories, marketplaces and comparison sites where buyers in the brand's category look, and keep a current profile on each.",
+		"description": "Buyers shortlist tools on directories, integration marketplaces, review sites and comparison pages before they ever reach a website. A missing or stale profile there loses the sale quietly. This playbook lists the sites that matter for the brand's category, checks which already have a profile, and submits or updates the rest from the brand's own context, signed in as the brand's own account on each site. Each listing is kept in Coverage, so the team can see which ones are live and which bring visits.",
+		"tier": "obvious",
+		"goals": [
+			"search",
+			"customers"
+		],
+		"publisher": "outflare",
+		"author": {
+			"github": "outflareai"
+		},
+		"needs": {
+			"data": [],
+			"connections": [
+				{
+					"capability": "plan",
+					"label": "An AI model, unless you run this from your own AI app",
+					"optional": true,
+					"recommended": [
+						"claude",
+						"openai"
+					],
+					"recommended_names": [
+						"Claude",
+						"OpenAI"
+					]
+				}
+			]
+		},
+		"inputs": [
+			{
+				"name": "brand",
+				"label": "Brand",
+				"example": "Northpeak",
+				"optional": false
+			},
+			{
+				"name": "category",
+				"label": "The category buyers search for",
+				"example": "project management software",
+				"optional": false
+			}
+		],
+		"steps": [
+			{
+				"say": "Read the brand's context, so every profile says the same true things.",
+				"tools": [
+					"getBrandContext"
+				]
+			},
+			{
+				"say": "List where the brand is already listed, and the sites where it should be.",
+				"tools": [
+					"listCoveragePlacements",
+					"listCoveragePublishers"
+				]
+			},
+			{
+				"say": "Check the brand has an account on each site; record any the team gives you.",
+				"tools": [
+					"listAccounts",
+					"createAccount"
+				]
+			},
+			{
+				"say": "Submit or update each profile in a browser signed in as the brand's own account, with text a person approved.",
+				"tools": [
+					"createBrowserTask",
+					"getBrowserTask"
+				]
+			},
+			{
+				"say": "When a site asks for a code, a CAPTCHA or a sign-in step, ask a person to take over.",
+				"tools": [
+					"requestAccountTakeover"
+				]
+			},
+			{
+				"say": "Record each listing in Coverage and check it is live.",
+				"tools": [
+					"createCoveragePlacements",
+					"checkCoveragePlacement"
+				]
+			}
+		],
+		"guardrails": [
+			"Every profile's text waits for a person's approval before it is submitted.",
+			"Never pays for a listing or accepts a site's terms without a person.",
+			"Only the brand's own accounts; never creates an account in someone's name.",
+			"Never posts reviews or asks for them on the brand's behalf."
+		],
+		"measure": [
+			{
+				"metric": "Listings live",
+				"how": "Coverage placements of the directory, profile and integration kinds that are live."
+			},
+			{
+				"metric": "Referral visits",
+				"how": "Visits from each listing, by publisher."
+			}
+		],
+		"prompt": "Find the directories, marketplaces and comparison sites where people looking for {{category}} shortlist tools, check where {{brand}} is already listed, and draft a profile for each one that's missing or out of date. Submit each one I approve from the brand's own account, and keep them in Coverage.",
+		"example": "Northpeak was missing from four of the ten sites buyers used. Three profiles went live in a week; the fourth needed a phone check, which the marketing lead did in a takeover.",
+		"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/get-listed-where-buyers-look/playbook.yaml"
 	},
 	{
 		"id": "hand-off-warm-prospects",
@@ -751,9 +974,9 @@
 			{
 				"say": "Check which meeting and intent events the workspace receives, and find the sequence for high-intent people.",
 				"tools": [
-					"listEventDefinitions",
-					"listCustomerEvents",
-					"listSequences"
+					"listBrandEventDefinitions",
+					"listBrandCustomerEvents",
+					"listBrandSequences"
 				]
 			},
 			{
@@ -795,6 +1018,127 @@
 			"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/kits/outbound-handoff.yaml"
 		},
 		"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/hand-off-warm-prospects/playbook.yaml"
+	},
+	{
+		"id": "move-ad-budget-to-what-works",
+		"version": 1,
+		"title": "Move ad budget to the campaigns that bring customers",
+		"summary": "Each week, judge every campaign by cost per sign-up from Outflare's attribution, pause the wasteful ones and move budget to the winners.",
+		"description": "Ad platforms report their own conversions generously. This playbook judges each campaign by what Outflare's attribution traced back to it (sign-ups and revenue from the brand's own data), pauses the campaigns that spend without results, and moves their budget to the ones that bring customers. Every change stays inside the run's spend grant: the largest automatic change, and the daily and monthly caps. Anything bigger, and any new campaign, waits for a person.",
+		"tier": "obvious",
+		"goals": [
+			"customers",
+			"revenue"
+		],
+		"publisher": "outflare",
+		"author": {
+			"github": "outflareai"
+		},
+		"needs": {
+			"data": [],
+			"connections": [
+				{
+					"capability": "ads.manage",
+					"label": "An ad platform that can be managed",
+					"optional": false,
+					"recommended": [
+						"google_ads",
+						"meta_ads",
+						"microsoft_ads",
+						"linkedin_ads",
+						"tiktok_ads"
+					],
+					"recommended_names": [
+						"Google Ads",
+						"Meta Ads",
+						"Microsoft Advertising",
+						"LinkedIn Ads",
+						"TikTok Ads"
+					]
+				},
+				{
+					"capability": "plan",
+					"label": "An AI model, unless you run this from your own AI app",
+					"optional": true,
+					"recommended": [
+						"claude",
+						"openai"
+					],
+					"recommended_names": [
+						"Claude",
+						"OpenAI"
+					]
+				}
+			]
+		},
+		"inputs": [
+			{
+				"name": "brand",
+				"label": "Brand",
+				"example": "Northpeak",
+				"optional": false
+			},
+			{
+				"name": "target",
+				"label": "Most you'll pay for a sign-up",
+				"example": "40 USD",
+				"optional": false
+			}
+		],
+		"steps": [
+			{
+				"say": "Read the brand's ad accounts, campaigns and the changes made recently, so nothing is changed twice in a week.",
+				"tools": [
+					"getBrandAdsSummary",
+					"listBrandAdCampaigns",
+					"listBrandAdChanges"
+				]
+			},
+			{
+				"say": "For each campaign, compare its spend with the sign-ups and revenue Outflare's attribution traced to it.",
+				"tools": [
+					"getBrandAttributionCampaigns",
+					"getBrandAttributionAds"
+				]
+			},
+			{
+				"say": "Pause campaigns well above the target with enough spend to judge.",
+				"tools": [
+					"pauseBrandAdCampaign"
+				]
+			},
+			{
+				"say": "Raise the daily budget of campaigns under the target, within the spend grant.",
+				"tools": [
+					"updateBrandAdCampaign"
+				]
+			},
+			{
+				"say": "A week later, check each change against the platform and the results.",
+				"tools": [
+					"listBrandAdChanges",
+					"getBrandAttributionCampaigns"
+				]
+			}
+		],
+		"guardrails": [
+			"Every change stays within the run's spend grant; bigger changes wait for a person.",
+			"Never creates a campaign, an audience or new creative.",
+			"A campaign is judged only once it has spent enough to tell, and changed at most once a week."
+		],
+		"measure": [
+			{
+				"metric": "Cost per sign-up",
+				"how": "Across the brand's campaigns, from Outflare's attribution, this week against last."
+			},
+			{
+				"metric": "Share of spend on winners",
+				"how": "Spend on campaigns under the target divided by all spend."
+			}
+		],
+		"prompt": "Review {{brand}}'s ad campaigns by cost per sign-up from Outflare's attribution. Pause the ones well above {{target}} that have spent enough to judge, and move budget to the ones under it, within my spend grant. Tell me what you changed and why.",
+		"example": "Northpeak had nine campaigns. Two broad-match search campaigns cost 110 USD per sign-up and were paused; their budget went to the brand campaign and one LinkedIn audience, and cost per sign-up fell from 52 to 37 USD in three weeks.",
+		"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/move-ad-budget-to-what-works/playbook.yaml"
 	},
 	{
 		"id": "pr-expert-comment",
@@ -864,43 +1208,43 @@
 				"say": "Read the brand's context and pick the expert whose topics fit; make sure a news search follows the topic.",
 				"tools": [
 					"getBrandContext",
-					"listPRExperts",
-					"listNewsSearches",
-					"createNewsSearch"
+					"listBrandPRExperts",
+					"listBrandNewsSearches",
+					"createBrandNewsSearch"
 				]
 			},
 			{
 				"say": "Start a comment story on the topic and draft the expert's view as a quote for them to approve.",
 				"tools": [
-					"createStory",
-					"addStoryQuote",
-					"addStoryFact"
+					"createBrandStory",
+					"addBrandStoryQuote",
+					"addBrandStoryFact"
 				]
 			},
 			{
 				"say": "Once the quote is approved, draft the release, check it and fix what the check finds. A person approves it.",
 				"tools": [
-					"draftStory",
-					"getStory",
-					"updateStory",
-					"checkStory"
+					"draftBrandStory",
+					"getBrandStory",
+					"updateBrandStory",
+					"checkBrandStory"
 				]
 			},
 			{
 				"say": "Pick the journalists who covered the topic in the last two months and a short sequence whose first step uses {{custom.opener}}; start a pitch to each, waiting for a person.",
 				"tools": [
-					"listJournalists",
-					"listSequences",
-					"createSequence",
-					"startStoryPitches",
-					"listStoryPitches"
+					"listBrandJournalists",
+					"listBrandSequences",
+					"createBrandSequence",
+					"startBrandStoryPitches",
+					"listBrandStoryPitches"
 				]
 			},
 			{
 				"say": "Report replies, flagging every request for an interview, and the coverage that followed.",
 				"tools": [
-					"getStoryResults",
-					"listStoryPitches"
+					"getBrandStoryResults",
+					"listBrandStoryPitches"
 				]
 			}
 		],
@@ -922,6 +1266,117 @@
 		"prompt": "Run the \"Expert comment\" playbook for {{brand}} on {{topic}}. Pick the expert whose topics fit, draft their view on {{topic}} as a short quote for them to approve, write and check the release, and offer it, with an interview, to the journalists who covered {{topic}} recently. The release and every pitch wait for my approval.",
 		"example": "Northpeak offered its head of research on AI agents to 15 journalists; 4 asked for an interview and 2 quoted her within a month.",
 		"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/pr-expert-comment/playbook.yaml"
+	},
+	{
+		"id": "post-what-the-brand-learned",
+		"version": 1,
+		"title": "Post what the brand learned this week",
+		"summary": "Turn the brand's own news, findings and customer questions into a week of posts on X and LinkedIn, each approved by a person.",
+		"description": "The posts that grow a brand's audience share something useful: a number from its own data, an answer to a question customers keep asking, what it shipped and why. This playbook drafts a week of posts from the brand's knowledge and recent results, in the brand's voice, for the team to approve, then reads each post's numbers so the next week leans on what people engaged with.",
+		"tier": "obvious",
+		"goals": [
+			"customers"
+		],
+		"publisher": "outflare",
+		"author": {
+			"github": "outflareai"
+		},
+		"needs": {
+			"data": [],
+			"connections": [
+				{
+					"capability": "social.publish",
+					"label": "A social account that can post",
+					"optional": false,
+					"recommended": [
+						"x",
+						"linkedin"
+					],
+					"recommended_names": [
+						"X",
+						"LinkedIn"
+					]
+				},
+				{
+					"capability": "plan",
+					"label": "An AI model, unless you run this from your own AI app",
+					"optional": true,
+					"recommended": [
+						"claude",
+						"openai"
+					],
+					"recommended_names": [
+						"Claude",
+						"OpenAI"
+					]
+				}
+			]
+		},
+		"inputs": [
+			{
+				"name": "brand",
+				"label": "Brand",
+				"example": "Northpeak",
+				"optional": false
+			},
+			{
+				"name": "per_week",
+				"label": "Posts a week",
+				"example": "4",
+				"optional": false
+			}
+		],
+		"steps": [
+			{
+				"say": "Read the brand's context and voice, and how recent posts did.",
+				"tools": [
+					"getBrandContext",
+					"getBrandSocialOverview",
+					"listBrandSocialPosts",
+					"getBrandSocialGrowth"
+				]
+			},
+			{
+				"say": "Gather this week's material from the brand's knowledge and its customer questions.",
+				"tools": [
+					"listBrandKnowledgeItems",
+					"findBrandKnowledgePassages"
+				]
+			},
+			{
+				"say": "Draft the week's posts as a series, each held for a person's approval.",
+				"tools": [
+					"createBrandSocialSeries",
+					"draftBrandSocialPublication",
+					"createBrandSocialPublication"
+				]
+			},
+			{
+				"say": "The next week, read each post's numbers and note what to do more of.",
+				"tools": [
+					"listBrandSocialPosts",
+					"getBrandSocialGrowth"
+				]
+			}
+		],
+		"guardrails": [
+			"Every post waits for a person's approval.",
+			"Never claims a number or a result the brand's knowledge doesn't support.",
+			"Never replies to, tags or messages people on the brand's behalf."
+		],
+		"measure": [
+			{
+				"metric": "Engagement per post",
+				"how": "The brand's own posts' numbers, against the last four weeks."
+			},
+			{
+				"metric": "Followers",
+				"how": "Followers gained across the brand's accounts."
+			}
+		],
+		"prompt": "Draft {{per_week}} posts for {{brand}} this week from what the brand learned, shipped and keeps being asked, in its voice, for me to approve. Next week, tell me which ones people engaged with.",
+		"example": "Northpeak's week led with a chart from its own data on how long projects slip. That post had four times the usual engagement, and the next week's plan added two more data posts.",
+		"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/post-what-the-brand-learned/playbook.yaml"
 	},
 	{
 		"id": "pr-react-to-news",
@@ -985,50 +1440,50 @@
 				"say": "Read the brand's experts and their topics, and the articles the news watch found in the last day on those topics.",
 				"tools": [
 					"getBrandContext",
-					"listPRExperts",
-					"listNewsSearches",
-					"runNewsSearch",
-					"listNewsArticles"
+					"listBrandPRExperts",
+					"listBrandNewsSearches",
+					"runBrandNewsSearch",
+					"listBrandNewsArticles"
 				]
 			},
 			{
 				"say": "Pick the story most worth reacting to and start a reactive story on that article.",
 				"tools": [
-					"suggestStories",
-					"createStory",
-					"listStories"
+					"suggestBrandStories",
+					"createBrandStory",
+					"listBrandStories"
 				]
 			},
 			{
 				"say": "Draft a short comment in the expert's voice as a quote for them to approve, with any number as a sourced fact.",
 				"tools": [
-					"addStoryQuote",
-					"addStoryFact",
-					"getStory"
+					"addBrandStoryQuote",
+					"addBrandStoryFact",
+					"getBrandStory"
 				]
 			},
 			{
 				"say": "Once the expert has approved the quote, draft the release, check it and fix what the check finds. A person approves it.",
 				"tools": [
-					"draftStory",
-					"updateStory",
-					"checkStory"
+					"draftBrandStory",
+					"updateBrandStory",
+					"checkBrandStory"
 				]
 			},
 			{
 				"say": "Pitch the journalists who wrote about the story, through a short sequence whose first step uses {{custom.opener}}, each pitch waiting for a person.",
 				"tools": [
-					"listJournalists",
-					"listSequences",
-					"createSequence",
-					"startStoryPitches",
-					"listStoryPitches"
+					"listBrandJournalists",
+					"listBrandSequences",
+					"createBrandSequence",
+					"startBrandStoryPitches",
+					"listBrandStoryPitches"
 				]
 			},
 			{
 				"say": "Report replies and coverage.",
 				"tools": [
-					"getStoryResults"
+					"getBrandStoryResults"
 				]
 			}
 		],
@@ -1123,8 +1578,8 @@
 			{
 				"say": "Check which payment and cancellation events the workspace receives, and that the failed-payment event arrives.",
 				"tools": [
-					"listEventDefinitions",
-					"listCustomerEvents"
+					"listBrandEventDefinitions",
+					"listBrandCustomerEvents"
 				]
 			},
 			{
@@ -1178,6 +1633,130 @@
 		"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/win-back-churned-customers/playbook.yaml"
 	},
 	{
+		"id": "send-a-monthly-newsletter",
+		"version": 1,
+		"title": "Send a newsletter people open",
+		"summary": "Draft a monthly newsletter from what the brand shipped and learned, send it to people who agreed to hear from it, and measure the lift against a holdout.",
+		"description": "A newsletter keeps customers and prospects close between purchases, but only if it is worth opening and you can tell whether it moved anything. This playbook drafts one issue a month from the brand's own news, product updates and knowledge, sends it only to people who agreed to email, through the marketing email guardrails (consent, frequency cap, quiet hours), and keeps a holdout so the team sees what the newsletter itself changed.",
+		"tier": "obvious",
+		"goals": [
+			"retention",
+			"revenue"
+		],
+		"publisher": "outflare",
+		"author": {
+			"github": "outflareai"
+		},
+		"needs": {
+			"data": [
+				{
+					"check": "records",
+					"label": "People with consent to email"
+				}
+			],
+			"connections": [
+				{
+					"capability": "email.send",
+					"label": "An email provider for marketing email",
+					"optional": false,
+					"recommended": [
+						"resend",
+						"postmark",
+						"amazon_ses"
+					],
+					"recommended_names": [
+						"Resend",
+						"Postmark",
+						"Amazon SES"
+					]
+				},
+				{
+					"capability": "plan",
+					"label": "An AI model, unless you run this from your own AI app",
+					"optional": true,
+					"recommended": [
+						"claude",
+						"openai"
+					],
+					"recommended_names": [
+						"Claude",
+						"OpenAI"
+					]
+				}
+			]
+		},
+		"inputs": [
+			{
+				"name": "brand",
+				"label": "Brand",
+				"example": "Northpeak",
+				"optional": false
+			},
+			{
+				"name": "news",
+				"label": "What happened this month",
+				"help": "Leave it empty and the agent drafts from the brand's knowledge and recent updates.",
+				"example": "Launched the timeline view; new customer story from a design agency",
+				"optional": true
+			}
+		],
+		"steps": [
+			{
+				"say": "Read the brand's context and voice, and how the last issues did.",
+				"tools": [
+					"getBrandContext",
+					"listBrandEmailBroadcasts",
+					"getBrandEmailBroadcastLift"
+				]
+			},
+			{
+				"say": "Gather this month's news from the brand's knowledge.",
+				"tools": [
+					"listBrandKnowledgeItems",
+					"findBrandKnowledgePassages"
+				]
+			},
+			{
+				"say": "Draft the issue with a holdout, addressed to people with consent to email.",
+				"tools": [
+					"createBrandEmailBroadcast",
+					"updateBrandEmailBroadcast",
+					"listBrandEmailBroadcastRecipients"
+				]
+			},
+			{
+				"say": "Send it once a person approves the draft.",
+				"tools": [
+					"sendBrandEmailBroadcast"
+				]
+			},
+			{
+				"say": "A week later, read its lift against the holdout and note what to change next time.",
+				"tools": [
+					"getBrandEmailBroadcastLift"
+				]
+			}
+		],
+		"guardrails": [
+			"Every issue waits for a person's approval before it is sent.",
+			"Only people with consent to email, through the marketing email guardrails.",
+			"Never more than one issue a month, and never claims a feature or result the brand's knowledge doesn't support."
+		],
+		"measure": [
+			{
+				"metric": "Lift against the holdout",
+				"how": "Conversions from people who got the issue against those held out."
+			},
+			{
+				"metric": "Subscribers",
+				"how": "People with consent to email, gained and lost."
+			}
+		],
+		"prompt": "Draft {{brand}}'s newsletter for this month in the brand's voice, from what it shipped and learned (start from \"{{news}}\" if I gave it). Send it to people who agreed to email, with a holdout, once I approve it, and tell me its lift a week later.",
+		"example": "Northpeak's October issue led with the timeline launch. It went to 3,800 people with consent; a week later, people who got it started 9% more projects than the holdout.",
+		"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/send-a-monthly-newsletter/playbook.yaml"
+	},
+	{
 		"id": "tag-every-link",
 		"version": 1,
 		"title": "Tag every link you share",
@@ -1228,21 +1807,21 @@
 			{
 				"say": "Read the channels and sources campaign links can use.",
 				"tools": [
-					"getTrackingTaxonomy"
+					"getBrandTrackingTaxonomy"
 				]
 			},
 			{
 				"say": "Compare where visits come from with the campaigns that exist, and list the channels with untagged traffic.",
 				"tools": [
-					"getAnalyticsOverview",
-					"listTrackingCampaigns"
+					"getBrandAnalyticsOverview",
+					"listBrandTrackingCampaigns"
 				]
 			},
 			{
 				"say": "Create a campaign for each gap and a tagged link for every place the brand shares links.",
 				"tools": [
-					"createTrackingCampaign",
-					"createTrackingLink"
+					"createBrandTrackingCampaign",
+					"createBrandTrackingLink"
 				]
 			}
 		],
@@ -1258,6 +1837,133 @@
 		"prompt": "Run the \"Tag every link\" playbook for {{brand}}. Look at where the site's visits come from and which campaigns already exist, and tell me which channels send traffic we can't credit. Then create a campaign for each gap and a tagged link for every place we share links (newsletter, social profiles, partner pages, email signatures), and give me the list.",
 		"example": "Northpeak found that 31% of sign-ups came from \"unknown\". Most were from the newsletter and two partner blogs; three campaigns and eight links fixed it the same week.",
 		"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/tag-every-link/playbook.yaml"
+	},
+	{
+		"id": "test-your-best-page",
+		"version": 2,
+		"title": "Test the page that matters most",
+		"summary": "Find the page where most visitors decide, test a better version of it against the current one, and keep the winner once a person agrees.",
+		"description": "Most sites have one or two pages where visitors decide whether to sign up or buy: a home page, a pricing page, a landing page for paid ads. Small changes there are worth more than anything else on the site, but only when you can tell a real lift from noise. This playbook picks that page from the brand's own visits, writes one clear change to test against the current version, builds it as a no-code test of the page (the same changes the visual editor makes, so no developer is needed), runs it through the website script, and reads the result against the control. Starting the test and shipping the winner are always a person's call.",
+		"tier": "obvious",
+		"goals": [
+			"activation",
+			"revenue"
+		],
+		"publisher": "outflare",
+		"author": {
+			"github": "outflareai"
+		},
+		"needs": {
+			"data": [
+				{
+					"check": "site_tracking",
+					"label": "The website script installed on the brand's site"
+				}
+			],
+			"connections": [
+				{
+					"capability": "plan",
+					"label": "An AI model, unless you run this from your own AI app",
+					"optional": true,
+					"recommended": [
+						"claude",
+						"openai"
+					],
+					"recommended_names": [
+						"Claude",
+						"OpenAI"
+					]
+				}
+			]
+		},
+		"inputs": [
+			{
+				"name": "brand",
+				"label": "Brand",
+				"example": "Northpeak",
+				"optional": false
+			},
+			{
+				"name": "goal",
+				"label": "What a visitor should do on the page",
+				"help": "Leave it empty and the agent uses the brand's main conversion.",
+				"example": "start a free trial",
+				"optional": true
+			}
+		],
+		"steps": [
+			{
+				"say": "Read the brand's context and the tests it has already run, so nothing is tested twice.",
+				"tools": [
+					"getBrandContext",
+					"listBrandABTests",
+					"listBrandABTestLearnings"
+				]
+			},
+			{
+				"say": "Find the page with the most visitors who leave without converting.",
+				"tools": [
+					"getAnalyticsReport"
+				]
+			},
+			{
+				"say": "Suggest a few changes to that page, pick the one with the clearest reason, and plan the test with its sample size.",
+				"tools": [
+					"suggestBrandABTests",
+					"planBrandABTest"
+				]
+			},
+			{
+				"say": "Create a test of the page (the current page is the control), build the new version's changes on the page with no code, and check each version's preview and the checklist.",
+				"tools": [
+					"createBrandABTest",
+					"setBrandABTestVersion",
+					"getBrandABTestVersion",
+					"getBrandABTestPreviews",
+					"getBrandABTestChecklist"
+				]
+			},
+			{
+				"say": "Ask a person to start the test once the checklist passes, with the preview links.",
+				"tools": [
+					"startBrandABTest"
+				]
+			},
+			{
+				"say": "Read the results when the planned sample is reached, end the test and write down what was learned.",
+				"tools": [
+					"getBrandABTestResults",
+					"summarizeBrandABTest",
+					"endBrandABTest",
+					"writeBrandABTestLearning"
+				]
+			},
+			{
+				"say": "Propose shipping the winner, for a person to decide.",
+				"tools": [
+					"shipBrandABTest"
+				]
+			}
+		],
+		"guardrails": [
+			"Starting a test and shipping a version are always a person's decision.",
+			"Versions change text, looks, order and links on the page, never scripts; claims in new copy come from the brand's context.",
+			"One test per page at a time, and never one that changes prices, legal text or what the product promises.",
+			"A test is read only once its planned sample is reached; no early calls."
+		],
+		"measure": [
+			{
+				"metric": "Conversion rate on the page",
+				"how": "The winning version against the control, with the test's confidence."
+			},
+			{
+				"metric": "Tests that shipped",
+				"how": "Tests ended with a winner a person shipped."
+			}
+		],
+		"prompt": "For {{brand}}, find the page where most visitors leave without converting (the goal is \"{{goal}}\" if I gave one), suggest one change worth testing, and run it as an A/B test against the current page. Read the result when the planned sample is reached and propose shipping the winner for me to approve.",
+		"example": "Northpeak's pricing page had the most visitors who left. The test moved the annual plan's saving into the headline; after 4,200 visitors the new version converted 11% better, and the team shipped it.",
+		"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/test-your-best-page/playbook.yaml"
 	},
 	{
 		"id": "link-unlinked-mentions",
@@ -1331,45 +2037,45 @@
 			{
 				"say": "Read coverage the news watch kept for the brand, and search Google for pages that name it, leaving out its own site, after showing the cost.",
 				"tools": [
-					"listSEOSites",
+					"listBrandSEOSites",
 					"getBrandContext",
-					"listCoverage",
-					"readSearchResults"
+					"listBrandCoverage",
+					"readBrandSearchResults"
 				]
 			},
 			{
 				"say": "Add those pages as mention prospects. Pages that already link to you are kept out when checked.",
 				"tools": [
-					"addLinkProspects"
+					"addBrandLinkProspects"
 				]
 			},
 			{
 				"say": "Check each new prospect's page with OutflareBot (free apart from the AI read) for whether it is up, already links, its broken links, what it is about and who to contact.",
 				"tools": [
-					"checkLinkProspects",
-					"listLinkProspects"
+					"checkBrandLinkProspects",
+					"listBrandLinkProspects"
 				]
 			},
 			{
 				"say": "Pick a sequence for the pitches whose first step uses {{custom.opener}}, or create the starter sequence (a draft with the opener and one follow-up) if none does.",
 				"tools": [
-					"listLinkSequences",
-					"createLinkSequence",
-					"previewSequence"
+					"listBrandLinkSequences",
+					"createBrandLinkSequence",
+					"previewBrandSequence"
 				]
 			},
 			{
 				"say": "Start a pitch for each prospect worth asking, to its best contact. The workspace's AI writes an opener about their page, and each pitch waits for a person to approve it.",
 				"tools": [
-					"startLinkPitch",
-					"listLinkPitches"
+					"startBrandLinkPitch",
+					"listBrandLinkPitches"
 				]
 			},
 			{
 				"say": "Report what was pitched and, later, what replied, agreed and went live.",
 				"tools": [
-					"getLinkResults",
-					"listLinkProspects"
+					"getBrandLinkResults",
+					"listBrandLinkProspects"
 				]
 			}
 		],
@@ -1472,8 +2178,8 @@
 			{
 				"say": "Look at the events new users send in their first week and pick the one that best marks a first win, unless one was given.",
 				"tools": [
-					"listCustomerEvents",
-					"listRecords"
+					"listBrandCustomerEvents",
+					"listBrandRecords"
 				]
 			},
 			{
@@ -1575,51 +2281,51 @@
 			{
 				"say": "Find the site and read the links you lost and the fixes the backlinks found, such as links to your pages that now return 404.",
 				"tools": [
-					"listSEOSites",
-					"listBacklinkEvents",
-					"listFixes"
+					"listBrandSEOSites",
+					"listBrandBacklinkEvents",
+					"listBrandFixes"
 				]
 			},
 			{
 				"say": "Turn links to your own broken pages into redirect fixes for a person or a coding agent; those need no email.",
 				"tools": [
-					"getFix",
-					"getFixPrompt"
+					"getBrandFix",
+					"getBrandFixPrompt"
 				]
 			},
 			{
 				"say": "Add the pages that dropped a link as reclaim prospects, with the page they linked to as the page to offer.",
 				"tools": [
-					"reclaimLinkProspects"
+					"brandReclaimLinkProspects"
 				]
 			},
 			{
 				"say": "Check each new prospect's page with OutflareBot (free apart from the AI read) for whether it is up, already links, its broken links, what it is about and who to contact.",
 				"tools": [
-					"checkLinkProspects",
-					"listLinkProspects"
+					"checkBrandLinkProspects",
+					"listBrandLinkProspects"
 				]
 			},
 			{
 				"say": "Pick a sequence for the pitches whose first step uses {{custom.opener}}, or create the starter sequence (a draft with the opener and one follow-up) if none does.",
 				"tools": [
-					"listLinkSequences",
-					"createLinkSequence",
-					"previewSequence"
+					"listBrandLinkSequences",
+					"createBrandLinkSequence",
+					"previewBrandSequence"
 				]
 			},
 			{
 				"say": "Start a pitch for each prospect worth asking, to its best contact. The workspace's AI writes an opener about their page, and each pitch waits for a person to approve it.",
 				"tools": [
-					"startLinkPitch",
-					"listLinkPitches"
+					"startBrandLinkPitch",
+					"listBrandLinkPitches"
 				]
 			},
 			{
 				"say": "Report what was pitched and, later, what replied, agreed and went live.",
 				"tools": [
-					"getLinkResults",
-					"listLinkProspects"
+					"getBrandLinkResults",
+					"listBrandLinkProspects"
 				]
 			}
 		],
@@ -1642,6 +2348,234 @@
 		"prompt": "Run the \"Win back the links you lost\" playbook for {{site}}, for links lost in the last {{days}} days (90 if empty). Turn links to our broken pages into redirect fixes, add the pages that dropped a link as reclaim prospects, check which are still up and who to ask, and pitch each one with a short note about the link it used to have. Every pitch waits for my approval.",
 		"example": "Northpeak had lost 37 links in 90 days: 11 pointed at a guide that had moved, fixed with one redirect, and 26 pages had dropped the link. 19 were still up with a contact, and 7 added the link back.",
 		"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/link-reclaim-lost-links/playbook.yaml"
+	},
+	{
+		"id": "write-new-ads",
+		"version": 1,
+		"title": "Write new ads where the old ones are tired",
+		"summary": "Each week, write new ads and ad groups where ads are tired or searches convert with nowhere to go, for a person to check.",
+		"description": "Ads get stale and searches drift away from the keywords an account was built on. This playbook reads each campaign's ads, keywords and the searches people made, finds ad groups whose ads are old or far behind the rest, and searches that convert with no ad group of their own. For each it writes a draft from the brand's own knowledge and site: a new ad, a new ad group with its keywords, or (rarely) a new search campaign, with why it should do better. Nothing is made on the ad platform until a person approves the draft, and then it is made paused; a person turns it on.",
+		"tier": "obvious",
+		"goals": [
+			"customers",
+			"search"
+		],
+		"publisher": "outflare",
+		"author": {
+			"github": "outflareai"
+		},
+		"needs": {
+			"data": [],
+			"connections": [
+				{
+					"capability": "ads.create",
+					"label": "An ad platform Outflare can make new ads on",
+					"optional": false,
+					"recommended": [
+						"google_ads",
+						"meta_ads"
+					],
+					"recommended_names": [
+						"Google Ads",
+						"Meta Ads"
+					]
+				},
+				{
+					"capability": "plan",
+					"label": "An AI model, unless you run this from your own AI app",
+					"optional": true,
+					"recommended": [
+						"claude",
+						"openai"
+					],
+					"recommended_names": [
+						"Claude",
+						"OpenAI"
+					]
+				}
+			]
+		},
+		"inputs": [
+			{
+				"name": "brand",
+				"label": "Brand",
+				"example": "Northpeak",
+				"optional": false
+			}
+		],
+		"steps": [
+			{
+				"say": "Read the brand's knowledge sheet (what its website says it offers) and whether a person has reviewed it; if not, or its read failed, stop and ask the person to check it under Paid ads, Set up. Then read what the brand says about itself and the words its customers use.",
+				"tools": [
+					"getBrandKnowledge",
+					"getBrandContext",
+					"findBrandKnowledgePassages"
+				]
+			},
+			{
+				"say": "Read the brand's campaigns, their ads, keywords and the searches people made, and the drafts already written, so nothing is written twice.",
+				"tools": [
+					"listBrandAdCampaigns",
+					"listBrandAdItems",
+					"listBrandAdKeywords",
+					"listBrandAdSearchTerms",
+					"listAdDrafts"
+				]
+			},
+			{
+				"say": "For an ad group whose ads are old or far behind the others, write one evergreen responsive search ad with nothing pinned, 11 or more distinct headlines across the keywords, benefits, features, calls to action and authority, in sentence case and short, every claim from the sheet. Fix what the answer's checks warn about before leaving it for the person.",
+				"tools": [
+					"createAdDraft"
+				]
+			},
+			{
+				"say": "For searches that convert with no ad group of their own, write a new ad group with those keywords and an evergreen ad for them; where an evergreen ad already runs well, at most one challenger with partial pins and three variants a position.",
+				"tools": [
+					"createAdDraft"
+				]
+			},
+			{
+				"say": "A few weeks after a person turns a draft on, compare it with the ads beside it.",
+				"tools": [
+					"listAdDrafts",
+					"listBrandAdItems"
+				]
+			}
+		],
+		"guardrails": [
+			"Writes drafts only; a person approves each one, it is made paused, and a person turns it on.",
+			"Writes only from a knowledge sheet a person has reviewed; while it is unreviewed or its read failed, the draft is refused and the person is asked to check the sheet, never to skip it.",
+			"Every claim in an ad comes from the brand's knowledge sheet; no prices, numbers or promises it can't point to, no superlatives (best,",
+			"One evergreen unpinned ad per ad group, 11 or more distinct headlines in sentence case; at most one challenger with partial pins.",
+			"At most three drafts a week per campaign, and none for an ad group that already has one waiting."
+		],
+		"measure": [
+			{
+				"metric": "Drafts approved",
+				"how": "Drafts a person approved divided by drafts written."
+			},
+			{
+				"metric": "New ads' click-through and cost per conversion",
+				"how": "Each live draft's ad against the other ads in its ad group over the same weeks."
+			}
+		],
+		"prompt": "First read {{brand}}'s knowledge sheet and check a person has reviewed it; if not, or its read failed, tell me and stop. Then read {{brand}}'s ad campaigns, ads, keywords and search terms. Where an ad group's ads are old or weak, or searches convert with no ad group of their own, write new ads (or a new ad group) as drafts: one evergreen responsive search ad per ad group with nothing pinned, 11 or more distinct headlines across the keywords, benefits, features, calls to action and authority, in sentence case and short, every claim from the sheet (no prices or promises it lacks, no superlatives, no competitor names), and at most one challenger with partial pins. Fix what the checks warn about, and say why each should do better. Don't approve or turn anything on: leave the drafts for me.",
+		"example": "Northpeak's \"CRM software\" ad group had two ads from last year with a click-through rate half the account's. The agent wrote a new ad from the pricing page and three customer quotes, and a new ad group for \"crm for small teams\", which converted twice at half the target cost with no ad group of its own. Both were approved, made paused, checked and turned on.",
+		"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/write-new-ads/playbook.yaml"
+	},
+	{
+		"id": "answer-reddit-questions",
+		"version": 1,
+		"title": "Answer the Reddit questions the brand can help with",
+		"summary": "Watch the subreddits where the brand's buyers ask for advice, and draft helpful replies from the brand's own account for a person to approve.",
+		"description": "Reddit threads rank in search and get read for years, and buyers ask there for honest advice. This playbook watches the subreddits and keywords the team picks, finds the posts the brand can genuinely help with, and drafts a reply from what the brand knows. Every reply waits for a person and posts from the brand's own account, within the brand's Reddit limits.",
+		"tier": "clever",
+		"goals": [
+			"customers",
+			"search"
+		],
+		"publisher": "outflare",
+		"author": {
+			"github": "outflareai"
+		},
+		"needs": {
+			"data": [],
+			"connections": [
+				{
+					"capability": "social.search",
+					"label": "Reddit, with the workspace's own app",
+					"optional": false,
+					"recommended": [
+						"reddit"
+					],
+					"recommended_names": [
+						"Reddit"
+					]
+				},
+				{
+					"capability": "plan",
+					"label": "An AI model, unless you run this from your own AI app",
+					"optional": true,
+					"recommended": [
+						"claude",
+						"openai"
+					],
+					"recommended_names": [
+						"Claude",
+						"OpenAI"
+					]
+				}
+			]
+		},
+		"inputs": [
+			{
+				"name": "brand",
+				"label": "Brand",
+				"example": "Northpeak",
+				"optional": false
+			},
+			{
+				"name": "watch",
+				"label": "Subreddits and keywords to watch",
+				"example": "r/projectmanagement, \"best tool for client projects\"",
+				"optional": false
+			}
+		],
+		"steps": [
+			{
+				"say": "Read the brand's context and voice, and the brand's Reddit settings and limits.",
+				"tools": [
+					"getBrandContext",
+					"listBrandRedditSettings"
+				]
+			},
+			{
+				"say": "Set up a watch on the subreddits and keywords.",
+				"tools": [
+					"createBrandSocialWatch",
+					"listBrandSocialWatches"
+				]
+			},
+			{
+				"say": "Read new posts and pick the ones the brand can genuinely help with.",
+				"tools": [
+					"listBrandSocialItems",
+					"getBrandSocialItem"
+				]
+			},
+			{
+				"say": "Draft a reply to each from what the brand knows, held for a person's approval.",
+				"tools": [
+					"findBrandKnowledgePassages",
+					"draftBrandSocialReply"
+				]
+			},
+			{
+				"say": "Check which replies are still up and what they brought.",
+				"tools": [
+					"listBrandSocialActions"
+				]
+			}
+		],
+		"guardrails": [
+			"Every reply waits for a person's approval and posts from the brand's own account.",
+			"Replies help first; the brand is named only where it is the honest answer.",
+			"Stays within the brand's Reddit limits and each subreddit's rules.",
+			"Never votes, asks for votes, or posts from another account."
+		],
+		"measure": [
+			{
+				"metric": "Replies kept up",
+				"how": "Replies that went live and are still up."
+			},
+			{
+				"metric": "Visits from Reddit",
+				"how": "Visits and sign-ups traced back to the replies."
+			}
+		],
+		"prompt": "Watch {{watch}} for posts {{brand}} can genuinely help with, and draft a helpful reply to each from the brand's own account for me to approve.",
+		"example": "In a month the watch found 90 posts; the team approved 11 replies. Two threads ranked on Google for the brand's category and kept sending visits.",
+		"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/answer-reddit-questions/playbook.yaml"
 	},
 	{
 		"id": "qualify-signups-for-partnerships",
@@ -1726,14 +2660,14 @@
 				"say": "Read the brand context and confirm the sign-up event and available customer data.",
 				"tools": [
 					"getBrandContext",
-					"listEventDefinitions"
+					"listBrandEventDefinitions"
 				]
 			},
 			{
 				"say": "Read sign-up events in the requested window and resolve their existing people and companies; deduplicate by record ID.",
 				"tools": [
-					"listCustomerEvents",
-					"getRecord"
+					"listBrandCustomerEvents",
+					"getBrandRecord"
 				]
 			},
 			{
@@ -1843,9 +2777,9 @@
 			{
 				"say": "Check the usage and NPS events the workspace receives, and that key accounts have the plan field set.",
 				"tools": [
-					"listEventDefinitions",
-					"listCustomerEvents",
-					"listRecords"
+					"listBrandEventDefinitions",
+					"listBrandCustomerEvents",
+					"listBrandRecords"
 				]
 			},
 			{
@@ -1981,14 +2915,14 @@
 				"say": "Read the brand context and confirm the sign-up event and available customer data.",
 				"tools": [
 					"getBrandContext",
-					"listEventDefinitions"
+					"listBrandEventDefinitions"
 				]
 			},
 			{
 				"say": "Read sign-up events in the requested window and resolve their existing people and companies; deduplicate by record ID.",
 				"tools": [
-					"listCustomerEvents",
-					"getRecord"
+					"listBrandCustomerEvents",
+					"getBrandRecord"
 				]
 			},
 			{
@@ -2111,50 +3045,50 @@
 				"say": "Read the brand's context, and check its setup kit is applied so the Partnerships board and creator fields are there.",
 				"tools": [
 					"getBrandContext",
-					"listRecordTypes"
+					"listBrandRecordTypes"
 				]
 			},
 			{
 				"say": "Look at partnerships already on the board, so nobody is pitched twice.",
 				"tools": [
-					"listRecords"
+					"listBrandRecords"
 				]
 			},
 			{
 				"say": "Find reviews, comparisons and sponsored posts about each competitor from the last twelve months, with the brand's social watches and web search.",
 				"tools": [
-					"createSocialWatch",
-					"checkSocialWatch",
-					"listSocialItems"
+					"createBrandSocialWatch",
+					"checkBrandSocialWatch",
+					"listBrandSocialItems"
 				]
 			},
 			{
 				"say": "For each creator behind them, find or add a person with their platforms, audience size, topics and past sponsors, and a partnership at Found.",
 				"tools": [
-					"lookupRecords",
-					"createRecord",
-					"updateRecord"
+					"lookupBrandRecords",
+					"createBrandRecord",
+					"updateBrandRecord"
 				]
 			},
 			{
 				"say": "Vet each one (topic fit, recent views, how the review read) and move them to Vetted or Declined with a one-line reason.",
 				"tools": [
-					"updateRecord"
+					"updateBrandRecord"
 				]
 			},
 			{
 				"say": "Draft a short pitch for each vetted creator that names what they said about the competitor and why your product is worth a look, as a sequence held until a person approves the sends.",
 				"tools": [
-					"createSequence",
-					"replaceSequenceSteps",
-					"previewSequence"
+					"createBrandSequence",
+					"replaceBrandSequenceSteps",
+					"previewBrandSequence"
 				]
 			},
 			{
 				"say": "Move partnerships to Pitched when the sequence runs, and to Negotiating or Declined as replies come in.",
 				"tools": [
-					"listInbox",
-					"updateRecord"
+					"listBrandInbox",
+					"updateBrandRecord"
 				]
 			}
 		],
@@ -2271,14 +3205,14 @@
 				"say": "Read the brand context and confirm the sign-up event and available customer data.",
 				"tools": [
 					"getBrandContext",
-					"listEventDefinitions"
+					"listBrandEventDefinitions"
 				]
 			},
 			{
 				"say": "Read sign-up events in the requested window and resolve their existing people and companies; deduplicate by record ID.",
 				"tools": [
-					"listCustomerEvents",
-					"getRecord"
+					"listBrandCustomerEvents",
+					"getBrandRecord"
 				]
 			},
 			{
@@ -2397,14 +3331,14 @@
 				"say": "Read the brand context and confirm the sign-up event and available customer data.",
 				"tools": [
 					"getBrandContext",
-					"listEventDefinitions"
+					"listBrandEventDefinitions"
 				]
 			},
 			{
 				"say": "Read sign-up events in the requested window and resolve their existing people and companies; deduplicate by record ID.",
 				"tools": [
-					"listCustomerEvents",
-					"getRecord"
+					"listBrandCustomerEvents",
+					"getBrandRecord"
 				]
 			},
 			{
@@ -2442,10 +3376,10 @@
 	},
 	{
 		"id": "get-named-in-ai-answers",
-		"version": 1,
+		"version": 2,
 		"title": "Get named in AI answers",
-		"summary": "See which questions AI assistants answer without naming you, and what to publish so they do.",
-		"description": "People ask ChatGPT, Claude and Perplexity which tool to use. If the answer names three competitors and not you, you lose the sale before anyone visits your site. This playbook samples the questions buyers ask in your category, finds the ones where competitors are named and you aren't, reads the pages the assistants cite, and lists what to publish or correct.",
+		"summary": "See which questions AI assistants answer without naming or recommending you, and what to publish so they do.",
+		"description": "People ask ChatGPT, Claude and Perplexity which tool to use. If the answer names three competitors and not you, you lose the sale before anyone visits your site. This playbook drafts the questions buyers ask in your category (with how often people ask them), finds the ones where competitors are named or recommended and you aren't, reads the pages the assistants cite, and lists what to publish, correct or get listed on.",
 		"tier": "clever",
 		"goals": [
 			"ai_answers",
@@ -2472,6 +3406,17 @@
 						"Claude",
 						"Gemini"
 					]
+				},
+				{
+					"capability": "ai.demand",
+					"label": "DataForSEO, for real AI questions, demand and the daily benchmark",
+					"optional": true,
+					"recommended": [
+						"dataforseo"
+					],
+					"recommended_names": [
+						"DataForSEO"
+					]
 				}
 			]
 		},
@@ -2491,36 +3436,45 @@
 		],
 		"steps": [
 			{
-				"say": "Read how often AI answers name the brand today.",
+				"say": "Read the brand's score against competitors today, and what AI answers bring its site.",
 				"tools": [
-					"getAIVisibility",
-					"listAICohorts"
+					"getBrandAIVisibility",
+					"listBrandAICohorts"
 				]
 			},
 			{
-				"say": "Add a set of buyer questions for the category if there isn't one.",
+				"say": "Add a set of buyer questions for the category if there isn't one, drafted with real demand.",
 				"tools": [
-					"createAICohort",
-					"listAIPrompts"
+					"createBrandAICohort",
+					"draftBrandAIPrompts",
+					"listBrandAIPrompts"
 				]
 			},
 			{
-				"say": "Read the answers where competitors are named and the brand isn't, and the pages they cite.",
+				"say": "Track the competitors answers recommend that the cohort doesn't follow yet.",
 				"tools": [
-					"listAISamples",
-					"listAIFacts"
+					"updateBrandAICohort"
 				]
 			},
 			{
-				"say": "Compare with what competitors publish.",
+				"say": "Read the fixes for questions that leave the brand out or recommend a competitor, and the answers behind them.",
 				"tools": [
-					"getSEOCompetitorGaps"
+					"listBrandFixes",
+					"listBrandAISamples",
+					"listBrandAIFacts"
 				]
 			},
 			{
-				"say": "Post a short list of pages to write or facts to correct.",
+				"say": "Read the cited pages worth being on, and compare with what competitors publish.",
 				"tools": [
-					"postMissionUpdate"
+					"listCoverageOpportunities",
+					"getBrandSEOCompetitorGaps"
+				]
+			},
+			{
+				"say": "Post a short list of pages to write, facts to correct and pages to get listed on.",
+				"tools": [
+					"addAgentRunUpdate"
 				]
 			}
 		],
@@ -2531,11 +3485,127 @@
 			{
 				"metric": "Share of AI answers",
 				"how": "Share of sampled answers that name the brand, before and after."
+			},
+			{
+				"metric": "AI visibility score",
+				"how": "The demand-weighted score, 0 to 100; a change counts when its range moves clear of the week before."
 			}
 		],
-		"prompt": "Run the \"Get named in AI answers\" playbook for {{brand}}, which sells {{category}}. Check how often AI assistants name us today. If there's no set of buyer questions for our category, add one. Then find the answers that name competitors but not us, read the pages they cite, and give me a short list of pages to write or facts to correct so we get named.",
+		"prompt": "Run the \"Get named in AI answers\" playbook for {{brand}}, which sells {{category}}. Check how often AI assistants name us today. If there's no set of buyer questions for our category, draft one. Then find the questions where answers leave us out or recommend a competitor instead, read the pages they cite, and give me a short list of pages to write, facts to correct and pages to get listed on so we get named and recommended.",
 		"example": "Northpeak was named in 4 of 40 answers about agency project tools. Most answers cited two comparison pages and a review site, none of which listed Northpeak; the list started with asking those three to add it.",
 		"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/get-named-in-ai-answers/playbook.yaml"
+	},
+	{
+		"id": "help-in-communities",
+		"version": 1,
+		"title": "Help people in the communities where buyers ask",
+		"summary": "Watch the forums and communities where the brand's buyers ask questions, and draft helpful answers from what the brand knows, for a person to approve.",
+		"description": "People ask for advice on Hacker News, Indie Hackers, Stack Overflow, Quora and niche forums long before they talk to a vendor. A useful answer there earns trust and visits for years; a pushy one costs the brand its account. This playbook reads the threads in the communities the team picks, finds the questions the brand can genuinely help with, and drafts an answer from the brand's own knowledge. Every answer waits for a person, and posting happens in a browser signed in as the brand's own account.",
+		"tier": "clever",
+		"goals": [
+			"customers",
+			"search"
+		],
+		"publisher": "outflare",
+		"author": {
+			"github": "outflareai"
+		},
+		"needs": {
+			"data": [],
+			"connections": [
+				{
+					"capability": "plan",
+					"label": "An AI model, unless you run this from your own AI app",
+					"optional": true,
+					"recommended": [
+						"claude",
+						"openai"
+					],
+					"recommended_names": [
+						"Claude",
+						"OpenAI"
+					]
+				}
+			]
+		},
+		"inputs": [
+			{
+				"name": "brand",
+				"label": "Brand",
+				"example": "Northpeak",
+				"optional": false
+			},
+			{
+				"name": "communities",
+				"label": "Communities to watch",
+				"help": "Forums, subforums or tags, one per line.",
+				"example": "Indie Hackers, Stack Overflow tag project-management",
+				"optional": false
+			},
+			{
+				"name": "per_week",
+				"label": "Most answers a week",
+				"example": "5",
+				"optional": false
+			}
+		],
+		"steps": [
+			{
+				"say": "Read the brand's context and voice, and the brand's accounts on each community.",
+				"tools": [
+					"getBrandContext",
+					"listAccounts",
+					"listAccountIncidents"
+				]
+			},
+			{
+				"say": "Read recent threads in each community in a browser, without posting.",
+				"tools": [
+					"createBrowserTask",
+					"getBrowserTask"
+				]
+			},
+			{
+				"say": "Pick the questions the brand can genuinely help with, and draft an answer from what the brand knows.",
+				"tools": [
+					"findBrandKnowledgePassages",
+					"askBrandKnowledge"
+				]
+			},
+			{
+				"say": "Post each answer a person approved, in a browser signed in as the brand's own account.",
+				"tools": [
+					"createBrowserTask",
+					"getBrowserTask"
+				]
+			},
+			{
+				"say": "Keep each answer in Coverage and check it stays up.",
+				"tools": [
+					"createCoveragePlacements",
+					"checkCoveragePlacement"
+				]
+			}
+		],
+		"guardrails": [
+			"Every answer waits for a person's approval.",
+			"Answers help first; the brand is mentioned only where it is the honest answer, and always as the brand's own account.",
+			"Follows each community's rules on self-promotion, and stays within the weekly limit.",
+			"Never votes, asks for votes, or posts from more than one account."
+		],
+		"measure": [
+			{
+				"metric": "Answers kept up",
+				"how": "Coverage placements of the community kind that are live."
+			},
+			{
+				"metric": "Visits from communities",
+				"how": "Visits and sign-ups traced back to each answer."
+			}
+		],
+		"prompt": "Watch {{communities}} for questions {{brand}} can genuinely help with. Draft at most {{per_week}} answers a week from what the brand knows, helpful first, and post each one I approve from the brand's own account.",
+		"example": "In two weeks the agent read 140 threads, drafted six answers, and the team approved four. One answer on Stack Overflow brought 60 visits and three trial sign-ups in its first month.",
+		"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/help-in-communities/playbook.yaml"
 	},
 	{
 		"id": "link-promote-an-asset",
@@ -2630,57 +3700,57 @@
 			{
 				"say": "Read your page so the pitch can say what it adds. With no page given, take the page and topic from the published assets, newest first.",
 				"tools": [
-					"listSEOSites",
-					"listCrawlPages",
-					"listLinkAssets"
+					"listBrandSEOSites",
+					"listBrandCrawlPages",
+					"listBrandLinkAssets"
 				]
 			},
 			{
 				"say": "Search Google for the topic and keep the top pages that aren't yours, after showing the cost.",
 				"tools": [
-					"readSearchResults"
+					"readBrandSearchResults"
 				]
 			},
 			{
 				"say": "Read who links to the top three to five of them, after showing the cost and the budget.",
 				"tools": [
-					"readLinks",
-					"getLinkRead"
+					"readBrandLinks",
+					"getBrandLinkRead"
 				]
 			},
 			{
 				"say": "Add the linking pages as content prospects, with your new page as the page to offer.",
 				"tools": [
-					"addLinkProspects"
+					"addBrandLinkProspects"
 				]
 			},
 			{
 				"say": "Check each new prospect's page with OutflareBot (free apart from the AI read) for whether it is up, already links, its broken links, what it is about and who to contact.",
 				"tools": [
-					"checkLinkProspects",
-					"listLinkProspects"
+					"checkBrandLinkProspects",
+					"listBrandLinkProspects"
 				]
 			},
 			{
 				"say": "Pick a sequence for the pitches whose first step uses {{custom.opener}}, or create the starter sequence (a draft with the opener and one follow-up) if none does.",
 				"tools": [
-					"listLinkSequences",
-					"createLinkSequence",
-					"previewSequence"
+					"listBrandLinkSequences",
+					"createBrandLinkSequence",
+					"previewBrandSequence"
 				]
 			},
 			{
 				"say": "Start a pitch for each prospect worth asking, to its best contact. The workspace's AI writes an opener about their page, and each pitch waits for a person to approve it.",
 				"tools": [
-					"startLinkPitch",
-					"listLinkPitches"
+					"startBrandLinkPitch",
+					"listBrandLinkPitches"
 				]
 			},
 			{
 				"say": "Report what was pitched and, later, what replied, agreed and went live.",
 				"tools": [
-					"getLinkResults",
-					"listLinkProspects"
+					"getBrandLinkResults",
+					"listBrandLinkProspects"
 				]
 			}
 		],
@@ -2805,15 +3875,15 @@
 				"say": "Read the brand's context, and check its setup kit is applied so the Partnerships board is there.",
 				"tools": [
 					"getBrandContext",
-					"listRecordTypes"
+					"listBrandRecordTypes"
 				]
 			},
 			{
 				"say": "List people who signed up in the period, with their companies and websites, and skip anyone already on the board or who opted out of marketing email.",
 				"tools": [
-					"listCustomerEvents",
-					"listRecords",
-					"getRecord"
+					"listBrandCustomerEvents",
+					"listBrandRecords",
+					"getBrandRecord"
 				]
 			},
 			{
@@ -2823,8 +3893,8 @@
 			{
 				"say": "For each one with an audience in the space, save their creator fields and add a partnership at Found with a suggested deal type, and a one-line reason.",
 				"tools": [
-					"updateRecord",
-					"createRecord"
+					"updateBrandRecord",
+					"createBrandRecord"
 				]
 			},
 			{
@@ -2837,8 +3907,8 @@
 			{
 				"say": "Move partnerships to Pitched when the invite goes out, and to Negotiating or Declined as replies come in.",
 				"tools": [
-					"listInbox",
-					"updateRecord"
+					"listBrandInbox",
+					"updateBrandRecord"
 				]
 			}
 		],
@@ -2930,7 +4000,7 @@
 				"say": "Read the brand's context, and list partnerships at Live or Measured.",
 				"tools": [
 					"getBrandContext",
-					"listRecords"
+					"listBrandRecords"
 				]
 			},
 			{
@@ -2944,21 +4014,21 @@
 			{
 				"say": "Rank them by cost per paying customer, mark each as renew, renegotiate or stop against the target, and move them to Measured.",
 				"tools": [
-					"updateRecord"
+					"updateBrandRecord"
 				]
 			},
 			{
 				"say": "Draft a renewal for each one to renew, a new rate for each to renegotiate, and a short thank-you for the rest, held until a person approves them.",
 				"tools": [
-					"createSequence",
-					"replaceSequenceSteps",
-					"previewSequence"
+					"createBrandSequence",
+					"replaceBrandSequenceSteps",
+					"previewBrandSequence"
 				]
 			},
 			{
 				"say": "Once the person decides, move each partnership to Renewed or Declined.",
 				"tools": [
-					"updateRecord"
+					"updateBrandRecord"
 				]
 			}
 		],
@@ -3064,51 +4134,51 @@
 			{
 				"say": "Search Google for pages on each topic that list tools, guides or resources, after showing what the searches cost.",
 				"tools": [
-					"listSEOSites",
-					"readSearchResults"
+					"listBrandSEOSites",
+					"readBrandSearchResults"
 				]
 			},
 			{
 				"say": "Add the pages that list outbound links as broken link prospects.",
 				"tools": [
-					"addLinkProspects"
+					"addBrandLinkProspects"
 				]
 			},
 			{
 				"say": "Check each new prospect's page with OutflareBot (free apart from the AI read) for whether it is up, already links, its broken links, what it is about and who to contact.",
 				"tools": [
-					"checkLinkProspects",
-					"listLinkProspects"
+					"checkBrandLinkProspects",
+					"listBrandLinkProspects"
 				]
 			},
 			{
 				"say": "Keep the pages with a broken link your page can replace, say which one in the prospect's note, and set the page to offer. Delete the rest.",
 				"tools": [
-					"getLinkProspect",
-					"updateLinkProspect",
-					"deleteLinkProspect"
+					"getBrandLinkProspect",
+					"updateBrandLinkProspect",
+					"deleteBrandLinkProspect"
 				]
 			},
 			{
 				"say": "Pick a sequence for the pitches whose first step uses {{custom.opener}}, or create the starter sequence (a draft with the opener and one follow-up) if none does.",
 				"tools": [
-					"listLinkSequences",
-					"createLinkSequence",
-					"previewSequence"
+					"listBrandLinkSequences",
+					"createBrandLinkSequence",
+					"previewBrandSequence"
 				]
 			},
 			{
 				"say": "Start a pitch for each prospect worth asking, to its best contact. The workspace's AI writes an opener about their page, and each pitch waits for a person to approve it.",
 				"tools": [
-					"startLinkPitch",
-					"listLinkPitches"
+					"startBrandLinkPitch",
+					"listBrandLinkPitches"
 				]
 			},
 			{
 				"say": "Report what was pitched and, later, what replied, agreed and went live.",
 				"tools": [
-					"getLinkResults",
-					"listLinkProspects"
+					"getBrandLinkResults",
+					"listBrandLinkProspects"
 				]
 			}
 		],
@@ -3197,51 +4267,51 @@
 				"say": "Read the brand's context, and check its setup kit is applied so the Partnerships board and creator fields are there.",
 				"tools": [
 					"getBrandContext",
-					"listRecordTypes"
+					"listBrandRecordTypes"
 				]
 			},
 			{
 				"say": "Look at partnerships already on the board, so nobody is pitched twice.",
 				"tools": [
-					"listRecords"
+					"listBrandRecords"
 				]
 			},
 			{
 				"say": "Find creators who already cover the topics, starting with people in your own records who create, then the web through your AI app. Add each one as a person with their platforms, audience size and topics, and a partnership at Found.",
 				"tools": [
 					"searchWorkspace",
-					"lookupRecords",
-					"createRecord",
-					"updateRecord"
+					"lookupBrandRecords",
+					"createBrandRecord",
+					"updateBrandRecord"
 				]
 			},
 			{
 				"say": "Vet each one (recent posts, audience fit, past sponsors) and move them to Vetted or Declined with a one-line reason.",
 				"tools": [
-					"updateRecord"
+					"updateBrandRecord"
 				]
 			},
 			{
 				"say": "Draft a short, personal pitch for each vetted creator as a sequence, held until a person approves the sends.",
 				"tools": [
-					"createSequence",
-					"replaceSequenceSteps",
-					"previewSequence"
+					"createBrandSequence",
+					"replaceBrandSequenceSteps",
+					"previewBrandSequence"
 				]
 			},
 			{
 				"say": "Watch for replies and move partnerships to Negotiating or Declined. For each agreed deal, make its own tracked link and promo code, save them on the partnership, and record the fee as spend.",
 				"tools": [
-					"listInbox",
-					"updateRecord",
-					"createTrackingLink",
+					"listBrandInbox",
+					"updateBrandRecord",
+					"createBrandTrackingLink",
 					"recordSpend"
 				]
 			},
 			{
 				"say": "When a post goes live, save its link and move it to Live; after two weeks, report visits, sign-ups and cost per sign-up for each, and move it to Measured.",
 				"tools": [
-					"updateRecord",
+					"updateBrandRecord",
 					"getAnalyticsReport",
 					"outcomesReport"
 				]
@@ -3356,37 +4426,37 @@
 				"say": "Read the brand's context, and check its setup kit is applied so the Partnerships board and creator fields are there.",
 				"tools": [
 					"getBrandContext",
-					"listRecordTypes"
+					"listBrandRecordTypes"
 				]
 			},
 			{
 				"say": "Pick creators from the board at Found or Vetted who fit the offer, and suggest more from your own records who create, up to the number given.",
 				"tools": [
-					"listRecords",
+					"listBrandRecords",
 					"searchWorkspace"
 				]
 			},
 			{
 				"say": "Draft a short offer that says what they get and that there's no obligation to post, as a sequence held until a person approves it.",
 				"tools": [
-					"createSequence",
-					"replaceSequenceSteps",
-					"previewSequence"
+					"createBrandSequence",
+					"replaceBrandSequenceSteps",
+					"previewBrandSequence"
 				]
 			},
 			{
 				"say": "For each creator who accepts, set the deal type to free product, make their tracked link, save it and their promo code on the partnership, record what the product cost as spend, and move it to Agreed.",
 				"tools": [
-					"updateRecord",
-					"createTrackingLink",
+					"updateBrandRecord",
+					"createBrandTrackingLink",
 					"recordSpend"
 				]
 			},
 			{
 				"say": "Two weeks later, check who posted, save the post link and move them to Live; suggest a friendly nudge for the rest.",
 				"tools": [
-					"listSocialItems",
-					"updateRecord"
+					"listBrandSocialItems",
+					"updateBrandRecord"
 				]
 			},
 			{
@@ -3502,51 +4572,51 @@
 				"say": "Read the brand's context and experts, and save a news search for the topic in each region so local journalists are found.",
 				"tools": [
 					"getBrandContext",
-					"listPRExperts",
-					"createNewsSearch",
-					"listNewsSearches"
+					"listBrandPRExperts",
+					"createBrandNewsSearch",
+					"listBrandNewsSearches"
 				]
 			},
 			{
 				"say": "Work out the finding for each region from the brand's own data, as aggregates only, and leave out regions with too few to be fair.",
 				"tools": [
-					"listQueryTables",
-					"runQuery"
+					"listBrandQueryTables",
+					"runBrandQuery"
 				]
 			},
 			{
 				"say": "Start one story per region with its own facts and sources, and draft the expert's quote for approval.",
 				"tools": [
-					"createStory",
-					"addStoryFact",
-					"addStoryQuote",
-					"listStories"
+					"createBrandStory",
+					"addBrandStoryFact",
+					"addBrandStoryQuote",
+					"listBrandStories"
 				]
 			},
 			{
 				"say": "Draft each release, check it and fix what the check finds. A person approves each one.",
 				"tools": [
-					"draftStory",
-					"getStory",
-					"updateStory",
-					"checkStory"
+					"draftBrandStory",
+					"getBrandStory",
+					"updateBrandStory",
+					"checkBrandStory"
 				]
 			},
 			{
 				"say": "For each region, pick the journalists from that region's news search and a short sequence whose first step uses {{custom.opener}}.",
 				"tools": [
-					"listJournalists",
-					"listSequences",
-					"createSequence",
-					"previewSequence"
+					"listBrandJournalists",
+					"listBrandSequences",
+					"createBrandSequence",
+					"previewBrandSequence"
 				]
 			},
 			{
 				"say": "Start the pitches, each waiting for a person, and report results by region.",
 				"tools": [
-					"startStoryPitches",
-					"listStoryPitches",
-					"getStoryResults"
+					"startBrandStoryPitches",
+					"listBrandStoryPitches",
+					"getBrandStoryResults"
 				]
 			}
 		],
@@ -3643,13 +4713,13 @@
 				"say": "Read the brand's context, and check its setup kit is applied so the Partnerships board is there.",
 				"tools": [
 					"getBrandContext",
-					"listRecordTypes"
+					"listBrandRecordTypes"
 				]
 			},
 			{
 				"say": "Look at partnerships already on the board, so nobody is asked twice.",
 				"tools": [
-					"listRecords"
+					"listBrandRecords"
 				]
 			},
 			{
@@ -3659,24 +4729,24 @@
 			{
 				"say": "Add each one as a company with its host or editor as a person, and a partnership at Found with the platform, deal type flat fee and the published price as the fee.",
 				"tools": [
-					"lookupRecords",
-					"createRecord",
-					"updateRecord"
+					"lookupBrandRecords",
+					"createBrandRecord",
+					"updateBrandRecord"
 				]
 			},
 			{
 				"say": "Draft a short rate card request to the best shortlisted ones that don't publish prices, as a sequence held until a person approves it.",
 				"tools": [
-					"createSequence",
-					"replaceSequenceSteps",
-					"previewSequence"
+					"createBrandSequence",
+					"replaceBrandSequenceSteps",
+					"previewBrandSequence"
 				]
 			},
 			{
 				"say": "Suggest which test slots to book within the budget, cheapest per reader first. For each slot a person books, make its tracked link, save it and the promo code on the partnership, and record the fee as spend.",
 				"tools": [
-					"updateRecord",
-					"createTrackingLink",
+					"updateBrandRecord",
+					"createBrandTrackingLink",
 					"recordSpend"
 				]
 			},
@@ -3685,7 +4755,7 @@
 				"tools": [
 					"getAnalyticsReport",
 					"outcomesReport",
-					"updateRecord"
+					"updateBrandRecord"
 				]
 			}
 		],
@@ -3785,50 +4855,50 @@
 			{
 				"say": "List your competitors' pages that went dead and still have links, the most linking sites first.",
 				"tools": [
-					"listSEOSites",
-					"listDeadPages"
+					"listBrandSEOSites",
+					"listBrandDeadPages"
 				]
 			},
 			{
 				"say": "For dead pages not read yet, read who links to them, after showing the cost and the budget.",
 				"tools": [
-					"readLinks",
-					"getLinkRead"
+					"readBrandLinks",
+					"getBrandLinkRead"
 				]
 			},
 			{
 				"say": "Add the linking pages as competitor dead page prospects, with the dead page as evidence and your page that covers the same ground as the page to offer.",
 				"tools": [
-					"addLinkProspects"
+					"addBrandLinkProspects"
 				]
 			},
 			{
 				"say": "Check each new prospect's page with OutflareBot (free apart from the AI read) for whether it is up, already links, its broken links, what it is about and who to contact.",
 				"tools": [
-					"checkLinkProspects",
-					"listLinkProspects"
+					"checkBrandLinkProspects",
+					"listBrandLinkProspects"
 				]
 			},
 			{
 				"say": "Pick a sequence for the pitches whose first step uses {{custom.opener}}, or create the starter sequence (a draft with the opener and one follow-up) if none does.",
 				"tools": [
-					"listLinkSequences",
-					"createLinkSequence",
-					"previewSequence"
+					"listBrandLinkSequences",
+					"createBrandLinkSequence",
+					"previewBrandSequence"
 				]
 			},
 			{
 				"say": "Start a pitch for each prospect worth asking, to its best contact. The workspace's AI writes an opener about their page, and each pitch waits for a person to approve it.",
 				"tools": [
-					"startLinkPitch",
-					"listLinkPitches"
+					"startBrandLinkPitch",
+					"listBrandLinkPitches"
 				]
 			},
 			{
 				"say": "Report what was pitched and, later, what replied, agreed and went live.",
 				"tools": [
-					"getLinkResults",
-					"listLinkProspects"
+					"getBrandLinkResults",
+					"listBrandLinkProspects"
 				]
 			}
 		],
@@ -3928,58 +4998,58 @@
 				"say": "Read the brand's context and experts, and make sure a news search follows the topic so the journalists who cover it are known.",
 				"tools": [
 					"getBrandContext",
-					"listPRExperts",
-					"listNewsSearches",
-					"createNewsSearch"
+					"listBrandPRExperts",
+					"listBrandNewsSearches",
+					"createBrandNewsSearch"
 				]
 			},
 			{
 				"say": "Look for a surprising finding in the brand's own data, as aggregates only, and suggest story ideas from it and the news.",
 				"tools": [
-					"listQueryTables",
-					"runQuery",
-					"suggestStories",
-					"listStories"
+					"listBrandQueryTables",
+					"runBrandQuery",
+					"suggestBrandStories",
+					"listBrandStories"
 				]
 			},
 			{
 				"say": "Start the story, add every number as a fact with how to find it again, and draft a quote for the brand's expert to approve.",
 				"tools": [
-					"createStory",
-					"addStoryFact",
-					"addStoryQuote"
+					"createBrandStory",
+					"addBrandStoryFact",
+					"addBrandStoryQuote"
 				]
 			},
 			{
 				"say": "Draft the release from the facts and approved quotes, check it, and fix what the check finds. A person approves it.",
 				"tools": [
-					"draftStory",
-					"getStory",
-					"updateStory",
-					"checkStory"
+					"draftBrandStory",
+					"getBrandStory",
+					"updateBrandStory",
+					"checkBrandStory"
 				]
 			},
 			{
 				"say": "Pick the journalists who wrote about the topic in the last two months, and a sequence of one email and at most one follow-up whose first step uses {{custom.opener}}.",
 				"tools": [
-					"listJournalists",
-					"listSequences",
-					"createSequence",
-					"previewSequence"
+					"listBrandJournalists",
+					"listBrandSequences",
+					"createBrandSequence",
+					"previewBrandSequence"
 				]
 			},
 			{
 				"say": "Start a pitch to each journalist. The AI writes an opener from the story and their latest article, and each pitch waits for a person.",
 				"tools": [
-					"startStoryPitches",
-					"listStoryPitches"
+					"startBrandStoryPitches",
+					"listBrandStoryPitches"
 				]
 			},
 			{
 				"say": "Report replies and the coverage that followed.",
 				"tools": [
-					"getStoryResults",
-					"listCoverage"
+					"getBrandStoryResults",
+					"listBrandCoverage"
 				]
 			}
 		],
@@ -4061,8 +5131,8 @@
 			{
 				"say": "Read replies from the period and pull out every question.",
 				"tools": [
-					"listInbox",
-					"getInboundMessage"
+					"listBrandInbox",
+					"getBrandInboundMessage"
 				]
 			},
 			{
@@ -4072,15 +5142,15 @@
 			{
 				"say": "Check which ones the site already answers and which pages target them.",
 				"tools": [
-					"listSEOSites",
-					"getSiteSearch",
-					"listPageTargets"
+					"listBrandSEOSites",
+					"getBrandSiteSearch",
+					"listBrandPageTargets"
 				]
 			},
 			{
 				"say": "Write a brief for each missing page and post them to the mission.",
 				"tools": [
-					"postMissionUpdate"
+					"addAgentRunUpdate"
 				]
 			}
 		],

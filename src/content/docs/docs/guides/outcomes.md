@@ -17,7 +17,7 @@ Outflare records costs; it never bills. You pay your providers directly.
 
 - **Calendars and booking tools.** Connect Google Calendar, Outlook, Calendly or Cal.com under **Connectors** (see [Calendars and HubSpot](/docs/integrations/calendars-and-hubspot/)). Each is read every 15 minutes. Only events with a lead among the attendees are stored; the rest of your calendar is never copied, and nothing is changed there.
 - **HubSpot.** Meetings logged in HubSpot, with their outcome (completed, no-show, canceled).
-- **By hand or by an agent.** **Log meeting** on the Meetings tab, `POST /v1/workspaces/{ws}/meetings`, or the `log_meeting` MCP tool.
+- **By hand or by an agent.** **Log meeting** on the Meetings tab, `POST /v1/brands/{brand}/meetings`, or the `log_meeting` MCP tool.
 
 The same meeting seen in two places, say Calendly and Google Calendar, is counted once: two meetings with the same lead that start within 15 minutes of each other are treated as one.
 
@@ -90,8 +90,8 @@ A new charge returns `201`; one whose `ref` was already recorded returns `200` w
 | GET | `/v1/workspaces/{ws}/outcomes/export` | Meetings, deals, spend or the report as CSV or NDJSON |
 | GET | `/v1/workspaces/{ws}/outcomes/syncs` | Each connected source: last run, last success, last error, changes |
 | POST | `/v1/workspaces/{ws}/outcomes/syncs/{id}/run` | Sync one source now |
-| GET, POST, PATCH, DELETE | `/v1/workspaces/{ws}/meetings` | List, log, correct and delete meetings |
-| GET, POST, PATCH, DELETE | `/v1/workspaces/{ws}/deals` | List, log, update and delete deals |
+| GET, POST, PATCH, DELETE | `/v1/brands/{brand}/meetings` | List, log, correct and delete meetings |
+| GET, POST, PATCH, DELETE | `/v1/brands/{brand}/deals` | List, log, update and delete deals |
 | GET, POST, DELETE | `/v1/workspaces/{ws}/spend` | The ledger |
 | GET, POST, PUT, DELETE | `/v1/workspaces/{ws}/spend-recurring` | Recurring costs |
 | GET, PUT, DELETE | `/v1/workspaces/{ws}/spend-rates` | Price per unit, and usage still without one |

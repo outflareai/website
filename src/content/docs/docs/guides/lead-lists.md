@@ -47,12 +47,12 @@ Each run reports what it found, added and enriched, what it left out and why (`a
 
 ```sh
 # Preview a search (free)
-curl -X POST "https://outflare.example.com/v1/workspaces/$WS/lead-lists/preview" \
+curl -X POST "https://outflare.example.com/v1/brands/$BRAND/lead-lists/preview" \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" \
   -d '{"search_integration_id": "'$APOLLO'", "filters": {"titles": ["Head of Growth"], "locations": ["Australia"], "employee_ranges": ["51-200"]}}'
 
 # Create the list and build it
-curl -X POST "https://outflare.example.com/v1/workspaces/$WS/lead-lists" \
+curl -X POST "https://outflare.example.com/v1/brands/$BRAND/lead-lists" \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" \
   -d '{"name": "AU growth leaders", "profile_id": "'$PROFILE'", "search_integration_id": "'$APOLLO'",
        "filters": {"titles": ["Head of Growth"], "locations": ["Australia"], "employee_ranges": ["51-200"]},
@@ -60,11 +60,11 @@ curl -X POST "https://outflare.example.com/v1/workspaces/$WS/lead-lists" \
        "min_score": 40, "refresh_every_days": 7, "build": true}'
 
 # Follow the run, then read the leads, best fit first
-curl "https://outflare.example.com/v1/workspaces/$WS/list-runs/$RUN" -H "Authorization: Bearer $OUTFLARE_TOKEN"
-curl "https://outflare.example.com/v1/workspaces/$WS/lead-lists/$LIST/members" -H "Authorization: Bearer $OUTFLARE_TOKEN"
+curl "https://outflare.example.com/v1/brands/$BRAND/list-runs/$RUN" -H "Authorization: Bearer $OUTFLARE_TOKEN"
+curl "https://outflare.example.com/v1/brands/$BRAND/lead-lists/$LIST/members" -H "Authorization: Bearer $OUTFLARE_TOKEN"
 
 # Refresh now, or fill in missing fields on the leads already there
-curl -X POST "https://outflare.example.com/v1/workspaces/$WS/lead-lists/$LIST/runs" \
+curl -X POST "https://outflare.example.com/v1/brands/$BRAND/lead-lists/$LIST/runs" \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" -d '{"kind": "refresh"}'
 ```
 
@@ -78,11 +78,11 @@ Every lead in a searched list gets a 0 to 100 fit score, with the reasons. It is
 
 ## Where a lead came from
 
-`GET /v1/workspaces/{ws}/leads/{id}/sources` shows each provider that supplied or filled in a lead, its id there and when. Useful for data requests and for knowing which provider's data replies best.
+`GET /v1/brands/{brand}/leads/{id}/sources` shows each provider that supplied or filled in a lead, its id there and when. Useful for data requests and for knowing which provider's data replies best.
 
 ## Clay, spreadsheets and other tools
 
-Anything that can send an HTTP request can add leads: a Clay HTTP API column, Zapier, n8n or a script can `POST /v1/workspaces/{ws}/leads` with `"list_id"` set, or `POST /leads/import?list=<name>` with a CSV (see [Import leads](/docs/guides/import-leads/)). Upserts are by email, so sending the same person twice updates them.
+Anything that can send an HTTP request can add leads: a Clay HTTP API column, Zapier, n8n or a script can `POST /v1/brands/{brand}/leads` with `"list_id"` set, or `POST /leads/import?list=<name>` with a CSV (see [Import leads](/docs/guides/import-leads/)). Upserts are by email, so sending the same person twice updates them.
 
 ## Permissions
 

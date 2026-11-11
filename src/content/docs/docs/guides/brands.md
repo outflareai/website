@@ -9,7 +9,7 @@ sidebar:
 
 Many companies market more than one business. Geonode runs geonode.com and repocket.com, and also makes games, on the web, on phones and on TVs. Separate workspaces would mean connecting every tool twice and inviting every person twice, and nobody could see everything at once. So a workspace can hold **brands** instead.
 
-Each brand has its own website (its point of truth), its own context for agents, and its own sequences, lead lists, domains and mailboxes. Your connectors, people, API tokens, leads and suppression list stay shared, and nobody switches accounts or keys. You can also keep a person or an API token to some brands, so a brand's agency or contractor sees only that brand.
+Each brand has its own website (its point of truth), its own context for agents, and its own sequences, lead lists, domains and mailboxes. Brands share only your team, your billing and the tools you connect, so nobody switches accounts or keys. Everything else, including leads and the unsubscribe list, belongs to one brand. You can also keep a person or an API token to some brands, so a brand's agency or contractor sees only that brand.
 
 ![The Brands page: each brand with its website, platforms and what belongs to it](/screens/brands-list.png)
 
@@ -37,7 +37,7 @@ Memories belong to the company or to a brand. An agent working on Repocket reads
 
 ## Decide what belongs to each brand
 
-Move sending domains, mailboxes, lead lists, sequences and missions into a brand from **Company → Brands** (see [Records in no brand](#records-in-no-brand)), or with `POST /brands/{brand}/add`. A domain brings its mailboxes. Anything you leave out belongs to no brand: its mailboxes can still send for any brand, but it only shows under **All brands**.
+Move sending domains, mailboxes, lead lists and sequences into a brand from **Settings → Brands** (see [Records in no brand](#records-in-no-brand)), or with `POST /brands/{brand}/add`. A domain brings its mailboxes. Anything you leave out belongs to no brand: it shows on no brand's pages until you move it.
 
 A brand's mailboxes send for any of that brand's sequences, and never for another brand's, so Repocket never emails from a Geonode domain. Shared mailboxes can send for any sequence.
 
@@ -45,7 +45,7 @@ What a brand is for (its offer, its audience) goes in its context, who it sells 
 
 ## See one brand at a time
 
-Like a project in PostHog, you work on one brand at a time. The brand picker sits at the top of the sidebar, under your workspace (on a phone, in the top bar), and narrows every page to that brand: sequences, lead lists, mailboxes, domains, missions, connectors, SEO, analytics, ad platforms, site audits and search. Outflare opens on the brand you picked last, or your first brand.
+Like a project in PostHog, you work on one brand at a time. The brand picker sits at the top of the sidebar, under your workspace (on a phone, in the top bar), and narrows every page to that brand: sequences, lead lists, mailboxes, domains, agents, connectors, SEO, analytics, ad platforms, site audits and search. Outflare opens on the brand you picked last, or your first brand.
 
 The brand is part of every link, after the workspace: `app.outflare.ai/acme/repocket/seo`, or `app.outflare.ai/acme/all/seo` for every brand. A link you share opens on the same brand, and older links ending in `?brand=repocket` still work. Pages for the whole workspace, such as Members and API tokens, have no brand in their link. Because handles sit in links, a brand's handle can't be the name of a page, such as `seo` or `members`.
 
@@ -53,13 +53,11 @@ Switching brand reloads the page you're on with that brand's records. If you had
 
 SEO and analytics read through a connection every brand shares, such as Ahrefs or Google Search Console, count each website for the brand whose domains include it. So a brand only sees the keywords and traffic of its own websites.
 
-To compare brands side by side, pick **All brands** at the bottom of the picker. Each record then shows the brand it belongs to.
-
-With one brand picked you see only that brand. Home, infrastructure, warm-up, mailbox health, leads, allocation, meetings and deals count nothing from other brands, and nothing that belongs to no brand.
+You always work in one brand, and you see only that brand. Home, infrastructure, warm-up, mailbox health, leads, allocation, meetings and deals count nothing from other brands, and nothing that belongs to no brand.
 
 ### Records in no brand
 
-Under **All brands**, Home tells you when domains, mailboxes, lead lists or sequences belong to no brand. **Company → Brands** lists them under **Not in a brand**: tick what belongs together, choose the brand and move them in one go. A domain brings its mailboxes. Agents do the same with `add_to_brand`.
+**Settings → Brands** lists domains, mailboxes, lead lists and sequences that belong to no brand under **Not in a brand**: tick what belongs together, choose the brand and move them in one go. A domain brings its mailboxes. Agents do the same with `add_to_brand`.
 
 ## Connect a tool once for every brand
 
@@ -102,7 +100,7 @@ With one brand picked and no analytics counting for it yet, the Analytics page o
 
 ## Keep brands from emailing the same person
 
-Leads and the suppression list are shared, so one person is one lead, and an unsubscribe from any brand stops every brand. You can go further and keep two brands from cold emailing the same person close together. Under **All brands**, open **Company → Brands** and turn on **Contacting the same person** and choose how many days to wait (1 to 365).
+Each brand has its own leads and its own unsubscribe list, so the same person can be a lead of two brands, and an unsubscribe from one brand doesn't stop the other. You can keep two brands from cold emailing the same person close together: open **Settings → Brands**, turn on **Contacting the same person** and choose how many days to wait (1 to 365).
 
 With the rule on, a brand's sequence skips anyone another brand emailed within that many days. Their enrollment shows as blocked with the reason `other_brand:geonode`, naming the brand that got there first. The rule checks only first emails, so follow-ups already under way carry on, and sequences shared by every brand don't count. To check before you enroll, call `POST /recipients/check` with `brand`.
 
@@ -121,7 +119,7 @@ Someone kept to some brands:
 - sees those brands' sequences, lists, mailboxes, domains, inbox, overview and analytics, plus anything shared;
 - changes only their brands' records, so shared records are read-only to them;
 - makes new records in their brand;
-- can't use what needs every brand, such as workspace settings, webhooks, missions and connecting tools. The app hides those pages, and the API answers `403`. In the [API reference](/docs/api/), these endpoints aren't marked `brand_limited`.
+- can't use what needs every brand, such as workspace settings and connecting tools. The app hides those pages, and the API answers `403`. In the [API reference](/docs/api/), these endpoints aren't marked `brand_limited`.
 
 Changing someone's brands is in the audit log as `member.brands_changed`.
 
@@ -150,7 +148,7 @@ On the brand's page (**Company → Brand**), the **⋯** menu has **Archive** an
 | Reports by brand | `GET /reports?group_by=brand`, `GET /outcomes/report?group_by=brand` | `get_report`, `get_outcomes_report` |
 | Analytics sites by brand | `GET /analytics/site-brands`, `PUT /analytics/{id}/site-brand` | `list_analytics_site_brands`, `set_analytics_site_brand` |
 
-`{brand}` is the brand's handle (such as `repocket`) or its id. List endpoints take `?brand=` with a handle or id, `none` for shared records, or `all`. Set `OUTFLARE_BRAND` on the MCP server to make one brand its default.
+`{brand}` is the brand's handle (such as `repocket`) or its id. Brand data is under `/v1/brands/{brand}/…`. The few workspace lists that take `?brand=` accept a handle or id, or `none` for records in no brand. Set `OUTFLARE_BRAND` on the MCP server to make one brand its default.
 
 ```sh
 curl -X POST https://app.outflare.ai/v1/workspaces/$WS/brands \

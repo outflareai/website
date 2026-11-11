@@ -58,12 +58,12 @@ Reading searches, articles, coverage and journalists needs `seo.read`. Saving, c
 
 | Call | What it does |
 | --- | --- |
-| `GET /v1/workspaces/{ws}/news-searches`, `POST` | List or save searches |
-| `PATCH /v1/workspaces/{ws}/news-searches/{search}`, `DELETE` | Change, pause or delete a search |
-| `POST /v1/workspaces/{ws}/news-searches/{search}/run` | Run a search now |
-| `GET /v1/workspaces/{ws}/news-articles` | Articles found, by search or by journalist (`journalist_id`) |
-| `GET /v1/workspaces/{ws}/coverage`, `POST` | Coverage, or add an article yourself |
-| `PATCH /v1/workspaces/{ws}/coverage/{coverage}` | Confirm or dismiss coverage, mark whether it links, or put it on a story |
-| `GET /v1/workspaces/{ws}/journalists` | Journalists, most articles first, optionally for one search |
+| `GET /v1/brands/{brand}/news-searches`, `POST` | List or save searches |
+| `PATCH /v1/brands/{brand}/news-searches/{search}`, `DELETE` | Change, pause or delete a search |
+| `POST /v1/brands/{brand}/news-searches/{search}/run` | Run a search now |
+| `GET /v1/brands/{brand}/news-articles` | Articles found, by search or by journalist (`journalist_id`) |
+| `GET /v1/brands/{brand}/coverage`, `POST` | Coverage, or add an article yourself |
+| `PATCH /v1/brands/{brand}/coverage/{coverage}` | Confirm or dismiss coverage, mark whether it links, or put it on a story |
+| `GET /v1/brands/{brand}/journalists` | Journalists, most articles first, optionally for one search |
 
 A media list is a smart list with the rule `{"news_search": "<search id>", "op": "exists", "within_days": 90}`. Agents use the MCP tools `create_news_search`, `list_coverage` and `list_journalists`, among others.

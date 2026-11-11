@@ -82,7 +82,7 @@ curl -X PATCH "$OUTFLARE_URL/v1/workspaces/$WS/context" -H "Authorization: Beare
   -H "Content-Type: application/json" -d '{"voice": "Plain and short. Sign off with first name."}'
 
 # Remember a decision
-curl -X POST "$OUTFLARE_URL/v1/workspaces/$WS/memories" -H "Authorization: Bearer $TOKEN" \
+curl -X POST "$OUTFLARE_URL/v1/brands/$BRAND/memories" -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" -d '{"text": "Only target Series A and later", "kind": "decision"}'
 
 # What is blocked

@@ -80,29 +80,29 @@ Each search shows its pages with their share and position, and the page to keep:
 
 ```sh
 # Pages by clicks, or queries by impressions
-curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/workspaces/$WS/seo-sites/$SITE/search"
-curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/workspaces/$WS/seo-sites/$SITE/search?group=query&sort=impressions"
+curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/brands/$BRAND/seo-sites/$SITE/search"
+curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/brands/$BRAND/seo-sites/$SITE/search?group=query&sort=impressions"
 # Which pages Google shows for one query
-curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/workspaces/$WS/seo-sites/$SITE/search?group=page_query&keyword=proxy%20pricing"
+curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/brands/$BRAND/seo-sites/$SITE/search?group=page_query&keyword=proxy%20pricing"
 # One page day by day, pages not indexed, and sitemaps
-curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/workspaces/$WS/seo-sites/$SITE/search/history?page=https%3A%2F%2Fwww.example.com%2Fpricing"
-curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/workspaces/$WS/seo-sites/$SITE/indexing?state=not_indexed"
-curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/workspaces/$WS/seo-sites/$SITE/sitemaps"
+curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/brands/$BRAND/seo-sites/$SITE/search/history?page=https%3A%2F%2Fwww.example.com%2Fpricing"
+curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/brands/$BRAND/seo-sites/$SITE/indexing?state=not_indexed"
+curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/brands/$BRAND/seo-sites/$SITE/sitemaps"
 # Keyword targets and suggestions; set one, or accept every suggestion
-curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/workspaces/$WS/seo-sites/$SITE/targets"
-curl -X PUT -H "Authorization: Bearer $TOKEN" -d '{"url": "https://www.example.com/pricing", "keyword": "proxy pricing"}' "https://app.outflare.ai/v1/workspaces/$WS/seo-sites/$SITE/targets"
-curl -X POST -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/workspaces/$WS/seo-sites/$SITE/targets/accept"
+curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/brands/$BRAND/seo-sites/$SITE/targets"
+curl -X PUT -H "Authorization: Bearer $TOKEN" -d '{"url": "https://www.example.com/pricing", "keyword": "proxy pricing"}' "https://app.outflare.ai/v1/brands/$BRAND/seo-sites/$SITE/targets"
+curl -X POST -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/brands/$BRAND/seo-sites/$SITE/targets/accept"
 # Track keywords (and every target keyword), then read where they rank
-curl -X POST -H "Authorization: Bearer $TOKEN" -d '{"keywords": ["proxy pricing"], "from_targets": true}' "https://app.outflare.ai/v1/workspaces/$WS/seo-sites/$SITE/rankings"
-curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/workspaces/$WS/seo-sites/$SITE/rankings"
+curl -X POST -H "Authorization: Bearer $TOKEN" -d '{"keywords": ["proxy pricing"], "from_targets": true}' "https://app.outflare.ai/v1/brands/$BRAND/seo-sites/$SITE/rankings"
+curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/brands/$BRAND/seo-sites/$SITE/rankings"
 # Conversions by landing page, most conversions from search first
-curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/workspaces/$WS/seo-sites/$SITE/conversions?sort=search_conversions"
+curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/brands/$BRAND/seo-sites/$SITE/conversions?sort=search_conversions"
 # What dropped, and what recovered
-curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/workspaces/$WS/seo-sites/$SITE/regressions"
-curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/workspaces/$WS/seo-sites/$SITE/regressions?status=resolved"
+curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/brands/$BRAND/seo-sites/$SITE/regressions"
+curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/brands/$BRAND/seo-sites/$SITE/regressions?status=resolved"
 # Internal links worth adding, and searches your pages compete for
-curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/workspaces/$WS/seo-sites/$SITE/internal-links"
-curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/workspaces/$WS/seo-sites/$SITE/cannibalisation"
+curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/brands/$BRAND/seo-sites/$SITE/internal-links"
+curl -H "Authorization: Bearer $TOKEN" "https://app.outflare.ai/v1/brands/$BRAND/seo-sites/$SITE/cannibalisation"
 ```
 
 Each answer has `source`, the property the numbers come from, or `null` when no Search Console property covers the site. Reading needs the `seo.read` scope, and setting targets or tracking keywords `seo.manage`. Agents use the MCP tools `get_site_search`, `get_site_search_history`, `get_site_indexing`, `get_site_sitemaps`, `list_page_targets`, `set_page_target`, `accept_page_targets`, `track_keywords`, `list_rankings`, `get_rank_history`, `get_site_conversions`, `get_site_regressions`, `get_site_internal_links` and `get_site_cannibalisation`, for example: "Which pages get many impressions but few clicks, and what would you change on them?" or "Accept the suggested target keywords and fix the pages whose titles miss them."

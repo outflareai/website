@@ -92,15 +92,15 @@ Reading experts, stories and results, and running the check, needs `seo.read`; c
 
 | Call | What it does |
 | --- | --- |
-| `GET /v1/workspaces/{ws}/pr-experts`, `POST` | List or add experts |
-| `GET /v1/workspaces/{ws}/stories`, `POST` | List or start stories |
-| `POST /v1/workspaces/{ws}/stories/{story}/check` | Check the release |
-| `POST /v1/workspaces/{ws}/stories/{story}/approve` | Approve it (people only) |
-| `POST /v1/workspaces/{ws}/stories/ideas` | Suggest ideas with AI |
-| `POST /v1/workspaces/{ws}/stories/{story}/draft` | Draft the release with AI |
-| `POST /v1/workspaces/{ws}/stories/{story}/pitches` | Start pitches to journalists |
-| `GET /v1/workspaces/{ws}/story-pitches` | List pitches |
-| `POST /v1/workspaces/{ws}/story-pitches/{pitch}/approve` | Approve a pitch (people only) |
-| `GET /v1/workspaces/{ws}/stories/results` | Pitches, replies and coverage per story |
+| `GET /v1/brands/{brand}/pr-experts`, `POST` | List or add experts |
+| `GET /v1/brands/{brand}/stories`, `POST` | List or start stories |
+| `POST /v1/brands/{brand}/stories/{story}/check` | Check the release |
+| `POST /v1/brands/{brand}/stories/{story}/approve` | Approve it (people only) |
+| `POST /v1/brands/{brand}/stories/ideas` | Suggest ideas with AI |
+| `POST /v1/brands/{brand}/stories/{story}/draft` | Draft the release with AI |
+| `POST /v1/brands/{brand}/stories/{story}/pitches` | Start pitches to journalists |
+| `GET /v1/brands/{brand}/story-pitches` | List pitches |
+| `POST /v1/brands/{brand}/story-pitches/{pitch}/approve` | Approve a pitch (people only) |
+| `GET /v1/brands/{brand}/stories/results` | Pitches, replies and coverage per story |
 
 Agents use `list_stories`, `create_story`, `add_story_fact`, `add_story_quote`, `check_story`, `suggest_stories`, `draft_story`, `pitch_story`, `list_story_pitches`, `get_story_results` and `list_pr_experts`, among others. They can draft a story and fix what the check finds; a person approves quotes, releases and pitches in Outflare.

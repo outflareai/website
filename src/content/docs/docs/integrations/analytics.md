@@ -70,10 +70,10 @@ explains caveats in words, such as Search Console's two to three day delay.
 
 ```sh
 # Connected analytics tools, their reports and default site
-curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/analytics"
+curl -H "Authorization: Bearer $TOKEN" "$URL/v1/brands/$BRAND/analytics"
 
 # Traffic totals from every tool, one call
-curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/analytics/summary?from=2026-09-27&to=2026-10-24"
+curl -H "Authorization: Bearer $TOKEN" "$URL/v1/brands/$BRAND/analytics/summary?from=2026-09-27&to=2026-10-24"
 
 # Top 50 search queries from one connection
 curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/analytics/$ID/reports/search_queries?limit=50"
@@ -139,16 +139,16 @@ Reading history never calls a provider, so it is fast and free:
 
 ```sh
 # Every website, each tool side by side, search clicks added up across Google and Bing
-curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/analytics/overview?from=2026-07-01&to=2026-10-23"
+curl -H "Authorization: Bearer $TOKEN" "$URL/v1/brands/$BRAND/analytics/overview?from=2026-07-01&to=2026-10-23"
 
 # Each tool's daily traffic for one website, to compare them
-curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/analytics/compare?host=example.com"
+curl -H "Authorization: Bearer $TOKEN" "$URL/v1/brands/$BRAND/analytics/compare?host=example.com"
 
 # Top pages over three months, added up across tools
-curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/analytics/history?report=pages&group=key&host=example.com&from=2026-07-24&limit=50"
+curl -H "Authorization: Bearer $TOKEN" "$URL/v1/brands/$BRAND/analytics/history?report=pages&group=key&host=example.com&from=2026-07-24&limit=50"
 
 # Sync status, and sync now (one connection waits and returns rows stored; all is queued)
-curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/analytics/syncs"
+curl -H "Authorization: Bearer $TOKEN" "$URL/v1/brands/$BRAND/analytics/syncs"
 curl -X POST -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/analytics/$ID/sync"
 curl -X POST -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/analytics/sync"
 ```
