@@ -21,6 +21,8 @@ Also on its page, under **Links**, add everywhere else the brand lives: its App 
 
 With your own [Geonode](/docs/integrations/connectors/) connection, Outflare also reads the brand's website when you add it (the home page, then up to 40 of the pages it links to: products, pricing, features, integrations, about, use cases, customers and docs) and asks your own AI model what the business does. The result, **What the website says** on the brand's page, is a summary, the industry, and bullets for products, services, features, integrations, capabilities, who it serves and use cases, each linked to the page it came from. Edit any of it, or press **Read the website again** after a redesign. Agents read it with the brand's context, and [AI visibility](/docs/guides/ai-visibility/#set-up-in-three-minutes) drafts its questions from it. Geonode and your AI provider bill your own accounts; without a Geonode connection the brand's page says which connection to add.
 
+Outflare also fills in the brand's logo and main colour from its own website, under **Company → Logo and colours**: when you add the brand, when its website changes, and when you open that card with no logo yet (or press **Find on website**). OutflareBot reads the home page, obeying robots.txt, and takes the logo the site names for itself, or else its icon, plus its theme colour. It only fills in what is empty and never replaces a logo or colour you set. This needs no connection or key.
+
 The Brands page shows brands as cards or as a table you can sort; it remembers which you picked.
 
 ## Tell agents about it
@@ -124,6 +126,7 @@ Changing someone's brands is in the audit log as `member.brands_changed`.
 | List brands | `GET /v1/workspaces/{ws}/brands` | `list_brands` |
 | Add or edit one, including its links | `POST /brands`, `PATCH /brands/{brand}` | `create_brand`, `update_brand` |
 | Links found on its website | `POST /brands/{brand}/links/discover`, `GET /brands/{brand}/link-suggestions` | `find_brand_links`, `list_brand_link_suggestions`, `add_brand_link`, `dismiss_brand_link` |
+| Logo and colour from its website | `POST /brands/{brand}/look/find` | `find_brand_look` |
 | A brand's own context | `GET`/`PATCH /brands/{brand}/context` | `get_brand_context`, `update_brand_context` |
 | Company and brand context together | `GET /context?brand=repocket` | `get_context` with `brand` |
 | Move records in or out | `POST /brands/{brand}/add`, `/remove` | `add_to_brand`, `remove_from_brand` |
