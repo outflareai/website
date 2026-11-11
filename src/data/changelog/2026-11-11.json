@@ -2,7 +2,7 @@
 	"version": "2026.11.11",
 	"date": "2026-11-11",
 	"status": "in-progress",
-	"updated": "2026-11-11T18:25:50Z",
+	"updated": "2026-11-11T18:41:51Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -248,7 +248,21 @@
 			"edition": "open-source",
 			"text": "The API panel's examples are ready to paste: they carry the page's real brand, workspace and item ids, and **Create a token for this** puts a new read-only token for just that call and brand into the example, shown once.",
 			"at": "2026-11-11T18:25:50Z"
+		},
+		{
+			"kind": "launch",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "With a Google Workspace connection, the CRM now also reads enabled members' calendars: meetings with a CRM contact or company appear on its timeline and in the relationship check. Internal and personal meetings are never copied.",
+			"at": "2026-11-11T18:30:13Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Direct tracking for tracker campaigns: an ad can link straight to your page with the campaign's code, and the site script records the click itself, with the traffic source's click id, cost and fields. outflare.clickId() and {ofclk} in your links pass the click id on to offers, so postbacks still find the click.",
+			"at": "2026-11-11T18:41:51Z"
 		}
 	],
-	"through": "05ee0da+1889d54"
+	"through": "b5e4bd6+891df77"
 }
