@@ -2,7 +2,7 @@
 	"version": "2026.11.11",
 	"date": "2026-11-11",
 	"status": "in-progress",
-	"updated": "2026-11-11T14:27:22Z",
+	"updated": "2026-11-11T14:40:02Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -87,7 +87,21 @@
 			"edition": "open-source",
 			"text": "Kits with smart lists, rules and journeys can now be set up for any brand, and each brand gets its own copies. Two brands can also have smart lists with the same name.",
 			"at": "2026-11-11T14:27:22Z"
+		},
+		{
+			"kind": "fix",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "Every Outflare tool now works in ChatGPT and other apps that cap how many tools they show. Apps see about 50 core tools, including email templates, send email and broadcasts, plus `find_tools` to search all of Outflare's tools and `call_tool` to run any of them. Connect to `/mcp?tools=all` to list every tool instead. The MCP server now reports the Outflare version it runs.",
+			"at": "2026-11-11T14:40:02Z"
+		},
+		{
+			"kind": "fix",
+			"area": "lifecycle",
+			"edition": "open-source",
+			"text": "Email providers and sending domains that belong to no brand are shared, so every brand's Email providers page now lists them, marked Shared, instead of asking you to connect a provider. Disconnecting the default provider makes the next one the default, so sends always have a sender.",
+			"at": "2026-11-11T14:40:02Z"
 		}
 	],
-	"through": "1caeb44+146615f"
+	"through": "0c9133b+3aada0c"
 }
