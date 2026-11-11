@@ -2,7 +2,7 @@
 	"version": "2026.11.11",
 	"date": "2026-11-11",
 	"status": "in-progress",
-	"updated": "2026-11-11T15:45:14Z",
+	"updated": "2026-11-11T16:04:58Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -122,7 +122,14 @@
 			"edition": "open-source",
 			"text": "Business details on About your company: save each brand's legal name, tax or company number and postal address once. Lifecycle email adds the address to its footer (or place it with {{brand_address}}), sequences can use it too, and the brand's help centre, cookie policy and agents show it.",
 			"at": "2026-11-11T15:45:14Z"
+		},
+		{
+			"kind": "fix",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Failed Ahrefs (and other SEO) reads no longer count against the connection's budget, and a refused report is not retried and billed again every hour. Competitor suggestions run weekly with the snapshot, not every day.",
+			"at": "2026-11-11T16:04:58Z"
 		}
 	],
-	"through": "53823f6+63397f4"
+	"through": "26477fe+969e6f4"
 }
