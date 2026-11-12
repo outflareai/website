@@ -39,8 +39,8 @@ workspace added before is still sent and does no harm.
 | Google Ads (`google_ads`) | Sign in with Google (read-only Google Ads access). Manager accounts list the accounts under them. | Nothing: Google retired developer tokens in September 2026 (see below). |
 | Meta Ads (`meta_ads`) | A system user access token from your own Business Manager with `ads_read` (and `ads_management` for journeys to fill audiences), or sign in with Facebook | Nothing |
 | Microsoft Advertising (`microsoft_ads`) | Sign in with Microsoft | The workspace's own developer token, from the Microsoft Advertising Developer Portal. |
-| Reddit Ads (`reddit_ads`) | Sign in with Reddit (read-only ads access) | Nothing |
-| X Ads (`x_ads`) | Your own X developer app's API key and secret, plus an access token and secret for the account that runs the ads | Ads API access approved for that app by X |
+| Reddit Ads (`reddit_ads`) | Sign in with Reddit, with read and edit access to ads, so Outflare can pause campaigns and set budgets when a person approves it. A connection made before edit access was asked for keeps reading; connect it again to manage campaigns. To send conversions back, add your pixel ID and a Conversions API token on the connection. | Nothing |
+| X Ads (`x_ads`) | Your own X developer app's API key and secret, plus an access token and secret for the account that runs the ads. Make the token after setting the app's permissions to Read and write, so Outflare can pause campaigns and set budgets. To send conversions back, add your pixel ID and conversion event IDs (`Sign-up = tw-…, Purchase = tw-…`) on the connection. | Ads API access approved for that app by X |
 | LinkedIn Ads (`linkedin_ads`) | Sign in with LinkedIn (`r_ads`, `r_ads_reporting`) | Advertising API access approved for the app by LinkedIn |
 | TikTok Ads (`tiktok_ads`) | Sign in with TikTok For Business and choose the ad accounts to share (Ad Account Management and Reporting read access). To add accounts later, connect again. | Nothing |
 | Snapchat Ads (`snapchat_ads`) | Sign in with Snapchat (`snapchat-marketing-api`). Every ad account of every organization you belong to is listed. | Nothing |
@@ -231,7 +231,8 @@ definitions first.
 | Google Ads | A conversion action that takes uploaded clicks (Upload clicks) | `gclid`, `gbraid` or `wbraid`; hashed email and phone (enhanced conversions for leads) | The sign-in needs Google Ads access that can upload |
 | Meta Ads | A pixel (dataset), as a standard event such as Purchase or Lead | `fbc` (from `fbclid`), `fbp`, hashed email, phone and record id | The system user assigned to the pixel |
 | Microsoft Advertising | An offline conversion goal | `msclkid`; hashed email and phone | The developer token above |
-| Reddit Ads | The Conversions API, as SignUp, Lead, Purchase and so on | `rdt_cid`, hashed email and record id | The workspace's own Conversions API access token, from Reddit Ads Manager → Events Manager |
+| Reddit Ads | Your pixel, through the Conversions API, as SignUp, Lead, Purchase and so on | `rdt_cid`, hashed email and record id | Your own pixel ID and Conversions API access token, from Reddit Ads Manager → Events Manager. A connection with a token but no pixel ID still sends through Reddit's older endpoint, so add the pixel ID before Reddit retires it. |
+| X Ads | A conversion event on your pixel, through the Conversions API, by its event ID (`tw-…`) | `twclid`, hashed email and phone | The pixel ID and event IDs on the connection, from X Ads Manager → Events Manager → Install with Conversion API |
 | TikTok Ads | A pixel, through the Events API, as CompletePayment, CompleteRegistration, SubmitForm and so on | `ttclid`, the `_ttp` cookie (`ttp`), hashed email, phone and record id | The sign-in's Pixel and Events access; if TikTok refuses it, an Events API access token from Events Manager on the connection |
 | Snapchat Ads | A Snap Pixel, through the Conversions API, as PURCHASE, SIGN_UP, SUBSCRIBE and so on | `ScCid`, the `_scid` cookie (`scid`), hashed email, phone and record id | The sign-in's access; if Snapchat refuses it, a Conversions API token from Ads Manager → Business Details on the connection |
 | Taboola Ads | An active event-based conversion (Realize → Tracking, "Create conversions using code"), by its event name, as a server-to-server action | `tblci` only | Nothing: the bulk S2S endpoint takes no token |
@@ -350,7 +351,7 @@ in the ad account. See
 
 ## Suggestions
 
-After each sync Outflare reads every campaign it can change (Google Ads, Meta, Microsoft Advertising, LinkedIn and TikTok) and suggests at most one change for each, with why and the numbers behind it, on the **Suggestions** tab at whatever level the page shows:
+After each sync Outflare reads every campaign it can change (Google Ads, Meta, Microsoft Advertising, LinkedIn, TikTok, Reddit and X) and suggests at most one change for each, with why and the numbers behind it, on the **Suggestions** tab at whatever level the page shows:
 
 - **Raise the budget** by a fifth when a conversion cost at most nine tenths of the target over the last 14 days and the budget ran out on at least 4 of the last 7.
 - **Lower the budget** by a fifth when a conversion cost more than 1.3 times the target (with at least 5 conversions).
@@ -413,9 +414,11 @@ X Ads tests are planned once X's developer access is set up.
 
 ## Managing campaigns
 
-Three changes, on Google Ads, Meta, Microsoft Advertising, LinkedIn and
-TikTok (the other platforms are read but not changed yet, and say so with
-`422 connector_invalid`):
+Three changes, on Google Ads, Meta, Microsoft Advertising, LinkedIn,
+TikTok, Reddit and X (the other platforms are read but not changed yet, and
+say so with `422 connector_invalid`). On Reddit, a daily budget can be set
+only on a campaign with campaign budget optimization; a campaign whose
+budgets are on its ad groups is refused with a reason:
 
 | Call | What it does |
 | --- | --- |
@@ -455,8 +458,9 @@ Every change is an audit event and a webhook (`ad_campaign.paused`,
 how it ended is a product event (`ad_change.applied`, `ad_change.failed`) and
 the metric `outflare_ads_changes_total` (the Grafana row "Paid media
 (managing campaigns)"). Meta needs the `ads_management` permission on the
-token or sign-in, LinkedIn `rw_ads`, and TikTok write access to Ad Account
-Management on the app; a connection made before that was asked for is
+token or sign-in, LinkedIn `rw_ads`, TikTok write access to Ad Account
+Management on the app, Reddit edit access to ads, and X an access token
+made with Read and write permission; a connection made before that was asked for is
 reconnected to manage campaigns. Microsoft's sign-in already covers it.
 
 ## Targeting
