@@ -2,7 +2,7 @@
 	"version": "2026.11.12",
 	"date": "2026-11-12",
 	"status": "in-progress",
-	"updated": "2026-11-12T12:10:31Z",
+	"updated": "2026-11-12T12:53:00Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -101,7 +101,14 @@
 			"edition": "open-source",
 			"text": "Link orders: import an intermediary's full database (up to 32 MB, sent in batches with progress). Headers like \"Traffic / Organic\" now map, and the donor card shows the full metrics: referring domains, backlinks, keywords, outgoing links, geo and more. Donors get their own Intermediary (searchable), Theme and Site age fields.",
 			"at": "2026-11-12T12:01:50Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "The lander script now carries a honeypot: a link no person can see or reach, so a bot that follows every link on a lander flags its own click as suspect, keeping it out of caps and reports.",
+			"at": "2026-11-12T12:53:00Z"
 		}
 	],
-	"through": "1c85d64+4d2dbef"
+	"through": "e7e2fe6+03ac616"
 }
