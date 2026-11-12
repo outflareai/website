@@ -2,7 +2,7 @@
 	"version": "2026.11.12",
 	"date": "2026-11-12",
 	"status": "in-progress",
-	"updated": "2026-11-12T14:22:57Z",
+	"updated": "2026-11-12T14:30:43Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -143,7 +143,14 @@
 			"edition": "open-source",
 			"text": "A sent broadcast now shows its recipients: one row per person with what happened to their email (delivered, bounced and why, marked as spam, skipped and why) and when it was sent, delivered, opened and clicked. Filter by status with one click, search for a person, or download a group as a CSV. The API and MCP list the same with `show` and `q`.",
 			"at": "2026-11-12T13:41:37Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "general",
+			"edition": "open-source",
+			"text": "The sidebar groups its modules under seven headings (Customers, Email and outreach, Search, Social, Ads, Measure, Company). Home puts the outreach email numbers under their own heading. The Agent page uses plainer names: All changes, Playbook runs and Rules, where a grant is now called a rule.",
+			"at": "2026-11-12T14:30:43Z"
 		}
 	],
-	"through": "8c1ed1f+8fea817"
+	"through": "e4226ff+dbe7d88"
 }
