@@ -2,7 +2,7 @@
 	"version": "2026.11.12",
 	"date": "2026-11-12",
 	"status": "in-progress",
-	"updated": "2026-11-12T14:36:02Z",
+	"updated": "2026-11-12T14:42:12Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -157,7 +157,14 @@
 			"edition": "open-source",
 			"text": "X Ads connects with a **Sign in to X** button on Paid ads, Accounts, through your own X developer app, instead of pasting an access token and secret.",
 			"at": "2026-11-12T14:36:02Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Conversions flagged as suspect (a hosting network, a repeat clicker, a filter list, the honeypot or a conversion seconds after its click) are no longer sent back to traffic sources, so the networks' bidding doesn't learn from bots. They stay in the ledger and the reports.",
+			"at": "2026-11-12T14:42:12Z"
 		}
 	],
-	"through": "26bf903+ff6fd97"
+	"through": "0e0eca3+e6cf885"
 }
