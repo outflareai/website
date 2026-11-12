@@ -33,6 +33,17 @@ Settings → **Company** shows everything Outflare knows. Edit the context, and 
 
 Until the company name, what you do, goals and voice are filled in, agents ask for them once. Press **Don't ask again** if you'd rather they didn't.
 
+### Business details
+
+Under **Business details**, enter the brand's legal name, its tax or company number (ABN, VAT, EIN) and its postal address once. Outflare reuses them so nobody types them again:
+
+- **Lifecycle email** adds the legal name and address to every footer, and fills `{{brand_address}}` and `{{brand_legal_name}}` in [templates](/docs/guides/email-templates/) and [sequences](/docs/guides/sequences/).
+- The brand's **help centre** shows them in its footer and tells search engines who runs it.
+- The brand's **cookie policy** says who runs the site.
+- **Agents** read them with the rest of the brand's context, so a press release or a form gets the exact legal name and address.
+
+Each brand has its own. Agents can save them too, with `update_brand_context`.
+
 ## In Claude, ChatGPT and Cursor
 
 The MCP server tells every agent to start with `get_context`. One call returns the company context, pinned and recent memories, your brands and the workspace status. The agent asks only for what is missing, saves your answers with `update_context`, and saves anything lasting you say with `remember`.
