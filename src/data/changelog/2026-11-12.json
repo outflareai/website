@@ -2,7 +2,7 @@
 	"version": "2026.11.12",
 	"date": "2026-11-12",
 	"status": "in-progress",
-	"updated": "2026-11-12T05:30:24Z",
+	"updated": "2026-11-12T08:03:13Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -45,7 +45,14 @@
 			"edition": "open-source",
 			"text": "Insights, dashboards, site analytics, email reports and the digest now count days in the brand's reporting time zone, so \"today\" and a chart's days are the brand's. Periods stay whole across daylight-saving changes, and `?timezone=` reads any of them in another zone.",
 			"at": "2026-11-12T02:45:19Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "The Tracker has Offers, Landers and Flows tabs: offers with a token picker, a missing click id warning, payouts by country, caps with a fallback and a test preview; landers with each call to action's click URL and page script; and flows edited like a campaign's paths.",
+			"at": "2026-11-12T08:03:13Z"
 		}
 	],
-	"through": "fa5b639+dceea00"
+	"through": "a86430f+375d73c"
 }
