@@ -13,18 +13,19 @@ Agent actions replace [missions](/docs/agents/missions/), which are retired.
 
 ## The Agents page
 
-**Agents** in the sidebar has three views for the brand you picked:
+**Agents** in the sidebar has four views for the brand you picked:
 
 - **Waiting for you**: changes held until you approve or reject them. Each card leads with the question the agent is asking, then its reason and exactly what will run.
-- **Everything**: every change your agents made, what ran, what failed and what was refused.
-- **What agents may do**: each agent's rules, which you set.
+- **Playbook runs**: the playbooks Outflare's agent is carrying out.
+- **All changes**: every change your agents made, what ran, what failed and what was refused.
+- **Rules**: what each agent may do on its own, which you set.
 
-**Runs** lists the playbooks Outflare's agent is carrying out. Changes about no brand, such as invites and connections, are under **Settings → Team activity**.
+Changes about no brand, such as invites and connections, are under **Settings → Team activity**.
 
 ## Turn it on for an agent
 
 - **An app you connect** ([Connect Claude, ChatGPT or Cursor](/docs/agents/connect/)) starts with **Every change waits for you** switched on.
-- **An API token**: tick **It's an agent: send its changes through the action layer** when you create or edit it, or set `action_gate`:
+- **An API token**: tick **It's an agent: its changes follow your rules** when you create or edit it, or set `action_gate`:
 
 ```sh
 curl -X POST "$OUTFLARE_URL/v1/workspaces/$WS/api-tokens" \
@@ -48,7 +49,7 @@ A new agent has no rules, so it starts out asking for everything.
 
 ## Rules for an agent
 
-A rule (a **grant** in the API) says what happens to one agent's changes that match it. Only a signed-in person who may manage agent actions sets them, on **Agents → What agents may do** or with the API:
+A rule (a **grant** in the API) says what happens to one agent's changes that match it. Only a signed-in person who may manage agent actions sets them, on **Agents → Rules** or with the API:
 
 ```sh
 # Let the agent create sequences on its own, at most 5 a day.
