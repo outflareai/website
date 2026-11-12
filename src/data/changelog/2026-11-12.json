@@ -2,7 +2,7 @@
 	"version": "2026.11.12",
 	"date": "2026-11-12",
 	"status": "in-progress",
-	"updated": "2026-11-12T15:32:38Z",
+	"updated": "2026-11-12T18:10:07Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -178,7 +178,14 @@
 			"edition": "open-source",
 			"text": "Tracker clicks can now be looked up on your own IPQualityScore account (Tracker → Setup): a high risk score or a data-centre network flags the click and its conversions, and their postbacks to traffic sources wait for the lookup.",
 			"at": "2026-11-12T15:32:38Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Link orders: the catalog marks sites worth writing to directly, not only through the intermediary (not a PBN, DR or traffic stored, an email at the site already stored), and you can filter to them and Find email or Send to a sequence from the row. The mark itself sends nothing.",
+			"at": "2026-11-12T18:10:07Z"
 		}
 	],
-	"through": "1c2e283+4e1b21a"
+	"through": "84a28f0+be116cb"
 }
