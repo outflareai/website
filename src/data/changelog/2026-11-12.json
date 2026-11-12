@@ -2,7 +2,7 @@
 	"version": "2026.11.12",
 	"date": "2026-11-12",
 	"status": "in-progress",
-	"updated": "2026-11-12T01:56:00Z",
+	"updated": "2026-11-12T02:22:00Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -31,7 +31,14 @@
 			"edition": "open-source",
 			"text": "Each brand has a reporting time zone. Attribution and paid ads reports count days in it (with `?timezone=` for one report), and tracker caps and path rules by day or hour follow the brand's midnight. Ad platforms' own numbers stay in their accounts' time zones.",
 			"at": "2026-11-12T01:56:00Z"
+		},
+		{
+			"kind": "launch",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "AI answer share: see mention rate and share of voice from already-stored AI answers, by topic, with a weekly trend and citations of compare pages. This does not start a new run.",
+			"at": "2026-11-12T02:22:00Z"
 		}
 	],
-	"through": "22e633b+1de61ca"
+	"through": "4d9a919+b1aeadd"
 }
