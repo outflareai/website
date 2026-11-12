@@ -2,7 +2,7 @@
 	"version": "2026.11.12",
 	"date": "2026-11-12",
 	"status": "in-progress",
-	"updated": "2026-11-12T10:03:02Z",
+	"updated": "2026-11-12T10:43:28Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -87,7 +87,14 @@
 			"edition": "open-source",
 			"text": "The Tracker has a Logs tab: clicks, lander clicks, conversions, and postbacks in and out, newest first with Live refresh, plus the postbacks that weren't recorded, grouped by why with the fix. The API and MCP list clicks and lander clicks too.",
 			"at": "2026-11-12T10:03:02Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "The Tracker's Report can show tracker clicks instead of site visits: clicks, conversions from your affiliate networks, payouts and the cost traffic sources reported, by campaign, traffic source, offer, lander, path, custom field or any click detail.",
+			"at": "2026-11-12T10:43:28Z"
 		}
 	],
-	"through": "346c728+80145e9"
+	"through": "7dafdfa+3cba221"
 }
