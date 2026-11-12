@@ -40,7 +40,7 @@ workspace added before is still sent and does no harm.
 | Meta Ads (`meta_ads`) | A system user access token from your own Business Manager with `ads_read` (and `ads_management` for journeys to fill audiences), or sign in with Facebook | Nothing |
 | Microsoft Advertising (`microsoft_ads`) | Sign in with Microsoft | The workspace's own developer token, from the Microsoft Advertising Developer Portal. |
 | Reddit Ads (`reddit_ads`) | Sign in with Reddit, with read and edit access to ads, so Outflare can pause campaigns and set budgets when a person approves it. A connection made before edit access was asked for keeps reading; connect it again to manage campaigns. To send conversions back, add your pixel ID and a Conversions API token on the connection. | Nothing |
-| X Ads (`x_ads`) | Your own X developer app's API key and secret, plus an access token and secret for the account that runs the ads. Make the token after setting the app's permissions to Read and write, so Outflare can pause campaigns and set budgets. To send conversions back, add your pixel ID and conversion event IDs (`Sign-up = o8z2x, Purchase = o8z2y`) on the connection. | Ads API access approved for that app by X |
+| X Ads (`x_ads`) | Your own X developer app's API key and secret, then **Sign in to X** on the connection (Paid ads, Accounts) with the account that runs the ads. Before you sign in, set the app's permissions to Read and write, so Outflare can pause campaigns and set budgets, and add `https://app.outflare.ai/v1/integrations/oauth/callback` (or your own server's address) to the app's callback URLs. An access token and secret made in X's developer portal still work instead. To send conversions back, add your pixel ID and conversion event IDs (`Sign-up = o8z2x, Purchase = o8z2y`) on the connection. | Ads API access approved for that app by X |
 | LinkedIn Ads (`linkedin_ads`) | Sign in with LinkedIn (`r_ads`, `r_ads_reporting`) | Advertising API access approved for the app by LinkedIn |
 | TikTok Ads (`tiktok_ads`) | Sign in with TikTok For Business and choose the ad accounts to share (Ad Account Management and Reporting read access). To add accounts later, connect again. | Nothing |
 | Snapchat Ads (`snapchat_ads`) | Sign in with Snapchat (`snapchat-marketing-api`). Every ad account of every organization you belong to is listed. | Nothing |
@@ -410,7 +410,7 @@ A trial whose conversions cost more than twice the target three days running is 
 | `POST /v1/brands/{brand}/ads/tests/{id}/roll-back` | End the test and leave the campaign as it was (`ads.manage`) |
 | `POST /v1/brands/{brand}/ads/suggestions/{id}/approve` with `{"test": true}` | Test a budget suggestion instead of making it (`ads.manage`) |
 
-X Ads tests are planned once X's developer access is set up.
+X Ads has no tests here: X splits an audience only between campaigns that already exist and offers no way to copy a campaign with its ads, so change an X budget directly and compare the days before and after.
 
 ## Managing campaigns
 
@@ -461,8 +461,8 @@ how it ended is a product event (`ad_change.applied`, `ad_change.failed`) and
 the metric `outflare_ads_changes_total` (the Grafana row "Paid media
 (managing campaigns)"). Meta needs the `ads_management` permission on the
 token or sign-in, LinkedIn `rw_ads`, TikTok write access to Ad Account
-Management on the app, Reddit edit access to ads, and X an access token
-made with Read and write permission; a connection made before that was asked for is
+Management on the app, Reddit edit access to ads, and X an app with Read and write permission
+before you sign in; a connection made before that was asked for is
 reconnected to manage campaigns. Microsoft's sign-in already covers it.
 
 ## Targeting
