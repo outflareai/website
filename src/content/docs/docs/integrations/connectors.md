@@ -34,7 +34,7 @@ By category, including what is planned:
 | Messaging | [Telegram](/docs/guides/team/#sign-a-telegram-account-in-to-outflare), with your company's own Telegram app: the company's Telegram accounts sign in by QR code, read only |
 | Knowledge sources | Slack (knowledge), read only: the [support assistant](/docs/guides/support-assistant/#when-your-knowledge-has-no-answer) looks in the channels you pick for answers your team already gave. Separate from the Slack connection that posts [alerts](/docs/guides/alerts/) |
 | Social | [Reddit](/docs/guides/reddit/), with your workspace's own app: find posts and post replies a person approves from the brand's own account |
-| Ad platforms | [Google Ads, Meta Ads, Microsoft Advertising, Reddit Ads, X Ads, LinkedIn Ads](/docs/integrations/paid-media/), read only, with your own ad accounts |
+| Ad platforms | [Google Ads, Meta Ads, Microsoft Advertising, Reddit Ads, X Ads, LinkedIn Ads](/docs/integrations/paid-media/), with your own ad accounts: spend and results, conversions sent back, and campaign changes a person approves |
 | DNS and registrars | Cloudflare, Namecheap, GoDaddy, Route 53 |
 | AI models | [Claude, OpenAI, Gemini, Mistral, xAI, DeepSeek and the routers OpenRouter, Vercel AI Gateway and Requesty](/docs/agents/ai-models/), for planning and running missions and for [AI visibility](/docs/guides/ai-visibility/), with your own key |
 | Custom | Any HTTP API or MCP server you register |
