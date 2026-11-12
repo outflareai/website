@@ -2,7 +2,7 @@
 	"version": "2026.11.12",
 	"date": "2026-11-12",
 	"status": "in-progress",
-	"updated": "2026-11-12T08:06:30Z",
+	"updated": "2026-11-12T08:44:43Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -59,7 +59,14 @@
 			"edition": "open-source",
 			"text": "Link orders can now target article and product pages: a new Targets tab suggests pages from stored competitor data, you tick the ones to use, and each order gets a primary anchor from SE Ranking plus an optional second anchor (brand, URL, or another keyword).",
 			"at": "2026-11-12T08:06:30Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "The Tracker has Traffic sources and Affiliate networks tabs: start from a gallery of network templates, preview the campaign URL as you edit its parameters, and send conversions back with a postback that can't be saved half filled in; each affiliate network shows its postback URL to paste into the network.",
+			"at": "2026-11-12T08:44:43Z"
 		}
 	],
-	"through": "bd246e1+7f81b05"
+	"through": "ff5bf0d+8c322e5"
 }
