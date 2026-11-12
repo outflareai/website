@@ -416,9 +416,11 @@ X Ads tests are planned once X's developer access is set up.
 
 Three changes, on Google Ads, Meta, Microsoft Advertising, LinkedIn,
 TikTok, Reddit and X (the other platforms are read but not changed yet, and
-say so with `422 connector_invalid`). On Reddit, a daily budget can be set
-only on a campaign with campaign budget optimization; a campaign whose
-budgets are on its ad groups is refused with a reason:
+say so with `422 connector_invalid`). On Reddit, a campaign with campaign
+budget optimization holds its daily budget; otherwise the campaign's budget
+is the sum of its ad groups' daily budgets, and a new one is shared between
+them in the same proportions. A campaign with only lifetime budgets is
+refused with a reason.:
 
 | Call | What it does |
 | --- | --- |
