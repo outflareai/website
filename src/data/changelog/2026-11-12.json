@@ -2,7 +2,7 @@
 	"version": "2026.11.12",
 	"date": "2026-11-12",
 	"status": "in-progress",
-	"updated": "2026-11-12T02:22:00Z",
+	"updated": "2026-11-12T02:45:19Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -38,7 +38,14 @@
 			"edition": "open-source",
 			"text": "AI answer share: see mention rate and share of voice from already-stored AI answers, by topic, with a weekly trend and citations of compare pages. This does not start a new run.",
 			"at": "2026-11-12T02:22:00Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Insights, dashboards, site analytics, email reports and the digest now count days in the brand's reporting time zone, so \"today\" and a chart's days are the brand's. Periods stay whole across daylight-saving changes, and `?timezone=` reads any of them in another zone.",
+			"at": "2026-11-12T02:45:19Z"
 		}
 	],
-	"through": "4d9a919+b1aeadd"
+	"through": "585d457+3fa6329"
 }
