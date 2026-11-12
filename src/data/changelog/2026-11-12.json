@@ -2,7 +2,7 @@
 	"version": "2026.11.12",
 	"date": "2026-11-12",
 	"status": "in-progress",
-	"updated": "2026-11-12T12:56:31Z",
+	"updated": "2026-11-12T13:28:55Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -115,7 +115,14 @@
 			"edition": "open-source",
 			"text": "Link orders: right-click any catalog cell for site actions. Find email shows the addresses already stored for the site (people, link-building contacts, Outreach leads, notes). Send to a sequence adds a stored or typed address to one of the brand's Outreach sequences with the usual suppression and exclusion rules.",
 			"at": "2026-11-12T12:56:31Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Direct-mode tracker clicks, recorded by the site script, are now checked against the brand's user agent click filters too, so they are flagged as suspect like redirect clicks.",
+			"at": "2026-11-12T13:28:55Z"
 		}
 	],
-	"through": "2dfd25f+2d2ddab"
+	"through": "7578352+2b637d1"
 }
