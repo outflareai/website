@@ -2,7 +2,7 @@
 	"version": "2026.11.12",
 	"date": "2026-11-12",
 	"status": "in-progress",
-	"updated": "2026-11-12T14:50:26Z",
+	"updated": "2026-11-12T15:16:07Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -164,7 +164,14 @@
 			"edition": "open-source",
 			"text": "Conversions flagged as suspect (a hosting network, a repeat clicker, a filter list, the honeypot or a conversion seconds after its click) are no longer sent back to traffic sources, so the networks' bidding doesn't learn from bots. They stay in the ledger and the reports.",
 			"at": "2026-11-12T14:42:12Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Brands can choose which tracker clicks get an IP reputation lookup on their own IPQualityScore account: flagged clicks, converting clicks and a sample of the rest, up to a monthly cap. The lookups themselves arrive next.",
+			"at": "2026-11-12T15:16:07Z"
 		}
 	],
-	"through": "fb80490+9627e54"
+	"through": "b5114f2+47d7e4e"
 }
