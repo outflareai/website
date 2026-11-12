@@ -2,7 +2,7 @@
 	"version": "2026.11.12",
 	"date": "2026-11-12",
 	"status": "in-progress",
-	"updated": "2026-11-12T13:32:37Z",
+	"updated": "2026-11-12T13:41:37Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -129,7 +129,21 @@
 			"edition": "open-source",
 			"text": "Business details on About your company no longer show example values in empty fields, and an address in a city-state such as Singapore no longer names the country twice.",
 			"at": "2026-11-12T13:32:37Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "X Ads and Reddit Ads can now be managed from Outflare: pause, resume and set campaign budgets (with your approval), get the same budget and pause suggestions as Google and Meta, read each network's own conversions, and send sign-ups and purchases back through X's and Reddit's Conversions APIs (Reddit's newer v3 API once you add your pixel ID).",
+			"at": "2026-11-12T13:41:37Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "lifecycle",
+			"edition": "open-source",
+			"text": "A sent broadcast now shows its recipients: one row per person with what happened to their email (delivered, bounced and why, marked as spam, skipped and why) and when it was sent, delivered, opened and clicked. Filter by status with one click, search for a person, or download a group as a CSV. The API and MCP list the same with `show` and `q`.",
+			"at": "2026-11-12T13:41:37Z"
 		}
 	],
-	"through": "80c08bf+37fe84f"
+	"through": "8c1ed1f+87dd9a1"
 }
