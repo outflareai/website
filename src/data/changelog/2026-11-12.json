@@ -2,7 +2,7 @@
 	"version": "2026.11.12",
 	"date": "2026-11-12",
 	"status": "in-progress",
-	"updated": "2026-11-12T13:28:55Z",
+	"updated": "2026-11-12T13:32:37Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -122,7 +122,14 @@
 			"edition": "open-source",
 			"text": "Direct-mode tracker clicks, recorded by the site script, are now checked against the brand's user agent click filters too, so they are flagged as suspect like redirect clicks.",
 			"at": "2026-11-12T13:28:55Z"
+		},
+		{
+			"kind": "fix",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Business details on About your company no longer show example values in empty fields, and an address in a city-state such as Singapore no longer names the country twice.",
+			"at": "2026-11-12T13:32:37Z"
 		}
 	],
-	"through": "7578352+2b637d1"
+	"through": "80c08bf+37fe84f"
 }
