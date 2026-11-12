@@ -2,7 +2,7 @@
 	"version": "2026.11.12",
 	"date": "2026-11-12",
 	"status": "in-progress",
-	"updated": "2026-11-12T09:34:52Z",
+	"updated": "2026-11-12T10:03:02Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -80,7 +80,14 @@
 			"edition": "open-source",
 			"text": "The Tracker has a Setup tab: a checklist that ticks itself as you set up conversion tracking, a postback URL builder in each affiliate network's own tokens with its pixel, script and server call, and a test conversion that says what happened and why.",
 			"at": "2026-11-12T09:34:52Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "The Tracker has a Logs tab: clicks, lander clicks, conversions, and postbacks in and out, newest first with Live refresh, plus the postbacks that weren't recorded, grouped by why with the fix. The API and MCP list clicks and lander clicks too.",
+			"at": "2026-11-12T10:03:02Z"
 		}
 	],
-	"through": "a19abe7+644e63a"
+	"through": "346c728+80145e9"
 }
