@@ -23,7 +23,7 @@ With your own [Geonode](/docs/integrations/connectors/) connection, Outflare als
 
 Outflare also fills in the brand's logo and main colour from its own website, under **Company → Logo and colours**: when you add the brand, when its website changes, and when you open that card with no logo yet (or press **Find on website**). OutflareBot reads the home page, obeying robots.txt, and takes the logo the site names for itself, or else its icon, plus its theme colour. It only fills in what is empty and never replaces a logo or colour you set. This needs no connection or key.
 
-The Brands page shows brands as cards or as a table you can sort; it remembers which you picked.
+**Settings → Brands** lists every brand in the workspace, as cards or as a table you can sort (it remembers which you picked). Open it from the switcher with **Manage brands**. It is also where you add, archive and restore brands, sort [records in no brand](#records-in-no-brand) and set the rule for [contacting the same person](#keep-brands-from-emailing-the-same-person).
 
 ## Tell agents about it
 
@@ -45,9 +45,9 @@ What a brand is for (its offer, its audience) goes in its context, who it sells 
 
 ## See one brand at a time
 
-Like a project in PostHog, you work on one brand at a time. The brand picker sits at the top of the sidebar, under your workspace (on a phone, in the top bar), and narrows every page to that brand: sequences, lead lists, mailboxes, domains, agents, connectors, SEO, analytics, ad platforms, site audits and search. Outflare opens on the brand you picked last, or your first brand.
+Like a project in PostHog, you work on one brand at a time. The brand picker sits at the top of the sidebar, under your workspace (on a phone, in the top bar), and narrows every page to that brand: sequences, lead lists, mailboxes, domains, agents, playbook automations, connectors, SEO, analytics, reports, ad platforms, site audits and search. There is no view across all brands: Outflare opens on the brand you picked last, or your first brand.
 
-The brand is part of every link, after the workspace: `app.outflare.ai/acme/repocket/seo`, or `app.outflare.ai/acme/all/seo` for every brand. A link you share opens on the same brand, and older links ending in `?brand=repocket` still work. Pages for the whole workspace, such as Members and API tokens, have no brand in their link. Because handles sit in links, a brand's handle can't be the name of a page, such as `seo` or `members`.
+The brand is part of every link, after the workspace: `app.outflare.ai/acme/repocket/seo`. A link you share opens on the same brand, and older links ending in `?brand=repocket` still work. Pages for the whole workspace, such as Members and API tokens, have no brand in their link. Because handles sit in links, a brand's handle can't be the name of a page, such as `seo` or `members`.
 
 Switching brand reloads the page you're on with that brand's records. If you had something open that belongs to the other brand, such as a site audit or a sequence, you go back to that page's list for the new brand.
 
@@ -106,7 +106,7 @@ With the rule on, a brand's sequence skips anyone another brand emailed within t
 
 ## Reports by brand
 
-**Sending reports** and **Cost per meeting** follow the brand picked in the sidebar, and both can group by brand to compare them side by side. In the API, `GET /reports` and `GET /outcomes/report` take `group_by=brand` and `?brand=`. A send, reply or meeting counts for its sequence's brand. Spend tied only to a mailbox or domain counts for that mailbox's or domain's brand.
+**Sending reports**, **Cost per meeting**, attribution and the email overview show only the brand picked in the sidebar. In the API they are brand routes: `GET /v1/brands/{brand}/reports`, `/outcomes/report`, `/outcomes/export`, `/email-overview` and `/attribution/...`. A send, reply or meeting counts for its sequence's brand. Spend tied only to a mailbox or domain counts for that mailbox's or domain's brand.
 
 The audit log and the events feed take `?brand=`, and every event and webhook payload carries `brand_id` when the changed record has a brand. A webhook can be kept to one brand: pick it under **Which brands** in Settings → Webhooks, or send `"brand": "repocket"` when you create it.
 
@@ -133,6 +133,8 @@ On the brand's page (**Company → Brand**), the **⋯** menu has **Archive** an
 
 ## API and MCP
 
+What belongs to a brand lives under `/v1/brands/{brand}/`, where `{brand}` is the brand's id (`GET /v1/workspaces/{ws}/brands` lists them). Only what the whole workspace shares, such as members, API tokens, connections and billing, stays under `/v1/workspaces/{ws}/`. An older workspace route for brand data answers `410` with the error code `route_moved` and names its brand route. MCP tools that read or change a brand's data take `brand`.
+
 | What | REST | MCP tool |
 | --- | --- | --- |
 | List brands | `GET /v1/workspaces/{ws}/brands` | `list_brands` |
@@ -145,7 +147,7 @@ On the brand's page (**Company → Brand**), the **⋯** menu has **Archive** an
 | Keep a member to some brands | `PATCH /members/{user}` with `brand_ids` | (people only, in the app or API) |
 | A token for one brand | `POST /tokens` with `brand` | (in the app or API) |
 | The cross-brand contact rule | `GET`/`PATCH /brand-rules` | `get_brand_rules`, `set_brand_rules` |
-| Reports by brand | `GET /reports?group_by=brand`, `GET /outcomes/report?group_by=brand` | `get_report`, `get_outcomes_report` |
+| A brand's reports | `GET /v1/brands/{brand}/reports`, `GET /v1/brands/{brand}/outcomes/report` | `get_report`, `get_outcomes_report` |
 | Analytics sites by brand | `GET /analytics/site-brands`, `PUT /analytics/{id}/site-brand` | `list_analytics_site_brands`, `set_analytics_site_brand` |
 
 `{brand}` is the brand's handle (such as `repocket`) or its id. Brand data is under `/v1/brands/{brand}/…`. The few workspace lists that take `?brand=` accept a handle or id, or `none` for records in no brand. Set `OUTFLARE_BRAND` on the MCP server to make one brand its default.

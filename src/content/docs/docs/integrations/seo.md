@@ -141,8 +141,7 @@ its own), or the last read failed, for example because the monthly budget is
 used up.
 
 Below them are the brand's audited sites with their [health score](/docs/guides/site-audits/)
-and its open fixes. Websites no brand claims show as shared. Pick a brand in
-the brand switcher to see only that one. A number reads "Not enough data"
+and its open fixes. The page shows the brand picked in the brand switcher. A number reads "Not enough data"
 until its tool has synced the weeks before the ones you picked, or has a
 snapshot from before them.
 
