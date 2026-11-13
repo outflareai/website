@@ -55,7 +55,7 @@ Scripts and agents usually want a call to either succeed or stop. Wrap it in `ok
 ```ts
 import { createClient, ok, OutflareError } from '@outflare/sdk';
 
-const stats = ok(await gtm.GET('/v1/workspaces/{ws}/stats', { params: { path: { ws } } }));
+const stats = ok(await gtm.GET('/v1/brands/{brand}/stats', { params: { path: { brand } } }));
 console.log(`${stats.sent_24h} sent today of ${stats.mailboxes.daily_capacity}, ${stats.unread_replies} unread replies`);
 
 try {
