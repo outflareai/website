@@ -2,7 +2,7 @@
 	"version": "2026.11.13",
 	"date": "2026-11-13",
 	"status": "in-progress",
-	"updated": "2026-11-13T12:33:50Z",
+	"updated": "2026-11-13T12:41:26Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -17,7 +17,14 @@
 			"edition": "open-source",
 			"text": "Meetings read from your team's calendars now follow the same privacy as their email: private to the calendar's owner unless they share the contact, or team sharing shows those the AI check finds to be about work. Events marked private in Google are never saved.",
 			"at": "2026-11-13T12:33:50Z"
+		},
+		{
+			"kind": "fix",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Sales queues show the prospect’s reply, source links and arrival time before you open a conversation. Managers start on All leads with status and teammate filters; Sales keeps the API panel closed until opened and gives browser tabs readable names.",
+			"at": "2026-11-13T12:41:26Z"
 		}
 	],
-	"through": "cf0021f+1ffbc92"
+	"through": "4a97ee5+4e1ad20"
 }
