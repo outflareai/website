@@ -19,6 +19,16 @@ A **playbook** is a ready-made recipe for growth, such as welcoming new sign-ups
 
 Open one to see what it needs, its steps and the API operations each step uses, what it won't do, how to tell it worked, and its prompt with your inputs filled in.
 
+## A playbook's home in your brand
+
+A playbook with a setup kit shows **In this brand** at the top once the kit is set up: every rule, journey, list and signal type it added, whether each is on, and what it has done. Above them are the [signals](/docs/guides/signals/) it raised: how many need attention, how many are late, and how many closed as won or not useful in the last 90 days, so you can tell whether the playbook earns its place. **Set it up now, without a run** adds the kit's parts as drafts straight from the page, so a playbook that is only rules and journeys needs no AI model.
+
+## Your own playbooks
+
+**New playbook** groups rules, journeys, smart lists and signal types your brand already has under a name of your own, such as "Save accounts that go quiet". It gets the same home as a ready-made playbook, so one page answers whether the whole motion works. A playbook owns none of its parts: a part can sit in several playbooks, and removing a playbook removes only the grouping, never a rule, journey, list or signal type. From the API it is `/v1/brands/{brand}/own-playbooks` (MCP `list_own_playbooks`, `create_own_playbook`, `update_own_playbook`, `delete_own_playbook`).
+
+Playbooks for customer teams: **Flag renewals and quiet accounts for their owners** puts every company that goes quiet or comes up for renewal in Needs attention, and **Grow your share of each customer's spend** adds [share of wallet](/docs/guides/customer-records/#company-groups-and-share-of-wallet) fields and flags the healthy companies with the most room left.
+
 ## Run one
 
 - **In Outflare:** fill in the blanks, choose a mode and press **Start**. Outflare's agent carries the playbook out in turns on your own [AI model](/docs/agents/ai-models/), as a [run](/docs/agents/actions/#outflares-agent-runs) you follow on the **Agents** page. The mode is your say on what it may do alone: **copilot** holds every change for you, **autonomous** runs changes within the budget you set, and **dry run** changes nothing and shows what it would have done.

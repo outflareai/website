@@ -181,6 +181,24 @@ Neither sets off a rule, journey, email or webhook for what moves back.
 
 Owners can change many people or companies at once, from a list, a saved query or ids: set an owner or a field, add or remove tags, move them in or out of a static list, or archive them. See [Bulk edits](/docs/guides/bulk-edits/).
 
+## The account page
+
+A person's or company's page is the one place to read before you act on an account. It shows only the cards that have something to say for your brand:
+
+- **Needs attention** first: open [signals](/docs/guides/signals/), a reply or a conversation waiting, an overdue task, a failed payment, a renewal within 60 days, or no owner.
+- **Stage and owner**, and the **account plan**: their goal, the next step, their hesitations and their limits. These are ordinary fields, so every change is in the record's history.
+- **Billing, products and usage**: plan and revenue from your payment connections, each product's lifecycle stage, and live [metrics](/docs/guides/metrics/) with whether each is up or down on the period before.
+- **Scores** with a "Why?" that lists the factors ([Scores](/docs/guides/scores/)).
+- **People** at a company with their roles, **deals** with their stage (a lost deal keeps its lost reason and note; the board asks for a reason when a deal moves to Lost), support conversations, who spoke last, website visits, tasks, journeys and alerts.
+
+`GET /v1/brands/{brand}/records/{record}/summary` (MCP `get_record_summary`) returns the same in one call.
+
+### Company groups and share of wallet
+
+Companies have a **Parent company** field, for a subsidiary, a regional office or a separate sign-up that belongs to a bigger account. A company can't be its own parent or sit under one of its own children. Once a company has a parent or a company underneath, its page shows a **Company group** card: each company's recurring revenue, what it paid in the last 12 months, its health and its open signals, with totals for the group (`GET /v1/brands/{brand}/records/{record}/group`, MCP `get_record_group`).
+
+**Share of wallet** is what a company paid you in the last 12 months against what it spends a year on what you sell, with every supplier. The share of wallet setup kit (from the playbook **Grow your share of each customer's spend**) adds four fields to companies: the yearly spend on your category, how sure the number is, where it comes from, and the other suppliers. Once a company has an estimate, its page shows the share and the room left. Nothing is estimated for you: a person or an agent writes the number and says where it came from.
+
 ## Timeline
 
 Every person and company has one timeline across every module, newest first (`GET /records/{record}/timeline`, MCP `get_record_timeline`):
@@ -191,6 +209,7 @@ Every person and company has one timeline across every module, newest first (`GE
 - cold email sent to them and their replies, meetings and deals
 - visits to your website: the landing page, pages seen, where they came from and the campaign
 - journeys entered, and finished or left
+- support conversations opening and closing, CRM tasks and notes
 
 A company's timeline includes its people's, and each item says whose it is; `people=false` shows only the company's own. Filter it with `kinds`, for example `?kinds=message,meeting,deal` for just the outreach, and with `brand` for one brand's items and the shared ones. Pages are 50 items; pass `next_before` as `before` for the next.
 
