@@ -136,7 +136,7 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `list_mission_actions`, `get_mission_action` | Changes a retired mission held or dry-ran, with decisions and results (history) | |
 | `list_mission_calls`, `list_pending_approvals` | Every call made in a retired mission, and what retired missions held (changes waiting now: `list_actions`) | |
 | `create_brand`, `update_brand` | Add a brand (a business with its own website), or change or archive one | Yes |
-| `add_to_brand`, `remove_from_brand` | Move domains, mailboxes, lead lists, sequences or missions into a brand, or make them shared by every brand again | Yes |
+| `add_to_brand` | Move domains, mailboxes, lead lists, sequences or missions to another brand. Everything belongs to one brand, so `remove_from_brand` always refuses | Yes |
 | `create_ideal_customer_profile`, `update_ideal_customer_profile` | Describe an ideal customer once (words and filters) for list scoring and the lead finder | Yes |
 | `log_meeting`, `update_meeting` | Log a meeting, or correct its status, qualification or which sequence it counts for | Yes |
 | `log_deal`, `update_deal` | Log or update a deal (synced deals keep their CRM fields) | Yes |
