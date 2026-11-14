@@ -5,6 +5,8 @@ sidebar:
   order: 2
 ---
 
+This page is about sending mailboxes for outreach. To bring your team's own work email and meetings with contacts into the CRM, see [Email and meetings in the CRM](/docs/guides/crm-email/).
+
 There are three ways to connect Google Workspace and Microsoft 365 mailboxes. All of them end the same way: Outflare signs in over SMTP and IMAP, checks the domain's DNS, and marks the mailbox `active` or `error`.
 
 | Way | Best for | Passwords |
