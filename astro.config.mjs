@@ -55,7 +55,7 @@ export default defineConfig({
 			title: 'Outflare',
 			// Keep in step with src/data/positioning.ts (the config can't import TypeScript).
 			description:
-				'Outflare is the open-source AI marketing platform for people and their agents: analytics, SEO, AI visibility, cold email, leads and more, through one API and MCP.',
+				'Outflare is the open-source, AI-native GTM platform: analytics, SEO, AI visibility, ads, outreach, CRM and customer data on one record, with an agent that works on it, through one API and MCP.',
 			logo: { light: './src/assets/logo-light.svg', dark: './src/assets/logo-dark.svg', alt: 'Outflare', replacesTitle: true },
 			favicon: '/favicon.svg',
 			social: [{ icon: 'github', label: 'GitHub', href: repo }],
@@ -90,7 +90,7 @@ export default defineConfig({
 				{ tag: 'meta', attrs: { property: 'og:image', content: 'https://outflare.ai/brand/social/outflare-social-1200x630.png' } },
 				{ tag: 'meta', attrs: { property: 'og:image:width', content: '1200' } },
 				{ tag: 'meta', attrs: { property: 'og:image:height', content: '630' } },
-				{ tag: 'meta', attrs: { property: 'og:image:alt', content: 'Outflare: the open-source AI marketing platform for people and agents' } },
+				{ tag: 'meta', attrs: { property: 'og:image:alt', content: 'Outflare: the AI-native GTM platform. Find, win and keep every customer, with one agent.' } },
 				{ tag: 'meta', attrs: { name: 'twitter:image', content: 'https://outflare.ai/brand/social/outflare-social-1200x630.png' } },
 			],
 			sidebar: [

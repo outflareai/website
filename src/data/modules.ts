@@ -3,10 +3,22 @@
 
 export type ModuleStatus = 'live' | 'building' | 'planned';
 
+// Where a module sits in the customer's life, as the home page groups them.
+// 'all' is for the parts every stage uses (the agent, brands, customer data).
+export type ModuleStage = 'found' | 'win' | 'keep' | 'all';
+
+export const moduleStages: { id: ModuleStage; name: string; summary: string }[] = [
+	{ id: 'found', name: 'Get found', summary: 'Search, AI answers, ads, social and reviews.' },
+	{ id: 'win', name: 'Win the deal', summary: 'Leads, outreach, replies and what each deal cost.' },
+	{ id: 'keep', name: 'Keep and grow', summary: 'Onboarding, product email, accounts at risk and win-backs.' },
+	{ id: 'all', name: 'Under all of it', summary: 'One record per customer, one agent, every brand.' },
+];
+
 export interface Module {
 	name: string;
 	summary: string;
 	status: ModuleStatus;
+	stage: ModuleStage;
 	docs?: string;
 	// Inner SVG markup for a 24x24 stroke icon.
 	icon: string;
@@ -21,6 +33,7 @@ export const moduleStatusLabel: Record<ModuleStatus, string> = {
 export const modules: Module[] = [
 	{
 		name: 'Agents and missions',
+		stage: 'all',
 		summary: 'Give a goal in plain words. Your AI model drafts the plan, works within the limits you set and waits for approval where you choose.',
 		status: 'live',
 		docs: '/docs/agents/missions/',
@@ -28,6 +41,7 @@ export const modules: Module[] = [
 	},
 	{
 		name: 'Website analytics',
+		stage: 'found',
 		summary: 'Visitors, pages, sources, search queries and conversions from Google Analytics, Search Console, PostHog and 13 more, side by side.',
 		status: 'live',
 		docs: '/docs/integrations/analytics/',
@@ -35,6 +49,7 @@ export const modules: Module[] = [
 	},
 	{
 		name: 'SEO',
+		stage: 'found',
 		summary: 'Domain rating, backlinks, rankings, competitors and site audits from Ahrefs or DataForSEO, with weekly history and a budget you set.',
 		status: 'live',
 		docs: '/docs/integrations/seo/',
@@ -42,6 +57,7 @@ export const modules: Module[] = [
 	},
 	{
 		name: 'Inbox',
+		stage: 'win',
 		summary: 'Every conversation in one place, sorted by what it means, with labels, assignment and replies from the same address and thread.',
 		status: 'live',
 		docs: '/docs/guides/inbox/',
@@ -49,6 +65,7 @@ export const modules: Module[] = [
 	},
 	{
 		name: 'Leads and lists',
+		stage: 'win',
 		summary: 'Import leads or build lists from your own data providers, scored against your ideal customer, with suppression built in.',
 		status: 'live',
 		docs: '/docs/guides/lead-lists/',
@@ -56,6 +73,7 @@ export const modules: Module[] = [
 	},
 	{
 		name: 'Email campaigns',
+		stage: 'win',
 		summary: 'Sequences, sending domains and deliverability checks, with one policy check on every email and limits agents cannot get around.',
 		status: 'live',
 		docs: '/docs/guides/sequences/',
@@ -63,6 +81,7 @@ export const modules: Module[] = [
 	},
 	{
 		name: 'Outcomes and cost',
+		stage: 'win',
 		summary: 'Meetings, deals and spend from your calendar and CRM, so you can see what each brand and sequence costs and returns.',
 		status: 'live',
 		docs: '/docs/guides/outcomes/',
@@ -70,6 +89,7 @@ export const modules: Module[] = [
 	},
 	{
 		name: 'Brands',
+		stage: 'all',
 		summary: 'Market several businesses from one workspace, each with its own website, context for agents, mailboxes and analytics, without connecting tools twice.',
 		status: 'live',
 		docs: '/docs/guides/brands/',
@@ -77,6 +97,7 @@ export const modules: Module[] = [
 	},
 	{
 		name: 'Social',
+		stage: 'found',
 		summary: 'Followers and post numbers for every brand on X and LinkedIn, and helpful Reddit replies you approve before they post.',
 		status: 'live',
 		docs: '/docs/guides/social/',
@@ -84,6 +105,7 @@ export const modules: Module[] = [
 	},
 	{
 		name: 'Reviews',
+		stage: 'found',
 		summary: 'Every review of your brands on Trustpilot, G2, Capterra and Google, a review score with its direction, and answers drafted for you to post.',
 		status: 'live',
 		docs: '/docs/guides/reviews/',
@@ -91,6 +113,7 @@ export const modules: Module[] = [
 	},
 	{
 		name: 'Paid media',
+		stage: 'found',
 		summary: 'Spend, clicks and conversions from Google, Meta, LinkedIn, Microsoft, Reddit and X Ads next to the rest of your numbers.',
 		status: 'live',
 		docs: '/docs/integrations/paid-media/',
@@ -98,6 +121,7 @@ export const modules: Module[] = [
 	},
 	{
 		name: 'Lifecycle email',
+		stage: 'keep',
 		summary: 'Receipts, onboarding and product email from your own Amazon SES, Postmark or Resend account, with versioned templates.',
 		status: 'live',
 		docs: '/docs/guides/lifecycle-email/',
@@ -105,12 +129,14 @@ export const modules: Module[] = [
 	},
 	{
 		name: 'Email intelligence',
+		stage: 'keep',
 		summary: 'Classify every email that comes in, pull out what matters, and route it to the right person or tool.',
 		status: 'building',
 		icon: '<path d="M12 3l1.9 5.8L20 10l-6.1 1.2L12 17l-1.9-5.8L4 10l6.1-1.2z"/>',
 	},
 	{
 		name: 'Customer data',
+		stage: 'all',
 		summary: 'One record per person and company, built from your website, product, CRM and campaigns, for every module and agent to use.',
 		status: 'live',
 		docs: '/docs/guides/customer-records/',
