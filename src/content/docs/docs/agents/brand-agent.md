@@ -34,6 +34,7 @@ An objective is what you want more of. Choose one or several:
 - Grow the audience
 - Get more from paid ads ([Paid ads Autopilot](/docs/integrations/paid-media/#paid-ads-autopilot))
 - Win more with A/B tests
+- Keep and grow customers: the agent works your [Needs attention](/docs/guides/signals/) queue. It reads each account before it speaks, gives accounts with no owner one through your [routing](/docs/guides/routing/) rules, writes what it found and a suggested next step for the owner, flags what your rules missed, and tells you which signals are noise. It never contacts a customer or closes a signal itself, and it is measured by the signals your team closed as won
 - Something else, in your own words
 
 Where Outflare can measure an objective, the agent reads the number itself, so you see where it stands. An objective that needs a connection you haven't made says which one to add. An agent with no open objective does nothing until you give it another.

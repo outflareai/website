@@ -13,6 +13,8 @@ sidebar:
 
 Each person has a name, a work email, a title, a department, a team and a manager. Add them with **Add person**; nobody needs an Outflare sign-in to be listed.
 
+Switch from **List** to **Org chart** to see who reports to whom, from the top down. The CRM reads its people from here: [sales quotas and commission](/docs/guides/sales-team/) use each person's title and manager, and a person needs their sign-in linked before leads, companies and deals can be given to them.
+
 - **Departments** have a name and a head. A team (**Settings → Teams**) can sit in a department and have a lead.
 - **Leaving.** Choose **Start their handover** when someone hands in their notice. The page shows a banner for anyone leaving who still holds company accounts, so nothing is forgotten. Choose **Mark as left** when they've gone. People who left stay in the list for history.
 - **Removing** is for someone added by mistake. Someone who has held a company account can't be removed: mark them left instead, so the account's history stays whole.

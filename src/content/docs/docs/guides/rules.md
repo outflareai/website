@@ -5,7 +5,7 @@ sidebar:
   order: 13.4
 ---
 
-<span class="pill shipped">Shipped</span> In the web app (**Lifecycle → Rules**), the REST API and the MCP server.
+<span class="pill shipped">Shipped</span> In the web app (**Automations → Rules and journeys**), the REST API and the MCP server.
 
 A rule watches what happens to the people and companies of a brand and, when its condition becomes true, emits a business event of its own on the record's timeline, such as `customer.stalled` or `customer.reactivated`. Anything that listens to events acts on it: a [journey](/docs/guides/journeys/) can start on it, a [webhook](/docs/api/webhooks/) can deliver it, a [smart list](/docs/guides/smart-lists/) can count it and Query can read it.
 
@@ -41,6 +41,28 @@ curl -X POST https://app.outflare.ai/v1/brands/$BRAND/rules \
        "conditions": [{"attribute": "billing_plan", "op": "neq", "value": "enterprise"}],
        "emit_event": "customer.stalled"}'
 ```
+
+## Rules about companies
+
+Event and absence rules are about people unless you say otherwise. With `record_type: account` they are about companies: an event by anyone at the company counts for the company, so "nobody at the company has used the product for 14 days" is one absence rule, and its event goes on the company's timeline. A change rule can watch any kind of record, such as a deal.
+
+## Dates, trends and scores in conditions
+
+- **Dates relative to today.** For a date field the value can be `today`, `+60d` (60 days from now) or `-14d` (14 days ago): `renews_on` `lt` `+60d` with `renews_on` `gt` `today` is "renews within 60 days". A change rule with such a condition is also checked against every record once a day, because it can come true when a day passes and nothing else changes. The first check after the rule goes live only notes where each record stands, so a record that already matched doesn't fire.
+- **Trends.** A [metric](/docs/guides/metrics/#trends) with a twin over the window before has a `_change` value in percent: `metrics.usage_7d_change` `lt` `-30` is "usage is down more than 30% on the week before".
+- **Scores.** A [score](/docs/guides/scores/) is a field too: `scores.health_band` `eq` `low` is "their health score came to be low".
+
+## Events from the rest of Outflare
+
+Deals, support conversations and CRM tasks reach the timeline as events, so a rule, a journey or a metric can use them like any event your product sends. They are recorded within a minute of the change, wherever it was made.
+
+| Event | When |
+| --- | --- |
+| `deal.created`, `deal.stage_changed`, `deal.won`, `deal.lost`, `deal.reopened` | A deal was added, moved to another stage, closed as won or lost, or opened again |
+| `support.conversation_opened`, `support.conversation_closed`, `support.conversation_reopened` | A support conversation started, was closed, or was opened again |
+| `task.created`, `task.completed`, `task.reopened` | A CRM task about the record was added, done, or opened again |
+
+Deals, conversations and tasks from before a rule existed record nothing, so turning a rule on never fires for the past. To put what a rule finds in front of a person, list its event on a [signal type](/docs/guides/signals/#signal-types).
 
 ## Firing once, and only on new things
 

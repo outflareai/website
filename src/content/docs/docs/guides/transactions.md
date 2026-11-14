@@ -5,7 +5,7 @@ sidebar:
   order: 9.52
 ---
 
-<span class="pill shipped">Shipped</span> In the web app (**CRM → People → Transactions**), the REST API and the MCP server.
+<span class="pill shipped">Shipped</span> In the web app (**CRM → Customer data → Transactions**), the REST API and the MCP server.
 
 A brand's transactions are the money it takes and gives back: payments, refunds, chargebacks and credits, one row each. They are the record of revenue that [metrics](/docs/guides/metrics/), [product lifecycle stages](/docs/guides/products-and-lifecycle/), reports and Query read.
 

@@ -5,7 +5,7 @@ sidebar:
   order: 9.54
 ---
 
-<span class="pill shipped">Shipped</span> In the web app (**CRM → People → Metrics**, and on each company and person), the REST API, the MCP server and Query.
+<span class="pill shipped">Shipped</span> In the web app (**CRM → Customer data → Metrics**, and on each company and person), the REST API, the MCP server and Query.
 
 A metric is a number Outflare keeps up to date for each company and person, such as their spend in the last 30 days or how often they used your product this week. [Rules](/docs/guides/rules/), [journeys](/docs/guides/journeys/), [smart lists](/docs/guides/smart-lists/) and Query read metrics like any field, so you can act on totals, not only on single events: "a company spent over $1,000 this month", or "usage this week fell below half of last week's".
 
@@ -42,9 +42,15 @@ So a change rule on `metrics.spend_30d` greater than `100000` fires when a compa
 
 When metrics are turned on, a metric is added, or what it counts changes, Outflare fills it from the events it already has, in the background, so the numbers are right straight away. A fill never sets anything off: no rule, journey, email or webhook reacts to it. A company already over $1,000 before the fill counts as having crossed already, so it doesn't get a "you reached $1,000" email on its next payment. `POST .../metrics/{metric}/backfill` refills one metric, also quietly.
 
+## Trends
+
+To compare two periods, keep two metrics: the same events and window, with the second one moved back by one window (`usage_7d` and `usage_prev_7d`, using `offset_days`). Outflare then adds the trend to the record as `<key>_change`: how far the metric is from the window before, in percent (`usage_7d_change: -40` is down 40%). A [rule](/docs/guides/rules/#dates-trends-and-scores-in-conditions) or a [score](/docs/guides/scores/) can test it.
+
+For something your product reports as it stands, such as a prepaid balance, a plan limit or a seat count, use the `latest` aggregate: the value of a property in the latest event.
+
 ## Making your own
 
-In the web app, **CRM → People → Metrics** turns metrics on and lists them. **New metric** adds one, and each metric has **Edit**, **Refill** (fill it again from stored events) and **Archive**. Changing metrics needs permission to manage the catalog.
+In the web app, **CRM → Customer data → Metrics** turns metrics on and lists them. **New metric** adds one, and each metric has **Edit**, **Refill** (fill it again from stored events) and **Archive**. Changing metrics needs permission to manage the catalog.
 
 `POST /v1/brands/{brand}/metrics` (MCP `create_metric`):
 
