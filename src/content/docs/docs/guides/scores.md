@@ -83,3 +83,7 @@ Archiving a score takes it off every record, quietly, and frees its key.
 MCP: `list_scores`, `create_score`, `update_score`, `get_record_scores`.
 
 The [Revenue](/docs/guides/revenue/) page uses the score with the key `health`: it adds up the recurring revenue of paying customers in its low band as revenue at risk.
+
+## From a playbook
+
+The playbook **Score account health and catch usage drops** sets a health score up for you: name the event that shows someone is using the product and it adds the score, the metrics it reads, and a rule and journey that flag a company whose usage falls. See [Playbooks](/docs/agents/playbooks/).

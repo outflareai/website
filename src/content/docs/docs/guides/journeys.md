@@ -36,6 +36,10 @@ By default a person goes through a journey once. Set it to run again to let them
 
 When you make a journey, choose who goes through it: people or companies. A company journey starts on the company's own events or on anything its people do, once per company, and its goal, exit and wait events count for anyone at the company. It takes the steps that make sense for a company (wait, check, set a field, add a tag, create a task, assign an owner, raise a signal, alerts, webhooks and Outflare actions), not emails to one person. Who a journey is about can't change once it has run.
 
+## Journeys about deals
+
+Choose **Each deal** and every deal goes through the journey on its own. It starts on the deal's own events (created, moved a stage, won, lost, reopened), its checks read the deal's fields such as its stage, value and close date, and it ends when that deal reaches its goal, so a journey that chases a proposal stops the moment the deal is won. Its steps act on the deal: tasks, fields, owners, alerts, signals and webhooks. Deals have no tags, so the tag steps are left out, and email steps need a journey about people.
+
 Steps that call another service use your workspace's own connection to it, and stay off until you connect it.
 
 ## Holdouts: what a journey changed
