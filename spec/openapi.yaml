@@ -1446,6 +1446,9 @@ paths:
                       id: { type: string, format: uuid }
                       email: { type: string }
                       name: { type: string }
+                      avatar_url:
+                        type: string
+                        description: Their profile photo (the picture on the Google account they sign in with), or empty for none.
                       email_verified:
                         type: boolean
                         description: The person opened a confirmation or reset link sent to this address, or Google vouched for it.
@@ -16333,6 +16336,7 @@ paths:
               properties:
                 sequence_id: { type: string, format: uuid }
                 record_id: { type: string, format: uuid, description: "One of the prospect's contacts." }
+                confirm_claimed: { type: boolean, description: "Pitch anyway when a teammate is managing the site (its company's owner). Without it the pitch is refused with site_claimed, naming them. Agents can't confirm: they leave claimed sites to their owner." }
       responses:
         "201":
           description: The pitch, while its opener is written.
@@ -45947,6 +45951,90 @@ paths:
                   - { $ref: "#/components/schemas/MissionHeld" }
         "409": { $ref: "#/components/responses/Error" }
         default: { $ref: '#/components/responses/Error' }
+  /v1/brands/{brand}/coverage/sites:
+    parameters:
+    - $ref: '#/components/parameters/BrandID'
+    get:
+      operationId: listCoverageSites
+      summary: Who manages each site
+      description: "For each site asked for, the teammate managing it for the brand: the owner of the site's company record (its built-in owner field), or null when nobody has claimed it. record_id is null when the brand has no company record for the site yet. Check before reaching out, so two teammates never contact one site."
+      tags:
+      - coverage
+      x-outflare-access:
+        scope: coverage.read
+        brand: true
+      parameters:
+      - name: host
+        in: query
+        required: true
+        description: A site such as example.com, repeated or comma-separated, up to 200.
+        schema:
+          type: array
+          items:
+            type: string
+        style: form
+        explode: true
+      responses:
+        '200':
+          description: The sites, in the order asked
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CoverageSite'
+        default:
+          $ref: '#/components/responses/Error'
+  /v1/brands/{brand}/coverage/sites/claim:
+    parameters:
+    - $ref: '#/components/parameters/BrandID'
+    post:
+      operationId: claimCoverageSite
+      summary: Claim a site, hand it over or release it
+      description: "Says who on the team is managing a site the brand wants a link or placement from, so nobody else reaches out to it at the same time. It sets the owner of the site's company record (adding the company when the brand has none), so it shows in the CRM and the relationship check, and the change is in the company's history. The site's open and picked opportunities take that owner (their state stays as it was). owner_id defaults to you; null releases the site. A site a teammate manages is refused with site_claimed (naming them) unless take_over is true, which agents can't send. It contacts nobody."
+      tags:
+      - coverage
+      x-outflare-access:
+        scope: coverage.manage
+        brand: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required:
+              - host
+              properties:
+                host:
+                  type: string
+                  description: The site, such as example.com. A URL works too.
+                owner_id:
+                  type:
+                  - string
+                  - 'null'
+                  format: uuid
+                  description: The member to manage it, you by default; null releases it.
+                take_over:
+                  type: boolean
+                  description: Take the site over from the teammate managing it.
+      responses:
+        '200':
+          description: The site
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoverageSite'
+        '202':
+          $ref: '#/components/responses/MissionHeld'
+        default:
+          $ref: '#/components/responses/Error'
   /v1/brands/{brand}/coverage/opportunities:
     parameters:
     - $ref: '#/components/parameters/BrandID'
@@ -46023,6 +46111,15 @@ paths:
           - paid
           - free
           - unknown
+      - name: owner
+        in: query
+        description: "Whose sites: me (the ones you manage), none (nobody has claimed them) or others (a teammate manages them)."
+        schema:
+          type: string
+          enum:
+          - me
+          - none
+          - others
       - name: exclude_competitors
         in: query
         description: Leave out the sites of the brand's tracked competitors, which rarely link to a rival.
@@ -56640,7 +56737,7 @@ components:
         moves: { type: array, items: { $ref: "#/components/schemas/ProductMove" } }
     RecordRelationshipCheck:
       type: object
-      required: [record_id, company_id, people, customer, deals, pipelines, contact, team, flags]
+      required: [record_id, company_id, people, customer, deals, pipelines, contact, team, owner, flags]
       properties:
         record_id: { type: string, format: uuid }
         company_id: { type: [string, "null"], format: uuid, description: The company the card is about, or null when it has none. }
@@ -56692,9 +56789,17 @@ components:
               name: { type: string }
               messages: { type: integer }
               last_at: { type: string, format: date-time }
+        owner:
+          type: [object, "null"]
+          description: The teammate managing the company (its owner field, the claim on a site in Presence), or null.
+          required: [user_id, name]
+          properties:
+            user_id: { type: string, format: uuid }
+            name: { type: string }
         flags:
           type: array
-          items: { type: string, enum: [already_customer, in_other_pipeline, open_deal, warm_intro, stale_thread] }
+          description: "claimed: a teammate other than you manages the company, so check with them before reaching out."
+          items: { type: string, enum: [already_customer, in_other_pipeline, open_deal, warm_intro, stale_thread, claimed] }
     RecordProductLifecycle:
       type: object
       required: [record_id, states, overall, moves]
@@ -65742,6 +65847,7 @@ components:
         user_id: { type: string, format: uuid }
         email: { type: string }
         name: { type: string }
+        avatar_url: { type: string, description: "Their profile photo (the picture on the Google account they sign in with), or empty for none: show their initials." }
         role: { type: string, description: "The role they are on: its id as GET /roles lists it (a starting role's key, or the id of one of the workspace's own roles)." }
         role_name: { type: string, description: "Their role's name as the workspace shows it." }
         created_at: { type: string, format: date-time }
@@ -65923,7 +66029,7 @@ components:
         waiting_on:
           type: [string, "null"]
           enum: [platform, null]
-          description: "platform while warm-up is on here but the sequencer running it doesn't show it on yet; null otherwise."
+          description: "platform while the sequencer running warm-up doesn't show what was asked for here yet: on when it was turned on, or still on after it was turned off (for example while the sequencer refuses the change); null otherwise."
     WarmupSettings:
       type: object
       description: Unset fields are left as they are.
@@ -70542,6 +70648,10 @@ components:
         team_ids: { type: array, items: { type: string, format: uuid }, description: Empty for a shared sender any team may use. }
         mailboxes: { type: integer }
         created_at: { type: string, format: date-time }
+        first_name: { type: string, maxLength: 200, description: "Given name the sender's mailboxes use." }
+        last_name: { type: string, maxLength: 200 }
+        photo_url: { type: string, maxLength: 2048, description: "https URL of the profile photo, or empty." }
+        signature_html: { type: string, maxLength: 10000, description: "Email signature the sender's mailboxes use, as HTML." }
     SenderInput:
       type: object
       properties:
@@ -70550,6 +70660,10 @@ components:
         user_id: { type: [string, "null"], format: uuid }
         status: { type: string, enum: [active, retired] }
         team_ids: { type: array, items: { type: string, format: uuid } }
+        first_name: { type: string, maxLength: 200, description: "Given name the sender's mailboxes use." }
+        last_name: { type: string, maxLength: 200 }
+        photo_url: { type: string, maxLength: 2048, description: "https URL of the profile photo, or empty." }
+        signature_html: { type: string, maxLength: 10000, description: "Email signature the sender's mailboxes use, as HTML." }
     AllocationBlocking:
       type: object
       description: Mailboxes that could not be used, grouped by why.
@@ -74266,6 +74380,38 @@ components:
           default: true
       required:
       - version
+    CoverageSite:
+      type: object
+      required:
+      - host
+      - record_id
+      - owner_id
+      - owner_name
+      - owner_avatar_url
+      properties:
+        host:
+          type: string
+        record_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: The site's company record for the brand, or null when it has none yet.
+        owner_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: The teammate managing the site, or null.
+        owner_name:
+          type:
+          - string
+          - 'null'
+        owner_avatar_url:
+          type:
+          - string
+          - 'null'
+          description: That teammate's profile photo, or null.
     PlacementOpportunity:
       type: object
       required:
@@ -74350,6 +74496,22 @@ components:
           - 'null'
           format: uuid
           description: The brand's publisher on this site, when it has one.
+        site_owner_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: In a list, the teammate managing the site (the owner of its company record), or null when nobody has claimed it.
+        site_owner_name:
+          type:
+          - string
+          - 'null'
+          description: In a list, that teammate's name.
+        site_owner_avatar_url:
+          type:
+          - string
+          - 'null'
+          description: In a list, that teammate's profile photo, or null.
         site_opportunities:
           type: integer
           description: In a list, how many opportunities (matching its filters) the site has.
@@ -75594,6 +75756,11 @@ components:
             format: uuid
           maxItems: 500
         excluded_user_ids: *id001
+        excluded_emails:
+          type: array
+          items: { type: string, format: email }
+          maxItems: 500
+          description: People always left out by email address, including those without an Outflare account yet. Whoever joins with one of these addresses is excluded from the start, and a mailbox already read is removed.
         workspace_integration_id:
           type: [string, "null"]
           format: uuid
