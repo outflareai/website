@@ -5,11 +5,11 @@ sidebar:
   order: 1.64
 ---
 
-<span class="pill shipped">Shipped</span> In the web app (**People → Routing**), the REST API and the MCP server.
+<span class="pill shipped">Shipped</span> In the web app (**CRM → Customer data → Routing**), the REST API and the MCP server.
 
 Routing decides which teammate gets a person or company that has no owner. A brand keeps a short list of rules, tried from the top. The first rule whose conditions hold gives the record to the member of its pool who owns the fewest of the brand's records, so work is shared evenly. Someone who already has an owner always keeps them.
 
-Routing belongs to one brand. It works the same from the REST API (`/v1/brands/{brand}/routing`), the MCP server (`get_routing`, `set_routing`, `route_record`) and the app (CRM → People → Routing). Reading needs `customers.read`, changing the rules `catalog.manage`, and routing one record by hand `customers.manage`.
+Routing belongs to one brand. It works the same from the REST API (`/v1/brands/{brand}/routing`), the MCP server (`get_routing`, `set_routing`, `route_record`) and the app (CRM → Customer data → Routing). Reading needs `customers.read`, changing the rules `catalog.manage`, and routing one record by hand `customers.manage`.
 
 ## Rules
 

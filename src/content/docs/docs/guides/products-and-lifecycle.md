@@ -5,7 +5,7 @@ sidebar:
   order: 9.53
 ---
 
-<span class="pill shipped">Shipped</span> In the web app (**CRM → People → Products**, and a Products card on each person and company), the REST API and the MCP server.
+<span class="pill shipped">Shipped</span> In the web app (**CRM → Customer data → Products**, and a Products card on each person and company), the REST API and the MCP server.
 
 A brand often sells more than one product, and a customer can be in a different place with each: still paying for one, cancelled on another, trying a third. Outflare keeps a **stage per product** for every company and person, so a [rule](/docs/guides/rules/) or [journey](/docs/guides/journeys/) reacts to the right product. A company that cancels one product while it keeps paying for another isn't "churned", and doesn't get a "welcome back" email for the product it never left.
 

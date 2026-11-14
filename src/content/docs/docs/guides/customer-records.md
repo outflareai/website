@@ -5,7 +5,7 @@ sidebar:
   order: 1.5
 ---
 
-<span class="pill shipped">Shipped</span> Records, identities, links, the shared catalog, product events, duplicates and merges, timelines, consent, Recently deleted (a 7-day restore) and erasure, in the web app (**CRM → People**), the REST API and the MCP server. [Smart lists](/docs/guides/smart-lists/) group records by rules.
+<span class="pill shipped">Shipped</span> Records, identities, links, the shared catalog, product events, duplicates and merges, timelines, consent, Recently deleted (a 7-day restore) and erasure, in the web app (**CRM → Customer data**), the REST API and the MCP server. [Smart lists](/docs/guides/smart-lists/) group records by rules.
 
 Outflare keeps one record of each person and company your business knows, plus anything else you track, such as deals, subscriptions or partners. The customer data platform, the CRM and lifecycle email all use the same records, so nobody types the same detail twice and nothing ends up in a separate copy.
 
@@ -13,7 +13,7 @@ Moving from Attio? [Import it once](/docs/guides/move-from-attio/) and its peopl
 
 ## In the web app
 
-Open **CRM → People** (or press `g` then `h`). It works inside the brand picked in the sidebar, and has these tabs:
+Open **CRM → Customer data** (or press `g` then `h`). It works inside the brand picked in the sidebar, and has these tabs:
 
 - **People** and **Companies** list every record of that type, newest first. Search by name, email, phone or id, and narrow the list with a filter for each choice field, such as lifecycle stage, seniority, country, industry or company size. The brand picked in the sidebar applies here as everywhere else. **Held for review** shows the people a visitor identification tool named, waiting for someone to approve them, and **Archived** shows the records you archived.
 - **Duplicates** lists pairs that may be the same person or company, side by side, to merge, link or dismiss. See [Duplicates](#duplicates).
@@ -94,7 +94,7 @@ Send what people do in your product to a brand, in Segment's format: `track`, `i
 - **Products.** Name the [product](/docs/guides/products-and-lifecycle/) an event is about with `properties.product_id` or `properties.product`.
 - **Retries.** Send a `messageId` with each event, so a retry is stored once.
 - **Orders are payments.** An `Order Completed` event from your server, for a known person, with `revenue` (or `total`, or `value`) in dollars and a `currency`, is also saved as a [transaction](/docs/guides/transactions/) and counted as a payment. Put the payment's id in `order_id`: if the same payment also arrives as a transaction with that `source_id`, or from a billing connection, it counts once ([One payment, counted once](/docs/guides/transactions/#one-payment-counted-once)).
-- **Refunded orders are refunds.** An `Order Refunded` event from your server, with the order's `order_id`, refunds that payment, counted once with a refund transaction for the same refund ([Refunds, counted once](/docs/guides/transactions/#refunds-counted-once)). **People → Developer setup** checks that sign-ups, orders and refunds arrive and count ([Developer setup](/docs/guides/developer-setup/)).
+- **Refunded orders are refunds.** An `Order Refunded` event from your server, with the order's `order_id`, refunds that payment, counted once with a refund transaction for the same refund ([Refunds, counted once](/docs/guides/transactions/#refunds-counted-once)). **CRM → Customer data → Developer setup** checks that sign-ups, orders and refunds arrive and count ([Developer setup](/docs/guides/developer-setup/)).
 
 Each event is matched to a person in that brand only:
 
@@ -125,7 +125,7 @@ To stop using a name, deprecate it in the catalog. To pause one, set its status 
 
 ## Duplicates
 
-When two records share an email or phone number, they might be the same person. Outflare lists each such pair once, with both records side by side, so someone can decide: in the web app under **CRM → People → Duplicates**, which marks the fields where the two disagree, and on each record's page. This includes pairs you already had before the upgrade.
+When two records share an email or phone number, they might be the same person. Outflare lists each such pair once, with both records side by side, so someone can decide: in the web app under **CRM → Customer data → Duplicates**, which marks the fields where the two disagree, and on each record's page. This includes pairs you already had before the upgrade.
 
 - **Merge** keeps one record (choose **Keep this one** on the record to keep). The other one's emails and ids, links, product events, consent, leads and outreach move to the kept record, and its details fill in whatever the kept record is missing. The usual "which value wins" order still applies, so a CRM value never replaces one someone typed. The merged record stays in the archive, so its history and any old links still lead to the record you kept.
 - **Link** keeps both records but marks them as the same person, for example one person with two accounts in your product.
@@ -152,7 +152,7 @@ You can delete a person or company, one field's value, one email or id, one link
 - **Restoring** puts everything back with its ids, history and links, and fires nothing: no rule, journey, webhook or email for what came back. If part of it can't come back (for example another person verified the same email since), the rest is restored and that part stays, with the reason.
 - **After 7 days** it is erased for good.
 
-Find it under **CRM → People → Recently deleted**, `GET /v1/brands/{brand}/recently-deleted` or MCP `list_recently_deleted`, and restore with `POST /v1/brands/{brand}/recently-deleted/{deletion}/restore` or `restore_deletion`. Seeing it needs permission to read customers; deleting and restoring need permission to manage them. The webhook events are `record.soft_deleted`, `transaction.deleted` and `deletion.restored`.
+Find it under **CRM → Customer data → Recently deleted**, `GET /v1/brands/{brand}/recently-deleted` or MCP `list_recently_deleted`, and restore with `POST /v1/brands/{brand}/recently-deleted/{deletion}/restore` or `restore_deletion`. Seeing it needs permission to read customers; deleting and restoring need permission to manage them. The webhook events are `record.soft_deleted`, `transaction.deleted` and `deletion.restored`.
 
 ### Erasing for good
 
@@ -173,7 +173,7 @@ From the API, `DELETE /v1/brands/{brand}/records/{record}?suppress=true` returns
 ## Undoing a merge or an import
 
 - **A merge.** A record's page lists its merges, with **Undo merge** (`POST /v1/brands/{brand}/merges/{merge}/undo`, MCP `undo_merge`). The merged record becomes a record of its own again, and everything the merge moved goes back to it. Anything that reached the kept record after the merge stays there. Merges in a chain are undone newest first.
-- **An import or a batch of events.** Every CSV import, CRM import and batch of product events is a batch. **CRM → People → Imports** lists them, with a preview of what undoing one would remove and what changed since (records someone edited or emailed, for example). Choose **Undo only what's untouched** or **Undo everything** (`POST /v1/brands/{brand}/batches/{batch}/undo`, MCP `undo_batch`). What an undo removes goes to Recently deleted, so it can be restored for 7 days. Emails already sent can't be unsent.
+- **An import or a batch of events.** Every CSV import, CRM import and batch of product events is a batch. **CRM → Customer data → Imports** lists them, with a preview of what undoing one would remove and what changed since (records someone edited or emailed, for example). Choose **Undo only what's untouched** or **Undo everything** (`POST /v1/brands/{brand}/batches/{batch}/undo`, MCP `undo_batch`). What an undo removes goes to Recently deleted, so it can be restored for 7 days. Emails already sent can't be unsent.
 
 Neither sets off a rule, journey, email or webhook for what moves back.
 

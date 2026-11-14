@@ -50,7 +50,7 @@ Each rule says:
 | Rates by quota | Percent rates that take over once the person has won a share of their quarter's quota, such as 12% from 100%. |
 | A monthly cap | The most the rule pays one person in a month. |
 | Refunds | For money collected: take the commission back when a payment is refunded. |
-| Extra tests | Up to five tests on the deal's or payment's fields: `amount` (in whole units), `stage`, `product`, and the company's fields under `company.`, such as `company.country`. |
+| Extra conditions | Up to five conditions on the deal's or payment's fields: `amount` (in whole units), `stage`, `product`, and the company's fields under `company.`, such as `company.country`. |
 
 **Coming back.** A plan sets how many days without a payment make the next payment a return (90 to start with). A customer who returns counts as coming back, and their days start again from 0. If customers pay once a year, use 400 so a yearly renewal is not mistaken for a return.
 

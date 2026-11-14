@@ -5,11 +5,11 @@ sidebar:
   order: 1.62
 ---
 
-<span class="pill shipped">Shipped</span> In the web app (**People → Scores**), the REST API and the MCP server.
+<span class="pill shipped">Shipped</span> In the web app (**CRM → Customer data → Scores**), the REST API and the MCP server.
 
 A score is one number from 0 to 100 that Outflare keeps on every company or person and keeps up to date, such as a health score for customers or a lead score for people who signed up. You decide what goes into it, so it means what your business needs it to mean, and every record can say why it scores what it does.
 
-Scores are part of the [customer data platform](/docs/guides/customer-records/) and belong to one brand. Everything here works the same from the REST API (`/v1/brands/{brand}/scores`), the MCP server and Query. In the app, People → Scores adds, changes and archives scores (people with `catalog.manage`; everyone else can read them), and a company's or person's page shows their scores with a "Why?" that lists the factors.
+Scores are part of the [customer data platform](/docs/guides/customer-records/) and belong to one brand. Everything here works the same from the REST API (`/v1/brands/{brand}/scores`), the MCP server and Query. In the app, CRM → Customer data → Scores adds, changes and archives scores (people with `catalog.manage`; everyone else can read them), and a company's or person's page shows their scores with a "Why?" that lists the factors.
 
 ## How a score is worked out
 

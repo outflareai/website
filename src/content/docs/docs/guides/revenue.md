@@ -67,7 +67,7 @@ For brands whose customers pay as they go, with no subscription to count, the pa
 
 ## Revenue at risk
 
-Paying customers whose health score is in its low band, the biggest first, with the total at the top of the page. It needs a score with the key `health`: People → Scores has a starter.
+Paying customers whose health score is in its low band, the biggest first, with the total at the top of the page. It needs a score with the key `health`: CRM → Customer data → Scores has a starter.
 
 ## Forecast
 
