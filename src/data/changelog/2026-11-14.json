@@ -2,7 +2,7 @@
 	"version": "2026.11.14",
 	"date": "2026-11-14",
 	"status": "in-progress",
-	"updated": "2026-11-14T13:04:32Z",
+	"updated": "2026-11-14T14:25:08Z",
 	"items": [
 		{
 			"kind": "fix",
@@ -24,7 +24,28 @@
 			"edition": "open-source",
 			"text": "Assign a site on Presence: pick who on the team is managing a site you want a link or placement from (a dropdown of teammates with their photos), so nobody else reaches out. Opportunities show each site's assignee and filter to yours or unassigned ones, the CRM's relationship check names the teammate, and pitching a teammate's site asks you to confirm first.",
 			"at": "2026-11-14T13:04:32Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Connect Zeropark with your own API token to bring in each campaign's daily spend, visits, conversions and payout, beside your other ad platforms.",
+			"at": "2026-11-14T14:25:08Z"
+		},
+		{
+			"kind": "security",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Security improvements to the web app.",
+			"at": "2026-11-14T14:25:08Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "A brand's Events page now shows every event it received, from your website, your product's servers and any connector, newest first, with counts by source and filters by source and name. Before, it showed only events sent to the events API, so a brand tracking only its website saw an empty page. The events API's receipts, rejections and replays are on the page's second view.",
+			"at": "2026-11-14T14:25:08Z"
 		}
 	],
-	"through": "f66920b+20e161b"
+	"through": "72d978e+ef648d0"
 }
