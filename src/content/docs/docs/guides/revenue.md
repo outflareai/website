@@ -93,6 +93,10 @@ PUT /v1/brands/{brand}/revenue/forecast
 
 Reading needs `customers.read`; setting the target or weights needs `catalog.manage`. Only what is sent changes: a null target removes it and a null weight goes back to its default. MCP: `get_revenue_forecast`, `set_revenue_forecast`.
 
+## Sales team and commission
+
+**Sales team** and **Commissions**, beside Forecast at the top of the Revenue page, show each person's quota and progress for the quarter and what they earn from your commission rules. See [Sales team and commission](/docs/guides/sales-team/).
+
 ## The API
 
 ```http
