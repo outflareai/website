@@ -1,7 +1,7 @@
 ---
 import Marketing from '../layouts/Marketing.astro';
 import { app, repo, site } from '../data/project';
-import { modules, moduleStatusLabel } from '../data/modules';
+import { modules, moduleStages, moduleStatusLabel } from '../data/modules';
 import { integrations } from '../data/integrations';
 import { softwareApplication, website } from '../lib/schema';
 
@@ -11,10 +11,10 @@ const liveConnectors = integrations.filter((i) => i.status === 'available').leng
 // Real screenshots of the web app (outflare web/), taken from a local demo
 // workspace where every name and domain is fictional (.example).
 const shots = [
-	{ id: 'analytics', label: 'Analytics', alt: 'Website analytics: visitors, page views, visits, search clicks and impressions for one website from Google Analytics, Search Console and PostHog, with an Ahrefs SEO line' },
-	{ id: 'seo', label: 'SEO', alt: 'SEO: an Ahrefs connection with its monthly budget, and the keywords the site ranks for with position, change, searches and estimated visits' },
-	{ id: 'inbox-item', label: 'Inbox', alt: 'Inbox: conversations sorted by meaning, with one open and a reply box sending from the same address' },
-	{ id: 'connectors', label: 'Connectors', alt: 'Connectors: Ahrefs, Apollo, Google Analytics, Google Calendar, Google Search Console and HubSpot, each connected' },
+	{ id: 'home', label: 'Home', alt: 'Home: what needs you in the brand today, with outreach email sent, replies and bounces, mailboxes and sequences' },
+	{ id: 'customer', label: 'Customers', alt: 'A company record: its fields, and a timeline of product events, consent and field changes from everyone at the company' },
+	{ id: 'inbox-item', label: 'Inbox', alt: 'Inbox: replies from every mailbox, with one conversation open and buttons to mark it done or snooze it' },
+	{ id: 'playbooks', label: 'Playbooks', alt: 'Playbooks: ready-made recipes for growth that the agent runs on your own accounts, such as activating new trials and answering every review' },
 ];
 
 // Five of these are connectors (Google Analytics to PostHog); "and N more" counts the rest.
@@ -98,9 +98,17 @@ const methodColor: Record<string, string> = {
 const moduleTag: Record<string, string> = { live: 'badge-live', building: 'badge-next', planned: 'badge-muted' };
 
 const principles = [
-	{ title: 'Connect what you already use', body: 'Sign in once with OAuth or paste a key, and Outflare reads from your analytics, search, CRM, calendar and data tools. No connector is required to start.' },
-	{ title: 'Ask, or hand over a goal', body: 'Ask a question from Claude, ChatGPT or Cursor, or hand the agent a goal. It reads your company and brand context first, so you never explain twice.' },
-	{ title: 'Stay in control', body: 'Agents work through scoped tokens, within send and spend limits, and wait for your approval where you choose. Every action is logged under who did it.' },
+	{ title: 'Connect your accounts', body: 'Analytics, search, ads, email, calendar, CRM and payments. Sign in once with OAuth or add a key. No connector is required to start.' },
+	{ title: 'See every customer in one place', body: 'Visits, emails, replies, meetings, deals and payments land on the same person and company, so everyone works from one record.' },
+	{ title: 'Let the agent act', body: 'Ask from Claude, ChatGPT or Cursor, or give the agent a goal. It suggests and runs the next move: a sequence, a page fix, an ad change, a check-in with an account at risk.' },
+	{ title: 'Stay in control', body: 'Agents work within send and spend limits and wait for your approval where you choose. Every action is logged under who did it.' },
+];
+
+// The playbooks that keep and grow customers, linked under "Keep and grow".
+const keepPlaybooks = [
+	{ name: 'Catch key accounts at risk', href: '/playbooks/catch-accounts-at-risk/' },
+	{ name: 'Win back cancelled customers', href: '/playbooks/win-back-churned-customers/' },
+	{ name: 'Activate new trials', href: '/playbooks/activate-new-trials/' },
 ];
 
 const quickstart = [
@@ -113,8 +121,8 @@ const quickstart = [
 ---
 
 <Marketing
-	title="Outflare: the open-source AI marketing platform for people and agents"
-	description="An AI marketing agent you prompt from Claude, ChatGPT or Cursor. Outflare connects your analytics, SEO, CRM and email tools in one open-source workspace and does the work through one API. Hosted or self-hosted."
+	title="Outflare: the AI agent that finds, wins and keeps your customers"
+	description="Outflare puts your website, search, ads, outreach, CRM and customer data on one record, with an agent that works on it: it finds the accounts worth chasing, runs the campaigns and catches customers at risk. Open source, hosted or self-hosted."
 	schema={[website(), softwareApplication()]}
 >
 	<!-- Hero -->
@@ -122,16 +130,15 @@ const quickstart = [
 		<div class="grid-bg pointer-events-none absolute inset-0" aria-hidden="true"></div>
 		<div class="relative mx-auto max-w-6xl px-4 pt-16 pb-10 text-center sm:px-6 sm:pt-24">
 			<a href="#modules" class="hit group inline-flex items-center gap-2 rounded-full border bg-background/80 py-1 pr-3 pl-1 text-xs text-muted-foreground shadow-xs backdrop-blur transition-colors hover:text-foreground">
-				<span class="badge badge-live rounded-full">Open source</span>
+				<span class="badge badge-live rounded-full">AI-native GTM platform</span>
 				{liveModules} modules live, more on the way
 				<span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">→</span>
 			</a>
 			<h1 class="mx-auto mt-6 max-w-4xl bg-gradient-to-b from-foreground to-foreground/65 bg-clip-text pb-1 text-4xl font-semibold tracking-tighter text-balance text-transparent sm:text-6xl sm:leading-[1.05]">
-				The GTM platform your agents can run.
+				The AI agent that finds, wins and keeps your customers.
 			</h1>
 			<p class="mx-auto mt-5 max-w-2xl text-base text-pretty text-muted-foreground sm:text-lg">
-				Outflare brings your go-to-market into one workspace. Connect the tools you already use, see what's working across
-				your website, search and campaigns, and let your AI agents do the work through one API.
+				SEO, ads, outreach and CRM in one place, run by an agent you approve.
 			</p>
 			<div class="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
 				<a href={app.url} data-signed-in data-track="dashboard_click" class="btn btn-primary btn-lg w-full sm:w-auto">
@@ -200,12 +207,18 @@ const quickstart = [
 
 	<!-- Modules -->
 	<section id="modules" class="mx-auto max-w-6xl scroll-mt-20 px-4 py-24 sm:px-6">
-		<p class="eyebrow"><span class="text-foreground">01</span> / Modules</p>
-		<h2 class="h2 mt-3 max-w-3xl">One workspace for your whole go-to-market.</h2>
-		<p class="sub">Each module shares the same connectors, context, people and API, so a new one works with everything you've already set up. Use one, or all of them.</p>
-		<ul class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+		<p class="eyebrow"><span class="text-foreground">01</span> / From first visit to renewal</p>
+		<h2 class="h2 mt-3 max-w-3xl">Ten tools, and nobody sees the whole customer.</h2>
+		<p class="sub">Your SEO tool knows the visit, your outreach tool knows the email, your CRM knows the deal. In Outflare every module writes to the same person and company, so the agent can see the whole customer. Use one module, or all of them.</p>
+		{moduleStages.map((st) => (
+		<div class="mt-12">
+			<div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+				<h3 class="text-lg font-semibold">{st.name}</h3>
+				<p class="text-sm text-muted-foreground">{st.summary}</p>
+			</div>
+		<ul class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 			{
-				modules.map((m) => (
+				modules.filter((m) => m.stage === st.id).map((m) => (
 					<li class={`card relative flex flex-col p-6 ${m.docs ? 'transition-colors has-[a:hover]:border-foreground/20' : ''}`}>
 						<div class="mb-4 flex items-center justify-between gap-2">
 							<span class="flex size-8 items-center justify-center rounded-md border bg-muted/60 text-muted-foreground"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={m.icon} /></span>
@@ -216,7 +229,17 @@ const quickstart = [
 					</li>
 				))
 			}
+			{st.id === 'keep' && (
+				<li class="card flex flex-col p-6">
+					<span class="font-semibold">Playbooks for customers you have</span>
+					<ul class="mt-2 grid gap-1 text-sm">
+						{keepPlaybooks.map((p) => <li><a href={p.href} class="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline">{p.name} →</a></li>)}
+					</ul>
+				</li>
+			)}
 		</ul>
+		</div>
+		))}
 		<a href="/docs/project/roadmap/" class="hit mt-8 inline-block text-sm font-medium underline-offset-4 hover:underline">See the roadmap →</a>
 	</section>
 
@@ -276,9 +299,9 @@ const quickstart = [
 	<!-- How it works -->
 	<section class="mx-auto max-w-6xl px-4 py-24 sm:px-6">
 		<p class="eyebrow"><span class="text-foreground">03</span> / How it works</p>
-		<h2 class="h2 mt-3 max-w-3xl">Outflare is the brain. Your tools stay where they are.</h2>
-		<p class="sub">Outflare reads from the tools you already pay for, keeps the history in one place, and gives people and agents the same view and the same controls.</p>
-		<ol class="mt-12 grid gap-4 md:grid-cols-3">
+		<h2 class="h2 mt-3 max-w-3xl">Connect, see every customer, act.</h2>
+		<p class="sub">Keep the tools you like. Outflare reads from them, keeps the history on one record, and gives people and agents the same view and the same controls. Each brand keeps its own data, agent and reports.</p>
+		<ol class="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
 			{
 				principles.map((p, i) => (
 					<li class="card p-6">
@@ -369,7 +392,7 @@ const quickstart = [
 	<section class="relative overflow-hidden border-t">
 		<div class="grid-bg pointer-events-none absolute inset-0" style="--grid-mask: radial-gradient(ellipse 60% 90% at 50% 100%, #000 30%, transparent 100%)" aria-hidden="true"></div>
 		<div class="relative mx-auto max-w-3xl px-4 py-24 text-center sm:px-6">
-			<h2 class="text-3xl font-semibold tracking-tighter text-balance sm:text-5xl">Use it hosted, or run it yourself.</h2>
+			<h2 class="text-3xl font-semibold tracking-tighter text-balance sm:text-5xl">See every customer in one place.</h2>
 			<p class="mx-auto mt-4 max-w-xl text-muted-foreground sm:text-lg">Sign up and connect your first tools in a few minutes, free while we're in early access. Or run it yourself: two containers and one settings file.</p>
 			<div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
 				<a href={app.url} data-signed-in data-track="dashboard_click" class="btn btn-primary btn-lg">Open your dashboard</a>
