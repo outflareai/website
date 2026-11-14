@@ -13,9 +13,10 @@ Moving from Attio? [Import it once](/docs/guides/move-from-attio/) and its peopl
 
 ## In the web app
 
-Open **CRM → Customer data** (or press `g` then `h`). It works inside the brand picked in the sidebar, and has these tabs:
+There is one list of people and one of companies: **CRM → People** and **CRM → Companies**. Each has saved views, filters, columns you choose and the brand's headline scores. Search by name, email, phone or id. The **Show** menu switches between **Active**, **Held for review** (the people a visitor identification tool named, waiting for someone to approve them) and **Archived**. Tick rows to give them an owner (**Assign to…**), change them together (**Bulk edit**), or archive or restore them. A record opens as a full page.
 
-- **People** and **Companies** list every record of that type, newest first. Search by name, email, phone or id, and narrow the list with a filter for each choice field, such as lifecycle stage, seniority, country, industry or company size. The brand picked in the sidebar applies here as everywhere else. **Held for review** shows the people a visitor identification tool named, waiting for someone to approve them, and **Archived** shows the records you archived.
+**CRM → Customer data** (or press `g` then `h`) holds what sits behind those records. It works inside the brand picked in the sidebar, links to the two lists, and has these tabs:
+
 - **Duplicates** lists pairs that may be the same person or company, side by side, to merge, link or dismiss. See [Duplicates](#duplicates).
 - **Events** shows the product events your brand received, with any that were rejected and what to do about each, and asks about any new event name that looks like a typo. See [Product events](#product-events).
 - **Products** lists the brand's products and lifecycle stages. See [Products and lifecycle stages](/docs/guides/products-and-lifecycle/).
