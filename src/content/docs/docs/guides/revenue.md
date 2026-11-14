@@ -44,6 +44,23 @@ Amounts in another currency are converted with the day's European Central Bank r
 
 The list runs from a month late to 90 days out, soonest first, and leaves out records whose stage is ended, cancelled or lost. Each line shows the record, the company it belongs to, its value (or what the company pays a month) and the company's health band, so the renewals that need work stand out. To be told about a renewal in time instead of looking for it, set up the "Flag renewals and quiet accounts" playbook, which raises a [signal](/docs/guides/signals/) for the owner.
 
+### Renewal deals
+
+A renewal can open its own deal, so it is worked in the pipeline like any other. The journey step **Open a renewal deal** (in a [journey about companies](/docs/guides/journeys/#journeys-about-companies)) looks at the company's own "Renews on" date and at each record that names it as its company, such as an agreement, and opens a deal for every one due within the days you set (90 when left out):
+
+- named "Renewal: " and the company (and the agreement, when it is one);
+- at the stage you choose, or the first of your deal stages;
+- worth the record's value, or for a company with none twelve times what it pays a month;
+- closing on the renewal date and linked to the company, so it counts for the company's owner in the forecast.
+
+One renewal gets one deal: a renewal that has had a deal for that date never gets a second, whatever became of the first, so the step is safe to run every day. The "Flag renewals and quiet accounts" playbook does this 60 days before a renewal, after it raises the signal and the task.
+
+In the [forecast](#forecast) a renewal deal stands in for its renewal: it is counted once, under renewals, at the weight of the company's health band and not of the deal's stage. When the deal is won it counts in full, as won. Move the record's "Renews on" date to the next term when you win it; the next renewal then gets a deal of its own.
+
+## By product
+
+When payments name a product (your billing connection or the API sends one with the transaction), **By product** splits what was collected in the period: what each product brought in, its share, how many people and companies paid for it, and whether that is up or down on the same number of days before. Payments that name no product are one line at the end, so the split always adds up to what was collected. The card stays away until some payment names a product.
+
 ## Spending more, spending less
 
 For brands whose customers pay as they go, with no subscription to count, the page lists the people and companies whose payments moved most between this period and the same number of days before: up to ten who paid less and ten who paid more. It reads the same transactions as Collected, so it works for any way of paying.
@@ -64,6 +81,8 @@ Paying customers whose health score is in its low band, the biggest first, with 
 
 Every line shows its value, its weight and what it adds, so the total can be checked by hand. **Best case** counts every renewal and open deal in full. Set the quarter's **target** on the page to see the gap, and change the weights under **How it's weighted** to match how your renewals and deals really turn out; an empty box goes back to the default. Deals and renewals with no amount are left out and counted at the bottom, so you know what to fill in.
 
+**By owner** splits the same forecast by teammate: what each has won this quarter, what is expected from the renewals and open deals they own, and their best case. A deal or renewal with no owner of its own counts for the owner of the company it is with; what nobody owns is the last line, so the split adds up to the forecast. It shows once at least one deal or renewal has an owner.
+
 The forecast is arithmetic on what the CRM holds. No model predicts anything, and nothing is stored but the target and the weights, so correcting a deal or a health score changes the forecast the next time you look.
 
 ```http
@@ -80,4 +99,4 @@ Reading needs `customers.read`; setting the target or weights needs `catalog.man
 GET /v1/brands/{brand}/revenue?days=90
 ```
 
-`days` runs from 7 to 730. The answer has `recurring` (null without counted subscriptions), `periods`, `collected` (null without payments), `renewals`, `at_risk`, `spending` and `bands`. Money is in the brand's `currency`, in its minor unit (cents).
+`days` runs from 7 to 730. The answer has `recurring` (null without counted subscriptions), `periods`, `collected` (null without payments), `renewals`, `at_risk`, `spending`, `products` and `bands`. Money is in the brand's `currency`, in its minor unit (cents).

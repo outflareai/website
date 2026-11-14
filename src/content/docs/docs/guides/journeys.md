@@ -30,7 +30,8 @@ By default a person goes through a journey once. Set it to run again to let them
 - **Actions** do something besides email: set a field, add a tag, move someone in or out of a list, record consent, assign an owner, move a deal, start or stop another journey or a sequence, suppress an address, send a transactional email, raise an alert, post to Slack, call a webhook, push to a sequencer, HubSpot or an ad audience, or ask your own AI model to sort the person.
 
 - **Raise a signal** puts the person or company in [Needs attention](/docs/guides/signals/) for their owner, with a type, a title and a due date, so a flow can wait, check something and only then ask a person to step in.
-- **Do an Outflare action** makes one API call in the journey's brand as one of your agents, so a journey can do anything Outflare can. The [action layer](/docs/agents/actions/) decides it like any agent's change: what you granted runs, anything else waits for a person on the Agents page while the journey goes on.
+- **Do an Outflare action** makes one API call in the journey's brand as one of your agents, so a journey can do anything Outflare can. The [action layer](/docs/agents/actions/) decides it like any agent's change: what you granted runs, anything else waits for a person on the Agents page while the journey goes on. **What to do** lists the common actions by name (add a note, give an owner by the routing rules, refresh a smart list, pause or resume an ad campaign, pause every campaign, pause another journey or a rule, check competitors again), and where the action is about one thing you choose it by name. **Something else** is a call of your own.
+- **Open a renewal deal** (journeys about companies) opens one deal for each [renewal coming up](/docs/guides/revenue/#renewal-deals), with its value and date.
 
 ## Journeys about companies
 

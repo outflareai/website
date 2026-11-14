@@ -23,6 +23,12 @@ Open one to see what it needs, its steps and the API operations each step uses, 
 
 A playbook with a setup kit shows **In this brand** at the top once the kit is set up: every rule, journey, list and signal type it added, whether each is on, and what it has done. Above them are the [signals](/docs/guides/signals/) it raised: how many need attention, how many are late, and how many closed as won or not useful in the last 90 days, so you can tell whether the playbook earns its place. **Set it up now, without a run** adds the kit's parts as drafts straight from the page, so a playbook that is only rules and journeys needs no AI model.
 
+### Did it work?
+
+To find out what a playbook adds beyond what would have happened anyway, pick **Hold 10% back** (or 20%) under **Measure whether it works** when you set it up. Each journey the playbook adds then starts with a random split: the held-back share of people (or companies, for a journey about companies) is left alone, and the rest go through the journey as usual. The split is the same every time for a person or company, so nobody moves between the groups.
+
+The playbook's page then shows **Did it work?**: for each journey, how many went through it and how many were held back, how many of each paid in the days after, the revenue from them, and the lift. A company's people count for their company. Until both groups are big enough it says there isn't enough to tell yet. `GET /v1/brands/{brand}/playbooks/{id}/lift` (`analytics.read`, MCP `get_playbook_lift`) returns the same. Holding people back means some of them miss the journey's help, so use a small share and take the holdout step out of the journey once you know. See [holdouts](/docs/guides/journeys/#holdouts-what-a-journey-changed).
+
 ## Your own playbooks
 
 **New playbook** groups rules, journeys, smart lists and signal types your brand already has under a name of your own, such as "Save accounts that go quiet". It gets the same home as a ready-made playbook, so one page answers whether the whole motion works. A playbook owns none of its parts: a part can sit in several playbooks, and removing a playbook removes only the grouping, never a rule, journey, list or signal type. From the API it is `/v1/brands/{brand}/own-playbooks` (MCP `list_own_playbooks`, `create_own_playbook`, `update_own_playbook`, `delete_own_playbook`).
