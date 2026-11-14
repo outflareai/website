@@ -27,7 +27,7 @@ A playbook with a setup kit shows **In this brand** at the top once the kit is s
 
 **New playbook** groups rules, journeys, smart lists and signal types your brand already has under a name of your own, such as "Save accounts that go quiet". It gets the same home as a ready-made playbook, so one page answers whether the whole motion works. A playbook owns none of its parts: a part can sit in several playbooks, and removing a playbook removes only the grouping, never a rule, journey, list or signal type. From the API it is `/v1/brands/{brand}/own-playbooks` (MCP `list_own_playbooks`, `create_own_playbook`, `update_own_playbook`, `delete_own_playbook`).
 
-Playbooks for customer teams: **Flag renewals and quiet accounts for their owners** puts every company that goes quiet or comes up for renewal in Needs attention, and **Grow your share of each customer's spend** adds [share of wallet](/docs/guides/customer-records/#company-groups-and-share-of-wallet) fields and flags the healthy companies with the most room left.
+Playbooks for customer teams: **Flag renewals and quiet accounts for their owners** puts every company that goes quiet or comes up for renewal in Needs attention, **Grow your share of each customer's spend** adds [share of wallet](/docs/guides/customer-records/#company-groups-and-share-of-wallet) fields and flags the healthy companies with the most room left, and **Hand every won deal over to the people who look after it** puts each newly won customer in Needs attention with a kick-off task for their owner.
 
 ## Run one
 
