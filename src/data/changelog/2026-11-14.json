@@ -2,7 +2,7 @@
 	"version": "2026.11.14",
 	"date": "2026-11-14",
 	"status": "in-progress",
-	"updated": "2026-11-14T12:24:55Z",
+	"updated": "2026-11-14T13:04:32Z",
 	"items": [
 		{
 			"kind": "fix",
@@ -17,7 +17,14 @@
 			"edition": "open-source",
 			"text": "CRM email settings can now exclude people by email address, including people who don't have an Outflare account yet. Whoever joins with one of those addresses is never read.",
 			"at": "2026-11-14T12:24:55Z"
+		},
+		{
+			"kind": "launch",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Assign a site on Presence: pick who on the team is managing a site you want a link or placement from (a dropdown of teammates with their photos), so nobody else reaches out. Opportunities show each site's assignee and filter to yours or unassigned ones, the CRM's relationship check names the teammate, and pitching a teammate's site asks you to confirm first.",
+			"at": "2026-11-14T13:04:32Z"
 		}
 	],
-	"through": "fbc4dc3+2f150c7"
+	"through": "f66920b+20e161b"
 }
