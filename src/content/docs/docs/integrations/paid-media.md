@@ -49,6 +49,7 @@ workspace added before is still sent and does no harm.
 | Apple Ads (`apple_ads`, formerly Apple Search Ads) | Your own Apple Ads API user: its client id, team id and key id from Account Settings → API, and the private key whose public half you uploaded there (see below). Every ad account the user can reach is listed, App Store and Apple Maps. | An API role for that user (API Account Read Only is enough) |
 | Amazon Ads (`amazon_ads`) | Sign in with Amazon (Login with Amazon, `advertising::campaign_management`). Every advertising profile the sign-in reaches is an ad account: one advertiser in one marketplace, with its currency and time zone, in North America, Europe or the Far East. Sponsored Products campaigns are read; their daily numbers come from Amazon's reports, which Amazon builds in a few minutes, so a sync can take longer than for other platforms. Purchases and sales are Amazon's seven-day attribution. | Nothing |
 | Pinterest Ads (`pinterest_ads`) | Sign in with Pinterest (`ads:read`, read-only) | Nothing |
+| ChatGPT Ads (`chatgpt_ads`) | Your own Advertiser API key from [OpenAI Ads Manager](https://ads.openai.com), under Settings. A key reaches one ad account, so connect each account with its own key. To send conversions back, add the pixel ID, a conversion key (Conversions, Manage conversion keys) and your website address on the connection. | Nothing |
 
 **Apple Ads** has no sign-in: it uses OAuth client credentials that belong to
 your own Apple Ads organization. An account administrator invites a user with
@@ -237,6 +238,7 @@ definitions first.
 | Snapchat Ads | A Snap Pixel, through the Conversions API, as PURCHASE, SIGN_UP, SUBSCRIBE and so on | `ScCid`, the `_scid` cookie (`scid`), hashed email, phone and record id | The sign-in's access; if Snapchat refuses it, a Conversions API token from Ads Manager → Business Details on the connection |
 | Taboola Ads | An active event-based conversion (Realize → Tracking, "Create conversions using code"), by its event name, as a server-to-server action | `tblci` only | Nothing: the bulk S2S endpoint takes no token |
 | Pinterest Ads | The Conversions API, as checkout, signup, lead and so on | `epik`, hashed email, phone and record id | The workspace's own conversion access token, from Pinterest Ads Manager → Conversions |
+| ChatGPT Ads | Your pixel, through OpenAI's Conversions API, as `registration_completed`, `order_created`, `lead_created`, `subscription_created` and so on | `oppref`, the pixel's browser reference, hashed email, phone and record id | Your own pixel ID and conversion key from OpenAI Ads Manager → Conversions, and your website address. OpenAI takes conversions from the last 7 days only. |
 
 Taboola matches only on its click id: a conversion with no `tblci` from the
 click is skipped. Taboola accepts each batch at once and processes it later
@@ -351,7 +353,7 @@ in the ad account. See
 
 ## Suggestions
 
-After each sync Outflare reads every campaign it can change (Google Ads, Meta, Microsoft Advertising, LinkedIn, TikTok, Reddit and X) and suggests at most one change for each, with why and the numbers behind it, on the **Suggestions** tab at whatever level the page shows:
+After each sync Outflare reads every campaign it can change (Google Ads, Meta, Microsoft Advertising, LinkedIn, TikTok, Reddit, X and ChatGPT) and suggests at most one change for each, with why and the numbers behind it, on the **Suggestions** tab at whatever level the page shows:
 
 - **Raise the budget** by a fifth when a conversion cost at most nine tenths of the target over the last 14 days and the budget ran out on at least 4 of the last 7.
 - **Lower the budget** by a fifth when a conversion cost more than 1.3 times the target (with at least 5 conversions).
@@ -415,12 +417,14 @@ X Ads has no tests here: X splits an audience only between campaigns that alread
 ## Managing campaigns
 
 Three changes, on Google Ads, Meta, Microsoft Advertising, LinkedIn,
-TikTok, Reddit and X (the other platforms are read but not changed yet, and
+TikTok, Reddit, X and ChatGPT (the other platforms are read but not changed yet, and
 say so with `422 connector_invalid`). On Reddit, a campaign with campaign
 budget optimization holds its daily budget; otherwise the campaign's budget
 is the sum of its ad groups' daily budgets, and a new one is shared between
 them in the same proportions. A campaign with only lifetime budgets is
-refused with a reason.:
+refused with a reason. On ChatGPT, the campaign's daily spend limit is set
+(at least 1 of the account's currency); a campaign with only a lifetime
+limit is refused with a reason:
 
 | Call | What it does |
 | --- | --- |
