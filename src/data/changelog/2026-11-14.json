@@ -2,7 +2,7 @@
 	"version": "2026.11.14",
 	"date": "2026-11-14",
 	"status": "in-progress",
-	"updated": "2026-11-14T14:42:12Z",
+	"updated": "2026-11-14T14:46:36Z",
 	"items": [
 		{
 			"kind": "fix",
@@ -52,7 +52,14 @@
 			"edition": "open-source",
 			"text": "Every mailbox, sending domain and ad account now belongs to a brand. New ones join their connection's or domain's brand, or else the workspace's first brand. Ones that had no brand moved to the first brand, and the \"Not in a brand\" card is gone. Move any of them to another brand on the Brands page.",
 			"at": "2026-11-14T14:42:12Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Tracker cost from Zeropark is now exact: each day, Zeropark's spend per campaign and target is shared out over the matching clicks by their own visit cost, so every report shows cost and ROI that add up to what Zeropark charged.",
+			"at": "2026-11-14T14:46:36Z"
 		}
 	],
-	"through": "023985e+a8ca646"
+	"through": "3cd9f09+bfd222d"
 }
