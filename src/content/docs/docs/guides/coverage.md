@@ -109,16 +109,17 @@ Each opportunity says why it is there and what to do next:
 | Names you without a link | Ask for a link |
 | Your link was removed | Win the link back |
 
-**Claim** a site to say you're the one managing it, **Dismiss** an opportunity that isn't worth it, or mark it **Won**. Opportunities update every day and after each competitor scan, and one is marked won by itself once your brand has a publisher on that site or the link is back. Claiming contacts nobody: reach out through the [outreach workflow](/docs/guides/sequences/) with its normal approval and sending checks.
+**Assign** a site to say who's managing it, **Dismiss** an opportunity that isn't worth it, or mark it **Won**. Opportunities update every day and after each competitor scan, and one is marked won by itself once your brand has a publisher on that site or the link is back. Assigning contacts nobody: reach out through the [outreach workflow](/docs/guides/sequences/) with its normal approval and sending checks.
 
-### Claim a site so your team doesn't overlap
+### Assign a site so your team doesn't overlap
 
-When you're already talking to a site, or about to, press **Claim** on any of its opportunities. The **Managed by** column then shows **Yours** to you and your name to everyone else, on every page of that site. Use the filter next to the others to see **Mine**, **Unclaimed** or **Teammates'** sites.
+When you're already talking to a site, or about to, open the **Assigned to** dropdown on any of its opportunities and pick yourself or a teammate. Everyone then sees that person's photo and name on every page of that site. Use the filter next to the others to see sites **Assigned to me**, **Unassigned** or **Assigned to teammates**.
 
-- **Someone else has it.** The button says **Take over**. Outflare asks you to check with them first, and the site's history records who took it over.
-- **Hand it over or let it go.** **Release** a site you no longer manage so anyone can take it.
-- **It's the company's owner.** A claim sets the owner of the site's company in the [CRM](/docs/guides/customer-records/), so the company's card shows who's managing it under "Before you reach out", and every change is in the company's history.
-- **Overlap warnings.** Pitching a link prospect at a site a teammate manages asks you to confirm first. Agents never pitch or take over a site a teammate manages: they leave it to them.
+- **Someone else has it.** Picking another person for a teammate's site asks you to check with them first, and the site's history records who reassigned it.
+- **Let it go.** Pick **Unassigned** when nobody is managing it any more, so anyone can take it.
+- **Photos.** Each person's photo is the picture on the Google account they sign in with. Without one, Outflare shows their initials.
+- **It's the company's owner.** Assigning a site sets the owner of the site's company in the [CRM](/docs/guides/customer-records/), so the company's card shows who's managing it under "Before you reach out", and every change is in the company's history.
+- **Overlap warnings.** Pitching a link prospect at a site a teammate manages asks you to confirm first. Agents never pitch or reassign a site a teammate manages: they leave it to them.
 
 ## Check publication, links and accuracy
 
@@ -192,6 +193,6 @@ Save an immutable snapshot for a weekly review or export the displayed report. S
 
 ## API and agents
 
-The brand-scoped API starts at `/v1/brands/{brand}/coverage`. The TypeScript and Python SDKs expose the same operations, and MCP provides Presence tools for records, checks, discovery, reviews, reports and commercial extraction. The people and companies on a placement are the `parties` resource; remove one with `delete_coverage_parties`. Web searches are the `searches` resource, and `run_coverage_search` runs one now. Competitor scans are `/coverage/competitors` and `/coverage/competitor_placements`; `list_coverage_competitor_placements` with `gap` lists the sites to go after, and `scan_coverage_competitor` scans one now. Opportunities are `/coverage/opportunities`; `list_coverage_opportunities` gives agents the next outreach, highest leverage first. Claims are `/coverage/sites` (who manages each site) and `/coverage/sites/claim`; MCP has `list_coverage_sites` and `claim_coverage_site`, and `owner=me|none|others` filters opportunities. Each placement carries `traction`, and the report from `get_coverage_reports` carries `momentum` and `share_of_voice`.
+The brand-scoped API starts at `/v1/brands/{brand}/coverage`. The TypeScript and Python SDKs expose the same operations, and MCP provides Presence tools for records, checks, discovery, reviews, reports and commercial extraction. The people and companies on a placement are the `parties` resource; remove one with `delete_coverage_parties`. Web searches are the `searches` resource, and `run_coverage_search` runs one now. Competitor scans are `/coverage/competitors` and `/coverage/competitor_placements`; `list_coverage_competitor_placements` with `gap` lists the sites to go after, and `scan_coverage_competitor` scans one now. Opportunities are `/coverage/opportunities`; `list_coverage_opportunities` gives agents the next outreach, highest leverage first. Assignments are `/coverage/sites` (who manages each site) and `/coverage/sites/claim`; MCP has `list_coverage_sites` and `claim_coverage_site`, and `owner=me|none|others` filters opportunities. Each placement carries `traction`, and the report from `get_coverage_reports` carries `momentum` and `share_of_voice`.
 
 Use `get_coverage_schema` to inspect available fields. Base records use `coverage.read` and `coverage.manage`; commercial data has separate finance scopes, and agreement approval requires `coverage.approve` and a human principal. Existing CRM, Knowledge and analytics access rules still apply.
