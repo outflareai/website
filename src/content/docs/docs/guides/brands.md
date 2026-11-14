@@ -23,7 +23,7 @@ With your own [Geonode](/docs/integrations/connectors/) connection, Outflare als
 
 Outflare also fills in the brand's logo and main colour from its own website, under **Company → Logo and colours**: when you add the brand, when its website changes, and when you open that card with no logo yet (or press **Find on website**). OutflareBot reads the home page, obeying robots.txt, and takes the logo the site names for itself, or else its icon, plus its theme colour. It only fills in what is empty and never replaces a logo or colour you set. This needs no connection or key.
 
-**Settings → Brands** lists every brand in the workspace, as cards or as a table you can sort (it remembers which you picked). Open it from the switcher with **Manage brands**. It is also where you add, archive and restore brands, sort [records in no brand](#records-in-no-brand) and set the rule for [contacting the same person](#keep-brands-from-emailing-the-same-person).
+**Settings → Brands** lists every brand in the workspace, as cards or as a table you can sort (it remembers which you picked). Open it from the switcher with **Manage brands**. It is also where you add, archive and restore brands, move records between brands and set the rule for [contacting the same person](#keep-brands-from-emailing-the-same-person).
 
 ## Tell agents about it
 
@@ -37,9 +37,9 @@ Memories belong to the company or to a brand. An agent working on Repocket reads
 
 ## Decide what belongs to each brand
 
-Move sending domains, mailboxes, lead lists and sequences into a brand from **Settings → Brands** (see [Records in no brand](#records-in-no-brand)), or with `POST /brands/{brand}/add`. A domain brings its mailboxes. Anything you leave out belongs to no brand: it shows on no brand's pages until you move it.
+Every sending domain, mailbox, ad account and analytics site belongs to exactly one brand. Brands share only the team, billing and connections; nothing else is shared between them. Something new goes to the brand you're working in, or, when Outflare can't tell (an ad account found by a sync, say), to your first brand. Move it to another brand from **Settings → Brands**, or with `POST /brands/{brand}/add`. A domain brings its mailboxes.
 
-A brand's mailboxes send for any of that brand's sequences, and never for another brand's, so Repocket never emails from a Geonode domain. Shared mailboxes can send for any sequence.
+A brand's mailboxes send for any of that brand's sequences, and never for another brand's, so Repocket never emails from a Geonode domain.
 
 What a brand is for (its offer, its audience) goes in its context, who it sells to in [ideal customer profiles](/docs/guides/ideal-customers/), and each sequence has its own switch and daily send limit. Outflare used to have projects between a brand and its sequences; they were removed ([Projects were removed](/docs/guides/projects/)).
 
@@ -51,13 +51,13 @@ The brand is part of every link, after the workspace: `app.outflare.ai/acme/repo
 
 Switching brand reloads the page you're on with that brand's records. If you had something open that belongs to the other brand, such as a site audit or a sequence, you go back to that page's list for the new brand.
 
-SEO and analytics read through a connection every brand shares, such as Ahrefs or Google Search Console, count each website for the brand whose domains include it. So a brand only sees the keywords and traffic of its own websites.
+SEO and analytics read through a connection every brand shares, such as Ahrefs or Google Search Console, count each website for the brand it belongs to (see [Analytics by brand](#analytics-by-brand)). So a brand only sees the keywords and traffic of its own websites.
 
-You always work in one brand, and you see only that brand. Home, infrastructure, warm-up, mailbox health, leads, allocation, meetings and deals count nothing from other brands, and nothing that belongs to no brand.
+You always work in one brand, and you see only that brand. Home, infrastructure, warm-up, mailbox health, leads, allocation, meetings and deals count nothing from other brands.
 
-### Records in no brand
+### Move records to another brand
 
-**Settings → Brands** lists domains, mailboxes, lead lists and sequences that belong to no brand under **Not in a brand**: tick what belongs together, choose the brand and move them in one go. A domain brings its mailboxes. Agents do the same with `add_to_brand`.
+Nothing sits outside a brand, so there is nothing to take out of one: move a domain, mailbox or ad account to the brand it belongs to instead. A domain brings its mailboxes. Agents do the same with `add_to_brand`.
 
 ## Connect a tool once for every brand
 
@@ -92,11 +92,11 @@ To look up a domain someone else owns (is it free mail, a disposable address, a 
 
 ## Analytics by brand
 
-Each site in your analytics tools, such as a GA4 property, a Search Console site or a PostHog project, counts as a brand's when its domain is one of the brand's domains. Subdomains count too, so app.repocket.com is Repocket's. A site read through a brand's own connection always counts for that brand. For a site named after an app rather than a domain, pick its brand yourself (`PUT /v1/workspaces/{ws}/analytics/{id}/site-brand`), or mark it as shared.
+Each site in your analytics tools, such as a GA4 property, a Search Console site or a PostHog project, belongs to one brand: the one you picked for it, else the brand of the connection it was read through, else your first brand. A site's domain only suggests a brand (subdomains count too, so app.repocket.com suggests Repocket); it never decides on its own. Pick or change a site's brand yourself (`PUT /v1/workspaces/{ws}/analytics/{id}/site-brand`).
 
-You connect Google Analytics (or any analytics tool) once for the workspace, and every property ends up in one of three places: a brand, **Shared by all brands**, or **Don't import**. Outflare suggests a brand for each and says why ("Matches repocket.com", "Name matches"), and nothing is imported until every property has a choice. A property no brand fits can start one: **New brand from this site** makes a brand named after it, with its domain as the website. Outflare never makes a brand on its own.
+You connect Google Analytics (or any analytics tool) once for the workspace, and every property ends up in one of two places: a brand, or **Don't import**. Outflare suggests a brand for each and says why ("Matches repocket.com", "Name matches"), and nothing is imported until every property has a choice. A property no brand fits can start one: **New brand from this site** makes a brand named after it, with its domain as the website. Outflare never makes a brand on its own.
 
-With one brand picked and no analytics counting for it yet, the Analytics page offers **Pick from Google Analytics**: it uses the connection you already have, with no second sign-in, and lists only that brand's properties and the ones no brand has yet. Someone kept to some brands, or their API token, can only place properties in their own brands, never another brand's property or a shared one. Campaigns inside a brand are told apart with UTM tags on their links, not with separate properties.
+With one brand picked and no analytics counting for it yet, the Analytics page offers **Pick from Google Analytics**: it uses the connection you already have, with no second sign-in, and lists only that brand's properties and the ones no brand has yet. Someone kept to some brands, or their API token, can only place properties in their own brands, never another brand's property. Campaigns inside a brand are told apart with UTM tags on their links, not with separate properties.
 
 ## Keep brands from emailing the same person
 
@@ -143,7 +143,7 @@ What belongs to a brand lives under `/v1/brands/{brand}/`, where `{brand}` is th
 | Logo and colour from its website | `POST /brands/{brand}/look/find` | `find_brand_look` |
 | A brand's own context | `GET`/`PATCH /brands/{brand}/context` | `get_brand_context`, `update_brand_context` |
 | Company and brand context together | `GET /context?brand=repocket` | `get_context` with `brand` |
-| Move records in or out | `POST /brands/{brand}/add`, `/remove` | `add_to_brand`, `remove_from_brand` |
+| Move records to a brand | `POST /brands/{brand}/add` | `add_to_brand` |
 | Keep a member to some brands | `PATCH /members/{user}` with `brand_ids` | (people only, in the app or API) |
 | A token for one brand | `POST /tokens` with `brand` | (in the app or API) |
 | The cross-brand contact rule | `GET`/`PATCH /brand-rules` | `get_brand_rules`, `set_brand_rules` |
