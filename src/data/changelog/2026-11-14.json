@@ -2,7 +2,7 @@
 	"version": "2026.11.14",
 	"date": "2026-11-14",
 	"status": "in-progress",
-	"updated": "2026-11-14T17:50:19Z",
+	"updated": "2026-11-14T18:26:34Z",
 	"items": [
 		{
 			"kind": "fix",
@@ -276,7 +276,14 @@
 			"edition": "cloud",
 			"text": "The brand agent can keep and grow your customers. Give it the Keep and grow customers objective and it works the Needs attention queue each turn: it reads each account, finds an owner through your routing rules, and writes what it found and a suggested next step. It never contacts a customer or closes a signal itself.",
 			"at": "2026-11-14T17:50:19Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Taking records out of a brand (`remove_from_brand`) is refused, because brands share nothing; move a record to another brand with `add_to_brand` instead. Ad campaigns again follow their ad account's brand when the account moves.",
+			"at": "2026-11-14T18:26:34Z"
 		}
 	],
-	"through": "3fc28a6+018dc9c"
+	"through": "039aa15+ba4389b"
 }
