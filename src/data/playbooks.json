@@ -411,6 +411,107 @@
 		"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/seo-quick-wins/playbook.yaml"
 	},
 	{
+		"id": "flag-renewals-and-quiet-accounts",
+		"version": 1,
+		"title": "Flag renewals and quiet accounts for their owners",
+		"summary": "Put every company that goes quiet or comes up for renewal in the Needs attention queue, with an owner and a due date.",
+		"description": "Renewals slip and accounts fade when nobody is told in time. This playbook adds two rules and two journeys about companies, as drafts. One rule spots a company where nobody has used the product for two weeks; the other spots a renewal date coming within 60 days. Their journeys raise a signal in Needs attention, so the account's owner sees it with a due date, add a task to prepare the renewal and open a renewal deal in the pipeline. It also adds a \"Renews on\" date to companies if you don't have one. Nothing goes live until you've checked the dry runs and turned them on.",
+		"tier": "obvious",
+		"goals": [
+			"retention",
+			"revenue"
+		],
+		"publisher": "outflare",
+		"author": {
+			"github": "outflareai"
+		},
+		"needs": {
+			"data": [
+				{
+					"check": "records",
+					"label": "Companies in the CRM with their owners"
+				},
+				{
+					"check": "customer_events",
+					"label": "Product usage events sent to Outflare"
+				}
+			],
+			"connections": []
+		},
+		"inputs": [
+			{
+				"name": "brand",
+				"label": "Brand",
+				"example": "Northpeak",
+				"optional": false
+			},
+			{
+				"name": "usage_event",
+				"label": "The event that shows someone is using the product",
+				"example": "project_updated",
+				"optional": false
+			}
+		],
+		"steps": [
+			{
+				"say": "Check the usage event the brand receives, and how many companies have an owner and a renewal date.",
+				"tools": [
+					"listBrandEventDefinitions",
+					"listBrandCustomerEvents",
+					"listBrandRecords"
+				]
+			},
+			{
+				"say": "Check what the setup kit would add, then add it with that event. Its rules and journeys arrive as drafts.",
+				"tools": [
+					"previewKit",
+					"applyKit"
+				]
+			},
+			{
+				"say": "Dry-run both rules to see how many companies they would have caught, and test both journeys with one company.",
+				"tools": [
+					"simulateBrandRule",
+					"getBrandJourney",
+					"testBrandJourney"
+				]
+			},
+			{
+				"say": "Ask a person to turn the rules and journeys on, then show what is waiting in Needs attention.",
+				"tools": [
+					"listSignalTypes",
+					"listSignals"
+				]
+			}
+		],
+		"guardrails": [
+			"The rules and journeys are turned on only after a person approves them.",
+			"Signals and tasks go to the team; nothing is sent to a customer."
+		],
+		"measure": [
+			{
+				"metric": "Signals picked up in time",
+				"how": "Share of signals accepted before their due date."
+			},
+			{
+				"metric": "Renewals prepared",
+				"how": "Share of renewals with a done signal before the renewal date."
+			}
+		],
+		"prompt": "Run the \"Flag renewals and quiet accounts\" playbook for {{brand}}. Usage arrives as {{usage_event}}. Check that event, and how many companies have an owner and a renewal date, then preview and apply the account-signals setup kit. Dry-run both rules over the last 30 days and test both journeys with one company. Don't turn anything on: show me the dry runs and the tests first.",
+		"example": "For Northpeak, \"Company went quiet\" would have caught six companies in the last 30 days, and nine renewals fall within the next 60 days; four of those companies have no owner yet.",
+		"kit": {
+			"id": "account-signals",
+			"title": "Account signals",
+			"summary": "Rules that spot a company going quiet and a renewal coming up, and journeys that put each in Needs attention with a task for its owner.",
+			"adds": [
+				"1 fields on companies"
+			],
+			"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/kits/account-signals.yaml"
+		},
+		"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/flag-renewals-and-quiet-accounts/playbook.yaml"
+	},
+	{
 		"id": "link-competitor-gaps",
 		"version": 4,
 		"title": "Get links from sites that link to your competitors",
@@ -921,6 +1022,190 @@
 		"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/get-listed-where-buyers-look/playbook.yaml"
 	},
 	{
+		"id": "grow-share-of-wallet",
+		"version": 1,
+		"title": "Grow your share of each customer's spend",
+		"summary": "Work out how much of each customer's yearly spend on what you sell is yours, and flag the ones with the most room left for their owners.",
+		"description": "A customer who pays you a little may spend ten times that with someone else. This playbook adds four fields to companies: what each spends a year on your category with every supplier, how sure that number is, where it came from and who else they buy from. Each company's page then shows your share of its wallet, and a parent company's page adds up the whole group. The agent fills in estimates only from what the CRM already holds or what a person tells it, marks each one as told, estimated or a guess, and puts the customers with the most room left in Needs attention for their owners. It contacts nobody.",
+		"tier": "obvious",
+		"goals": [
+			"revenue",
+			"retention"
+		],
+		"publisher": "outflare",
+		"author": {
+			"github": "outflareai"
+		},
+		"needs": {
+			"data": [
+				{
+					"check": "records",
+					"label": "Companies in the CRM with their owners"
+				}
+			],
+			"connections": []
+		},
+		"inputs": [
+			{
+				"name": "brand",
+				"label": "Brand",
+				"example": "Northpeak",
+				"optional": false
+			},
+			{
+				"name": "category",
+				"label": "What you sell, in a few words",
+				"example": "project management software",
+				"optional": false
+			}
+		],
+		"steps": [
+			{
+				"say": "Check what the setup kit would add, then add its fields and the \"Room to grow\" signal type.",
+				"tools": [
+					"previewKit",
+					"applyKit"
+				]
+			},
+			{
+				"say": "List the paying companies, biggest first, and read each one's summary and group for what it pays, its size, its notes and its parent.",
+				"tools": [
+					"listBrandRecords",
+					"getRecordSummary",
+					"getRecordGroup"
+				]
+			},
+			{
+				"say": "Write an estimate only where the record or a person gives a basis for one, with how sure it is and where it came from. Leave the rest empty and list them for the owner to ask.",
+				"tools": [
+					"updateBrandRecord"
+				]
+			},
+			{
+				"say": "Raise \"Room to grow\" for the companies whose share is lowest and whose health is good, with the numbers in the note, and show the list.",
+				"tools": [
+					"raiseSignal",
+					"listSignals"
+				]
+			}
+		],
+		"guardrails": [
+			"An estimate is never invented. Each one says where it came from and how sure it is.",
+			"Signals go to the team; nothing is sent to a customer."
+		],
+		"measure": [
+			{
+				"metric": "Companies with an estimate",
+				"how": "Share of paying companies with a yearly spend filled in."
+			},
+			{
+				"metric": "Share of wallet",
+				"how": "Paid in the last 12 months over the estimates, for companies that have one."
+			}
+		],
+		"prompt": "Run the \"Grow your share of each customer's spend\" playbook for {{brand}}. We sell {{category}}. Preview and apply the share-of-wallet setup kit. Then go through our paying companies, biggest first: read each summary and group, and fill in the yearly spend only where the record gives a basis, saying where it came from and how sure it is. List the companies you couldn't estimate so their owners can ask. Raise \"Room to grow\" for the healthy companies with the lowest share and show me the list. Don't contact anyone.",
+		"example": "For Northpeak, 14 of 31 paying companies now have an estimate. Kestrel Mobility pays $18,000 a year of an estimated $120,000 (15%), is in good health and buys the rest from two other suppliers, so it is flagged for its owner; 17 companies need a question on the next call.",
+		"kit": {
+			"id": "share-of-wallet",
+			"title": "Share of wallet",
+			"summary": "Fields on companies for what each spends a year on what you sell, with every supplier, so its page shows how much of that is yours and how much room is left.",
+			"adds": [
+				"4 fields on companies"
+			],
+			"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/kits/share-of-wallet.yaml"
+		},
+		"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/grow-share-of-wallet/playbook.yaml"
+	},
+	{
+		"id": "hand-over-won-customers",
+		"version": 1,
+		"title": "Hand every won deal over to the people who look after it",
+		"summary": "Put each newly won customer in Needs attention with a kick-off task for their owner, and tell the owner when a closed support conversation comes back.",
+		"description": "The gap between \"deal won\" and the first useful week is where new customers are lost, because sales has moved on and nobody else was told. This playbook adds two signal types and one journey, the journey as a draft. A won deal lands in Needs attention as \"New customer to onboard\" with a due date, and the journey gives the customer's owner a task to book the kick-off call. A support conversation that was closed and comes back lands there too, as \"Support trouble\", so the owner hears of it before the next call. Customers with no owner are listed, so routing or a person can give them one. Nothing is sent to a customer, and the journey goes live only when a person turns it on.",
+		"tier": "obvious",
+		"goals": [
+			"customers",
+			"retention"
+		],
+		"publisher": "outflare",
+		"author": {
+			"github": "outflareai"
+		},
+		"needs": {
+			"data": [
+				{
+					"check": "records",
+					"label": "Deals in the CRM with the person or company they are with"
+				}
+			],
+			"connections": []
+		},
+		"inputs": [
+			{
+				"name": "brand",
+				"label": "Brand",
+				"example": "Northpeak",
+				"optional": false
+			}
+		],
+		"steps": [
+			{
+				"say": "Check that deals are tracked and how many won deals in the last 90 days are with a person or company that has no owner.",
+				"tools": [
+					"listBrandRecords",
+					"listBrandCustomerEvents"
+				]
+			},
+			{
+				"say": "Check what the setup kit would add, then add it. Its journey arrives as a draft.",
+				"tools": [
+					"previewKit",
+					"applyKit"
+				]
+			},
+			{
+				"say": "Test the journey with one recently won customer, and show the routing rules if customers have no owner.",
+				"tools": [
+					"getBrandJourney",
+					"testBrandJourney",
+					"getRouting"
+				]
+			},
+			{
+				"say": "Ask a person to turn the journey on, then show what is waiting in Needs attention.",
+				"tools": [
+					"listSignalTypes",
+					"listSignals"
+				]
+			}
+		],
+		"guardrails": [
+			"The journey is turned on only after a person approves it.",
+			"Signals and tasks go to the team; nothing is sent to a customer.",
+			"Owners are given by the brand's routing rules or a person, never picked by the agent."
+		],
+		"measure": [
+			{
+				"metric": "New customers picked up in time",
+				"how": "Share of 'New customer to onboard' signals accepted before their due date."
+			},
+			{
+				"metric": "Support trouble acted on",
+				"how": "Share of 'Support trouble' signals closed as won or no change, not left to run late."
+			}
+		],
+		"prompt": "Run the \"Hand over won customers\" playbook for {{brand}}. Check that deals are tracked and how many recently won customers have no owner, then preview and apply the customer-handover setup kit. Test its journey with one recently won customer. Don't turn anything on: show me the test and the customers with no owner first.",
+		"example": "For Northpeak, seven deals were won in the last 90 days; two of those customers have no owner. The kick-off journey would have given the other five owners a task within a minute of the deal closing.",
+		"kit": {
+			"id": "customer-handover",
+			"title": "Customer handover",
+			"summary": "Signal types that put every newly won customer and every reopened support conversation in Needs attention, and a journey that gives the new customer's owner a kick-off task.",
+			"adds": [],
+			"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/kits/customer-handover.yaml"
+		},
+		"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/hand-over-won-customers/playbook.yaml"
+	},
+	{
 		"id": "hand-off-warm-prospects",
 		"version": 1,
 		"title": "Hand off warm prospects the moment they say yes",
@@ -1046,14 +1331,20 @@
 						"meta_ads",
 						"microsoft_ads",
 						"linkedin_ads",
-						"tiktok_ads"
+						"tiktok_ads",
+						"reddit_ads",
+						"x_ads",
+						"chatgpt_ads"
 					],
 					"recommended_names": [
 						"Google Ads",
 						"Meta Ads",
 						"Microsoft Advertising",
 						"LinkedIn Ads",
-						"TikTok Ads"
+						"TikTok Ads",
+						"Reddit Ads",
+						"X Ads",
+						"ChatGPT Ads"
 					]
 				},
 				{
@@ -1631,6 +1922,215 @@
 			"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/kits/win-back.yaml"
 		},
 		"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/win-back-churned-customers/playbook.yaml"
+	},
+	{
+		"id": "score-account-health",
+		"version": 1,
+		"title": "Score account health and catch usage drops",
+		"summary": "Give every company a health score from how often it uses the product, and flag the ones whose usage falls for their owner.",
+		"description": "Most teams find out a customer is unhappy when the cancellation arrives. This playbook sets up the early warning: two metrics that count the days a company did your key action, a health score built on them that anyone can read (\"Why?\" on the company's page), a rule that spots usage falling by two fifths, and a journey that puts the company in Needs attention with a task for its owner. The score shows on every company, in Revenue as revenue at risk, and in lists and rules. The rule and the journey arrive as drafts, and you can change the score's factors and points at any time.",
+		"tier": "obvious",
+		"goals": [
+			"retention",
+			"revenue"
+		],
+		"publisher": "outflare",
+		"author": {
+			"github": "outflareai"
+		},
+		"needs": {
+			"data": [
+				{
+					"check": "records",
+					"label": "Companies in the CRM with their owners"
+				},
+				{
+					"check": "customer_events",
+					"label": "Product usage events sent to Outflare"
+				}
+			],
+			"connections": []
+		},
+		"inputs": [
+			{
+				"name": "brand",
+				"label": "Brand",
+				"example": "Northpeak",
+				"optional": false
+			},
+			{
+				"name": "usage_event",
+				"label": "The event that shows someone is using the product",
+				"example": "project_updated",
+				"optional": false
+			}
+		],
+		"steps": [
+			{
+				"say": "Check the usage event the brand receives and whether metrics are on for the brand; ask a person to turn them on if not.",
+				"tools": [
+					"listBrandEventDefinitions",
+					"listBrandCustomerEvents",
+					"listMetrics"
+				]
+			},
+			{
+				"say": "Check what the setup kit would add, then add it with that event. A health score the brand already has stays as it is.",
+				"tools": [
+					"previewKit",
+					"applyKit"
+				]
+			},
+			{
+				"say": "Once the records are scored, show how many companies are in each band and explain the score of two of them.",
+				"tools": [
+					"listScores",
+					"listBrandRecords",
+					"getRecordScores"
+				]
+			},
+			{
+				"say": "Dry-run the rule to see how many companies it would have caught, and test the journey with one company.",
+				"tools": [
+					"simulateBrandRule",
+					"getBrandJourney",
+					"testBrandJourney"
+				]
+			},
+			{
+				"say": "Ask a person to turn the rule and the journey on, then show what is waiting in Needs attention.",
+				"tools": [
+					"listSignals"
+				]
+			}
+		],
+		"guardrails": [
+			"The rule and the journey are turned on only after a person approves them.",
+			"Signals and tasks go to the team; nothing is sent to a customer.",
+			"A score the brand already keeps is never changed by the playbook."
+		],
+		"measure": [
+			{
+				"metric": "Revenue at risk",
+				"how": "Recurring revenue of companies with a low health score, on the Revenue page."
+			},
+			{
+				"metric": "Usage drops picked up in time",
+				"how": "Share of churn risk signals accepted before their due date."
+			}
+		],
+		"prompt": "Run the \"Score account health and catch usage drops\" playbook for {{brand}}. Usage arrives as {{usage_event}}. Check that event and that metrics are on, then preview and apply the usage-health setup kit. When the records are scored, show how many companies are high, medium and low, and explain two of them. Dry-run the \"Usage dropped\" rule over the last 30 days and test the journey with one company. Don't turn anything on: show me the dry run and the test first.",
+		"example": "For Northpeak, 41 companies score high, 22 medium and 9 low. \"Usage dropped\" would have caught five companies in the last 30 days; two of them renew within 60 days.",
+		"kit": {
+			"id": "usage-health",
+			"title": "Usage health",
+			"summary": "A health score for companies from how often they use the product, a rule that spots usage dropping, and a journey that flags it for the owner.",
+			"adds": [],
+			"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/kits/usage-health.yaml"
+		},
+		"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/score-account-health/playbook.yaml"
+	},
+	{
+		"id": "see-customer-health",
+		"version": 1,
+		"title": "See customer health, churn risk and who is ready to grow",
+		"summary": "Score every company on usage, billing and engagement, roll that into one health score, read how it sounds, and predict who may leave and who may buy more.",
+		"description": "One health number hides what is going on: a customer can use the product every day and still be angry about an invoice. This playbook sets up the full picture. Three measured scores (usage trend, billing and engagement) roll up into a health score, and each stays visible under it. Sentiment, which your own AI reads from conversations, sits beside it, so a judgement never moves a measured number. Two predictions are built on both: churn risk and expansion potential, each showing the points behind it. Every score says whether it is measured, AI-read or predicted, keeps its history so you can see where it is heading, and can be used in lists, rules, journeys and routing. Two rules and two journeys arrive as drafts: they put a company in Needs attention when its churn risk or its expansion potential turns high. Sentiment needs conversation reading switched on, which runs on your own AI connection; without it every other score works and nobody has a sentiment score.",
+		"tier": "obvious",
+		"goals": [
+			"retention",
+			"revenue"
+		],
+		"publisher": "outflare",
+		"author": {
+			"github": "outflareai"
+		},
+		"needs": {
+			"data": [
+				{
+					"check": "records",
+					"label": "Companies in the CRM with their owners"
+				},
+				{
+					"check": "customer_events",
+					"label": "Product usage events sent to Outflare"
+				}
+			],
+			"connections": []
+		},
+		"inputs": [
+			{
+				"name": "brand",
+				"label": "Brand",
+				"example": "Northpeak",
+				"optional": false
+			}
+		],
+		"steps": [
+			{
+				"say": "Check that metrics are on for the brand and whether conversation reading is on; ask a person to turn them on if not, and say sentiment stays empty without reading.",
+				"tools": [
+					"listMetrics",
+					"getConversationSignals"
+				]
+			},
+			{
+				"say": "Check what the setup kit would add, then add it. A score the brand already has under the same key stays as it is.",
+				"tools": [
+					"previewKit",
+					"applyKit"
+				]
+			},
+			{
+				"say": "Once the records are scored, show how many companies are in each band of health, churn risk and expansion potential, and explain two companies with the scores under their health.",
+				"tools": [
+					"listScores",
+					"listBrandRecords",
+					"getRecordScores"
+				]
+			},
+			{
+				"say": "Dry-run both rules to see how many companies they would have caught, and test each journey with one company.",
+				"tools": [
+					"simulateBrandRule",
+					"getBrandJourney",
+					"testBrandJourney"
+				]
+			},
+			{
+				"say": "Ask a person to turn the rules and the journeys on, then show what is waiting in Needs attention. Later, check the predictions against what happened.",
+				"tools": [
+					"listSignals",
+					"getScoreTrackRecord"
+				]
+			}
+		],
+		"guardrails": [
+			"The rules and the journeys are turned on only after a person approves them.",
+			"Signals and tasks go to the team; nothing is sent to a customer.",
+			"A score the brand already keeps is never changed by the playbook.",
+			"A prediction is quoted with its track record once there is one, never as a certainty."
+		],
+		"measure": [
+			{
+				"metric": "Revenue at risk",
+				"how": "Recurring revenue of companies with a low health score, on the Revenue page."
+			},
+			{
+				"metric": "Churn risk that was right",
+				"how": "Share of companies with high churn risk 90 days ago that left since, under the score on the Scores page."
+			}
+		],
+		"prompt": "Run the \"See customer health, churn risk and who is ready to grow\" playbook for {{brand}}. Check that metrics are on and whether conversation reading is on, then preview and apply the customer-health setup kit. When the records are scored, show how many companies are high, medium and low for health, churn risk and expansion potential, and explain two of them, with the scores under their health. Dry-run both rules over the last 30 days and test each journey with one company. Don't turn anything on: show me the dry runs and the tests first.",
+		"example": "For Northpeak, 38 companies are healthy, 25 in the middle and 9 low. Six have high churn risk: four because usage fell and two because they sound unhappy about billing. Eleven look ready to grow.",
+		"kit": {
+			"id": "customer-health",
+			"title": "Customer health",
+			"summary": "A health score made of usage, billing and engagement, sentiment from conversations, and churn risk and expansion potential predicted from them, flagged for the owner.",
+			"adds": [],
+			"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/kits/customer-health.yaml"
+		},
+		"source_url": "https://github.com/outflareai/outflare/blob/main/playbooks/see-customer-health/playbook.yaml"
 	},
 	{
 		"id": "send-a-monthly-newsletter",
@@ -4008,7 +4508,7 @@
 				"tools": [
 					"listSpend",
 					"getAnalyticsReport",
-					"outcomesReport"
+					"getBrandOutcomesReport"
 				]
 			},
 			{
@@ -4313,7 +4813,7 @@
 				"tools": [
 					"updateBrandRecord",
 					"getAnalyticsReport",
-					"outcomesReport"
+					"getBrandOutcomesReport"
 				]
 			}
 		],
@@ -4463,7 +4963,7 @@
 				"say": "After a month, report visits, sign-ups and paying customers per creator, and say who to offer a paid deal.",
 				"tools": [
 					"getAnalyticsReport",
-					"outcomesReport"
+					"getBrandOutcomesReport"
 				]
 			}
 		],
@@ -4754,7 +5254,7 @@
 				"say": "Thirty days after each slot runs, report visits, sign-ups, paying customers and cost per paying customer, and say which to book again.",
 				"tools": [
 					"getAnalyticsReport",
-					"outcomesReport",
+					"getBrandOutcomesReport",
 					"updateBrandRecord"
 				]
 			}

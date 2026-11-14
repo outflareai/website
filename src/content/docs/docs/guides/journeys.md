@@ -7,7 +7,7 @@ sidebar:
 
 <span class="pill shipped">Shipped</span> In the web app, the REST API and the MCP server.
 
-A journey is an if-this-then-that flow for the people on your [customer records](/docs/guides/customer-records/), such as onboarding a new trial, saving a failed payment or winning back someone who cancelled. Open **Lifecycle → Journeys**. A journey is a draft until you activate it.
+A journey is an if-this-then-that flow for the people on your [customer records](/docs/guides/customer-records/), such as onboarding a new trial, saving a failed payment or winning back someone who cancelled. Open **Automations → Rules and journeys**. A journey is a draft until you activate it.
 
 ## Build one
 
@@ -28,6 +28,18 @@ By default a person goes through a journey once. Set it to run again to let them
 - **Wait until** waits for whichever comes first: an event, a condition coming true, or a timeout.
 - **Split** sends people down one of several paths: the first whose conditions hold, or at random by weight. A random path can be a holdout (below).
 - **Actions** do something besides email: set a field, add a tag, move someone in or out of a list, record consent, assign an owner, move a deal, start or stop another journey or a sequence, suppress an address, send a transactional email, raise an alert, post to Slack, call a webhook, push to a sequencer, HubSpot or an ad audience, or ask your own AI model to sort the person.
+
+- **Raise a signal** puts the person or company in [Needs attention](/docs/guides/signals/) for their owner, with a type, a title and a due date, so a flow can wait, check something and only then ask a person to step in.
+- **Do an Outflare action** makes one API call in the journey's brand as one of your agents, so a journey can do anything Outflare can. The [action layer](/docs/agents/actions/) decides it like any agent's change: what you granted runs, anything else waits for a person on the Agents page while the journey goes on. **What to do** lists the common actions by name (add a note, give an owner by the routing rules, refresh a smart list, pause or resume an ad campaign, pause every campaign, pause another journey or a rule, check competitors again), and where the action is about one thing you choose it by name. **Something else** is a call of your own.
+- **Open a renewal deal** (journeys about companies) opens one deal for each [renewal coming up](/docs/guides/revenue/#renewal-deals), with its value and date.
+
+## Journeys about companies
+
+When you make a journey, choose who goes through it: people or companies. A company journey starts on the company's own events or on anything its people do, once per company, and its goal, exit and wait events count for anyone at the company. It takes the steps that make sense for a company (wait, check, set a field, add a tag, create a task, assign an owner, raise a signal, alerts, webhooks and Outflare actions), not emails to one person. Who a journey is about can't change once it has run.
+
+## Journeys about deals
+
+Choose **Each deal** and every deal goes through the journey on its own. It starts on the deal's own events (created, moved a stage, won, lost, reopened), its checks read the deal's fields such as its stage, value and close date, and it ends when that deal reaches its goal, so a journey that chases a proposal stops the moment the deal is won. Its steps act on the deal: tasks, fields, owners, alerts, signals and webhooks. Deals have no tags, so the tag steps are left out, and email steps need a journey about people.
 
 Steps that call another service use your workspace's own connection to it, and stay off until you connect it.
 

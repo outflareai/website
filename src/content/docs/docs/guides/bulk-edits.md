@@ -19,7 +19,7 @@ Pick one of:
 - **A saved query** (`saved_query_id`): its `record_id` (or `id`) column picks the records, up to 10,000. Write it in [Query](/docs/guides/query-and-search/#query), such as `SELECT id FROM people WHERE country = 'DE'`.
 - **Records by id** (`record_ids`): up to 10,000.
 
-In the web app: **Bulk edit everyone in it** on a list, **Bulk edit its records** in a saved query's menu, or, on **CRM → People** or **Companies**, tick the records you want and choose **Bulk edit**. With none ticked, it changes every record shown.
+In the web app: **Bulk edit everyone in it** on a list, **Bulk edit its records** in a saved query's menu, or, on **CRM → Customer data** or **Companies**, tick the records you want and choose **Bulk edit**. With none ticked, it changes every record shown.
 
 One bulk edit changes people or companies, not both, and up to 50,000 records. Merged and deleted records are left out. The records are fixed when it is made, so it changes exactly what the preview counted.
 
