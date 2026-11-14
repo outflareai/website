@@ -2,7 +2,7 @@
 	"version": "2026.11.14",
 	"date": "2026-11-14",
 	"status": "in-progress",
-	"updated": "2026-11-14T12:19:18Z",
+	"updated": "2026-11-14T12:24:55Z",
 	"items": [
 		{
 			"kind": "fix",
@@ -10,7 +10,14 @@
 			"edition": "open-source",
 			"text": "The Google Workspace tenant checks connection is back: the new Google Workspace email and calendar connection had taken its place in the list of connectors. Both are now listed and work side by side.",
 			"at": "2026-11-14T12:19:18Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "CRM email settings can now exclude people by email address, including people who don't have an Outflare account yet. Whoever joins with one of those addresses is never read.",
+			"at": "2026-11-14T12:24:55Z"
 		}
 	],
-	"through": "df154af+0e30934"
+	"through": "fbc4dc3+2f150c7"
 }
