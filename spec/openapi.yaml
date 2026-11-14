@@ -36106,8 +36106,8 @@ paths:
       operationId: removeFromBrand
       x-outflare-access: { scope: profiles.manage }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
-      summary: Take missions out of a brand
-      description: "Scope: profiles.manage, plus missions.run. Makes the named missions in this brand ones for every brand. Brands share nothing else: sending domains, mailboxes, lead lists and sequences are refused (400); move them to another brand with addToBrand."
+      summary: Take records out of a brand (refused)
+      description: "Scope: profiles.manage. Brands share nothing, so every record belongs to a brand and this is always refused (400). Move domains, mailboxes, lead lists, sequences or missions to another brand with addToBrand."
       tags: [brands]
       requestBody:
         required: true
