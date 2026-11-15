@@ -2,7 +2,7 @@
 	"version": "2026.11.15",
 	"date": "2026-11-15",
 	"status": "in-progress",
-	"updated": "2026-11-15T17:59:17Z",
+	"updated": "2026-11-15T18:05:01Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -157,7 +157,14 @@
 			"edition": "open-source",
 			"text": "Two new alerts under Settings → Alerts: one when a connected ad platform stops syncing (a refused sign-in, or three failed syncs in a row), and one when an ad platform starts refusing the conversions sent to it. Like every alert, each can go by email, Slack or Telegram.",
 			"at": "2026-11-15T17:59:17Z"
+		},
+		{
+			"kind": "fix",
+			"area": "connectors",
+			"edition": "open-source",
+			"text": "Sign in again on a connection now signs that same connection in, instead of adding a second one. It keeps its accounts and history, so a Google Ads connection from before Outflare asked for Data Manager can grant it without counting your ad spend twice.",
+			"at": "2026-11-15T18:05:01Z"
 		}
 	],
-	"through": "7018e92+138bfa6"
+	"through": "1876a29+ef1695c"
 }
