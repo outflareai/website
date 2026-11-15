@@ -2,7 +2,7 @@
 	"version": "2026.11.15",
 	"date": "2026-11-15",
 	"status": "in-progress",
-	"updated": "2026-11-15T20:06:14Z",
+	"updated": "2026-11-15T20:15:58Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -199,7 +199,21 @@
 			"edition": "open-source",
 			"text": "Fixes: a ticket now opens as its own page inside the app, says what is wrong with examples from your pages, and explains its labels. AI write-ups are shorter, more specific and shown formatted. Each ticket has a number and a link, plus Copy (for a developer) and Give to agent (instructions for a coding agent).",
 			"at": "2026-11-15T20:06:14Z"
+		},
+		{
+			"kind": "fix",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "AI visibility: answers read from ChatGPT's and Gemini's own screens through DataForSEO are no longer cut off after 45 seconds. They now get the three minutes an assistant can need to search the web and write, so runs stop losing most of their screen answers, and one that still runs out of time is recorded as a timeout.",
+			"at": "2026-11-15T20:15:58Z"
+		},
+		{
+			"kind": "fix",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "AI visibility: when a run's answers fail, the page now says how many failed and why (a connection that is gone, a refused key, an account out of credit), instead of looking as if nothing ran. A run in progress has a Stop button, and one that stands still for ten minutes says so.",
+			"at": "2026-11-15T20:15:58Z"
 		}
 	],
-	"through": "2939125+c98efdf"
+	"through": "0e5d81d+b74f5c1"
 }
