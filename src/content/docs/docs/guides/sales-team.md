@@ -15,17 +15,21 @@ Outflare works commission out. It never pays anyone: you approve a month, pay it
 
 Someone in the team directory is on a brand's sales team for a quarter when they have a quota that quarter, own something in the [forecast](/docs/guides/revenue/#forecast), have a role on the brand's sales desk (SDR, account executive or sales manager), or are covered by a commission plan that is on. Their managers are on it too, up to the top.
 
-A record's owner is a workspace member, so a person in the directory needs their sign-in linked (**Settings → Team**, edit the person) before deals and companies can be theirs. The page marks people with no sign-in.
+Anyone in the team directory can own records, with or without a sign-in to Outflare, so a salesperson who never opens the app still has their leads, deals, quota and commission counted. The page marks people with no sign-in. When they get one later (**Settings → Team**, edit the person), everything they own stays theirs.
 
 ## Giving someone a lead, a company or a deal
 
-Every person, company and deal page has an **Owner** control in its header: pick a teammate, yourself, or nobody. In the CRM list, tick several rows and choose **Assign to…** to hand them all to one person. [Routing](/docs/guides/routing/) gives new people and companies an owner by rule, so nobody has to do it by hand.
+Every person, company and deal page has an **Owner** control in its header: pick a teammate, yourself, or nobody. The same picker, with each person's photo and job title and a search box, is used everywhere you choose a teammate. In the CRM list, tick several rows and choose **Assign to…** to hand them all to one person. [Routing](/docs/guides/routing/) gives new people and companies an owner by rule, so nobody has to do it by hand.
 
 A deal counts for its own Owner field. When that is empty it follows the owner of its person, then of its company. Renewals count for the owner of the company. A deal also has **Sourced by**, for the person who found it when that is someone other than its owner, and **Lead source**: inbound (they came to you) or outbound (you went to them). With no lead source, a deal tied to outreach is outbound and any other is inbound.
+
+**Two owners.** A deal two people worked has a **Second owner** and **Second owner's share (%)**, from 1 to 99; left empty, they share it evenly. The deal's amount is split between the two everywhere: what each has won against quota, their forecast, and commission. A rule that pays the owner pays each on their share (10 percent of a 10,000 deal split 70/30 pays 700 and 300), a fixed amount is divided the same way, and a manager's rule pays each owner's manager on that owner's share. Rules for the company's owner and for whoever sourced the deal still pay on the whole deal.
 
 ## Quotas and the quarter
 
 **Set quotas** takes an amount per person for the quarter, in the brand's currency. Each person's row shows what they have won, their forecast (won, plus the renewals and open deals they own weighted as in the forecast), their open lines and their percent of quota. A manager's row carries a second line for their team: the same numbers for them and everyone below them in the org chart.
+
+Under each person, a line says how they handle the [signals](/docs/guides/signals/) given to them: how many they closed this quarter and how many of those were won, how long it usually takes them from the signal being raised to closing it, and how many wait on them now, with the late ones called out.
 
 Someone who can manage the catalog sees the whole team, the total and what has no owner on the team. Everyone else sees their own numbers and those of the people who report to them.
 
@@ -56,6 +60,8 @@ Each rule says:
 
 New plans can start from an example: a percent of every deal; more on money collected in the first month; outbound paying more than inbound; or a better rate once quota is reached.
 
+An open plan has an address of its own, as does the Plans view, so you can send a teammate a link to the plan you mean, and Back returns to the list.
+
 ## Earnings and approving a month
 
 Commissions lists everyone a plan covers for the month, with their total. Open a person to see every line: the deal or payment, its amount, whether it was inbound or outbound, new or coming back and which day, the rule that paid it, the rate and what it pays. A refund taken back shows as a negative line.
@@ -64,16 +70,17 @@ Commissions lists everyone a plan covers for the month, with their total. Open a
 - **Approve** keeps the month's lines and total as they are. Later changes no longer move it.
 - **Mark as paid** records that you paid it.
 - **Reopen** drops what was kept and works the month out again.
+- **Download** saves the month as a CSV file for payroll, one row for every line: the person, the date, the deal or payment and its customer, the plan and rule, the rate, their share of a split deal, and the amount. You get the rows of the people you may see.
 
 ## The API
 
 | Call | What it does |
 | --- | --- |
-| `GET /v1/brands/{brand}/revenue/team?quarter=` | The team's quarter, person by person, with each manager's roll-up. |
+| `GET /v1/brands/{brand}/revenue/team?quarter=` | The team's quarter, person by person, with each manager's roll-up and each person's `signals`. |
 | `PUT /v1/brands/{brand}/revenue/team/quotas` | Set people's quotas for a quarter; a null target takes one away. |
 | `GET /v1/brands/{brand}/commission-plans` | The brand's plans and rules. |
 | `POST /v1/brands/{brand}/commission-plans`, `PATCH` and `DELETE .../{id}` | Add, change or delete a plan. |
-| `GET /v1/brands/{brand}/commissions?month=` | Each person's statement for a month. |
+| `GET /v1/brands/{brand}/commissions?month=` | Each person's statement for a month. Add `&format=csv` to download it as a file. |
 | `PUT /v1/brands/{brand}/commissions/{staff}` | Approve a person's month, mark it paid, or reopen it. |
 
 Reading needs `customers.read`; setting quotas, changing plans and approving need `catalog.manage`. The MCP server has the same calls: `get_sales_team`, `set_sales_quotas`, `list_commission_plans`, `create_commission_plan`, `update_commission_plan`, `delete_commission_plan`, `get_commissions` and `set_commission_statement`.

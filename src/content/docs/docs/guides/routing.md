@@ -45,6 +45,16 @@ Send a rule with its `id` to keep it (and its count of records routed); a rule l
 
 Every owner routing sets is in the record's history with the source `routing`, and rules, journeys and webhooks that watch the owner field hear about it like any other change.
 
+## Hours and capacity
+
+Under the rules, **Hours and capacity** lists your teammates. For each one you can set:
+
+- **Working days and hours**, in their own time zone. While someone in a rule's pool is at work, a new record goes to them and not to a teammate who is off. If nobody in the pool is at work, the record still goes to the next person, so nothing waits without an owner. Hours that end before they start run past midnight.
+- **Capacity**: the most people and companies of the brand they own at once. Someone at that number gets no more until some of theirs are archived or given to someone else. When everyone in a pool is full, the record stays without an owner and shows in the count at the top of the page.
+- **Away**: on leave. Routing gives them nothing until it is switched off. What they already own stays theirs.
+
+Someone with nothing set is always at work and has no limit. Among the people who can take a record, the one who owns the fewest still gets it. Saving looks at every record with no owner again. Over the API this is `PUT /v1/brands/{brand}/routing/people` (`set_routing_people` over MCP), and `people` in the routing response shows what is set, how many each person owns and whether they are at work now.
+
 ## What it doesn't do
 
 Routing never takes a record from its owner by itself, and it doesn't rebalance: when a teammate joins a pool they get new records until they have as many as the others. A member who leaves the workspace is skipped; when a rule's whole pool has left, or its team is empty or has been deleted, its records stay without an owner and the page says so.
