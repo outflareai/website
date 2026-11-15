@@ -2,7 +2,7 @@
 	"version": "2026.11.15",
 	"date": "2026-11-15",
 	"status": "in-progress",
-	"updated": "2026-11-15T21:42:49Z",
+	"updated": "2026-11-15T22:25:31Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -276,7 +276,21 @@
 			"edition": "open-source",
 			"text": "Charts look and read better: smooth lines with a soft fill, sharp text at any size, and a card beside the cursor with the exact numbers for each day, week or month, the period before and the change. Line and bar charts show a forecast in a lighter dashed line with its likely range, and the day or week still running is marked \"so far\". Retention, lifecycle and funnel charts got the same treatment.",
 			"at": "2026-11-15T21:42:49Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Sales reporting has a Discovery view: when your connected Lead Portal reports its company discovery, see how many companies were found, passed screening, were graded and sent to research, which search lanes produced them, and what each tool cost against the spending cap.",
+			"at": "2026-11-15T22:25:31Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Stickiness: see how many days, weeks or months people come back in, on the Retention page and on dashboards. Funnels now draw conversion over time as a line, and a new Time to convert chart shows how long people take between steps.",
+			"at": "2026-11-15T22:25:31Z"
 		}
 	],
-	"through": "b0dc6b9+b32635e"
+	"through": "80e2243+5b04ea7"
 }
