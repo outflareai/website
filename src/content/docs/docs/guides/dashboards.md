@@ -17,13 +17,17 @@ In the app, open **Analytics** in the sidebar, then **Dashboards**. Type a name 
 
 Every tile runs its insight again when you open the page, with the dashboard's dates in place of its own, so nothing on a dashboard is ever out of date. Choose the dates at the top: a moving range such as the last 30 days, fixed dates, or **each tile's own dates** to let every insight keep what it was saved with. Tick **Compare with the period before** to show every trend against the same length of time before it.
 
+## Filter the whole dashboard
+
+Press **+ Filter** next to the dates to show every tile for just some events: a field such as `plan` or `utm_source`, a comparison and a value (`plan` is `pro`). Up to five filters show as chips at the top; the × takes one off. They apply to every event and page view in the dashboard's trends, funnels, retention and lifecycle tiles, and on its share link and in the digest too. Visits, payments, conversions, ad numbers and paths keep only their own filters.
+
 ## Edit a tile
 
 Press **Edit** on a tile to change it without leaving the dashboard: the event or other thing it counts, filters, what it measures, the breakdown, the interval, how it shows (lines, bars, one number or a table) and its name. It is the same builder as the [Trends](/docs/guides/trends/) and Funnels pages, with the chart updating as you change it. **Save** takes you back to the dashboard. A tile is a saved insight, so saving changes it on every dashboard that shows it. Press **Edit** on a note to change its text.
 
 ## Edit the dashboard
 
-Press **Edit dashboard** to change the dashboard itself. Its name, description, whether its trends go in the digest, its share link and **Delete dashboard** show above the tiles, and each tile gets arrows to move it left, right, up and down and to make it wider, narrower, taller or shorter on a twelve-column grid, and a cross to take it off the dashboard. Taking a tile off never deletes the saved funnel or trend. Press **Done** when it looks right; everyone in the brand sees the same layout.
+Press **Edit dashboard** to change the dashboard itself. Its name, description, whether its trends go in the digest, its share link and **Delete dashboard** show above the tiles, and you can drag a tile by the bar on top to move it, or by its bottom-right corner to resize it. Tiles in the way move down and gaps close up. Each tile also keeps arrows to move it left, right, up and down and to make it wider, narrower, taller or shorter on a twelve-column grid, and a cross to take it off the dashboard. Taking a tile off never deletes the saved funnel or trend. Press **Done** when it looks right; everyone in the brand sees the same layout.
 
 Deleting a saved insight leaves its tile in place, saying so, until someone takes it off.
 
