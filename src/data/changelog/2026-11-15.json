@@ -2,7 +2,7 @@
 	"version": "2026.11.15",
 	"date": "2026-11-15",
 	"status": "in-progress",
-	"updated": "2026-11-15T18:40:04Z",
+	"updated": "2026-11-15T19:52:07Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -164,7 +164,35 @@
 			"edition": "open-source",
 			"text": "Sign in again on a connection now signs that same connection in, instead of adding a second one. It keeps its accounts and history, so a Google Ads connection from before Outflare asked for Data Manager can grant it without counting your ad spend twice.",
 			"at": "2026-11-15T18:05:01Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Tracking domains now show when their registration runs out, and you get an alert 30 days before, 7 days before and when it has, so the links on a domain don't stop working because it lapsed. The date comes from the domain's public registration record.",
+			"at": "2026-11-15T19:20:33Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "A Zeropark campaign's bid, or the bid of one of its targets, can now be set through the API and MCP as a queued change that records the bid before; agents may only lower a bid without a person's approval.",
+			"at": "2026-11-15T19:24:01Z"
+		},
+		{
+			"kind": "fix",
+			"area": "connectors",
+			"edition": "open-source",
+			"text": "After signing in again, the dialog for choosing which sites to import shows Done when nothing needs to change, instead of a greyed-out Saved button.",
+			"at": "2026-11-15T19:52:07Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "The Tracker's Targets table now shows each Zeropark target's bid and state as Zeropark holds them, so a target paused in Zeropark's own panel shows as paused, and a bid can be changed by clicking it.",
+			"at": "2026-11-15T19:52:07Z"
 		}
 	],
-	"through": "62a3bb3+32089bd"
+	"through": "f13d999+892eb97"
 }
