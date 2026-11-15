@@ -24409,6 +24409,33 @@ paths:
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/own-playbooks/{id}/lift:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getOwnPlaybookLift
+      x-outflare-access: { scope: analytics.read, brand: true }
+      summary: Get what one of the brand's own playbooks changed
+      description: |
+        Scope: analytics.read. Did it work? Each journey in the playbook that holds some people or companies back at
+        random (a random split with a holdout path) is compared with the ones it held back, exactly as
+        `getPlaybookLift` does for a community playbook: `ran` carries the lift, the verdict and the incremental
+        revenue. A journey that holds nobody back has measured false and no numbers, and a playbook with no journey
+        has an empty list.
+      tags: [playbooks]
+      parameters:
+        - { name: event, in: query, description: "Only this conversion, such as payment.succeeded; any conversion by default.", schema: { type: string, maxLength: 200 } }
+        - { name: days, in: query, description: "How long after entering a conversion counts.", schema: { type: integer, minimum: 1, maximum: 180, default: 30 } }
+      responses:
+        "200":
+          description: Each of the playbook's journeys against what it held back.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PlaybookLift" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/own-playbooks:
     parameters: [{ $ref: "#/components/parameters/BrandID" }]
     get:
@@ -24416,8 +24443,8 @@ paths:
       x-outflare-access: { scope: customers.read, brand: true }
       summary: List the brand's own playbooks
       description: |
-        Scope: customers.read. A playbook of the brand's own is a name and a purpose around rules, journeys, lists and
-        signal types the brand already has, so the things that work together are found, switched on and measured
+        Scope: customers.read. A playbook of the brand's own is a name and a purpose around rules, journeys, lists, signal
+        types, scores, routing rules, emails and metrics the brand already has, so the things that work together are found, switched on and measured
         together. Each comes with its parts as they are now (whether each is on and what it has done) and the signals
         they raised with how they ended, like a community playbook's home. Oldest first.
       tags: [playbooks]
@@ -40263,6 +40290,39 @@ paths:
         "404": { $ref: "#/components/responses/Error" }
         "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/routing/people:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    put:
+      operationId: setRoutingPeople
+      x-outflare-access: { scope: catalog.manage, brand: true }
+      summary: Set teammates' working hours, capacity and away
+      description: |
+        Scope: catalog.manage. Sends every teammate who has working hours, a capacity or away set in this brand; someone
+        left out goes back to always at work with no limit. Routing gives a record to someone at work before someone
+        who is off (when nobody is at work it still goes to the next person, so nothing waits without an owner), and
+        never to someone who is away or already owns as many of the brand's people and companies as their capacity.
+        Every record with no owner is then looked at again within a minute or two.
+      tags: [routing]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [people]
+              properties:
+                people: { type: array, maxItems: 500, items: { $ref: "#/components/schemas/RoutingPersonInput" } }
+      responses:
+        "200":
+          description: The rules and the people.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Routing" }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/records/{record}/routing:
     parameters:
       - { $ref: "#/components/parameters/BrandID" }
@@ -55395,8 +55455,8 @@ components:
             type: object
             required: [kind, id]
             properties:
-              kind: { type: string, enum: [rule, journey, smart_list, signal_type] }
-              id: { type: string, description: "The rule's, journey's or list's id, or the signal type's key." }
+              kind: { type: string, enum: [rule, journey, smart_list, signal_type, score, routing_rule, email, metric] }
+              id: { type: string, description: "The part's id (a rule, journey, list, score, routing rule, email template or metric), or the signal type's key." }
     OwnPlaybook:
       type: object
       description: A playbook of the brand's own, with what its parts have done.
@@ -55412,12 +55472,12 @@ components:
             type: object
             required: [kind, key, id, name, status, count]
             properties:
-              kind: { type: string, enum: [rule, journey, smart_list, signal_type] }
+              kind: { type: string, enum: [rule, journey, smart_list, signal_type, score, routing_rule, email, metric] }
               key: { type: string, description: "Its id, or a signal type's key: what to send back in parts." }
               id: { type: [string, "null"], description: "Its id. A signal type has none: its key names it." }
               name: { type: string }
-              status: { type: string, description: "A rule's or journey's status (draft, active, paused), a list's kind (smart, static), or active or archived for a signal type." }
-              count: { type: integer, description: "What it has done: a rule's firings in the last 30 days, the records now in a journey or on a list, a signal type's open signals." }
+              status: { type: string, description: "A rule's or journey's status (draft, active, paused), a list's kind (smart, static), active or paused for a routing rule, or active or archived for a signal type, score, email or metric." }
+              count: { type: integer, description: "What it has done: a rule's firings in the last 30 days, the records now in a journey or on a list, a signal type's open signals, the records that have a score or a metric, the records a routing rule gave an owner, or an email's sends in the last 30 days." }
         signals:
           type: object
           description: "The signals it raised: of its signal types, or raised by its journeys. Closed ones count for 90 days."
@@ -58904,11 +58964,36 @@ components:
         countries: { type: array, items: { type: string }, description: "The rule's territory as two-letter country codes; empty means anywhere." }
         status: { type: string, enum: [active, paused] }
         assigned: { type: integer, format: int64, description: "How many records it has given an owner." }
+    RoutingPersonInput:
+      type: object
+      required: [user_id]
+      properties:
+        user_id: { type: string, format: uuid, description: "A workspace member's user id." }
+        capacity: { type: [integer, "null"], minimum: 0, maximum: 1000000, description: "The most of the brand's people and companies they own at once. At that many, routing gives them no more. Null or left out is no limit." }
+        days: { type: array, maxItems: 7, items: { type: integer, minimum: 1, maximum: 7 }, description: "The days they work, 1 (Monday) to 7 (Sunday). None means every day." }
+        from: { type: [string, "null"], description: "When their day starts, as HH:MM in their time zone, such as 09:00. Send with to; both left out means all day." }
+        to: { type: [string, "null"], description: "When their day ends, such as 17:30 (24:00 for midnight). An end before the start runs past midnight." }
+        timezone: { type: string, maxLength: 64, description: "Their time zone's name, such as Europe/Lisbon. UTC when left out." }
+        paused: { type: boolean, description: "True while they are away: routing gives them nothing." }
+    RoutingPerson:
+      type: object
+      required: [user_id, capacity, days, from, to, timezone, paused, owned, at_work]
+      properties:
+        user_id: { type: string, format: uuid }
+        capacity: { type: [integer, "null"], description: "Null is no limit." }
+        days: { type: array, items: { type: integer }, description: "1 (Monday) to 7 (Sunday); empty means every day." }
+        from: { type: [string, "null"], description: "HH:MM in their time zone; null with to means all day." }
+        to: { type: [string, "null"] }
+        timezone: { type: string }
+        paused: { type: boolean, description: "Away: routing gives them nothing." }
+        owned: { type: integer, description: "How many of the brand's people and companies they own now." }
+        at_work: { type: boolean, description: "Whether their days and hours cover this moment." }
     Routing:
       type: object
-      required: [data, unowned]
+      required: [data, unowned, people]
       properties:
         data: { type: array, items: { $ref: "#/components/schemas/RoutingRule" }, description: "In the order they are tried." }
+        people: { type: array, items: { $ref: "#/components/schemas/RoutingPerson" }, description: "Teammates with working hours, a capacity or away set. Anyone not listed is always at work with no limit." }
         unowned:
           type: object
           description: "People and companies in the brand with no owner now."
@@ -58920,7 +59005,7 @@ components:
       type: object
       required: [outcome, rule_id, rule_name, owner_id]
       properties:
-        outcome: { type: string, enum: [assigned, kept, no_rule, no_member, no_record], description: "assigned: the member got it (or would, in a preview). kept: it has an owner, or the pick is its owner already. no_rule: no rule matches. no_member: nobody in the matching rule's pool is in the workspace (its members left, or its team is empty or gone)." }
+        outcome: { type: string, enum: [assigned, kept, no_rule, no_member, no_record], description: "assigned: the member got it (or would, in a preview). kept: it has an owner, or the pick is its owner already. no_rule: no rule matches. no_member: nobody in the matching rule's pool can take it: its members left, its team is empty or gone, or everyone in it is away or at their capacity." }
         rule_id: { type: [string, "null"], format: uuid }
         rule_name: { type: [string, "null"] }
         owner_id: { type: [string, "null"], description: "The member picked, or the owner kept." }
@@ -59100,7 +59185,7 @@ components:
         paid_at: { type: [string, "null"], format: date-time }
     RevenueForecast:
       type: object
-      required: [quarter, starts_on, ends_on, days_left, currency, target_minor, won, collected_minor, renewals, new_business, expansion, forecast_minor, best_case_minor, gap_minor, attainment, renewal_lines, deal_lines, owners, skipped, weights]
+      required: [quarter, starts_on, ends_on, days_left, currency, target_minor, won, collected_minor, renewals, new_business, expansion, forecast_minor, best_case_minor, gap_minor, attainment, renewal_lines, deal_lines, owners, skipped, weights, history]
       properties:
         quarter: { type: string, description: Such as 2026-Q4. }
         starts_on: { type: string, format: date }
@@ -59197,6 +59282,22 @@ components:
                   label: { type: string }
                   weight: { type: integer }
                   custom: { type: boolean, description: True when the brand set this weight itself. }
+        history:
+          type: array
+          description: What the quarter's forecast said in each week so far, the oldest first. A reading is kept once a day and the last one of a week stands for it, so a new brand has none until the next day.
+          items:
+            type: object
+            required: [week, target_minor, won_minor, renewals_expected_minor, deals_expected_minor, forecast_minor, best_case_minor, open, change_minor]
+            properties:
+              week: { type: string, format: date, description: The Monday the week starts on. }
+              target_minor: { type: [integer, "null"], format: int64, description: The target set that week; null with none. }
+              won_minor: { type: integer, format: int64 }
+              renewals_expected_minor: { type: integer, format: int64 }
+              deals_expected_minor: { type: integer, format: int64 }
+              forecast_minor: { type: integer, format: int64 }
+              best_case_minor: { type: integer, format: int64 }
+              open: { type: integer, description: Renewals and open deals behind the numbers. }
+              change_minor: { type: [integer, "null"], format: int64, description: The forecast less the week before's; null for the first week kept. }
     RevenueReport:
       type: object
       required: [currency, days, group, recurring, periods, collected, products, renewals, at_risk, spending, bands]
