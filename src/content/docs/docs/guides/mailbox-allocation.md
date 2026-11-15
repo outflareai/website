@@ -9,7 +9,7 @@ sidebar:
 
 Teams with dozens or thousands of mailboxes spend hours deciding which inboxes go on which campaign, and get it wrong in ways that hurt: two campaigns hammering the same inbox, a follow-up arriving from a different sender than the first email, or a campaign quietly starved of capacity. Outflare does this for you, by rules you can read, and tells you why it did each thing.
 
-![A sequence's Mailboxes card: two mailboxes sending, each with the reason it was chosen](/screens/allocation-sequence.png)
+![A sequence's Mailboxes card: three mailboxes sending, each with the reason it was chosen](/screens/allocation-sequence.png)
 
 ## The rules
 
@@ -73,7 +73,7 @@ A token can't change its own limits, or give another token looser ones than it h
 
 Connect an **EmailBison**, **Instantly** or **Smartlead** account under **Connectors** and its mailboxes and campaigns join the same allocation. Outflare reads each account every 5 minutes; **Read now** on the Allocation page reads it straight away.
 
-![The Allocation page with a connected EmailBison account awaiting its first review](/screens/allocation-platforms.png)
+![Sequencer accounts on the Allocation page: a connected EmailBison account with its first plan to review](/screens/allocation-platforms.png)
 
 - **Each live campaign becomes a sequence** that says where it runs. The platform keeps its steps, leads, schedule and status. Outflare decides which mailboxes it uses and adds or removes them in the platform. Set a **daily send target** on it to start allocating.
 - **Mailboxes that exist only in the platform** are added without a login. They can serve that platform's campaigns, but Outflare never sends from them or reads their inbox. Their [warm-up](/docs/guides/warmup/) is switched in the platform like any other mailbox's. If you use teams, confirm their sender like any other mailbox.
