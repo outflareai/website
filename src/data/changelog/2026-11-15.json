@@ -2,7 +2,7 @@
 	"version": "2026.11.15",
 	"date": "2026-11-15",
 	"status": "in-progress",
-	"updated": "2026-11-15T19:52:07Z",
+	"updated": "2026-11-15T20:06:14Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -192,7 +192,14 @@
 			"edition": "open-source",
 			"text": "The Tracker's Targets table now shows each Zeropark target's bid and state as Zeropark holds them, so a target paused in Zeropark's own panel shows as paused, and a bid can be changed by clicking it.",
 			"at": "2026-11-15T19:52:07Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Fixes: a ticket now opens as its own page inside the app, says what is wrong with examples from your pages, and explains its labels. AI write-ups are shorter, more specific and shown formatted. Each ticket has a number and a link, plus Copy (for a developer) and Give to agent (instructions for a coding agent).",
+			"at": "2026-11-15T20:06:14Z"
 		}
 	],
-	"through": "f13d999+892eb97"
+	"through": "2939125+c98efdf"
 }
