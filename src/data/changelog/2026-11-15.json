@@ -2,7 +2,7 @@
 	"version": "2026.11.15",
 	"date": "2026-11-15",
 	"status": "in-progress",
-	"updated": "2026-11-15T21:16:24Z",
+	"updated": "2026-11-15T21:34:51Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -234,7 +234,14 @@
 			"edition": "open-source",
 			"text": "Search Console syncs now save each property's new days, sitemaps and status before inspecting its pages, and sync the properties that waited longest first. A sync that is interrupted part-way no longer leaves a property showing an old error and days-old data.",
 			"at": "2026-11-15T21:16:24Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "self-hosting",
+			"edition": "open-source",
+			"text": "Self-hosted servers can read connected ad platforms more often than once an hour: set `OUTFLARE_ADS_SYNC_INTERVAL` to a duration from `15m` to `24h` (such as `30m`). No platform is read more often than its floor (half an hour for most, a quarter of an hour for Zeropark), so a shorter setting reads at the floor.",
+			"at": "2026-11-15T21:34:51Z"
 		}
 	],
-	"through": "c489834+271f3e6"
+	"through": "134d3f1+308e8a3"
 }
