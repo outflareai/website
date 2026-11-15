@@ -1,11 +1,11 @@
 ---
 title: Team inbox
-description: One Inbox for support conversations and replies to outreach, with views, teams, private notes, looping teammates in, saved replies, Online and Away for chats, alerts for new chats, a hand-off to sales and an import from Intercom.
+description: One Inbox for support conversations and replies to outreach, with views, teams, private notes, looping teammates in, saved replies, Online and Away for chats, alerts for new chats and a hand-off to sales.
 sidebar:
   order: 8
 ---
 
-<span class="pill shipped">Shipped</span> One Inbox for support and sales, everyday actions on every row, working together, saved replies, Online and Away, sound and notifications, handing a conversation to sales, and importing past conversations from Intercom.
+<span class="pill shipped">Shipped</span> One Inbox for support and sales, everyday actions on every row, working together, saved replies, Online and Away, sound and notifications and handing a conversation to sales.
 
 The **Inbox** is one page for everything your customers and leads write to you: support conversations (email and the chat on your website) and [replies to outreach](/docs/guides/inbox/). Support and sales each see what is theirs, and the customer never needs to know which team answers.
 
@@ -64,20 +64,8 @@ When a support conversation turns into a sales opportunity, press **Sales opport
 
 Sales finds these under **From support**. If your own AI model reads support conversations for signals and spotted an opportunity, a line above the reply box suggests the hand-off; there is no extra AI call.
 
-## Import from Intercom
-
-Bring your past conversations over so the history is in one place:
-
-1. Under **Connectors**, connect **Intercom** with your own access token and choose your region (US, EU or Australia). The token is tested, sealed and never shown again.
-2. Open **Support settings** in the Inbox and find **Import from Intercom**. The preview says how many conversations there are and which Intercom teammates match a member of your workspace by email. Invite the ones that don't match first if you want their replies under their name.
-3. Start the import. It runs in the background and shows its progress; you can leave the page.
-
-The import is quiet: it starts no reply clocks, runs no AI, raises no alerts and sends nothing. Customers are matched to people you already have by email, or added. Open, snoozed and closed states, assignees, notes and times carry over. Attachments stay in Intercom, and a very long conversation brings its 500 most recent messages.
-
-Run it again with **Import what's new** before you switch over: it adds only what changed, and a conversation your team has since answered in Outflare keeps its Outflare state.
-
 ## API and agents
 
-Everything on this page is in the [API](/docs/api/) under `/v1/brands/{brand}/`: `support/conversations`, `inbox`, `saved-replies`, `inbox-presence`, `inbox-loop-ins`, `inbox-viewing`, `support/conversations/{id}/hand-off` and `support/imports`. Reading needs `inbox.read`; changing anything needs `inbox.manage`, and an import also needs `customers.manage`.
+Everything on this page is in the [API](/docs/api/) under `/v1/brands/{brand}/`: `support/conversations`, `inbox`, `saved-replies`, `inbox-presence`, `inbox-loop-ins`, `inbox-viewing` and `support/conversations/{id}/hand-off`. Reading needs `inbox.read`; changing anything needs `inbox.manage`.
 
-Agents use the [MCP server](/docs/agents/mcp/): `add_inbox_note`, `loop_in_on_inbox_message`, `list_saved_replies`, `create_saved_reply`, `suggest_inbox_reply`, `hand_off_support_conversation`, `preview_support_import`, `start_support_import`, `list_support_imports` and `get_support_import`. Message text is stored and returned as data, never acted on as instructions.
+Agents use the [MCP server](/docs/agents/mcp/): `add_inbox_note`, `loop_in_on_inbox_message`, `list_saved_replies`, `create_saved_reply`, `suggest_inbox_reply` and `hand_off_support_conversation`. Message text is stored and returned as data, never acted on as instructions.
