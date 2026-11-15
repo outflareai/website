@@ -19,7 +19,7 @@ At the top of Dashboards is a box: type what you want to know ("How many people 
 - **The model never sees your data.** It gets the question and the names of your events, their descriptions and property names from the [event dictionary](/docs/guides/customer-records/), your conversions and the fields a chart can break down by. Outflare runs the chart itself, so no people, values or numbers leave it. The better your dictionary describes your events, the better the answers.
 - **When it can't answer**, it says why instead of drawing a chart.
 
-Through the API, `POST /v1/brands/{brand}/insights/ask` with `{"question": "…"}` starts a question and `GET /v1/brands/{brand}/insights/ask/{id}` returns it: once `status` is `done` it carries the chart's `kind` and `spec`, which you can run or save like any other.
+Through the API, `POST /v1/brands/{brand}/insights/ask` with `{"question": "…"}` starts a question and `GET /v1/brands/{brand}/insights/ask/{id}` returns it: once `status` is `ready` it carries the chart's `kind` and `spec`, which you can run or save like any other.
 
 ## Tiles
 
