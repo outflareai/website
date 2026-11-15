@@ -492,6 +492,94 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/SalesTemplateInput"
+  /v1/brands/{brand}/sales/reporting:
+    parameters:
+      - name: brand
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getSalesReporting
+      summary: Read Sales throughput, costs and capacity
+      description: Sales managers and workspace owners only. Pipeline evidence uses a brand-owned Lead Portal connection; SDR pickup and customer confirmations use Outflare Sales. Archived records are not counted as lost deals. Payments are not recorded by this report.
+      tags: [records]
+      x-outflare-access:
+        scope: customers.read
+        brand: true
+      parameters:
+        - name: period
+          in: query
+          schema: { type: string, enum: [24h, 48h, 7d, 30d, 365d], default: 24h }
+        - name: integration
+          in: query
+          schema: { type: string, format: uuid }
+        - name: from
+          in: query
+          schema: { type: string, format: date-time }
+        - name: to
+          in: query
+          schema: { type: string, format: date-time }
+        - name: stages
+          in: query
+          description: Comma-separated discovered, researched, verified, emailed, replied, sdr, closed. Required for lead inspection.
+          schema: { type: string }
+        - name: offset
+          in: query
+          schema: { type: integer, minimum: 0, maximum: 1000000, default: 0 }
+      responses:
+        "200":
+          description: Read-only report. Counts are first milestones per identity. Missing source data stays unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesReportingResponse'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /v1/brands/{brand}/sales/reporting/leads:
+    parameters:
+      - name: brand
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getSalesReportingLeads
+      summary: Inspect the leads behind selected Sales milestones
+      description: Sales managers and workspace owners only. Pipeline evidence uses a brand-owned Lead Portal connection; SDR pickup and customer confirmations use Outflare Sales. Archived records are not counted as lost deals. Payments are not recorded by this report.
+      tags: [records]
+      x-outflare-access:
+        scope: customers.read
+        brand: true
+      parameters:
+        - name: period
+          in: query
+          schema: { type: string, enum: [24h, 48h, 7d, 30d, 365d], default: 24h }
+        - name: integration
+          in: query
+          schema: { type: string, format: uuid }
+        - name: from
+          in: query
+          schema: { type: string, format: date-time }
+        - name: to
+          in: query
+          schema: { type: string, format: date-time }
+        - name: stages
+          in: query
+          description: Comma-separated discovered, researched, verified, emailed, replied, sdr, closed. Required for lead inspection.
+          schema: { type: string }
+        - name: offset
+          in: query
+          schema: { type: integer, minimum: 0, maximum: 1000000, default: 0 }
+      responses:
+        "200":
+          description: Read-only report. Counts are first milestones per identity. Missing source data stays unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesReportingResponse'
+        default:
+          $ref: '#/components/responses/Error'
+
   /v1/brands/{brand}/sales/bridge:
     parameters:
       - $ref: "#/components/parameters/BrandID"
@@ -53369,6 +53457,91 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/MissionHeld" }
   schemas:
+    SalesAttribution:
+      type: object
+      description: Original uploader identity from authenticated submission evidence. Never includes credential values, hashes or prefixes. Research and Sales ownership do not change it.
+      required: [id, name, kind]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        kind: { type: string, enum: [worker, api_key, sales_agent, manual, unknown] }
+        status: { type: string, enum: [known, unknown, unavailable] }
+        submitted_at: { type: [string, 'null'], format: date-time }
+        event_id: { type: [string, 'null'] }
+        revoked: { type: boolean }
+    SalesAgentPerformance:
+      type: object
+      required: [attribution, counts]
+      properties:
+        attribution: { $ref: '#/components/schemas/SalesAttribution' }
+        counts:
+          type: object
+          additionalProperties: { type: integer, minimum: 0 }
+        cohort: { type: [object, 'null'], additionalProperties: true }
+        intake: { type: [object, 'null'], additionalProperties: true }
+    SalesReportingResponse:
+      type: object
+      description: Versioned Sales reporting envelope. Summary responses contain buckets, totals, cohort, tools, capacity and result amounts; inspection responses contain independently paginated stage groups (50 per stage). Source status is always explicit.
+      required: [schema_version, source]
+      properties:
+        schema_version: { type: integer, const: 1 }
+        source:
+          type: object
+          required: [status, connections]
+          properties:
+            status: { type: string, enum: [connected, missing, choose] }
+            integration_id: { type: string }
+            connections:
+              type: array
+              items:
+                type: object
+                required: [id, name]
+                properties:
+                  id: { type: string }
+                  name: { type: string }
+        generated_at: { type: string, format: date-time }
+        from: { type: string, format: date-time }
+        to: { type: string, format: date-time }
+        bucket: { type: string, enum: [hour, day] }
+        buckets:
+          type: array
+          items:
+            type: object
+            required: [at, counts]
+            properties:
+              at: { type: string, format: date-time }
+              counts:
+                type: object
+                additionalProperties: { type: integer, minimum: 0 }
+        totals:
+          type: object
+          additionalProperties: { type: integer, minimum: 0 }
+        agents:
+          type: array
+          items: { $ref: '#/components/schemas/SalesAgentPerformance' }
+        attribution_coverage:
+          type: object
+          properties:
+            native_milestones: { type: integer }
+            known: { type: integer }
+            unavailable: { type: integer }
+        cohort: { type: [object, 'null'], additionalProperties: true }
+        tools: { type: [object, 'null'], additionalProperties: true }
+        capacity: { type: [object, 'null'], additionalProperties: true }
+        results: { type: object, additionalProperties: true }
+        groups:
+          type: array
+          items:
+            type: object
+            required: [stage, total, offset, leads]
+            properties:
+              stage: { type: string }
+              total: { type: integer, minimum: 0 }
+              offset: { type: integer, minimum: 0 }
+              leads:
+                type: array
+                items: { type: object, additionalProperties: true }
+
     SalesMember:
       type: object
       properties:
@@ -53557,6 +53730,7 @@ components:
     SalesLead:
       type: object
       properties:
+        attribution: { $ref: '#/components/schemas/SalesAttribution' }
         id:
           type: string
           format: uuid
