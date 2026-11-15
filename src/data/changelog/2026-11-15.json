@@ -2,7 +2,7 @@
 	"version": "2026.11.15",
 	"date": "2026-11-15",
 	"status": "in-progress",
-	"updated": "2026-11-15T20:15:58Z",
+	"updated": "2026-11-15T20:24:57Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -213,7 +213,14 @@
 			"edition": "open-source",
 			"text": "AI visibility: when a run's answers fail, the page now says how many failed and why (a connection that is gone, a refused key, an account out of credit), instead of looking as if nothing ran. A run in progress has a Stop button, and one that stands still for ten minutes says so.",
 			"at": "2026-11-15T20:15:58Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "The tracker now checks that the landers and offers your links send clicks to still answer: landers about once an hour, offers every six hours. The Landers and Offers tabs show what it found, and you get an alert when one fails two checks in a row, so clicks aren't wasted on a dead page. An offer's check can be switched off on its form.",
+			"at": "2026-11-15T20:24:57Z"
 		}
 	],
-	"through": "0e5d81d+b74f5c1"
+	"through": "ac2c0d4+f772f5a"
 }
