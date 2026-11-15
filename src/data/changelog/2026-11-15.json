@@ -2,7 +2,7 @@
 	"version": "2026.11.15",
 	"date": "2026-11-15",
 	"status": "in-progress",
-	"updated": "2026-11-15T17:14:41Z",
+	"updated": "2026-11-15T17:23:25Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -129,7 +129,21 @@
 			"edition": "open-source",
 			"text": "Site audits no longer report email links hidden by Cloudflare's email obfuscation (`/cdn-cgi/l/email-protection`) as links to a broken page, and reading a page now finds those addresses.",
 			"at": "2026-11-15T17:01:36Z"
+		},
+		{
+			"kind": "fix",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Website analytics on a brand now reads only that brand's own sites: the live reports never fall back to another brand's Search Console or Google Analytics site, and offer to pick the brand's site when it has none. A site read by two connections counts once, and signing in to Google again renews the connection instead of adding a copy.",
+			"at": "2026-11-15T17:23:25Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Sales reps can now use the company's Google Workspace connection for their Sales email instead of signing in to Google themselves. In Sales, My email shows **Use Google Workspace** to reps the CRM email settings allow, and taking someone off those settings disconnects their Sales email too.",
+			"at": "2026-11-15T17:23:25Z"
 		}
 	],
-	"through": "5bf7ec4+b47320b"
+	"through": "c8232af+5e30b55"
 }
