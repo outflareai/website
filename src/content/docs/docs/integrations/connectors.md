@@ -59,6 +59,7 @@ If the server has no OAuth app for a provider, the dialog says so and asks for t
 | Outlook Calendar | Microsoft | |
 | HubSpot | HubSpot | Private app token |
 | Attio | Attio | Access token |
+| Intercom | | Access token, with your region (to [import past conversations](/docs/guides/team-inbox/#import-from-intercom)) |
 | PostHog | PostHog Cloud, no app to register | Personal API key (also self-hosted) |
 | Calendly | Calendly | Personal access token |
 | Apollo | Apollo | Master API key |
