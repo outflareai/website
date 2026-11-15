@@ -492,6 +492,94 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/SalesTemplateInput"
+  /v1/brands/{brand}/sales/reporting:
+    parameters:
+      - name: brand
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getSalesReporting
+      summary: Read Sales throughput, costs and capacity
+      description: Sales managers and workspace owners only. Pipeline evidence uses a brand-owned Lead Portal connection; SDR pickup and customer confirmations use Outflare Sales. Archived records are not counted as lost deals. Payments are not recorded by this report.
+      tags: [records]
+      x-outflare-access:
+        scope: customers.read
+        brand: true
+      parameters:
+        - name: period
+          in: query
+          schema: { type: string, enum: [24h, 48h, 7d, 30d, 365d], default: 24h }
+        - name: integration
+          in: query
+          schema: { type: string, format: uuid }
+        - name: from
+          in: query
+          schema: { type: string, format: date-time }
+        - name: to
+          in: query
+          schema: { type: string, format: date-time }
+        - name: stages
+          in: query
+          description: Comma-separated discovered, researched, verified, emailed, replied, sdr, closed. Required for lead inspection.
+          schema: { type: string }
+        - name: offset
+          in: query
+          schema: { type: integer, minimum: 0, maximum: 1000000, default: 0 }
+      responses:
+        "200":
+          description: Read-only report. Counts are first milestones per identity. Missing source data stays unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesReportingResponse'
+        default:
+          $ref: '#/components/responses/Error'
+
+  /v1/brands/{brand}/sales/reporting/leads:
+    parameters:
+      - name: brand
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getSalesReportingLeads
+      summary: Inspect the leads behind selected Sales milestones
+      description: Sales managers and workspace owners only. Pipeline evidence uses a brand-owned Lead Portal connection; SDR pickup and customer confirmations use Outflare Sales. Archived records are not counted as lost deals. Payments are not recorded by this report.
+      tags: [records]
+      x-outflare-access:
+        scope: customers.read
+        brand: true
+      parameters:
+        - name: period
+          in: query
+          schema: { type: string, enum: [24h, 48h, 7d, 30d, 365d], default: 24h }
+        - name: integration
+          in: query
+          schema: { type: string, format: uuid }
+        - name: from
+          in: query
+          schema: { type: string, format: date-time }
+        - name: to
+          in: query
+          schema: { type: string, format: date-time }
+        - name: stages
+          in: query
+          description: Comma-separated discovered, researched, verified, emailed, replied, sdr, closed. Required for lead inspection.
+          schema: { type: string }
+        - name: offset
+          in: query
+          schema: { type: integer, minimum: 0, maximum: 1000000, default: 0 }
+      responses:
+        "200":
+          description: Read-only report. Counts are first milestones per identity. Missing source data stays unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesReportingResponse'
+        default:
+          $ref: '#/components/responses/Error'
+
   /v1/brands/{brand}/sales/bridge:
     parameters:
       - $ref: "#/components/parameters/BrandID"
@@ -40043,14 +40131,18 @@ paths:
         currency. An open month is worked out when it is read, so it follows the deals, the payments and the rules as
         they are now; an approved or paid month reads as it was approved. Share of quota is what the person has won in
         the month's quarter over their quota. With catalog.manage the caller sees everyone; otherwise only themselves
-        and the people who report to them.
+        and the people who report to them. A deal with a second owner (its co_owner field) is split between the two
+        by co_owner_percent, half each when empty: rules that pay the owner, or the owner's manager, pay each on their
+        share. format=csv gives the same lines as a file, one row a line, for payroll.
       tags: [revenue]
       parameters:
         - { name: month, in: query, schema: { type: string, pattern: '^\d{4}-(0[1-9]|1[0-2])$' }, description: "Such as 2026-11. This month when left out." }
+        - { name: format, in: query, schema: { type: string, enum: [json, csv] }, description: "csv downloads the month's statement lines as a file. json when left out." }
       responses:
         "200":
           description: The statements.
           content:
+            text/csv: { schema: { type: string } }
             application/json:
               schema:
                 type: object
@@ -53365,6 +53457,91 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/MissionHeld" }
   schemas:
+    SalesAttribution:
+      type: object
+      description: Original uploader identity from authenticated submission evidence. Never includes credential values, hashes or prefixes. Research and Sales ownership do not change it.
+      required: [id, name, kind]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        kind: { type: string, enum: [worker, api_key, sales_agent, manual, unknown] }
+        status: { type: string, enum: [known, unknown, unavailable] }
+        submitted_at: { type: [string, 'null'], format: date-time }
+        event_id: { type: [string, 'null'] }
+        revoked: { type: boolean }
+    SalesAgentPerformance:
+      type: object
+      required: [attribution, counts]
+      properties:
+        attribution: { $ref: '#/components/schemas/SalesAttribution' }
+        counts:
+          type: object
+          additionalProperties: { type: integer, minimum: 0 }
+        cohort: { type: [object, 'null'], additionalProperties: true }
+        intake: { type: [object, 'null'], additionalProperties: true }
+    SalesReportingResponse:
+      type: object
+      description: Versioned Sales reporting envelope. Summary responses contain buckets, totals, cohort, tools, capacity and result amounts; inspection responses contain independently paginated stage groups (50 per stage). Source status is always explicit.
+      required: [schema_version, source]
+      properties:
+        schema_version: { type: integer, const: 1 }
+        source:
+          type: object
+          required: [status, connections]
+          properties:
+            status: { type: string, enum: [connected, missing, choose] }
+            integration_id: { type: string }
+            connections:
+              type: array
+              items:
+                type: object
+                required: [id, name]
+                properties:
+                  id: { type: string }
+                  name: { type: string }
+        generated_at: { type: string, format: date-time }
+        from: { type: string, format: date-time }
+        to: { type: string, format: date-time }
+        bucket: { type: string, enum: [hour, day] }
+        buckets:
+          type: array
+          items:
+            type: object
+            required: [at, counts]
+            properties:
+              at: { type: string, format: date-time }
+              counts:
+                type: object
+                additionalProperties: { type: integer, minimum: 0 }
+        totals:
+          type: object
+          additionalProperties: { type: integer, minimum: 0 }
+        agents:
+          type: array
+          items: { $ref: '#/components/schemas/SalesAgentPerformance' }
+        attribution_coverage:
+          type: object
+          properties:
+            native_milestones: { type: integer }
+            known: { type: integer }
+            unavailable: { type: integer }
+        cohort: { type: [object, 'null'], additionalProperties: true }
+        tools: { type: [object, 'null'], additionalProperties: true }
+        capacity: { type: [object, 'null'], additionalProperties: true }
+        results: { type: object, additionalProperties: true }
+        groups:
+          type: array
+          items:
+            type: object
+            required: [stage, total, offset, leads]
+            properties:
+              stage: { type: string }
+              total: { type: integer, minimum: 0 }
+              offset: { type: integer, minimum: 0 }
+              leads:
+                type: array
+                items: { type: object, additionalProperties: true }
+
     SalesMember:
       type: object
       properties:
@@ -53553,6 +53730,7 @@ components:
     SalesLead:
       type: object
       properties:
+        attribution: { $ref: '#/components/schemas/SalesAttribution' }
         id:
           type: string
           format: uuid
@@ -58776,15 +58954,25 @@ components:
       allOf:
         - { $ref: "#/components/schemas/RevenueTeamSum" }
         - type: object
-          required: [staff_id, name, title, role, manager_id, user_id, has_quota, reports, team]
+          required: [staff_id, name, title, role, manager_id, user_id, has_quota, signals, reports, team]
           properties:
             staff_id: { type: string, format: uuid }
             name: { type: string }
             title: { type: string }
             role: { type: string, description: "Their role on the brand's sales desk: sdr, ae, manager, or empty." }
             manager_id: { type: [string, "null"], format: uuid }
-            user_id: { type: [string, "null"], format: uuid, description: "Their sign-in. Without one they can own nothing, so their own numbers are zero." }
+            user_id: { type: [string, "null"], format: uuid, description: "Their sign-in, when they have one." }
             has_quota: { type: boolean }
+            signals:
+              type: object
+              required: [open, late, handled, won, median_hours]
+              description: "How they handle the signals given to them. Signals go to people with a sign-in, so it is all zero for someone without one."
+              properties:
+                open: { type: integer, description: "Waiting on them now: open or accepted." }
+                late: { type: integer, description: "Of those, open and past their due time." }
+                handled: { type: integer, description: "Closed in the quarter, done or dismissed." }
+                won: { type: integer, description: "Closed in the quarter with the outcome won." }
+                median_hours: { type: [number, "null"], description: "The usual time, in hours, from a signal being raised to its being closed, for those handled in the quarter. null with none." }
             reports: { type: integer, description: "People under them on the team, however deep." }
             team:
               oneOf:
@@ -58893,6 +59081,7 @@ components:
         who: { type: string, enum: [owner, company_owner, sourced_by, manager] }
         percent: { type: number }
         tier_from: { type: integer, description: "The share of quota the rate applies from, when a tier set it." }
+        split_percent: { type: number, description: "This person's share of a deal with two owners (the deal's co_owner and co_owner_percent). Left out when the whole deal is theirs." }
         amount_minor: { type: integer, format: int64, description: "What the line pays. Negative for a refund taken back." }
         capped: { type: boolean, description: "The rule's monthly cap cut the line short." }
     CommissionStatement:
@@ -58969,6 +59158,8 @@ components:
             required: [deal_id, name, record_id, record_name, kind, stage, close_date, amount_minor, weight, weight_from, expected_minor, owner_id]
             properties:
               owner_id: { type: [string, "null"], description: "The deal's owner, or the owner of who it is with." }
+              co_owner_id: { type: [string, "null"], description: "The deal's second owner, when it has one. The deal counts under each owner by their share." }
+              co_owner_percent: { type: [number, "null"], description: "The second owner's share of the deal, in percent." }
               deal_id: { type: string, format: uuid }
               name: { type: string }
               record_id: { type: [string, "null"], format: uuid, description: The person or company the deal is with. }
