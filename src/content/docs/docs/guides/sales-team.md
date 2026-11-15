@@ -60,6 +60,8 @@ Each rule says:
 
 New plans can start from an example: a percent of every deal; more on money collected in the first month; outbound paying more than inbound; or a better rate once quota is reached.
 
+An open plan has an address of its own, as does the Plans view, so you can send a teammate a link to the plan you mean, and Back returns to the list.
+
 ## Earnings and approving a month
 
 Commissions lists everyone a plan covers for the month, with their total. Open a person to see every line: the deal or payment, its amount, whether it was inbound or outbound, new or coming back and which day, the rule that paid it, the rate and what it pays. A refund taken back shows as a negative line.
