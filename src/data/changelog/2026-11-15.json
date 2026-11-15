@@ -2,7 +2,7 @@
 	"version": "2026.11.15",
 	"date": "2026-11-15",
 	"status": "in-progress",
-	"updated": "2026-11-15T19:24:01Z",
+	"updated": "2026-11-15T19:52:07Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -178,7 +178,21 @@
 			"edition": "open-source",
 			"text": "A Zeropark campaign's bid, or the bid of one of its targets, can now be set through the API and MCP as a queued change that records the bid before; agents may only lower a bid without a person's approval.",
 			"at": "2026-11-15T19:24:01Z"
+		},
+		{
+			"kind": "fix",
+			"area": "connectors",
+			"edition": "open-source",
+			"text": "After signing in again, the dialog for choosing which sites to import shows Done when nothing needs to change, instead of a greyed-out Saved button.",
+			"at": "2026-11-15T19:52:07Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "The Tracker's Targets table now shows each Zeropark target's bid and state as Zeropark holds them, so a target paused in Zeropark's own panel shows as paused, and a bid can be changed by clicking it.",
+			"at": "2026-11-15T19:52:07Z"
 		}
 	],
-	"through": "ff7baa7+ea87b45"
+	"through": "f13d999+892eb97"
 }
