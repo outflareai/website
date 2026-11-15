@@ -2,7 +2,7 @@
 	"version": "2026.11.15",
 	"date": "2026-11-15",
 	"status": "in-progress",
-	"updated": "2026-11-15T21:34:51Z",
+	"updated": "2026-11-15T21:42:49Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -241,7 +241,42 @@
 			"edition": "open-source",
 			"text": "Self-hosted servers can read connected ad platforms more often than once an hour: set `OUTFLARE_ADS_SYNC_INTERVAL` to a duration from `15m` to `24h` (such as `30m`). No platform is read more often than its floor (half an hour for most, a quarter of an hour for Zeropark), so a shorter setting reads at the floor.",
 			"at": "2026-11-15T21:34:51Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "You can now pause and resume a single ad set or ad, without pausing the whole campaign, on Meta and Google Ads, and set the daily budget of a Meta ad set that holds its own. Open a campaign on the Paid ads page and use Manage on an ad set or ad; the API and MCP have the same changes.",
+			"at": "2026-11-15T21:42:49Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Website analytics is now one tab per question: Overview, Pages, Sources, Websites, Countries, Devices, Search and Connected tools. Each tab shows a single table or chart, names where its numbers come from (Outflare Analytics, your search tool, or the connected tool you opened) and has its own address.",
+			"at": "2026-11-15T21:42:49Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Website tracking moved from Analytics to Settings, and now says plainly whether a brand's script is working: Live when a visit arrived in the last 24 hours, with the last visit and today's events, or Quiet when visits have stopped. The setup steps only show until the first visit arrives.",
+			"at": "2026-11-15T21:42:49Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Trends do more: medians and percentiles, times per person, weekly and monthly active people, and a breakdown by two fields at once with each group as its own line. Show a trend as stacked areas or bars, bars across, a ring of shares or a world map, with a running total, shares of the whole, a moving average or a second axis.",
+			"at": "2026-11-15T21:42:49Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Charts look and read better: smooth lines with a soft fill, sharp text at any size, and a card beside the cursor with the exact numbers for each day, week or month, the period before and the change. Line and bar charts show a forecast in a lighter dashed line with its likely range, and the day or week still running is marked \"so far\". Retention, lifecycle and funnel charts got the same treatment.",
+			"at": "2026-11-15T21:42:49Z"
 		}
 	],
-	"through": "134d3f1+308e8a3"
+	"through": "b0dc6b9+b32635e"
 }
