@@ -19,7 +19,7 @@ Every tile runs its insight again when you open the page, with the dashboard's d
 
 ## Edit a tile
 
-Press **Edit** on a tile to change it without leaving the dashboard: the event or other thing it counts, filters, what it measures, the breakdown, the interval, how it shows (lines, bars, one number or a table) and its name. It is the same builder as the [Trends](/docs/guides/trends/) and Funnels pages, with the chart updating as you change it. **Save** takes you back to the dashboard. A tile is a saved insight, so saving changes it on every dashboard that shows it. Press **Edit** on a note to change its text.
+Press **Edit** on a tile to change it without leaving the dashboard: the event or other thing it counts, filters, what it measures, the breakdown, the interval, how it shows (lines, areas, bars, a ring of shares, a map, one number or a table) and its name. It is the same builder as the [Trends](/docs/guides/trends/) and Funnels pages, with the chart updating as you change it. **Save** takes you back to the dashboard. A tile is a saved insight, so saving changes it on every dashboard that shows it. Press **Edit** on a note to change its text.
 
 ## Edit the dashboard
 
