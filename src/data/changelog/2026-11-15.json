@@ -2,7 +2,7 @@
 	"version": "2026.11.15",
 	"date": "2026-11-15",
 	"status": "in-progress",
-	"updated": "2026-11-15T00:11:53Z",
+	"updated": "2026-11-15T01:10:54Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -38,7 +38,35 @@
 			"edition": "open-source",
 			"text": "Picking a teammate looks the same everywhere: the Owner control on a record, \"Assign to…\" in CRM lists and Coverage now share one searchable list with photos. People in the team directory who have no sign-in can own records too, and their deals count towards their quota and commission.",
 			"at": "2026-11-15T00:11:53Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Sales queues, lead details and reporting lists show the original uploading agent or named API key. Results compares each uploader’s pipeline progress and discovery submission quality, keeping unknown origins and revoked identities visible without exposing credentials.",
+			"at": "2026-11-15T01:10:54Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Compare Sales milestones as lines or bars and open an hour or day to inspect every selected stage. Connect your Lead Portal for pipeline progress, costs per verified lead and mailbox capacity, alongside Outflare SDR pickup and confirmed customers.",
+			"at": "2026-11-15T01:10:54Z"
+		},
+		{
+			"kind": "launch",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Sales reporting preview sits beside Sales workspace: explore seven milestones, hourly or daily volume, each tool’s cost per lead, Sales mailbox capacity and closed deals. All figures are clearly marked as example data until reporting is connected.",
+			"at": "2026-11-15T01:10:54Z"
+		},
+		{
+			"kind": "launch",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Sales teams can work a shared new-lead queue, open full conversations, save personal email templates, keep notes through handoffs and confirm customers without recording a payment. Personal email sending requires each person's own consent.",
+			"at": "2026-11-15T01:10:54Z"
 		}
 	],
-	"through": "bc090b9+4a2aa70"
+	"through": "c616abc+e0ff794"
 }
