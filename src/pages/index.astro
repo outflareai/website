@@ -11,10 +11,11 @@ const liveConnectors = integrations.filter((i) => i.status === 'available').leng
 // Real screenshots of the web app (outflare web/), taken from a local demo
 // workspace where every name and domain is fictional (.example).
 const shots = [
-	{ id: 'analytics', label: 'Analytics', alt: 'Website analytics: visitors, page views, visits, search clicks and impressions for one website from Google Analytics, Search Console and PostHog, with an Ahrefs SEO line' },
-	{ id: 'seo', label: 'SEO', alt: 'SEO: an Ahrefs connection with its monthly budget, and the keywords the site ranks for with position, change, searches and estimated visits' },
-	{ id: 'inbox-item', label: 'Inbox', alt: 'Inbox: conversations sorted by meaning, with one open and a reply box sending from the same address' },
-	{ id: 'connectors', label: 'Connectors', alt: 'Connectors: Ahrefs, Apollo, Google Analytics, Google Calendar, Google Search Console and HubSpot, each connected' },
+	{ id: 'home', label: 'Home', alt: 'Home: what needs you today, with sends, replies and bounces for the week, mailbox health and active sequences for one brand' },
+	{ id: 'inbox-item', label: 'Inbox', alt: 'Inbox: replies from every mailbox in one list, with one conversation open and a reply box sending from the same address' },
+	{ id: 'people', label: 'CRM', alt: 'CRM: people with their job title, company, lifecycle stage and owner' },
+	{ id: 'mailboxes', label: 'Mailboxes', alt: 'Mailboxes: every sending mailbox with its status, warm-up and daily limit' },
+	{ id: 'connectors', label: 'Connectors', alt: 'Connectors: Ahrefs, Google Workspace, HubSpot, PostHog, Slack and Stripe, each connected, and the address to connect an AI agent over MCP' },
 ];
 
 // Five of these are connectors (Google Analytics to PostHog); "and N more" counts the rest.
