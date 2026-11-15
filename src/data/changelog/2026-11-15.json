@@ -1,0 +1,44 @@
+{
+	"version": "2026.11.15",
+	"date": "2026-11-15",
+	"status": "in-progress",
+	"updated": "2026-11-15T00:11:53Z",
+	"items": [
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Two people can share a deal: set a Second owner and their share, and the deal is split between them for quotas, the forecast and commission. A month's commission downloads as a CSV file, one row for every line, for payroll.",
+			"at": "2026-11-15T00:11:53Z"
+		},
+		{
+			"kind": "fix",
+			"area": "lifecycle",
+			"edition": "open-source",
+			"text": "\"When this fires, do…\" on a rule no longer fails with an error: the step you pick opens in the new journey, ready to fill in. Choosing a step is a bigger screen with groups down the side and a search box. On the automation map, many sources that send the same events fold into one card.",
+			"at": "2026-11-15T00:11:53Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "The Sales team page shows how each person handles their signals: how many they closed this quarter, how many were won, how long it usually takes, and how many are waiting or late.",
+			"at": "2026-11-15T00:11:53Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "One list of people and one of companies. CRM → People and Companies now also show scores, records held for review and archived ones (with Restore), and the bulk edit you can undo. Customer data keeps Events, Duplicates, Products, Transactions, Metrics, Scores, Routing, Imports and Recently deleted, and no longer has a second list.",
+			"at": "2026-11-15T00:11:53Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Picking a teammate looks the same everywhere: the Owner control on a record, \"Assign to…\" in CRM lists and Coverage now share one searchable list with photos. People in the team directory who have no sign-in can own records too, and their deals count towards their quota and commission.",
+			"at": "2026-11-15T00:11:53Z"
+		}
+	],
+	"through": "bc090b9+4a2aa70"
+}
