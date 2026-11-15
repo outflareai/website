@@ -2,7 +2,7 @@
 	"version": "2026.11.15",
 	"date": "2026-11-15",
 	"status": "in-progress",
-	"updated": "2026-11-15T12:15:39Z",
+	"updated": "2026-11-15T15:20:27Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -101,7 +101,14 @@
 			"edition": "open-source",
 			"text": "The side menu fits better: open several groups at once without the others closing, fold away the headings you don't use, close every group with one button beside Search, and the menu remembers how you left it. Rows are a little tighter.",
 			"at": "2026-11-15T12:15:39Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "lifecycle",
+			"edition": "open-source",
+			"text": "Journeys now ignore events that arrive more than a day after they happened, such as imported history: they are kept for reports, but start, move and end no journey, so a backfill never emails people about the past. Automations, signals and lifecycle stages already worked this way.",
+			"at": "2026-11-15T15:20:27Z"
 		}
 	],
-	"through": "41d0709+c0e6e56"
+	"through": "030bc61+596ecab"
 }
