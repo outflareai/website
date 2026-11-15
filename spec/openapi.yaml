@@ -40043,14 +40043,18 @@ paths:
         currency. An open month is worked out when it is read, so it follows the deals, the payments and the rules as
         they are now; an approved or paid month reads as it was approved. Share of quota is what the person has won in
         the month's quarter over their quota. With catalog.manage the caller sees everyone; otherwise only themselves
-        and the people who report to them.
+        and the people who report to them. A deal with a second owner (its co_owner field) is split between the two
+        by co_owner_percent, half each when empty: rules that pay the owner, or the owner's manager, pay each on their
+        share. format=csv gives the same lines as a file, one row a line, for payroll.
       tags: [revenue]
       parameters:
         - { name: month, in: query, schema: { type: string, pattern: '^\d{4}-(0[1-9]|1[0-2])$' }, description: "Such as 2026-11. This month when left out." }
+        - { name: format, in: query, schema: { type: string, enum: [json, csv] }, description: "csv downloads the month's statement lines as a file. json when left out." }
       responses:
         "200":
           description: The statements.
           content:
+            text/csv: { schema: { type: string } }
             application/json:
               schema:
                 type: object
@@ -58776,15 +58780,25 @@ components:
       allOf:
         - { $ref: "#/components/schemas/RevenueTeamSum" }
         - type: object
-          required: [staff_id, name, title, role, manager_id, user_id, has_quota, reports, team]
+          required: [staff_id, name, title, role, manager_id, user_id, has_quota, signals, reports, team]
           properties:
             staff_id: { type: string, format: uuid }
             name: { type: string }
             title: { type: string }
             role: { type: string, description: "Their role on the brand's sales desk: sdr, ae, manager, or empty." }
             manager_id: { type: [string, "null"], format: uuid }
-            user_id: { type: [string, "null"], format: uuid, description: "Their sign-in. Without one they can own nothing, so their own numbers are zero." }
+            user_id: { type: [string, "null"], format: uuid, description: "Their sign-in, when they have one." }
             has_quota: { type: boolean }
+            signals:
+              type: object
+              required: [open, late, handled, won, median_hours]
+              description: "How they handle the signals given to them. Signals go to people with a sign-in, so it is all zero for someone without one."
+              properties:
+                open: { type: integer, description: "Waiting on them now: open or accepted." }
+                late: { type: integer, description: "Of those, open and past their due time." }
+                handled: { type: integer, description: "Closed in the quarter, done or dismissed." }
+                won: { type: integer, description: "Closed in the quarter with the outcome won." }
+                median_hours: { type: [number, "null"], description: "The usual time, in hours, from a signal being raised to its being closed, for those handled in the quarter. null with none." }
             reports: { type: integer, description: "People under them on the team, however deep." }
             team:
               oneOf:
@@ -58893,6 +58907,7 @@ components:
         who: { type: string, enum: [owner, company_owner, sourced_by, manager] }
         percent: { type: number }
         tier_from: { type: integer, description: "The share of quota the rate applies from, when a tier set it." }
+        split_percent: { type: number, description: "This person's share of a deal with two owners (the deal's co_owner and co_owner_percent). Left out when the whole deal is theirs." }
         amount_minor: { type: integer, format: int64, description: "What the line pays. Negative for a refund taken back." }
         capped: { type: boolean, description: "The rule's monthly cap cut the line short." }
     CommissionStatement:
@@ -58969,6 +58984,8 @@ components:
             required: [deal_id, name, record_id, record_name, kind, stage, close_date, amount_minor, weight, weight_from, expected_minor, owner_id]
             properties:
               owner_id: { type: [string, "null"], description: "The deal's owner, or the owner of who it is with." }
+              co_owner_id: { type: [string, "null"], description: "The deal's second owner, when it has one. The deal counts under each owner by their share." }
+              co_owner_percent: { type: [number, "null"], description: "The second owner's share of the deal, in percent." }
               deal_id: { type: string, format: uuid }
               name: { type: string }
               record_id: { type: [string, "null"], format: uuid, description: The person or company the deal is with. }
