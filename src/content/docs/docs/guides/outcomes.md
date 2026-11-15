@@ -45,7 +45,7 @@ Every charge is one row: what it was for (lead data, verification, mailboxes, do
 - **Recurring costs.** Mailbox seats, a data subscription or an SDR's time, monthly or yearly. Each is spread evenly over the days it was active, so a 30-day report carries 30 days of it.
 - **Idempotent.** Send a `ref` (an invoice number, a batch id) and recording the same charge twice keeps the first one, so scripts and agents can retry safely.
 
-![The Spend tab: unpriced usage, recurring costs and the charges in the period](/screens/outcomes-spend.png)
+![The Spend tab: recurring costs and the charges in the period](/screens/outcomes-spend.png)
 
 ### How costs are shared
 
