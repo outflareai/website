@@ -11,7 +11,7 @@ A journey is an if-this-then-that flow for the people on your [customer records]
 
 ## Build one
 
-The builder draws the journey from the top down: what starts it, then each step, with a check's Yes and No side by side and End where a path finishes. Press **+** on any link, or **Add the first step** on an empty journey, to add a step there: the step chooser opens as a large window with a search box and the steps in groups. Select a step to change it on a full page, with the fields it needs first. Each step shows its live numbers and how many people are on it now. Anything that would stop it going live, such as an unpublished template or a step nothing leads to, is marked in red. Changes save as you go, and Undo and Redo step through them. On a phone the flow is read-only.
+The builder draws the journey from the top down: what starts it, then each step, with a check's Yes and No side by side and End where a path finishes. Press **+** on any link, or **Add the first step** on an empty journey, to add a step there: the step chooser opens as a large window with a search box and the steps in groups. Select a step to change it on a full page, with the fields it needs first. An open step has an address of its own, so you can send a teammate a link to it, and Back returns to the flow. Each step shows its live numbers and how many people are on it now. Anything that would stop it going live, such as an unpublished template or a step nothing leads to, is marked in red. Changes save as you go, and Undo and Redo step through them. On a phone the flow is read-only.
 
 ## What starts it
 
