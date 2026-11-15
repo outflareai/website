@@ -2,7 +2,7 @@
 	"version": "2026.11.15",
 	"date": "2026-11-15",
 	"status": "in-progress",
-	"updated": "2026-11-15T19:20:33Z",
+	"updated": "2026-11-15T19:24:01Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -171,7 +171,14 @@
 			"edition": "open-source",
 			"text": "Tracking domains now show when their registration runs out, and you get an alert 30 days before, 7 days before and when it has, so the links on a domain don't stop working because it lapsed. The date comes from the domain's public registration record.",
 			"at": "2026-11-15T19:20:33Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "A Zeropark campaign's bid, or the bid of one of its targets, can now be set through the API and MCP as a queued change that records the bid before; agents may only lower a bid without a person's approval.",
+			"at": "2026-11-15T19:24:01Z"
 		}
 	],
-	"through": "b49fca5+528b631"
+	"through": "ff7baa7+ea87b45"
 }
