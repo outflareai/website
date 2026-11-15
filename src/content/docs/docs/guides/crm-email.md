@@ -1,6 +1,6 @@
 ---
 title: Email and meetings in the CRM
-description: Bring your team's work email and meetings with contacts into the CRM through one Google Workspace connection, private to each person unless they share, with a check before anyone reaches out.
+description: Bring your team's work email and meetings with contacts into the CRM, and Sales reps' conversations, through one Google Workspace connection, private to each person unless they share.
 sidebar:
   order: 1.6
 ---
@@ -19,8 +19,9 @@ In one line: for the people an admin picks, Outflare saves their email and meeti
 | **Email → Meetings** | Meetings with them from people's calendars, past and upcoming |
 | A record's overview → **Before you reach out** | Whether they're already a customer, have an open deal or sit in another pipeline (such as a partnership), who on the team has emailed them (for a warm intro), and whether the conversation has gone quiet for 60 days |
 | The API → **send as yourself** | Send from your own Gmail address through Outflare, kept on the contact |
+| **Sales → My email** | Sales reps read and reply to their Sales conversations from their own address, through the same connection ([below](#sales-email)) |
 
-The same connection is meant to serve every part of Outflare that works with your team's own email and calendars, so nobody signs in to Google more than once.
+The same connection serves every part of Outflare that works with your team's own email and calendars (CRM email, meetings and Sales), so nobody signs in to Google more than once.
 
 ## Connect Google Workspace
 
@@ -107,6 +108,23 @@ With `gmail.send` delegated, a person can send from their own address through Ou
 - A retry looks in your Sent mail first, so an email is never sent twice.
 - Only eligible people whose mailbox is read through the Workspace connection can send. A person's own Google sign-in reads only.
 
+## Sales email
+
+Sales reps (SDRs and account managers) send and receive their Sales conversations from their own address. They can do it through the same Google Workspace connection, without signing in to Google:
+
+1. An admin adds the rep to the eligible members in **CRM → Settings → Sales eligibility**, with the Google Workspace connection chosen.
+2. The rep opens **Sales → My email** and clicks **Use Google Workspace**. A catch-up of their Sales conversations starts straight away.
+
+Sales reads the rep's mailbox with `gmail.readonly` and sends with `gmail.send`, so the connection needs both delegated. **Connect Gmail** stays available for teams without a Google Workspace admin: the rep signs in to their own Google account instead.
+
+Sales follows the same eligibility list as CRM email, checked every time it reads or sends:
+
+- Taking a rep off the list, excluding them by account or email address, or choosing a different connection disconnects their Sales email at once. My email then says Google Workspace is no longer set up for them.
+- If Google doesn't allow sending from their address, My email says so: delegate `gmail.send` to the connection, then the rep clicks **Use Google Workspace** again.
+- Deleting the Google Workspace connection disconnects every rep who used it.
+
+Sales conversations are shared with the colleagues assigned to the lead and with Sales managers; the rest of the rep's mailbox is not read into Sales. Unrelated mail, drafts, spam and anything the email privacy rules exclude stay out.
+
 ## Questions people ask
 
 **Can my manager read my email?** No. Only what you share, or work email under team sharing once it's on and after the AI check. No role grants access.
@@ -121,7 +139,7 @@ With `gmail.send` delegated, a person can send from their own address through Ou
 
 ## API
 
-Every endpoint is under `/v1/brands/{brand}/crm/mail/`, except the relationship check. They work only with **your own signed-in session**: an API token or a support session gets `403 forbidden`, because personal mail never follows an automation's access. The [API reference](/docs/api/reference/) lists them under **CRM**, with every field.
+Every endpoint is under `/v1/brands/{brand}/crm/mail/`, except the relationship check and the [Sales](#sales) calls. They work only with **your own signed-in session**: an API token or a support session gets `403 forbidden`, because personal mail never follows an automation's access. The [API reference](/docs/api/reference/) lists them under **CRM**, with every field.
 
 ### Admin: eligibility and privacy
 
@@ -165,6 +183,18 @@ curl -X PUT "$OUTFLARE_URL/v1/brands/$BRAND/crm/mail/rollout" \
 | `GET /records/{record}/relationship` | `getRecordRelationship`: Before you reach out, with `flags` such as `already_customer`, `open_deal`, `in_other_pipeline`, `warm_intro` and `stale_thread` | `customers.read` |
 
 An email or meeting shared as "who and when" comes back with `visibility: metadata` and no subject, body, title or guests. Mail you may not see isn't returned at all, not even as a count. The relationship check also works with API tokens and the MCP tool `get_record_relationship`, without the warm intro list.
+
+### Sales
+
+| Call | Operation | Scope |
+| --- | --- | --- |
+| `GET /sales/me` | `getSalesMe`: your Sales role and email, with `mail_via` (`workspace`, `personal` or `none`), `mail_status` and `workspace_available` | `customers.read` |
+| `POST /sales/mail/workspace` | `connectSalesWorkspace`: use the Google Workspace connection for your Sales email | `customers.manage` |
+| `POST /sales/mail/authorize` | `authorizeSalesGoogle`: a link to connect your own Gmail instead | `customers.manage` |
+| `POST /sales/mail/sync` | `syncSalesGoogle`: catch up now | `customers.manage` |
+| `DELETE /sales/mail/connection` | `disconnectSalesGoogle`: disconnect your Sales email | `customers.read` |
+
+These are under `/v1/brands/{brand}/` and, like the rest, need your own signed-in session. `mail_status` is `connected`, `not_connected`, or why it stopped: `workspace_not_allowed` (no longer eligible), `send_not_allowed` (delegate `gmail.send`), `google_connection_failed` or `sync_failed`.
 
 ### Sending
 
