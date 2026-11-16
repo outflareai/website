@@ -2,7 +2,7 @@
 	"version": "2026.11.16",
 	"date": "2026-11-16",
 	"status": "in-progress",
-	"updated": "2026-11-16T09:07:15Z",
+	"updated": "2026-11-16T09:36:09Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -199,7 +199,35 @@
 			"edition": "open-source",
 			"text": "Destinations: write your product events to a table in your own BigQuery or Snowflake as they arrive, and press Send a test event on any destination to see it work before real events come in.",
 			"at": "2026-11-16T09:07:15Z"
+		},
+		{
+			"kind": "fix",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "A Telegram chat, and picking its customer, open as full pages instead of a side panel. Every Settings tab has an icon, and the AI model settings and approval messages no longer mention retired missions.",
+			"at": "2026-11-16T09:18:33Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Pinterest Ads and Reddit Ads now show what is below each campaign: ad groups and their ads, with spend, clicks and conversions per day, each ad's landing page, and whether its link carries your tracking template. They are read only for now; pause, resume and budgets stay at the campaign level on these two.",
+			"at": "2026-11-16T09:23:05Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Tracker logs: a postback to a traffic source can be sent again. **Send again** on a row of Postbacks out (or `POST .../traffic-sources/{id}/postbacks/{send}/resend`, MCP `resend_traffic_source_postback`) queues it with the status and payout it had, to the source's postback URL as it is now, so a send that failed on a wrong URL goes through once you fix the URL.",
+			"at": "2026-11-16T09:31:51Z"
+		},
+		{
+			"kind": "fix",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Link orders catalog: a broker export's price column is now imported when its header names the currency twice (\"Price USD, $\"), and \"Ref. IPs / Subnets\" fills referring subnets. The catalog table shows every intermediary metric as a sortable column you can hide, draws large catalogs a page at a time, and an import can set the intermediary for every row.",
+			"at": "2026-11-16T09:36:09Z"
 		}
 	],
-	"through": "e005eef+4bcbc81"
+	"through": "c21b2bd+bff8992"
 }
