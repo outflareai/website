@@ -2,7 +2,7 @@
 	"version": "2026.11.16",
 	"date": "2026-11-16",
 	"status": "in-progress",
-	"updated": "2026-11-16T20:45:06Z",
+	"updated": "2026-11-16T20:52:28Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -549,7 +549,14 @@
 			"edition": "open-source",
 			"text": "Paid ads has a Send log screen: every conversion sent to an ad platform, with what happened in plain words, what it was matched on, its value, and a link to the person. When an event doesn't say which country someone is in, Outflare now uses their earlier events and then their record before holding the conversion back.",
 			"at": "2026-11-16T20:45:06Z"
+		},
+		{
+			"kind": "launch",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "People from events: Source \"Event\" is now \"Events and conferences\", and a new Sub-source names the event or conference each person was met at. Pick one of the brand's events or type a new one, add several people from one event at once or from a CSV, and filter People by event.",
+			"at": "2026-11-16T20:52:28Z"
 		}
 	],
-	"through": "8c4409e+8e655a5"
+	"through": "1ffe76d+f3623ba"
 }
