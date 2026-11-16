@@ -639,6 +639,35 @@ paths:
           $ref: "#/components/responses/MissionHeld"
         default:
           $ref: "#/components/responses/Error"
+  /v1/brands/{brand}/sales/mail/workspace:
+    parameters:
+      - $ref: "#/components/parameters/BrandID"
+    post:
+      operationId: connectSalesWorkspace
+      summary: Use the company's Google Workspace for my Sales email
+      description: |
+        Connects your Sales email through the company's Google Workspace connection instead of your own Google sign-in, when the brand's CRM email rollout names one and you are eligible under it (`workspace_available` on `/sales/me`). Sending needs `gmail.send` delegated to that connection. Taking you off the rollout, or changing its connection, disconnects it. Your own signed-in session only.
+      tags:
+        - records
+      x-outflare-access:
+        scope: customers.manage
+        brand: true
+      responses:
+        "200":
+          description: Connected; a catch-up is queued.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  connected:
+                    type: boolean
+                required:
+                  - connected
+        "202":
+          $ref: "#/components/responses/MissionHeld"
+        default:
+          $ref: "#/components/responses/Error"
   /v1/brands/{brand}/sales/mail/connection:
     parameters:
       - $ref: "#/components/parameters/BrandID"
@@ -7834,6 +7863,42 @@ paths:
                   data: { type: array, items: { $ref: "#/components/schemas/NetworkCostDay" } }
         "400": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/network-targets:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    get:
+      operationId: listBrandNetworkTargets
+      x-outflare-access: { scope: analytics.read, brand: true }
+      summary: List results per target of the networks' campaigns
+      description: |
+        Scope: analytics.read. For traffic sources made from a network template whose network reports spend per
+        target (Zeropark), each target of each network campaign over the days from..to (in the brand's time zone;
+        the last 7 days by default, a year at most): the tracker's clicks from it, their cost (each click's share of
+        the network's spend, else its own cost token), the conversions they brought (declined ones left out), their
+        payouts in the source's currency as revenue, profit and roi (profit over cost; null when nothing was spent).
+        ad_campaign_id is the network campaign as Paid ads knows it, once its connection has synced it: pass it and
+        the target to POST .../ads/campaigns/{id}/exclusions (kind placement) to pause the target. state is the
+        target as Outflare last changed it (active, pausing, paused, resuming); one paused in the network's own
+        panel still reads active. Most costly first, at most 500 per source.
+      tags: [tracker]
+      parameters:
+        - { name: from, in: query, schema: { type: string, format: date } }
+        - { name: to, in: query, schema: { type: string, format: date } }
+        - { name: source_id, in: query, schema: { type: string, format: uuid } }
+        - { name: campaign_ref, in: query, description: "One network campaign, by the id its clicks carry.", schema: { type: string } }
+      responses:
+        "200":
+          description: Targets.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, from, to]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/NetworkTarget" } }
+                  from: { type: string, format: date }
+                  to: { type: string, format: date }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/ip-lookups:
     parameters: [{ $ref: "#/components/parameters/BrandID" }]
     get:
@@ -10390,6 +10455,51 @@ paths:
       responses:
         "202":
           description: "The change is queued. For an agent, a MissionHeld answer: a person approves it."
+          content:
+            application/json:
+              schema: { oneOf: [{ $ref: "#/components/schemas/AdChangeQueued" }, { $ref: "#/components/schemas/MissionHeld" }] }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "422": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/ads/campaigns/{id}/exclusions:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: changeBrandAdCampaignExclusion
+      x-outflare-access: { scope: ads.manage, brand: true }
+      summary: Add or take out an exclusion
+      description: |
+        Scope: ads.manage. Stops the campaign showing on one thing, or lets it
+        show there again, and answers 202 with the queued change
+        (exclusion_add or exclusion_remove in GET .../ads/changes). What can
+        be excluded depends on the platform: on Zeropark a placement, which
+        is one of the campaign's targets by its address or hash (pausing the
+        target; the campaign keeps running on the others); on Google Ads a
+        device, location, placement, network, schedule or brand. A kind the
+        platform doesn't take is a 400 that lists the ones it does. Adding
+        an exclusion can only spend less, so an agent's follows its grant;
+        taking one out always waits for a person.
+      tags: [ads]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [kind, value, action]
+              properties:
+                kind: { type: string, enum: [device, location, placement, network, schedule, brand] }
+                value: { type: string, maxLength: 500, description: "The platform's own id or word for it: a Zeropark target's address or hash, a placement URL or app id, mobile, search_partners, 00-06." }
+                detail: { type: string, maxLength: 100, description: "Narrows a Google placement: website, mobile_application, youtube_channel or youtube_video." }
+                label: { type: string, maxLength: 200, description: "What a person reads in the list of changes." }
+                action: { type: string, enum: [add, remove] }
+      responses:
+        "202":
+          description: "The change is queued. For an agent taking an exclusion out, a MissionHeld answer: a person approves it."
           content:
             application/json:
               schema: { oneOf: [{ $ref: "#/components/schemas/AdChangeQueued" }, { $ref: "#/components/schemas/MissionHeld" }] }
@@ -13186,9 +13296,18 @@ paths:
         caveats such as data delay. Answers are kept for 15 minutes (an
         hour for Mixpanel and Amplitude, six hours for Clarity) to spare
         the provider's rate limits; `fresh=true` reads again.
+
+        One sign-in reads every site of the account, each belonging to a
+        brand. With `brand` (or for someone kept to some brands) the
+        report keeps to that brand's sites: a `site` of another brand is
+        `404 site_not_in_brand`, and with no `site` it reads the brand's
+        own (the connection's default when that is the brand's), or
+        answers `400 pick_site` when the brand has none in this
+        connection.
       tags: [analytics]
       parameters:
-        - { name: site, in: query, schema: { type: string }, description: "A site id from .../sites. Default: the connection's default site, or its only one." }
+        - { name: site, in: query, schema: { type: string }, description: "A site id from .../sites. Default: the connection's default site, or its only one; with brand, the brand's own site." }
+        - { $ref: "#/components/parameters/Brand" }
         - { $ref: "#/components/parameters/AnalyticsFrom" }
         - { $ref: "#/components/parameters/AnalyticsTo" }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 1000, default: 20 }, description: Rows in a breakdown report. }
@@ -53621,8 +53740,16 @@ components:
           type: string
         connected:
           type: boolean
+        mail_via:
+          type: string
+          enum:
+            - personal
+            - workspace
+            - none
+          description: "How the Sales email is connected: the person's own Google sign-in, or the company's Google Workspace connection."
         mail_status:
           type: string
+          description: "`connected`, `not_connected`, `reconnect_required`, or why it stopped: `sync_failed`, `google_connection_failed`, `send_not_allowed` (delegate gmail.send to the Google Workspace connection) or `workspace_not_allowed` (no longer eligible for Google Workspace)."
         last_synced_at:
           type:
             - string
@@ -53630,12 +53757,16 @@ components:
           format: date-time
         open_leads:
           type: integer
+        workspace_available:
+          type: boolean
+          description: On `/sales/me` only. Whether you may connect through the company's Google Workspace connection (`POST .../sales/mail/workspace`).
       required:
         - user_id
         - name
         - role
         - introduction
         - connected
+        - mail_via
         - mail_status
         - open_leads
     SalesTemplate:
@@ -57678,6 +57809,24 @@ components:
         value: { type: string, description: "An address, a range in its masked form, or a lowercase piece of a user agent." }
         note: { type: string }
         created_at: { type: string, format: date-time }
+    NetworkTarget:
+      type: object
+      required: [source_id, network, campaign_ref, ad_campaign_id, campaign_name, target, clicks, conversions, currency, cost, revenue, profit, roi, state]
+      properties:
+        source_id: { type: string, format: uuid }
+        network: { type: string }
+        campaign_ref: { type: string, description: "The network's campaign id, as the clicks carry it ({campaign_id})." }
+        ad_campaign_id: { type: [string, "null"], format: uuid, description: "The campaign in Paid ads, when synced: the id the exclusions endpoint takes." }
+        campaign_name: { type: string }
+        target: { type: string, description: "The target as the clicks carry it ({target}): what the exclusions endpoint takes as value." }
+        clicks: { type: integer, format: int64 }
+        conversions: { type: integer, format: int64 }
+        currency: { type: string }
+        cost: { type: string }
+        revenue: { type: string }
+        profit: { type: string }
+        roi: { type: [number, "null"], description: "Profit over cost: -1 lost everything, 0.5 made half again. Null when nothing was spent." }
+        state: { type: string, enum: [active, pausing, paused, resuming] }
     NetworkCostDay:
       type: object
       required: [source_id, network, campaign_ref, day, currency, spend, matched, spread, unattributed, clicks, targets, synced_at]
@@ -62150,6 +62299,15 @@ components:
         ad_id: { type: string, description: "A removed ad's id on the platform (ad_remove)." }
         keyword_id: { type: string, description: "A removed keyword's id on the platform (keyword_remove)." }
         name: { type: string, description: "The name of the campaign or ad removed, as it was." }
+        exclusion:
+          type: object
+          description: The exclusion added or taken out (exclusion_add, exclusion_remove).
+          required: [kind, value]
+          properties:
+            kind: { type: string }
+            value: { type: string }
+            detail: { type: string }
+            label: { type: string }
     AdBidding:
       type: object
       description: How a campaign bids. Read from the platform, strategy is in its own words (Google maximize_conversions, target_cpa, manual_cpc; Meta set_per_ad_set); set here, it is maximize_conversions or maximize_conversion_value.
@@ -63216,7 +63374,7 @@ components:
           type: array
           items:
             type: object
-            required: [integration_id, name, connector, site, site_name, totals, first_day, last_day, last_synced_at]
+            required: [integration_id, name, connector, site, site_name, totals, first_day, last_day, last_synced_at, copy_of]
             properties:
               integration_id: { type: string, format: uuid }
               name: { type: string }
@@ -63227,6 +63385,15 @@ components:
               first_day: { type: [string, "null"], format: date }
               last_day: { type: [string, "null"], format: date }
               last_synced_at: { type: [string, "null"], format: date-time }
+              copy_of:
+                description: "Set when another connection reads the same site of the same tool (one account connected twice): the connection that is counted, whose sync worked last. A copy is left out of `search` and of history, compare and changes; disconnect it to tidy up."
+                oneOf:
+                  - type: "null"
+                  - type: object
+                    required: [integration_id, name]
+                    properties:
+                      integration_id: { type: string, format: uuid }
+                      name: { type: string }
         search: { $ref: "#/components/schemas/AnalyticsMetrics" }
         seo: { type: array, items: { $ref: "#/components/schemas/SEOLatest" }, description: "Each SEO connection's latest snapshot of the domain." }
     SEOReportName:
@@ -71850,6 +72017,11 @@ components:
         date_range: { $ref: "#/components/schemas/InsightDateRange" }
         compare: { type: boolean }
         digest: { type: boolean, description: "Puts the dashboard's trends in the workspace's digest, over the digest's period." }
+        filters:
+          type: array
+          maxItems: 5
+          description: Conditions on event properties and page fields that every tile takes, on each of its event and page view series or steps (trends, funnels, retention and lifecycle). Visits, payments, conversions, ad numbers and paths keep only their own filters.
+          items: { $ref: "#/components/schemas/InsightFilter" }
     Dashboard:
       type: object
       required: [id, brand_id, name, description, settings, tiles, share, created_by, created_at, updated_at]

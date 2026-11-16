@@ -29,9 +29,9 @@ When you're through, **Continue with Acme** takes you on to the rest of that bra
 
 ## Then Home
 
-Home shows one set-up checklist at a time: what's left of Get started first, then the brand's setup. Get started's list includes **Invite your team**, which waits until you've seen Outflare work. **Open** takes you back to that step; × hides the checklist.
+Home's **Needs you** list shows **Finish setting up** your brand, with how far you've got and the next step: what's left of Get started first, then the brand's setup. **Continue** takes you back to that step; **Hide set-up** hides it. **Invite your team** waits at the end of Get started until you've seen Outflare work.
 
-![The checklist on Home](/screens/get-started-home.png)
+![Finish setting up on Home, with the next step](/screens/get-started-home.png)
 
 ## Help Outflare grow
 
