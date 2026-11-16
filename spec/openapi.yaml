@@ -7829,7 +7829,7 @@ paths:
                 required: [data, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/LanderClick" } }
-                  next_cursor: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
@@ -8063,7 +8063,7 @@ paths:
                 required: [data, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/TrackerCostUpdate" } }
-                  next_cursor: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         "400": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
     post:
@@ -8121,7 +8121,7 @@ paths:
       operationId: listTrackerConversions
       x-outflare-access: { scope: analytics.read, brand: true }
       summary: List tracker conversions
-      description: "Scope: analytics.read. The click ledger: every conversion a postback source reported, with the click it credits, newest first, 100 a page (pass the last one's converted_at as before)."
+      description: "Scope: analytics.read. The click ledger: every conversion a postback source reported, with the click it credits, newest first, 100 a page. Pass a page's next_cursor as cursor for the next one; it reaches conversions that share a converted_at, which before (a time alone) can skip."
       tags: [analytics]
       parameters:
         - { name: source, in: query, schema: { type: string, format: uuid } }
@@ -8129,7 +8129,9 @@ paths:
         - { name: status, in: query, schema: { type: string, enum: [approved, pending, declined] } }
         - { name: offer, in: query, schema: { type: string, format: uuid } }
         - { name: suspect, in: query, schema: { type: boolean }, description: "true for only the conversions a fraud signal flagged, false for only the others." }
-        - { name: before, in: query, schema: { type: string, format: date-time } }
+        - { name: before, in: query, schema: { type: string, format: date-time }, description: "Only conversions before this time. Prefer cursor: conversions at exactly this time are left out." }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
       responses:
         "200":
           description: Conversions.
@@ -8137,9 +8139,10 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [data]
+                required: [data, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/TrackerConversion" } }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
@@ -8248,7 +8251,7 @@ paths:
                 required: [data, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/TrackerConversionCall" } }
-                  next_cursor: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
@@ -8470,7 +8473,7 @@ paths:
                 required: [data, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/TrackerClick" } }
-                  next_cursor: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
@@ -8504,7 +8507,7 @@ paths:
                 required: [data, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/TrackerLanderClick" } }
-                  next_cursor: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
@@ -8612,7 +8615,7 @@ paths:
                 required: [data, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/TrafficSourcePostbackSend" } }
-                  next_cursor: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
@@ -11757,7 +11760,7 @@ paths:
                 required: [data, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/Finding" } }
-                  next_cursor: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
@@ -11870,7 +11873,7 @@ paths:
                 required: [data, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/ContentItem" } }
-                  next_cursor: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
@@ -13661,7 +13664,7 @@ paths:
       operationId: getBrandAdSettings
       x-outflare-access: { scope: analytics.read, brand: true }
       summary: Read the paid media settings
-      description: "Scope: analytics.read. consent_mode decides who conversions are sent for outside the EEA, the UK and Switzerland: opt_out (the default) sends unless the person withdrew consent for ad data, opt_in only when they granted it. Inside those countries, and when a person's country is unknown, a grant is always needed."
+      description: "Scope: analytics.read. consent_mode decides who conversions are sent for outside the EEA, the UK and Switzerland: opt_out (the default) sends unless the person withdrew consent for ad data, opt_in only when they granted it. Inside those countries, and when a person's country is unknown, a grant is always needed. collected says the brand's own site already collects consent for ad data from everyone: conversions are sent for everyone, in every country, as granted, except people who withdrew."
       tags: [ads]
       responses:
         "200":
@@ -13675,7 +13678,7 @@ paths:
       x-outflare-access: { scope: integrations.manage, brand: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Change the paid media settings
-      description: "Scope: integrations.manage. Sets consent_mode."
+      description: "Scope: integrations.manage. Sets consent_mode. Only a signed-in person can set collected: an API token or an agent gets 403."
       tags: [ads]
       requestBody:
         required: true
@@ -13685,7 +13688,7 @@ paths:
               type: object
               required: [consent_mode]
               properties:
-                consent_mode: { type: string, enum: [opt_out, opt_in] }
+                consent_mode: { type: string, enum: [opt_out, opt_in, collected] }
       responses:
         "200":
           description: The settings now.
@@ -13826,7 +13829,7 @@ paths:
                 required: [data, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/AdAcquisition" } }
-                  next_cursor: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
@@ -25979,7 +25982,7 @@ paths:
                 required: [data, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/AgentRun" } }
-                  next_cursor: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/agent-runs:
     parameters:
@@ -26006,7 +26009,7 @@ paths:
                 required: [data, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/AgentRun" } }
-                  next_cursor: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/agent-runs/{id}:
     parameters:
@@ -26715,7 +26718,7 @@ paths:
                 required: [data, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/Action" } }
-                  next_cursor: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/actions:
     parameters: [{ $ref: "#/components/parameters/BrandID" }]
@@ -26743,7 +26746,7 @@ paths:
                 required: [data, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/Action" } }
-                  next_cursor: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/actions/decide:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
@@ -27853,7 +27856,7 @@ paths:
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/Memory" } }
                   total: { type: integer }
-                  next_cursor: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         "400": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
     post:
@@ -28301,7 +28304,7 @@ paths:
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/KnowledgeItem" } }
                   total: { type: integer }
-                  next_cursor: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         "400": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
     post:
@@ -28830,7 +28833,7 @@ paths:
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/SupportConversation" } }
                   total: { type: integer }
-                  next_cursor: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
                   counts: { $ref: "#/components/schemas/SupportCounts" }
         default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/support/conversations/{id}:
@@ -31037,6 +31040,7 @@ paths:
                 clicks: { type: array, items: { type: array, items: { type: integer }, minItems: 2, maxItems: 2 } }
                 depth: { type: integer, minimum: 1, maximum: 10 }
                 page_height: { type: integer }
+                screen: { type: string, description: "What the page showed when it was clicked, for a page whose content changes while its address stays the same: the current step's or the first heading's text. Each screen gets its own heatmap." }
                 snapshot:
                   type: array
                   description: "The page for its heatmap's picture, sent only after an answer said snapshot: the recorder's note of the page's size, then its whole document."
@@ -33602,6 +33606,34 @@ paths:
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/catalog/event-counts:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    get:
+      operationId: listBrandEventCounts
+      x-outflare-access: { scope: customers.read, brand: true }
+      summary: Count a brand's events by name
+      description: |
+        Scope: customers.read. How many events of each name the brand stored over the last days (whole UTC days,
+        today included), from how many people (known or anonymous), and when the newest happened. Names with no
+        events in the range are left out; the event definitions carry each name's all-time count. Most events
+        first, at most 5,000 names.
+      tags: [catalog]
+      parameters:
+        - { name: days, in: query, description: How many days back to count., schema: { type: integer, minimum: 1, maximum: 365, default: 30 } }
+      responses:
+        "200":
+          description: The counts, most events first.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, days]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/EventCount" } }
+                  days: { type: integer }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/catalog/events/{event}/usage:
     parameters:
       - { $ref: "#/components/parameters/BrandID" }
@@ -33758,10 +33790,13 @@ paths:
       description: |
         Scope: customers.manage. Up to 10,000 people (a CSV of sign-ups, an export of account ids), each with an email,
         a user_id (the workspace's own id for them) or both. Each row is matched first by user_id, then by email, to
-        the brand's people; only a row whose email nobody in the brand holds makes a new person, with origin and
-        acquired_via as given. A row with only a user_id nobody holds is skipped. Imported emails are not verified:
+        the brand's people. An email match adds the row's user_id with source import when that person has no active
+        user_id in the brand. If that person already holds a different user_id, the row is skipped without changing
+        the person or counting them as matched. Only a row whose email nobody in the brand holds makes a new person,
+        with origin and acquired_via as given. A row with only a user_id nobody holds is skipped. Imported emails are not verified:
         they claim no one's address. With list_id, everyone matched or made is added to that static list, ready for a
-        broadcast with audience kind list.
+        broadcast with audience kind list. New people start with the first_name, last_name, job_title and company
+        their row gives; people already here keep what they have.
       tags: [records]
       requestBody:
         required: true
@@ -33781,10 +33816,15 @@ paths:
                       email: { type: string }
                       user_id: { type: string, maxLength: 500 }
                       name: { type: string, maxLength: 200 }
+                      first_name: { type: string, maxLength: 200 }
+                      last_name: { type: string, maxLength: 200 }
+                      job_title: { type: string, maxLength: 200 }
+                      company: { type: string, maxLength: 200, description: "The company's name: the brand's company of that name, else the company of their work email's domain, else a new company." }
                 origin: { type: string, enum: [first_party, prospect, import], default: import, description: "How you got them: your own users or customers, a list you bought or found, or unknown." }
                 acquired_via: { type: string, default: csv, description: "A short lowercase label, such as csv or admin_export." }
                 list_id: { type: string, format: uuid, description: "A static list (GET .../smart-lists) to add them to." }
                 source: { type: string, enum: [cold, inbound, event, signup, invited, customer, other], description: "Where these people are from: their Source, set on everyone created and on matched people who have none yet. Cold makes them prospects (no marketing email until they opt in) when origin is left out; Sign-up, Customer and Invited make them first_party." }
+                sub_source: { type: string, description: "Which one within their Source, as a sub-source's key (GET .../sub-sources), such as the event or conference they were met at. Set on everyone created and on matched people with that Source and no sub-source yet. Without source, the sub-source's own Source is used." }
       responses:
         "200":
           description: What it did.
@@ -33795,7 +33835,7 @@ paths:
                 required: [created, matched, skipped, record_ids, list_id, list_members]
                 properties:
                   created: { type: integer }
-                  matched: { type: integer, description: People who were already in the brand. }
+                  matched: { type: integer, description: "People who were already in the brand, excluding skipped rows." }
                   skipped:
                     type: array
                     items:
@@ -33803,7 +33843,9 @@ paths:
                       required: [row, reason]
                       properties:
                         row: { type: integer, description: "The row's number, from 1." }
-                        reason: { type: string }
+                        reason:
+                          type: string
+                          description: 'Why the row was skipped. An email match with a different active user_id returns "this email belongs to a person with another user id".'
                   record_ids: { type: array, items: { type: string, format: uuid }, description: "The people matched or made, in row order." }
                   list_id: { type: [string, "null"], format: uuid }
                   list_members: { type: [integer, "null"], description: "How many the list holds now." }
@@ -35418,7 +35460,7 @@ paths:
                 required: [data, next_cursor, sites]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/Recording" } }
-                  next_cursor: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
                   sites: { type: array, items: { type: string }, description: "The websites with a recording in the period, by host name, whatever the other filters." }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
@@ -35576,11 +35618,12 @@ paths:
                     type: array
                     items:
                       type: object
-                      required: [path, clicks, views]
+                      required: [path, clicks, views, screens]
                       properties:
                         path: { type: string }
                         clicks: { type: integer }
                         views: { type: integer }
+                        screens: { type: integer, description: "How many screens the page's clicks are split into, when its content changes while its address stays the same (the steps of a sign-up). 0 or 1 for a plain page." }
                   days: { type: integer }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
@@ -35599,6 +35642,7 @@ paths:
         - { name: path, in: query, required: true, schema: { type: string }, description: "The page's path, such as /pricing." }
         - { name: days, in: query, schema: { type: integer, minimum: 1, maximum: 90, default: 30 } }
         - { name: device, in: query, schema: { type: string, enum: [desktop, tablet, mobile], default: desktop } }
+        - { name: screen, in: query, schema: { type: string }, description: "One screen of a page whose content changes while its address stays the same, by its name from the heatmap's screens. Empty is the clicks from before screens were told apart. Left out, a page with several screens answers with its most clicked one." }
       responses:
         "200":
           description: The heatmap.
@@ -35624,6 +35668,7 @@ paths:
       parameters:
         - { name: path, in: query, required: true, schema: { type: string }, description: "The page's path, such as /pricing." }
         - { name: device, in: query, schema: { type: string, enum: [desktop, tablet, mobile], default: desktop } }
+        - { name: screen, in: query, schema: { type: string }, description: "One screen of a page whose content changes while its address stays the same, by its name from the heatmap's screens. Empty is the clicks from before screens were told apart. Left out, a page with several screens answers with its most clicked one." }
       responses:
         "200":
           description: The picture.
@@ -36659,6 +36704,100 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/RecordRelationship" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/sub-sources:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+    get:
+      operationId: listSubSources
+      x-outflare-access: { scope: customers.read, brand: true }
+      summary: List the brand's sub-sources
+      description: |
+        Scope: customers.read. Where within their Source the brand's people came from: for Source event (Events and
+        conferences), each event or conference the team met people at. Each says how many of the brand's people have
+        it. They are the options of the built-in Sub-source field (attributes.sub_source), so people filter by one with
+        attribute=sub_source:{key}.
+      tags: [records]
+      parameters:
+        - { name: source, in: query, schema: { type: string, enum: [cold, inbound, event, signup, invited, customer, other] }, description: "Only this Source's sub-sources." }
+        - { name: archived, in: query, schema: { type: string, enum: ["true", "false"] }, description: "true includes archived ones." }
+      responses:
+        "200":
+          description: The sub-sources, in the order they were added.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/SubSource" } }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: addSubSource
+      x-outflare-access: { scope: customers.manage, brand: true }
+      summary: Add a sub-source
+      description: |
+        Scope: customers.manage. Adds an event, conference or other sub-source under a Source, or returns the one
+        already called that (any case or spacing) under the same Source, bringing it back if it was archived (201 when
+        added or brought back, 200 when it was there). Its key never changes. Records sub_source.created.
+      tags: [records]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [source, label]
+              properties:
+                source: { type: string, enum: [cold, inbound, event, signup, invited, customer, other], description: "The Source it belongs to: event for an event or conference." }
+                label: { type: string, minLength: 1, maxLength: 120, example: Web Summit 2026 }
+      responses:
+        "200":
+          description: It was there already.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SubSource" }
+        "201":
+          description: Added, or brought back from archived.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SubSource" }
+        "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/sub-sources/{key}:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: key, in: path, required: true, schema: { type: string } }
+    patch:
+      operationId: updateSubSource
+      x-outflare-access: { scope: customers.manage, brand: true }
+      summary: Rename or archive a sub-source
+      description: |
+        Scope: customers.manage. A new label fixes its name everywhere at once, since people hold its key. An archived
+        sub-source stays on the people who have it but can't be picked for anyone else. Records sub_source.updated.
+      tags: [records]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                label: { type: string, minLength: 1, maxLength: 120 }
+                archived: { type: boolean }
+      responses:
+        "200":
+          description: The sub-source.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SubSource" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
         "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/people-setup:
@@ -58538,7 +58677,7 @@ components:
     PartnerProgram:
       type: object
       required: [id, name, slug, kind, status, brand_id, landing_url, currency, credit_window_days, credit_model, codes_win, block_self_referrals, hold_days,
-        auto_approve, auto_accept, pay_browser_signups, min_payout_cents, payout_term_days, payout_methods, payout_tokens, terms_url, sales_source, postback_hint, portal_enabled, portal_subdomain, portal, portal_url, rules, groups,
+        auto_approve, auto_accept, pay_browser_signups, min_payout_cents, payout_term_days, payout_methods, payout_tokens, terms_url, sales_source, credits_from, postback_hint, portal_enabled, portal_subdomain, portal, portal_url, rules, groups,
         partners, imported_from, switched_over_at, lead_expiry_days, url_params, block_ad_clicks, block_social_clicks, blocked_countries, created_at, updated_at]
       properties:
         id: { type: string, format: uuid }
@@ -58550,6 +58689,7 @@ components:
         landing_url: { type: string, description: "Where partner links land; '' for none (short links then answer 404)." }
         currency: { type: string }
         credit_window_days: { type: integer, description: How long after a visit or click a conversion still credits the partner. }
+        credits_from: { type: [string, "null"], format: date-time, description: "Only conversions at or after this time credit partners. Earlier sales, sign-ups, leads and custom conversions return reason before_credits_from, with no referral or reward. Refunds are unaffected. null: no start time." }
         credit_model: { type: string, enum: [first, last], description: Which visit with a ref wins inside the window. }
         codes_win: { type: boolean, description: A promo code beats a link when a conversion carries both. }
         block_self_referrals: { type: boolean, description: "A partner's own sign-ups and sales earn them nothing (reason self_referral). On by default." }
@@ -58831,6 +58971,7 @@ components:
         landing_url: { type: string, maxLength: 2000 }
         currency: { type: string, description: "A three-letter code; USD when left out." }
         credit_window_days: { type: integer, minimum: 1, maximum: 365 }
+        credits_from: { type: [string, "null"], format: date-time, description: "Only conversions at or after this RFC 3339 time credit partners; earlier ones return reason before_credits_from. Refunds are unaffected. null clears the start time. Omitted: null on create, unchanged on update. Existing conversions and rewards are unchanged." }
         credit_model: { type: string, enum: [first, last] }
         codes_win: { type: boolean }
         block_self_referrals: { type: boolean, description: "true when left out on create." }
@@ -59281,7 +59422,7 @@ components:
       required: [credited, duplicate, partner_id, referral_id, conversion, rewards]
       properties:
         credited: { type: boolean }
-        reason: { type: string, enum: [no_partner, partner_inactive, program_inactive, self_referral, sale_not_found, currency, lead_expired, country_blocked] }
+        reason: { type: string, enum: [no_partner, partner_inactive, program_inactive, self_referral, sale_not_found, currency, lead_expired, country_blocked, before_credits_from] }
         duplicate: { type: boolean, description: "Already recorded with this external_id (or, for a lead, already a lead)." }
         partner_id: { type: [string, "null"], format: uuid }
         referral_id: { type: [string, "null"], format: uuid }
@@ -59483,7 +59624,7 @@ components:
         rows: { type: array, maxItems: 0, items: {}, description: "Empty: the fifth level has no children." }
     DrilldownReport:
       type: object
-      required: [from, to, timezone, model, conversion_time, source, currency, group_by, cost_available, cost_note, totals, rows, truncated]
+      required: [from, to, timezone, model, conversion_time, source, currency, group_by, cost_available, cost_note, totals, rows, truncated, unconverted_currencies, names]
       properties:
         from: { type: string, format: date }
         to: { type: string, format: date }
@@ -59498,6 +59639,8 @@ components:
         totals: { $ref: "#/components/schemas/DrilldownMetrics" }
         rows: { type: array, items: { $ref: "#/components/schemas/DrilldownRow" } }
         truncated: { type: boolean, description: "Rows past the limit were left out; the totals still count them." }
+        unconverted_currencies: { type: array, items: { type: string }, description: "Currencies whose revenue or cost is left out of every number, because there is no exchange rate from them to the report's currency. Empty when everything was counted." }
+        names: { type: object, additionalProperties: { type: string }, description: "The names of the things the report keys by id (tracker campaigns, traffic sources, offers, landers, paths, destinations), by id, for the ids in its rows and filters. An id that is gone or has no name has no entry. The CSV writes these names in place of the ids." }
     ReportViewSpec:
       type: object
       description: "The drill-down report's settings, as its query parameters name them, and the app's display settings."
@@ -64602,7 +64745,7 @@ components:
         updated_at: { type: string, format: date-time }
     AdConversionSend:
       type: object
-      required: [id, rule_id, connector, event_name, record_id, event_id, occurred_at, status, reason, match_keys, value_micros, currency, attempts, sent_at, created_at, transport, request_id]
+      required: [id, rule_id, connector, event_name, record_id, event_id, occurred_at, status, reason, match_keys, value_micros, currency, attempts, sent_at, created_at, transport, request_id, country, country_source, target_name, ad_account_id, record_name]
       properties:
         id: { type: string, format: uuid }
         rule_id: { type: string, format: uuid }
@@ -64621,11 +64764,19 @@ components:
         created_at: { type: string, format: date-time }
         transport: { type: string, enum: [data_manager, ads_api], description: "The path the send took: Google's Data Manager API, or the platform's older upload call." }
         request_id: { type: string, description: "The Data Manager request the send went in, when it did; its processing can be asked by it." }
+        country: { type: string, description: "The two-letter country the consent decision was made on; '' when nothing said where the person is." }
+        country_source:
+          type: string
+          enum: ["", visit, event, earlier_event, record]
+          description: "Where the country came from, best evidence first: the person's latest website visit, the event's own context, their most recent earlier event that carried a country or an IP address, or the country on their customer record."
+        target_name: { type: string, description: "The conversion the rule sends to, by the platform's name for it." }
+        ad_account_id: { type: string, format: uuid }
+        record_name: { type: string, description: "The person's name on their customer record; '' when the event belongs to nobody known." }
     AdSettings:
       type: object
       required: [consent_mode, updated_at]
       properties:
-        consent_mode: { type: string, enum: [opt_out, opt_in] }
+        consent_mode: { type: string, enum: [opt_out, opt_in, collected] }
         updated_at: { type: [string, "null"], format: date-time }
     AdEconomics:
       type: object
@@ -65665,6 +65816,19 @@ components:
         integration_id: { type: string, format: uuid }
         name: { type: string }
         connector: { type: string, example: dataforseo, description: "dataforseo or geonode for checks; seranking for imports." }
+        last_import:
+          type: object
+          description: "On a site's imports: what the last import of this site from the connection did. Absent before the first import."
+          required: [ran_at, outcome, project, keywords, added, skipped, projects_seen, error_code]
+          properties:
+            ran_at: { type: string, format: date-time }
+            outcome: { type: string, enum: [imported, no_project, failed], description: "imported: a project of the tracker matched the site. no_project: none of the account's projects is for this site. failed: the read failed (error_code)." }
+            project: { type: string, description: "The tracker's project that matched." }
+            keywords: { type: integer, description: "Keywords whose positions came in." }
+            added: { type: integer, description: "Keywords newly followed by this import." }
+            skipped: { type: array, items: { type: string }, description: "What could not be mapped, such as a search engine whose country is unknown (at most 20)." }
+            projects_seen: { type: array, items: { type: string }, description: "With no_project: the sites the account's projects are for (at most 50)." }
+            error_code: { type: string, description: "With failed: the kind of failure, such as auth, quota or unavailable." }
     TrackedKeyword:
       type: object
       required: [id, keyword, country, device, engine, frequency, status, integration_id, position, url, previous_position, best_position, last_checked_at, last_error, target_url, created_at]
@@ -73259,6 +73423,16 @@ components:
         key: { type: string, example: won }
         label: { type: string, example: Won }
         archived: { type: boolean }
+        source: { type: string, description: "A sub-source's Source (option set sub_source only)." }
+    SubSource:
+      type: object
+      required: [key, label, source, archived, people]
+      properties:
+        key: { type: string, example: web_summit_2026 }
+        label: { type: string, example: Web Summit 2026 }
+        source: { type: string, enum: [cold, inbound, event, signup, invited, customer, other] }
+        archived: { type: boolean }
+        people: { type: integer, description: "How many of the brand's people have it (0 in a write's answer)." }
     OptionSet:
       type: object
       required: [key, name, builtin, options]
@@ -73513,7 +73687,7 @@ components:
         viewed_at: { type: [string, "null"], format: date-time }
     Heatmap:
       type: object
-      required: [path, days, device, clicks, total_clicks, scroll, views, height, recording_id, snapshot_at]
+      required: [path, days, device, clicks, total_clicks, scroll, views, height, recording_id, snapshot_at, screen, screens]
       properties:
         path: { type: string }
         days: { type: integer }
@@ -73536,6 +73710,36 @@ components:
         height: { type: integer, description: "The page's height in pixels, the tallest it was." }
         recording_id: { type: [string, "null"], format: uuid, description: "A recent recording of a visit that saw this page, to draw the page behind the heatmap when it has no picture of its own." }
         snapshot_at: { type: [string, "null"], format: date-time, description: "When the page's own picture for the heatmap was taken (GET .../heatmaps/snapshot). Null until a visitor's browser has sent one." }
+        screen: { type: string, description: "The screen shown, of a page whose content changes while its address stays the same. Empty for a plain page." }
+        screens:
+          type: array
+          description: "Every screen of the page with clicks, most clicked first. Empty for a plain page. A screen named \"\" is the clicks from before screens were told apart."
+          items:
+            type: object
+            required: [screen, clicks]
+            properties:
+              screen: { type: string }
+              clicks: { type: integer }
+    EventCount:
+      type: object
+      required: [name, events, people, last_at, sources]
+      properties:
+        name: { type: string }
+        events: { type: integer, description: How many events of this name were stored in the days asked for. }
+        people: { type: integer, description: How many different people (known or anonymous) sent them. }
+        last_at: { type: string, format: date-time, description: When the newest one happened. }
+        sources:
+          type: array
+          description: |
+            Where they came from, most events first: browser (the website script), api, transactions (the
+            payment.succeeded and payment.refunded events Outflare writes, once per payment, from orders, the
+            transactions API and billing connectors), or a connector's id.
+          items:
+            type: object
+            required: [source, events]
+            properties:
+              source: { type: string }
+              events: { type: integer }
     EventPlanProblem:
       type: object
       required: [event_name, kind, property, events, last_seen_at]
@@ -74147,11 +74351,12 @@ components:
               connected: { type: boolean }
         fields:
           type: object
-          required: [event, visit, payment]
+          required: [event, visit, payment, search]
           properties:
             event: { type: array, items: { type: string } }
             visit: { type: array, items: { type: string } }
             payment: { type: array, items: { type: string } }
+            search: { type: array, items: { type: string }, description: "What a search series is filtered and broken down by: query, page, country, device." }
         breakdowns:
           type: object
           additionalProperties: { type: array, items: { type: string } }
@@ -74169,7 +74374,7 @@ components:
         ad_metrics: { type: array, items: { type: string }, description: Measures of an ad series. }
         source_metrics:
           type: object
-          description: "Measures of the series read from stored tool data, by kind: analytics, backlinks, link_orders."
+          description: "Measures of the series read from stored tool data, by kind: analytics, backlinks, link_orders, search."
           additionalProperties: { type: array, items: { type: string } }
         analytics_connectors: { type: array, items: { type: string }, description: "The analytics and search tools with daily numbers stored for the brand, for an analytics series' connector (google_search_console, bing_webmaster, google_analytics...)." }
         intervals: { type: array, items: { type: string }, description: Trend intervals. }
@@ -74182,8 +74387,8 @@ components:
       properties:
         kind:
           type: string
-          enum: [event, page, visit, conversion, payment, ad, analytics, backlinks, link_orders]
-          description: "analytics: the daily totals of the brand's analytics and search tools (Search Console, Bing Webmaster Tools, Google Analytics...). backlinks: its referring domains. link_orders: its paid link orders. These three read stored data only."
+          enum: [event, page, visit, conversion, payment, ad, analytics, backlinks, link_orders, search]
+          description: "search: Search Console's detail by query, page, country and device (filters and breakdown take those four; a series uses query, or country and device, not both). analytics: the daily totals of the brand's analytics and search tools (Search Console, Bing Webmaster Tools, Google Analytics...). backlinks: its referring domains. link_orders: its paid link orders. These three read stored data only."
         event: { type: string, maxLength: 100, description: For an event series. }
         conversion: { type: string, maxLength: 100, description: "For a conversion series: the conversion definition's key." }
         filters: { type: array, maxItems: 10, items: { $ref: "#/components/schemas/InsightFilter" } }
@@ -74191,7 +74396,7 @@ components:
         measure:
           type: string
           enum: [count, people, sum, average, median, p90, p99, min, max, per_person_average, per_person_median, per_person_max, weekly_active, monthly_active, clicks, impressions, spend, conversions, ctr, position, visitors, pageviews, sessions, referring_domains, dofollow_referring_domains, new_referring_domains, lost_referring_domains, committed, published, paid]
-          description: "count (default); people (distinct people: daily active by day); sum, average, median, p90, p99, min or max of a property; per_person_average, per_person_median or per_person_max of how many times each person did it in the period; weekly_active or monthly_active (distinct people in the 7 or 30 days up to the end of each period). For an ad series: clicks (default), impressions, spend or conversions. For an analytics series: clicks (default), impressions, ctr, position (impression-weighted), visitors (a sum of daily visitors), pageviews, sessions or conversions. For a backlinks series: referring_domains (default; live at the end of each period), dofollow_referring_domains, new_referring_domains or lost_referring_domains. For a link_orders series: spend (default; US dollars marked Paid), committed (US dollars approved), published or paid (orders)."
+          description: "count (default); people (distinct people: daily active by day); sum, average, median, p90, p99, min or max of a property; per_person_average, per_person_median or per_person_max of how many times each person did it in the period; weekly_active or monthly_active (distinct people in the 7 or 30 days up to the end of each period). For an ad series: clicks (default), impressions, spend or conversions. For an analytics series: clicks (default), impressions, ctr, position (impression-weighted), visitors (a sum of daily visitors), pageviews, sessions or conversions. For a backlinks series: referring_domains (default; live at the end of each period), dofollow_referring_domains, new_referring_domains or lost_referring_domains. For a link_orders series: spend (default; US dollars marked Paid), committed (US dollars approved), published or paid (orders). For a search series: clicks (default), impressions, ctr or position."
         property: { type: string, maxLength: 200, description: "What sum, average, median, p90, p99, min and max read: amount for payments, a property for events." }
         network: { type: string, description: "For an ad series: one ad network, or all when empty." }
         campaign: { type: string, maxLength: 200, description: "For an ad series: only campaigns whose name contains this." }
