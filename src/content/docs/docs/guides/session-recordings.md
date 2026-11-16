@@ -49,9 +49,16 @@ Say in your privacy notice that visits to your site may be recorded.
 
 ## Watch a visit
 
-The list shows each visit's visitor, when it started, how long it lasted, the pages seen, clicks, device and country. A green dot marks the ones nobody has watched yet. Filter by page, device, length and period.
+The list shows each visit's visitor, when it started, how long it lasted, the pages seen, clicks, device and country. A green dot marks the ones nobody has watched yet. Filter by page, device, length and period, by **Known people** or **Anonymous visitors**, and by website when your snippet is on more than one, such as your site and your app. Once a visitor is known (they signed up or signed in), the list shows their name and links to their [person](/docs/guides/customer-records/); until then it says **Anonymous visitor**.
 
-Open a row to watch the visit full screen: play and pause, drag to any moment, play at up to 8× speed, and skip the pauses where nothing happened. Once the visitor is known (they signed up or signed in), the recording links to their [person](/docs/guides/customer-records/).
+Open a row to watch the visit full screen. It starts playing by itself, and the progress bar shows what happened when:
+
+- a red dot for each **click**
+- an amber bar for **typing** (never what was typed)
+- a tick where a **new page** opened
+- grey where the visitor **paused**
+
+Pick a mark to jump to it. While the visit plays, each click shows as a ring where it landed and a label says what the visitor is doing. Below the player, **The visit, page by page** lists each page with how long the visitor stayed, their clicks and how often they typed; pick a page to jump to it. You can also play at up to 8× speed and skip the pauses.
 
 A visit is one browser tab, up to four hours, and shows in the list a few seconds after it starts. Delete a recording from its page; its files are removed within ten minutes.
 
@@ -76,7 +83,7 @@ A recording stops at 4 hours or 60 MB and keeps what it has, and a workspace sto
 | Call | What it does |
 | --- | --- |
 | `GET /v1/brands/{brand}/replay/settings`, `PATCH` | Read and change the settings |
-| `GET /v1/brands/{brand}/recordings` | List recordings, by `days`, `path`, `device`, `min_seconds` or `record_id` |
+| `GET /v1/brands/{brand}/recordings` | List recordings, by `days`, `path`, `device`, `min_seconds`, `record_id`, `host` or `visitor` (`known` or `anonymous`) |
 | `GET /v1/brands/{brand}/recordings/{recording}` | One recording; its parts are at `/parts/{part}`, in order |
 | `DELETE /v1/brands/{brand}/recordings/{recording}` | Delete one |
 
