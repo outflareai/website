@@ -2,7 +2,7 @@
 	"version": "2026.11.16",
 	"date": "2026-11-16",
 	"status": "in-progress",
-	"updated": "2026-11-16T11:09:40Z",
+	"updated": "2026-11-16T11:16:50Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -283,7 +283,14 @@
 			"edition": "open-source",
 			"text": "Taboola campaigns now show their ads: each item with its headline, picture, landing page, whether Taboola approved it, and its spend, clicks and conversions per day. Taboola has no ad groups, so the ads sit directly in the campaign. They are read only for now.",
 			"at": "2026-11-16T11:09:40Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Session recordings and heatmaps: watch a visit to your website back as the visitor saw it, and see where each page is clicked and how far down it is scrolled. Both come from the snippet you already have, are off until you turn them on under Analytics → Recordings, and never record what a visitor types. Recordings need file storage on the server.",
+			"at": "2026-11-16T11:16:50Z"
 		}
 	],
-	"through": "8ca1255+b5ee6a8"
+	"through": "14be042+5b36443"
 }
