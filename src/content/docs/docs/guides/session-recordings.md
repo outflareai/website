@@ -55,6 +55,16 @@ Open a row to watch the visit full screen: play and pause, drag to any moment, p
 
 A visit is one browser tab, up to four hours, and shows in the list a few seconds after it starts. Delete a recording from its page; its files are removed within ten minutes.
 
+## Delete recordings and heatmaps
+
+Recordings delete themselves after **Keep recordings for**, and heatmap counts after 90 days. To delete sooner:
+
+- **Some recordings**: tick them in the list and choose **Delete selected**.
+- **Old recordings**: **Delete old recordings…** above the list deletes every recording older than 7, 30 or 60 days, or every recording.
+- **A heatmap**: open the page's [heatmap](/docs/guides/heatmaps/) and choose **Clear**, such as after a redesign. **Clear all** on the Heatmaps page clears every page. Counting carries on from then.
+
+Deleted recordings and cleared heatmaps are gone for good.
+
 ## Storage and limits
 
 Recordings are kept as files, so the server needs file storage; the Recordings page says so when it has none. When you host Outflare yourself, set an S3-compatible bucket (Cloudflare R2, Amazon S3, MinIO) with `OUTFLARE_S3_ENDPOINT`, `OUTFLARE_S3_BUCKET`, `OUTFLARE_S3_ACCESS_KEY_ID` and `OUTFLARE_S3_SECRET_ACCESS_KEY`. Heatmaps need no bucket.
