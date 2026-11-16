@@ -2,7 +2,7 @@
 	"version": "2026.11.16",
 	"date": "2026-11-16",
 	"status": "in-progress",
-	"updated": "2026-11-16T20:52:28Z",
+	"updated": "2026-11-16T21:14:07Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -556,7 +556,84 @@
 			"edition": "open-source",
 			"text": "People from events: Source \"Event\" is now \"Events and conferences\", and a new Sub-source names the event or conference each person was met at. Pick one of the brand's events or type a new one, add several people from one event at once or from a CSV, and filter People by event.",
 			"at": "2026-11-16T20:52:28Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "AI crawler visits without Cloudflare: your server can now report them. Call `crawlerVisit` (`crawler_visit` in Python) in the server library for every request, and AI visibility shows how often GPTBot, ClaudeBot, PerplexityBot and the others read each site, per day. Only the counts are kept.",
+			"at": "2026-11-16T21:14:07Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Upload your build's source maps and the Errors page shows every stack in your own files, lines and function names instead of minified ones. One command in your build script uploads them; your source code is never kept, only names and positions. Errors has a new Source maps page that lists what you uploaded.",
+			"at": "2026-11-16T21:14:07Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Outflare tells you when a new error appears. The first error of a kind nobody has seen before raises an alert, and so does an error you resolved when it comes back; an issue you ignored stays quiet. Choose who gets it by email, Slack or Telegram under Alerts, like every other alert.",
+			"at": "2026-11-16T21:14:07Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Funnels can be split by more than the first step. Under \"Break down by a field of\", pick any later step (for example the plan people chose at step 2) or the person, to compare how each plan, lifecycle stage or field of your own converts. In the API, `breakdown` takes `step:<n>:<field>` and `person:<key>`.",
+			"at": "2026-11-16T21:14:07Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "The TypeScript and Python libraries got shortcuts for flags and errors on a server. `LocalFlags` answers for one flag with `variant`, `isEnabled` and `payload`; the event tracker's `exposed` counts a visitor in a flag's A/B test when your server shows them a version; and `captureException` sends an error to the Errors page with email addresses and keys taken out.",
+			"at": "2026-11-16T21:14:07Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Your pages can now tell Outflare who a signed-in visitor is, safely. Turn on browser identify for a site in Website tracking, have your server sign each user id with the secret you get, and call `outflare.identify(userId, signature)` in the page. The visitor's earlier visits join their record. A page can't name a person without your server's signature.",
+			"at": "2026-11-16T21:14:07Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "The website script can tell your marketing site that a visitor is signed in to your app. Call `outflare.signedIn(true)` after sign-in and every page on your domain can ask `outflare.isSignedIn()`, show or hide elements with `data-outflare-signed-in`, and use a \"Signed in\" condition on flags and A/B tests. The cookie only says yes: it never says who the visitor is.",
+			"at": "2026-11-16T21:14:07Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Named clicks: give any button or link on your site an event name, such as Signup Clicked, without changing the site. Open Analytics, then Named clicks, pick a click from the list of what people clicked, and name it. Matching clicks are stored under that name from then on, ready for funnels, trends and A/B test goals. Needs \"Capture clicks\" on for the site.",
+			"at": "2026-11-16T21:14:07Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Error tracking: turn on \"Capture errors\" for a site and the new Errors page under Analytics shows what breaks on your website or app, grouped into issues with how often each happens, on which pages and to whom. Resolve or ignore an issue; a resolved one opens again if it comes back. Email addresses and keys are taken out before anything is sent.",
+			"at": "2026-11-16T21:14:07Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Website tracking can capture clicks and form submits without any code: turn on \"Capture clicks on buttons and links\" or \"Capture form submits\" for a site and they arrive as the events Element Clicked and Form Submitted, ready for funnels and trends. What visitors type is never read. Add `data-outflare-event=\"Plan Chosen\"` to any element to give its click your own name.",
+			"at": "2026-11-16T21:14:07Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Feature flags and A/B tests can now be decided in your own server's memory: `LocalFlags` in the TypeScript and Python libraries reads a brand's flag definitions every 30 seconds and picks each visitor's version without a request to Outflare per page, with the same answers as the website script.",
+			"at": "2026-11-16T21:14:07Z"
 		}
 	],
-	"through": "1ffe76d+f3623ba"
+	"through": "d29df60+b48ece3"
 }
