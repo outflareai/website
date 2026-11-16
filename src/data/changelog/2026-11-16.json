@@ -2,7 +2,7 @@
 	"version": "2026.11.16",
 	"date": "2026-11-16",
 	"status": "in-progress",
-	"updated": "2026-11-16T12:52:49Z",
+	"updated": "2026-11-16T13:39:39Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -353,7 +353,21 @@
 			"edition": "open-source",
 			"text": "Recordings and heatmaps have more settings: record only the pages you list or leave some out, drop recordings of very short visits, and cap how many visits are recorded a day. A heatmap whose page can't be shown yet now says why, with a button to turn recordings on.",
 			"at": "2026-11-16T12:52:49Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Delete recordings in bulk: tick several and delete them, or delete every recording older than a number of days. A page's heatmap, or every heatmap, can be cleared to start counting again, such as after a redesign.",
+			"at": "2026-11-16T13:39:39Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "agents",
+			"edition": "cloud",
+			"text": "Agent conversations can be pinned to the top of the list or archived out of it from each conversation's ⋯ menu, and the list no longer scrolls sideways. The task count next to the agent's status opens each task with where it stands.",
+			"at": "2026-11-16T13:39:39Z"
 		}
 	],
-	"through": "c4e088c+54b9736"
+	"through": "9bc94ac+7d0378c"
 }
