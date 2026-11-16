@@ -31,7 +31,7 @@ Ideal customers used to live in projects. Projects were removed, and each list t
 ## From the API and agents
 
 ```sh
-curl -X POST "https://app.outflare.ai/v1/workspaces/$WS/ideal-customer-profiles" \
+curl -X POST "https://app.outflare.ai/v1/brands/$BRAND/ideal-customer-profiles" \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" \
   -d '{"name": "Series A fintech, AU", "description": "Fintechs that just raised and need pipeline.",
        "filters": {"industries": ["Financial Services"], "employee_ranges": ["51-200"], "locations": ["Australia"]}}'
@@ -40,7 +40,7 @@ curl -X POST "https://app.outflare.ai/v1/workspaces/$WS/ideal-customer-profiles"
 Score a lead list against it:
 
 ```sh
-curl -X PATCH "https://app.outflare.ai/v1/workspaces/$WS/lead-lists/$LIST" \
+curl -X PATCH "https://app.outflare.ai/v1/brands/$BRAND/lead-lists/$LIST" \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" -d '{"profile_id": "'$PROFILE'"}'
 ```
 

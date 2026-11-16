@@ -21,7 +21,7 @@ With no choice saved, Outflare uses the first connected provider in the order ab
 
 Outflare knows the list price of Claude models, and OpenRouter reports the cost of every call. For a model it doesn't know, enter the provider's price in US$ per million input and output tokens, from the pricing page linked in the form. Prices are needed so spend limits work.
 
-![Choosing an OpenAI model and entering its price](/screens/ai-model-price.png)
+![Choosing a fine-tuned OpenAI model and entering its price](/screens/ai-model-price.png)
 
 ## Routers and subscription plans
 
@@ -46,12 +46,13 @@ Not every task needs the strongest model. Under **Model for each task** you can 
 | **Domain research** | Reading an unknown email domain's homepage to classify it | The provider's cheapest model: Claude Haiku 5.5 |
 | **AI visibility** | Reading what AI models answer about your brands, such as checking answers against your brand's facts. The questions themselves go to the models you pick for [AI visibility](/docs/guides/ai-visibility/) | The provider's cheaper model: Claude Sonnet 5.5 under Claude Opus 5.5 |
 | **Email verification** | Checking email addresses the free checks could not settle | The provider's cheapest model: Claude Haiku 5.5 |
+| **Event name check** | Comparing new [event names](/docs/guides/customer-records/#new-event-names) your product sends with the ones it already sends, to ask you only when one looks like a typo | The provider's cheapest model: Claude Haiku 5.5 |
 | **Fix tickets** | Writing [fix tickets](/docs/guides/site-audits/#fix-tickets) from site audits and other findings, for your team or your coding agent | The provider's cheaper model: Claude Sonnet 5.5 under Claude Opus 5.5 |
 | **PR stories** | Suggesting [story](/docs/guides/stories/) ideas, drafting press releases from a story's facts and approved quotes, writing pitch openers and reading journalists' replies | The provider's cheaper model: Claude Sonnet 5.5 under Claude Opus 5.5 |
 
 The cheaper defaults are Claude's; with another provider every task uses the main model until you pick one. Each list shows what the model costs, in US$ per million input/output tokens, and every call is priced at its own model's price. A choice belongs to the provider it was made for: switch provider and the tasks go back to their defaults.
 
-![A model for each task: Sonnet for planning, Opus for agent turns, Haiku for routine check-ins](/screens/ai-model-tasks.png)
+![A model for each task: Sonnet for planning, Opus for agent turns, Haiku for labelling replies and researching domains](/screens/ai-model-tasks.png)
 
 ## Limit what AI can spend
 

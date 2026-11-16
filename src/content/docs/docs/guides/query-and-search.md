@@ -41,7 +41,7 @@ When a person or company is deleted, merged or archived, or a reply, meeting or 
 
 ## Query
 
-A query belongs to one brand. Open **CRM → Query**, send `POST /v1/brands/{brand}/query` with `{"sql": "select stage, count(*) from deals group by stage"}`, or ask your agent (MCP `run_query`). `GET .../query/tables` (MCP `list_query_tables`) lists the tables and their columns. The older `/v1/workspaces/{ws}/query` still works for now.
+A query belongs to one brand. Open **CRM → Query**, send `POST /v1/brands/{brand}/query` with `{"sql": "select stage, count(*) from deals group by stage"}`, or ask your agent (MCP `run_query`). `GET .../query/tables` (MCP `list_query_tables`) lists the tables and their columns. The older `/v1/brands/{brand}/query` still works for now.
 
 | Tables | What they hold |
 | --- | --- |

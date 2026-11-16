@@ -1,8 +1,8 @@
 {
 	"version": "2026.11.11",
 	"date": "2026-11-11",
-	"status": "in-progress",
-	"updated": "2026-11-11T17:34:50Z",
+	"status": "final",
+	"updated": "2026-11-12T00:00:29Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -234,7 +234,98 @@
 			"edition": "open-source",
 			"text": "Desktop app: the account menu at the bottom of the sidebar now shows which version of the Outflare app you have, with Check for updates. A waiting update still shows as Update available in the sidebar.",
 			"at": "2026-11-11T17:34:50Z"
+		},
+		{
+			"kind": "fix",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Desktop app: email previews (in email templates, sent emails and the help centre) show again instead of a blank box.",
+			"at": "2026-11-11T18:14:52Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "The API panel's examples are ready to paste: they carry the page's real brand, workspace and item ids, and **Create a token for this** puts a new read-only token for just that call and brand into the example, shown once.",
+			"at": "2026-11-11T18:25:50Z"
+		},
+		{
+			"kind": "launch",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "With a Google Workspace connection, the CRM now also reads enabled members' calendars: meetings with a CRM contact or company appear on its timeline and in the relationship check. Internal and personal meetings are never copied.",
+			"at": "2026-11-11T18:30:13Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Direct tracking for tracker campaigns: an ad can link straight to your page with the campaign's code, and the site script records the click itself, with the traffic source's click id, cost and fields. outflare.clickId() and {ofclk} in your links pass the click id on to offers, so postbacks still find the click.",
+			"at": "2026-11-11T18:41:51Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Importing leads into a list is simpler: **Import leads** on a list's page uploads a CSV straight into that list, and the import on Leads picks a list from a menu (or makes a new one) instead of typing its name.",
+			"at": "2026-11-11T18:53:04Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "A brand's logo and main colour now fill in from its own website: when you add a brand or change its website, and when Company → Logo and colours has no logo yet. Outflare uses the logo the site names, else its icon, and never replaces one you set. The Logo field no longer shows an example address.",
+			"at": "2026-11-11T18:58:27Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "New product event names no longer wait for approval: events are usable straight away in segments, lists, journeys and reports. Outflare checks each new name, with your own AI model when one is connected, and asks only when one looks like a typo of a name you already send, such as sign_up for signed_up.",
+			"at": "2026-11-11T19:53:26Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Presence now scans a brand's top 10 competitors every 30 days by default, and the rest every 90 days. Brands still on the previous monthly default for the rest move to 90 days; a cadence you set yourself is left as it is. Change either on the Presence competitors page.",
+			"at": "2026-11-11T21:45:19Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "The \"Won't be emailed\" badge on leads and lists now says why: unsubscribed, bounced, marked as spam, on a blocklist and so on, whether it is the address or its whole domain, and where the entry came from. The API returns the same as `suppression` on each lead.",
+			"at": "2026-11-11T22:08:42Z"
+		},
+		{
+			"kind": "fix",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Campaign links always belong to the brand you are in, so the brand picker on a new campaign is gone, and a few leftover \"All brands\" and \"missions\" labels are corrected. The Python SDK's `is_held` now recognises a change that waits for a person on the Agents page. The demo workspace scripts work with brands again.",
+			"at": "2026-11-11T22:08:42Z"
+		},
+		{
+			"kind": "security",
+			"area": "api",
+			"edition": "open-source",
+			"text": "Security improvements to sign-in sessions.",
+			"at": "2026-11-11T22:08:42Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "The workspace routes for stats, reports, outcomes, lifecycle email, email recipients, attribution and install health are retired and answer 410 `route_moved`: call the same route under `/v1/brands/{brand}/`.",
+			"at": "2026-11-11T22:39:19Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Suspect tracker clicks are flagged: clicks from cloud and hosting networks, an address clicking the same link over and over, and conversions within seconds of their click. Flagged clicks still go on but don't use up your caps. Links show how many there were, and conversions say why they're suspect.",
+			"at": "2026-11-11T23:26:14Z"
 		}
 	],
-	"through": "e3e26a7+8064407"
+	"through": "505e30d+d1c15cc"
 }

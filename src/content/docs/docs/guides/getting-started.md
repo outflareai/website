@@ -14,7 +14,7 @@ A new workspace opens on **Get started** for its owners and admins. It is a page
 ## The steps
 
 1. **Start with one brand.** Its website, the brand name (filled in from the domain) and, if you like, a line on what it does. Agents read it before writing anything for the brand, and the company's name and website are filled in too if they're empty. Market more than one business? Add the rest later under [Brands](/docs/guides/brands/), once this one works.
-2. **Add your AI key.** Outflare has no AI of its own and never pays for yours: your own Claude, OpenAI, Gemini, Mistral, xAI, DeepSeek or router (OpenRouter, Vercel AI Gateway, Requesty) key is what lets its agent plan [missions](/docs/agents/missions/), write emails and research companies. You pay your provider directly, at their prices, with nothing added. The key is tested before it's saved, stored encrypted and never shown again. Without one, reports, tracking and connections still work; anything that needs AI waits until you add it. [Connecting Claude or ChatGPT](/docs/agents/mcp/) to run Outflare from the app you already use does the step too.
+2. **Add your AI key.** Outflare has no AI of its own and never pays for yours: your own Claude, OpenAI, Gemini, Mistral, xAI, DeepSeek or router (OpenRouter, Vercel AI Gateway, Requesty) key is what lets its agent run [playbooks](/docs/agents/playbooks/), write emails and research companies. You pay your provider directly, at their prices, with nothing added. The key is tested before it's saved, stored encrypted and never shown again. Without one, reports, tracking and connections still work; anything that needs AI waits until you add it. [Connecting Claude or ChatGPT](/docs/agents/mcp/) to run Outflare from the app you already use does the step too.
 3. **What to do first.** Find and email new customers, grow search traffic, see what's working, or nurture existing customers. It only decides what later steps suggest; you can do all of them later.
 4. **Connect your website.** Two parts, both for the brand you just added:
    - **The script.** One line on every page that records visits, sign-ups and where they came from, added in one click through your own Google Tag Manager, or sent to a developer or your AI coding tool.
@@ -29,9 +29,9 @@ When you're through, **Continue with Acme** takes you on to the rest of that bra
 
 ## Then Home
 
-Home shows one set-up checklist at a time: what's left of Get started first, then the brand's setup. Get started's list includes **Invite your team**, which waits until you've seen Outflare work. **Open** takes you back to that step; × hides the checklist.
+Home's **Needs you** list shows **Finish setting up** your brand, with how far you've got and the next step: what's left of Get started first, then the brand's setup. **Continue** takes you back to that step; **Hide set-up** hides it. **Invite your team** waits at the end of Get started until you've seen Outflare work.
 
-![The checklist on Home](/screens/get-started-home.png)
+![Finish setting up on Home, with the next step](/screens/get-started-home.png)
 
 ## Help Outflare grow
 

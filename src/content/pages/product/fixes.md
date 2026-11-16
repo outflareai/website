@@ -96,7 +96,7 @@ Connect the site's GitHub repository or Vercel project on your own account, and 
 
 ## Webhooks and the API
 
-Every step is an event: `fix.found`, `fix.started`, `fix.updated`, `fix.verify_requested`, `fix.confirmed` and `fix.reopened`, so your own systems, Slack or a ticket tracker can follow along. The list is `GET /v1/workspaces/{ws}/fixes`, and a fix's prompt is `GET .../fixes/{fix}/prompt`. See the [API](/developers/api/).
+Every step is an event: `fix.found`, `fix.started`, `fix.updated`, `fix.verify_requested`, `fix.confirmed` and `fix.reopened`, so your own systems, Slack or a ticket tracker can follow along. The list is `GET /v1/brands/{brand}/fixes`, and a fix's prompt is `GET .../fixes/{fix}/prompt`. See the [API](/developers/api/).
 
 ## What Outflare doesn't do
 

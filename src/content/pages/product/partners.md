@@ -73,7 +73,7 @@ Until you add a [tracking domain](/docs/guides/tracking-domains/), short links u
 
 ## The partner conversions API
 
-If your backend can't send events or transactions to Outflare, report sign-ups, sales, refunds and custom conversions to `POST /v1/workspaces/{ws}/partner-conversions`, with a token that has only the `partners.conversions` scope. It stores the same events and transactions with the same ids, so a customer reported both ways still counts once.
+If your backend can't send events or transactions to Outflare, report sign-ups, sales, refunds and custom conversions to `POST /v1/brands/{brand}/partner-conversions`, with a token that has only the `partners.conversions` scope. It stores the same events and transactions with the same ids, so a customer reported both ways still counts once.
 
 ## Moving from Tolt
 

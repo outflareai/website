@@ -9,7 +9,7 @@ sidebar:
 
 Website tracking records each visit to your sites as an event in your [customer records](/docs/guides/customer-records/). It keeps what the visitor arrived with, exactly as it came: UTM tags, ad click ids, the referrer and any referral or partner code. Outflare works out channels and attribution from these on the server, never in the browser. Visitors stay anonymous until your own product says who they are.
 
-[Website visitors](/docs/guides/website-visitors/) shows which known companies and people came, and who is ready to talk. [Page speed](#page-speed) shows how fast your pages were for real visitors, and [Right now](#right-now) who is on your site this minute.
+[Website visitors](/docs/guides/website-visitors/) shows which known companies and people came, and who is ready to talk. [Page speed](#page-speed) shows how fast your pages were for real visitors, and [Right now](#right-now) who is on your site this minute. [Session recordings](/docs/guides/session-recordings/) play a visit back, and [heatmaps](/docs/guides/heatmaps/) show where each page is clicked.
 
 ## Set it up
 
@@ -35,7 +35,7 @@ To record a step that isn't a page, such as a click on a sign-up button, call `o
 - The page's address, host, path and title, with its whole query string, so reports can filter on any parameter. A sign-in link's token, a password, a code, a session id or an email address in a URL is never kept, and **Edit sites** lets you leave out more by name (`plan`) or prefix (`fb_*`).
 - Where the visitor came from: just the other site's address and path, without its query string.
 - The `utm_source`, `utm_medium`, `utm_campaign`, `utm_term`, `utm_content` and `utm_id` tags.
-- Ad click ids: `gclid`, `gbraid`, `wbraid`, `fbclid`, `msclkid`, `li_fat_id`, `rdt_cid` and `twclid`.
+- Ad click ids: `gclid`, `gbraid`, `wbraid`, `fbclid`, `msclkid`, `li_fat_id`, `rdt_cid`, `twclid` and `oppref` (ChatGPT).
 - A referral or partner code from `ref` or `via`, and an Outflare campaign link's `ofc`.
 
 ## Visits, first and last touch
@@ -89,7 +89,7 @@ The same place tells you whether it works, from the last 7 days of visits: how m
 
 ### Keep the visitor's address
 
-Behind your proxy, every visit comes from your server's address. To pass the visitor's own address on, open the key and choose **Proxy secret** (or call `POST /v1/workspaces/{ws}/site-keys/{id}/proxy-secret`, or the MCP tool `create_site_proxy_secret`). The secret starts `ofp_` and is shown once. Keep it in your proxy's configuration, never in a page.
+Behind your proxy, every visit comes from your server's address. To pass the visitor's own address on, open the key and choose **Proxy secret** (or call `POST /v1/brands/{brand}/site-keys/{id}/proxy-secret`, or the MCP tool `create_site_proxy_secret`). The secret starts `ofp_` and is shown once. Keep it in your proxy's configuration, never in a page.
 
 Have the proxy send the secret in `X-Outflare-Proxy` and the visitor's address in `X-Outflare-Client-IP`, replacing anything the browser sent. With nginx:
 

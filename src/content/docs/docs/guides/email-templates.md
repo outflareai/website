@@ -49,7 +49,7 @@ If you leave the plain-text part empty, Outflare makes it from the HTML.
 ## By API
 
 ```sh
-curl -X POST "https://app.outflare.ai/v1/workspaces/$WS/email-templates" \
+curl -X POST "https://app.outflare.ai/v1/brands/$BRAND/email-templates" \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" \
   -d '{"name": "Receipt", "subject": "Your receipt for {{amount}}",
        "html": "<p>We received {{amount}}.</p>",

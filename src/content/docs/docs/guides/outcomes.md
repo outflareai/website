@@ -1,13 +1,13 @@
 ---
 title: Outcomes and cost per meeting
-description: See the meetings and deals your outreach produced, what it cost, and the cost of each meeting by sequence and brand. Costs are recorded, never billed.
+description: See the meetings and deals your outreach produced, what it cost, and the cost of each meeting by sequence, for each brand. Costs are recorded, never billed.
 sidebar:
   order: 9
 ---
 
 <span class="pill shipped">Shipped</span> Meetings, deals, a spend ledger and cost per meeting, in the web app, the REST API and the MCP server.
 
-Sends and replies say whether outreach is working. What a team actually needs to know is what each meeting cost, and which brand and which sequence got it cheapest. The **Outcomes** page answers that: meetings and deals for a period, everything you spent to get them, and the cost per reply, per meeting, per held meeting and per won deal, for the whole workspace or by sequence or [brand](/docs/guides/brands/).
+Sends and replies say whether outreach is working. What a team actually needs to know is what each meeting cost, and which brand and which sequence got it cheapest. The **Outcomes** page answers that: meetings and deals for a period, everything you spent to get them, and the cost per reply, per meeting, per held meeting and per won deal, for the [brand](/docs/guides/brands/) you're on, overall or by sequence.
 
 Outflare records costs; it never bills. You pay your providers directly.
 
@@ -17,7 +17,7 @@ Outflare records costs; it never bills. You pay your providers directly.
 
 - **Calendars and booking tools.** Connect Google Calendar, Outlook, Calendly or Cal.com under **Connectors** (see [Calendars and HubSpot](/docs/integrations/calendars-and-hubspot/)). Each is read every 15 minutes. Only events with a lead among the attendees are stored; the rest of your calendar is never copied, and nothing is changed there.
 - **HubSpot.** Meetings logged in HubSpot, with their outcome (completed, no-show, canceled).
-- **By hand or by an agent.** **Log meeting** on the Meetings tab, `POST /v1/workspaces/{ws}/meetings`, or the `log_meeting` MCP tool.
+- **By hand or by an agent.** **Log meeting** on the Meetings tab, `POST /v1/brands/{brand}/meetings`, or the `log_meeting` MCP tool.
 
 The same meeting seen in two places, say Calendly and Google Calendar, is counted once: two meetings with the same lead that start within 15 minutes of each other are treated as one.
 
@@ -45,7 +45,7 @@ Every charge is one row: what it was for (lead data, verification, mailboxes, do
 - **Recurring costs.** Mailbox seats, a data subscription or an SDR's time, monthly or yearly. Each is spread evenly over the days it was active, so a 30-day report carries 30 days of it.
 - **Idempotent.** Send a `ref` (an invoice number, a batch id) and recording the same charge twice keeps the first one, so scripts and agents can retry safely.
 
-![The Spend tab: unpriced usage, recurring costs and the charges in the period](/screens/outcomes-spend.png)
+![The Spend tab: recurring costs and the charges in the period](/screens/outcomes-spend.png)
 
 ### How costs are shared
 
@@ -59,16 +59,16 @@ Reports never convert currencies. Pick the currency at the top of the page; spen
 
 ```sh
 # Cost per meeting by sequence, this month
-curl "https://outflare.example.com/v1/workspaces/$WS/outcomes/report?group_by=sequence&from=2026-10-01" \
+curl "https://outflare.example.com/v1/brands/$BRAND/outcomes/report?group_by=sequence&from=2026-10-01" \
   -H "Authorization: Bearer $OUTFLARE_TOKEN"
 ```
 
-`group_by` is `none`, `sequence` or `brand` (a row's brand is its sequence's); filter with `brand` or `sequence_id`; `from` and `to` are dates and include the whole of both days (the last 30 days by default). Each row has emails sent, replies, meetings, held meetings, no-shows, qualified meetings, deals, deals won, pipeline and won amounts, spend broken down by category, and the cost of each. The response also lists unpriced usage, meetings not tied to outreach, and notes that explain any number that is estimated or shared.
+`group_by` is `none` or `sequence`; filter with `sequence_id`; a meeting counts for its sequence's brand; `from` and `to` are dates and include the whole of both days (the last 30 days by default). Each row has emails sent, replies, meetings, held meetings, no-shows, qualified meetings, deals, deals won, pipeline and won amounts, spend broken down by category, and the cost of each. The response also lists unpriced usage, meetings not tied to outreach, and notes that explain any number that is estimated or shared.
 
 For a warehouse, export any dataset as CSV or NDJSON (up to 100,000 rows):
 
 ```sh
-curl "https://outflare.example.com/v1/workspaces/$WS/outcomes/export?dataset=meetings&format=ndjson" \
+curl "https://outflare.example.com/v1/brands/$BRAND/outcomes/export?dataset=meetings&format=ndjson" \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" > meetings.ndjson
 ```
 
@@ -86,12 +86,12 @@ A new charge returns `201`; one whose `ref` was already recorded returns `200` w
 
 | Method | Path | Does |
 | --- | --- | --- |
-| GET | `/v1/workspaces/{ws}/outcomes/report` | Cost per meeting and the rest, for the workspace or by sequence or brand |
-| GET | `/v1/workspaces/{ws}/outcomes/export` | Meetings, deals, spend or the report as CSV or NDJSON |
+| GET | `/v1/brands/{brand}/outcomes/report` | Cost per meeting and the rest, for the brand or by sequence |
+| GET | `/v1/brands/{brand}/outcomes/export` | Meetings, deals, spend or the report as CSV or NDJSON |
 | GET | `/v1/workspaces/{ws}/outcomes/syncs` | Each connected source: last run, last success, last error, changes |
 | POST | `/v1/workspaces/{ws}/outcomes/syncs/{id}/run` | Sync one source now |
-| GET, POST, PATCH, DELETE | `/v1/workspaces/{ws}/meetings` | List, log, correct and delete meetings |
-| GET, POST, PATCH, DELETE | `/v1/workspaces/{ws}/deals` | List, log, update and delete deals |
+| GET, POST, PATCH, DELETE | `/v1/brands/{brand}/meetings` | List, log, correct and delete meetings |
+| GET, POST, PATCH, DELETE | `/v1/brands/{brand}/deals` | List, log, update and delete deals |
 | GET, POST, DELETE | `/v1/workspaces/{ws}/spend` | The ledger |
 | GET, POST, PUT, DELETE | `/v1/workspaces/{ws}/spend-recurring` | Recurring costs |
 | GET, PUT, DELETE | `/v1/workspaces/{ws}/spend-rates` | Price per unit, and usage still without one |

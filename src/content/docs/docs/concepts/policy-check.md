@@ -35,7 +35,7 @@ A blocked send is not an error that disappears. It is recorded as a message with
 The recipient checks are available on their own, so a script or agent can filter a list before adding anyone to a sequence (scope `leads.read`, up to 1000 addresses per call):
 
 ```sh
-curl -X POST https://outflare.example.com/v1/workspaces/$WS/recipients/check \
+curl -X POST https://outflare.example.com/v1/brands/$BRAND/recipients/check \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" \
   -d '{"emails": ["ana@acme.example", "bo@competitor.example", "not-an-email"]}'
 ```

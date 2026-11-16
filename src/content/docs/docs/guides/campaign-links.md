@@ -73,4 +73,4 @@ Everyone in the workspace can see campaigns and links (`analytics.read`). Owners
 
 ## For agents and scripts
 
-The REST API is under `/v1/workspaces/{ws}/tracking-campaigns`, with `/tracking-taxonomy` for the channel list; see the [API reference](/docs/api/). The MCP tools are `get_tracking_taxonomy`, `list_tracking_campaigns`, `get_tracking_campaign`, `create_tracking_campaign`, `update_tracking_campaign`, `list_tracking_links` and `create_tracking_link`. Ask your agent something like *"Make a tagged link for our spring launch on LinkedIn ads, pointing at the pricing page."*
+The REST API is under `/v1/brands/{brand}/tracking-campaigns`, with `/tracking-taxonomy` for the channel list; see the [API reference](/docs/api/). The MCP tools are `get_tracking_taxonomy`, `list_tracking_campaigns`, `get_tracking_campaign`, `create_tracking_campaign`, `update_tracking_campaign`, `list_tracking_links` and `create_tracking_link`. Ask your agent something like *"Make a tagged link for our spring launch on LinkedIn ads, pointing at the pricing page."*

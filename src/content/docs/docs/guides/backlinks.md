@@ -102,31 +102,31 @@ The read counts against the connection's monthly budget like any other SEO call,
 
 ```sh
 # Links, strongest first: free, reads what is stored
-curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/backlinks?status=live&order=rating"
+curl -H "Authorization: Bearer $TOKEN" "$URL/v1/brands/$BRAND/backlinks?status=live&order=rating"
 
 # One followed link per domain from DR 50 and up, new in the last month
-curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/backlinks?group=domain&follow=dofollow&dr_min=50&change=new&since=2026-09-27"
+curl -H "Authorization: Bearer $TOKEN" "$URL/v1/brands/$BRAND/backlinks?group=domain&follow=dofollow&dr_min=50&change=new&since=2026-09-27"
 
 # Links lost since a date, and links whose anchor mentions a phrase
-curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/backlinks?change=lost&since=2026-09-01"
-curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/backlinks?q=free%20trial&q_in=anchor"
+curl -H "Authorization: Bearer $TOKEN" "$URL/v1/brands/$BRAND/backlinks?change=lost&since=2026-09-01"
+curl -H "Authorization: Bearer $TOKEN" "$URL/v1/brands/$BRAND/backlinks?q=free%20trial&q_in=anchor"
 
 # What changed in the last 30 days
-curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/backlinks/events?days=30"
+curl -H "Authorization: Bearer $TOKEN" "$URL/v1/brands/$BRAND/backlinks/events?days=30"
 
 # Toxic links nobody reviewed yet
-curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/backlinks?spam=toxic&review=none"
+curl -H "Authorization: Bearer $TOKEN" "$URL/v1/brands/$BRAND/backlinks?spam=toxic&review=none"
 
 # Mark a domain to disavow, then download the file
 curl -X PATCH -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
-  -d '{"review": "disavow", "domain": true}' "$URL/v1/workspaces/$WS/backlinks/$LINK"
-curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/backlinks/disavow?site_id=$SITE" -o disavow.txt
+  -d '{"review": "disavow", "domain": true}' "$URL/v1/brands/$BRAND/backlinks/$LINK"
+curl -H "Authorization: Bearer $TOKEN" "$URL/v1/brands/$BRAND/backlinks/disavow?site_id=$SITE" -o disavow.txt
 
 # Link opportunities on the fixes list
-curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/fixes?source=seo_links&status=open"
+curl -H "Authorization: Bearer $TOKEN" "$URL/v1/brands/$BRAND/fixes?source=seo_links&status=open"
 
 # Each site's totals and weekly trend
-curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/backlinks/summary"
+curl -H "Authorization: Bearer $TOKEN" "$URL/v1/brands/$BRAND/backlinks/summary"
 ```
 
 Reading needs the `seo.read` scope and reviewing needs `seo.manage`, and a brand's token sees only its brand's sites. Agents use the MCP tools `list_backlinks` (with `spam=toxic`), `list_backlink_events`, `get_backlinks_summary`, `review_backlink` and `get_disavow_file`, and can ask things like "which strong links did we lose this month?". Agents see link opportunities with `list_fixes` (`source: seo_links`) and `get_fix_prompt`. Each weekly read is the audit action `backlinks.synced`, with how many links were seen, gained, lost and regained and how many link opportunities it added, reopened and confirmed.

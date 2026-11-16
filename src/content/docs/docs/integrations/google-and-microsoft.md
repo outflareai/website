@@ -5,6 +5,8 @@ sidebar:
   order: 2
 ---
 
+This page is about sending mailboxes for outreach. To bring your team's own work email and meetings with contacts into the CRM, see [Email and meetings in the CRM](/docs/guides/crm-email/).
+
 There are three ways to connect Google Workspace and Microsoft 365 mailboxes. All of them end the same way: Outflare signs in over SMTP and IMAP, checks the domain's DNS, and marks the mailbox `active` or `error`.
 
 | Way | Best for | Passwords |
@@ -42,7 +44,7 @@ An admin connection gives Outflare access to every mailbox in an organisation, s
 In the web app, click Add mailboxes on the connection and paste one address per line, optionally followed by a comma and a display name. Or use the API, up to 5000 at a time:
 
 ```sh
-curl -X POST "$OUTFLARE_URL/v1/workspaces/$WS/oauth-connections/$CONN/mailboxes" \
+curl -X POST "$OUTFLARE_URL/v1/workspaces/$WS/integrations/$CONN/mailboxes" \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" \
   -d '{"mailboxes":[{"email":"ana@acme.example","display_name":"Ana Smith"},{"email":"bo@acme.example"}],"pool":"Warm"}'
 ```

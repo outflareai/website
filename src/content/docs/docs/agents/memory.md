@@ -27,9 +27,9 @@ If you market several brands from one workspace, each [brand](/docs/guides/brand
 
 ## The Company page
 
-Settings → **Company** shows everything Outflare knows. Edit the context, and pin, correct or forget any memory, including ones agents saved. Each memory says who saved it and whether it came from a mission.
+**Knowledge → About your company** shows everything Outflare knows about the brand you have open. Edit the context, and pin, correct or forget any memory, including ones agents saved. Each memory says who saved it and whether it came from a mission.
 
-![The Company page: the company context and the memories agents saved](/screens/company.png)
+![About your company: what the brand does, who it is for, its goals, voice and rules, which every agent reads first](/screens/company.png)
 
 Until the company name, what you do, goals and voice are filled in, agents ask for them once. Press **Don't ask again** if you'd rather they didn't.
 
@@ -64,7 +64,7 @@ Outflare's own mission agent reads the same context and pinned memories every tu
 | Analytics sites with no brand, brands no analytics tool reads | You map the site or connect the tool |
 | Email sending domains the provider wouldn't verify, broadcasts that stopped | You add the DNS records; the agent finds out why a broadcast stopped |
 | Social replies waiting for approval | You approve or reject them: nothing posts without you |
-| Possible duplicate people, new product event names held for review | The agent merges, links or dismisses, and approves the event names |
+| Possible duplicate people, new product event names that look like a typo | The agent merges, links or dismisses the people, and asks you whether each event name is a typo |
 | CRM imports that failed | The agent runs the import again |
 
 Each blocker names the tool an agent calls next, the dashboard page that fixes it, and whether the agent or a person has to act. Home's **Needs you** list shows the same list, so there is one place for every module's to-dos.
@@ -82,7 +82,7 @@ curl -X PATCH "$OUTFLARE_URL/v1/workspaces/$WS/context" -H "Authorization: Beare
   -H "Content-Type: application/json" -d '{"voice": "Plain and short. Sign off with first name."}'
 
 # Remember a decision
-curl -X POST "$OUTFLARE_URL/v1/workspaces/$WS/memories" -H "Authorization: Bearer $TOKEN" \
+curl -X POST "$OUTFLARE_URL/v1/brands/$BRAND/memories" -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" -d '{"text": "Only target Series A and later", "kind": "decision"}'
 
 # What is blocked

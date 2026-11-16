@@ -33,18 +33,18 @@ Every smart list refreshes on its own every 15 minutes, which also moves people 
 
 ```sh
 # How many people would these rules pick? Nothing is saved.
-curl -X POST "https://app.outflare.ai/v1/workspaces/$WS/smart-lists/preview" \
+curl -X POST "https://app.outflare.ai/v1/brands/$BRAND/smart-lists/preview" \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" \
   -d '{"rules": [{"attribute": "billing_plan", "op": "eq", "value": "pro"},
                  {"event": "payment_succeeded", "op": "exists", "within_days": 90}]}'
 
 # Save it
-curl -X POST "https://app.outflare.ai/v1/workspaces/$WS/smart-lists" \
+curl -X POST "https://app.outflare.ai/v1/brands/$BRAND/smart-lists" \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" \
   -d '{"name": "Paying customers", "rules": [{"attribute": "billing_plan", "op": "eq", "value": "pro"}]}'
 
 # Who is in it now, newest to join first
-curl "https://app.outflare.ai/v1/workspaces/$WS/smart-lists/$LIST/members" \
+curl "https://app.outflare.ai/v1/brands/$BRAND/smart-lists/$LIST/members" \
   -H "Authorization: Bearer $OUTFLARE_TOKEN"
 ```
 

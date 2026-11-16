@@ -11,7 +11,7 @@ Outflare stores what every [analytics tool](/docs/integrations/analytics/) and [
 
 ## Start with "what changed?"
 
-`get_analytics_changes` (`GET /v1/workspaces/$WS/analytics/changes`) answers for each website, in one call:
+`get_analytics_changes` (`GET /v1/brands/$BRAND/analytics/changes`) answers for each website, in one call:
 
 - **Headline sentences** the agent can repeat as they are, each naming its tool and dates: *"Visitors 1,180, up 68.6% on the 7 days before (700) (Plausible, 2026-10-17 to 2026-10-23)."*
 - **Each tool, this period against the one before.** Each tool is compared over its own latest stored days, so Search Console running two or three days behind is not read as a drop. `days` sets the period: 7 by default, 28 for month on month.
@@ -22,7 +22,7 @@ Outflare stores what every [analytics tool](/docs/integrations/analytics/) and [
 - **Gaps**: what is missing for a full picture, and the fix. For example, no search console, no conversions, a sync that is failing or late, or no SEO tool. Each gap lists the connector ids for `request_connection` or the action to take.
 
 ```sh
-curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/analytics/changes?host=example.com&days=28"
+curl -H "Authorization: Bearer $TOKEN" "$URL/v1/brands/$BRAND/analytics/changes?host=example.com&days=28"
 ```
 
 ## Then "what can I ask?"

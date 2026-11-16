@@ -141,8 +141,7 @@ its own), or the last read failed, for example because the monthly budget is
 used up.
 
 Below them are the brand's audited sites with their [health score](/docs/guides/site-audits/)
-and its open fixes. Websites no brand claims show as shared. Pick a brand in
-the brand switcher to see only that one. A number reads "Not enough data"
+and its open fixes. The page shows the brand picked in the brand switcher. A number reads "Not enough data"
 until its tool has synced the weeks before the ones you picked, or has a
 snapshot from before them.
 
@@ -158,12 +157,12 @@ Each weekly snapshot also suggests the domains competing with each audited site 
 
 ```sh
 # SEO connections, their domains, budget and snapshot status
-curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/seo"
+curl -H "Authorization: Bearer $TOKEN" "$URL/v1/brands/$BRAND/seo"
 
 # Is each brand growing in search: free
-curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/seo/overview?brand=repocket&weeks=12"
+curl -H "Authorization: Bearer $TOKEN" "$URL/v1/brands/$BRAND/seo/overview?weeks=12"
 # Your own weeks (Monday to Sunday, up to 104), with `period` against the weeks before
-curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/seo/overview?brand=repocket&from=2026-07-01&to=2026-09-30"
+curl -H "Authorization: Bearer $TOKEN" "$URL/v1/brands/$BRAND/seo/overview?from=2026-07-01&to=2026-09-30"
 
 # Stored snapshots: free, never calls the provider
 curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/seo/history?report=overview&host=example.com"

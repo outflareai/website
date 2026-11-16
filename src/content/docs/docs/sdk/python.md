@@ -82,9 +82,9 @@ Paged lists also take `fields=["email", "status"]`, which answers only those fie
 - `extra_body={...}` sends body fields this version of the SDK doesn't know yet.
 - `client.request("GET", "/v1/workspaces/{ws}/...", query={...})` calls any path. `{ws}` is filled in for you.
 
-## Missions
+## Held changes
 
-`client.with_options(mission=mission_id)` makes every call act inside an [agent mission](/docs/agents/mcp/). A write the mission's limits hold answers `202`; `is_held(answer)` tells you so, and the write runs once someone approves it.
+When your token's changes wait for a person ([agent actions](/docs/agents/actions/)), a write answers `202` with the held `action` instead of running. It runs once someone approves it on the **Agents** page.
 
 ## Webhooks
 

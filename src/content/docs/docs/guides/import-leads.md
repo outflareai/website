@@ -9,10 +9,12 @@ sidebar:
 
 ## Import a CSV
 
-In the web app open **Leads**, choose the file, optionally name a list to add everyone to, and select **Import**. Or use the API (scope `leads.manage`):
+In the web app, open the list under **CRM → Lists** and select **Import leads**: choose the file and everyone in it goes into that list. Or open **Leads**, select **Import leads**, choose the file, pick a list under **Add them to a list** (one of your lists, **New list…**, or **No list**), and select **Import leads**. Lists built from a search fill themselves, so they aren't offered.
+
+Or use the API (scope `leads.manage`):
 
 ```sh
-curl -X POST "https://outflare.example.com/v1/workspaces/$WS/leads/import?list=Q4%20founders" \
+curl -X POST "https://outflare.example.com/v1/brands/$BRAND/leads/import?list=Q4%20founders" \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" \
   -H "Content-Type: text/csv" \
   --data-binary @leads.csv
@@ -50,7 +52,7 @@ Leads are unique by email within a workspace, ignoring case.
 
 ### Add or update one lead
 
-`POST /v1/workspaces/{ws}/leads` with JSON upserts one lead by email, with the same rules. Optional `list_id` adds it to a list.
+`POST /v1/brands/{brand}/leads` with JSON upserts one lead by email, with the same rules. Optional `list_id` adds it to a list.
 
 ```json
 { "email": "ana@acme.example", "first_name": "Ana", "company": "Acme", "custom": { "icp_tier": "A" } }
@@ -62,7 +64,7 @@ Lists group leads for a sequence, for example one per campaign or segment. A lea
 
 ## Search
 
-`GET /v1/workspaces/{ws}/leads` lists leads ordered by email, 100 per page (up to 500 with `limit`). Filter with `q` (email, name or company), `list_id` and `suppressed=true|false`. The response includes `total` and `next_cursor`; pass it back as `cursor` for the next page.
+`GET /v1/brands/{brand}/leads` lists leads ordered by email, 100 per page (up to 500 with `limit`). Filter with `q` (email, name or company), `list_id` and `suppressed=true|false`. The response includes `total` and `next_cursor`; pass it back as `cursor` for the next page.
 
 ## The suppression list
 
@@ -74,6 +76,6 @@ The suppression list holds addresses and whole domains that must never be emaile
 
 ### Erasure requests
 
-To honour a request to be forgotten, delete the person, not just the lead: open them under **CRM → People** and choose **Erase permanently → Erase and never contact**, or send `DELETE /records/{record}?suppress=true`. That erases their record and everything about them, their leads included, and adds their addresses to the suppression list with reason `do_not_contact`, so a later import cannot put them back into a sequence. See [Erasing for good](/docs/guides/customer-records/#erasing-for-good).
+To honour a request to be forgotten, delete the person, not just the lead: open them under **CRM → Customer data** and choose **Erase permanently → Erase and never contact**, or send `DELETE /records/{record}?suppress=true`. That erases their record and everything about them, their leads included, and adds their addresses to the suppression list with reason `do_not_contact`, so a later import cannot put them back into a sequence. See [Erasing for good](/docs/guides/customer-records/#erasing-for-good).
 
 Deleting only the lead (`DELETE /leads/{id}?suppress=true`) takes it out of every list and sequence and suppresses its address, but keeps the person's record and the emails already sent to them.

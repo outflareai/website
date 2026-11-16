@@ -190,7 +190,7 @@ While the AI works, you see how long it has taken and can **Stop** it; it keeps 
 
 **Agents build, people decide.** An agent can make a no-code test and build its versions (`PUT .../ab-tests/{test}/versions/{version}`, MCP `set_ab_test_version`), with the same changes the editor makes, and check them with previews. Anything visitors would see waits for a person, whatever the agent is allowed to do: starting or shipping a test, turning a flag on, and changing a version while it's live. The agent's request is held, and a person approves it under **Actions**.
 
-Everything here is in the REST API, under `/v1/workspaces/{ws}/ab-tests`: creating and changing tests, the checklist, previews and checks, starting, freezing, ending, shipping and duplicating, results, breakdowns, every combination of a multivariate test, tests at the same time, the planner, learnings and AI help. Agents use the matching MCP tools, such as `create_ab_test`, `get_ab_test_checklist`, `start_ab_test`, `get_ab_test_results`, `get_ab_test_breakdown`, `get_ab_test_interactions`, `get_ab_test_factorial` and `ship_ab_test`. See the [API reference](/docs/api/).
+Everything here is in the REST API, under `/v1/brands/{brand}/ab-tests`: creating and changing tests, the checklist, previews and checks, starting, freezing, ending, shipping and duplicating, results, breakdowns, every combination of a multivariate test, tests at the same time, the planner, learnings and AI help. Agents use the matching MCP tools, such as `create_ab_test`, `get_ab_test_checklist`, `start_ab_test`, `get_ab_test_results`, `get_ab_test_breakdown`, `get_ab_test_interactions`, `get_ab_test_factorial` and `ship_ab_test`. See the [API reference](/docs/api/).
 
 ## Who can change them
 

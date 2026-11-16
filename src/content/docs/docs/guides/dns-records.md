@@ -41,8 +41,8 @@ Every step also gives you the records to copy, a prompt for your AI agent, and a
 
 The approval link for each kind of record:
 
-- `GET /v1/workspaces/{ws}/seo-sites/{site}/dns/approval`
-- `GET /v1/workspaces/{ws}/tracking-domains/{id}/dns/approval`
+- `GET /v1/brands/{brand}/seo-sites/{site}/dns/approval`
+- `GET /v1/brands/{brand}/tracking-domains/{id}/dns/approval`
 - `GET /v1/workspaces/{ws}/email-provider-domains/{id}/dns/approval`
 
 Each gives `available` and `url`, or `available: false` with a `reason`: `not_configured`, `no_provider` (your DNS host doesn't support Domain Connect), `not_onboarded` (it does, but hasn't added Outflare's templates yet), `no_template`, `nothing_to_add` or `lookup_failed`. Pass `return` with the page to come back to. Afterwards, `POST .../dns/approved` reports the result, and Outflare checks the records. Agents use `get_seo_site_dns_approval`, `get_tracking_domain_dns_approval` and `get_email_domain_dns_approval`.

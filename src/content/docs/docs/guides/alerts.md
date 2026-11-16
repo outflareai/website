@@ -34,7 +34,7 @@ Under **Settings → Alerts**, owners and admins choose who gets each kind by em
 A brand can choose differently from the workspace through the API:
 
 ```sh
-curl -X PUT https://outflare.example.com/v1/workspaces/$WS/alerts/settings \
+curl -X PUT https://outflare.example.com/v1/brands/$BRAND/alerts/settings \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" \
   -d '{"brand_id": "'$BRAND_ID'", "kind": "visitor.hot", "email": "off"}'
 ```
@@ -48,7 +48,7 @@ Connect your Slack under **Connectors → Slack**: sign in with Slack, or paste 
 Through the API, list the channels with `GET /v1/workspaces/{ws}/alerts/channels?integration_id=` and pick one:
 
 ```sh
-curl -X PUT https://outflare.example.com/v1/workspaces/$WS/alerts/settings \
+curl -X PUT https://outflare.example.com/v1/brands/$BRAND/alerts/settings \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" \
   -d '{"kind": "reply.hot", "slack_integration_id": "'$SLACK_ID'", "slack_channel": "C0123456789"}'
 ```
@@ -57,9 +57,9 @@ Send both as `null` to stop posting.
 
 ## API and agents
 
-`GET /v1/workspaces/{ws}/alerts` lists alerts, newest first, with a `title`, a line of `text` and the app `path` that has each one. Filter with `kind` and page with `before` (`next_before` from the last page). You see the kinds your role can read: hot replies need `inbox.read`, hot visitors `customers.read`, and brand-limited people see their brands' alerts and the shared ones.
+`GET /v1/brands/{brand}/alerts` lists alerts, newest first, with a `title`, a line of `text` and the app `path` that has each one. Filter with `kind` and page with `before` (`next_before` from the last page). You see the kinds your role can read: hot replies need `inbox.read`, hot visitors `customers.read`, and brand-limited people see their brands' alerts and the shared ones.
 
-`GET /v1/workspaces/{ws}/alerts/settings` shows the kinds and who gets each, and `PUT /v1/workspaces/{ws}/alerts/mutes` with `kind` and `muted` mutes one for you. Agents use `list_alerts`, `get_alert_settings`, `set_alert_settings`, `list_alert_channels` and `mute_alerts`.
+`GET /v1/brands/{brand}/alerts/settings` shows the kinds and who gets each, and `PUT /v1/brands/{brand}/alerts/mutes` with `kind` and `muted` mutes one for you. Agents use `list_alerts`, `get_alert_settings`, `set_alert_settings`, `list_alert_channels` and `mute_alerts`.
 
 ## In your CRM
 

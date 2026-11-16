@@ -13,7 +13,7 @@ Each digest is kept in the app (**Settings → Digests**), sent as the `digest.r
 
 ## The schedule
 
-Without changes, a workspace gets a weekly digest on Mondays at 08:00 UTC, kept in the app and sent as a webhook, with no email. Owners and admins change it on the Digests page or with `PUT /v1/workspaces/{ws}/digest-settings`:
+Without changes, a workspace gets a weekly digest on Mondays at 08:00 UTC, kept in the app and sent as a webhook, with no email. Owners and admins change it on the Digests page or with `PUT /v1/brands/{brand}/digest-settings`:
 
 | Field | Values |
 | --- | --- |
@@ -38,10 +38,10 @@ Each email is a transactional email in Sent emails, tagged `digest`, so its deli
 
 | Endpoint | MCP tool | What it does |
 | --- | --- | --- |
-| `GET /v1/workspaces/{ws}/digest-settings` | `get_digest_settings` | The schedule, who gets it, and why it can't be emailed yet |
-| `PUT /v1/workspaces/{ws}/digest-settings` | `update_digest_settings` | Change them (`workspace.manage`) |
+| `GET /v1/brands/{brand}/digest-settings` | `get_digest_settings` | The schedule, who gets it, and why it can't be emailed yet |
+| `PUT /v1/brands/{brand}/digest-settings` | `update_digest_settings` | Change them (`workspace.manage`) |
 | `PUT /v1/workspaces/{ws}/digest-settings/me` | | Turn the email off or on for yourself |
-| `GET /v1/workspaces/{ws}/digests` | `list_digests` | The newest 50 digests |
-| `GET /v1/workspaces/{ws}/digests/{id}` | | One digest |
-| `GET /v1/workspaces/{ws}/digests/preview` | `preview_digest` | The digest of the period that ends now, not kept |
-| `POST /v1/workspaces/{ws}/digests` | `send_digest` | Make one now (`workspace.manage`) |
+| `GET /v1/brands/{brand}/digests` | `list_digests` | The newest 50 digests |
+| `GET /v1/brands/{brand}/digests/{id}` | | One digest |
+| `GET /v1/brands/{brand}/digests/preview` | `preview_digest` | The digest of the period that ends now, not kept |
+| `POST /v1/brands/{brand}/digests` | `send_digest` | Make one now (`workspace.manage`) |

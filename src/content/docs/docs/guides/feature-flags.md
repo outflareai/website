@@ -124,7 +124,7 @@ The editor link works for two hours, only for that flag's versions, and only whi
 
 ## On your servers
 
-Ask `POST /v1/workspaces/{ws}/flags/evaluate` with an API token that has `analytics.read`, passing the visitor's id from the page (`outflare.anonymousId()`) as `anonymous_id` so the server agrees with the page. It returns each flag that is on with the visitor's version and why. Agents use the MCP tools `list_flags`, `create_flag`, `update_flag`, `archive_flag` and `evaluate_flags`, and `list_flag_groups`, `set_flag_group_holdout` and `get_flag_group_holdout` for exclusion groups.
+Ask `POST /v1/brands/{brand}/flags/evaluate` with an API token that has `analytics.read`, passing the visitor's id from the page (`outflare.anonymousId()`) as `anonymous_id` so the server agrees with the page. It returns each flag that is on with the visitor's version and why. Agents use the MCP tools `list_flags`, `create_flag`, `update_flag`, `archive_flag` and `evaluate_flags`, and `list_flag_groups`, `set_flag_group_holdout` and `get_flag_group_holdout` for exclusion groups.
 
 ## Who can change them
 

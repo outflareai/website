@@ -82,4 +82,4 @@ Reddit is the first channel where Outflare helps you take part, not just measure
 
 ## For agents
 
-Growth, accounts, posts and Reddit watches are in the API under `/v1/workspaces/{ws}/social` and in the [MCP server](/product/mcp/), with tools such as `get_social_growth` and `list_social_accounts`. Reddit replies waiting for approval show in the workspace's status and on the fixes list, so nothing posts without you.
+Growth, accounts, posts and Reddit watches are in the API under `/v1/brands/{brand}/social` and in the [MCP server](/product/mcp/), with tools such as `get_social_growth` and `list_social_accounts`. Reddit replies waiting for approval show in the workspace's status and on the fixes list, so nothing posts without you.

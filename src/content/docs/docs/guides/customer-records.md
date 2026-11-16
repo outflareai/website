@@ -5,7 +5,7 @@ sidebar:
   order: 1.5
 ---
 
-<span class="pill shipped">Shipped</span> Records, identities, links, the shared catalog, product events, duplicates and merges, timelines, consent, Recently deleted (a 7-day restore) and erasure, in the web app (**CRM → People**), the REST API and the MCP server. [Smart lists](/docs/guides/smart-lists/) group records by rules.
+<span class="pill shipped">Shipped</span> Records, identities, links, the shared catalog, product events, duplicates and merges, timelines, consent, Recently deleted (a 7-day restore) and erasure, in the web app (**CRM → Customer data**), the REST API and the MCP server. [Smart lists](/docs/guides/smart-lists/) group records by rules.
 
 Outflare keeps one record of each person and company your business knows, plus anything else you track, such as deals, subscriptions or partners. The customer data platform, the CRM and lifecycle email all use the same records, so nobody types the same detail twice and nothing ends up in a separate copy.
 
@@ -13,11 +13,12 @@ Moving from Attio? [Import it once](/docs/guides/move-from-attio/) and its peopl
 
 ## In the web app
 
-Open **CRM → People** (or press `g` then `h`). It works inside the brand picked in the sidebar, and has these tabs:
+There is one list of people: **CRM → People**, cold contacts included. Next to it are **CRM → Companies** and, when your product has workspaces or teams, **CRM → Accounts** (see [People, accounts and companies](#people-accounts-and-companies)). Each has saved views, filters, columns you choose and the brand's headline scores. Search by name, email, phone or id. The **Show** menu switches between **Active**, **Held for review** (the people a visitor identification tool named, waiting for someone to approve them) and **Archived**. Tick rows to give them an owner (**Assign to…**), change them together (**Bulk edit**), or archive or restore them. A record opens as a full page.
 
-- **People** and **Companies** list every record of that type, newest first. Search by name, email, phone or id, and narrow the list with a filter for each choice field, such as lifecycle stage, seniority, country, industry or company size. The brand picked in the sidebar applies here as everywhere else. **Held for review** shows the people a visitor identification tool named, waiting for someone to approve them, and **Archived** shows the records you archived.
+**CRM → Customer data** (or press `g` then `h`) holds what sits behind those records. It works inside the brand picked in the sidebar, links to the two lists, and has these tabs:
+
 - **Duplicates** lists pairs that may be the same person or company, side by side, to merge, link or dismiss. See [Duplicates](#duplicates).
-- **Events** shows the product events your brand received, with any that were rejected or held and what to do about each. See [Product events](#product-events).
+- **Events** shows the product events your brand received, with any that were rejected and what to do about each, and asks about any new event name that looks like a typo. See [Product events](#product-events).
 - **Products** lists the brand's products and lifecycle stages. See [Products and lifecycle stages](/docs/guides/products-and-lifecycle/).
 - **Transactions** lists the brand's payments, refunds and credits. See [Transactions](/docs/guides/transactions/).
 - **Imports** lists each import and batch of events, to undo one. See [Undoing a merge or an import](#undoing-a-merge-or-an-import).
@@ -34,6 +35,20 @@ With permission to manage customers, you can also:
 - **Archive** a record to hide it and keep its history, or **restore** it.
 - **Delete** a record, restorable for 7 days, or **erase** it for good: see [Deleting and restoring](#deleting-and-restoring).
 
+## People, accounts and companies
+
+Three kinds of record are kept apart, never mixed:
+
+- **A person** is one human. Their **Source** says where they came from: Cold, Inbound, Event, Sign-up, Invited, Customer or Other. It's set once when they're added (a prospect from a data provider is Cold, someone from your own site or product is Sign-up, and an import asks where the people are from), and nothing that happens later changes it: a cold contact who becomes a customer stays Source Cold, and their progress lives on [deals](#deals). You can correct it by hand, but never empty it. **Marketing email** says yes or no: a Cold person starts at no until they opt in, and a reply is not an opt-in. Filter People by Source and Marketing email; Outreach's **Cold contacts** is People with the Cold filter, and **Add to sequence** puts the people you tick straight into a sequence.
+- **An account** is their workspace or team in your product, with its plan, usage and billing. Its members are people, each with a role (Owner, Admin, Member, Billing or Viewer). An account belongs to one company or none (a freelancer's own workspace). Someone can be in several accounts.
+- **A company** is the organisation. **Being in an account never sets a person's company.**
+
+**CRM settings → People setup** decides which lists you see. **Who do you sell to?** Consumers (a customer is a person, and Companies is hidden), Companies, Both (people with no company show as Individual, with an Individuals filter) or Marketplace (people carry a Buyer or Seller label). **Does your product have accounts?** Turn it on and each workspace your product reports becomes an Account. Both start at the defaults for your brand's business type, and each says whether it's the default or your team's choice.
+
+With accounts on, your product's group calls (`group` in [product events](#product-events)) make or find the account, link it to the company its website names, and add the person to its members.
+
+A person with several emails has one **preferred** email: sends go there. With none picked, they go to the most recent verified address. The others stay on the person, and an opt-out still covers every one. Pick it with **Make preferred** on the person's page.
+
 ## Leads are people
 
 Every lead you import or add is a person record too. A new lead joins the person who already has its email, or gets a record of its own marked as a prospect, with its name, job title and LinkedIn filled in. Its email stays unverified, so it never takes over an address someone later proves they own. Each lead in the API has a `record_id` that points at its person.
@@ -48,8 +63,8 @@ Cold email, replies, meetings and deals are linked to the person as well: throug
 
 The catalog lists everything a record can hold, and every feature uses the same definitions.
 
-- **Record types.** People, companies and [deals](#deals) come ready to use. Add your own, such as subscriptions or partners.
-- **Fields.** First and last name, job title, seniority, companies, country, city, time zone, LinkedIn and lifecycle stage for people. Website, industry, company size, country, LinkedIn and lifecycle stage for companies. Add your own fields with a value type: text, number, currency, date, checkbox, a choice from a list, rating, email, phone, URL, location, or a link to another record or a teammate.
+- **Record types.** People, companies, accounts and [deals](#deals) come ready to use. Add your own, such as subscriptions or partners.
+- **Fields.** First and last name, job title, seniority, companies, accounts, Source, country, city, time zone and LinkedIn for people. Website, industry, company size, country, LinkedIn and lifecycle stage for companies. Add your own fields with a value type: text, number, currency, date, checkbox, a choice from a list, rating, email, phone, URL, location, or a link to another record or a teammate.
 - **Option lists.** Choices shared across fields, such as country, industry, company size, seniority and lifecycle stage. Add your own, such as deal stages. Options are archived, never deleted, so old records keep their meaning.
 - **Product events.** Define the events your product sends, such as `product.activated`, with their properties.
 - **Field labels.** Every field, built in or your own, and every product event says how sensitive it is (public, internal, confidential or restricted), which teammate owns it, how long its data is meant to be kept (forever by default) and where it may be sent: webhooks, exports, AI, published queries and email (all of them by default). They're labels for your team: nothing is blocked or deleted because of them. Set them with **Edit labels** on a field, or on an event under **Product events**, in the CRM settings, `PATCH .../catalog/types/{type}/fields/{field}` or `PATCH .../catalog/events/{event}` (`owner_id`, `retention_days`, `destinations`), or the MCP tools `update_field` and `update_event_definition`.
@@ -86,15 +101,18 @@ Only a **verified** email or phone counts. If someone signs up on your website w
 Send what people do in your product to a brand, in Segment's format: `track`, `identify`, `page`, `screen`, `group` and `alias`. If your product already sends to Segment, RudderStack or a similar library, it can send the same calls to Outflare. Send them from your servers to `POST /v1/brands/{brand}/events` (MCP `send_brand_events`) with an API token that can manage customers: one event, or `{"batch": [...]}` with up to 500.
 
 - **Saved first.** Every event is saved as sent, and the answer is `202` at once, with a `batch_id` and a receipt `id` per event. Only a malformed request is refused, never an event for its content.
-- **Processed in the background**, in order, usually within seconds. Each event ends as `accepted` (stored, with the person it matched), `duplicate` (a `messageId` already received), `rejected` (with a `code` and a `reason` that says what to fix) or `held` (a new event name waiting for approval).
-- **Follow them** on the **Events** tab, or with `GET /v1/brands/{brand}/events` (filter by `status`, `code`, `batch_id` or `name`) and `GET .../events/summary` for the last 24 hours and 7 days.
-- **Fix and replay.** Approve a held name (on the Events tab, or `POST .../catalog/events/{name}/approve`), or fix what a rejection says, then `POST .../events/replay` with the events' `ids` or a filter such as `{"status": "held"}`.
+- **Processed in the background**, in order, usually within seconds. Each event ends as `accepted` (stored, with the person it matched), `duplicate` (a `messageId` already received), `rejected` (with a `code` and a `reason` that says what to fix) or `held` (an event name someone paused in the catalog). New event names are never held: see [New event names](#new-event-names).
+- **Follow them** on the **Events** tab, under **Sent to the events API**, or with `GET /v1/brands/{brand}/events` (filter by `status`, `code`, `batch_id` or `name`) and `GET .../events/summary` for the last 24 hours and 7 days.
+- **See every event.** The **Events** tab opens on **All events**: everything the brand received, from your website script, this API or a connector, newest first, with counts by source and filters by source and name. The API is `GET /v1/brands/{brand}/customer-events?source=` (`browser` is the website script), and the summary's `sources` has the counts.
+- **Give them names.** The **Events** tab's **Dictionary** lists every event name with the name people see, what it means, how many arrived and when it was last seen. Open a row to see its last 30 days, the properties it carries (their type, how often each is set and their common values) and the charts, conversions and journeys that use it, and to write its name, its description and a note per property. The names then show wherever you pick an event in [Trends](/docs/guides/trends/), [Funnels](/docs/guides/funnels/) and Paths. Filter to **Without a description** to see what's left to describe; mark an event you no longer want built on as **Retired**. Values that could name a person, such as an email address or a link, are never shown as common values. The API is `GET /v1/brands/{brand}/catalog/events` for the list, `PATCH .../catalog/events/{name}` to edit and `GET .../catalog/events/{name}/usage` for the detail (MCP `get_event_usage`).
+- **Set a tracking plan.** The properties an event lists in the Dictionary are its plan. Open the event and tick **Required** on the properties every one must carry, then save. From then on, events that arrive without a required property, or with a property the event doesn't list, are still stored, and counted: the **Plan** column says how many broke it in the last seven days, **Breaks the plan** filters to those events, and the open row says which property and on how many events. **Add to plan** lists a property you meant to send. Fix the code that sends the event, or change the plan; either clears the count. An event with no listed properties has no plan. The same counts are at `GET /v1/brands/{brand}/catalog/event-problems`, and agents read them with `list_event_plan_problems`.
+- **Fix and replay.** Fix what a rejection says, or approve a paused name again (on the Events tab, or `POST .../catalog/events/{name}/approve`), then `POST .../events/replay` with the events' `ids` or a filter such as `{"status": "held"}`.
 - **Kept for a while.** Accepted events stay in this log for 30 days, rejected and held ones for 90. The product events themselves stay on each person's timeline.
 - **Names.** `Order Completed` is stored as `order_completed`, and dotted names such as `product.activated` stay as they are. A name the brand hasn't approved yet is held, and drives nothing until someone approves it.
 - **Products.** Name the [product](/docs/guides/products-and-lifecycle/) an event is about with `properties.product_id` or `properties.product`.
 - **Retries.** Send a `messageId` with each event, so a retry is stored once.
 - **Orders are payments.** An `Order Completed` event from your server, for a known person, with `revenue` (or `total`, or `value`) in dollars and a `currency`, is also saved as a [transaction](/docs/guides/transactions/) and counted as a payment. Put the payment's id in `order_id`: if the same payment also arrives as a transaction with that `source_id`, or from a billing connection, it counts once ([One payment, counted once](/docs/guides/transactions/#one-payment-counted-once)).
-- **Refunded orders are refunds.** An `Order Refunded` event from your server, with the order's `order_id`, refunds that payment, counted once with a refund transaction for the same refund ([Refunds, counted once](/docs/guides/transactions/#refunds-counted-once)). **People → Developer setup** checks that sign-ups, orders and refunds arrive and count ([Developer setup](/docs/guides/developer-setup/)).
+- **Refunded orders are refunds.** An `Order Refunded` event from your server, with the order's `order_id`, refunds that payment, counted once with a refund transaction for the same refund ([Refunds, counted once](/docs/guides/transactions/#refunds-counted-once)). **CRM → Customer data → Developer setup** checks that sign-ups, orders and refunds arrive and count ([Developer setup](/docs/guides/developer-setup/)).
 
 Each event is matched to a person in that brand only:
 
@@ -108,9 +126,24 @@ Traits that match a field in the catalog fill in the record: `firstName` is firs
 
 The older `POST /v1/workspaces/{ws}/customer-events` (MCP `track_customer_events`) still works for now, and answers each event's result while you wait.
 
+### New event names
+
+Nobody approves event names. A name your product sends for the first time, such as `signup_started`, is added to the brand's catalog and its events are stored straight away, ready for segments, lists, journeys and reports.
+
+Within a minute, Outflare checks each new name against the names the brand already sends, and asks only when one looks like a typo or a second spelling of another. The **Events** tab then shows **Is this a typo?**, for example "Is `sign_up` a typo of `signed_up`?", with how many events each has:
+
+- **Yes, merge** moves the name's events to the other name, and stores events sent with it later under that name too.
+- **No, keep both** keeps them as two events.
+
+The events are usable either way while the question waits. Agents see the same questions in `get_brand_events_summary` and answer with `answer_event_name_check`; the API is `POST /v1/brands/{brand}/catalog/events/{name}/name-check` with `{"same": true}` or `{"same": false}`.
+
+The check runs on your workspace's own AI connection when it has one ([AI models](/docs/agents/ai-models/), the **Event name check** task, on your provider's cheapest model and within your AI limits). Without one, it compares the spellings instead: other separators, a prefix more or less (`user.signed_up` and `signed_up`), a letter or two added or dropped, or one letter changed. Names that differ only in a number, such as `step_1` and `step_2`, are always separate events.
+
+To stop using a name, deprecate it in the catalog. To pause one, set its status to quarantined: its new events are held until you approve it again and replay them. A brand takes up to 100 new event names a day from its website's snippet.
+
 ## Duplicates
 
-When two records share an email or phone number, they might be the same person. Outflare lists each such pair once, with both records side by side, so someone can decide: in the web app under **CRM → People → Duplicates**, which marks the fields where the two disagree, and on each record's page. This includes pairs you already had before the upgrade.
+When two records share an email or phone number, they might be the same person. Outflare lists each such pair once, with both records side by side, so someone can decide: in the web app under **CRM → Customer data → Duplicates**, which marks the fields where the two disagree, and on each record's page. This includes pairs you already had before the upgrade.
 
 - **Merge** keeps one record (choose **Keep this one** on the record to keep). The other one's emails and ids, links, product events, consent, leads and outreach move to the kept record, and its details fill in whatever the kept record is missing. The usual "which value wins" order still applies, so a CRM value never replaces one someone typed. The merged record stays in the archive, so its history and any old links still lead to the record you kept.
 - **Link** keeps both records but marks them as the same person, for example one person with two accounts in your product.
@@ -137,7 +170,7 @@ You can delete a person or company, one field's value, one email or id, one link
 - **Restoring** puts everything back with its ids, history and links, and fires nothing: no rule, journey, webhook or email for what came back. If part of it can't come back (for example another person verified the same email since), the rest is restored and that part stays, with the reason.
 - **After 7 days** it is erased for good.
 
-Find it under **CRM → People → Recently deleted**, `GET /v1/brands/{brand}/recently-deleted` or MCP `list_recently_deleted`, and restore with `POST /v1/brands/{brand}/recently-deleted/{deletion}/restore` or `restore_deletion`. Seeing it needs permission to read customers; deleting and restoring need permission to manage them. The webhook events are `record.soft_deleted`, `transaction.deleted` and `deletion.restored`.
+Find it under **CRM → Customer data → Recently deleted**, `GET /v1/brands/{brand}/recently-deleted` or MCP `list_recently_deleted`, and restore with `POST /v1/brands/{brand}/recently-deleted/{deletion}/restore` or `restore_deletion`. Seeing it needs permission to read customers; deleting and restoring need permission to manage them. The webhook events are `record.soft_deleted`, `transaction.deleted` and `deletion.restored`.
 
 ### Erasing for good
 
@@ -158,13 +191,31 @@ From the API, `DELETE /v1/brands/{brand}/records/{record}?suppress=true` returns
 ## Undoing a merge or an import
 
 - **A merge.** A record's page lists its merges, with **Undo merge** (`POST /v1/brands/{brand}/merges/{merge}/undo`, MCP `undo_merge`). The merged record becomes a record of its own again, and everything the merge moved goes back to it. Anything that reached the kept record after the merge stays there. Merges in a chain are undone newest first.
-- **An import or a batch of events.** Every CSV import, CRM import and batch of product events is a batch. **CRM → People → Imports** lists them, with a preview of what undoing one would remove and what changed since (records someone edited or emailed, for example). Choose **Undo only what's untouched** or **Undo everything** (`POST /v1/brands/{brand}/batches/{batch}/undo`, MCP `undo_batch`). What an undo removes goes to Recently deleted, so it can be restored for 7 days. Emails already sent can't be unsent.
+- **An import or a batch of events.** Every CSV import, CRM import and batch of product events is a batch. **CRM → Customer data → Imports** lists them, with a preview of what undoing one would remove and what changed since (records someone edited or emailed, for example). Choose **Undo only what's untouched** or **Undo everything** (`POST /v1/brands/{brand}/batches/{batch}/undo`, MCP `undo_batch`). What an undo removes goes to Recently deleted, so it can be restored for 7 days. Emails already sent can't be unsent.
 
 Neither sets off a rule, journey, email or webhook for what moves back.
 
 ## Bulk edits
 
 Owners can change many people or companies at once, from a list, a saved query or ids: set an owner or a field, add or remove tags, move them in or out of a static list, or archive them. See [Bulk edits](/docs/guides/bulk-edits/).
+
+## The account page
+
+A person's or company's page is the one place to read before you act on an account. It shows only the cards that have something to say for your brand:
+
+- **Needs attention** first: open [signals](/docs/guides/signals/), a reply or a conversation waiting, an overdue task, a failed payment, a renewal within 60 days, or no owner.
+- **Stage and owner**, and the **account plan**: their goal, the next step, their hesitations and their limits. These are ordinary fields, so every change is in the record's history.
+- **Billing, products and usage**: plan and revenue from your payment connections, each product's lifecycle stage, and live [metrics](/docs/guides/metrics/) with whether each is up or down on the period before.
+- **Scores** with a "Why?" that lists the factors ([Scores](/docs/guides/scores/)).
+- **People** at a company with their roles, **deals** with their stage (a lost deal keeps its lost reason and note; the board asks for a reason when a deal moves to Lost), support conversations, who spoke last, website visits, tasks, journeys and alerts.
+
+`GET /v1/brands/{brand}/records/{record}/summary` (MCP `get_record_summary`) returns the same in one call.
+
+### Company groups and share of wallet
+
+Companies have a **Parent company** field, for a subsidiary, a regional office or a separate sign-up that belongs to a bigger account. A company can't be its own parent or sit under one of its own children. Once a company has a parent or a company underneath, its page shows a **Company group** card: each company's recurring revenue, what it paid in the last 12 months, its health and its open signals, with totals for the group (`GET /v1/brands/{brand}/records/{record}/group`, MCP `get_record_group`).
+
+**Share of wallet** is what a company paid you in the last 12 months against what it spends a year on what you sell, with every supplier. The share of wallet setup kit (from the playbook **Grow your share of each customer's spend**) adds four fields to companies: the yearly spend on your category, how sure the number is, where it comes from, and the other suppliers. Once a company has an estimate, its page shows the share and the room left. Nothing is estimated for you: a person or an agent writes the number and says where it came from.
 
 ## Timeline
 
@@ -176,6 +227,7 @@ Every person and company has one timeline across every module, newest first (`GE
 - cold email sent to them and their replies, meetings and deals
 - visits to your website: the landing page, pages seen, where they came from and the campaign
 - journeys entered, and finished or left
+- support conversations opening and closing, CRM tasks and notes
 
 A company's timeline includes its people's, and each item says whose it is; `people=false` shows only the company's own. Filter it with `kinds`, for example `?kinds=message,meeting,deal` for just the outreach, and with `brand` for one brand's items and the shared ones. Pages are 50 items; pass `next_before` as `before` for the next.
 
@@ -222,10 +274,20 @@ curl -X POST https://app.outflare.ai/v1/brands/$BRAND/events \
          "properties": {"total": 42}}]}'
 ```
 
-List records filtered by their fields with `attribute=key:value`, repeated for more: values of one field are alternatives, different fields must all match. For example, customers and trials at one company:
+Read or change how the brand's People are set up (who it sells to, whether its product has accounts; `null` goes back to the business type's default):
 
 ```sh
-curl "https://app.outflare.ai/v1/brands/$BRAND/records?type=person&attribute=lifecycle_stage:customer&attribute=lifecycle_stage:trial&attribute=companies:$COMPANY_ID" \
+curl -X PATCH https://app.outflare.ai/v1/brands/$BRAND/people-setup \
+  -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" \
+  -d '{"sells_to": "mixed", "accounts": true}'
+```
+
+Cold contacts who may not get marketing email are `GET .../records?type=person&attribute=source:cold&marketing=no`. Make an email the preferred one with `POST .../records/{record}/identities/{identity}/prefer`, and set a member's role in an account with `PATCH .../records/{record}/relationships/{relationship}` and `{"properties": {"role": "admin"}}`.
+
+List records filtered by their fields with `attribute=key:value`, repeated for more: values of one field are alternatives, different fields must all match. For example, people at one company who signed up or were invited:
+
+```sh
+curl "https://app.outflare.ai/v1/brands/$BRAND/records?type=person&attribute=source:signup&attribute=source:invited&attribute=companies:$COMPANY_ID" \
   -H "Authorization: Bearer $OUTFLARE_TOKEN"
 ```
 

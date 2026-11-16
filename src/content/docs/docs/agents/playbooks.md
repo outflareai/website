@@ -1,6 +1,6 @@
 ---
 title: Playbooks
-description: Ready-made growth recipes that say what they need, run as a mission on your own accounts, and wait for your approval. Anyone can add one on GitHub.
+description: Ready-made growth recipes that say what they need, run on your own accounts, and wait for your approval. Anyone can add one on GitHub.
 sidebar:
   order: 4
 ---
@@ -19,11 +19,27 @@ A **playbook** is a ready-made recipe for growth, such as welcoming new sign-ups
 
 Open one to see what it needs, its steps and the API operations each step uses, what it won't do, how to tell it worked, and its prompt with your inputs filled in.
 
+## A playbook's home in your brand
+
+A playbook with a setup kit shows **In this brand** at the top once the kit is set up: every rule, journey, list and signal type it added, whether each is on, and what it has done. Above them are the [signals](/docs/guides/signals/) it raised: how many need attention, how many are late, and how many closed as won or not useful in the last 90 days, so you can tell whether the playbook earns its place. **Set it up now, without a run** adds the kit's parts as drafts straight from the page, so a playbook that is only rules and journeys needs no AI model.
+
+### Did it work?
+
+To find out what a playbook adds beyond what would have happened anyway, pick **Hold 10% back** (or 20%) under **Measure whether it works** when you set it up. Each journey the playbook adds then starts with a random split: the held-back share of people (or companies, for a journey about companies) is left alone, and the rest go through the journey as usual. The split is the same every time for a person or company, so nobody moves between the groups.
+
+The playbook's page then shows **Did it work?**: for each journey, how many went through it and how many were held back, how many of each paid in the days after, the revenue from them, and the lift. A company's people count for their company. Until both groups are big enough it says there isn't enough to tell yet. `GET /v1/brands/{brand}/playbooks/{id}/lift` (`analytics.read`, MCP `get_playbook_lift`) returns the same. Holding people back means some of them miss the journey's help, so use a small share and take the holdout step out of the journey once you know. See [holdouts](/docs/guides/journeys/#holdouts-what-a-journey-changed).
+
+## Your own playbooks
+
+**New playbook** groups rules, journeys, smart lists, signal types, scores, routing rules, emails and metrics your brand already has under a name of your own, such as "Save accounts that go quiet". It gets the same home as a ready-made playbook, so one page answers whether the whole motion works. Under that, **Did it work?** compares each of its journeys that holds some people back at random with the ones it held back; a journey that holds nobody back says so, because nothing shows what would have happened without it. A playbook owns none of its parts: a part can sit in several playbooks, and removing a playbook removes only the grouping, never the parts themselves. From the API it is `/v1/brands/{brand}/own-playbooks` (MCP `list_own_playbooks`, `create_own_playbook`, `update_own_playbook`, `delete_own_playbook`), and `GET /v1/brands/{brand}/own-playbooks/{id}/lift` (MCP `get_own_playbook_lift`) is "Did it work?".
+
+Playbooks for customer teams: **Flag renewals and quiet accounts for their owners** puts every company that goes quiet or comes up for renewal in Needs attention, **Grow your share of each customer's spend** adds [share of wallet](/docs/guides/customer-records/#company-groups-and-share-of-wallet) fields and flags the healthy companies with the most room left, **Hand every won deal over to the people who look after it** puts each newly won customer in Needs attention with a kick-off task for their owner, and **Score account health and catch usage drops** asks for your usage event and adds a [health score](/docs/guides/scores/) for companies, the two [metrics](/docs/guides/metrics/) behind it, and a rule and journey that flag a company whose usage falls. A health score you already keep stays as it is.
+
 ## Run one
 
-- **In Outflare:** fill in the blanks and press **Start as a mission**. You get a [mission](/docs/agents/missions/) draft named after the playbook, with the prompt and guardrails as its instructions and the steps as its plan. Nothing runs until you approve it, and its mode decides whether changes are dry runs, wait for your approval or run within limits.
-- **From your own AI app:** copy the prompt into Claude, ChatGPT or Cursor with the [Outflare MCP server](/docs/agents/mcp/) connected. The agent can read the steps with `get_playbook`.
-- **From any agent or script:** call `POST /v1/workspaces/{ws}/playbooks/{id}/runs` with `inputs`, or the MCP tool `start_playbook`. It answers with the mission, or `409 connector_needed` while a required connection is missing.
+- **In Outflare:** fill in the blanks, choose a mode and press **Start**. Outflare's agent carries the playbook out in turns on your own [AI model](/docs/agents/ai-models/), as a [run](/docs/agents/actions/#outflares-agent-runs) you follow on the **Agents** page. The mode is your say on what it may do alone: **copilot** holds every change for you, **autonomous** runs changes within the budget you set, and **dry run** changes nothing and shows what it would have done.
+- **From your own AI app:** copy the prompt into Claude, ChatGPT or Cursor with the [Outflare MCP server](/docs/agents/mcp/) connected. The agent can read the steps with `get_playbook`, and its changes go through [agent actions](/docs/agents/actions/).
+- **From any agent or script:** call `POST /v1/workspaces/{ws}/playbooks/{id}/agent-runs` with `inputs` and a `mode`, or the MCP tool `run_playbook`. It answers with the run, or `409 connector_needed` while a required connection is missing.
 
 Missions started from a playbook carry `playbook_id` and `playbook_version`, so you can compare results per playbook and version.
 
@@ -38,7 +54,7 @@ When you open such a playbook, **What it sets up** lists each part of the kit:
 - **Have**: already there and set up the same way.
 - **Conflict**: you already have something under the same name, set up differently (for example a text field where the kit wants a number).
 
-Tick **Set up what it needs when I start**, and the kit is added in the same step as the mission draft. A kit only ever adds: nothing you already have changes, email drafts arrive unpublished so you read and publish them first, and while anything conflicts it changes nothing and tells you what's in the way. Setting it up again changes nothing.
+Tick **Set up what it needs when I start**, and the kit is added in the same step as the run. A kit only ever adds: nothing you already have changes, email drafts arrive unpublished so you read and publish them first, and while anything conflicts it changes nothing and tells you what's in the way. Setting it up again changes nothing.
 
 The first kit, **Creator partnerships**, adds a Partnerships pipeline (Found, Vetted, Pitched, Negotiating, Agreed, Live, Measured, Renewed or Declined) with the creator, deal type, fee, deliverables, platform, go-live date, post, content rights, tracked link and promo code; creator fields on people (platforms, audience size, topics, rate card, past sponsors); and email drafts for the brief, a go-live reminder, thanks with first results, and an invite for customers who create. The creator playbooks use it.
 

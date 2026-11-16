@@ -5,7 +5,7 @@ sidebar:
   order: 9.53
 ---
 
-<span class="pill shipped">Shipped</span> In the web app (**CRM → People → Developer setup**), the REST API and the MCP server.
+<span class="pill shipped">Shipped</span> In the web app (**CRM → Customer data → Developer setup**), the REST API and the MCP server.
 
 Developer setup checks what one brand's developer sends, live. Each [brand](/docs/guides/brands/) has its own, because each brand's integration is separate. The page refreshes every 30 seconds while it's open, so a developer can watch a test sign-up or order arrive.
 

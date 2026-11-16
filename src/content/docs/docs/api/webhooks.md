@@ -10,7 +10,7 @@ Webhooks tell your own systems what happened as it happens: a lead replied, an e
 In the app, go to **Settings → Webhooks**, add the URL and pick the events: everything, whole categories, or single types. Each endpoint opens its delivery log, where you can see every payload and your receiver's answer, and send any delivery again. Over the API:
 
 ```sh
-curl -X POST https://outflare.example.com/v1/workspaces/$WS/webhooks \
+curl -X POST https://outflare.example.com/v1/brands/$BRAND/webhooks \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" \
   -d '{"url": "https://example.com/hooks/outflare", "events": ["lead.replied", "lead.bounced", "mailbox.auto_paused"]}'
 ```
@@ -18,7 +18,7 @@ curl -X POST https://outflare.example.com/v1/workspaces/$WS/webhooks \
 To hear about some reply labels only, add `categories` with labels or groups, such as `["hot"]` for interested, meeting booked and question; events about replies with other labels are then not sent to it, and other events are unaffected. The answer includes the endpoint's signing secret (`whsec_...`). Keep it with your receiver; `GET .../webhooks/{id}/secret` shows it again. Then send a test event and see how your receiver answered:
 
 ```sh
-curl -X POST https://outflare.example.com/v1/workspaces/$WS/webhooks/$HOOK/test -H "Authorization: Bearer $OUTFLARE_TOKEN"
+curl -X POST https://outflare.example.com/v1/brands/$BRAND/webhooks/$HOOK/test -H "Authorization: Bearer $OUTFLARE_TOKEN"
 ```
 
 `events` takes event types, a category wildcard such as `lead.*`, or `"*"` for everything (the default). `GET /v1/webhook-events` lists every type. A workspace can have up to 20 endpoints. Managing them needs the `webhooks.manage` scope, which owners and admins have; `webhooks.read` shows endpoints and deliveries. The same works from the CLI (`outflare create-webhook --url ... --events lead.replied`) and from agents over MCP (`create_webhook`, `test_webhook`).

@@ -43,7 +43,7 @@ A brand's programs read the events and payments your product already sends Outfl
 
 ## The partner conversions API
 
-If your backend can't send events or transactions, report sign-ups, sales, refunds and custom conversions to `POST /v1/workspaces/{ws}/partner-conversions` with a token that has only the `partners.conversions` scope. It stores the same events and transactions, with the same ids, so a customer reported both ways still counts once. See the [API reference](/docs/api/reference/) (`createPartnerConversion`).
+If your backend can't send events or transactions, report sign-ups, sales, refunds and custom conversions to `POST /v1/brands/{brand}/partner-conversions` with a token that has only the `partners.conversions` scope. It stores the same events and transactions, with the same ids, so a customer reported both ways still counts once. See the [API reference](/docs/api/reference/) (`createPartnerConversion`).
 
 ## Moving from Tolt
 

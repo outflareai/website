@@ -1,0 +1,345 @@
+{
+	"version": "2026.11.16",
+	"date": "2026-11-16",
+	"status": "in-progress",
+	"updated": "2026-11-16T12:16:05Z",
+	"items": [
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Archive a Sales conversation directly from the queue, with Undo for accidental clicks. Archived conversations keep their messages and notes, and every archive and reopen remains recorded with who made the change.",
+			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "TikTok Ads now shows what is below each campaign: its ad groups and ads, with spend, clicks and conversions per day, each ad's text and landing page, and whether its link carries your tracking template. You can pause and resume an ad group or an ad from a campaign's page, and set the daily budget of an ad group that has its own.",
+			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "On Google Ads campaigns that bid by hand (manual CPC), you can now set an ad group's bid and a keyword's bid from Outflare. Use Set bid in the Manage menu on a campaign's page; the Changes tab shows the bid it replaced. The API and MCP can also make a change that may only lower a bid.",
+			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "fix",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Sales introductions and handoffs can CC connected colleagues when their company domain is on an outreach blocklist. Prospect blocks, address-level blocks and opt-outs remain enforced.",
+			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Sales reporting's Discovery view now has the full lane board from your connected Lead Portal: filter the search lanes by state, page through them, and open one to see how it searches, why it was proposed, what it learned and what it found. Agents can read it with the get_sales_discovery_lanes tool.",
+			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "fix",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "CRM's Telegram page opens again, ⌘K finds People, Companies, Deals and the rest of the menu's pages, a link to a page that doesn't exist says so, old People links open the CRM lists, and page names match the menu (Library, Customer data, sales conversations).",
+			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "launch",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Customer accounts: if your product has workspaces or teams, they are now their own records (Accounts), with members and their roles, separate from People and Companies. Each brand starts with smart defaults for its business type (who it sells to, whether it has accounts) and can change them. A person can also have a preferred email that sends go to.",
+			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "inbox",
+			"edition": "open-source",
+			"text": "A teammate you loop in on a conversation is now told. Their Watching view shows how many are new, the Inbox shows a message with an Open button, and if they haven't opened it after five minutes they get one email with a link.",
+			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "inbox",
+			"edition": "open-source",
+			"text": "The Inbox now tells you when something new arrives. New chats and messages show up on their own with an Open button, and a \"Sound and notifications\" switch plays a chime and shows a browser notification when the Inbox is in the background.",
+			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "inbox",
+			"edition": "open-source",
+			"text": "The Inbox warns you when a teammate has the same conversation open, or is writing a reply in it, so two people don't answer the same customer.",
+			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "One People list: everyone, cold contacts included, with a Source (Cold, Inbound, Event, Sign-up, Invited, Customer) set once when they are added and a Marketing email yes/no column. Cold contacts get no marketing email until they opt in. Outreach's Leads is now the Cold filter, and you can add people to a sequence straight from the list.",
+			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "inbox",
+			"edition": "open-source",
+			"text": "Right-click a conversation in the Inbox (or use its More button) to assign it to anyone, move it to a team or loop a teammate in. The same three are on the bar that shows when you tick several.",
+			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "launch",
+			"area": "inbox",
+			"edition": "open-source",
+			"text": "Sales opportunity on a support conversation hands it to your sales team in one step: it moves there with a note, you keep it under Watching, and the customer's owner gets it in Needs attention. When your AI spots an opportunity in a conversation, the Inbox says so and offers the hand-over.",
+			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "launch",
+			"area": "inbox",
+			"edition": "open-source",
+			"text": "Online and Away in the Inbox: say when you are taking chats, and a new website chat goes to someone online, moves to the next person after 30 seconds with no answer, and carries on by email when nobody is free or the visitor has left.",
+			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "launch",
+			"area": "inbox",
+			"edition": "open-source",
+			"text": "Saved replies: write an answer once and drop it into any reply from the Saved replies menu, in support conversations and in replies to outreach, with the person's first name and your own filled in. Replies to outreach also get a Draft with AI button that writes an answer from your knowledge for you to edit.",
+			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "inbox",
+			"edition": "open-source",
+			"text": "Work a conversation as a team in the Inbox. Move a reply to a team, loop a teammate in so it shows under their new Watching view, and add private notes that only your team sees, on replies to outreach as well as support conversations.",
+			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "launch",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Alerts can now post to Telegram: connect your own Telegram bot under Connectors, then pick a chat, group or channel for each kind of alert under Settings → Alerts, beside its Slack channel and email.",
+			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Destinations: send your product events on to a webhook, Slack, Google Analytics 4 or HubSpot as they arrive, each on your own connection, with a log of what was sent, skipped or refused. Find it under Events.",
+			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "inbox",
+			"edition": "open-source",
+			"text": "Inbox rows have quick actions: right-click a conversation (or use its More button) to open it in a new tab, mark it unread, assign it to yourself, snooze it, close it or copy its link. Tick several rows to act on them together, and undo a close, snooze or assignment from the message that confirms it.",
+			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "inbox",
+			"edition": "open-source",
+			"text": "The Inbox now shows support conversations and replies to your outreach in one place: pick a support folder or a sales view in the views column, and the list and the conversation open beside it. Saved views of replies sit in the same column.",
+			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Ask a question: type what you want to know at the top of Dashboards and get a chart you can open in the builder or save. It runs on your own AI model and sees only event names and descriptions, never people or their data.",
+			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Libraries for sending product events from your servers: Node, Python, Go, Ruby and PHP. Each has identify, track, page, screen, group and alias, sends in batches in the background and retries when the server is busy.",
+			"at": "2026-11-16T08:10:56Z"
+		},
+		{
+			"kind": "launch",
+			"area": "records",
+			"edition": "open-source",
+			"text": "Outflare for Chrome: a side panel that shows what you know about the person an email is from in Gmail, or the company whose website you are on, and adds the ones you don't know with a note or a to-do. The toolbar icon turns green on a company you know and red on a do-not-contact site, checked inside the browser. For now it is loaded from the `extension/` folder.",
+			"at": "2026-11-16T08:14:56Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "outreach",
+			"edition": "open-source",
+			"text": "Mailbox health now counts the emails, replies and bounces your connected Instantly or Smartlead account sends from each mailbox, read from your own account about hourly. A new endpoint and agent tool give one mailbox's activity by day. Warm-up mail is never counted.",
+			"at": "2026-11-16T08:29:02Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Libraries for sending screens and events from mobile apps: iOS, Android, React Native and Flutter. Apps send with a public site key that has no origins, keep events on the phone while it is offline, and say which app version and phone each event came from.",
+			"at": "2026-11-16T08:33:45Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Snapchat Ads and Microsoft Advertising now show what is below each campaign: ad squads or ad groups and their ads, with spend, clicks and conversions per day, each ad's headline and landing page, and whether its link carries your tracking template. They are read only for now; pause, resume and budgets stay at the campaign level on these two.",
+			"at": "2026-11-16T09:02:58Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "The iOS library now installs in Xcode from the repository's address (File, Add Package Dependencies), and every library has the same version as the Outflare release it comes with, so you can tell at a glance which release a library belongs to.",
+			"at": "2026-11-16T09:07:15Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Destinations: write your product events to a table in your own BigQuery or Snowflake as they arrive, and press Send a test event on any destination to see it work before real events come in.",
+			"at": "2026-11-16T09:07:15Z"
+		},
+		{
+			"kind": "fix",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "A Telegram chat, and picking its customer, open as full pages instead of a side panel. Every Settings tab has an icon, and the AI model settings and approval messages no longer mention retired missions.",
+			"at": "2026-11-16T09:18:33Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Pinterest Ads and Reddit Ads now show what is below each campaign: ad groups and their ads, with spend, clicks and conversions per day, each ad's landing page, and whether its link carries your tracking template. They are read only for now; pause, resume and budgets stay at the campaign level on these two.",
+			"at": "2026-11-16T09:23:05Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Tracker logs: a postback to a traffic source can be sent again. **Send again** on a row of Postbacks out (or `POST .../traffic-sources/{id}/postbacks/{send}/resend`, MCP `resend_traffic_source_postback`) queues it with the status and payout it had, to the source's postback URL as it is now, so a send that failed on a wrong URL goes through once you fix the URL.",
+			"at": "2026-11-16T09:31:51Z"
+		},
+		{
+			"kind": "fix",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Link orders catalog: a broker export's price column is now imported when its header names the currency twice (\"Price USD, $\"), and \"Ref. IPs / Subnets\" fills referring subnets. The catalog table shows every intermediary metric as a sortable column you can hide, draws large catalogs a page at a time, and an import can set the intermediary for every row.",
+			"at": "2026-11-16T09:36:09Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Tracker: enter what a campaign cost by hand. For a network whose cost Outflare can't read, Tracker → Logs → Cost updates takes a campaign, the days and the amount (or a CSV of them) and shares it out evenly over the campaign's clicks, so every report has cost and the total is exactly what you entered.",
+			"at": "2026-11-16T09:54:13Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Sales reporting now shows discovery searches, tool calls, retries and recorded costs from a connected Lead Portal. Compare lane yield and inspect screening and grading evidence, with missing prices clearly marked.",
+			"at": "2026-11-16T10:16:42Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Link orders catalog: filter by category, subcategory, audience country, article type, DR, price and traffic ranges, referring domains, keywords, outgoing domains, date added, and price per 1,000 visits. A \"Sort by\" list adds best value, price, DR, traffic, referring domains, keywords and newest first, and Reset clears everything.",
+			"at": "2026-11-16T10:28:55Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Tracking plans: in the event dictionary, mark the properties every event must carry, and see which events arrive without them or with properties you never listed. Nothing is dropped.",
+			"at": "2026-11-16T10:49:18Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "agents",
+			"edition": "cloud",
+			"text": "On the Agents page, each change in a task now says what became of it, with Allow once, Always allow and Don't allow on the row. The chat opens a new conversation unless the latest is still going, and a dropdown in its header switches conversations.",
+			"at": "2026-11-16T10:49:18Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Link orders: the live-link check now compares the link text on the donor page with the ordered primary and second anchors, and the Checks tab marks it as matching, partly matching or not the ordered anchor. It is a warning only and never marks a link lost.",
+			"at": "2026-11-16T11:09:40Z"
+		},
+		{
+			"kind": "launch",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Link orders: Recommended donors. Pick a page to link to and the catalog ranks donors for it, with the reasons: topic, language, DR, organic traffic, price per 1,000 visits and links to the competitors that rank for the page, minus link farms and donors already used. Add the best to a quote request in one click; nothing is ordered on its own.",
+			"at": "2026-11-16T11:09:40Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Taboola campaigns now show their ads: each item with its headline, picture, landing page, whether Taboola approved it, and its spend, clicks and conversions per day. Taboola has no ad groups, so the ads sit directly in the campaign. They are read only for now.",
+			"at": "2026-11-16T11:09:40Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Session recordings and heatmaps: watch a visit to your website back as the visitor saw it, and see where each page is clicked and how far down it is scrolled. Both come from the snippet you already have, are off until you turn them on under Analytics → Recordings, and never record what a visitor types. Recordings need file storage on the server.",
+			"at": "2026-11-16T11:16:50Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Tracker report: three new columns for landers. Lander views (clicks sent to a lander), lander clicks (those that went on to an offer) and lander CTR show for every grouping, sort, work in custom columns and are in the CSV, so you can compare landers by how many visitors they pass on.",
+			"at": "2026-11-16T11:29:37Z"
+		},
+		{
+			"kind": "launch",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Link orders: an order now shows the conversation with its donor: what Outreach sent to the site or its intermediary, their replies with the Inbox label, and the prices written in those replies, so the agreed price is one glance away.",
+			"at": "2026-11-16T11:33:45Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Outbrain and LinkedIn campaigns now show their ads, with spend, clicks and conversions per day: Outbrain's promoted links with their title, landing page and whether Outbrain approved them, and LinkedIn's creatives with their name, status and review. Neither platform has ad groups, so the ads sit directly in the campaign. They are read only for now.",
+			"at": "2026-11-16T11:33:45Z"
+		},
+		{
+			"kind": "fix",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Link orders catalog: the Catalog page now loads the whole catalog instead of stopping at 1,600 sites, so filters, sorting, recommended donors and PBN hints cover a full intermediary database. The catalog API returns up to 1,000 rows a page.",
+			"at": "2026-11-16T11:56:52Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Pause and resume a single ad on Taboola, Outbrain and Reddit (and a Reddit ad group) from the campaign's page, the API or MCP, leaving the campaign and its other ads running. An agent's pause follows its grant; a resume always waits for a person.",
+			"at": "2026-11-16T11:56:52Z"
+		},
+		{
+			"kind": "launch",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Link orders: label the donors you most want links from as Best link. The catalog shows them first, can show only them, and the label can be set from a cell's right-click menu, the donor card or a best_link CSV column.",
+			"at": "2026-11-16T11:56:52Z"
+		},
+		{
+			"kind": "launch",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Link orders: record a link you already bought in one form (article, page, anchors, price and currency), or import past orders from a CSV. Outflare adds the site to the catalog, opens the order, saves the price, approves it if you are the brand's approver and records the publication, which starts the live-link check; Paid stays a separate step.",
+			"at": "2026-11-16T12:16:05Z"
+		}
+	],
+	"through": "82ce1e5+5bc61f2"
+}

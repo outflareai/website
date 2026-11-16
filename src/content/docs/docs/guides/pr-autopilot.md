@@ -23,23 +23,22 @@ You stay in control of everything that reaches a journalist:
 - A [brand](/docs/guides/brands/) with at least one **expert** (**Outreach → Stories → Experts**), with the topics they speak to.
 - [News searches](/docs/guides/news-watch/) for those topics, so there is news to react to and journalists who cover it. They run on your own Geonode account.
 - A pitch sequence, as [Stories](/docs/guides/stories/#pitching) describes.
-- An [AI model](/docs/agents/ai-models/) connected with your own key. The autopilot runs as a [mission](/docs/agents/missions/) on that model, and its calls count against your [AI limits](/docs/guides/ai-usage/). Outflare never pays for the AI or lends you a key.
+- An [AI model](/docs/agents/ai-models/) connected with your own key. The autopilot runs on that model, and its calls count against your [AI limits](/docs/guides/ai-usage/). Outflare never pays for the AI or lends you a key.
 
 ## Set it up
 
 1. Open **Outreach → PR autopilot**.
 2. Choose the brand and the most stories it may start a week.
-3. Select **Set up the autopilot**. It opens the autopilot's mission for you to review.
-4. Approve the mission. Nothing runs before you do.
+3. Select **Add the objective**. The brand's agent gets a press coverage objective and starts at once; if the brand has no agent yet, one is set up for it.
 
-Each brand has one autopilot while its mission runs. The page lists your autopilots with their mission's status, a link to review and approve it, and a link to the brand's stories. To change one, stop its mission and set up a new one.
+The page lists each brand's press coverage objective with where it stands and a link to the brand's stories. To change or stop one, open the brand's agent.
 
 ## Each day
 
-The autopilot checks in once a day. On a day with nothing worth reacting to, it does nothing. Otherwise it starts a reactive story with a draft comment for your expert and tells you what it started in the mission's updates. When you have recorded the expert's approval of the quote, it drafts and checks the release for you to approve. Once the release is approved, it starts pitches to the journalists covering the story, each waiting for your approval.
+The autopilot checks in once a day. On a day with nothing worth reacting to, it does nothing. Otherwise it starts a reactive story with a draft comment for your expert and tells you what it started. When you have recorded the expert's approval of the quote, it drafts and checks the release for you to approve. Once the release is approved, it starts pitches to the journalists covering the story, each waiting for your approval.
 
-You see everything it did in the mission and on **Outreach → Stories**, and the replies and coverage in each story's results.
+You see everything it did on the **Agents** page and on **Outreach → Stories**, and the replies and coverage in each story's results.
 
 ## Permissions
 
-Setting up an autopilot needs permission to run missions; seeing them needs permission to read missions. Its work is a [mission](/docs/agents/missions/) like any other, so the mission's approval gate, limits and history apply, and the stories, pitches and coverage it creates follow the [Stories](/docs/guides/stories/#permissions) permissions.
+Setting up an autopilot needs permission to run agents; seeing it needs permission to read them. Every change it makes goes through [agent actions](/docs/agents/actions/), so your approvals, limits and history apply, and the stories, pitches and coverage it creates follow the [Stories](/docs/guides/stories/#permissions) permissions.

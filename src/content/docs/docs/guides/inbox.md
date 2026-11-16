@@ -7,6 +7,8 @@ sidebar:
 
 <span class="pill shipped">Shipped</span> IMAP sync, one inbox across all mailboxes, stop on reply, opt-out and bounce handling, labelling replies by what they mean in four groups, assigning, snoozing, coloured tags, saved views, label webhooks, replying from the inbox, replies from EmailBison, AI labelling with your own AI key, reply rules that also move deals in your CRM, and [alerts](/docs/guides/alerts/) for hot replies. <span class="pill">Next</span> Other sequencers.
 
+Replies show in the same Inbox as your support conversations: see [Team inbox](/docs/guides/team-inbox/) for views, teams, notes, saved replies and working together.
+
 ## How mail arrives
 
 Every active mailbox is checked over IMAP every two minutes, so replies arrive without forwarding rules. To check one now, use **Check mail** on the Mailboxes page or call `POST /v1/workspaces/{ws}/mailboxes/{id}/sync`. The mailbox shows `last_synced_at`, and `sync_error` if the last check failed.
@@ -38,7 +40,7 @@ Every action is recorded in the audit log (`lead.replied`, `lead.unsubscribed`, 
 The **Inbox** tab lists replies and auto-replies from every mailbox, newest first, with the lead, company and sequence. Open one to see the whole conversation with that lead through that mailbox: what was sent and what came back, in order.
 
 ```sh
-curl "https://outflare.example.com/v1/workspaces/$WS/inbox?unread=true" -H "Authorization: Bearer $OUTFLARE_TOKEN"
+curl "https://outflare.example.com/v1/brands/$BRAND/inbox?unread=true" -H "Authorization: Bearer $OUTFLARE_TOKEN"
 ```
 
 Filter with `kind` (`reply`, `auto_reply`, `bounce`, `other` or `all`), `unread`, `mailbox_id`, `lead_id`, `sequence_id`, `brand` and `q` (sender, subject or text), and page with `before`. The response includes `unread_replies`. `GET /inbox/{id}` returns the message and its `thread`; `PATCH /inbox/{id}` with `{"read": true}` marks it read.
@@ -87,7 +89,7 @@ The inbox opens on what still needs handling. Unsubscribes and automatic replies
 | `needs_review` | Flag it for a person to check, or clear the flag. |
 
 ```sh
-curl -X PATCH https://outflare.example.com/v1/workspaces/$WS/inbox/$ID \
+curl -X PATCH https://outflare.example.com/v1/brands/$BRAND/inbox/$ID \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" \
   -d '{"category": "interested", "assigned_to": "'$USER_ID'"}'
 ```
@@ -122,7 +124,7 @@ curl -X PUT https://outflare.example.com/v1/workspaces/$WS/reply-rules \
   -d '{"sequence_id": "'$SEQUENCE_ID'", "rules": {"not_now": {"action": "restart", "days": 30}}}'
 ```
 
-`GET /v1/workspaces/{ws}/reply-rules` shows the defaults, the actions each label can take, and every saved set. Sending empty `rules` removes a set. Add a referral by hand with `POST /v1/workspaces/{ws}/inbox/{id}/referral`, optionally with a `sequence_id`. Agents use `get_reply_rules`, `set_reply_rules` and `add_reply_referral`. Changing rules needs `inbox.manage`.
+`GET /v1/workspaces/{ws}/reply-rules` shows the defaults, the actions each label can take, and every saved set. Sending empty `rules` removes a set. Add a referral by hand with `POST /v1/brands/{brand}/inbox/{id}/referral`, optionally with a `sequence_id`. Agents use `get_reply_rules`, `set_reply_rules` and `add_reply_referral`. Changing rules needs `inbox.manage`.
 
 The AI reads dates and referred people only from replies it labels, so these rules act on dates and referrals once [your own AI model](#ai-labelling-with-your-own-key) is connected. Without it, a not now waits the default 90 days.
 
@@ -146,9 +148,9 @@ Each move is recorded on the deal's history and as an `inbox.rule_applied` event
 
 ## Tags and saved views
 
-Tags have a colour and are listed with how many replies carry each. Manage them under **Tags** in the inbox, or with `GET`, `POST`, `PATCH` and `DELETE` on `/v1/workspaces/{ws}/inbox-tags`. Renaming a tag renames it on every reply; deleting one takes it off them.
+Tags have a colour and are listed with how many replies carry each. Manage them under **Tags** in the inbox, or with `GET`, `POST`, `PATCH` and `DELETE` on `/v1/brands/{brand}/inbox-tags`. Renaming a tag renames it on every reply; deleting one takes it off them.
 
-Save a set of filters as a view from the **Views** menu, or with `POST /v1/workspaces/{ws}/inbox-views` and a name and `filters` (the same names as the list's filters). A view is yours alone unless you share it. Views an API token or agent saves are shared, so everyone sees what an agent set up. Agents use `list_inbox_views`, `create_inbox_view` and the tag tools.
+Save a set of filters as a view from the **Views** menu, or with `POST /v1/brands/{brand}/inbox-views` and a name and `filters` (the same names as the list's filters). A view is yours alone unless you share it. Views an API token or agent saves are shared, so everyone sees what an agent set up. Agents use `list_inbox_views`, `create_inbox_view` and the tag tools.
 
 ## Alerts for hot replies
 
@@ -159,7 +161,7 @@ A reply labelled interested, meeting booked or question raises an [alert](/docs/
 Every new or changed label is an `inbox.classified` event, with the label, its group, who set it, how sure they were and the ids of the reply, lead, sequence and mailbox. Send it to a CRM, Slack or Zapier with a [webhook](/docs/api/webhooks/). To hear only about some labels, give the webhook `categories`, as labels or groups:
 
 ```sh
-curl -X POST https://outflare.example.com/v1/workspaces/$WS/webhooks \
+curl -X POST https://outflare.example.com/v1/brands/$BRAND/webhooks \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" \
   -d '{"url": "https://example.com/hooks/hot-leads", "events": ["inbox.classified"], "categories": ["hot"]}'
 ```
@@ -167,7 +169,7 @@ curl -X POST https://outflare.example.com/v1/workspaces/$WS/webhooks \
 ## Reply from the inbox
 
 ```sh
-curl -X POST https://outflare.example.com/v1/workspaces/$WS/inbox/$ID/reply \
+curl -X POST https://outflare.example.com/v1/brands/$BRAND/inbox/$ID/reply \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" \
   -d '{"body": "Tuesday at 10 works. I will send an invite."}'
 ```

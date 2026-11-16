@@ -39,8 +39,8 @@ workspace added before is still sent and does no harm.
 | Google Ads (`google_ads`) | Sign in with Google (read-only Google Ads access). Manager accounts list the accounts under them. | Nothing: Google retired developer tokens in September 2026 (see below). |
 | Meta Ads (`meta_ads`) | A system user access token from your own Business Manager with `ads_read` (and `ads_management` for journeys to fill audiences), or sign in with Facebook | Nothing |
 | Microsoft Advertising (`microsoft_ads`) | Sign in with Microsoft | The workspace's own developer token, from the Microsoft Advertising Developer Portal. |
-| Reddit Ads (`reddit_ads`) | Sign in with Reddit (read-only ads access) | Nothing |
-| X Ads (`x_ads`) | Your own X developer app's API key and secret, plus an access token and secret for the account that runs the ads | Ads API access approved for that app by X |
+| Reddit Ads (`reddit_ads`) | Sign in with Reddit, with read and edit access to ads, so Outflare can pause campaigns and set budgets when a person approves it. A connection made before edit access was asked for keeps reading; connect it again to manage campaigns. To send conversions back, add your pixel ID and a Conversions API token on the connection. | Nothing |
+| X Ads (`x_ads`) | Your own X developer app's API key and secret, then **Sign in to X** on the connection (Paid ads, Accounts) with the account that runs the ads. Before you sign in, set the app's permissions to Read and write, so Outflare can pause campaigns and set budgets, and add `https://app.outflare.ai/v1/integrations/oauth/callback` (or your own server's address) to the app's callback URLs. An access token and secret made in X's developer portal still work instead. To send conversions back, add your pixel ID and conversion event IDs (`Sign-up = o8z2x, Purchase = o8z2y`) on the connection. | Ads API access approved for that app by X |
 | LinkedIn Ads (`linkedin_ads`) | Sign in with LinkedIn (`r_ads`, `r_ads_reporting`) | Advertising API access approved for the app by LinkedIn |
 | TikTok Ads (`tiktok_ads`) | Sign in with TikTok For Business and choose the ad accounts to share (Ad Account Management and Reporting read access). To add accounts later, connect again. | Nothing |
 | Snapchat Ads (`snapchat_ads`) | Sign in with Snapchat (`snapchat-marketing-api`). Every ad account of every organization you belong to is listed. | Nothing |
@@ -49,6 +49,7 @@ workspace added before is still sent and does no harm.
 | Apple Ads (`apple_ads`, formerly Apple Search Ads) | Your own Apple Ads API user: its client id, team id and key id from Account Settings → API, and the private key whose public half you uploaded there (see below). Every ad account the user can reach is listed, App Store and Apple Maps. | An API role for that user (API Account Read Only is enough) |
 | Amazon Ads (`amazon_ads`) | Sign in with Amazon (Login with Amazon, `advertising::campaign_management`). Every advertising profile the sign-in reaches is an ad account: one advertiser in one marketplace, with its currency and time zone, in North America, Europe or the Far East. Sponsored Products campaigns are read; their daily numbers come from Amazon's reports, which Amazon builds in a few minutes, so a sync can take longer than for other platforms. Purchases and sales are Amazon's seven-day attribution. | Nothing |
 | Pinterest Ads (`pinterest_ads`) | Sign in with Pinterest (`ads:read`, read-only) | Nothing |
+| ChatGPT Ads (`chatgpt_ads`) | Your own Advertiser API key from [OpenAI Ads Manager](https://ads.openai.com), under Settings. A key reaches one ad account, so connect each account with its own key. To send conversions back, add the pixel ID, a conversion key (Conversions, Manage conversion keys) and your website address on the connection. | Nothing |
 
 **Apple Ads** has no sign-in: it uses OAuth client credentials that belong to
 your own Apple Ads organization. An account administrator invites a user with
@@ -129,14 +130,14 @@ In the app, open **Paid ads** in the sidebar. A trail at the top picks the level
 | Call | What it answers |
 | --- | --- |
 | `GET /v1/workspaces/{ws}/ads/accounts` | Every account, its brand and sync status |
-| `GET /v1/workspaces/{ws}/ads/campaigns` | Campaigns ranked by spend over `from`–`to`, with CPC, CTR, cost per conversion and platform ROAS, their type, how the platform bids, the brand's target with over or under, and the trend against the days before |
-| `PUT /v1/workspaces/{ws}/ads/campaigns/{id}/target` | Set a campaign's target cost per conversion (`analytics.manage`) |
+| `GET /v1/brands/{brand}/ads/campaigns` | Campaigns ranked by spend over `from`–`to`, with CPC, CTR, cost per conversion and platform ROAS, their type, how the platform bids, the brand's target with over or under, and the trend against the days before |
+| `PUT /v1/brands/{brand}/ads/campaigns/{id}/target` | Set a campaign's target cost per conversion (`analytics.manage`) |
 | `PUT /v1/workspaces/{ws}/ads/accounts/{id}/target` | Set the target for every campaign of an account without its own (`analytics.manage`) |
-| `GET /v1/workspaces/{ws}/ads/items` | Ad sets and ad groups (`level=ad_group`) or ads (`level=ad`), ranked by spend, with their campaign; `campaign_id` or `parent_id` narrows them |
-| `GET /v1/workspaces/{ws}/ads/conversion-actions` | Platform conversions by action, per connector and currency; `entity_id` gives one campaign's, ad set's or ad's |
-| `GET /v1/workspaces/{ws}/ads/keywords` | Google search keywords ranked by spend; `campaign_id` or `ad_group_id` narrows them |
-| `GET /v1/workspaces/{ws}/ads/search-terms` | What people searched that showed a Google ad, with the keyword it matched, ranked by spend |
-| `GET /v1/workspaces/{ws}/ads/summary` | Totals grouped by `connector`, `brand`, `account` or `day`, per currency; `entity_id` gives one campaign's, ad set's or ad's numbers alone |
+| `GET /v1/brands/{brand}/ads/items` | Ad sets and ad groups (`level=ad_group`) or ads (`level=ad`), ranked by spend, with their campaign; `campaign_id` or `parent_id` narrows them |
+| `GET /v1/brands/{brand}/ads/conversion-actions` | Platform conversions by action, per connector and currency; `entity_id` gives one campaign's, ad set's or ad's |
+| `GET /v1/brands/{brand}/ads/keywords` | Google search keywords ranked by spend; `campaign_id` or `ad_group_id` narrows them |
+| `GET /v1/brands/{brand}/ads/search-terms` | What people searched that showed a Google ad, with the keyword it matched, ranked by spend |
+| `GET /v1/brands/{brand}/ads/summary` | Totals grouped by `connector`, `brand`, `account` or `day`, per currency; `entity_id` gives one campaign's, ad set's or ad's numbers alone |
 | `POST /v1/workspaces/{ws}/ads/sync` | Sync now instead of within six hours |
 
 All of them take `brand`. Money is in micros of the account's currency
@@ -194,7 +195,7 @@ conversion count is shown next to it for comparison, never added in.
 A campaign with spend and no tracked visits is listed too: it usually has no
 tracking template yet.
 
-`GET /v1/workspaces/{ws}/attribution/ads` (MCP `get_attribution_ads`) gives the
+`GET /v1/brands/{brand}/attribution/ads` (MCP `get_attribution_ads`) gives the
 same rows. It takes `level` (`campaign`, `adset` or `ad`), `from`, `to`,
 `model` and `brand`. Meta and Google ad sets and ads come with their names and
 spend; other platforms sync campaigns only, so their ad sets and ads come with
@@ -231,11 +232,13 @@ definitions first.
 | Google Ads | A conversion action that takes uploaded clicks (Upload clicks) | `gclid`, `gbraid` or `wbraid`; hashed email and phone (enhanced conversions for leads) | The sign-in needs Google Ads access that can upload |
 | Meta Ads | A pixel (dataset), as a standard event such as Purchase or Lead | `fbc` (from `fbclid`), `fbp`, hashed email, phone and record id | The system user assigned to the pixel |
 | Microsoft Advertising | An offline conversion goal | `msclkid`; hashed email and phone | The developer token above |
-| Reddit Ads | The Conversions API, as SignUp, Lead, Purchase and so on | `rdt_cid`, hashed email and record id | The workspace's own Conversions API access token, from Reddit Ads Manager → Events Manager |
+| Reddit Ads | Your pixel, through the Conversions API, as SignUp, Lead, Purchase and so on | `rdt_cid`, hashed email and record id | Your own pixel ID and Conversions API access token, from Reddit Ads Manager → Events Manager. A connection with a token but no pixel ID still sends through Reddit's older endpoint, so add the pixel ID before Reddit retires it. |
+| X Ads | A conversion event on your pixel, through the Conversions API, by its Event ID from Events Manager | `twclid`, hashed email and phone | The pixel ID and Event IDs on the connection, from X Ads Manager → Tools → Events Manager. Conversions are sent with the connection's keys, or with a Conversion API access token from Events Manager if you add one |
 | TikTok Ads | A pixel, through the Events API, as CompletePayment, CompleteRegistration, SubmitForm and so on | `ttclid`, the `_ttp` cookie (`ttp`), hashed email, phone and record id | The sign-in's Pixel and Events access; if TikTok refuses it, an Events API access token from Events Manager on the connection |
 | Snapchat Ads | A Snap Pixel, through the Conversions API, as PURCHASE, SIGN_UP, SUBSCRIBE and so on | `ScCid`, the `_scid` cookie (`scid`), hashed email, phone and record id | The sign-in's access; if Snapchat refuses it, a Conversions API token from Ads Manager → Business Details on the connection |
 | Taboola Ads | An active event-based conversion (Realize → Tracking, "Create conversions using code"), by its event name, as a server-to-server action | `tblci` only | Nothing: the bulk S2S endpoint takes no token |
 | Pinterest Ads | The Conversions API, as checkout, signup, lead and so on | `epik`, hashed email, phone and record id | The workspace's own conversion access token, from Pinterest Ads Manager → Conversions |
+| ChatGPT Ads | Your pixel, through OpenAI's Conversions API, as `registration_completed`, `order_created`, `lead_created`, `subscription_created` and so on | `oppref`, the pixel's browser reference, hashed email, phone and record id | Your own pixel ID and conversion key from OpenAI Ads Manager → Conversions, and your website address. OpenAI takes conversions from the last 7 days only. |
 
 Taboola matches only on its click id: a conversion with no `tblci` from the
 click is skipped. Taboola accepts each batch at once and processes it later
@@ -297,7 +300,7 @@ How it works:
 - **Consent.** In the EEA, the UK and Switzerland, and whenever a person's
   country is unknown, a conversion is sent only when they said yes to ad data
   (a consent with channel `ads` and purpose `ad_user_data`, recorded with
-  `POST /v1/workspaces/{ws}/records/{id}/consents` when your consent banner
+  `POST /v1/brands/{brand}/records/{id}/consents` when your consent banner
   says yes). Elsewhere the workspace's setting decides: **Everyone,
   unless they opted out** (`opt_out`, the default) or **Only people who said
   yes** (`opt_in`). Anyone who withdrew consent is never sent.
@@ -350,7 +353,7 @@ in the ad account. See
 
 ## Suggestions
 
-After each sync Outflare reads every campaign it can change (Google Ads, Meta, Microsoft Advertising, LinkedIn and TikTok) and suggests at most one change for each, with why and the numbers behind it, on the **Suggestions** tab at whatever level the page shows:
+After each sync Outflare reads every campaign it can change (Google Ads, Meta, Microsoft Advertising, LinkedIn, TikTok, Reddit, X and ChatGPT) and suggests at most one change for each, with why and the numbers behind it, on the **Suggestions** tab at whatever level the page shows:
 
 - **Raise the budget** by a fifth when a conversion cost at most nine tenths of the target over the last 14 days and the budget ran out on at least 4 of the last 7.
 - **Lower the budget** by a fifth when a conversion cost more than 1.3 times the target (with at least 5 conversions).
@@ -379,11 +382,11 @@ When the window ends the change is judged against as many days just before it: *
 
 | Call | What it does |
 | --- | --- |
-| `GET /v1/workspaces/{ws}/ads/suggestions` | Suggestions by network (`connector`), account, campaign or status, open first (`analytics.read`) |
-| `POST /v1/workspaces/{ws}/ads/suggestions/{id}/approve` | Make the change and start measuring it; a person's session only (`ads.manage`), except savings applying on their own (below) |
-| `POST /v1/workspaces/{ws}/ads/suggestions/{id}/dismiss` | Leave the campaign as it is (`ads.manage`) |
-| `GET /v1/workspaces/{ws}/ads/recommendations` | The platform's own recommendations for an account, read live (Google Ads; `analytics.read`) |
-| `POST /v1/workspaces/{ws}/ads/suggestions/refresh` | Read the campaigns again now, at most once an hour (`ads.manage`) |
+| `GET /v1/brands/{brand}/ads/suggestions` | Suggestions by network (`connector`), account, campaign or status, open first (`analytics.read`) |
+| `POST /v1/brands/{brand}/ads/suggestions/{id}/approve` | Make the change and start measuring it; a person's session only (`ads.manage`), except savings applying on their own (below) |
+| `POST /v1/brands/{brand}/ads/suggestions/{id}/dismiss` | Leave the campaign as it is (`ads.manage`) |
+| `GET /v1/brands/{brand}/ads/recommendations` | The platform's own recommendations for an account, read live (Google Ads; `analytics.read`) |
+| `POST /v1/brands/{brand}/ads/suggestions/refresh` | Read the campaigns again now, at most once an hour (`ads.manage`) |
 
 **Savings that apply on their own.** An extension can let an agent approve suggestions that only spend less (a lower budget, a pause, a negative keyword) for a brand; `/v1/meta` then lists `ad_suggestions_auto`. Anything that can spend more always waits for a person, a suggestion on an account every brand shares never applies on its own, the agent's grant still applies, and the change is measured and judged like any other. `ad_suggestion.approved` carries `auto: true` for these. On Outflare Cloud, this is [Paid ads Autopilot](#paid-ads-autopilot).
 
@@ -403,27 +406,33 @@ A trial whose conversions cost more than twice the target three days running is 
 
 | Call | What it does |
 | --- | --- |
-| `GET /v1/workspaces/{ws}/ads/tests` | Tests by network, account, campaign or status, with both sides' numbers and the verdict (`analytics.read`) |
-| `POST /v1/workspaces/{ws}/ads/tests` | Start a test; a person's session only (`ads.manage`) |
-| `POST /v1/workspaces/{ws}/ads/tests/{id}/keep` | Apply the trial's change to the campaign and end the test (`ads.manage`) |
-| `POST /v1/workspaces/{ws}/ads/tests/{id}/roll-back` | End the test and leave the campaign as it was (`ads.manage`) |
-| `POST /v1/workspaces/{ws}/ads/suggestions/{id}/approve` with `{"test": true}` | Test a budget suggestion instead of making it (`ads.manage`) |
+| `GET /v1/brands/{brand}/ads/tests` | Tests by network, account, campaign or status, with both sides' numbers and the verdict (`analytics.read`) |
+| `POST /v1/brands/{brand}/ads/tests` | Start a test; a person's session only (`ads.manage`) |
+| `POST /v1/brands/{brand}/ads/tests/{id}/keep` | Apply the trial's change to the campaign and end the test (`ads.manage`) |
+| `POST /v1/brands/{brand}/ads/tests/{id}/roll-back` | End the test and leave the campaign as it was (`ads.manage`) |
+| `POST /v1/brands/{brand}/ads/suggestions/{id}/approve` with `{"test": true}` | Test a budget suggestion instead of making it (`ads.manage`) |
 
-X Ads tests are planned once X's developer access is set up.
+X Ads has no tests here: X splits an audience only between campaigns that already exist and offers no way to copy a campaign with its ads, so change an X budget directly and compare the days before and after.
 
 ## Managing campaigns
 
-Three changes, on Google Ads, Meta, Microsoft Advertising, LinkedIn and
-TikTok (the other platforms are read but not changed yet, and say so with
-`422 connector_invalid`):
+Three changes, on Google Ads, Meta, Microsoft Advertising, LinkedIn,
+TikTok, Reddit, X and ChatGPT (the other platforms are read but not changed yet, and
+say so with `422 connector_invalid`). On Reddit, a campaign with campaign
+budget optimization holds its daily budget; otherwise the campaign's budget
+is the sum of its ad groups' daily budgets, and a new one is shared between
+them in the same proportions. A campaign with only lifetime budgets is
+refused with a reason. On ChatGPT, the campaign's daily spend limit is set
+(at least 1 of the account's currency); a campaign with only a lifetime
+limit is refused with a reason:
 
 | Call | What it does |
 | --- | --- |
-| `POST /v1/workspaces/{ws}/ads/campaigns/{id}/pause` | Pause a campaign (`ads.manage`) |
-| `POST /v1/workspaces/{ws}/ads/campaigns/{id}/resume` | Run a paused campaign again (`ads.manage`) |
-| `PATCH /v1/workspaces/{ws}/ads/campaigns/{id}` | Set its daily budget, `daily_budget_micros` in the account's currency (`ads.manage`) |
+| `POST /v1/brands/{brand}/ads/campaigns/{id}/pause` | Pause a campaign (`ads.manage`) |
+| `POST /v1/brands/{brand}/ads/campaigns/{id}/resume` | Run a paused campaign again (`ads.manage`) |
+| `PATCH /v1/brands/{brand}/ads/campaigns/{id}` | Set its daily budget, `daily_budget_micros` in the account's currency (`ads.manage`) |
 | `POST /v1/brands/{brand}/ads/pause-all` | The kill switch: pause every active campaign of the brand at once, on every platform that can be changed, as one batch (`ads.manage`) |
-| `GET /v1/workspaces/{ws}/ads/changes` | Every change asked for, by network (`connector`), account (`account_id`), campaign, status or brand (`analytics.read`) |
+| `GET /v1/brands/{brand}/ads/changes` | Every change asked for, by network (`connector`), account (`account_id`), campaign, status or brand (`analytics.read`) |
 
 Each call checks the campaign (yours, on an active account, in a state the
 change makes sense for) and answers `202` with the **change**: what the campaign was before, what was asked, who asked and,
@@ -455,8 +464,9 @@ Every change is an audit event and a webhook (`ad_campaign.paused`,
 how it ended is a product event (`ad_change.applied`, `ad_change.failed`) and
 the metric `outflare_ads_changes_total` (the Grafana row "Paid media
 (managing campaigns)"). Meta needs the `ads_management` permission on the
-token or sign-in, LinkedIn `rw_ads`, and TikTok write access to Ad Account
-Management on the app; a connection made before that was asked for is
+token or sign-in, LinkedIn `rw_ads`, TikTok write access to Ad Account
+Management on the app, Reddit edit access to ads, and X an app with Read and write permission
+before you sign in; a connection made before that was asked for is
 reconnected to manage campaigns. Microsoft's sign-in already covers it.
 
 ## Targeting
@@ -465,10 +475,10 @@ How a campaign bids, which audiences it reaches and in which countries it runs, 
 
 | Call | What it does |
 | --- | --- |
-| `GET /v1/workspaces/{ws}/ads/campaigns/{id}/targeting` | Its bidding method and target, audiences, countries, and notes on anything else (regions, cities, exclusions, ad sets that differ), read live, plus the bidding methods the platform lets Outflare set (`analytics.read`) |
-| `POST /v1/workspaces/{ws}/ads/campaigns/{id}/bidding` | Bid for as many conversions as it can (`maximize_conversions`, with an optional `target_cpa_micros`) or as much conversion value (`maximize_conversion_value`, with an optional `target_roas`); Google Ads only (`ads.manage`) |
-| `POST /v1/workspaces/{ws}/ads/campaigns/{id}/audiences` | Add or remove (`add: false`) one of the account's audiences, such as one made from a smart list (`ads.manage`) |
-| `POST /v1/workspaces/{ws}/ads/campaigns/{id}/countries` | Add or remove a country by its two-letter code (`ads.manage`) |
+| `GET /v1/brands/{brand}/ads/campaigns/{id}/targeting` | Its bidding method and target, audiences, countries, and notes on anything else (regions, cities, exclusions, ad sets that differ), read live, plus the bidding methods the platform lets Outflare set (`analytics.read`) |
+| `POST /v1/brands/{brand}/ads/campaigns/{id}/bidding` | Bid for as many conversions as it can (`maximize_conversions`, with an optional `target_cpa_micros`) or as much conversion value (`maximize_conversion_value`, with an optional `target_roas`); Google Ads only (`ads.manage`) |
+| `POST /v1/brands/{brand}/ads/campaigns/{id}/audiences` | Add or remove (`add: false`) one of the account's audiences, such as one made from a smart list (`ads.manage`) |
+| `POST /v1/brands/{brand}/ads/campaigns/{id}/countries` | Add or remove a country by its two-letter code (`ads.manage`) |
 
 Each answers `202` with the change, which runs as a job like the other campaign changes and shows on the **Changes** tab. On Meta an audience or a country is added to or removed from every ad set of the campaign, keeping the rest of each ad set's targeting as it was. A campaign never loses its last country: removing it is refused, so it can't start running everywhere. A change made by an agent always waits for a person, whatever its grant. Each is an audit event (`ad_campaign.bidding_changed`, `ad_campaign.audience_added`, `ad_campaign.audience_removed`, `ad_campaign.country_added`, `ad_campaign.country_removed`).
 

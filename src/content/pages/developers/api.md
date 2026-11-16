@@ -25,7 +25,7 @@ docs:
     href: /docs/agents/cli/
 faqs:
   - q: Does Outflare have an SEO ranking API?
-    a: Yes. You add keywords with POST /v1/workspaces/{ws}/seo-sites/{site}/rankings. GET on the same path returns each keyword's latest Google position in the top 100 and the page that ranks, and .../rankings/{tracked}/history returns one check a day with the top 10 results. The checks run through your own DataForSEO or Geonode connection.
+    a: Yes. You add keywords with POST /v1/brands/{brand}/seo-sites/{site}/rankings. GET on the same path returns each keyword's latest Google position in the top 100 and the page that ranks, and .../rankings/{tracked}/history returns one check a day with the top 10 results. The checks run through your own DataForSEO or Geonode connection.
   - q: Where does Outflare's SEO data come from?
     a: Domain rating, backlinks, ranking keywords and competitors come from your own Ahrefs or DataForSEO account. Rank tracking comes from your own DataForSEO or Geonode account. Search Console data comes from your own Google sign-in. Outflare has no SEO data of its own and never lends you an account.
   - q: Do reads of SEO data cost money every time?
@@ -81,7 +81,7 @@ All paths are under `/v1/workspaces/{ws}`. A rank check costs about $0.02 on Dat
 
 ```sh
 curl -H "Authorization: Bearer $OUTFLARE_TOKEN" \
-  "https://app.outflare.ai/v1/workspaces/$WS/seo-sites/$SITE/rankings"
+  "https://app.outflare.ai/v1/brands/$BRAND/seo-sites/$SITE/rankings"
 ```
 
 The same API covers the rest of marketing: [website analytics](/product/analytics/), site audits and the fixes list, [cold email](/product/cold-email/), the reply inbox, [customer records](/product/customer-data/), lifecycle email and outcomes.
