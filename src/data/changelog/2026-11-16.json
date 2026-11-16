@@ -2,7 +2,7 @@
 	"version": "2026.11.16",
 	"date": "2026-11-16",
 	"status": "in-progress",
-	"updated": "2026-11-16T10:49:18Z",
+	"updated": "2026-11-16T11:09:40Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -262,7 +262,28 @@
 			"edition": "cloud",
 			"text": "On the Agents page, each change in a task now says what became of it, with Allow once, Always allow and Don't allow on the row. The chat opens a new conversation unless the latest is still going, and a dropdown in its header switches conversations.",
 			"at": "2026-11-16T10:49:18Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Link orders: the live-link check now compares the link text on the donor page with the ordered primary and second anchors, and the Checks tab marks it as matching, partly matching or not the ordered anchor. It is a warning only and never marks a link lost.",
+			"at": "2026-11-16T11:09:40Z"
+		},
+		{
+			"kind": "launch",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Link orders: Recommended donors. Pick a page to link to and the catalog ranks donors for it, with the reasons: topic, language, DR, organic traffic, price per 1,000 visits and links to the competitors that rank for the page, minus link farms and donors already used. Add the best to a quote request in one click; nothing is ordered on its own.",
+			"at": "2026-11-16T11:09:40Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Taboola campaigns now show their ads: each item with its headline, picture, landing page, whether Taboola approved it, and its spend, clicks and conversions per day. Taboola has no ad groups, so the ads sit directly in the campaign. They are read only for now.",
+			"at": "2026-11-16T11:09:40Z"
 		}
 	],
-	"through": "caa69ef+6440d57"
+	"through": "8ca1255+b5ee6a8"
 }
