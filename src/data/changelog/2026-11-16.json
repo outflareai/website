@@ -2,7 +2,7 @@
 	"version": "2026.11.16",
 	"date": "2026-11-16",
 	"status": "in-progress",
-	"updated": "2026-11-16T16:29:09Z",
+	"updated": "2026-11-16T16:33:37Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -444,7 +444,14 @@
 			"edition": "open-source",
 			"text": "The event dictionary is now the **Event list**, the first view of Customer data → Events. Its counts cover a range you pick (last 7, 30 or 90 days, or all time) and show how many people sent each event and where it came from. `order_completed` and `payment.succeeded` say that one is made from the other, so they no longer look like duplicates. Adding a Send conversions rule links to the Event list.",
 			"at": "2026-11-16T16:29:09Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Trends and dashboards can show Search Console the way its own report does: clicks, impressions, CTR and position filtered and split by query, page, country and device. Any dashboard can now carry tiles such as top queries, clicks by country, or one page's positions on mobile.",
+			"at": "2026-11-16T16:33:37Z"
 		}
 	],
-	"through": "ea34278+0d1a66d"
+	"through": "a9c1f4b+25a4953"
 }
