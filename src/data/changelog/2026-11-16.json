@@ -2,7 +2,7 @@
 	"version": "2026.11.16",
 	"date": "2026-11-16",
 	"status": "in-progress",
-	"updated": "2026-11-16T17:46:18Z",
+	"updated": "2026-11-16T18:21:31Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -493,7 +493,35 @@
 			"edition": "open-source",
 			"text": "Website analytics, Search loads faster: Search Console is asked for a report's total and its rows at the same time, and the Pages and Search queries tables load together, so switching between them shows the answer straight away.",
 			"at": "2026-11-16T17:46:18Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Tracker → Report opens on tracker clicks, shows campaigns, offers, landers and paths by name (in the table, filters and CSV), and labels custom fields with what your traffic sources call them. Filters on a campaign, source, offer or lander are picked from a list. A mistyped custom column is refused where you type it, and deleting a saved view asks first.",
+			"at": "2026-11-16T18:21:31Z"
+		},
+		{
+			"kind": "fix",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Tracker: a postback with an unfilled placeholder (status={status}) is recorded instead of refused, and Setup builds postback URLs only from placeholders a network has. Logs tables have column headers and say why a conversion is suspect. Archived sources and networks leave their lists and can be restored; currencies come from a list; number fields no longer jump as you type.",
+			"at": "2026-11-16T18:21:31Z"
+		},
+		{
+			"kind": "fix",
+			"area": "records",
+			"edition": "open-source",
+			"text": "Importing people now adds a missing user ID when an email matches an existing person, so later events and transactions find the same record. Rows whose email belongs to a person with a different user ID are skipped with a clear reason.",
+			"at": "2026-11-16T18:21:31Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Partner programs can now credit only conversions from a time you choose. Set the credit start time before importing payment history for a program moved from another platform, so older sales and sign-ups earn no new rewards. Existing rewards and refunds stay unchanged.",
+			"at": "2026-11-16T18:21:31Z"
 		}
 	],
-	"through": "2b7d349+66b9595"
+	"through": "58344ec+7a8279b"
 }
