@@ -2,7 +2,7 @@
 	"version": "2026.11.16",
 	"date": "2026-11-16",
 	"status": "in-progress",
-	"updated": "2026-11-16T15:09:17Z",
+	"updated": "2026-11-16T15:29:07Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -409,7 +409,14 @@
 			"edition": "open-source",
 			"text": "Recordings and heatmap pictures hide API keys, tokens and passwords shown on a page, in the visitor's browser before anything is sent: known key formats, user:password@host addresses, values after labels such as \"API key\" or \"Password\", and long runs of mixed letters and digits.",
 			"at": "2026-11-16T15:09:17Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Recording settings have \"Hide your own keys\": type a made-up key that looks like the ones your product shows, and everything with that shape is hidden in recordings and heatmap pictures. Only the shape is kept.",
+			"at": "2026-11-16T15:29:07Z"
 		}
 	],
-	"through": "318c833+54d9af3"
+	"through": "5260202+526fce0"
 }
