@@ -31,7 +31,7 @@ Paste an API key in **Connectors** (or from the Lead lists page). See [Connector
 
 ## Build a list from a search
 
-![A new list: the search, a free preview of ten people, then the email waterfall and guard rails](/screens/lead-list-preview.png)
+![A new list: the search, a free preview of ten people, then the providers that find missing emails](/screens/lead-list-preview.png)
 
 1. **Pick who to find.** Job titles, seniority, company size, industries, person and company location, company domains and keywords. A list with an [ideal customer profile](/docs/guides/ideal-customers/) can copy the profile's filters into its search in one click.
 2. **Preview.** Ten people from the search, with the total number of matches. Nothing is saved and no credits are spent.

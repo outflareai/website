@@ -149,4 +149,4 @@ Common schemas are exported as types, including `Workspace`, `WorkspaceStats`, `
 
 ## Other languages
 
-Python has its own [SDK](/docs/sdk/python/). For other languages, generate a client from your instance's `/v1/openapi.yaml` with any OpenAPI 3.1 generator, such as [openapi-generator](https://openapi-generator.tech/) for Go or Java.
+Python has its own [SDK](/docs/sdk/python/), and Node, Python, Go, Ruby and PHP have libraries for [sending events](/docs/sdk/events/). For other languages, generate a client from your instance's `/v1/openapi.yaml` with any OpenAPI 3.1 generator, such as [openapi-generator](https://openapi-generator.tech/) for Go or Java.

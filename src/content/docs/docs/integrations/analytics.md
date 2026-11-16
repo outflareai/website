@@ -11,7 +11,7 @@ Outflare reads the analytics tools already on your website, so a person, a scrip
 
 ## Outflare's own tracking
 
-If your site has Outflare's [website tracking](/docs/guides/website-tracking/) tag, **Analytics → Website analytics** shows its numbers before you connect any tool. You get visitors, visits, page views, bounce rate and average visit length, one point per day. It also lists the top pages, sources, websites, countries and devices. The numbers are counted live from your own visits, so today counts too. They sit above any connected tool, so you can compare them with GA4 or PostHog. Bots and crawlers are left out. A visitor who doesn't allow cookies counts once per visit.
+If your site has Outflare's [website tracking](/docs/guides/website-tracking/) tag, **Analytics → Website analytics** shows its numbers before you connect any tool. You get visitors, visits, page views, bounce rate and average visit length, one point per day. It also lists the top pages, sources, websites, countries and devices. The numbers are counted live from your own visits, so today counts too. Connected tools have their own tab, so you can compare them with GA4 or PostHog. Bots and crawlers are left out. A visitor who doesn't allow cookies counts once per visit.
 
 ```sh
 # The last 28 days, or any range up to a year
@@ -21,11 +21,28 @@ curl -H "Authorization: Bearer $OUTFLARE_TOKEN" \
 
 Agents use `get_site_analytics`.
 
+## The Website analytics page
+
+The page has one tab per question, and each tab has its own address, so you can link straight to it.
+
+| Tab | What it shows | Source |
+| --- | --- | --- |
+| Overview | Visitors, visits, page views, bounce rate and visit length, one point per day | Outflare Analytics |
+| Pages | Your top pages | Outflare Analytics |
+| Sources | Where visits came from | Outflare Analytics |
+| Websites | Each of the brand's websites side by side | Outflare Analytics |
+| Countries | Visits by country | Outflare Analytics |
+| Devices | Desktop, tablet and phone | Outflare Analytics |
+| Search | Clicks, impressions and the queries people searched | Your Google Search Console or Bing Webmaster Tools site |
+| Connected tools | Every connected tool's totals per website; open one to see its own reports | The tool you open |
+
+Each tab shows one chart or one table, and names its source at the top, so you always know where a number comes from. "Outflare Analytics" means the numbers Outflare's own tag counted. The period and the website are picked once, at the right of the tabs, and apply to every tab.
+
 ## Connect
 
 Open **Connectors** and pick the **Analytics** category, or go straight to **Analytics → Website analytics** and click **Choose a tool**. Google tools connect with a read-only Google sign-in, and one sign-in connects both Google Analytics and Search Console. They also take a service account key. PostHog and Cloudflare offer a sign-in or a key, and you choose. The rest take an API key. An agent can ask for a connection with `request_connection`: you get a one-time link to paste the key into or sign in from, so the key never passes through the chat.
 
-One sign-in often sees many sites (every GA4 property, Search Console property or PostHog project the login can open). Every one of them syncs unless you switch it off, up to 20 per connection. The Website analytics page lists them with a sync switch and a domain field for each.
+One sign-in often sees many sites (every GA4 property, Search Console property or PostHog project the login can open). Every one of them syncs unless you switch it off, up to 20 per connection. The **Connected tools** tab of the Website analytics page lists them with a sync switch and a domain field for each.
 
 PostHog projects also count, for the SEO module, the visits that start on each page and how many go on to the events you choose as conversions. See [which pages bring conversions](/docs/guides/keywords/#which-pages-bring-conversions).
 
@@ -164,6 +181,10 @@ the range. Syncing needs `integrations.manage`; reading needs
 ## In the app
 
 The **Analytics** page starts with your websites: each domain with every tool's stored visitors, page views and search clicks side by side, search clicks added up across Google and Bing, when each tool last synced, and **Sync now**. **Compare tools day by day** draws one line per tool for that website. Right after you connect an analytics tool, Outflare asks what to import: every site the sign-in can see, with a tick for the ones to store and a [brand](/docs/guides/brands/) for each. Brands are guessed from each site's address or name, and test copies such as staging start unticked, so usually you check the list and press Save. Each suggestion says why it matched, Save waits until every ticked site has a brand, is shared or is set to **Don't import**, and **New brand from this site** makes a brand for a site none fits. Picking a brand uses the brand's website as the site's domain, so there is nothing to type; **Change** sets a subdomain such as `docs.example.com`. The same list is under **N sites in {tool}**, and while any site has no brand the page shows **Finish setting up analytics** and Home lists it under things that need attention. A site follows the brand that owns its domain unless you pick another brand or share it across all brands (`PUT .../analytics/$ID/site-brand` with `{"site", "brand"}`; `brand` is a handle, `none` or `auto`). Below that, one tool at a time, live: headline numbers, a chart per day, and tabs for pages, sources, search queries and events. Pick the period (7, 28 or 90 days, or 12 months); the refresh button asks the provider again instead of using the cached answer.
+
+One Google sign-in sees every site in your Google account, and each site belongs to one brand, so a brand's page only ever shows that brand's own sites. The site picker lists the brand's sites only. If the brand has no site in a connection yet, the page says so and offers **Pick {brand}'s Search Console site** (or Google Analytics, and so on). It never falls back to another brand's site. In the API, pass `brand` to `GET .../analytics/{id}/reports/{report}`: another brand's `site` answers `404 site_not_in_brand`, and a brand with no site in that connection answers `400 pick_site`.
+
+**Each site counts once.** If the same site is read by two connections, for example one Google account connected twice, totals, history and comparisons use the connection whose sync worked most recently. The Websites table still lists both and marks the other one **Same site as …, so it isn't counted twice**. Disconnect the copy you don't need. **More → Sign in again** on a connection renews that connection when you sign in with the same account. It doesn't add a copy, and it fixes a connection the provider has stopped accepting (HTTP 401).
 
 ## PostHog sign-in on your own server
 

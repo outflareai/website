@@ -27,9 +27,9 @@ If you market several brands from one workspace, each [brand](/docs/guides/brand
 
 ## The Company page
 
-Settings → **Company** shows everything Outflare knows. Edit the context, and pin, correct or forget any memory, including ones agents saved. Each memory says who saved it and whether it came from a mission.
+**Knowledge → About your company** shows everything Outflare knows about the brand you have open. Edit the context, and pin, correct or forget any memory, including ones agents saved. Each memory says who saved it and whether it came from a mission.
 
-![The Company page: the company context and the memories agents saved](/screens/company.png)
+![About your company: what the brand does, who it is for, its goals, voice and rules, which every agent reads first](/screens/company.png)
 
 Until the company name, what you do, goals and voice are filled in, agents ask for them once. Press **Don't ask again** if you'd rather they didn't.
 

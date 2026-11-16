@@ -13,7 +13,7 @@ Moving from Attio? [Import it once](/docs/guides/move-from-attio/) and its peopl
 
 ## In the web app
 
-There is one list of people and one of companies: **CRM → People** and **CRM → Companies**. Each has saved views, filters, columns you choose and the brand's headline scores. Search by name, email, phone or id. The **Show** menu switches between **Active**, **Held for review** (the people a visitor identification tool named, waiting for someone to approve them) and **Archived**. Tick rows to give them an owner (**Assign to…**), change them together (**Bulk edit**), or archive or restore them. A record opens as a full page.
+There is one list of people: **CRM → People**, cold contacts included. Next to it are **CRM → Companies** and, when your product has workspaces or teams, **CRM → Accounts** (see [People, accounts and companies](#people-accounts-and-companies)). Each has saved views, filters, columns you choose and the brand's headline scores. Search by name, email, phone or id. The **Show** menu switches between **Active**, **Held for review** (the people a visitor identification tool named, waiting for someone to approve them) and **Archived**. Tick rows to give them an owner (**Assign to…**), change them together (**Bulk edit**), or archive or restore them. A record opens as a full page.
 
 **CRM → Customer data** (or press `g` then `h`) holds what sits behind those records. It works inside the brand picked in the sidebar, links to the two lists, and has these tabs:
 
@@ -35,6 +35,20 @@ With permission to manage customers, you can also:
 - **Archive** a record to hide it and keep its history, or **restore** it.
 - **Delete** a record, restorable for 7 days, or **erase** it for good: see [Deleting and restoring](#deleting-and-restoring).
 
+## People, accounts and companies
+
+Three kinds of record are kept apart, never mixed:
+
+- **A person** is one human. Their **Source** says where they came from: Cold, Inbound, Event, Sign-up, Invited, Customer or Other. It's set once when they're added (a prospect from a data provider is Cold, someone from your own site or product is Sign-up, and an import asks where the people are from), and nothing that happens later changes it: a cold contact who becomes a customer stays Source Cold, and their progress lives on [deals](#deals). You can correct it by hand, but never empty it. **Marketing email** says yes or no: a Cold person starts at no until they opt in, and a reply is not an opt-in. Filter People by Source and Marketing email; Outreach's **Cold contacts** is People with the Cold filter, and **Add to sequence** puts the people you tick straight into a sequence.
+- **An account** is their workspace or team in your product, with its plan, usage and billing. Its members are people, each with a role (Owner, Admin, Member, Billing or Viewer). An account belongs to one company or none (a freelancer's own workspace). Someone can be in several accounts.
+- **A company** is the organisation. **Being in an account never sets a person's company.**
+
+**CRM settings → People setup** decides which lists you see. **Who do you sell to?** Consumers (a customer is a person, and Companies is hidden), Companies, Both (people with no company show as Individual, with an Individuals filter) or Marketplace (people carry a Buyer or Seller label). **Does your product have accounts?** Turn it on and each workspace your product reports becomes an Account. Both start at the defaults for your brand's business type, and each says whether it's the default or your team's choice.
+
+With accounts on, your product's group calls (`group` in [product events](#product-events)) make or find the account, link it to the company its website names, and add the person to its members.
+
+A person with several emails has one **preferred** email: sends go there. With none picked, they go to the most recent verified address. The others stay on the person, and an opt-out still covers every one. Pick it with **Make preferred** on the person's page.
+
 ## Leads are people
 
 Every lead you import or add is a person record too. A new lead joins the person who already has its email, or gets a record of its own marked as a prospect, with its name, job title and LinkedIn filled in. Its email stays unverified, so it never takes over an address someone later proves they own. Each lead in the API has a `record_id` that points at its person.
@@ -49,8 +63,8 @@ Cold email, replies, meetings and deals are linked to the person as well: throug
 
 The catalog lists everything a record can hold, and every feature uses the same definitions.
 
-- **Record types.** People, companies and [deals](#deals) come ready to use. Add your own, such as subscriptions or partners.
-- **Fields.** First and last name, job title, seniority, companies, country, city, time zone, LinkedIn and lifecycle stage for people. Website, industry, company size, country, LinkedIn and lifecycle stage for companies. Add your own fields with a value type: text, number, currency, date, checkbox, a choice from a list, rating, email, phone, URL, location, or a link to another record or a teammate.
+- **Record types.** People, companies, accounts and [deals](#deals) come ready to use. Add your own, such as subscriptions or partners.
+- **Fields.** First and last name, job title, seniority, companies, accounts, Source, country, city, time zone and LinkedIn for people. Website, industry, company size, country, LinkedIn and lifecycle stage for companies. Add your own fields with a value type: text, number, currency, date, checkbox, a choice from a list, rating, email, phone, URL, location, or a link to another record or a teammate.
 - **Option lists.** Choices shared across fields, such as country, industry, company size, seniority and lifecycle stage. Add your own, such as deal stages. Options are archived, never deleted, so old records keep their meaning.
 - **Product events.** Define the events your product sends, such as `product.activated`, with their properties.
 - **Field labels.** Every field, built in or your own, and every product event says how sensitive it is (public, internal, confidential or restricted), which teammate owns it, how long its data is meant to be kept (forever by default) and where it may be sent: webhooks, exports, AI, published queries and email (all of them by default). They're labels for your team: nothing is blocked or deleted because of them. Set them with **Edit labels** on a field, or on an event under **Product events**, in the CRM settings, `PATCH .../catalog/types/{type}/fields/{field}` or `PATCH .../catalog/events/{event}` (`owner_id`, `retention_days`, `destinations`), or the MCP tools `update_field` and `update_event_definition`.
@@ -90,6 +104,7 @@ Send what people do in your product to a brand, in Segment's format: `track`, `i
 - **Processed in the background**, in order, usually within seconds. Each event ends as `accepted` (stored, with the person it matched), `duplicate` (a `messageId` already received), `rejected` (with a `code` and a `reason` that says what to fix) or `held` (an event name someone paused in the catalog). New event names are never held: see [New event names](#new-event-names).
 - **Follow them** on the **Events** tab, under **Sent to the events API**, or with `GET /v1/brands/{brand}/events` (filter by `status`, `code`, `batch_id` or `name`) and `GET .../events/summary` for the last 24 hours and 7 days.
 - **See every event.** The **Events** tab opens on **All events**: everything the brand received, from your website script, this API or a connector, newest first, with counts by source and filters by source and name. The API is `GET /v1/brands/{brand}/customer-events?source=` (`browser` is the website script), and the summary's `sources` has the counts.
+- **Give them names.** The **Events** tab's **Dictionary** lists every event name with the name people see, what it means, how many arrived and when it was last seen. Open a row to see its last 30 days, the properties it carries (their type, how often each is set and their common values) and the charts, conversions and journeys that use it, and to write its name, its description and a note per property. The names then show wherever you pick an event in [Trends](/docs/guides/trends/), [Funnels](/docs/guides/funnels/) and Paths. Filter to **Without a description** to see what's left to describe; mark an event you no longer want built on as **Retired**. Values that could name a person, such as an email address or a link, are never shown as common values. The API is `GET /v1/brands/{brand}/catalog/events` for the list, `PATCH .../catalog/events/{name}` to edit and `GET .../catalog/events/{name}/usage` for the detail (MCP `get_event_usage`).
 - **Fix and replay.** Fix what a rejection says, or approve a paused name again (on the Events tab, or `POST .../catalog/events/{name}/approve`), then `POST .../events/replay` with the events' `ids` or a filter such as `{"status": "held"}`.
 - **Kept for a while.** Accepted events stay in this log for 30 days, rejected and held ones for 90. The product events themselves stay on each person's timeline.
 - **Names.** `Order Completed` is stored as `order_completed`, and dotted names such as `product.activated` stay as they are. A name the brand hasn't approved yet is held, and drives nothing until someone approves it.
@@ -258,10 +273,20 @@ curl -X POST https://app.outflare.ai/v1/brands/$BRAND/events \
          "properties": {"total": 42}}]}'
 ```
 
-List records filtered by their fields with `attribute=key:value`, repeated for more: values of one field are alternatives, different fields must all match. For example, customers and trials at one company:
+Read or change how the brand's People are set up (who it sells to, whether its product has accounts; `null` goes back to the business type's default):
 
 ```sh
-curl "https://app.outflare.ai/v1/brands/$BRAND/records?type=person&attribute=lifecycle_stage:customer&attribute=lifecycle_stage:trial&attribute=companies:$COMPANY_ID" \
+curl -X PATCH https://app.outflare.ai/v1/brands/$BRAND/people-setup \
+  -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" \
+  -d '{"sells_to": "mixed", "accounts": true}'
+```
+
+Cold contacts who may not get marketing email are `GET .../records?type=person&attribute=source:cold&marketing=no`. Make an email the preferred one with `POST .../records/{record}/identities/{identity}/prefer`, and set a member's role in an account with `PATCH .../records/{record}/relationships/{relationship}` and `{"properties": {"role": "admin"}}`.
+
+List records filtered by their fields with `attribute=key:value`, repeated for more: values of one field are alternatives, different fields must all match. For example, people at one company who signed up or were invited:
+
+```sh
+curl "https://app.outflare.ai/v1/brands/$BRAND/records?type=person&attribute=source:signup&attribute=source:invited&attribute=companies:$COMPANY_ID" \
   -H "Authorization: Bearer $OUTFLARE_TOKEN"
 ```
 
