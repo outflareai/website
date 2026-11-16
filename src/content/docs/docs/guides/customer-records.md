@@ -39,7 +39,7 @@ With permission to manage customers, you can also:
 
 Three kinds of record are kept apart, never mixed:
 
-- **A person** is one human. Their **Source** says where they came from: Cold, Inbound, Event, Sign-up, Invited, Customer or Other. It's set once when they're added (a prospect from a data provider is Cold, someone from your own site or product is Sign-up, and an import asks where the people are from), and nothing that happens later changes it: a cold contact who becomes a customer stays Source Cold, and their progress lives on [deals](#deals). You can correct it by hand, but never empty it. **Marketing email** says yes or no: a Cold person starts at no until they opt in, and a reply is not an opt-in. Filter People by Source and Marketing email; Outreach's **Cold contacts** is People with the Cold filter, and **Add to sequence** puts the people you tick straight into a sequence.
+- **A person** is one human. Their **Source** says where they came from: Cold, Inbound, Events and conferences, Sign-up, Invited, Customer or Other, and their **Sub-source** says which one, such as the event they were met at ([People from events](#people-from-events)). It's set once when they're added (a prospect from a data provider is Cold, someone from your own site or product is Sign-up, and an import asks where the people are from), and nothing that happens later changes it: a cold contact who becomes a customer stays Source Cold, and their progress lives on [deals](#deals). You can correct it by hand, but never empty it. **Marketing email** says yes or no: a Cold person starts at no until they opt in, and a reply is not an opt-in. Filter People by Source and Marketing email; Outreach's **Cold contacts** is People with the Cold filter, and **Add to sequence** puts the people you tick straight into a sequence.
 - **An account** is their workspace or team in your product, with its plan, usage and billing. Its members are people, each with a role (Owner, Admin, Member, Billing or Viewer). An account belongs to one company or none (a freelancer's own workspace). Someone can be in several accounts.
 - **A company** is the organisation. **Being in an account never sets a person's company.**
 
@@ -48,6 +48,18 @@ Three kinds of record are kept apart, never mixed:
 With accounts on, your product's group calls (`group` in [product events](#product-events)) make or find the account, link it to the company its website names, and add the person to its members.
 
 A person with several emails has one **preferred** email: sends go there. With none picked, they go to the most recent verified address. The others stay on the person, and an opt-out still covers every one. Pick it with **Make preferred** on the person's page.
+
+## People from events
+
+When your sales team meets people at an event or conference, add them with Source **Events and conferences** and the event as their **Sub-source**, so you can find and count them later.
+
+- **Add people from an event** on **People** is a full page. Pick the event once, or type a new name to add it, then type in everyone you met: first and last name, email, company and job title. You can paste rows from a spreadsheet, or upload a CSV with columns such as `first_name`, `last_name`, `email`, `company` and `job_title`. Everyone gets the Source and the event. Someone already in the brand is matched by email, not added twice: they keep their Source, and get the event only if they came from events and had none yet. A company is matched by name, then by their work email's domain, or added. New people get no marketing email until they opt in, unless you tick **They agreed to get our marketing email** (only when they said yes, such as on a badge scan that asked).
+- **One at a time.** **Add person** asks for the Source, then the event or conference from the brand's list, where typing a name that isn't there adds it. The Chrome side panel does the same with **Met at an event or conference**.
+- **From a CSV for a list.** Uploading a CSV on **Lists** can set a Source and Sub-source for everyone in it.
+- **Find them.** Pick **Events and conferences** above the People list and a second dropdown narrows it to one event, with how many people each has. Sub-source is a column too. The CRM's **Sales overview** lists how many people came from each event; click one to see them.
+- **Keep the list tidy.** Each event's name can be fixed once and every person shows the new name, because people hold the event's key, not its name. Archive an event to stop it being picked; the people who have it keep it.
+
+Other Sources can have sub-sources too, such as a webinar under Inbound. In the API, `GET`, `POST` and `PATCH /v1/brands/{brand}/sub-sources` list, add and rename or archive them (the list says how many people have each), a person's `sub_source` attribute holds the key, `attribute=sub_source:{key}` filters people, and `POST /v1/brands/{brand}/records/import` takes `sub_source` and, for new people, `first_name`, `last_name`, `job_title` and `company`. The MCP tools are `list_sub_sources`, `add_sub_source` and `update_sub_source`.
 
 ## Leads are people
 
