@@ -2,7 +2,7 @@
 	"version": "2026.11.16",
 	"date": "2026-11-16",
 	"status": "in-progress",
-	"updated": "2026-11-16T17:28:21Z",
+	"updated": "2026-11-16T17:32:46Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -465,7 +465,21 @@
 			"edition": "open-source",
 			"text": "Security improvements to tracker click recording.",
 			"at": "2026-11-16T17:13:39Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "The Rankings tab now says what the last import from SE Ranking did: the project it matched and how many keywords came in, that no project in the account is for this site (with the sites its projects are for), or that the import failed and why. Before, an import that brought nothing in looked the same as one that never ran.",
+			"at": "2026-11-16T17:32:46Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Heatmaps tell the steps of a page apart when its content changes at one address (a sign-up, a wizard): each step has its own heatmap and picture. Tick pages in the Heatmaps or Recordings list to exclude them from tracking, and Recordings has a \"Delete all\" button.",
+			"at": "2026-11-16T17:32:46Z"
 		}
 	],
-	"through": "6787e93+47380e4"
+	"through": "457ad3f+1506a4d"
 }
