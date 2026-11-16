@@ -128,6 +128,18 @@ Pages hidden from AI search or user crawlers, and a site with no `/llms.txt`, go
 
 With a [Cloudflare Web Analytics](/docs/integrations/analytics/) connection, the daily analytics sync also reads your own Cloudflare request logs and counts requests by each AI crawler, per site and day. This needs an API token with **Zone > Zone > Read** and **Zone > Analytics > Read** on the zones that serve your sites, as well as the Web Analytics permission. Without them your traffic reports keep working and the connection says which permission is missing.
 
+**Not behind Cloudflare?** Your own server can count the crawlers. AI crawlers run no scripts, so the website script never sees them; only the server that answers the request does. Call the [server library](/docs/sdk/events/) for every request, from a middleware:
+
+```js
+tracker.crawlerVisit({ userAgent: req.headers["user-agent"], host: req.headers.host });
+```
+
+```python
+tracker.crawler_visit(request.headers.get("user-agent"), request.headers.get("host"))
+```
+
+The call returns at once and never slows a request: it counts in memory only when the user agent looks like a crawler, and sends the counts in the background. Outflare works out which are AI crawlers and keeps only how many requests each made per site and day, never the user agent, the page or the address. The same table shows both, with a **Source** column; where Cloudflare's logs cover a site and day, they are used, so nothing counts twice. A user agent can be faked, so read these as counts, not proof of who called.
+
 ## Fixes
 
 AI visibility puts four kinds of fix on the brand's [fixes list](/docs/guides/site-audits/#the-fixes-list), next to the site audit's:

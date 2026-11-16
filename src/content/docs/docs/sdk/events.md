@@ -98,6 +98,14 @@ Events are sent when 20 wait, when you call `flush()` and when the request ends.
 | `group` | The company a person belongs to. |
 | `alias` | An id a person had before, joined to their user id. |
 
+The Node and Python libraries also have:
+
+| Call | What it does |
+| --- | --- |
+| `captureException` / `capture_exception` | Sends an error your server caught to the [Errors](/docs/guides/errors/) page. |
+| `exposed` | Says a visitor was shown a version of an A/B test from your server. |
+| `crawlerVisit` / `crawler_visit` | Counts requests from [AI crawlers](/docs/guides/ai-visibility/#are-ai-crawlers-visiting) for a site that isn't behind Cloudflare. |
+
 Every call takes a user id, an anonymous id or both, and can carry its own time and message id. Each library names itself as the events' source (`node`, `python`, `go`, `ruby`, `php`), which the **Events** page counts and filters by.
 
 ## Self-hosted servers and other languages
