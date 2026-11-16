@@ -3258,6 +3258,45 @@ paths:
         "404": { $ref: "#/components/responses/Error" }
         "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/mailboxes/{id}/activity:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getMailboxActivity
+      x-outflare-access: { scope: mailboxes.read, brand_limited: true }
+      summary: A mailbox's emails sent, replies and bounces per day
+      description: |
+        Scope: mailboxes.read. One row per UTC day, oldest first, with every
+        day in the range. It adds Outflare's own sends to what connected
+        sequencers report for the mailbox (Instantly and Smartlead, read at
+        most hourly). Warm-up mail is never counted. A reply a sequencer
+        also brought into the inbox is counted once.
+      tags: [mailboxes]
+      parameters:
+        - { name: days, in: query, schema: { type: integer, minimum: 1, maximum: 90, default: 14 }, description: "How many days back, today included." }
+      responses:
+        "200":
+          description: The days.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [date, sent, replies, bounced]
+                      properties:
+                        date: { type: string, format: date }
+                        sent: { type: integer }
+                        replies: { type: integer }
+                        bounced: { type: integer }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/mailboxes/{id}/verify:
     parameters:
       - { $ref: "#/components/parameters/Workspace" }
@@ -10382,9 +10421,12 @@ paths:
       summary: Ad sets, ad groups and ads with their spend and results
       description: |
         Scope: analytics.read. The level below a campaign (`ad_group`: Meta's
-        ad sets, Google's and TikTok's ad groups) or ads (`ad`), each with its
+        ad sets, Snapchat's ad squads, Google's, TikTok's, Microsoft's,
+        Pinterest's and Reddit's ad groups) or ads (`ad`), each with its
         campaign and parent and its totals over the range, most spend first.
-        Only Meta Ads, Google Ads and TikTok Ads read below campaigns. Each one listed spent, was seen
+        Only Meta Ads, Google Ads, TikTok Ads, Snapchat Ads, Microsoft
+        Advertising, Pinterest Ads and Reddit Ads read below campaigns. Each
+        one listed spent, was seen
         or is active. Their numbers are already in their campaign's, so never
         add them to it. An ad's `details` holds what the platform says about
         it: `headline`, `text`, `url` (its landing page), `url_tags` (Meta's
@@ -30681,10 +30723,11 @@ paths:
   /v1/site/events:
     post:
       operationId: sendSiteEvents
-      summary: Send website events
+      summary: Send website and app events
       description: |
-        Public: the site key (ofk_) in the body is the authority. What the tracking snippet (/site.js) sends: page views
-        and track events on a visitor's anonymousId, with context.page, context.campaign (the utm_ tags) and, on page
+        Public: the site key (ofk_) in the body is the authority. What the tracking snippet (/site.js) and the
+        libraries for apps send: page views, an app's screen views ({"type": "screen", "name": "Checkout"}; the name is
+        required) and track events on a visitor's anonymousId, with context.page, context.campaign (the utm_ tags) and, on page
         views, properties.click_ids, ofc and ref, exactly as the landing page had them. A userId, traits and timestamps
         are ignored: the browser cannot say who someone is. Page addresses keep their query string except the parameters
         the key's excluded_params lists and those always left out (sign-in tokens, passwords, codes, session ids, and any
@@ -30694,6 +30737,10 @@ paths:
         identify with userId and the same anonymousId to POST .../customer-events. Each event joins a visit (a session:
         30 minutes without an event, or a new campaign, starts another), whose id is in context.sessionId; a person's
         first and last touch fields come from their visits. Requests from bots and crawlers are counted, not stored.
+        An app sends no Origin, so it uses a site key with no origins; a key that lists origins refuses it. An app's
+        events keep context.app (name, version, build), context.device (manufacturer, model, type), context.os (name,
+        version) and context.library (name, version), and the libraries name themselves in User-Agent
+        (outflare-swift/1.0 (iPhone; ...)), which the visit shows as browser "app".
         With consent true, the answer sets the visitor's of_aid cookie on the site's domain, which browsers keep when
         events reach Outflare through the site's own domain. Send the JSON as text/plain to skip the CORS preflight.
         At most 20 events per request; 6,000 requests a minute per key, and 250,000 events a day per key, 1,000,000 per
@@ -30732,7 +30779,7 @@ paths:
                 required: [accepted, rejected]
                 properties:
                   accepted: { type: integer }
-                  rejected: { type: integer, description: Events refused, such as an identify call or one without anonymousId. }
+                  rejected: { type: integer, description: "Events refused, such as an identify call, a screen with no name or one without anonymousId." }
         default: { $ref: "#/components/responses/Error" }
     options:
       operationId: sendSiteEventsPreflight
@@ -33353,6 +33400,34 @@ paths:
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/records/known-domains:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    get:
+      operationId: listBrandKnownDomains
+      x-outflare-access: { scope: customers.read, brand: true }
+      summary: List the websites a brand knows, as digests
+      description: |
+        Scope: customers.read. For the browser extension's toolbar icon. The domains of the brand's companies and the
+        domains on its do-not-contact list (the brand's own and every brand's), each as a digest: the first 8 bytes of
+        SHA-256 of `salt`, a colon and the lowercase domain, in hex. The extension keeps the lists and checks the site
+        in front of it inside the browser, so the sites someone visits are never sent to Outflare. The salt is new on
+        every answer. Each list holds at most 200,000 domains, the newest first; truncated says when one was cut.
+      tags: [records]
+      responses:
+        "200":
+          description: The digests.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [salt, companies, do_not_contact, truncated]
+                properties:
+                  salt: { type: string }
+                  companies: { type: array, items: { type: string } }
+                  do_not_contact: { type: array, items: { type: string } }
+                  truncated: { type: boolean }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/records/import:
     parameters: [{ $ref: "#/components/parameters/BrandID" }]
     post:
@@ -34778,7 +34853,7 @@ paths:
       summary: List a brand's destinations
       description: |
         Scope: customers.read. Destinations forward the brand's customer events, as they arrive, to the tools it
-        already uses: a webhook of its own, Slack, Google Analytics 4 and HubSpot. Each has how many events it sent
+        already uses: a webhook of its own, Slack, Google Analytics 4, HubSpot, BigQuery and Snowflake. Each has how many events it sent
         and failed in the last 24 hours, how many are waiting, and since when it can't be reached. Conversions for
         ad platforms (Meta, Google Ads) are the ad conversion rules.
       tags: [customers]
@@ -34803,7 +34878,11 @@ paths:
         are signed like webhooks), slack (integration_id of the workspace's own Slack connection and config.channel),
         ga4 (config.measurement_id and secret, the data stream's Measurement Protocol API secret, sealed and never
         returned) or hubspot (integration_id of the workspace's own HubSpot connection; the event's person is created
-        or updated as a contact by email, and config.properties are set on them). events names the events to send;
+        or updated as a contact by email, and config.properties are set on them), bigquery (config.project, dataset
+        and table, and secret, the JSON key file of the workspace's own Google service account) or snowflake
+        (config.account, user, database, schema, table and warehouse, optionally role, and secret, the private key
+        of the workspace's own Snowflake user). A warehouse gets one row per event, and its table is made if it
+        isn't there. events names the events to send;
         empty sends every tracked event. Only events that arrive after it is made are sent. Every destination runs
         on the workspace's own connection or key. At most 20 per brand.
       tags: [customers]
@@ -34875,6 +34954,30 @@ paths:
         "204": { description: Removed. }
         "404": { $ref: "#/components/responses/Error" }
         "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/destinations/{destination}/test:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: destination, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: testDestination
+      x-outflare-access: { scope: customers.manage, brand: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Send a test event to a destination
+      description: |
+        Scope: customers.manage. Sends one made-up event named outflare_test to the destination, whether it is on
+        or off, so you can see it arrive before real events do. It is not stored as one of the brand's events. The
+        result shows on the destination within a few seconds (test.ok and test.reason; test.running until then).
+        For HubSpot the test only checks the connection, so no contact is made or changed. A warehouse's table is
+        made if it isn't there yet.
+      tags: [customers]
+      responses:
+        "202":
+          description: "Queued. Inside a mission, a MissionHeld answer when the call was held for approval or dry-run instead."
+          content:
+            application/json:
+              schema: { oneOf: [{ $ref: "#/components/schemas/Queued" }, { $ref: "#/components/schemas/MissionHeld" }] }
+        "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/destinations/{destination}/sends:
     parameters:
@@ -38733,6 +38836,7 @@ paths:
                   replies: { type: integer, description: New replies brought into the inbox, for a platform that reports them. }
                   opt_outs_pulled: { type: integer, description: "Entries of the platform's blocklist added to the opt-out list." }
                   opt_outs_pushed: { type: integer, description: "Opt-out list entries written to the platform's blocklist." }
+                  stat_days: { type: integer, description: "Mailbox-days of sent, reply and bounce counts read from the platform (Instantly, Smartlead), at most hourly." }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         "502": { $ref: "#/components/responses/Error" }
@@ -69842,7 +69946,7 @@ components:
         role_name: { type: string }
     AgentAppKind:
       type: string
-      enum: [claude, chatgpt, cursor, vscode, local, unknown]
+      enum: [claude, chatgpt, cursor, vscode, extension, local, unknown]
       description: The app, told from where it sends people back to (not from the name it registered with). local is an app on the person's computer (a loopback address); unknown is any other site.
     AgentApp:
       type: object
@@ -72529,23 +72633,36 @@ components:
           type: object
           additionalProperties: { type: string }
           description: "hubspot: contact properties to set when the event happens, by HubSpot's internal name."
+        project: { type: string, description: "bigquery: the Google Cloud project's id." }
+        dataset: { type: string, description: "bigquery: the dataset the table is in. It must exist." }
+        table: { type: string, description: "bigquery and snowflake: the table events are written to. Outflare makes it if it isn't there." }
+        account: { type: string, description: "snowflake: the account identifier, such as acme-prod1, without .snowflakecomputing.com." }
+        user: { type: string, description: "snowflake: the user whose key pair signs in." }
+        database: { type: string, description: "snowflake: the database." }
+        schema: { type: string, description: "snowflake: the schema." }
+        warehouse: { type: string, description: "snowflake: the warehouse that runs the writes." }
+        role: { type: string, description: "snowflake: the role to use; empty for the user's default role." }
     DestinationWrite:
       type: object
       additionalProperties: false
       properties:
-        kind: { type: string, enum: [webhook, slack, ga4, hubspot] }
+        kind: { type: string, enum: [webhook, slack, ga4, hubspot, bigquery, snowflake] }
         name: { type: string, maxLength: 120 }
         events: { type: array, maxItems: 50, items: { type: string }, description: Catalog names of the events to send; empty sends every tracked event. }
         config: { $ref: "#/components/schemas/DestinationConfig" }
         integration_id: { type: [string, "null"], format: uuid, description: The workspace's own connection, for slack and hubspot. }
-        secret: { type: string, description: "ga4: the Measurement Protocol API secret. Sealed; never returned." }
+        secret:
+          type: string
+          description: |
+            ga4: the Measurement Protocol API secret. bigquery: the JSON key file of your own Google service account,
+            whole. snowflake: the private key (PEM, no passphrase) of your own Snowflake user. Sealed; never returned.
         enabled: { type: boolean }
     Destination:
       type: object
-      required: [id, kind, name, events, config, integration_id, has_secret, enabled, failing_since, last_error, last_success_at, sent_24h, failed_24h, queued, created_at, updated_at]
+      required: [id, kind, name, events, config, integration_id, has_secret, enabled, failing_since, last_error, last_success_at, sent_24h, failed_24h, queued, test, created_at, updated_at]
       properties:
         id: { type: string, format: uuid }
-        kind: { type: string, enum: [webhook, slack, ga4, hubspot] }
+        kind: { type: string, enum: [webhook, slack, ga4, hubspot, bigquery, snowflake] }
         name: { type: string }
         events: { type: array, items: { type: string } }
         config: { $ref: "#/components/schemas/DestinationConfig" }
@@ -72558,6 +72675,16 @@ components:
         sent_24h: { type: integer }
         failed_24h: { type: integer }
         queued: { type: integer }
+        test:
+          type: object
+          description: The last test event sent to it (POST .../test).
+          required: [running, requested_at, at, ok, reason]
+          properties:
+            running: { type: boolean, description: A test was asked for and has not finished. }
+            requested_at: { type: [string, "null"], format: date-time }
+            at: { type: [string, "null"], format: date-time, description: When the last test finished. }
+            ok: { type: [boolean, "null"], description: Whether the tool took the test event; null before any test. }
+            reason: { type: string, description: What a passing test did, or why it failed. }
         created_at: { type: string, format: date-time }
         updated_at: { type: string, format: date-time }
         signing_secret: { type: string, description: "Only in the answer to creating a webhook destination: the secret its deliveries are signed with." }
