@@ -2,7 +2,7 @@
 	"version": "2026.11.16",
 	"date": "2026-11-16",
 	"status": "in-progress",
-	"updated": "2026-11-16T09:54:13Z",
+	"updated": "2026-11-16T10:16:42Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -234,7 +234,14 @@
 			"edition": "open-source",
 			"text": "Tracker: enter what a campaign cost by hand. For a network whose cost Outflare can't read, Tracker → Logs → Cost updates takes a campaign, the days and the amount (or a CSV of them) and shares it out evenly over the campaign's clicks, so every report has cost and the total is exactly what you entered.",
 			"at": "2026-11-16T09:54:13Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Sales reporting now shows discovery searches, tool calls, retries and recorded costs from a connected Lead Portal. Compare lane yield and inspect screening and grading evidence, with missing prices clearly marked.",
+			"at": "2026-11-16T10:16:42Z"
 		}
 	],
-	"through": "75b347d+492a676"
+	"through": "952d5cb+9074689"
 }
