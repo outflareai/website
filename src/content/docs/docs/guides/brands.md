@@ -68,7 +68,7 @@ You can narrow it down on the **Connectors** page, where the **Used by** column 
 - **Shared from the workspace**: every brand, or only the brands you tick.
 - **One brand's own**: for a brand with an account of its own, say Repocket's own Plausible. Only that brand uses it, and it takes the place of the shared Plausible for Repocket alone. The other brands keep the shared one.
 
-With one brand picked, Connectors lists what that brand uses and marks each one as **Shared from workspace** or the brand's own. When you connect something new there, choose **Every brand** or **Only Repocket**. Someone kept to some brands only sees the connections their brands use.
+With one brand picked, Connectors lists what that brand uses and marks each one as **Shared from workspace**, **Split by site** or the brand's own. A split connection (Google Analytics, Search Console, ad accounts) imports nothing into a brand wholesale. Each of its sites or accounts belongs to one brand, and **More → Choose {brand}'s sites** picks which ones. **Disconnect for every brand** removes the connection from the whole workspace, so to stop a site counting for one brand, choose its sites instead. When you connect something new there, choose **Every brand** or **Only Repocket**. Someone kept to some brands only sees the connections their brands use.
 
 In the API, every connection has `brand_id` (set on a brand's own) and `brand_ids` (the brands a shared one is shared with; empty means every brand). `GET /v1/workspaces/{ws}/integrations?brand=repocket` lists what a brand uses. Set who uses a connection with `brand_id` or `brand_ids` on `POST` or `PATCH /integrations`, or `?brand=` on the sign-in link. The MCP tools are `list_integrations` and `update_integration`.
 
