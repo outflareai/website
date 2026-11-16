@@ -2,7 +2,7 @@
 	"version": "2026.11.16",
 	"date": "2026-11-16",
 	"status": "in-progress",
-	"updated": "2026-11-16T14:48:28Z",
+	"updated": "2026-11-16T15:09:17Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -395,7 +395,21 @@
 			"edition": "open-source",
 			"text": "Recordings start playing when opened and mark every click, typing, new page and pause on the progress bar; the list names known visitors and filters by website. Heatmaps take their own picture of each page, so they work without recordings, show only the busiest areas by default and list the ten most clicked spots by name.",
 			"at": "2026-11-16T14:45:49Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Adding a rule under Send conversions back now lets you search your own events by name instead of typing one from memory, picks the amount for you (a payment sends its own amount), and works out whether the number is in dollars or cents. Rules can now be edited, and a payment rule with no value is fixed in one click.",
+			"at": "2026-11-16T15:09:17Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Recordings and heatmap pictures hide API keys, tokens and passwords shown on a page, in the visitor's browser before anything is sent: known key formats, user:password@host addresses, values after labels such as \"API key\" or \"Password\", and long runs of mixed letters and digits.",
+			"at": "2026-11-16T15:09:17Z"
 		}
 	],
-	"through": "d1c1146+d82220b"
+	"through": "318c833+54d9af3"
 }
