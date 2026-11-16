@@ -2,7 +2,7 @@
 	"version": "2026.11.16",
 	"date": "2026-11-16",
 	"status": "in-progress",
-	"updated": "2026-11-16T22:37:09Z",
+	"updated": "2026-11-16T23:34:21Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -661,7 +661,14 @@
 			"edition": "open-source",
 			"text": "Parallel joins the connector catalog under Lead data: connect your own Parallel API key to research a company on the web, with findings that name the pages they came from. Each run is paid from your own Parallel balance and booked on the connection.",
 			"at": "2026-11-16T22:37:09Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Link order target suggestions now put first the pages SE Ranking has at positions 4 to 20, where a link is most likely to move them onto the first page or into the top 3. Positions 4 to 10 count more, and each suggestion says the keyword and the position.",
+			"at": "2026-11-16T23:34:21Z"
 		}
 	],
-	"through": "39dc554+3f65d4a"
+	"through": "efd8b04+a5b539e"
 }
