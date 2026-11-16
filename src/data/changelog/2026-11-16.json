@@ -2,7 +2,7 @@
 	"version": "2026.11.16",
 	"date": "2026-11-16",
 	"status": "in-progress",
-	"updated": "2026-11-16T11:16:50Z",
+	"updated": "2026-11-16T11:29:37Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -290,7 +290,14 @@
 			"edition": "open-source",
 			"text": "Session recordings and heatmaps: watch a visit to your website back as the visitor saw it, and see where each page is clicked and how far down it is scrolled. Both come from the snippet you already have, are off until you turn them on under Analytics → Recordings, and never record what a visitor types. Recordings need file storage on the server.",
 			"at": "2026-11-16T11:16:50Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Tracker report: three new columns for landers. Lander views (clicks sent to a lander), lander clicks (those that went on to an offer) and lander CTR show for every grouping, sort, work in custom columns and are in the CSV, so you can compare landers by how many visitors they pass on.",
+			"at": "2026-11-16T11:29:37Z"
 		}
 	],
-	"through": "14be042+5b36443"
+	"through": "5e82314+37c7070"
 }
