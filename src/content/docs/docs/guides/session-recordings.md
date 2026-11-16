@@ -23,6 +23,7 @@ Open **Recordings › Settings**. Each setting saves as you change it, and your 
 | **Heatmaps** | Counts where each page is clicked and how far down it is scrolled. |
 | **Share of visits recorded** | Every visit, or a random share of them on a busy site. A visit is picked once, when it starts. |
 | **Hide all text** | Also hides every piece of text on the page, for sites that show personal details. |
+| **Hide your own keys** | For a product that shows its users keys of its own. Type a made-up key that looks like yours (never a real one): Outflare keeps only its shape, such as `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`, and hides everything with that shape. |
 | **Keep recordings for** | 7 to 90 days. Older recordings are deleted for good. |
 | **Shortest visit kept** | Recordings of visits shorter than this are deleted about half an hour after they end, so the list holds visits worth watching. |
 | **Most recordings a day** | Once this many visits are recorded in a day (UTC), the rest of that day's visits aren't. Heatmaps keep counting. No limit by default. |
@@ -41,7 +42,7 @@ Changing the settings needs the `customers.manage` permission; watching needs `c
   <section data-of-block>…</section>
   ```
 
-- **Keys, tokens and passwords shown on a page are hidden too**, before anything leaves the visitor's browser, in recordings and in heatmap pictures alike: known key formats (such as `sk-…`, `ghp_…`, AWS and Google keys, sign-in tokens), `user:password@host` addresses, whatever follows a label such as "API key", "Token" or "Password", secrets in a link's parameters, and any run of 16 or more mixed letters and digits, which covers UUIDs and other ids as well. They show as stars. The server checks the known formats again before storing. This is matching, so treat it as a safety net: for a page that shows secrets, add `data-of-mask` to that part, list the page under **Never these pages**, or turn on **Hide all text**.
+- **Keys, tokens and passwords shown on a page are hidden too**, before anything leaves the visitor's browser, in recordings and in heatmap pictures alike: known key formats (such as `sk-…`, `ghp_…`, AWS and Google keys, sign-in tokens), `user:password@host` addresses, whatever follows a label such as "API key", "Token" or "Password", secrets in a link's parameters, and any run of 16 or more mixed letters and digits, which covers UUIDs and other ids as well. They show as stars. The server checks the known formats again before storing. If your product has keys of its own, add their shape under **Hide your own keys**: whatever has that shape is hidden in the browser and again on the server. This is matching, so treat it as a safety net: for a page that shows secrets, add `data-of-mask` to that part, list the page under **Never these pages**, or turn on **Hide all text**.
 - Where consent is needed (see the [consent banner](/docs/guides/consent-banner/)), a visitor is recorded only after they allow analytics, and recording stops if they withdraw it.
 - `data-replay="off"` on the snippet keeps recordings and heatmaps off for that site, whatever the brand's settings say.
 - Canvas drawings and the contents of frames from other sites are not recorded.
