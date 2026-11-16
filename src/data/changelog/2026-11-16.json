@@ -2,7 +2,7 @@
 	"version": "2026.11.16",
 	"date": "2026-11-16",
 	"status": "in-progress",
-	"updated": "2026-11-16T15:52:47Z",
+	"updated": "2026-11-16T16:10:12Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -423,7 +423,21 @@
 			"edition": "open-source",
 			"text": "A Google Workspace connection can now create new users in your own tenant, when you turn on \"Allow creating users\" and authorize the Directory user scope. Each new user takes one of your own licences.",
 			"at": "2026-11-16T15:52:47Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "On Website analytics, Search, each page and search query now opens a page of its own: a page shows the searches that showed it, and a search shows the pages it showed, each with clicks, impressions, click-through and average position over the period you picked. Works with Google Search Console and Bing Webmaster Tools, and through the API and MCP with `page` and `keyword` on the report.",
+			"at": "2026-11-16T16:10:12Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Trends and dashboards can now show a brand's search and link-building numbers: Search Console, Bing and Google Analytics clicks, impressions, CTR, position and visitors; live, new and lost referring domains; and link-order spend, commitments, publications and payments. They read data Outflare already stores, so a dashboard can put organic search next to sign-ups.",
+			"at": "2026-11-16T16:10:12Z"
 		}
 	],
-	"through": "9495b58+528a238"
+	"through": "17f8503+bac6746"
 }
