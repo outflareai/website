@@ -2,7 +2,7 @@
 	"version": "2026.11.16",
 	"date": "2026-11-16",
 	"status": "in-progress",
-	"updated": "2026-11-16T18:21:31Z",
+	"updated": "2026-11-16T18:27:51Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -521,7 +521,14 @@
 			"edition": "open-source",
 			"text": "Partner programs can now credit only conversions from a time you choose. Set the credit start time before importing payment history for a program moved from another platform, so older sales and sign-ups earn no new rewards. Existing rewards and refunds stay unchanged.",
 			"at": "2026-11-16T18:21:31Z"
+		},
+		{
+			"kind": "fix",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "A repeat postback that only changes a conversion's status now keeps the payout the network first reported (it was replaced by the offer's own payout, or 0). Paging the conversions and cost update lists reaches rows that share a timestamp, and a later cost update for the same days always wins over an earlier one.",
+			"at": "2026-11-16T18:27:51Z"
 		}
 	],
-	"through": "58344ec+7a8279b"
+	"through": "70f07da+48b48db"
 }
