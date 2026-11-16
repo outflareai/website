@@ -2,7 +2,7 @@
 	"version": "2026.11.16",
 	"date": "2026-11-16",
 	"status": "in-progress",
-	"updated": "2026-11-16T13:39:39Z",
+	"updated": "2026-11-16T13:55:12Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -367,7 +367,14 @@
 			"edition": "cloud",
 			"text": "Agent conversations can be pinned to the top of the list or archived out of it from each conversation's ⋯ menu, and the list no longer scrolls sideways. The task count next to the agent's status opens each task with where it stands.",
 			"at": "2026-11-16T13:39:39Z"
+		},
+		{
+			"kind": "launch",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Link orders catalog: import donors from an Excel (.xlsx) file or a Google Sheet link, not only CSV. A sheet shared as \"Anyone with the link\" or published to the web is read without connecting Google, then imported in batches with the same column matching and intermediary for every row.",
+			"at": "2026-11-16T13:55:12Z"
 		}
 	],
-	"through": "9bc94ac+7d0378c"
+	"through": "678f829+f35becf"
 }
