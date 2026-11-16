@@ -2,7 +2,7 @@
 	"version": "2026.11.16",
 	"date": "2026-11-16",
 	"status": "in-progress",
-	"updated": "2026-11-16T07:59:56Z",
+	"updated": "2026-11-16T08:10:56Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -150,7 +150,14 @@
 			"edition": "open-source",
 			"text": "Ask a question: type what you want to know at the top of Dashboards and get a chart you can open in the builder or save. It runs on your own AI model and sees only event names and descriptions, never people or their data.",
 			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Libraries for sending product events from your servers: Node, Python, Go, Ruby and PHP. Each has identify, track, page, screen, group and alias, sends in batches in the background and retries when the server is busy.",
+			"at": "2026-11-16T08:10:56Z"
 		}
 	],
-	"through": "212b9f7+c560f73"
+	"through": "31c695a+cabe5ac"
 }
