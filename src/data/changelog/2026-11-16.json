@@ -2,7 +2,7 @@
 	"version": "2026.11.16",
 	"date": "2026-11-16",
 	"status": "in-progress",
-	"updated": "2026-11-16T09:07:15Z",
+	"updated": "2026-11-16T09:18:33Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -199,7 +199,14 @@
 			"edition": "open-source",
 			"text": "Destinations: write your product events to a table in your own BigQuery or Snowflake as they arrive, and press Send a test event on any destination to see it work before real events come in.",
 			"at": "2026-11-16T09:07:15Z"
+		},
+		{
+			"kind": "fix",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "A Telegram chat, and picking its customer, open as full pages instead of a side panel. Every Settings tab has an icon, and the AI model settings and approval messages no longer mention retired missions.",
+			"at": "2026-11-16T09:18:33Z"
 		}
 	],
-	"through": "e005eef+4bcbc81"
+	"through": "2499012+9fa7b70"
 }
