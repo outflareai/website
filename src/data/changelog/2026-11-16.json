@@ -1,0 +1,156 @@
+{
+	"version": "2026.11.16",
+	"date": "2026-11-16",
+	"status": "in-progress",
+	"updated": "2026-11-16T06:57:22Z",
+	"items": [
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Archive a Sales conversation directly from the queue, with Undo for accidental clicks. Archived conversations keep their messages and notes, and every archive and reopen remains recorded with who made the change.",
+			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "TikTok Ads now shows what is below each campaign: its ad groups and ads, with spend, clicks and conversions per day, each ad's text and landing page, and whether its link carries your tracking template. You can pause and resume an ad group or an ad from a campaign's page, and set the daily budget of an ad group that has its own.",
+			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "On Google Ads campaigns that bid by hand (manual CPC), you can now set an ad group's bid and a keyword's bid from Outflare. Use Set bid in the Manage menu on a campaign's page; the Changes tab shows the bid it replaced. The API and MCP can also make a change that may only lower a bid.",
+			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "fix",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Sales introductions and handoffs can CC connected colleagues when their company domain is on an outreach blocklist. Prospect blocks, address-level blocks and opt-outs remain enforced.",
+			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Sales reporting's Discovery view now has the full lane board from your connected Lead Portal: filter the search lanes by state, page through them, and open one to see how it searches, why it was proposed, what it learned and what it found. Agents can read it with the get_sales_discovery_lanes tool.",
+			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "fix",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "CRM's Telegram page opens again, ⌘K finds People, Companies, Deals and the rest of the menu's pages, a link to a page that doesn't exist says so, old People links open the CRM lists, and page names match the menu (Library, Customer data, sales conversations).",
+			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "launch",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Customer accounts: if your product has workspaces or teams, they are now their own records (Accounts), with members and their roles, separate from People and Companies. Each brand starts with smart defaults for its business type (who it sells to, whether it has accounts) and can change them. A person can also have a preferred email that sends go to.",
+			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "inbox",
+			"edition": "open-source",
+			"text": "A teammate you loop in on a conversation is now told. Their Watching view shows how many are new, the Inbox shows a message with an Open button, and if they haven't opened it after five minutes they get one email with a link.",
+			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "inbox",
+			"edition": "open-source",
+			"text": "The Inbox now tells you when something new arrives. New chats and messages show up on their own with an Open button, and a \"Sound and notifications\" switch plays a chime and shows a browser notification when the Inbox is in the background.",
+			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "inbox",
+			"edition": "open-source",
+			"text": "The Inbox warns you when a teammate has the same conversation open, or is writing a reply in it, so two people don't answer the same customer.",
+			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "One People list: everyone, cold contacts included, with a Source (Cold, Inbound, Event, Sign-up, Invited, Customer) set once when they are added and a Marketing email yes/no column. Cold contacts get no marketing email until they opt in. Outreach's Leads is now the Cold filter, and you can add people to a sequence straight from the list.",
+			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "inbox",
+			"edition": "open-source",
+			"text": "Right-click a conversation in the Inbox (or use its More button) to assign it to anyone, move it to a team or loop a teammate in. The same three are on the bar that shows when you tick several.",
+			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "launch",
+			"area": "inbox",
+			"edition": "open-source",
+			"text": "Sales opportunity on a support conversation hands it to your sales team in one step: it moves there with a note, you keep it under Watching, and the customer's owner gets it in Needs attention. When your AI spots an opportunity in a conversation, the Inbox says so and offers the hand-over.",
+			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "launch",
+			"area": "inbox",
+			"edition": "open-source",
+			"text": "Online and Away in the Inbox: say when you are taking chats, and a new website chat goes to someone online, moves to the next person after 30 seconds with no answer, and carries on by email when nobody is free or the visitor has left.",
+			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "launch",
+			"area": "inbox",
+			"edition": "open-source",
+			"text": "Saved replies: write an answer once and drop it into any reply from the Saved replies menu, in support conversations and in replies to outreach, with the person's first name and your own filled in. Replies to outreach also get a Draft with AI button that writes an answer from your knowledge for you to edit.",
+			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "inbox",
+			"edition": "open-source",
+			"text": "Work a conversation as a team in the Inbox. Move a reply to a team, loop a teammate in so it shows under their new Watching view, and add private notes that only your team sees, on replies to outreach as well as support conversations.",
+			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "launch",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Alerts can now post to Telegram: connect your own Telegram bot under Connectors, then pick a chat, group or channel for each kind of alert under Settings → Alerts, beside its Slack channel and email.",
+			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Destinations: send your product events on to a webhook, Slack, Google Analytics 4 or HubSpot as they arrive, each on your own connection, with a log of what was sent, skipped or refused. Find it under Events.",
+			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "inbox",
+			"edition": "open-source",
+			"text": "Inbox rows have quick actions: right-click a conversation (or use its More button) to open it in a new tab, mark it unread, assign it to yourself, snooze it, close it or copy its link. Tick several rows to act on them together, and undo a close, snooze or assignment from the message that confirms it.",
+			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "inbox",
+			"edition": "open-source",
+			"text": "The Inbox now shows support conversations and replies to your outreach in one place: pick a support folder or a sales view in the views column, and the list and the conversation open beside it. Saved views of replies sit in the same column.",
+			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Ask a question: type what you want to know at the top of Dashboards and get a chart you can open in the builder or save. It runs on your own AI model and sees only event names and descriptions, never people or their data.",
+			"at": "2026-11-16T06:57:22Z"
+		}
+	],
+	"through": "212b9f7+2664520"
+}
