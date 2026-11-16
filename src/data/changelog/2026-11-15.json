@@ -2,7 +2,7 @@
 	"version": "2026.11.15",
 	"date": "2026-11-15",
 	"status": "in-progress",
-	"updated": "2026-11-15T20:24:57Z",
+	"updated": "2026-11-15T23:21:17Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -220,7 +220,91 @@
 			"edition": "open-source",
 			"text": "The tracker now checks that the landers and offers your links send clicks to still answer: landers about once an hour, offers every six hours. The Landers and Offers tabs show what it found, and you get an alert when one fails two checks in a row, so clicks aren't wasted on a dead page. An offer's check can be switched off on its form.",
 			"at": "2026-11-15T20:24:57Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Taboola and Outbrain campaigns can now be changed from Outflare: pause and resume, the daily budget, and blocking a publisher site (or an Outbrain section) on a campaign, each as a queued change on your own account. Until now both were read-only.",
+			"at": "2026-11-15T21:00:20Z"
+		},
+		{
+			"kind": "fix",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Search Console syncs now save each property's new days, sitemaps and status before inspecting its pages, and sync the properties that waited longest first. A sync that is interrupted part-way no longer leaves a property showing an old error and days-old data.",
+			"at": "2026-11-15T21:16:24Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "self-hosting",
+			"edition": "open-source",
+			"text": "Self-hosted servers can read connected ad platforms more often than once an hour: set `OUTFLARE_ADS_SYNC_INTERVAL` to a duration from `15m` to `24h` (such as `30m`). No platform is read more often than its floor (half an hour for most, a quarter of an hour for Zeropark), so a shorter setting reads at the floor.",
+			"at": "2026-11-15T21:34:51Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "You can now pause and resume a single ad set or ad, without pausing the whole campaign, on Meta and Google Ads, and set the daily budget of a Meta ad set that holds its own. Open a campaign on the Paid ads page and use Manage on an ad set or ad; the API and MCP have the same changes.",
+			"at": "2026-11-15T21:42:49Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Website analytics is now one tab per question: Overview, Pages, Sources, Websites, Countries, Devices, Search and Connected tools. Each tab shows a single table or chart, names where its numbers come from (Outflare Analytics, your search tool, or the connected tool you opened) and has its own address.",
+			"at": "2026-11-15T21:42:49Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Website tracking moved from Analytics to Settings, and now says plainly whether a brand's script is working: Live when a visit arrived in the last 24 hours, with the last visit and today's events, or Quiet when visits have stopped. The setup steps only show until the first visit arrives.",
+			"at": "2026-11-15T21:42:49Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Trends do more: medians and percentiles, times per person, weekly and monthly active people, and a breakdown by two fields at once with each group as its own line. Show a trend as stacked areas or bars, bars across, a ring of shares or a world map, with a running total, shares of the whole, a moving average or a second axis.",
+			"at": "2026-11-15T21:42:49Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Charts look and read better: smooth lines with a soft fill, sharp text at any size, and a card beside the cursor with the exact numbers for each day, week or month, the period before and the change. Line and bar charts show a forecast in a lighter dashed line with its likely range, and the day or week still running is marked \"so far\". Retention, lifecycle and funnel charts got the same treatment.",
+			"at": "2026-11-15T21:42:49Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Sales reporting has a Discovery view: when your connected Lead Portal reports its company discovery, see how many companies were found, passed screening, were graded and sent to research, which search lanes produced them, and what each tool cost against the spending cap.",
+			"at": "2026-11-15T22:25:31Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Stickiness: see how many days, weeks or months people come back in, on the Retention page and on dashboards. Funnels now draw conversion over time as a line, and a new Time to convert chart shows how long people take between steps.",
+			"at": "2026-11-15T22:25:31Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Event dictionary: a new Dictionary view on Product events lists every event with a plain name, what it means, how much of it arrives, the properties it carries and where it is used. Edit names and notes in place; the names then show wherever you pick an event.",
+			"at": "2026-11-15T22:41:12Z"
+		},
+		{
+			"kind": "launch",
+			"area": "connectors",
+			"edition": "open-source",
+			"text": "Intercom: keep answering in Intercom while Outflare keeps a copy of every conversation in Support, with its messages, notes, tags, ratings and what Fin did (how it ended, its rating and the articles it answered from). Copying starts when you connect Intercom for a brand, then stays in step every few minutes, and each customer joins your people. Copied conversations are read-only in Outflare.",
+			"at": "2026-11-15T23:21:17Z"
 		}
 	],
-	"through": "ac2c0d4+f772f5a"
+	"through": "3a5ab48+0b7e2ce"
 }
