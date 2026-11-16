@@ -1,6 +1,6 @@
 ---
 title: Retention
-description: Of the people who first did something in a week, how many came back the week after, and the one after that. And each week, how many active people were new, returning or back after a gap.
+description: Of the people who first did something in a week, how many came back the week after, and the one after that. And each week, how many active people were new, returning or back after a gap, and how many days people come back in.
 sidebar:
   order: 9.75
 ---
@@ -36,10 +36,20 @@ The **Lifecycle** view at the top of the page asks the other retention question:
 
 New, returning and resurrected add up to everyone active in the period. A growing bar made of returning people is a product people keep using; a bar that is mostly new with a long dormant tail is a leaky bucket. Hover a bar for the numbers; the table underneath has every period. Lifecycle questions save and go on dashboards like cohorts do.
 
+## Stickiness
+
+The **Stickiness** view asks how often people come back. Pick what counts as **active** and the dates, and count the **days**, **weeks** or **months** each person was active in. The chart has one bar per number: the people active on exactly one day, on two, on three and so on, each with its share of everyone.
+
+- Almost everyone at 1 means people try it and leave.
+- A long tail to the right means a habit: the same people on many days.
+- The three numbers on top give the people counted, the average number of days (or weeks, or months) each was active in, and the share who came back at least once.
+
+Hover a bar for its people and share. Stickiness questions save and go on dashboards like cohorts do.
+
 ## Who can do what
 
 Everyone in the workspace can run retention (`analytics.read`). Owners, admins and operators can save, change and delete questions (`analytics.manage`).
 
 ## For agents and scripts
 
-The REST API is `POST /v1/brands/{brand}/insights/retention` for cohorts and `POST /v1/brands/{brand}/insights/lifecycle` for lifecycle, and `/v1/brands/{brand}/insights` keeps saved questions with funnels and trends. See the [API reference](/docs/api/). The MCP tools are `run_retention` and `run_lifecycle`, with `save_insight` and the other saved-insight tools. Ask your agent something like *"Of the people who signed up each week this quarter, what share came back the week after, and which cohort sticks best?"*
+The REST API is `POST /v1/brands/{brand}/insights/retention` for cohorts `POST /v1/brands/{brand}/insights/lifecycle` for lifecycle and `POST /v1/brands/{brand}/insights/stickiness` for stickiness, and `/v1/brands/{brand}/insights` keeps saved questions with funnels and trends. See the [API reference](/docs/api/). The MCP tools are `run_retention`, `run_lifecycle` and `run_stickiness`, with `save_insight` and the other saved-insight tools. Ask your agent something like *"Of the people who signed up each week this quarter, what share came back the week after, and which cohort sticks best?"*
