@@ -19,6 +19,8 @@ A new flag is off until you turn it on. While it's off, every visitor gets `fals
 ## Who gets it
 
 - **Conditions.** The page's path, site, full address, a parameter of the address (such as `utm_source`), where the visitor came from, their device (computer, phone, tablet) and browser language. Your servers can also say whether someone is signed in, and send their own properties, such as their plan. Every condition must hold.
+- **People.** A flag can be limited to the people in one of your [lists](/docs/guides/smart-lists/), to a field of the person's record (such as `plan` is `pro`), or to named user ids. This is how you give a feature to staff and pilot customers only. A visitor Outflare doesn't know yet isn't in any list.
+- **Signed in.** Whether the visitor is signed in, from the [signed-in hint](/docs/guides/website-tracking/#signed-in-visitors) your app sets.
 - **Rollout.** Of the visitors who match, the share that gets the flag at all. Raising it only adds visitors: nobody loses it.
 - **Brand.** A flag for one brand reaches only that brand's site.
 - **Servers only.** A flag can stay out of your pages entirely, for your servers alone.
@@ -123,6 +125,18 @@ No developer is needed: the page only needs the tracking script, without `data-f
 The editor link works for two hours, only for that flag's versions, and only while you can still change flags. It carries a secret, so don't share it.
 
 ## On your servers
+
+There are two ways. To decide without a network call on each request, let the server library keep the flags in memory: it reads your brand's live flags from `GET /v1/brands/{brand}/flags/definitions`, refreshes them every 30 seconds, and decides each visitor's version itself, with the same answer the website script and the API give.
+
+```js
+import { createClient, LocalFlags } from "@outflare/sdk";
+const flags = new LocalFlags(createClient({ baseUrl: "https://app.outflare.ai", token: process.env.OUTFLARE_TOKEN }), { brand: "northpeak" });
+const variant = await flags.variant("pricing-headline", { anonymousId, url: request.url });
+```
+
+Python has the same `LocalFlags` with `variant`, `is_enabled` and `payload`. When you show someone a version from your server, call `tracker.exposed(key, variant, { anonymousId })` so the A/B test counts them. The token needs `analytics.read` and stays on your server. For rules about people, pass the lists and fields you already know for that person.
+
+Or ask Outflare each time:
 
 Ask `POST /v1/brands/{brand}/flags/evaluate` with an API token that has `analytics.read`, passing the visitor's id from the page (`outflare.anonymousId()`) as `anonymous_id` so the server agrees with the page. It returns each flag that is on with the visitor's version and why. Agents use the MCP tools `list_flags`, `create_flag`, `update_flag`, `archive_flag` and `evaluate_flags`, and `list_flag_groups`, `set_flag_group_holdout` and `get_flag_group_holdout` for exclusion groups.
 
