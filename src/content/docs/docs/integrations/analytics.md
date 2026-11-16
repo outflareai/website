@@ -11,7 +11,7 @@ Outflare reads the analytics tools already on your website, so a person, a scrip
 
 ## Outflare's own tracking
 
-If your site has Outflare's [website tracking](/docs/guides/website-tracking/) tag, **Analytics → Website analytics** shows its numbers before you connect any tool. You get visitors, visits, page views, bounce rate and average visit length, one point per day. It also lists the top pages, sources, websites, countries and devices. The numbers are counted live from your own visits, so today counts too. They sit above any connected tool, so you can compare them with GA4 or PostHog. Bots and crawlers are left out. A visitor who doesn't allow cookies counts once per visit.
+If your site has Outflare's [website tracking](/docs/guides/website-tracking/) tag, **Analytics → Website analytics** shows its numbers before you connect any tool. You get visitors, visits, page views, bounce rate and average visit length, one point per day. It also lists the top pages, sources, websites, countries and devices. The numbers are counted live from your own visits, so today counts too. Connected tools have their own tab, so you can compare them with GA4 or PostHog. Bots and crawlers are left out. A visitor who doesn't allow cookies counts once per visit.
 
 ```sh
 # The last 28 days, or any range up to a year
@@ -21,11 +21,28 @@ curl -H "Authorization: Bearer $OUTFLARE_TOKEN" \
 
 Agents use `get_site_analytics`.
 
+## The Website analytics page
+
+The page has one tab per question, and each tab has its own address, so you can link straight to it.
+
+| Tab | What it shows | Source |
+| --- | --- | --- |
+| Overview | Visitors, visits, page views, bounce rate and visit length, one point per day | Outflare Analytics |
+| Pages | Your top pages | Outflare Analytics |
+| Sources | Where visits came from | Outflare Analytics |
+| Websites | Each of the brand's websites side by side | Outflare Analytics |
+| Countries | Visits by country | Outflare Analytics |
+| Devices | Desktop, tablet and phone | Outflare Analytics |
+| Search | Clicks, impressions and the queries people searched | Your Google Search Console or Bing Webmaster Tools site |
+| Connected tools | Every connected tool's totals per website; open one to see its own reports | The tool you open |
+
+Each tab shows one chart or one table, and names its source at the top, so you always know where a number comes from. "Outflare Analytics" means the numbers Outflare's own tag counted. The period and the website are picked once, at the right of the tabs, and apply to every tab.
+
 ## Connect
 
 Open **Connectors** and pick the **Analytics** category, or go straight to **Analytics → Website analytics** and click **Choose a tool**. Google tools connect with a read-only Google sign-in, and one sign-in connects both Google Analytics and Search Console. They also take a service account key. PostHog and Cloudflare offer a sign-in or a key, and you choose. The rest take an API key. An agent can ask for a connection with `request_connection`: you get a one-time link to paste the key into or sign in from, so the key never passes through the chat.
 
-One sign-in often sees many sites (every GA4 property, Search Console property or PostHog project the login can open). Every one of them syncs unless you switch it off, up to 20 per connection. The Website analytics page lists them with a sync switch and a domain field for each.
+One sign-in often sees many sites (every GA4 property, Search Console property or PostHog project the login can open). Every one of them syncs unless you switch it off, up to 20 per connection. The **Connected tools** tab of the Website analytics page lists them with a sync switch and a domain field for each.
 
 PostHog projects also count, for the SEO module, the visits that start on each page and how many go on to the events you choose as conversions. See [which pages bring conversions](/docs/guides/keywords/#which-pages-bring-conversions).
 
