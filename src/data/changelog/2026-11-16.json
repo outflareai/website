@@ -2,7 +2,7 @@
 	"version": "2026.11.16",
 	"date": "2026-11-16",
 	"status": "in-progress",
-	"updated": "2026-11-16T21:14:07Z",
+	"updated": "2026-11-16T21:39:44Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -633,7 +633,14 @@
 			"edition": "open-source",
 			"text": "Feature flags and A/B tests can now be decided in your own server's memory: `LocalFlags` in the TypeScript and Python libraries reads a brand's flag definitions every 30 seconds and picks each visitor's version without a request to Outflare per page, with the same answers as the website script.",
 			"at": "2026-11-16T21:14:07Z"
+		},
+		{
+			"kind": "launch",
+			"area": "connectors",
+			"edition": "open-source",
+			"text": "Treg joins the email finders: connect your own Treg token under Connectors and add it to a lead list's email waterfall to find work emails from a name and company domain. Lookups are billed to your own Treg balance (at most $0.10 each) and each billed lookup counts as one credit against the list's cap and in the spend ledger.",
+			"at": "2026-11-16T21:39:44Z"
 		}
 	],
-	"through": "d29df60+b48ece3"
+	"through": "6981886+0caf045"
 }
