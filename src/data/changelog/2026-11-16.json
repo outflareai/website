@@ -2,7 +2,7 @@
 	"version": "2026.11.16",
 	"date": "2026-11-16",
 	"status": "in-progress",
-	"updated": "2026-11-16T13:55:12Z",
+	"updated": "2026-11-16T14:03:48Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -374,7 +374,14 @@
 			"edition": "open-source",
 			"text": "Link orders catalog: import donors from an Excel (.xlsx) file or a Google Sheet link, not only CSV. A sheet shared as \"Anyone with the link\" or published to the web is read without connecting Google, then imported in batches with the same column matching and intermediary for every row.",
 			"at": "2026-11-16T13:55:12Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Sales conversations now stay in step with the Inbox and the CRM. Taking a conversation makes you the person's Owner, confirming a customer wins their deal, hand-offs from support show with New conversations, and the Inbox links your Sales queues. Sales screens say conversation, person or company in place of \"lead\".",
+			"at": "2026-11-16T14:03:48Z"
 		}
 	],
-	"through": "678f829+f35becf"
+	"through": "a0acd3a+b4fe1e6"
 }
