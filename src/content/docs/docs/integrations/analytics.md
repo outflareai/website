@@ -38,6 +38,8 @@ The page has one tab per question, and each tab has its own address, so you can 
 
 Each tab shows one chart or one table, and names its source at the top, so you always know where a number comes from. "Outflare Analytics" means the numbers Outflare's own tag counted. The period and the website are picked once, at the right of the tabs, and apply to every tab.
 
+On the **Search** tab, click a row of **Pages** to open the searches that showed that page, or a row of **Search queries** to open the pages that search showed. Each opens a page of its own with clicks, impressions, click-through and average position, clicks per day, and the table of the other side, whose rows open in turn. The period stays as you picked it, and **← Search** takes you back. This works for Google Search Console and Bing Webmaster Tools.
+
 ## Connect
 
 Open **Connectors** and pick the **Analytics** category, or go straight to **Analytics → Website analytics** and click **Choose a tool**. Google tools connect with a read-only Google sign-in, and one sign-in connects both Google Analytics and Search Console. They also take a service account key. PostHog and Cloudflare offer a sign-in or a key, and you choose. The rest take an API key. An agent can ask for a connection with `request_connection`: you get a one-time link to paste the key into or sign in from, so the key never passes through the chat.
@@ -85,6 +87,13 @@ Metrics are `visitors`, `pageviews`, `sessions` (visits), `bounce_rate` and
 does not measure is left out of the answer, never reported as zero. `notes`
 explains caveats in words, such as Search Console's two to three day delay.
 
+Search Console and Bing Webmaster Tools can narrow `traffic`, `pages` and
+`search_queries` to one page (`page`, the full URL as a `pages` row names it)
+and one search (`keyword`): `search_queries` with `page` lists the searches
+that showed that page, and `pages` with `keyword` the pages that search
+showed. Other tools answer `422` when asked to narrow. MCP's
+`get_analytics_report` takes the same two fields.
+
 ```sh
 # Connected analytics tools, their reports and default site
 curl -H "Authorization: Bearer $TOKEN" "$URL/v1/brands/$BRAND/analytics"
@@ -94,6 +103,10 @@ curl -H "Authorization: Bearer $TOKEN" "$URL/v1/brands/$BRAND/analytics/summary?
 
 # Top 50 search queries from one connection
 curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/analytics/$ID/reports/search_queries?limit=50"
+
+# The searches that showed one page, and the pages one search showed
+curl -G -H "Authorization: Bearer $TOKEN" --data-urlencode "page=https://example.com/pricing" "$URL/v1/workspaces/$WS/analytics/$ID/reports/search_queries"
+curl -G -H "Authorization: Bearer $TOKEN" --data-urlencode "keyword=acme pricing" "$URL/v1/workspaces/$WS/analytics/$ID/reports/pages"
 
 # Which sites a connection can read, the domain each counts under, and whether it syncs
 curl -H "Authorization: Bearer $TOKEN" "$URL/v1/workspaces/$WS/analytics/$ID/sites"
