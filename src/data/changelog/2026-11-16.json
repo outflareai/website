@@ -2,7 +2,7 @@
 	"version": "2026.11.16",
 	"date": "2026-11-16",
 	"status": "in-progress",
-	"updated": "2026-11-16T16:10:12Z",
+	"updated": "2026-11-16T16:29:09Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -437,7 +437,14 @@
 			"edition": "open-source",
 			"text": "Trends and dashboards can now show a brand's search and link-building numbers: Search Console, Bing and Google Analytics clicks, impressions, CTR, position and visitors; live, new and lost referring domains; and link-order spend, commitments, publications and payments. They read data Outflare already stores, so a dashboard can put organic search next to sign-ups.",
 			"at": "2026-11-16T16:10:12Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "records",
+			"edition": "open-source",
+			"text": "The event dictionary is now the **Event list**, the first view of Customer data → Events. Its counts cover a range you pick (last 7, 30 or 90 days, or all time) and show how many people sent each event and where it came from. `order_completed` and `payment.succeeded` say that one is made from the other, so they no longer look like duplicates. Adding a Send conversions rule links to the Event list.",
+			"at": "2026-11-16T16:29:09Z"
 		}
 	],
-	"through": "17f8503+bac6746"
+	"through": "ea34278+0d1a66d"
 }
