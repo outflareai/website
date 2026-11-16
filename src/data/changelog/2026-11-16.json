@@ -2,7 +2,7 @@
 	"version": "2026.11.16",
 	"date": "2026-11-16",
 	"status": "in-progress",
-	"updated": "2026-11-16T16:46:17Z",
+	"updated": "2026-11-16T17:09:43Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -451,7 +451,14 @@
 			"edition": "open-source",
 			"text": "Trends and dashboards can show Search Console the way its own report does: clicks, impressions, CTR and position filtered and split by query, page, country and device. Any dashboard can now carry tiles such as top queries, clicks by country, or one page's positions on mobile.",
 			"at": "2026-11-16T16:33:37Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "The Agents page keeps itself current: Waiting for you, All changes and Rules load again every few seconds while the page is open, and at once when you come back to the tab, so new changes from your agents show up without a reload. A selection you are making in Waiting for you stays ticked.",
+			"at": "2026-11-16T17:09:43Z"
 		}
 	],
-	"through": "a5af09d+fa2a266"
+	"through": "62caea9+3da632e"
 }
