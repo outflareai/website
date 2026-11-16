@@ -2,7 +2,7 @@
 	"version": "2026.11.16",
 	"date": "2026-11-16",
 	"status": "in-progress",
-	"updated": "2026-11-16T12:48:49Z",
+	"updated": "2026-11-16T12:52:49Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -346,7 +346,14 @@
 			"edition": "open-source",
 			"text": "Link orders catalog: sites whose metrics look like a PBN (high DR with almost no traffic or keywords, few referring subnets, thousands of outgoing links) get a \"Likely PBN?\" badge with the reasons, a filter to review them, and Flag as PBN in the right-click menu and on the donor card. It only suggests: the PBN flag stays yours to set.",
 			"at": "2026-11-16T12:48:49Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Recordings and heatmaps have more settings: record only the pages you list or leave some out, drop recordings of very short visits, and cap how many visits are recorded a day. A heatmap whose page can't be shown yet now says why, with a button to turn recordings on.",
+			"at": "2026-11-16T12:52:49Z"
 		}
 	],
-	"through": "0475bf0+0597b68"
+	"through": "c4e088c+54b9736"
 }
