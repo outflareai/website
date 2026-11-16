@@ -45,6 +45,10 @@ The **Agent** button in the top bar (or Ctrl+J) opens a chat with the brand's ag
 
 The chat opens on a new conversation, unless your latest one is still going (the agent is working on it or owes you an answer, or you wrote in the last half hour). The dropdown at the top of the chat lists every conversation, newest first, with a search and **New chat**.
 
+Each conversation's **⋯** menu pins it to the top of the list, renames it, archives it or deletes it. Archived conversations move to **Archived** at the bottom of the list and come back as soon as anyone writes in them. Pins and the archive are shared by everyone on the brand, like the conversations.
+
+The task count next to the agent's status opens a list of its tasks, with where each one stands and how far its plan has got. Pick one to open its page.
+
 ## Changes that wait for you
 
 Each task's page lists every change the agent made or asked for, and what became of it:
