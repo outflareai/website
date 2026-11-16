@@ -11,6 +11,16 @@ A **dashboard** is one page of your saved [funnels](/docs/guides/funnels/), [tre
 
 In the app, open **Analytics** in the sidebar, then **Dashboards**. Type a name and press **Create** to start one.
 
+## Ask a question
+
+At the top of Dashboards is a box: type what you want to know ("How many people opened the app each week, by plan?") and press **Ask**. You get a chart with a sentence on how it was built. **Open in the builder** to change it, or **Save this chart** to keep it and put it on a dashboard.
+
+- **It runs on your own AI model.** The workspace connects its own key under **Connectors** and picks the model for "Analytics questions" in the AI settings. Until it does, the box stays off and links to Connectors. Outflare never supplies a model.
+- **The model never sees your data.** It gets the question and the names of your events, their descriptions and property names from the [event dictionary](/docs/guides/customer-records/), your conversions and the fields a chart can break down by. Outflare runs the chart itself, so no people, values or numbers leave it. The better your dictionary describes your events, the better the answers.
+- **When it can't answer**, it says why instead of drawing a chart.
+
+Through the API, `POST /v1/brands/{brand}/insights/ask` with `{"question": "…"}` starts a question and `GET /v1/brands/{brand}/insights/ask/{id}` returns it: once `status` is `ready` it carries the chart's `kind` and `spec`, which you can run or save like any other.
+
 ## Tiles
 
 **Add tile** opens a page inside the dashboard: build a new trend, funnel, retention, paths or lifecycle chart right there (it is saved and added in one step), pick one you saved before, or write a note (a few lines of text, for what the page is for or what to look at first). A funnel tile takes the full width; the others half of it. A trend saved as a number shows its totals, with the change on the period before. A trend tile carries the brand's [notes on these dates](/docs/guides/trends/) as markers, so a jump or a dip on the dashboard has its reason beside it; a dashboard shared by link shows the numbers without the notes.
