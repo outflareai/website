@@ -2,7 +2,7 @@
 	"version": "2026.11.16",
 	"date": "2026-11-16",
 	"status": "in-progress",
-	"updated": "2026-11-16T09:36:09Z",
+	"updated": "2026-11-16T10:49:18Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -227,7 +227,42 @@
 			"edition": "open-source",
 			"text": "Link orders catalog: a broker export's price column is now imported when its header names the currency twice (\"Price USD, $\"), and \"Ref. IPs / Subnets\" fills referring subnets. The catalog table shows every intermediary metric as a sortable column you can hide, draws large catalogs a page at a time, and an import can set the intermediary for every row.",
 			"at": "2026-11-16T09:36:09Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Tracker: enter what a campaign cost by hand. For a network whose cost Outflare can't read, Tracker → Logs → Cost updates takes a campaign, the days and the amount (or a CSV of them) and shares it out evenly over the campaign's clicks, so every report has cost and the total is exactly what you entered.",
+			"at": "2026-11-16T09:54:13Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Sales reporting now shows discovery searches, tool calls, retries and recorded costs from a connected Lead Portal. Compare lane yield and inspect screening and grading evidence, with missing prices clearly marked.",
+			"at": "2026-11-16T10:16:42Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Link orders catalog: filter by category, subcategory, audience country, article type, DR, price and traffic ranges, referring domains, keywords, outgoing domains, date added, and price per 1,000 visits. A \"Sort by\" list adds best value, price, DR, traffic, referring domains, keywords and newest first, and Reset clears everything.",
+			"at": "2026-11-16T10:28:55Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Tracking plans: in the event dictionary, mark the properties every event must carry, and see which events arrive without them or with properties you never listed. Nothing is dropped.",
+			"at": "2026-11-16T10:49:18Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "agents",
+			"edition": "cloud",
+			"text": "On the Agents page, each change in a task now says what became of it, with Allow once, Always allow and Don't allow on the row. The chat opens a new conversation unless the latest is still going, and a dropdown in its header switches conversations.",
+			"at": "2026-11-16T10:49:18Z"
 		}
 	],
-	"through": "c21b2bd+bff8992"
+	"through": "caa69ef+6440d57"
 }
