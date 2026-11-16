@@ -2,7 +2,7 @@
 	"version": "2026.11.16",
 	"date": "2026-11-16",
 	"status": "in-progress",
-	"updated": "2026-11-16T09:02:58Z",
+	"updated": "2026-11-16T09:07:15Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -185,7 +185,21 @@
 			"edition": "open-source",
 			"text": "Snapchat Ads and Microsoft Advertising now show what is below each campaign: ad squads or ad groups and their ads, with spend, clicks and conversions per day, each ad's headline and landing page, and whether its link carries your tracking template. They are read only for now; pause, resume and budgets stay at the campaign level on these two.",
 			"at": "2026-11-16T09:02:58Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "The iOS library now installs in Xcode from the repository's address (File, Add Package Dependencies), and every library has the same version as the Outflare release it comes with, so you can tell at a glance which release a library belongs to.",
+			"at": "2026-11-16T09:07:15Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Destinations: write your product events to a table in your own BigQuery or Snowflake as they arrive, and press Send a test event on any destination to see it work before real events come in.",
+			"at": "2026-11-16T09:07:15Z"
 		}
 	],
-	"through": "41c9aa3+984d348"
+	"through": "e005eef+4bcbc81"
 }
