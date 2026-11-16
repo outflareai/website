@@ -2,7 +2,7 @@
 	"version": "2026.11.16",
 	"date": "2026-11-16",
 	"status": "in-progress",
-	"updated": "2026-11-16T21:52:24Z",
+	"updated": "2026-11-16T22:22:27Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -640,7 +640,14 @@
 			"edition": "open-source",
 			"text": "Treg joins the email finders: connect your own Treg token under Connectors and add it to a lead list's email waterfall to find work emails from a name and company domain. Lookups are billed to your own Treg balance (at most $0.10 each) and each billed lookup counts as one credit against the list's cap and in the spend ledger.",
 			"at": "2026-11-16T21:39:44Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "CRM → Lead finder has an Instructions box when you start a run: write your own brief on which companies fit and how to judge them, next to the accept and reject lists. It is saved for that ideal customer profile, and every AI step of a run reads it.",
+			"at": "2026-11-16T22:22:27Z"
 		}
 	],
-	"through": "6981886+c0956d2"
+	"through": "0775375+51c949e"
 }
