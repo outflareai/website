@@ -2,7 +2,7 @@
 	"version": "2026.11.16",
 	"date": "2026-11-16",
 	"status": "in-progress",
-	"updated": "2026-11-16T06:57:22Z",
+	"updated": "2026-11-16T09:23:05Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -150,7 +150,70 @@
 			"edition": "open-source",
 			"text": "Ask a question: type what you want to know at the top of Dashboards and get a chart you can open in the builder or save. It runs on your own AI model and sees only event names and descriptions, never people or their data.",
 			"at": "2026-11-16T06:57:22Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Libraries for sending product events from your servers: Node, Python, Go, Ruby and PHP. Each has identify, track, page, screen, group and alias, sends in batches in the background and retries when the server is busy.",
+			"at": "2026-11-16T08:10:56Z"
+		},
+		{
+			"kind": "launch",
+			"area": "records",
+			"edition": "open-source",
+			"text": "Outflare for Chrome: a side panel that shows what you know about the person an email is from in Gmail, or the company whose website you are on, and adds the ones you don't know with a note or a to-do. The toolbar icon turns green on a company you know and red on a do-not-contact site, checked inside the browser. For now it is loaded from the `extension/` folder.",
+			"at": "2026-11-16T08:14:56Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "outreach",
+			"edition": "open-source",
+			"text": "Mailbox health now counts the emails, replies and bounces your connected Instantly or Smartlead account sends from each mailbox, read from your own account about hourly. A new endpoint and agent tool give one mailbox's activity by day. Warm-up mail is never counted.",
+			"at": "2026-11-16T08:29:02Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Libraries for sending screens and events from mobile apps: iOS, Android, React Native and Flutter. Apps send with a public site key that has no origins, keep events on the phone while it is offline, and say which app version and phone each event came from.",
+			"at": "2026-11-16T08:33:45Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Snapchat Ads and Microsoft Advertising now show what is below each campaign: ad squads or ad groups and their ads, with spend, clicks and conversions per day, each ad's headline and landing page, and whether its link carries your tracking template. They are read only for now; pause, resume and budgets stay at the campaign level on these two.",
+			"at": "2026-11-16T09:02:58Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "The iOS library now installs in Xcode from the repository's address (File, Add Package Dependencies), and every library has the same version as the Outflare release it comes with, so you can tell at a glance which release a library belongs to.",
+			"at": "2026-11-16T09:07:15Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Destinations: write your product events to a table in your own BigQuery or Snowflake as they arrive, and press Send a test event on any destination to see it work before real events come in.",
+			"at": "2026-11-16T09:07:15Z"
+		},
+		{
+			"kind": "fix",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "A Telegram chat, and picking its customer, open as full pages instead of a side panel. Every Settings tab has an icon, and the AI model settings and approval messages no longer mention retired missions.",
+			"at": "2026-11-16T09:18:33Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Pinterest Ads and Reddit Ads now show what is below each campaign: ad groups and their ads, with spend, clicks and conversions per day, each ad's landing page, and whether its link carries your tracking template. They are read only for now; pause, resume and budgets stay at the campaign level on these two.",
+			"at": "2026-11-16T09:23:05Z"
 		}
 	],
-	"through": "212b9f7+2664520"
+	"through": "3766255+c9a4843"
 }
