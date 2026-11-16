@@ -43,6 +43,20 @@ Where Outflare can measure an objective, the agent reads the number itself, so y
 
 The **Agent** button in the top bar (or Ctrl+J) opens a chat with the brand's agent beside any page. Ask what it is doing, tell it what to change, or hand it a task. Home shows what it is working on and what waits for you.
 
+The chat opens on a new conversation, unless your latest one is still going (the agent is working on it or owes you an answer, or you wrote in the last half hour). The dropdown at the top of the chat lists every conversation, newest first, with a search and **New chat**.
+
+## Changes that wait for you
+
+Each task's page lists every change the agent made or asked for, and what became of it:
+
+- **Needs your OK**: nothing has happened yet. The row says why the agent asked (for example, a web search costs money on your own search connection) and has the buttons: **Allow once** runs it now, **Always allow changes like this** runs it and adds a rule so the agent makes changes like it on its own, and **Don't allow** turns it down. The agent sees your answer at its next turn.
+- **Done**: it ran, after your OK or because a rule allows it.
+- **Not allowed**, **Expired** (nobody decided within 30 days) or **Cancelled**: it never ran.
+- **Failed**: it ran and didn't go through; the agent sees why.
+- **Blocked by a rule**: one of your rules stops changes like this.
+
+The rules you've added are under **Settings**, **Rules** on the Agents page, where you can remove them.
+
 ## What you see
 
 - **Conversations**: your chats with the agent.
