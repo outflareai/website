@@ -2,7 +2,7 @@
 	"version": "2026.11.16",
 	"date": "2026-11-16",
 	"status": "in-progress",
-	"updated": "2026-11-16T09:31:51Z",
+	"updated": "2026-11-16T09:36:09Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -220,7 +220,14 @@
 			"edition": "open-source",
 			"text": "Tracker logs: a postback to a traffic source can be sent again. **Send again** on a row of Postbacks out (or `POST .../traffic-sources/{id}/postbacks/{send}/resend`, MCP `resend_traffic_source_postback`) queues it with the status and payout it had, to the source's postback URL as it is now, so a send that failed on a wrong URL goes through once you fix the URL.",
 			"at": "2026-11-16T09:31:51Z"
+		},
+		{
+			"kind": "fix",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Link orders catalog: a broker export's price column is now imported when its header names the currency twice (\"Price USD, $\"), and \"Ref. IPs / Subnets\" fills referring subnets. The catalog table shows every intermediary metric as a sortable column you can hide, draws large catalogs a page at a time, and an import can set the intermediary for every row.",
+			"at": "2026-11-16T09:36:09Z"
 		}
 	],
-	"through": "a4ad414+fa2a5c1"
+	"through": "c21b2bd+bff8992"
 }
