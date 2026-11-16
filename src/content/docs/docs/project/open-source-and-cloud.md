@@ -29,6 +29,7 @@ Two promises come with it:
 | Sign up in the browser, nothing to install | | Yes |
 | [Brand agent](/docs/agents/brand-agent/): one agent per brand that keeps working toward the objectives you set, with every change going through your approvals | | Yes |
 | [PR autopilot](/docs/guides/pr-autopilot/): reactive PR for a brand every morning, with each quote, release and pitch approved by you | | Yes |
+| [Outreach mailboxes](/docs/guides/outreach-mailboxes/): Google or Microsoft mailboxes for cold outreach, ordered and renewed from your balance, with domain DNS and sign-in details | | Yes |
 | [Lead finder](/docs/guides/lead-finder/): companies that fit your ideal customer profile, the people to contact there, into your CRM and campaigns | | Yes |
 | [Support assistant Auto](/docs/guides/support-assistant/#auto): it answers customers' chats and emails on its own when every check passes, signed as an AI assistant (drafting is open source) | | Yes |
 | [Paid ads Autopilot](/docs/integrations/paid-media/#paid-ads-autopilot): the brand agent applies the paid ads savings you allow (lower budgets, pauses, negative keywords) on its own, up to a daily limit; suggestions, tests and new ads are open source | | Yes |
