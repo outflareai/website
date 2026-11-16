@@ -41,6 +41,7 @@ Changing the settings needs the `customers.manage` permission; watching needs `c
   <section data-of-block>…</section>
   ```
 
+- **Keys, tokens and passwords shown on a page are hidden too**, before anything leaves the visitor's browser, in recordings and in heatmap pictures alike: known key formats (such as `sk-…`, `ghp_…`, AWS and Google keys, sign-in tokens), `user:password@host` addresses, whatever follows a label such as "API key", "Token" or "Password", secrets in a link's parameters, and any run of 16 or more mixed letters and digits, which covers UUIDs and other ids as well. They show as stars. The server checks the known formats again before storing. This is matching, so treat it as a safety net: for a page that shows secrets, add `data-of-mask` to that part, list the page under **Never these pages**, or turn on **Hide all text**.
 - Where consent is needed (see the [consent banner](/docs/guides/consent-banner/)), a visitor is recorded only after they allow analytics, and recording stops if they withdraw it.
 - `data-replay="off"` on the snippet keeps recordings and heatmaps off for that site, whatever the brand's settings say.
 - Canvas drawings and the contents of frames from other sites are not recorded.
