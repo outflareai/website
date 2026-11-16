@@ -2,7 +2,7 @@
 	"version": "2026.11.16",
 	"date": "2026-11-16",
 	"status": "in-progress",
-	"updated": "2026-11-16T17:32:46Z",
+	"updated": "2026-11-16T17:41:34Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -479,7 +479,14 @@
 			"edition": "open-source",
 			"text": "Heatmaps tell the steps of a page apart when its content changes at one address (a sign-up, a wizard): each step has its own heatmap and picture. Tick pages in the Heatmaps or Recordings list to exclude them from tracking, and Recordings has a \"Delete all\" button.",
 			"at": "2026-11-16T17:32:46Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "agents",
+			"edition": "cloud",
+			"text": "Each of the agent's tasks has its own page and link, with one clear status, what happens next, a box to answer the agent's question, and a chat about that task you can resize.",
+			"at": "2026-11-16T17:41:34Z"
 		}
 	],
-	"through": "457ad3f+1506a4d"
+	"through": "457ad3f+b115d72"
 }
