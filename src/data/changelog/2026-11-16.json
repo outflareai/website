@@ -2,7 +2,7 @@
 	"version": "2026.11.16",
 	"date": "2026-11-16",
 	"status": "in-progress",
-	"updated": "2026-11-16T11:33:45Z",
+	"updated": "2026-11-16T11:56:52Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -311,7 +311,28 @@
 			"edition": "open-source",
 			"text": "Outbrain and LinkedIn campaigns now show their ads, with spend, clicks and conversions per day: Outbrain's promoted links with their title, landing page and whether Outbrain approved them, and LinkedIn's creatives with their name, status and review. Neither platform has ad groups, so the ads sit directly in the campaign. They are read only for now.",
 			"at": "2026-11-16T11:33:45Z"
+		},
+		{
+			"kind": "fix",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Link orders catalog: the Catalog page now loads the whole catalog instead of stopping at 1,600 sites, so filters, sorting, recommended donors and PBN hints cover a full intermediary database. The catalog API returns up to 1,000 rows a page.",
+			"at": "2026-11-16T11:56:52Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Pause and resume a single ad on Taboola, Outbrain and Reddit (and a Reddit ad group) from the campaign's page, the API or MCP, leaving the campaign and its other ads running. An agent's pause follows its grant; a resume always waits for a person.",
+			"at": "2026-11-16T11:56:52Z"
+		},
+		{
+			"kind": "launch",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Link orders: label the donors you most want links from as Best link. The catalog shows them first, can show only them, and the label can be set from a cell's right-click menu, the donor card or a best_link CSV column.",
+			"at": "2026-11-16T11:56:52Z"
 		}
 	],
-	"through": "9cbf654+009b30e"
+	"through": "da38b89+1aa5126"
 }
