@@ -47,3 +47,11 @@ Counts are kept for 90 days. Pages are told apart by their path, without the que
 | `GET /v1/brands/{brand}/heatmaps/snapshot?path=/pricing` | The picture of the page behind its heatmap |
 
 In the MCP server: `list_heatmap_pages` and `get_heatmap`. Ask your agent how far down most phone visitors get on your pricing page, and where they click most.
+
+## Pages with steps
+
+Some pages change what they show without changing their address: the steps of a sign-up, a wizard. Outflare tells the steps apart by the step marked as current (`aria-current="step"`) or, without one, the first heading in view, and gives each its own heatmap and picture. The Heatmaps list shows such a page once with its number of steps, and its heatmap has a **Step** picker, busiest step first. A page keeps at most 12 steps. With **Hide all text** on, steps are named by a number instead of their heading.
+
+## Leaving pages out
+
+Tick pages in the Heatmaps list and choose **Exclude from tracking**. They are added to **Never these pages** in the settings, for recordings and heatmaps alike, and what was counted on them is deleted. On the Recordings list you can tick visits and choose **Exclude their pages from tracking**.

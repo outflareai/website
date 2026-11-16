@@ -69,7 +69,7 @@ A visit is one browser tab, up to four hours, and shows in the list a few second
 Recordings delete themselves after **Keep recordings for**, and heatmap counts after 90 days. To delete sooner:
 
 - **Some recordings**: tick them in the list and choose **Delete selected**.
-- **Old recordings**: **Delete old recordings…** above the list deletes every recording older than 7, 30 or 60 days, or every recording.
+- **Old recordings**: **Delete old recordings…** above the list deletes every recording older than 7, 30 or 60 days, or every recording. **Delete all** at the top of the page deletes every recording at once.
 - **A heatmap**: open the page's [heatmap](/docs/guides/heatmaps/) and choose **Clear**, such as after a redesign. **Clear all** on the Heatmaps page clears every page. Counting carries on from then.
 
 Deleted recordings and cleared heatmaps are gone for good.
