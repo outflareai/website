@@ -2,7 +2,7 @@
 	"version": "2026.11.16",
 	"date": "2026-11-16",
 	"status": "in-progress",
-	"updated": "2026-11-16T14:21:17Z",
+	"updated": "2026-11-16T14:45:49Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -388,7 +388,14 @@
 			"edition": "open-source",
 			"text": "Dashboards: pin a saved report as a tile. A report saved on Tracker → Report (tracker clicks or site visits) can sit on a dashboard beside your charts, showing its top rows and totals. It is for your signed-in team: on a shared link the tile shows only the report's name.",
 			"at": "2026-11-16T14:21:17Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Recordings start playing when opened and mark every click, typing, new page and pause on the progress bar; the list names known visitors and filters by website. Heatmaps take their own picture of each page, so they work without recordings, show only the busiest areas by default and list the ten most clicked spots by name.",
+			"at": "2026-11-16T14:45:49Z"
 		}
 	],
-	"through": "17379fe+069aa77"
+	"through": "16cd884+0fd7236"
 }
