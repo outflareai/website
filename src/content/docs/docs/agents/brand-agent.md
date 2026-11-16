@@ -35,7 +35,7 @@ An objective is what you want more of. Choose one or several:
 - Get more from paid ads ([Paid ads Autopilot](/docs/integrations/paid-media/#paid-ads-autopilot))
 - Win more with A/B tests
 - Keep and grow customers: the agent works your [Needs attention](/docs/guides/signals/) queue. It reads each account before it speaks, gives accounts with no owner one through your [routing](/docs/guides/routing/) rules, writes what it found and a suggested next step for the owner, flags what your rules missed, and tells you which signals are noise. It never contacts a customer or closes a signal itself, and it is measured by the signals your team closed as won
-- Something else, in your own words
+- Anything else, in your own words
 
 Where Outflare can measure an objective, the agent reads the number itself, so you see where it stands. An objective that needs a connection you haven't made says which one to add. An agent with no open objective does nothing until you give it another.
 
@@ -47,7 +47,33 @@ The chat opens on a new conversation, unless your latest one is still going (the
 
 Each conversation's **⋯** menu pins it to the top of the list, renames it, archives it or deletes it. Archived conversations move to **Archived** at the bottom of the list and come back as soon as anyone writes in them. Pins and the archive are shared by everyone on the brand, like the conversations.
 
-The task count next to the agent's status opens a list of its tasks, with where each one stands and how far its plan has got. Pick one to open its page.
+## Tasks
+
+The Agents page shows the agent's tasks beside the chat. On top is **Needs you**: every question the agent has for you, each with a box to answer it right there, and every change waiting for your OK, each naming its task. Below is a table of the tasks with a status, how far the plan has got and when the agent last updated it. **Finished** shows the tasks that are done or dropped. The task count in the agent's bar opens the same list as a menu.
+
+A task has one status, the same everywhere it shows:
+
+| Status | What it means | What you do |
+| --- | --- | --- |
+| **Needs you** | The agent asked you a question about this task, or one of its changes waits for your OK | Answer or decide on the task's page |
+| **Working now** | The agent is on this task right now | Nothing |
+| **Reading your answer** | You answered; the agent picks it up next | Nothing |
+| **In progress** | The task has a plan and the agent carries on with it the next time it works | Nothing |
+| **Steps done** | Every step of the plan is ticked | Check the results, then mark it as done or ask for more |
+| **Not started** | The agent hasn't written a plan yet | Nothing, or **Start now** |
+| **Paused** | The agent is paused, so the task isn't moving | Resume the agent |
+| **Done**, **Dropped** | The agent no longer works on it | **Reopen** to carry on |
+
+Pick a task to open its page. The page has its own address, so you can bookmark it or send it to a teammate with **Copy link**. From the top it shows:
+
+- the status and **what happens next**: when the agent works on it again, or exactly what it needs from you. A question comes with an answer box, and only this task's changes wait here for your OK
+- where the task is, in the agent's words, and the plan with the next step marked
+- the results so far, linked to where they live
+- the number the task is measured by, when Outflare can measure it
+- what the agent is trying, the number each attempt is judged by, and when it judges it
+- every change the agent made or asked for
+
+The chat beside a task is about that task. Ask "What's the status?" or "Do you need anything from me?", answer its question, or change what it should do. **All chats** goes back to your other conversations. Drag the handle between the task and the chat to make the chat wider or narrower; double-click it to put it back.
 
 ## Changes that wait for you
 
@@ -64,7 +90,8 @@ The rules you've added are under **Settings**, **Rules** on the Agents page, whe
 ## What you see
 
 - **Conversations**: your chats with the agent.
-- **Objectives**: each objective with what the agent tried for it, the number before and after, and whether it worked. What it learned about the brand is listed below.
+- **Tasks**: each task with its status, its plan, what the agent tried for it and whether it worked.
+- **Settings**, **Standing instructions**: the rules the agent follows on every task, and what it has learned about the brand.
 - **Activity** and **Turns**: everything it read and changed, and what each working session did.
 
 It alerts you when it finishes a task, when changes wait for you, and when it is stuck. You can pause, resume or stop it at any time. If it has no AI model or keeps failing, it pauses itself and says why.
