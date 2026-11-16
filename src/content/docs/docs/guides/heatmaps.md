@@ -9,7 +9,7 @@ sidebar:
 
 A **heatmap** shows where visitors click on a page and how far down they scroll. It tells you whether people see your call to action, what they click that isn't a link, and where they stop reading.
 
-Heatmaps come from the [website tracking](/docs/guides/website-tracking/) snippet you already have, run inside Outflare and call no third-party service. They are off until you turn them on: open **Analytics › Recordings › Settings** and switch on **Heatmaps** (the same settings as [session recordings](/docs/guides/session-recordings/)).
+Heatmaps come from the [website tracking](/docs/guides/website-tracking/) snippet you already have, run inside Outflare and call no third-party service. They are off until you turn them on with the switch at the top right of **Analytics › Heatmaps**, which also turns them off again. **Settings** beside it opens the settings heatmaps share with [session recordings](/docs/guides/session-recordings/), where you choose which pages are counted.
 
 In the app, open **Analytics** in the sidebar, then **Heatmaps**.
 

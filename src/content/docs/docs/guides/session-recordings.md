@@ -15,7 +15,7 @@ In the app, open **Analytics** in the sidebar, then **Recordings**. [Heatmaps](/
 
 ## Turn it on
 
-Open **Recordings › Settings**. Each setting saves as you change it, and your website picks it up within a minute.
+Open **Recordings › Settings**. Each setting saves as you change it, and your website picks it up within a minute. The switch at the top right of the Recordings page turns recording on or off without opening the settings.
 
 | Setting | What it does |
 | --- | --- |
@@ -24,6 +24,10 @@ Open **Recordings › Settings**. Each setting saves as you change it, and your 
 | **Share of visits recorded** | Every visit, or a random share of them on a busy site. A visit is picked once, when it starts. |
 | **Hide all text** | Also hides every piece of text on the page, for sites that show personal details. |
 | **Keep recordings for** | 7 to 90 days. Older recordings are deleted for good. |
+| **Shortest visit kept** | Recordings of visits shorter than this are deleted about half an hour after they end, so the list holds visits worth watching. |
+| **Most recordings a day** | Once this many visits are recorded in a day (UTC), the rest of that day's visits aren't. Heatmaps keep counting. No limit by default. |
+| **Only these pages** | Record and count only the pages you list, one per line: `/pricing`, or `/blog/*` for every page under it. Empty means every page. |
+| **Never these pages** | Pages left out of recordings and heatmaps, such as `/account/*`. A visit that passes through one is still recorded on its other pages. |
 
 Changing the settings needs the `customers.manage` permission; watching needs `customers.read`.
 
