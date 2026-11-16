@@ -304,15 +304,35 @@ How it works:
   says yes). Elsewhere the workspace's setting decides: **Everyone,
   unless they opted out** (`opt_out`, the default) or **Only people who said
   yes** (`opt_in`). Anyone who withdrew consent is never sent.
+  A brand whose own site already asks every visitor for consent to ad data,
+  but hasn't yet passed those answers to Outflare, can choose **Everyone:
+  our site already collects consent** (`collected`). Conversions are then
+  sent for everyone, in every country and when the country is unknown,
+  marked as consented; people who withdrew are still never sent. It is the
+  brand's own statement about its site, so only a signed-in person can
+  choose it (an API token or an agent gets `403`), the web app asks to
+  confirm, and the change is in the audit log. It covers conversions, not
+  adding people to ad audiences, which keeps asking for consent to ad
+  personalisation.
   A person's country is their latest website visit's. For someone the site
   script never saw, such as a purchase sent only from your server, it is the
   event's own: `context.location.country` (two letters, such as `US`), else
-  the country of `context.ip`. So send the user's IP address (or country)
-  in `context` on server events, or they are treated as country unknown.
+  the country of `context.ip`. When that event says nothing either, Outflare
+  looks at the person's most recent earlier event that carried a country or
+  an IP address, and then at the `country` on their customer record (two
+  letters). Only when none of these says is the person treated as country
+  unknown. So send the user's IP address (or country) in `context` on server
+  events: it is the most reliable source.
 - Every matched event is a row in the send log: `sent` (with the kinds of
   identifiers it carried, such as `gclid` and `email`), `skipped` with the reason
   (no consent, nothing to match on), `failed` when the platform refused it or
-  could not be reached after five tries, or `queued`.
+  could not be reached after five tries, or `queued`. Each row also has the
+  `country` the consent decision was made on and its `country_source`
+  (`visit`, `event`, `earlier_event` or `record`), the conversion it was
+  going to (`target_name`, `ad_account_id`) and the person's name
+  (`record_name`). In the web app the log is its own screen, **Paid ads →
+  Send log**: filter by result or rule, read what happened in plain words,
+  open the person from any row, and download it as CSV.
 
 On the **Paid ads** page, **Send conversions back** adds and switches rules,
 sets who to send for, and shows the latest sends.
@@ -323,7 +343,7 @@ sets who to send for, and shows the latest sends.
 | `GET`, `POST /v1/workspaces/{ws}/ads/conversion-rules` | List rules with their last 30 days, or add one |
 | `PATCH`, `DELETE /v1/workspaces/{ws}/ads/conversion-rules/{id}` | Change, switch off or delete a rule |
 | `GET /v1/workspaces/{ws}/ads/conversion-sends` | The send log, newest first |
-| `GET`, `PUT /v1/brands/{brand}/ads/settings` | The brand's `consent_mode`: `opt_out` or `opt_in` (the workspace route is deprecated and acts on the first brand) |
+| `GET`, `PUT /v1/brands/{brand}/ads/settings` | The brand's `consent_mode`: `opt_out`, `opt_in` or `collected` (the workspace route is deprecated and acts on the first brand) |
 
 The MCP tools are `list_ad_conversion_targets`, `list_ad_conversion_rules`,
 `create_ad_conversion_rule`, `update_ad_conversion_rule`,
