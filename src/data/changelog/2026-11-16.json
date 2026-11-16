@@ -2,7 +2,7 @@
 	"version": "2026.11.16",
 	"date": "2026-11-16",
 	"status": "in-progress",
-	"updated": "2026-11-16T16:46:17Z",
+	"updated": "2026-11-16T20:52:28Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -451,7 +451,112 @@
 			"edition": "open-source",
 			"text": "Trends and dashboards can show Search Console the way its own report does: clicks, impressions, CTR and position filtered and split by query, page, country and device. Any dashboard can now carry tiles such as top queries, clicks by country, or one page's positions on mobile.",
 			"at": "2026-11-16T16:33:37Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "The Agents page keeps itself current: Waiting for you, All changes and Rules load again every few seconds while the page is open, and at once when you come back to the tab, so new changes from your agents show up without a reload. A selection you are making in Waiting for you stays ticked.",
+			"at": "2026-11-16T17:09:43Z"
+		},
+		{
+			"kind": "security",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Security improvements to tracker click recording.",
+			"at": "2026-11-16T17:13:39Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "The Rankings tab now says what the last import from SE Ranking did: the project it matched and how many keywords came in, that no project in the account is for this site (with the sites its projects are for), or that the import failed and why. Before, an import that brought nothing in looked the same as one that never ran.",
+			"at": "2026-11-16T17:32:46Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Heatmaps tell the steps of a page apart when its content changes at one address (a sign-up, a wizard): each step has its own heatmap and picture. Tick pages in the Heatmaps or Recordings list to exclude them from tracking, and Recordings has a \"Delete all\" button.",
+			"at": "2026-11-16T17:32:46Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "agents",
+			"edition": "cloud",
+			"text": "Each of the agent's tasks has its own page and link, with one clear status, what happens next, a box to answer the agent's question, and a chat about that task you can resize.",
+			"at": "2026-11-16T17:41:34Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Website analytics, Search loads faster: Search Console is asked for a report's total and its rows at the same time, and the Pages and Search queries tables load together, so switching between them shows the answer straight away.",
+			"at": "2026-11-16T17:46:18Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Tracker → Report opens on tracker clicks, shows campaigns, offers, landers and paths by name (in the table, filters and CSV), and labels custom fields with what your traffic sources call them. Filters on a campaign, source, offer or lander are picked from a list. A mistyped custom column is refused where you type it, and deleting a saved view asks first.",
+			"at": "2026-11-16T18:21:31Z"
+		},
+		{
+			"kind": "fix",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Tracker: a postback with an unfilled placeholder (status={status}) is recorded instead of refused, and Setup builds postback URLs only from placeholders a network has. Logs tables have column headers and say why a conversion is suspect. Archived sources and networks leave their lists and can be restored; currencies come from a list; number fields no longer jump as you type.",
+			"at": "2026-11-16T18:21:31Z"
+		},
+		{
+			"kind": "fix",
+			"area": "records",
+			"edition": "open-source",
+			"text": "Importing people now adds a missing user ID when an email matches an existing person, so later events and transactions find the same record. Rows whose email belongs to a person with a different user ID are skipped with a clear reason.",
+			"at": "2026-11-16T18:21:31Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Partner programs can now credit only conversions from a time you choose. Set the credit start time before importing payment history for a program moved from another platform, so older sales and sign-ups earn no new rewards. Existing rewards and refunds stay unchanged.",
+			"at": "2026-11-16T18:21:31Z"
+		},
+		{
+			"kind": "fix",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "A repeat postback that only changes a conversion's status now keeps the payout the network first reported (it was replaced by the offer's own payout, or 0). Paging the conversions and cost update lists reaches rows that share a timestamp, and a later cost update for the same days always wins over an earlier one.",
+			"at": "2026-11-16T18:27:51Z"
+		},
+		{
+			"kind": "fix",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Tracker: link-preview fetchers such as Meta's facebookexternalhit and WhatsApp no longer count as visits (or as paid clicks). A conversion can't be dated before its click. A report asked for \"from today\" works in time zones ahead of UTC. The Offers and Landers lists say what their daily counts include.",
+			"at": "2026-11-16T20:01:18Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Under Send conversions back, \"Who to send for\" has a third choice: \"Everyone: our site already collects consent\". Pick it when your own site asks every visitor for consent to ad data, and conversions are sent for everyone in every country. People who opted out are still never sent.",
+			"at": "2026-11-16T20:45:06Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Paid ads has a Send log screen: every conversion sent to an ad platform, with what happened in plain words, what it was matched on, its value, and a link to the person. When an event doesn't say which country someone is in, Outflare now uses their earlier events and then their record before holding the conversion back.",
+			"at": "2026-11-16T20:45:06Z"
+		},
+		{
+			"kind": "launch",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "People from events: Source \"Event\" is now \"Events and conferences\", and a new Sub-source names the event or conference each person was met at. Pick one of the brand's events or type a new one, add several people from one event at once or from a CSV, and filter People by event.",
+			"at": "2026-11-16T20:52:28Z"
 		}
 	],
-	"through": "a5af09d+fa2a266"
+	"through": "1ffe76d+f3623ba"
 }
