@@ -2,7 +2,7 @@
 	"version": "2026.11.17",
 	"date": "2026-11-17",
 	"status": "in-progress",
-	"updated": "2026-11-17T06:34:54Z",
+	"updated": "2026-11-17T06:56:34Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -24,7 +24,14 @@
 			"edition": "open-source",
 			"text": "A slow email lookup no longer stalls the email step. When a connected finder such as Treg gives no answer in time for a person, that counts as no address from it and the step moves on, where before it asked again up to five times and could switch the connection off for a while.",
 			"at": "2026-11-17T06:34:54Z"
+		},
+		{
+			"kind": "launch",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Recommended donors can now be sent straight to an Outreach sequence: Find emails and send to a sequence has OutflareBot find each site's advertising or editorial address (never data-protection, legal or no-reply mailboxes) and adds the best one to a sequence: the one used last time, or a new draft made right there.",
+			"at": "2026-11-17T06:56:34Z"
 		}
 	],
-	"through": "a7c93fb+96bf3f4"
+	"through": "3c808d7+d1d83fe"
 }
