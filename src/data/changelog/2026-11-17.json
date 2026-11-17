@@ -2,7 +2,7 @@
 	"version": "2026.11.17",
 	"date": "2026-11-17",
 	"status": "in-progress",
-	"updated": "2026-11-17T11:03:55Z",
+	"updated": "2026-11-17T11:08:23Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -87,7 +87,14 @@
 			"edition": "open-source",
 			"text": "Sales managers and workspace admins can now see each SDR and account executive's activity by day, plus a log filtered by teammate, action, person or company. Seen actions and successful AE transfers now retain history for reporting.",
 			"at": "2026-11-17T11:03:55Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "connectors",
+			"edition": "open-source",
+			"text": "Treg finds more work emails: it now asks Blitz, Filtrat, Kitt and Anymailfinder in turn instead of Treg's own router, which often ran out of time. A Treg connection can also be your verification service (Filtrat, with BounceBan as a second opinion). One person can now use up to four credits on a Treg connection.",
+			"at": "2026-11-17T11:08:23Z"
 		}
 	],
-	"through": "bc54958+79c1ecd"
+	"through": "462fe08+4ba0ffd"
 }
