@@ -2,7 +2,7 @@
 	"version": "2026.11.17",
 	"date": "2026-11-17",
 	"status": "in-progress",
-	"updated": "2026-11-17T18:17:49Z",
+	"updated": "2026-11-17T18:26:35Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -339,7 +339,14 @@
 			"edition": "open-source",
 			"text": "Customers from ads now show their campaign, ad group and keyword within a few hours of the click instead of the next morning: Outflare reads Google Ads' click report on every sync, not once a day.",
 			"at": "2026-11-17T18:17:49Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "The Errors page is easier to act on: tabs for Open, Fixed, Ignored and Archived, search and filters, and ticking several errors to mark them fixed, ignore, archive or delete them at once, with Undo. Each error has a \"Copy fix prompt for AI\" button that hands your coding assistant the error, its stack, pages, browsers and release, plus \"Copy error\" for tickets.",
+			"at": "2026-11-17T18:26:35Z"
 		}
 	],
-	"through": "2f33c7e+1a08d05"
+	"through": "c4b245e+f89b0c0"
 }
