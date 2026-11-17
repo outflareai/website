@@ -2,7 +2,7 @@
 	"version": "2026.11.17",
 	"date": "2026-11-17",
 	"status": "in-progress",
-	"updated": "2026-11-17T09:57:48Z",
+	"updated": "2026-11-17T10:40:44Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -59,7 +59,28 @@
 			"edition": "open-source",
 			"text": "Internal and test people: list your team's email domains and your test accounts under Analytics, switch it on, and funnels, trends, retention, stickiness, lifecycle and paths leave them out. Nothing is deleted, and turning it off counts them again.",
 			"at": "2026-11-17T09:44:29Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "The send log can ask Google Ads what it did with a conversion after accepting it: processed, still processing, or refused and why. Press Ask Google Ads on a sent row.",
+			"at": "2026-11-17T10:40:44Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "New API call and MCP tool to exclude a search from a Google Ads campaign or ad group: `POST /v1/brands/{brand}/ads/campaigns/{id}/negative-keywords` (`add_ad_negative_keyword`), with exact or phrase match. It is queued and listed like any campaign change.",
+			"at": "2026-11-17T10:40:44Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Paid ads, Campaigns: each campaign shows its daily budget, sign-ups, new customers and cost per customer against your target, with Pause on the row and a link to it in Google Ads. Tick several campaigns to pause them or change their budgets with one confirmation. Inside a campaign, Pause and Resume are buttons, and a search you're paying for has Exclude.",
+			"at": "2026-11-17T10:40:44Z"
 		}
 	],
-	"through": "0efca33+fd39c7a"
+	"through": "e98ef9b+9a3ca38"
 }
