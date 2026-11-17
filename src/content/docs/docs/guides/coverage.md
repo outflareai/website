@@ -15,6 +15,7 @@ Choose a [brand](/docs/guides/brands/), then open **Outreach → Presence**. Its
 | --- | --- |
 | Overview | Review tracked placements, page availability, growth and open work. |
 | Work queue | Assign, prioritize, snooze and resolve publication, link, accuracy and relationship work. |
+| Partnerships | Track the sites and partners you are going after, on a board per kind of partnership. |
 | Placements | Manage individual placements in a table or pipeline, with filters and saved views. |
 | Publishers | Connect websites to CRM companies and review their placements and relationship context. |
 | Commercial | Manage agreements, deliverables, invoices, payments, rate cards, budgets and documents. |
@@ -120,6 +121,24 @@ When you're already talking to a site, or about to, open the **Assigned to** dro
 - **Photos.** Each person's photo is the picture on the Google account they sign in with. Without one, Outflare shows their initials.
 - **It's the company's owner.** Assigning a site sets the owner of the site's company in the [CRM](/docs/guides/customer-records/), so the company's card shows who's managing it under "Before you reach out", and every change is in the company's history.
 - **Overlap warnings.** Pitching a link prospect at a site a teammate manages asks you to confirm first. Agents never pitch or reassign a site a teammate manages: they leave it to them.
+
+## Track the sites you are going after
+
+**Partnerships** keeps a board for each kind of partnership: SEO links, sponsorships, integrations, affiliates and comparison sites. Select **Set up** on the ones you work on. Each card is a record in your [CRM](/docs/guides/customer-records/) linked to the site's company, so its emails and history stay in one place, separate from your sales deals.
+
+For places you want to be mentioned or linked from, use **SEO links**. Its stages say where each site stands:
+
+| Stage | What it means |
+| --- | --- |
+| Researching | A site you are looking at and haven't decided on. New cards start here. |
+| Prospect | A site you have decided to go after. |
+| Pitched, Replied, Negotiating, Agreed, Content sent | Where the conversation is. |
+| Live | The link or mention is up. With **Their page** filled in, it becomes a placement and is checked from then on. |
+| Declined, No reply | It ended without a link. |
+
+Type a site into **Add prospect**, or ask a [connected AI app](/docs/agents/connect/): "Add these sites to the SEO links pipeline as prospects." The app uses `add_partnership` with the stage you name, and `update_record` to move a card later. A site is never added to the same board twice. Adding needs the people and companies permission on that app's connection.
+
+If you set up SEO links before the Researching stage existed, ask your AI app to apply the SEO links kit again (`apply_kit` with `partnerships-seo`), and the stage is added in front of Prospect.
 
 ## Check publication, links and accuracy
 
