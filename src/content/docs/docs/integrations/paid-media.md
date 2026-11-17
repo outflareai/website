@@ -125,16 +125,17 @@ are not added up across platforms as if they were.
 
 ## Reading it
 
-In the app, open **Paid ads** in the sidebar. The page is for one goal: more paying customers at or under your target cost. It has six tabs, each with its own address, and one date menu (Today, Yesterday, the last 7, 28, 30 or 90 days, this month, last month or a custom range).
+In the app, open **Paid ads** in the sidebar. The page is for one goal: more paying customers at or under your target cost. It has seven tabs, each with its own address, and one date menu (Today, Yesterday, the last 7, 28, 30 or 90 days, this month, last month or a custom range).
 
 | Tab | What it is for |
 | --- | --- |
-| **Overview** | One sentence that says where you stand against your target, then cost per new customer, cost per sign-up, new customers, spend, revenue and return. Campaigns named for your brand are judged apart from everything else, so a cheap average doesn't hide an expensive campaign. **Do this next** lists the three open actions with the biggest effect, and a funnel shows ad clicks, sign-ups and first payments. Every number reads the same rows, so they can't disagree. |
+| **Overview** | Pick all networks, one network or one ad account at the top, and everything below follows it. One sentence says where you stand against your target, then cost per new customer, cost per sign-up, new customers, spend, revenue and return. Campaigns named for your brand are judged apart from everything else, so a cheap average doesn't hide an expensive campaign. **Do this next** lists the three open actions with the biggest effect, and a funnel shows ad clicks, sign-ups and first payments. Every number reads the same rows, so they can't disagree. |
 | **Actions** | One table of what to do: **Fix** (something is broken), **Cut waste**, **Grow** and **Experiment**, each with why, the expected effect and one main button. Views: To do, In progress, Done and Dismissed. A switch turns recommendations on or off; while off, what Outflare would have recommended is under Preview. Nothing changes in an ad account until you approve it, and a budget raise shows the budget before and after and the most it can add a month. |
-| **Campaigns** | Every campaign with what it spent and brought; open one for its ad groups, ads, keywords and searches. |
+| **Campaigns** | Every campaign with what it spent and brought; open one for its ad groups, ads, keywords and searches. Tables start on **All enabled**, with a **Status** filter (All enabled, All but removed, All) and two total rows under each: one for the rows shown and one for all of them. For Google Ads, an enabled campaign, ad group or ad also says whether it is really serving, in Google's words (Eligible, Limited by budget, Limited by bidding, Learning, Not eligible), with Google's reasons on hover, and the table has Google's Optimization score. |
 | **Customers** | The people your ads brought, and which campaign each came from. |
+| **Audiences** | Lists of your people sent to the ad networks you choose ([Audiences](#audiences-one-list-several-ad-networks)). |
 | **Experiments** | Tests the ad network splits fairly, and how each change you approved turned out. |
-| **Setup** | One table with a status on each line: ad accounts, recommendations, conversions sent to the networks, the send log, tracking, the counting window, which customers' revenue counts, and the change history. |
+| **Settings** | A row of its pages sits under the tabs (General, Tracking, Send conversions, Send log, Ad accounts, Change history). General is one table with a status on each line: ad accounts, recommendations, conversions sent to the networks, the send log, tracking, the counting window, which customers' revenue counts, and the change history. |
 
 It shows spend, clicks, CTR, cost per click and platform conversions for 7, 28 or 90 days, by day, platform and campaign, with each account's brand and sync switch. Each campaign shows the visits, conversions and revenue Outflare's own attribution credits to it beside what the platform reports. Click a campaign and it opens as a page of its own, like a level in the ad platform, with a trail back (All campaigns, then the campaign, then the ad group): its numbers and trend by day, its conversions by type, its ad groups or ad sets and its ads, and for Google its keywords and search terms. Click an ad group or ad set for its own page with only its ads. Each page has its own address, so the browser's back button and shared links work. Paid visits whose campaign id matches no campaign in a connected account are listed on their own, with why that happens. An ad whose links lack the tracking template is marked. A connection that still needs a developer token asks for it at the top.
 
@@ -151,8 +152,21 @@ It shows spend, clicks, CTR, cost per click and platform conversions for 7, 28 o
 | `GET /v1/brands/{brand}/ads/summary` | Totals grouped by `connector`, `brand`, `account` or `day`, per currency; `entity_id` gives one campaign's, ad set's or ad's numbers alone |
 | `POST /v1/workspaces/{ws}/ads/sync` | Sync now instead of within six hours |
 
-All of them take `brand`. Money is in micros of the account's currency
-(1,000,000 = one unit); totals are given per currency, never converted. The MCP
+All of them take `brand`. Money is in micros (1,000,000 = one unit).
+
+**One currency per brand.** An ad account billed in another currency (an
+account a network made you open in Singapore dollars, say) is converted into
+the brand's currency, so its spend adds up with the rest. The Overview, the
+Campaigns tables and the totals of each campaign, ad group, ad, keyword and
+search term are in the brand's currency, at the latest daily reference rate
+Outflare keeps (the European Central Bank's), and the page says so ("billed
+in SGD, shown in USD"). In the API each row says what its account is billed
+in (`account_currency`, or `currency` beside `report_currency` and
+`exchange_rate`). A budget and a cost target stay in the ad account's
+currency in the API, because that is what the network sets; the app shows
+them converted, and the forms that change them use the account's currency.
+Money in a currency with no rate stays in its own and is never added to
+another. The MCP
 server has a tool for each (`list_ad_accounts`, `list_ad_campaigns`, `list_ad_items`,
 `list_ad_conversion_actions`, `list_ad_keywords`, `list_ad_search_terms`,
 `get_ads_summary`, `sync_ads`, `list_ad_connections`, `update_ad_account`,
@@ -249,7 +263,7 @@ definitions first.
 | Snapchat Ads | A Snap Pixel, through the Conversions API, as PURCHASE, SIGN_UP, SUBSCRIBE and so on | `ScCid`, the `_scid` cookie (`scid`), hashed email, phone and record id | The sign-in's access; if Snapchat refuses it, a Conversions API token from Ads Manager → Business Details on the connection |
 | Taboola Ads | An active event-based conversion (Realize → Tracking, "Create conversions using code"), by its event name, as a server-to-server action | `tblci` only | Nothing: the bulk S2S endpoint takes no token |
 | Pinterest Ads | The Conversions API, as checkout, signup, lead and so on | `epik`, hashed email, phone and record id | The workspace's own conversion access token, from Pinterest Ads Manager → Conversions |
-| ChatGPT Ads | Your pixel, through OpenAI's Conversions API, as `registration_completed`, `order_created`, `lead_created`, `subscription_created` and so on | `oppref`, the pixel's browser reference, hashed email, phone and record id | Your own pixel ID and conversion key from OpenAI Ads Manager → Conversions, and your website address. OpenAI takes conversions from the last 7 days only. |
+| ChatGPT Ads | Your pixel, through OpenAI's Conversions API, as `registration_completed`, `order_created`, `lead_created`, `subscription_created` and so on | `oppref`, the pixel's browser reference, hashed email, phone and record id; beside them the IP address and browser the event's own context carries (`context.ip`, `context.userAgent`) and the person's country, unhashed as OpenAI asks | Your own pixel ID and conversion key from OpenAI Ads Manager → Conversions, and your website address. OpenAI takes conversions from the last 7 days only. |
 
 Taboola matches only on its click id: a conversion with no `tblci` from the
 click is skipped. Taboola accepts each batch at once and processes it later
@@ -365,6 +379,41 @@ Outbrain Ads only reads: the Amplify API has no call that takes conversions.
 Outbrain's click id (`ob_click_id`) is still recorded on each visit, so its
 clicks count in Outflare's own attribution.
 
+## Audiences: one list, several ad networks
+
+An **audience** is one of the brand's lists of people (a smart list such as
+"paid in the last 90 days", a list you filled by hand, or a saved query's),
+named once and sent to the ad accounts you choose, so the same people reach
+several ad networks. It is under **Paid ads, Audiences**, and at
+`/v1/brands/{brand}/ads/audiences` (`POST` with `name`, `list_id` and
+`ad_account_ids`; `PATCH` to rename it, turn it on or off, point it at another
+list or change where it goes; `POST .../{id}/sync` to sync now; `DELETE`).
+It runs on the workspace's own ad accounts and stays off until one is
+connected ([Platforms](#platforms)).
+
+- **What Outflare does on the network.** Through your own connection it
+  makes a customer list named "<name> (Outflare)" on each ad account (a
+  Google Ads Customer Match list, a Meta custom audience), adds the people in
+  the list, and once a day sends what changed: people who joined go in,
+  people who left come out. Only hashed emails and phone numbers leave
+  Outflare.
+- **Consent.** The same rules as sending conversions, for ad data and ad
+  personalisation: someone who may not be added is left out, and someone who
+  withdraws consent is taken out at the next sync.
+- **Status per network.** Each destination shows whether it synced, how many
+  people were sent and left out, the last error, and what the network says it
+  matched. Networks hide the number for small lists and take a day or two to
+  count a new one.
+- **Networks that take a file.** A network Outflare can't fill a list on, such
+  as ChatGPT Ads, takes an upload instead: **Download file**
+  (`GET .../ads/audiences/{id}/file`) gives a CSV with the columns
+  `email_sha256` and `phone_number_sha256`, never a plain email or phone.
+- **Turning it off or deleting it** stops the syncs. The lists already on the
+  networks stay as they are; delete them there if they are no longer wanted.
+
+Use the list on the network like any other: add it to a campaign or exclude it
+([Targeting](#targeting), on a campaign's page).
+
 ## Audiences from journeys
 
 A journey's `sync_audience` step adds a person to a customer list audience on
@@ -403,7 +452,7 @@ On Google campaigns that bid for as many conversions as they can with no target,
 
 At most one of each per campaign at a time. They are measured on the whole campaign after a week to settle (a day for a negative). With an account picked, the tab also shows Google Ads' own recommendations for it, read live.
 
-Budget suggestions need a target cost per conversion (the campaign's, its account's or the platform's own). A campaign changed in the last week, or still being measured, gets none. Nothing changes until a person approves; an agent changes campaigns with the campaign calls below, which follow its grant. Approving makes the change exactly as those calls do (it shows in the change history under **Setup**) and starts its measuring window:
+Budget suggestions need a target cost per conversion (the campaign's, its account's or the platform's own). A campaign changed in the last week, or still being measured, gets none. Nothing changes until a person approves; an agent changes campaigns with the campaign calls below, which follow its grant. Approving makes the change exactly as those calls do (it shows in the change history under **Settings**) and starts its measuring window:
 
 - the platform's settling time (3 days for a budget, 7 for a resumed campaign), then
 - at least a week, and long enough for about 30 conversions at the campaign's rate, plus 3 days for conversions reported late,
@@ -418,6 +467,10 @@ When the window ends the change is judged against as many days just before it: *
 | `POST /v1/brands/{brand}/ads/suggestions/{id}/dismiss` | Leave the campaign as it is (`ads.manage`) |
 | `GET /v1/brands/{brand}/ads/recommendations` | The platform's own recommendations for an account, read live (Google Ads; `analytics.read`) |
 | `POST /v1/brands/{brand}/ads/suggestions/refresh` | Read the campaigns again now, at most once an hour (`ads.manage`) |
+| `GET /v1/brands/{brand}/ads/findings/{id}` | One action: what it would change, the numbers behind it, the expected effect, how it turned out, and what you said about it (`analytics.read`) |
+| `POST /v1/brands/{brand}/ads/findings/{id}/feedback` | Say it was good or bad advice: `rating` (`good` or `bad`) and an optional `note` (`ads.manage`) |
+
+**One action, and what you think of it.** Each row under Actions opens its own page: what it would change, every number behind it, the expected effect, and how it turned out. There you say **Good advice** or **Bad advice**, with a reason. It decides nothing and changes nothing on the network. The rating and reason stay on the action and are kept as one of the brand's memories, which agents read with the brand's context, so the next advice follows it; rating again replaces both. MCP: `get_ad_finding`, `rate_ad_finding`.
 
 **Savings that apply on their own.** An extension can let an agent approve suggestions that only spend less (a lower budget, a pause, a negative keyword) for a brand; `/v1/meta` then lists `ad_suggestions_auto`. Anything that can spend more always waits for a person, a suggestion on an account every brand shares never applies on its own, the agent's grant still applies, and the change is measured and judged like any other. `ad_suggestion.approved` carries `auto: true` for these. On Outflare Cloud, this is [Paid ads Autopilot](#paid-ads-autopilot).
 
@@ -510,8 +563,11 @@ How a campaign bids, which audiences it reaches and in which countries it runs, 
 | `POST /v1/brands/{brand}/ads/campaigns/{id}/bidding` | Bid for as many conversions as it can (`maximize_conversions`, with an optional `target_cpa_micros`) or as much conversion value (`maximize_conversion_value`, with an optional `target_roas`); Google Ads only (`ads.manage`) |
 | `POST /v1/brands/{brand}/ads/campaigns/{id}/audiences` | Add or remove (`add: false`) one of the account's audiences, such as one made from a smart list (`ads.manage`) |
 | `POST /v1/brands/{brand}/ads/campaigns/{id}/countries` | Add or remove a country by its two-letter code (`ads.manage`) |
+| `POST /v1/brands/{brand}/ads/campaigns/{id}/locations/preview` | What setting the campaign's places would add and take out, without changing anything (`analytics.read`) |
+| `POST /v1/brands/{brand}/ads/campaigns/{id}/locations` | Set the places the campaign shows in and is kept out of, in one change (`ads.manage`, Google Ads) |
+| `POST /v1/brands/{brand}/ads/campaigns/{id}/rename` | Rename the campaign (`ads.manage`, Google Ads) |
 
-Each answers `202` with the change, which runs as a job like the other campaign changes and shows in the change history under **Setup**. On Meta an audience or a country is added to or removed from every ad set of the campaign, keeping the rest of each ad set's targeting as it was. A campaign never loses its last country: removing it is refused, so it can't start running everywhere. A change made by an agent always waits for a person, whatever its grant. Each is an audit event (`ad_campaign.bidding_changed`, `ad_campaign.audience_added`, `ad_campaign.audience_removed`, `ad_campaign.country_added`, `ad_campaign.country_removed`).
+Each answers `202` with the change, which runs as a job like the other campaign changes and shows in the change history under **Settings**. On Meta an audience or a country is added to or removed from every ad set of the campaign, keeping the rest of each ad set's targeting as it was. A campaign never loses its last country: removing it is refused, so it can't start running everywhere. A change made by an agent always waits for a person, whatever its grant. Each is an audit event (`ad_campaign.bidding_changed`, `ad_campaign.audience_added`, `ad_campaign.audience_removed`, `ad_campaign.country_added`, `ad_campaign.country_removed`).
 
 ## New ads
 
@@ -578,6 +634,19 @@ many a day. Only a person can turn it on or change it, and it starts off.
 - The agent also learns which kinds of suggestion have tended to work, from
   verdicts across Outflare Cloud accounts. Only counts are shared, never your
   campaigns or numbers.
+
+### Ask the agent why
+
+<span class="pill cloud">Outflare Cloud</span>
+
+On Outflare Cloud, an action's page has **Ask the agent why**. It opens the
+brand agent's chat beside the page with the question already asked, so the
+agent explains the recommendation with its numbers, says what would make it
+wrong and what it would do instead. It reads what you said about earlier
+advice (Good advice, Bad advice) before it answers. It can also answer
+questions about your audiences, and propose a campaign's places or a new
+name, which wait for your OK like its other changes. The agent runs on the
+workspace's own AI key ([Brand agent](/docs/agents/brand-agent/)).
 
 ## Coming next
 
