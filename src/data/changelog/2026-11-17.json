@@ -2,7 +2,7 @@
 	"version": "2026.11.17",
 	"date": "2026-11-17",
 	"status": "in-progress",
-	"updated": "2026-11-17T15:58:53Z",
+	"updated": "2026-11-17T16:52:44Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -220,7 +220,14 @@
 			"edition": "cloud",
 			"text": "The agent chat beside a page now knows which page you're on. Ask \"how is this campaign doing?\" from a Paid ads campaign and it looks at that campaign. Its paid ads know-how covers the new page: room to grow, search terms, disapproval reasons and the daily budget ceiling. An ad it drafts shows in the chat as it will read in Google's results.",
 			"at": "2026-11-17T15:58:53Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Error capture is now one switch at the top of the Errors page, with a plain line that says whether errors are being captured on your site, or what is stopping them. On Website tracking, what the script does on its own (errors, clicks, form submits, A/B tests) has its own switches that save at once, without Edit.",
+			"at": "2026-11-17T16:52:44Z"
 		}
 	],
-	"through": "10bd8ae+cd4b86a"
+	"through": "f9f8da5+3ce3f07"
 }
