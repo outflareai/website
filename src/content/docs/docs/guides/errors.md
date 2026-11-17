@@ -13,8 +13,10 @@ When your site or app throws an error, Outflare can record it, group the same bu
 
 Error capture is off until you switch it on, so nothing changes on a site that doesn't want it.
 
-1. Open **Settings → Website tracking**, and press **Edit** on the script your site uses.
-2. Turn on **Capture errors** and save.
+1. Open **Errors**.
+2. Flip the **Error capture** switch at the top. It saves at once, and nothing changes on your site.
+
+The line beside the switch says what is happening: off, capturing errors on your site (with the script's last visit and the last error), or on but the script has sent no visit lately, with a link to check it. The same switch, **Capture errors**, is on your script under **Settings → Website tracking**. If the brand's site doesn't have the website script yet, the page shows **Add the website script** instead.
 
 From the next page view, the [website script](/docs/guides/website-tracking/) sends uncaught errors and unhandled promise rejections as the event `Error Caught`. Because errors are ordinary events, [trends](/docs/guides/trends/), [funnels](/docs/guides/funnels/) and [alerts on a number](/docs/guides/trends/#alert-on-a-number) work on them too.
 
