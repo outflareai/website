@@ -2,7 +2,7 @@
 	"version": "2026.11.17",
 	"date": "2026-11-17",
 	"status": "in-progress",
-	"updated": "2026-11-17T16:52:44Z",
+	"updated": "2026-11-17T16:57:07Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -227,7 +227,63 @@
 			"edition": "open-source",
 			"text": "Error capture is now one switch at the top of the Errors page, with a plain line that says whether errors are being captured on your site, or what is stopping them. On Website tracking, what the script does on its own (errors, clicks, form submits, A/B tests) has its own switches that save at once, without Edit.",
 			"at": "2026-11-17T16:52:44Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Paid ads tables now say whether an enabled Google Ads campaign, ad group or ad is really serving, in Google's words (Eligible, Limited by budget, Learning, Not eligible), with the reasons on hover. Campaigns also show Google's Optimization score.",
+			"at": "2026-11-17T16:57:07Z"
+		},
+		{
+			"kind": "fix",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Listing the fields of a Google Ads resource for a live read (`query-fields` with a resource) was refused by Google. It now answers.",
+			"at": "2026-11-17T16:57:07Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Change bidding on a Google Ads campaign now offers Target impression share: pick where on the page the ad should show, the share of searches, and the most to pay for a click.",
+			"at": "2026-11-17T16:57:07Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "An agent or the API can now set every place a Google Ads campaign shows in and is kept out of in one change, with a preview of what would be added and taken out. Exclusions you don't mention stay as they are, the change is refused if the places moved since the preview, and it is read back afterwards. A campaign can also be renamed.",
+			"at": "2026-11-17T16:57:07Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Paid ads' Setup tab is now Settings, with its pages (General, Tracking, Send conversions, Send log, Ad accounts, Change history) in a row under the tabs, so each is one click from any other and there is nothing to go back out of.",
+			"at": "2026-11-17T16:57:07Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Paid ads tables now work more like Google Ads: campaigns, ad groups, ads and keywords show only enabled ones to start with (a Status filter brings back paused and removed, and is remembered), statuses read Enabled, Paused and Removed, two total rows sit under each table, numbers line up under their headings, and every amount shows its cents.",
+			"at": "2026-11-17T16:57:07Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "The chart on Paid ads now has four number tiles, like Google Ads: click one to draw or hide its line, and pick another metric (clicks, cost, average CPC, click rate, conversions and more) from its menu. Your choice is remembered in your browser.",
+			"at": "2026-11-17T16:57:07Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "An agent can now take back its own change while it waits for your approval, and point to the newer request that replaces it, so an out-of-date request can no longer be approved by mistake.",
+			"at": "2026-11-17T16:57:07Z"
 		}
 	],
-	"through": "f9f8da5+3ce3f07"
+	"through": "368d8c3+4ab6561"
 }
