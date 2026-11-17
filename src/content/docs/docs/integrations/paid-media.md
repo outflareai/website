@@ -125,7 +125,18 @@ are not added up across platforms as if they were.
 
 ## Reading it
 
-In the app, open **Paid ads** in the sidebar. A trail at the top picks the level: **All networks**, one network (Google Ads, Meta Ads, X Ads and so on) or one ad account of it, and every tab narrows to it; click a platform or an account in the overview to open its level. Its tabs are **Overview** (totals, by day, by platform, by account and conversion actions), **Campaigns**, **Changes** (every pause, resume and budget change at that level, and whether the platform shows it), **Tracking** (fix tracking links, tracking health and the templates), **Send conversions** and **Accounts** (ad accounts and connections), each with its own address. It shows spend, clicks, CTR, cost per click and platform conversions for 7, 28 or 90 days, by day, platform and campaign, with each account's brand and sync switch. Each campaign shows the visits, conversions and revenue Outflare's own attribution credits to it beside what the platform reports. Click a campaign and it opens as a page of its own, like a level in the ad platform, with a trail back (All campaigns, then the campaign, then the ad group): its numbers and trend by day, its conversions by type, its ad groups or ad sets and its ads, and for Google its keywords and search terms. Click an ad group or ad set for its own page with only its ads. Each page has its own address, so the browser's back button and shared links work. Paid visits whose campaign id matches no campaign in a connected account are listed on their own, with why that happens. An ad whose links lack the tracking template is marked. A connection that still needs a developer token asks for it at the top.
+In the app, open **Paid ads** in the sidebar. The page is for one goal: more paying customers at or under your target cost. It has six tabs, each with its own address, and one date menu (Today, Yesterday, the last 7, 28, 30 or 90 days, this month, last month or a custom range).
+
+| Tab | What it is for |
+| --- | --- |
+| **Overview** | One sentence that says where you stand against your target, then cost per new customer, cost per sign-up, new customers, spend, revenue and return. Campaigns named for your brand are judged apart from everything else, so a cheap average doesn't hide an expensive campaign. **Do this next** lists the three open actions with the biggest effect, and a funnel shows ad clicks, sign-ups and first payments. Every number reads the same rows, so they can't disagree. |
+| **Actions** | One table of what to do: **Fix** (something is broken), **Cut waste**, **Grow** and **Experiment**, each with why, the expected effect and one main button. Views: To do, In progress, Done and Dismissed. A switch turns recommendations on or off; while off, what Outflare would have recommended is under Preview. Nothing changes in an ad account until you approve it, and a budget raise shows the budget before and after and the most it can add a month. |
+| **Campaigns** | Every campaign with what it spent and brought; open one for its ad groups, ads, keywords and searches. |
+| **Customers** | The people your ads brought, and which campaign each came from. |
+| **Experiments** | Tests the ad network splits fairly, and how each change you approved turned out. |
+| **Setup** | One table with a status on each line: ad accounts, recommendations, conversions sent to the networks, the send log, tracking, the counting window, which customers' revenue counts, and the change history. |
+
+It shows spend, clicks, CTR, cost per click and platform conversions for 7, 28 or 90 days, by day, platform and campaign, with each account's brand and sync switch. Each campaign shows the visits, conversions and revenue Outflare's own attribution credits to it beside what the platform reports. Click a campaign and it opens as a page of its own, like a level in the ad platform, with a trail back (All campaigns, then the campaign, then the ad group): its numbers and trend by day, its conversions by type, its ad groups or ad sets and its ads, and for Google its keywords and search terms. Click an ad group or ad set for its own page with only its ads. Each page has its own address, so the browser's back button and shared links work. Paid visits whose campaign id matches no campaign in a connected account are listed on their own, with why that happens. An ad whose links lack the tracking template is marked. A connection that still needs a developer token asks for it at the top.
 
 | Call | What it answers |
 | --- | --- |
@@ -373,7 +384,7 @@ in the ad account. See
 
 ## Suggestions
 
-After each sync Outflare reads every campaign it can change (Google Ads, Meta, Microsoft Advertising, LinkedIn, TikTok, Reddit, X and ChatGPT) and suggests at most one change for each, with why and the numbers behind it, on the **Suggestions** tab at whatever level the page shows:
+After each sync Outflare reads every campaign it can change (Google Ads, Meta, Microsoft Advertising, LinkedIn, TikTok, Reddit, X and ChatGPT) and suggests at most one change for each, with why and the numbers behind it, on the **Actions** tab:
 
 - **Raise the budget** by a fifth when a conversion cost at most nine tenths of the target over the last 14 days and the budget ran out on at least 4 of the last 7.
 - **Lower the budget** by a fifth when a conversion cost more than 1.3 times the target (with at least 5 conversions).
@@ -392,7 +403,7 @@ On Google campaigns that bid for as many conversions as they can with no target,
 
 At most one of each per campaign at a time. They are measured on the whole campaign after a week to settle (a day for a negative). With an account picked, the tab also shows Google Ads' own recommendations for it, read live.
 
-Budget suggestions need a target cost per conversion (the campaign's, its account's or the platform's own). A campaign changed in the last week, or still being measured, gets none. Nothing changes until a person approves; an agent changes campaigns with the campaign calls below, which follow its grant. Approving makes the change exactly as those calls do (it shows on the **Changes** tab) and starts its measuring window:
+Budget suggestions need a target cost per conversion (the campaign's, its account's or the platform's own). A campaign changed in the last week, or still being measured, gets none. Nothing changes until a person approves; an agent changes campaigns with the campaign calls below, which follow its grant. Approving makes the change exactly as those calls do (it shows in the change history under **Setup**) and starts its measuring window:
 
 - the platform's settling time (3 days for a budget, 7 for a resumed campaign), then
 - at least a week, and long enough for about 30 conversions at the campaign's rate, plus 3 days for conversions reported late,
@@ -412,7 +423,7 @@ When the window ends the change is judged against as many days just before it: *
 
 ## Tests
 
-A before-and-after comparison can be thrown off by anything else that changed that week. A test avoids that: the network itself splits one campaign between how it is and a **trial** that tries one thing differently, on the same days, so the two compare fairly. Start one on the **Tests** tab, or press **Test it first** on a budget suggestion instead of approving it.
+A before-and-after comparison can be thrown off by anything else that changed that week. A test avoids that: the network itself splits one campaign between how it is and a **trial** that tries one thing differently, on the same days, so the two compare fairly. Start one on the **Experiments** tab, or press **Test it first** on a budget suggestion instead of approving it.
 
 - **Google Ads** runs it as a custom experiment on a search or display campaign: the trial gets a share of the campaign's traffic (half, unless the call says otherwise) and bids to a different target cost per conversion.
 - **Meta** runs it as a split test: Outflare copies the campaign with its ad sets and ads, gives the copy a different daily budget, and Meta splits the audience so no one sees both. The ad account must belong to a business, and the token needs `ads_management` and `business_management`.
@@ -500,7 +511,7 @@ How a campaign bids, which audiences it reaches and in which countries it runs, 
 | `POST /v1/brands/{brand}/ads/campaigns/{id}/audiences` | Add or remove (`add: false`) one of the account's audiences, such as one made from a smart list (`ads.manage`) |
 | `POST /v1/brands/{brand}/ads/campaigns/{id}/countries` | Add or remove a country by its two-letter code (`ads.manage`) |
 
-Each answers `202` with the change, which runs as a job like the other campaign changes and shows on the **Changes** tab. On Meta an audience or a country is added to or removed from every ad set of the campaign, keeping the rest of each ad set's targeting as it was. A campaign never loses its last country: removing it is refused, so it can't start running everywhere. A change made by an agent always waits for a person, whatever its grant. Each is an audit event (`ad_campaign.bidding_changed`, `ad_campaign.audience_added`, `ad_campaign.audience_removed`, `ad_campaign.country_added`, `ad_campaign.country_removed`).
+Each answers `202` with the change, which runs as a job like the other campaign changes and shows in the change history under **Setup**. On Meta an audience or a country is added to or removed from every ad set of the campaign, keeping the rest of each ad set's targeting as it was. A campaign never loses its last country: removing it is refused, so it can't start running everywhere. A change made by an agent always waits for a person, whatever its grant. Each is an audit event (`ad_campaign.bidding_changed`, `ad_campaign.audience_added`, `ad_campaign.audience_removed`, `ad_campaign.country_added`, `ad_campaign.country_removed`).
 
 ## New ads
 
@@ -521,7 +532,7 @@ write one through the API too. Each is a **draft**:
   country, bidding (maximise conversions unless named) and an ad group.
 
 Drafts are checked against the platform's rules when written, and wait for
-a person on the **Suggestions** tab under **New ads**. Approving one makes it
+a person on the **Actions** tab under **New ads**. Approving one makes it
 on the workspace's own account, everything paused: on Google in one batch,
 so a refused draft makes nothing. Check it on the platform, then **Turn on**:
 the ad, and the ad group and campaign when the draft made them, are turned
@@ -561,7 +572,7 @@ many a day. Only a person can turn it on or change it, and it starts off.
 - The agent approves only the kinds you ticked, up to the day's limit. Every
   other suggestion, and anything that could spend more, still waits for you.
 - Each change is made, measured and judged like one you approved, and shows
-  on the **Changes** and **Suggestions** tabs as approved by the agent.
+  in the change history and on the **Actions** tab as approved by the agent.
 - Turning it on, changing it and turning it off show in the agent's activity
   and the audit log.
 - The agent also learns which kinds of suggestion have tended to work, from
