@@ -45,6 +45,10 @@ The **Agent** button in the top bar (or Ctrl+J) opens a chat with the brand's ag
 
 The chat opens on a new conversation, unless your latest one is still going (the agent is working on it or owes you an answer, or you wrote in the last half hour). The dropdown at the top of the chat lists every conversation, newest first, with a search and **New chat**.
 
+To give the chat more room, drag its left edge (or focus the edge and use the arrow keys). The width is remembered in your browser and stays the same on every page; double-click the edge to put it back.
+
+While the agent is replying, the Send button becomes **Stop**. Press it after a typo or a change of mind, then send a new message. The reply ends within a couple of seconds, your message stays in the conversation marked **Stopped, not answered**, and the agent never answers it. Stop doesn't undo anything: changes the agent already made stay made, and changes waiting for your OK still wait. It only ends the reply to your message; to stop the agent's own scheduled work, pause the agent.
+
 Each conversation's **⋯** menu pins it to the top of the list, renames it, archives it or deletes it. Archived conversations move to **Archived** at the bottom of the list and come back as soon as anyone writes in them. Pins and the archive are shared by everyone on the brand, like the conversations.
 
 ## Tasks
