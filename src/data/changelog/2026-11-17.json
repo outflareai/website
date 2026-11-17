@@ -2,7 +2,7 @@
 	"version": "2026.11.17",
 	"date": "2026-11-17",
 	"status": "in-progress",
-	"updated": "2026-11-17T17:19:06Z",
+	"updated": "2026-11-17T17:58:20Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -297,7 +297,14 @@
 			"edition": "open-source",
 			"text": "Dashboard reports are easier to change: click a report's title or Edit to open it full screen with Save changes, Cancel and Save as a copy, and use its menu to rename, duplicate or open it in Trends. A report can now keep its own dates instead of following the dashboard's.",
 			"at": "2026-11-17T17:19:06Z"
+		},
+		{
+			"kind": "fix",
+			"area": "connectors",
+			"edition": "open-source",
+			"text": "A signed-in connection such as Google Search Console no longer breaks when the provider refuses a token early: Outflare renews the sign-in and checks again first. When it really has expired, the connection says so in plain words, with a Sign in again button that now works on an expired connection and also mends the other connections to the same Google account.",
+			"at": "2026-11-17T17:58:20Z"
 		}
 	],
-	"through": "958a4ce+5e6df80"
+	"through": "5c9081e+9718ceb"
 }
