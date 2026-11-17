@@ -82,6 +82,41 @@ The same refund as an event, counted once with the transaction above:
  "properties": {"order_id": "ch_1042", "refund_id": "re_2001", "amount": 49.00, "currency": "USD"}}
 ```
 
+## Failed payments and disputes
+
+Two more events say when a payment went wrong for a known person. Neither is money: revenue, attribution and ad conversions never count them.
+
+- **`payment.failed`**: a payment transaction sent with `status` `failed`, such as a declined card. When the retry goes through, send the same `source_id` as `succeeded`: the payment then counts, and the failure stays in the person's history.
+- **`payment.disputed`**: a transaction of `kind` `chargeback`. The money still comes off as a `payment.refunded`.
+
+Each is written once per `source_id`. Use them in segments, journeys, lifecycle moves and alerts, for example everyone whose payment failed in the last 7 days. They come from transactions sent to the API; a billing connection doesn't write them yet.
+
+## Subscriptions from your own billing
+
+A billing connection writes each customer's subscriptions as it reads them. When you bill with your own system, send them yourself: `POST /v1/brands/{brand}/billing-subscriptions` (MCP `save_billing_subscription`), once when a subscription starts and again whenever it changes.
+
+```json
+{
+  "source_id": "sub_1042",
+  "user_id": "u_123",
+  "status": "active",
+  "plan": "Pro",
+  "price_id": "pro_monthly",
+  "interval": "month",
+  "amount_minor": 4900,
+  "currency": "USD",
+  "started_at": "2026-08-01T09:00:00Z"
+}
+```
+
+- `source_id` is your id for the subscription. The same one sent again updates the subscription saved and never adds a second.
+- `record_id` or `user_id` says whose it is. A `user_id` must already be known: send an identify for them first.
+- `status` is `trialing`, `active`, `past_due` or `canceled`. `amount_minor` is what one `interval` (`day`, `week`, `month` or `year`) costs, in minor units.
+
+What changes is written on the person's timeline: `subscription.started` once, `subscription.changed` when the price or amount moves, and `subscription.canceled` once. Their monthly revenue, billing status and plan, and the brand's [Revenue](/docs/guides/revenue/) page, follow. To bring in history, send every existing subscription once with its real `started_at`.
+
+A subscription says what someone is signed up to pay; each charge is still a payment, sent as a transaction or an Order Completed event. `GET /v1/brands/{brand}/billing-subscriptions` lists them (MCP `list_billing_subscriptions`).
+
 ## Currencies
 
 Each amount is kept in its own currency and also converted to the brand's currency (USD unless you change it on the brand) at that day's European Central Bank rate, as `brand_amount_minor`. If the day's rate isn't published yet, it is empty and filled in within the hour.
