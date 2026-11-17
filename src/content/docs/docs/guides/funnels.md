@@ -27,7 +27,15 @@ Add up to ten steps. Each one is:
 - **Conversion**: one of your conversions, with the event and filters it already has.
 - **Payment**: a successful payment, filtered by amount, product or currency. Tick **first** to count only someone's first ever payment.
 
+Drag a step by its handle to move it, or use **Move up** and **Move down**. Time limits, breakdowns and exclusions that name a step follow it to its new place, and the funnel tells you when one had to be reset. Remove any step, the first included, with its ×; the rest are numbered again.
+
 Give any step a **time limit**: within so many minutes, hours, days or weeks of the step before, or of any earlier step. *A first payment within 3 days of signing up* is a payment step with a 3-day limit from the sign-up step. You can also limit the whole funnel from step 1.
+
+## Optional steps
+
+Every step is **Required** unless you set it to **Optional**. People who skip an optional step still carry on, and count at the next step if they did it. Use it when not everybody takes the same route: in *ad click, signed up, first payment*, some buyers already had an account, so a required sign-up step would hide them. With sign-up optional, the payment bar counts everyone who paid after the ad click, the sign-up bar still shows who signed up on the way, and its label says how many skipped it.
+
+The steps after an optional one show their share of the last required step, so the numbers stay honest. The first and last steps are always required, and a time limit or an exclusion can't count from an optional step. Any-order funnels have no optional steps. To drop people who did something instead, use [Leave people out](#leave-people-out).
 
 ## In any order
 
@@ -44,7 +52,7 @@ Under the steps, **Leave out people who…** drops from the whole funnel everyon
 ## Read it
 
 - Each bar shows the people who reached the step, the share of step 1 and of the step before, and the typical time it took. The striped part is who dropped off.
-- **Ad clicks** puts your ad network's own click count for the same dates in front of step 1. Ad networks report clicks as daily totals, not people, so this bar is for comparison; the people start at the visit the ad brought.
+- **Show ad clicks and spend** puts your ad network's own click count for the same dates beside the chart, as a dashed bar marked *Reference, not a step*. Ad networks report clicks as daily totals, not people, so it is there for comparison and has no number: the people start at step 1. Turn it off with the switch above the chart.
 - **Break down** splits every step by something about step 1, such as the campaign or the ad network, so you can compare campaigns side by side. Choose **A/B test version** to split people by the version of an [A/B test](/docs/guides/ab-tests/) they were first shown, and see where each version wins or loses people.
 - A breakdown can also use **a later step's property**, such as the plan chosen at the sign-up step, or **a field of the person**, such as their country or plan. Person fields are the ones safe to chart: choices, numbers and short text you defined, never a name, an address or a confidential field. In an any-order funnel a breakdown by a later step isn't available.
 - **Conversion over time** draws the share who finished as a line, one point per day, week or month people started in, with a table of who started and finished underneath. The newest period is dotted: people in it still have time to finish.
@@ -53,9 +61,17 @@ Under the steps, **Leave out people who…** drops from the whole funnel everyon
 - In that list, **Save as a list** puts everyone there with a record into a new static [list](/docs/guides/smart-lists/), to mail, score or compare. Visitors not signed in have no record and are skipped; the list says how many. *Signed up, never paid* as a list is a sequence waiting to happen.
 - **What did people who finished do differently?** compares, for everyone at step 1, the events, pages and properties of the people who reached a step with those who didn't. Properties are what your records say about identified people, such as `plan: pro` or `country: AU`, never anything that identifies one person (email, phone, name). Each row shows the share of each group who did or had it and how many times more likely finishing was (over 1 went with finishing, under 1 with dropping off). It runs when you press **Compare**, since it reads every event and page view, and leaves out anything fewer than three people did. For funnels of people, not companies.
 
-## Save it
+## Save it, and link to it
 
-**Save** keeps a funnel for everyone in the brand, with a name. Choose a moving date range, such as the last 30 days, and it stays current. A saved funnel keeps only its steps and settings: every view counts again, so it is never out of date.
+Nothing saves by itself. While you build or change a funnel you are working on a draft: the chart updates as you go, and the bar at the top says **Not saved**, **Saved** or **Unsaved changes**.
+
+- **Save** keeps a funnel for everyone in the brand, with a name. **Save changes** updates the saved funnel you have open, and only then does anyone else see the change.
+- **Cancel** puts a saved funnel back as it was. **Save as a copy** keeps your changes as a new funnel and leaves the original alone.
+- Leaving the page with unsaved changes to a saved funnel asks first.
+
+Every funnel has its own address. A saved funnel's address opens that funnel, and a draft's address carries its steps and settings, so **Copy link** gives a teammate exactly what you are looking at, saved or not. Back, forward and reload keep your place. A link to a funnel that was deleted says so and offers the way back to the list.
+
+Choose a moving date range, such as the last 30 days, and a saved funnel stays current. It keeps only its steps and settings: every view counts again, so it is never out of date. [Trends](/docs/guides/trends/), [retention](/docs/guides/retention/) and [paths](/docs/guides/paths/) save and link the same way.
 
 ## Who can do what
 
@@ -63,4 +79,4 @@ Everyone in the workspace can run funnels and the comparison (`analytics.read`);
 
 ## For agents and scripts
 
-The REST API is `POST /v1/brands/{brand}/insights/funnel` to run a funnel (with `exclusions`, `by` and `order`), `POST /v1/brands/{brand}/insights/funnel/people` for the people behind a step and `.../people/save` to keep them as a list, `.../funnel/correlation` for what converters did differently, `GET /v1/brands/{brand}/insights/catalog` for the events and fields you can use, and `/v1/brands/{brand}/insights` for saved funnels. See the [API reference](/docs/api/). The MCP tools are `get_insights_catalog`, `run_funnel`, `list_funnel_people`, `save_funnel_people`, `run_funnel_correlation`, `list_insights`, `get_insight`, `save_insight`, `update_insight` and `delete_insight`. Ask your agent something like *"Of the people who came from our Google ads last month, how many signed up, and how many of those paid within 3 days?"*
+The REST API is `POST /v1/brands/{brand}/insights/funnel` to run a funnel (with `exclusions`, `by`, `order` and `optional` on a step), `POST /v1/brands/{brand}/insights/funnel/people` for the people behind a step and `.../people/save` to keep them as a list, `.../funnel/correlation` for what converters did differently, `GET /v1/brands/{brand}/insights/catalog` for the events and fields you can use, and `/v1/brands/{brand}/insights` for saved funnels. See the [API reference](/docs/api/). The MCP tools are `get_insights_catalog`, `run_funnel`, `list_funnel_people`, `save_funnel_people`, `run_funnel_correlation`, `list_insights`, `get_insight`, `save_insight`, `update_insight` and `delete_insight`. Ask your agent something like *"Of the people who came from our Google ads last month, how many signed up, and how many of those paid within 3 days?"*
