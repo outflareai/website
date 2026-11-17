@@ -2,7 +2,7 @@
 	"version": "2026.11.17",
 	"date": "2026-11-17",
 	"status": "in-progress",
-	"updated": "2026-11-17T18:57:14Z",
+	"updated": "2026-11-17T19:27:06Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -353,7 +353,14 @@
 			"edition": "open-source",
 			"text": "Connect Blitz with your own API key to find decision makers at a company and their work emails from LinkedIn profiles. When a person's LinkedIn profile is known, the email step now asks by profile first (Blitz, then Treg), and asks again about people it could not find before the profile was known. It also asks about more people at once.",
 			"at": "2026-11-17T18:57:14Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Sales conversations now open by themselves when someone you added to an EmailBison campaign through Outflare replies interested, books a meeting or asks a question. The conversation arrives in New conversations with the whole thread, and a later reply from the same person joins it.",
+			"at": "2026-11-17T19:27:06Z"
 		}
 	],
-	"through": "fa26548+7e1e0f1"
+	"through": "34a9345+c14a926"
 }
