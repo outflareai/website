@@ -44,14 +44,22 @@ The type, the message, the stack, the page's path, and whether your code caught 
 
 ## Issues
 
-The same bug is one issue, however many times it happens: errors are grouped by their type, their message with numbers and ids left out, and where in your code they were thrown. The list is a table with each issue's count, the visitors it reached, and when it was first and last seen. Opening an issue shows it day by day, the pages it happens on, and the latest errors with their stack and a link to the person when they are known.
+The same bug is one issue, however many times it happens: errors are grouped by their type, their message with numbers and ids left out, and where in your code they were thrown. The list is a table with each issue's count, the visitors it reached, and when it was first and last seen, with a tab for each status. Search finds an error by its text or page, and filters show only new ones, ones back again, uncaught ones, or the website's or the server's. Opening an issue shows it day by day, the pages, browsers and release it happened on, and the latest errors with their stack and a link to the person when they are known.
 
-- **Resolve** an issue once it is fixed. If it happens again, it opens again and is marked as back.
-- **Ignore** one you don't want to hear about.
+- **Mark fixed** once it's fixed. If it happens again, it opens again, marked **Back again**, and alerts you.
+- **Ignore** one you won't fix, such as noise from a browser extension. It never comes back or alerts.
+- **Archive** one that may have stopped. It comes back quietly only if it happens again.
+- **Delete** removes the issue and every error in it. It can't be undone; if it happens again it's a new issue.
+
+Tick several rows to do any of these at once. Everything but Delete can be undone from the message that follows.
+
+## Fix it with your AI coding assistant
+
+**Copy fix prompt for AI** copies a prompt for Claude Code, Cursor or any coding assistant: the error, how often and where it happened, the pages, browsers and release, the stack (in your own files once you upload source maps), and what to do: find the cause, fix it rather than hide it, and add a test. **Show prompt** shows exactly what is copied, and selecting several errors on the list copies one prompt for up to 10. **Copy error** copies it as plain text for a ticket or a chat. Prompts never include who the visitor was.
 
 ## Alerts
 
-The first error of an issue nobody has seen before raises an [alert](/docs/guides/alerts/), once for the issue. An issue you resolved raises one more when it comes back; an ignored issue raises none. A release that breaks many things at once stops at ten alerts an hour for a brand, and the rest are on the Errors page. Who gets the alert, by email or in Slack, is set under **Settings → Alerts** like every other alert.
+The first error of an issue nobody has seen before raises an [alert](/docs/guides/alerts/), once for the issue. An issue you marked fixed raises one more when it comes back; an ignored or archived one raises none. A release that breaks many things at once stops at ten alerts an hour for a brand, and the rest are on the Errors page. Who gets the alert, by email or in Slack, is set under **Settings → Alerts** like every other alert.
 
 ## Source maps
 
@@ -74,4 +82,4 @@ Don't serve `.map` files from your site unless you mean to publish your source: 
 
 ## For agents and scripts
 
-`GET /v1/brands/{brand}/errors` lists issues, `GET /v1/brands/{brand}/errors/{fingerprint}` reads one and `PATCH` resolves, ignores or reopens it. In the MCP server: `list_error_issues`, `get_error_issue`, `update_error_issue`, `list_source_maps` and `delete_source_map`.
+`GET /v1/brands/{brand}/errors` lists issues, `GET /v1/brands/{brand}/errors/{fingerprint}` reads one, `PATCH` marks it fixed (`resolved`), ignored, archived or open, `DELETE` deletes it with its errors, and `POST /v1/brands/{brand}/errors/bulk` does any of these to up to 200 at once. In the MCP server: `list_error_issues`, `get_error_issue`, `update_error_issue`, `bulk_error_issues`, `delete_error_issue`, `list_source_maps` and `delete_source_map`.
