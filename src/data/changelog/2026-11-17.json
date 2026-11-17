@@ -2,7 +2,7 @@
 	"version": "2026.11.17",
 	"date": "2026-11-17",
 	"status": "in-progress",
-	"updated": "2026-11-17T18:26:35Z",
+	"updated": "2026-11-17T18:57:14Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -346,7 +346,14 @@
 			"edition": "open-source",
 			"text": "The Errors page is easier to act on: tabs for Open, Fixed, Ignored and Archived, search and filters, and ticking several errors to mark them fixed, ignore, archive or delete them at once, with Undo. Each error has a \"Copy fix prompt for AI\" button that hands your coding assistant the error, its stack, pages, browsers and release, plus \"Copy error\" for tickets.",
 			"at": "2026-11-17T18:26:35Z"
+		},
+		{
+			"kind": "launch",
+			"area": "connectors",
+			"edition": "open-source",
+			"text": "Connect Blitz with your own API key to find decision makers at a company and their work emails from LinkedIn profiles. When a person's LinkedIn profile is known, the email step now asks by profile first (Blitz, then Treg), and asks again about people it could not find before the profile was known. It also asks about more people at once.",
+			"at": "2026-11-17T18:57:14Z"
 		}
 	],
-	"through": "c4b245e+f89b0c0"
+	"through": "fa26548+7e1e0f1"
 }
