@@ -2,7 +2,7 @@
 	"version": "2026.11.17",
 	"date": "2026-11-17",
 	"status": "in-progress",
-	"updated": "2026-11-17T00:14:09Z",
+	"updated": "2026-11-17T00:20:08Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -10,7 +10,14 @@
 			"edition": "open-source",
 			"text": "One donor catalog for every brand: Import donors can send a broker's file to every brand at once, and the Catalog tab copies an existing catalog to the other brands with its prices, metrics and flags. Each brand's orders stay its own.",
 			"at": "2026-11-17T00:14:09Z"
+		},
+		{
+			"kind": "fix",
+			"area": "connectors",
+			"edition": "open-source",
+			"text": "The Treg connector now reads an answer without an address as \"no address found\". Before, some of those answers were taken for a broken service, retried, and could switch the connection off for a while.",
+			"at": "2026-11-17T00:20:08Z"
 		}
 	],
-	"through": "5fd1e77+bd2efd2"
+	"through": "d3298fc+85aaec6"
 }
