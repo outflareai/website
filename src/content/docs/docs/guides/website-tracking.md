@@ -117,12 +117,70 @@ Without help, a visitor going from `northpeak.example` to `northpeak-app.example
 
 The id travels only on a link clicked from one of the listed domains, and only for two minutes, so a copied link pasted elsewhere starts a new visitor. The key's snippet lists the domains for you when its origins span more than one. Subdomains of one domain need nothing.
 
+## Clicks and forms without code
+
+Two switches on a script record what visitors do without any change to your pages. Both are off until you turn them on: press **Edit** on the script under **Settings → Website tracking**.
+
+- **Capture clicks** sends `Element Clicked` for each click on a link or button, with its label, id, classes, the link's address without its query string and the page's path.
+- **Capture forms** sends `Form Submitted` with the form's id, name, action and number of fields.
+
+The script never reads what someone typed. A label that holds an email address, a long number or a key-shaped string is left out, and so is anything inside an element marked `data-of-mask` or `data-of-block`. Add `data-outflare-ignore` to an element to leave it out, or `data-autocapture="off"` to the script tag to stop all of it. A page sends at most 100 captured events.
+
+To give one element an event name of its own in your markup, add `data-outflare-event="Pricing CTA Clicked"`. It is sent with or without the switch.
+
+### Named clicks
+
+**Analytics → Named clicks** turns a captured click into an event with a proper name, with no change to the site. The page lists the clicks your site captured; press **Name this click** on one, give it a name such as `Pricing CTA Clicked`, and choose what it matches: the label, a part of the link's address, the element's id or a class, and optionally the page. From then on each matching click is also stored under that name, so it works in funnels, trends, A/B test goals and destinations like any event you send yourself. Naming applies to clicks from now on; the page shows how many of the last 7 days' clicks a rule would have matched.
+
+## Signed-in visitors
+
+Your marketing site often needs to know whether a visitor already has an account, to show **Open the app** instead of **Sign up**. Call this from your app when someone signs in or out:
+
+```js
+outflare.signedIn(true);   // after sign-in
+outflare.signedIn(false);  // after sign-out
+```
+
+The script keeps a cookie on your site's widest domain that holds only `1`. It names nobody. On any page of that domain:
+
+- `outflare.isSignedIn()` says whether the hint is set.
+- Elements with `data-outflare-signed-in="show"` appear only for signed-in visitors, and `"hide"` only for everyone else.
+- A [feature flag](/docs/guides/feature-flags/) or A/B test can use the **Signed in** condition.
+
+This is a hint for what to show, never proof. Your server must still check who someone is before it shows them anything private.
+
+## Identify from the browser
+
+A browser can never say who its visitor is on its own word: anyone can open the console and type an id. The safest way stays an `identify` from your server at sign-up and sign-in. When that is awkward, your server can vouch for the id and the page does the rest.
+
+1. Under **Settings → Website tracking**, open the script's menu and choose **Turn on browser identify**. You get an identify secret, shown once. Keep it on your server with your other secrets, never in a page.
+2. When someone signs in, your server signs their user id with the secret and gives the page the id and the signature:
+
+   ```js
+   import { identifySignature } from "@outflare/sdk";
+   const signature = await identifySignature(process.env.OUTFLARE_IDENTIFY_SECRET, user.id);
+   ```
+
+   ```python
+   from outflare import identify_signature
+   signature = identify_signature(os.environ["OUTFLARE_IDENTIFY_SECRET"], user.id)
+   ```
+
+   In any other language it is the HMAC-SHA256 of the user id with the secret as the key, written as hex.
+3. In the page: `outflare.identify(user.id, signature)`.
+
+The browser's earlier visits then join that person. A signature only works for the id it was made for, so a visitor can't use theirs to become someone else. The page sends no traits: a person's name, plan and other fields still come only from your server. **New identify secret** replaces the secret at once, and **Turn off browser identify** removes it.
+
+## Errors
+
+A third switch, **Capture errors**, sends the errors your pages throw. See [Errors](/docs/guides/errors/).
+
 ## Safe to put in a page
 
 The site key is public by design. It can only add anonymous page views and track events:
 
 - It can't read anything.
-- It can't name, create or merge a person.
+- It can't name, create or merge a person on its own word. The one way in is browser identify above, with a signature only your server can make.
 - It doesn't start journeys, send email or count as revenue.
 - It works on no other part of the API.
 

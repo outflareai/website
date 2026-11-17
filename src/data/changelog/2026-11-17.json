@@ -1,0 +1,51 @@
+{
+	"version": "2026.11.17",
+	"date": "2026-11-17",
+	"status": "in-progress",
+	"updated": "2026-11-17T09:29:45Z",
+	"items": [
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "One donor catalog for every brand: Import donors can send a broker's file to every brand at once, and the Catalog tab copies an existing catalog to the other brands with its prices, metrics and flags. Each brand's orders stay its own.",
+			"at": "2026-11-17T00:14:09Z"
+		},
+		{
+			"kind": "fix",
+			"area": "connectors",
+			"edition": "open-source",
+			"text": "The Treg connector now reads an answer without an address as \"no address found\". Before, some of those answers were taken for a broken service, retried, and could switch the connection off for a while.",
+			"at": "2026-11-17T00:20:08Z"
+		},
+		{
+			"kind": "fix",
+			"area": "connectors",
+			"edition": "open-source",
+			"text": "A slow email lookup no longer stalls the email step. When a connected finder such as Treg gives no answer in time for a person, that counts as no address from it and the step moves on, where before it asked again up to five times and could switch the connection off for a while.",
+			"at": "2026-11-17T06:34:54Z"
+		},
+		{
+			"kind": "launch",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Recommended donors can now be sent straight to an Outreach sequence: Find emails and send to a sequence has OutflareBot find each site's advertising or editorial address (never data-protection, legal or no-reply mailboxes) and adds the best one to a sequence: the one used last time, or a new draft made right there.",
+			"at": "2026-11-17T06:56:34Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Paid ads, Actions is now one table: every recommendation and alert with its type, why, the expected effect and one main button. Alerts open the page that fixes them, raises show the budget before and after and the most they can add a month, and recommendations have an obvious On/Off switch with a preview of what you'd get.",
+			"at": "2026-11-17T09:29:45Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Paid ads has a new layout: six tabs (Overview, Actions, Campaigns, Customers, Experiments, Setup), one date menu with Today and a custom range, and an Overview where every number reads the same source. Your own brand's campaigns are judged apart from the rest, the top actions are listed first, and a three-step funnel shows clicks, sign-ups and first payments.",
+			"at": "2026-11-17T09:29:45Z"
+		}
+	],
+	"through": "0f7d22b+03161df"
+}
