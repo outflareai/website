@@ -341,7 +341,7 @@ How it works:
   `country` the consent decision was made on and its `country_source`
   (`visit`, `event`, `earlier_event` or `record`), the conversion it was
   going to (`target_name`, `ad_account_id`) and the person's name
-  (`record_name`). In the web app the log is its own screen, **Paid ads →
+  (`record_name`). In the web app the log is its own screen, **Paid ads → Setup →
   Send log**: filter by result or rule, read what happened in plain words,
   open the person from any row, and download it as CSV.
 
