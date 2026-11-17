@@ -2,7 +2,7 @@
 	"version": "2026.11.17",
 	"date": "2026-11-17",
 	"status": "in-progress",
-	"updated": "2026-11-17T14:52:11Z",
+	"updated": "2026-11-17T15:58:53Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -199,7 +199,28 @@
 			"edition": "open-source",
 			"text": "Search ads now look like they do in Google's results: three headlines, the site and two descriptions, with every line and its length one click away. This shows on a campaign's ads and on new ads waiting for your approval, which you can now edit before approving. Existing ads fill in on the next sync.",
 			"at": "2026-11-17T14:52:11Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Optional funnel steps: mark a middle step Optional and people who skip it still count at the next step, so a sign-up step no longer hides payers who already had an account. The step shows how many did it and how many skipped it.",
+			"at": "2026-11-17T15:58:53Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Funnels, trends, retention and paths each have their own link, and edits stay a draft until you press Save changes, with Cancel and Save as a copy. Funnel steps can be dragged into a new order, and ad clicks show as a labelled reference bar with its own switch.",
+			"at": "2026-11-17T15:58:53Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "agents",
+			"edition": "cloud",
+			"text": "The agent chat beside a page now knows which page you're on. Ask \"how is this campaign doing?\" from a Paid ads campaign and it looks at that campaign. Its paid ads know-how covers the new page: room to grow, search terms, disapproval reasons and the daily budget ceiling. An ad it drafts shows in the chat as it will read in Google's results.",
+			"at": "2026-11-17T15:58:53Z"
 		}
 	],
-	"through": "e8bd11a+16a26b4"
+	"through": "10bd8ae+cd4b86a"
 }
