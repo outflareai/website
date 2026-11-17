@@ -119,7 +119,7 @@ The id travels only on a link clicked from one of the listed domains, and only f
 
 ## Clicks and forms without code
 
-Two switches on a script record what visitors do without any change to your pages. Both are off until you turn them on: press **Edit** on the script under **Settings → Website tracking**.
+Two switches on a script record what visitors do without any change to your pages. Both are off until you turn them on under **Settings → Website tracking**, in **What the script does on its own** below your script. Each switch saves at once.
 
 - **Capture clicks** sends `Element Clicked` for each click on a link or button, with its label, id, classes, the link's address without its query string and the page's path.
 - **Capture forms** sends `Form Submitted` with the form's id, name, action and number of fields.
@@ -173,7 +173,7 @@ The browser's earlier visits then join that person. A signature only works for t
 
 ## Errors
 
-A third switch, **Capture errors**, sends the errors your pages throw. See [Errors](/docs/guides/errors/).
+A third switch, **Capture errors**, sends the errors your pages throw. It is also at the top of the Errors page. See [Errors](/docs/guides/errors/).
 
 ## Safe to put in a page
 
