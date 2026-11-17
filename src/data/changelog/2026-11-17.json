@@ -2,7 +2,7 @@
 	"version": "2026.11.17",
 	"date": "2026-11-17",
 	"status": "in-progress",
-	"updated": "2026-11-17T16:57:07Z",
+	"updated": "2026-11-17T17:15:05Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -283,7 +283,14 @@
 			"edition": "open-source",
 			"text": "An agent can now take back its own change while it waits for your approval, and point to the newer request that replaces it, so an out-of-date request can no longer be approved by mistake.",
 			"at": "2026-11-17T16:57:07Z"
+		},
+		{
+			"kind": "fix",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "**Connect Gmail** in Sales (My email) and in CRM email no longer fails with Google's \"redirect_uri_mismatch\" error. Both now return to the same Google address as \"Continue with Google\".",
+			"at": "2026-11-17T17:15:05Z"
 		}
 	],
-	"through": "368d8c3+4ab6561"
+	"through": "76ad366+637934f"
 }
