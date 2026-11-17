@@ -2,7 +2,7 @@
 	"version": "2026.11.17",
 	"date": "2026-11-17",
 	"status": "in-progress",
-	"updated": "2026-11-17T14:47:53Z",
+	"updated": "2026-11-17T14:52:11Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -178,7 +178,28 @@
 			"edition": "open-source",
 			"text": "Paid ads Overview has a chart of cost per new customer against your target, day by day, so you can see when it is safe to raise budgets. `GET /v1/brands/{brand}/ads/performance` returns the same numbers per day as `daily`.",
 			"at": "2026-11-17T13:21:20Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Agents and the API can now read anything in a Google Ads account live: every campaign setting, ad group, keyword, negative, ad and asset, whether or not it ever had an impression, plus impression share reporting. A second call lists what can be asked for. Both only read.",
+			"at": "2026-11-17T14:52:11Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "A campaign's Targeting now names every place it shows in and every place it is kept out of, with Google's ids for agents and the API, and says plainly when it runs everywhere. Campaigns and portfolio strategies can bid for a share of searches (Target impression share) or for clicks, and each bidding change is checked against Google afterwards.",
+			"at": "2026-11-17T14:52:11Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Search ads now look like they do in Google's results: three headlines, the site and two descriptions, with every line and its length one click away. This shows on a campaign's ads and on new ads waiting for your approval, which you can now edit before approving. Existing ads fill in on the next sync.",
+			"at": "2026-11-17T14:52:11Z"
 		}
 	],
-	"through": "451a71e+81578bb"
+	"through": "e8bd11a+16a26b4"
 }
