@@ -2,7 +2,7 @@
 	"version": "2026.11.17",
 	"date": "2026-11-17",
 	"status": "in-progress",
-	"updated": "2026-11-17T19:27:06Z",
+	"updated": "2026-11-17T19:37:31Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -360,7 +360,21 @@
 			"edition": "open-source",
 			"text": "Sales conversations now open by themselves when someone you added to an EmailBison campaign through Outflare replies interested, books a meeting or asks a question. The conversation arrives in New conversations with the whole thread, and a later reply from the same person joins it.",
 			"at": "2026-11-17T19:27:06Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Paid ads warns you when an ad network accepts your conversions but counts none of them: a new alert under Actions when a week of conversions sent with the network's own click id shows as zero for that conversion action, with a button to the send log.",
+			"at": "2026-11-17T19:37:31Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Conversions sent to ChatGPT Ads now carry the person's IP address (when your server passes it on as `context.ip`), their browser and their country, so OpenAI can match more of them to an ad click. The browser comes from the event, or from the person's latest visit recorded by the Outflare site script, so your server doesn't need to send it.",
+			"at": "2026-11-17T19:37:31Z"
 		}
 	],
-	"through": "34a9345+c14a926"
+	"through": "751a5b4+d832a55"
 }
