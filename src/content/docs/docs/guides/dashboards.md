@@ -33,7 +33,17 @@ Press **+ Filter** next to the dates to show every tile for just some events: a 
 
 ## Edit a tile
 
-Press **Edit** on a tile to change it without leaving the dashboard: the event or other thing it counts, filters, what it measures, the breakdown, the interval, how it shows (lines, areas, bars, a ring of shares, a map, one number or a table) and its name. It is the same builder as the [Trends](/docs/guides/trends/) and Funnels pages, with the chart updating as you change it. **Save** takes you back to the dashboard. A tile is a saved insight, so saving changes it on every dashboard that shows it. Press **Edit** on a note to change its text.
+Click a tile's title, or **Edit**, to open it full screen without leaving the dashboard. Change the event or other thing it counts, filters, what it measures, the breakdown, the interval, how it shows (lines, areas, bars, a ring of shares, a map, one number or a table) and its name. It is the same builder as the [Trends](/docs/guides/trends/) and [Funnels](/docs/guides/funnels/) pages, with the chart updating as you change it and the same bar at the top:
+
+- **Save changes** keeps your changes and takes you back to the dashboard. A tile is a saved insight, so saving changes it on every dashboard that shows it.
+- **Cancel** puts it back as it was. Nothing changes until you save.
+- **Save as a copy** saves your version as a new insight and adds it to this dashboard, leaving the original alone.
+
+The menu on each tile does the rest without opening the builder: **Rename**, **Duplicate** (a copy on the same dashboard), **Open in Trends** (or Funnels, Retention, Paths) to see it on its own page with its own link, and **Take off the dashboard**. Press **Edit** on a note to change its text.
+
+### A tile with its own dates
+
+Every tile follows the dates at the top of the dashboard. To keep one on its own dates, such as sign-ups over the last 12 months on a dashboard that shows the last 30 days, choose **Keep its own dates** in the tile's menu, or **Keep this report's own dates** at the top of the builder, and pick the dates under Options there. The tile shows a label with its dates, and it keeps them on a share link too. **Follow the dashboard's dates** puts it back.
 
 ## Edit the dashboard
 
