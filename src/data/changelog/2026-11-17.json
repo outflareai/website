@@ -2,7 +2,7 @@
 	"version": "2026.11.17",
 	"date": "2026-11-17",
 	"status": "in-progress",
-	"updated": "2026-11-17T00:20:08Z",
+	"updated": "2026-11-17T06:34:54Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -17,7 +17,14 @@
 			"edition": "open-source",
 			"text": "The Treg connector now reads an answer without an address as \"no address found\". Before, some of those answers were taken for a broken service, retried, and could switch the connection off for a while.",
 			"at": "2026-11-17T00:20:08Z"
+		},
+		{
+			"kind": "fix",
+			"area": "connectors",
+			"edition": "open-source",
+			"text": "A slow email lookup no longer stalls the email step. When a connected finder such as Treg gives no answer in time for a person, that counts as no address from it and the step moves on, where before it asked again up to five times and could switch the connection off for a while.",
+			"at": "2026-11-17T06:34:54Z"
 		}
 	],
-	"through": "d3298fc+85aaec6"
+	"through": "a7c93fb+96bf3f4"
 }
