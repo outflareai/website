@@ -2,7 +2,7 @@
 	"version": "2026.11.17",
 	"date": "2026-11-17",
 	"status": "in-progress",
-	"updated": "2026-11-17T19:37:31Z",
+	"updated": "2026-11-17T20:00:09Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -374,7 +374,21 @@
 			"edition": "open-source",
 			"text": "Conversions sent to ChatGPT Ads now carry the person's IP address (when your server passes it on as `context.ip`), their browser and their country, so OpenAI can match more of them to an ad click. The browser comes from the event, or from the person's latest visit recorded by the Outflare site script, so your server doesn't need to send it.",
 			"at": "2026-11-17T19:37:31Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "The agent's chat panel can be made wider: drag its left edge (or use the arrow keys) to give the conversation more room. The width is remembered in your browser and stays the same on every page; double-click the edge to put it back.",
+			"at": "2026-11-17T20:00:09Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "agents",
+			"edition": "cloud",
+			"text": "On a Paid ads action, Ask the agent why opens the brand agent's chat with the question already asked, so it explains the recommendation with its numbers and suggests alternatives. The agent also reads what you said about earlier advice (Good advice, Bad advice), answers questions about your audiences, and can propose a campaign's places or a new name for you to approve.",
+			"at": "2026-11-17T20:00:09Z"
 		}
 	],
-	"through": "751a5b4+d832a55"
+	"through": "b3cdaaf+1765bb0"
 }
