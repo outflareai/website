@@ -2,7 +2,7 @@
 	"version": "2026.11.17",
 	"date": "2026-11-17",
 	"status": "in-progress",
-	"updated": "2026-11-17T17:58:20Z",
+	"updated": "2026-11-17T18:07:06Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -304,7 +304,14 @@
 			"edition": "open-source",
 			"text": "A signed-in connection such as Google Search Console no longer breaks when the provider refuses a token early: Outflare renews the sign-in and checks again first. When it really has expired, the connection says so in plain words, with a Sign in again button that now works on an expired connection and also mends the other connections to the same Google account.",
 			"at": "2026-11-17T17:58:20Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Funnels, Trends, Retention and Paths now open on a list of what you have saved, with a button to start a new one; click a row to open it. A funnel step's time limit no longer spills out of its box.",
+			"at": "2026-11-17T18:07:06Z"
 		}
 	],
-	"through": "5c9081e+9718ceb"
+	"through": "24a4db5+f744a8f"
 }
