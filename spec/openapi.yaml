@@ -239,13 +239,21 @@ paths:
               - all
         - in: query
           name: state
+          description: Open includes assigned but not started and active conversations.
           schema:
             type: string
             enum:
+              - open
               - new
               - active
               - customer
               - archived
+        - in: query
+          name: assignment
+          description: Filter new conversations by assignment. Assignments reserve a lead without sending email.
+          schema:
+            type: string
+            enum: [all, unassigned, mine]
         - in: query
           name: person
           description: Only leads owned by, taken by, or handed to this Sales teammate. Queue access still applies.
@@ -357,6 +365,63 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/SalesDraftInput"
+  /v1/brands/{brand}/sales/leads/{id}/draft-assist:
+    parameters:
+      - $ref: '#/components/parameters/BrandID'
+      - in: path
+        name: id
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: requestSalesDraftAssist
+      summary: Ask the workspace AI for a personal Sales reply preview
+      description: For the signed-in SDR or account executive who owns this conversation. Uses the current draft and its applied template. Never sends email or replaces a saved draft.
+      tags: [records]
+      x-outflare-access: { scope: customers.manage, brand: true }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                request_id: { type: string, format: uuid }
+                revision: { type: integer, minimum: 0 }
+                instructions: { type: string, maxLength: 4000 }
+              required: [request_id, revision, instructions]
+      responses:
+        '202':
+          description: AI preview queued, or an existing request returned
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/SalesDraftAssist'
+                  - $ref: '#/components/schemas/MissionHeld'
+        default: { $ref: '#/components/responses/Error' }
+  /v1/brands/{brand}/sales/leads/{id}/draft-assist/{request}:
+    parameters:
+      - $ref: '#/components/parameters/BrandID'
+      - in: path
+        name: id
+        required: true
+        schema: { type: string, format: uuid }
+      - in: path
+        name: request
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getSalesDraftAssist
+      summary: Read your own AI reply preview
+      tags: [records]
+      x-outflare-access: { scope: customers.read, brand: true }
+      responses:
+        '200':
+          description: Preview status and result
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SalesDraftAssist' }
+        default: { $ref: '#/components/responses/Error' }
   /v1/brands/{brand}/sales/leads/{id}/send:
     parameters:
       - $ref: "#/components/parameters/BrandID"
@@ -492,6 +557,40 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/SalesTemplateInput"
+  /v1/brands/{brand}/sales/templates/{id}/favorite:
+    parameters:
+      - $ref: "#/components/parameters/BrandID"
+      - in: path
+        name: id
+        required: true
+        schema: { type: string, format: uuid }
+    put:
+      operationId: favoriteSalesTemplate
+      summary: Favorite or unfavorite my personal email template
+      tags: [records]
+      x-outflare-access:
+        scope: customers.manage
+        brand: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [favorite]
+              properties:
+                favorite: { type: boolean }
+      responses:
+        "200":
+          description: Updated personal template; its content version is unchanged.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SalesTemplate"
+        "202":
+          $ref: "#/components/responses/MissionHeld"
+        default:
+          $ref: "#/components/responses/Error"
   /v1/brands/{brand}/sales/reporting:
     parameters:
       - name: brand
@@ -7829,7 +7928,7 @@ paths:
                 required: [data, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/LanderClick" } }
-                  next_cursor: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
@@ -8063,7 +8162,7 @@ paths:
                 required: [data, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/TrackerCostUpdate" } }
-                  next_cursor: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         "400": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
     post:
@@ -8121,7 +8220,7 @@ paths:
       operationId: listTrackerConversions
       x-outflare-access: { scope: analytics.read, brand: true }
       summary: List tracker conversions
-      description: "Scope: analytics.read. The click ledger: every conversion a postback source reported, with the click it credits, newest first, 100 a page (pass the last one's converted_at as before)."
+      description: "Scope: analytics.read. The click ledger: every conversion a postback source reported, with the click it credits, newest first, 100 a page. Pass a page's next_cursor as cursor for the next one; it reaches conversions that share a converted_at, which before (a time alone) can skip."
       tags: [analytics]
       parameters:
         - { name: source, in: query, schema: { type: string, format: uuid } }
@@ -8129,7 +8228,9 @@ paths:
         - { name: status, in: query, schema: { type: string, enum: [approved, pending, declined] } }
         - { name: offer, in: query, schema: { type: string, format: uuid } }
         - { name: suspect, in: query, schema: { type: boolean }, description: "true for only the conversions a fraud signal flagged, false for only the others." }
-        - { name: before, in: query, schema: { type: string, format: date-time } }
+        - { name: before, in: query, schema: { type: string, format: date-time }, description: "Only conversions before this time. Prefer cursor: conversions at exactly this time are left out." }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
       responses:
         "200":
           description: Conversions.
@@ -8137,9 +8238,10 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [data]
+                required: [data, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/TrackerConversion" } }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
@@ -8248,7 +8350,7 @@ paths:
                 required: [data, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/TrackerConversionCall" } }
-                  next_cursor: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
@@ -8470,7 +8572,7 @@ paths:
                 required: [data, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/TrackerClick" } }
-                  next_cursor: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
@@ -8504,7 +8606,7 @@ paths:
                 required: [data, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/TrackerLanderClick" } }
-                  next_cursor: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
@@ -8612,7 +8714,7 @@ paths:
                 required: [data, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/TrafficSourcePostbackSend" } }
-                  next_cursor: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
@@ -9904,6 +10006,358 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/PageSpeedReport" }
         "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/click-actions:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+    get:
+      operationId: listClickActions
+      x-outflare-access: { scope: analytics.read, brand: true }
+      summary: The brand's named clicks
+      description: |
+        Scope: analytics.read. A named click turns a captured click (the website script's Element Clicked, when
+        "Capture clicks" is on for the site) into an event with a name of its own, such as Signup Clicked, with no
+        change to the site. Each one carries how many of the last 7 days' captured clicks it matches.
+      tags: [analytics]
+      responses:
+        "200":
+          description: The named clicks, by name.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, capturing, clicks_7d]
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/ClickAction" }
+                  capturing: { type: boolean, description: "A site of the brand has Capture clicks on. Without it nothing can match." }
+                  clicks_7d: { type: integer, description: "Captured clicks in the last 7 days (at most 20,000 are looked at)." }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createClickAction
+      x-outflare-access: { scope: analytics.manage, brand: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Name a click
+      description: |
+        Scope: analytics.manage. Say which click it is with at least one of label, href_contains, element_id and
+        class; every part you give must match. From then on a matching click is also stored as an event with this
+        name, for funnels, trends and A/B test goals. Earlier clicks keep only their Element Clicked event.
+      tags: [analytics]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - { $ref: "#/components/schemas/ClickActionInput" }
+                - { required: [name] }
+      responses:
+        "201":
+          description: The named click.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ClickAction" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/click-actions/seen:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+    get:
+      operationId: listSeenClicks
+      x-outflare-access: { scope: analytics.read, brand: true }
+      summary: The clicks the site captured, most clicked first
+      description: |
+        Scope: analytics.read. The brand's captured clicks of the last days, grouped by what was clicked, so a
+        click can be named from a list. At most 200 groups.
+      tags: [analytics]
+      parameters:
+        - { name: days, in: query, schema: { type: integer, minimum: 1, maximum: 90, default: 7 } }
+      responses:
+        "200":
+          description: The clicks.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, days, clicks]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [tag, text, href, id, classes, path, count, action]
+                      properties:
+                        tag: { type: string, description: "The element, such as a or button." }
+                        text: { type: string, description: "Its label, as the script captured it." }
+                        href: { type: string, description: "Where a link goes, without its query string." }
+                        id: { type: string, description: "The element's id attribute." }
+                        classes: { type: string }
+                        path: { type: string, description: "The page of the latest such click." }
+                        count: { type: integer }
+                        action: { type: string, description: "The named click it already counts as, or empty." }
+                  days: { type: integer }
+                  clicks: { type: integer }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/click-actions/{id}:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    patch:
+      operationId: updateClickAction
+      x-outflare-access: { scope: analytics.manage, brand: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Change a named click, or switch it on or off
+      description: "Scope: analytics.manage. Send only what changes. A named click that is off stores nothing."
+      tags: [analytics]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ClickActionInput" }
+      responses:
+        "200":
+          description: The named click.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ClickAction" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    delete:
+      operationId: deleteClickAction
+      x-outflare-access: { scope: analytics.manage, brand: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Delete a named click
+      description: "Scope: analytics.manage. Events it already stored stay."
+      tags: [analytics]
+      responses:
+        "204": { description: Deleted. }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/source-maps:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+    get:
+      operationId: listSourceMaps
+      x-outflare-access: { scope: analytics.read, brand: true }
+      summary: The brand's source maps
+      description: |
+        Scope: analytics.read. The source maps the brand uploaded, newest first, without their contents. The Errors
+        page reads each stack through them, so an error in minified code shows the original file, line and function
+        (stack_original on an issue's errors).
+      tags: [analytics]
+      responses:
+        "200":
+          description: The source maps.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, limit]
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/SourceMap" }
+                  limit: { type: integer, description: "How many a brand keeps. Past it, the oldest are removed." }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: uploadSourceMap
+      x-outflare-access: { scope: analytics.manage, brand: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Upload a source map
+      description: |
+        Scope: analytics.manage. Send the map your build made for one built file, from your build or deploy script.
+        It replaces an earlier map for the same file and release. The map is kept without its sourcesContent (your
+        source code is never stored): only names and positions. Stacks are read through the maps when an issue is
+        opened, so a map uploaded after an error still explains it. The body may be up to 64 MB.
+      tags: [analytics]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [file, map]
+              properties:
+                file: { type: string, maxLength: 500, description: "The built file the map belongs to, as your site serves it: its path or full address, such as /assets/app-3f9a1c.js. A bare file name matches that file in any folder.", example: /assets/app-3f9a1c.js }
+                release: { type: string, maxLength: 100, description: "Your own name for the build, such as a version or a commit. Left out, there is one map per file." }
+                map:
+                  description: The contents of the .map file, as an object or as its text.
+                  oneOf:
+                    - { type: object, additionalProperties: true }
+                    - { type: string }
+      responses:
+        "201":
+          description: The source map, without its contents.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SourceMap" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "400": { $ref: "#/components/responses/Error" }
+        "413": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/source-maps/{id}:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    delete:
+      operationId: deleteSourceMap
+      x-outflare-access: { scope: analytics.manage, brand: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Delete a source map
+      description: "Scope: analytics.manage. Stacks from its file show the built names again."
+      tags: [analytics]
+      responses:
+        "204": { description: Deleted. }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/errors:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+    get:
+      operationId: listErrorIssues
+      x-outflare-access: { scope: analytics.read, brand: true }
+      summary: Errors on the brand's website or app, grouped into issues
+      description: |
+        Scope: analytics.read. Errors arrive as the track event Error Caught, from the website script (the site
+        key's capture_errors switch, or outflare.captureException) or from your own server (a track call named
+        Error Caught with properties type, message, stack and, to group it yourself, fingerprint). An issue is the
+        errors that share a fingerprint; without one, the type and message make it. Issues are listed most frequent
+        first, at most 200, with how often and for how many visitors each happened in the period, and when it was
+        first and last seen in the last 90 days. An issue is open until someone resolves or ignores it; a resolved
+        issue that happens again is open again, with regressed true.
+      tags: [analytics]
+      parameters:
+        - { name: days, in: query, schema: { type: integer, minimum: 1, maximum: 90, default: 7 }, description: "The period: this many days back from now." }
+        - { name: status, in: query, schema: { type: string, enum: [open, resolved, ignored, all], default: open } }
+      responses:
+        "200":
+          description: The brand's issues.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [from, to, days, errors, counts, data]
+                properties:
+                  from: { type: string, format: date-time }
+                  to: { type: string, format: date-time }
+                  days: { type: integer }
+                  errors: { type: integer, description: "Errors in the period, in the issues with the asked status." }
+                  counts:
+                    type: object
+                    description: "How many issues have each status in the period, whatever status was asked for."
+                    required: [open, resolved, ignored]
+                    properties:
+                      open: { type: integer }
+                      resolved: { type: integer }
+                      ignored: { type: integer }
+                  data: { type: array, items: { $ref: "#/components/schemas/ErrorIssue" } }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/errors/{fingerprint}:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: fingerprint, in: path, required: true, schema: { type: string, pattern: "^[a-z0-9]{1,64}$" }, description: "The issue's fingerprint, from the list." }
+    get:
+      operationId: getErrorIssue
+      x-outflare-access: { scope: analytics.read, brand: true }
+      summary: One issue, with its latest errors
+      description: |
+        Scope: analytics.read. The issue, how often it happened each day of the period, the pages it happened on,
+        and its 20 latest errors with their stack, page and visitor (record_id once the visitor is a known person).
+      tags: [analytics]
+      parameters:
+        - { name: days, in: query, schema: { type: integer, minimum: 1, maximum: 90, default: 7 } }
+      responses:
+        "200":
+          description: The issue.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [issue, from, to, days, pages, occurrences]
+                properties:
+                  issue: { $ref: "#/components/schemas/ErrorIssue" }
+                  from: { type: string, format: date-time }
+                  to: { type: string, format: date-time }
+                  days:
+                    type: array
+                    items:
+                      type: object
+                      required: [day, count]
+                      properties:
+                        day: { type: string, format: date }
+                        count: { type: integer }
+                  pages:
+                    type: array
+                    description: "The pages it happened on most in the period, at most 10."
+                    items:
+                      type: object
+                      required: [path, count]
+                      properties:
+                        path: { type: string }
+                        count: { type: integer }
+                  occurrences:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, at, type, message, stack, stack_original, handled, path, url, source, anonymous_id, record_id]
+                      properties:
+                        id: { type: string, format: uuid, description: "The event's id." }
+                        at: { type: string, format: date-time }
+                        type: { type: string }
+                        message: { type: string }
+                        stack: { type: string }
+                        stack_original: { type: string, description: "The stack read through the brand's source maps: original files, lines and function names where a map covers the line. Empty when no line could be read." }
+                        handled: { type: boolean, description: "The page caught it and handed it over (captureException); false for an uncaught error." }
+                        path: { type: string }
+                        url: { type: string }
+                        source: { type: string, description: "Where the event came from, such as site or api." }
+                        anonymous_id: { type: [string, "null"] }
+                        record_id: { type: [string, "null"], format: uuid, description: "The person's customer record, once the visitor is known." }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateErrorIssue
+      x-outflare-access: { scope: analytics.manage, brand: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Resolve, ignore or reopen an issue
+      description: |
+        Scope: analytics.manage. resolved: fixed; it opens again by itself if the error happens after this.
+        ignored: stays out of the open list even when it happens again. open: back in the list.
+      tags: [analytics]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [status]
+              properties:
+                status: { type: string, enum: [open, resolved, ignored] }
+      responses:
+        "200":
+          description: The issue's new status.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [fingerprint, status, status_at]
+                properties:
+                  fingerprint: { type: string }
+                  status: { type: string, enum: [open, resolved, ignored] }
+                  status_at: { type: string, format: date-time }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/analytics/live:
     parameters:
@@ -11757,7 +12211,7 @@ paths:
                 required: [data, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/Finding" } }
-                  next_cursor: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
@@ -11870,7 +12324,7 @@ paths:
                 required: [data, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/ContentItem" } }
-                  next_cursor: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
@@ -13661,7 +14115,7 @@ paths:
       operationId: getBrandAdSettings
       x-outflare-access: { scope: analytics.read, brand: true }
       summary: Read the paid media settings
-      description: "Scope: analytics.read. consent_mode decides who conversions are sent for outside the EEA, the UK and Switzerland: opt_out (the default) sends unless the person withdrew consent for ad data, opt_in only when they granted it. Inside those countries, and when a person's country is unknown, a grant is always needed."
+      description: "Scope: analytics.read. consent_mode decides who conversions are sent for outside the EEA, the UK and Switzerland: opt_out (the default) sends unless the person withdrew consent for ad data, opt_in only when they granted it. Inside those countries, and when a person's country is unknown, a grant is always needed. collected says the brand's own site already collects consent for ad data from everyone: conversions are sent for everyone, in every country, as granted, except people who withdrew."
       tags: [ads]
       responses:
         "200":
@@ -13675,7 +14129,7 @@ paths:
       x-outflare-access: { scope: integrations.manage, brand: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
       summary: Change the paid media settings
-      description: "Scope: integrations.manage. Sets consent_mode."
+      description: "Scope: integrations.manage. Sets consent_mode. Only a signed-in person can set collected: an API token or an agent gets 403."
       tags: [ads]
       requestBody:
         required: true
@@ -13685,7 +14139,7 @@ paths:
               type: object
               required: [consent_mode]
               properties:
-                consent_mode: { type: string, enum: [opt_out, opt_in] }
+                consent_mode: { type: string, enum: [opt_out, opt_in, collected] }
       responses:
         "200":
           description: The settings now.
@@ -13826,7 +14280,7 @@ paths:
                 required: [data, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/AdAcquisition" } }
-                  next_cursor: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
@@ -15746,6 +16200,99 @@ paths:
         "400": { $ref: "#/components/responses/Error" }
         "413": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/link-orders/catalog/find-emails:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    post:
+      operationId: findBrandLinkOrderDonorEmails
+      x-outflare-access: { scope: coverage.manage, brand: true }
+      summary: Search donor sites for who to write to
+      description: |
+        Scope: coverage.manage. Queues OutflareBot's search of each catalog
+        row's site (1 to 50 `ids`) for the addresses it publishes for itself:
+        its home page and up to five of its contact, advertising, imprint,
+        write-for-us and about pages, in English and the languages donor lists
+        are in (German, Slovenian, Spanish, Italian, French and more). It
+        keeps up to three addresses at the site's own domain (or a free-mail
+        address the site lists), best first: the advertising desk, then the
+        editors, then a general mailbox. Mailboxes that must never get a
+        placement pitch (data protection, abuse, legal, jobs, billing,
+        no-reply) are dropped. Found addresses become person records on the
+        site's company, so they are in .../contacts too. It obeys robots.txt
+        and crawl opt-outs and costs nothing; a row is searched at most once
+        a day. Answers at once with how many searches were queued; each
+        row's `email_search` says how its search ended.
+      tags: [coverage]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ids]
+              properties:
+                ids: { type: array, minItems: 1, maxItems: 50, items: { type: string, format: uuid } }
+      responses:
+        "202":
+          description: Queued (or, while a mission holds workspace writes, held).
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: object
+                    required: [queued, searches]
+                    properties:
+                      queued: { type: boolean, const: true }
+                      searches: { type: integer, description: "Searches queued now; rows already searched today are not searched again." }
+                  - { $ref: "#/components/schemas/MissionHeld" }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/link-orders/catalog/copy:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    post:
+      operationId: copyBrandLinkOrderCatalog
+      x-outflare-access: { scope: coverage.manage, brand: true }
+      summary: Copy another brand's donor catalog into this brand
+      description: |
+        Scope: coverage.manage. Writes up to `limit` (default and at most
+        500) of `from_brand`'s live donors into this brand, newest first, the
+        way an import does: a donor already here is updated, its prices
+        replaced and its metrics merged; flags (PBN, Best link), niches,
+        intermediary, theme, site age and notes come too. Archived donors
+        are not copied. Send the returned `next_cursor` as `cursor` until it
+        is null; donors upsert by domain, so running it again is safe. A
+        broker's database is the same for every brand, so it is imported
+        once and copied. The copy is this brand's own: its publishers,
+        orders and history stay separate, and nothing reads across brands.
+        `from_brand` must be another brand of the workspace the caller can
+        see (404 otherwise).
+      tags: [coverage]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [from_brand]
+              properties:
+                from_brand: { type: string, format: uuid }
+                cursor: { type: string, description: "next_cursor from the previous call." }
+                limit: { type: integer, minimum: 0, maximum: 500, description: "0 or left out: 500." }
+      responses:
+        "200":
+          description: What this page wrote.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [created, updated, next_cursor]
+                properties:
+                  created: { type: integer }
+                  updated: { type: integer }
+                  next_cursor: { type: [string, "null"], description: "null when the whole catalog is copied." }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/link-orders/catalog/table:
     parameters: [{ $ref: "#/components/parameters/BrandID" }]
     post:
@@ -16113,7 +16660,8 @@ paths:
         track, the Keywords page's page targets, and competitor link reads
         already kept. It never calls Ahrefs, DataForSEO or SE Ranking.
 
-        A page scores for each keyword a competitor ranks in the top 20 for
+        A page scores for each keyword SE Ranking has it at positions 4 to
+        20 for (near_top; 4 to 10 weighs more), for each keyword a competitor ranks in the top 20 for
         while the page is missing or 3 or more places behind
         (keyword_gap), and for each competitor page that other sites link
         to and that competes for the same keywords or has a matching
@@ -20067,7 +20615,10 @@ paths:
         Analytics, with Zone Read and Analytics Read permissions). The
         analytics sync reads them once a day. `connections` lists every
         connection that can read logs and how its last read went; an empty
-        list means none is connected.
+        list means none is connected. A site that isn't behind such a
+        connection can report crawler requests from its own server
+        (reportAIBotHits); those counts are used for the hosts and days no
+        connection's logs cover, and each host's `source` says which it was.
       tags: [seo]
       parameters:
         - { name: days, in: query, schema: { type: integer, minimum: 1, maximum: 365, default: 28 } }
@@ -20078,6 +20629,56 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/AIBotHits" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/ai-bot-hits:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+    post:
+      operationId: reportAIBotHits
+      x-outflare-access: { scope: customers.manage, brand: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Report AI crawler requests from your own server
+      description: |
+        Scope: customers.manage. For a site that isn't behind a connection whose request logs Outflare reads. AI
+        crawlers run no scripts, so the website script never sees them: your server sends the User-Agent and Host
+        of requests (the server libraries' crawler tracker counts them in memory and sends the counts). Outflare
+        works out which are AI crawlers it knows and keeps only how many requests each made per host and day. The
+        user agents, paths and addresses are not kept, and anything else is ignored. Send an Idempotency-Key so a
+        retry counts once. Where a connection's logs cover the same host and day, the logs are used instead.
+      tags: [seo]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [hits]
+              properties:
+                hits:
+                  type: array
+                  minItems: 1
+                  maxItems: 1000
+                  items:
+                    type: object
+                    required: [user_agent, host]
+                    properties:
+                      user_agent: { type: string, description: "The request's User-Agent header.", example: "Mozilla/5.0 (compatible; GPTBot/1.2; +https://openai.com/gptbot)" }
+                      host: { type: string, description: "The site's host name.", example: www.example.com }
+                      day: { type: string, format: date, description: "The day (UTC) of the requests, within the last 7 days. Today when left out." }
+                      requests: { type: integer, minimum: 1, default: 1, description: How many requests this entry stands for. }
+      responses:
+        "200":
+          description: What was counted.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [counted, ignored]
+                properties:
+                  counted: { type: integer, description: Requests counted as AI crawlers. }
+                  ignored: { type: integer, description: Entries whose user agent is no AI crawler Outflare knows. }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "400": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/ai-visibility:
     parameters:
@@ -24270,6 +24871,7 @@ paths:
                   type: object
                   description: A model per task; replaces the current choices. A task left out or null uses its default.
                   properties:
+                    sales_reply_draft: { $ref: "#/components/schemas/AITaskModelInput" }
                     plan: { $ref: "#/components/schemas/AITaskModelInput" }
                     turn: { $ref: "#/components/schemas/AITaskModelInput" }
                     check_in: { $ref: "#/components/schemas/AITaskModelInput" }
@@ -25979,7 +26581,7 @@ paths:
                 required: [data, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/AgentRun" } }
-                  next_cursor: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/agent-runs:
     parameters:
@@ -26006,7 +26608,7 @@ paths:
                 required: [data, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/AgentRun" } }
-                  next_cursor: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/agent-runs/{id}:
     parameters:
@@ -26715,7 +27317,7 @@ paths:
                 required: [data, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/Action" } }
-                  next_cursor: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/actions:
     parameters: [{ $ref: "#/components/parameters/BrandID" }]
@@ -26743,7 +27345,7 @@ paths:
                 required: [data, next_cursor]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/Action" } }
-                  next_cursor: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/actions/decide:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
@@ -27853,7 +28455,7 @@ paths:
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/Memory" } }
                   total: { type: integer }
-                  next_cursor: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         "400": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
     post:
@@ -28301,7 +28903,7 @@ paths:
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/KnowledgeItem" } }
                   total: { type: integer }
-                  next_cursor: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
         "400": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
     post:
@@ -28830,7 +29432,7 @@ paths:
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/SupportConversation" } }
                   total: { type: integer }
-                  next_cursor: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
                   counts: { $ref: "#/components/schemas/SupportCounts" }
         default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/support/conversations/{id}:
@@ -30455,6 +31057,47 @@ paths:
         "204": { description: Removed. }
         "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/site-keys/{id}/identify-secret:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: createSiteIdentifySecret
+      x-outflare-access: { scope: customers.manage, brand: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Make a site key's identify secret
+      description: |
+        Scope: customers.manage. Turns on verified browser identify for the site. Your server signs a person's user id
+        with this secret, hex(HMAC-SHA256(secret, userId)), and gives the page the id and the signature;
+        outflare.identify(userId, signature) then joins the browser's visits to that person. The secret (ofid_) is shown
+        once; keep it on your server, never in a page. Making a new one replaces the old at once, so signatures made
+        with the old one stop working.
+      tags: [records]
+      responses:
+        "200":
+          description: The new secret, shown once, and the key.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [secret, site_key]
+                properties:
+                  secret: { type: string, description: "The identify secret (ofid_). Shown once.", example: ofid_test_not_a_real_secret }
+                  site_key: { $ref: "#/components/schemas/SiteKey" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    delete:
+      operationId: removeSiteIdentifySecret
+      x-outflare-access: { scope: customers.manage, brand: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Remove a site key's identify secret
+      description: "Scope: customers.manage. Turns browser identify off for the site: outflare.identify is refused, and identify comes only from your server again."
+      tags: [records]
+      responses:
+        "204": { description: Removed. }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/site-keys/{id}/consent-banner:
     parameters:
       - { $ref: "#/components/parameters/BrandID" }
@@ -30993,6 +31636,14 @@ paths:
                       include: { type: array, items: { type: string }, description: "Only these pages are recorded and counted, when any are listed." }
                       exclude: { type: array, items: { type: string }, description: "Pages never recorded or counted." }
                       hide: { type: array, items: { type: string }, description: "The shapes of the brand's own keys, which the script hides (x is any letter or digit)." }
+                  capture:
+                    type: object
+                    description: "Only when the key has autocapture on (its capture_clicks, capture_forms or capture_errors): what the script should send on its own."
+                    required: [clicks, forms, errors]
+                    properties:
+                      errors: { type: boolean, description: "Send uncaught errors as Error Caught." }
+                      clicks: { type: boolean, description: "Send clicks on links and buttons as Element Clicked." }
+                      forms: { type: boolean, description: "Send form submits as Form Submitted." }
         default: { $ref: "#/components/responses/Error" }
     options:
       operationId: sendSiteEventsPreflight
@@ -31037,6 +31688,7 @@ paths:
                 clicks: { type: array, items: { type: array, items: { type: integer }, minItems: 2, maxItems: 2 } }
                 depth: { type: integer, minimum: 1, maximum: 10 }
                 page_height: { type: integer }
+                screen: { type: string, description: "What the page showed when it was clicked, for a page whose content changes while its address stays the same: the current step's or the first heading's text. Each screen gets its own heatmap." }
                 snapshot:
                   type: array
                   description: "The page for its heatmap's picture, sent only after an answer said snapshot: the recorder's note of the page's size, then its whole document."
@@ -31343,6 +31995,53 @@ paths:
       responses:
         "204": { description: Allowed. }
         default: { $ref: "#/components/responses/Error" }
+  /v1/site/identify:
+    post:
+      operationId: sendSiteIdentify
+      summary: Join a browser to a person your server vouched for
+      description: |
+        Public: the site key (ofk_) in the body and the signature are the authority. What outflare.identify(userId,
+        signature) in the tracking script sends. The signature is hex(HMAC-SHA256(identify secret, userId)), made on
+        your server with the site key's identify secret (POST .../site-keys/{id}/identify-secret). When it is right, the
+        browser's visits join the person with that user id, as an identify from your server would. It takes no traits:
+        a person's fields come only from a server. Refused with 403 when the site has no identify secret or the
+        signature is wrong. Send the JSON as text/plain to skip the CORS preflight.
+      tags: [records]
+      requestBody:
+        required: true
+        content:
+          text/plain:
+            schema: { type: string }
+          application/json:
+            schema:
+              type: object
+              required: [key, anonymousId, userId, signature]
+              properties:
+                key: { type: string, example: ofk_test_not_a_real_key }
+                anonymousId: { type: string, minLength: 8, maxLength: 64 }
+                userId: { type: string, minLength: 1, maxLength: 200 }
+                signature: { type: string, description: "64 hex characters." }
+      responses:
+        "200":
+          description: Joined.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok]
+                properties:
+                  ok: { type: boolean }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    options:
+      operationId: sendSiteIdentifyPreflight
+      summary: CORS preflight for browser identify
+      description: "Public. Any origin may send; the key and the signature, not the page, are checked."
+      tags: [records]
+      responses:
+        "204": { description: Allowed. }
+        default: { $ref: "#/components/responses/Error" }
   /v1/site/consent:
     get:
       operationId: getSiteConsentBanner
@@ -31645,7 +32344,8 @@ paths:
         Scope: analytics.read. The variant a visitor or user gets of every flag that is on (or of keys), for your own
         server, with why. Send anonymous_id from the page (outflare.anonymousId()) so the server and the site agree;
         user_id is used when there is no anonymous_id, and makes signed_in true. Rules on the page read url,
-        referrer, user_agent and language; property.<name> rules read properties. Nothing is stored.
+        referrer, user_agent and language; property.<name> rules read properties. Rules about who the visitor is (user_id,
+        list, person.<field>) read the brand's person that anonymous_id or user_id belongs to. Nothing is stored.
       tags: [flags]
       requestBody:
         required: true
@@ -31669,6 +32369,35 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/FlagDecisions" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/flags/definitions:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    get:
+      operationId: getBrandFlagDefinitions
+      x-outflare-access: { scope: analytics.read, brand: true }
+      summary: Flag definitions for deciding on your own server
+      description: |
+        Scope: analytics.read. Every flag of the brand that is on, with its versions, rules, rollout, salt and exclusion
+        group slice: everything needed to decide a visitor's flags in your own server's memory, with no request per
+        page. The server libraries do this (LocalFlags in TypeScript and Python): they read this every
+        refresh_seconds and give the same answers as POST .../flags/evaluate and the website script. Send the ETag
+        back as If-None-Match to get 304 while nothing changed. To decide by hand: a visitor's bucket for a string is
+        the first 8 bytes of its SHA-256 as an unsigned number, mod 10,000. A flag gives false when a rule fails,
+        when group is set and bucket("group:" + group + ":" + id) is outside group_from..group_to, or when
+        bucket(salt + ":rollout:" + id) is at least rollout times 100; else the version whose share of the weights,
+        laid out in order across the 10,000 buckets, holds bucket(salt + ":" + id).
+      tags: [flags]
+      parameters:
+        - { name: If-None-Match, in: header, schema: { type: string }, description: "The ETag of the definitions you hold." }
+      responses:
+        "200":
+          description: The brand's flags that are on.
+          headers:
+            ETag: { schema: { type: string }, description: "Changes when any of the flags does." }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/FlagDefinitions" }
+        "304": { description: "Nothing changed since the ETag sent in If-None-Match. No body." }
         default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/flags/{flag}:
     parameters:
@@ -33602,6 +34331,34 @@ paths:
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/catalog/event-counts:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    get:
+      operationId: listBrandEventCounts
+      x-outflare-access: { scope: customers.read, brand: true }
+      summary: Count a brand's events by name
+      description: |
+        Scope: customers.read. How many events of each name the brand stored over the last days (whole UTC days,
+        today included), from how many people (known or anonymous), and when the newest happened. Names with no
+        events in the range are left out; the event definitions carry each name's all-time count. Most events
+        first, at most 5,000 names.
+      tags: [catalog]
+      parameters:
+        - { name: days, in: query, description: How many days back to count., schema: { type: integer, minimum: 1, maximum: 365, default: 30 } }
+      responses:
+        "200":
+          description: The counts, most events first.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, days]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/EventCount" } }
+                  days: { type: integer }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/catalog/events/{event}/usage:
     parameters:
       - { $ref: "#/components/parameters/BrandID" }
@@ -33758,10 +34515,13 @@ paths:
       description: |
         Scope: customers.manage. Up to 10,000 people (a CSV of sign-ups, an export of account ids), each with an email,
         a user_id (the workspace's own id for them) or both. Each row is matched first by user_id, then by email, to
-        the brand's people; only a row whose email nobody in the brand holds makes a new person, with origin and
-        acquired_via as given. A row with only a user_id nobody holds is skipped. Imported emails are not verified:
+        the brand's people. An email match adds the row's user_id with source import when that person has no active
+        user_id in the brand. If that person already holds a different user_id, the row is skipped without changing
+        the person or counting them as matched. Only a row whose email nobody in the brand holds makes a new person,
+        with origin and acquired_via as given. A row with only a user_id nobody holds is skipped. Imported emails are not verified:
         they claim no one's address. With list_id, everyone matched or made is added to that static list, ready for a
-        broadcast with audience kind list.
+        broadcast with audience kind list. New people start with the first_name, last_name, job_title and company
+        their row gives; people already here keep what they have.
       tags: [records]
       requestBody:
         required: true
@@ -33781,10 +34541,15 @@ paths:
                       email: { type: string }
                       user_id: { type: string, maxLength: 500 }
                       name: { type: string, maxLength: 200 }
+                      first_name: { type: string, maxLength: 200 }
+                      last_name: { type: string, maxLength: 200 }
+                      job_title: { type: string, maxLength: 200 }
+                      company: { type: string, maxLength: 200, description: "The company's name: the brand's company of that name, else the company of their work email's domain, else a new company." }
                 origin: { type: string, enum: [first_party, prospect, import], default: import, description: "How you got them: your own users or customers, a list you bought or found, or unknown." }
                 acquired_via: { type: string, default: csv, description: "A short lowercase label, such as csv or admin_export." }
                 list_id: { type: string, format: uuid, description: "A static list (GET .../smart-lists) to add them to." }
                 source: { type: string, enum: [cold, inbound, event, signup, invited, customer, other], description: "Where these people are from: their Source, set on everyone created and on matched people who have none yet. Cold makes them prospects (no marketing email until they opt in) when origin is left out; Sign-up, Customer and Invited make them first_party." }
+                sub_source: { type: string, description: "Which one within their Source, as a sub-source's key (GET .../sub-sources), such as the event or conference they were met at. Set on everyone created and on matched people with that Source and no sub-source yet. Without source, the sub-source's own Source is used." }
       responses:
         "200":
           description: What it did.
@@ -33795,7 +34560,7 @@ paths:
                 required: [created, matched, skipped, record_ids, list_id, list_members]
                 properties:
                   created: { type: integer }
-                  matched: { type: integer, description: People who were already in the brand. }
+                  matched: { type: integer, description: "People who were already in the brand, excluding skipped rows." }
                   skipped:
                     type: array
                     items:
@@ -33803,7 +34568,9 @@ paths:
                       required: [row, reason]
                       properties:
                         row: { type: integer, description: "The row's number, from 1." }
-                        reason: { type: string }
+                        reason:
+                          type: string
+                          description: 'Why the row was skipped. An email match with a different active user_id returns "this email belongs to a person with another user id".'
                   record_ids: { type: array, items: { type: string, format: uuid }, description: "The people matched or made, in row order." }
                   list_id: { type: [string, "null"], format: uuid }
                   list_members: { type: [integer, "null"], description: "How many the list holds now." }
@@ -34858,7 +35625,7 @@ paths:
         payments. Someone counts at a step only when they did every step before it, in order, inside each step's time limit,
         so dropped is the people who stopped there. A person is a customer record once known, otherwise a browser; identifying
         a browser joins its earlier visits and events to the person. Each person counts once, from their first step 1 in the
-        dates. Optional: a breakdown by a field of step 1, conversion over time by when people did step 1, and the ad
+        dates. Optional: a breakdown by a field of step 1, of a later step or of the person's record, conversion over time by when people did step 1, and the ad
         networks' clicks, impressions and spend over the dates (ad_clicks), which are daily totals and never join the people.
         Runs for at most 30 seconds (query_timeout).
       tags: [insights]
@@ -35418,7 +36185,7 @@ paths:
                 required: [data, next_cursor, sites]
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/Recording" } }
-                  next_cursor: { type: [string, "null"] }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
                   sites: { type: array, items: { type: string }, description: "The websites with a recording in the period, by host name, whatever the other filters." }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
@@ -35576,11 +36343,12 @@ paths:
                     type: array
                     items:
                       type: object
-                      required: [path, clicks, views]
+                      required: [path, clicks, views, screens]
                       properties:
                         path: { type: string }
                         clicks: { type: integer }
                         views: { type: integer }
+                        screens: { type: integer, description: "How many screens the page's clicks are split into, when its content changes while its address stays the same (the steps of a sign-up). 0 or 1 for a plain page." }
                   days: { type: integer }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
@@ -35599,6 +36367,7 @@ paths:
         - { name: path, in: query, required: true, schema: { type: string }, description: "The page's path, such as /pricing." }
         - { name: days, in: query, schema: { type: integer, minimum: 1, maximum: 90, default: 30 } }
         - { name: device, in: query, schema: { type: string, enum: [desktop, tablet, mobile], default: desktop } }
+        - { name: screen, in: query, schema: { type: string }, description: "One screen of a page whose content changes while its address stays the same, by its name from the heatmap's screens. Empty is the clicks from before screens were told apart. Left out, a page with several screens answers with its most clicked one." }
       responses:
         "200":
           description: The heatmap.
@@ -35624,6 +36393,7 @@ paths:
       parameters:
         - { name: path, in: query, required: true, schema: { type: string }, description: "The page's path, such as /pricing." }
         - { name: device, in: query, schema: { type: string, enum: [desktop, tablet, mobile], default: desktop } }
+        - { name: screen, in: query, schema: { type: string }, description: "One screen of a page whose content changes while its address stays the same, by its name from the heatmap's screens. Empty is the clicks from before screens were told apart. Left out, a page with several screens answers with its most clicked one." }
       responses:
         "200":
           description: The picture.
@@ -36659,6 +37429,100 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/RecordRelationship" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/sub-sources:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+    get:
+      operationId: listSubSources
+      x-outflare-access: { scope: customers.read, brand: true }
+      summary: List the brand's sub-sources
+      description: |
+        Scope: customers.read. Where within their Source the brand's people came from: for Source event (Events and
+        conferences), each event or conference the team met people at. Each says how many of the brand's people have
+        it. They are the options of the built-in Sub-source field (attributes.sub_source), so people filter by one with
+        attribute=sub_source:{key}.
+      tags: [records]
+      parameters:
+        - { name: source, in: query, schema: { type: string, enum: [cold, inbound, event, signup, invited, customer, other] }, description: "Only this Source's sub-sources." }
+        - { name: archived, in: query, schema: { type: string, enum: ["true", "false"] }, description: "true includes archived ones." }
+      responses:
+        "200":
+          description: The sub-sources, in the order they were added.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/SubSource" } }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: addSubSource
+      x-outflare-access: { scope: customers.manage, brand: true }
+      summary: Add a sub-source
+      description: |
+        Scope: customers.manage. Adds an event, conference or other sub-source under a Source, or returns the one
+        already called that (any case or spacing) under the same Source, bringing it back if it was archived (201 when
+        added or brought back, 200 when it was there). Its key never changes. Records sub_source.created.
+      tags: [records]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [source, label]
+              properties:
+                source: { type: string, enum: [cold, inbound, event, signup, invited, customer, other], description: "The Source it belongs to: event for an event or conference." }
+                label: { type: string, minLength: 1, maxLength: 120, example: Web Summit 2026 }
+      responses:
+        "200":
+          description: It was there already.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SubSource" }
+        "201":
+          description: Added, or brought back from archived.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SubSource" }
+        "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/sub-sources/{key}:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: key, in: path, required: true, schema: { type: string } }
+    patch:
+      operationId: updateSubSource
+      x-outflare-access: { scope: customers.manage, brand: true }
+      summary: Rename or archive a sub-source
+      description: |
+        Scope: customers.manage. A new label fixes its name everywhere at once, since people hold its key. An archived
+        sub-source stays on the people who have it but can't be picked for anyone else. Records sub_source.updated.
+      tags: [records]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                label: { type: string, minLength: 1, maxLength: 120 }
+                archived: { type: boolean }
+      responses:
+        "200":
+          description: The sub-source.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SubSource" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
         "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/people-setup:
@@ -55657,6 +56521,8 @@ components:
           type: string
         body:
           type: string
+        favorite:
+          type: boolean
         archived:
           type: boolean
       required:
@@ -55666,6 +56532,7 @@ components:
         - name
         - body
         - archived
+        - favorite
     SalesTemplateInput:
       type: object
       properties:
@@ -55705,9 +56572,22 @@ components:
         - revision
         - body
         - resolved_text
+    SalesDraftAssist:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        status: { type: string, enum: [queued, running, ready, failed] }
+        base_revision: { type: integer }
+        body: { type: string }
+        error_code: { type: string }
+      required: [id, status, base_revision, body, error_code]
     SalesDraftInput:
       type: object
       properties:
+        assist_id:
+          type: string
+          format: uuid
+          description: Apply this AI preview only if its base draft revision still matches.
         revision:
           type: integer
         body:
@@ -55794,6 +56674,22 @@ components:
     SalesLead:
       type: object
       properties:
+        country:
+          type: string
+          description: Contact country from their canonical CRM record (country option key); empty when unknown.
+        city:
+          type: string
+          description: Contact city, when recorded.
+        company_country:
+          type: string
+          description: Company headquarters country, kept separate from the contact location.
+        viewed_by:
+          type: array
+          items:
+            $ref: '#/components/schemas/SalesLeadView'
+        feedback_count:
+          type: integer
+          minimum: 0
         attribution: { $ref: '#/components/schemas/SalesAttribution' }
         id:
           type: string
@@ -55903,9 +56799,28 @@ components:
         - reply_state
         - created_at
         - updated_at
+    SalesLeadView:
+      type: object
+      properties:
+        user_id: { type: string, format: uuid }
+        seen_at: { type: string, format: date-time }
+      required: [user_id, seen_at]
+    SalesLeadFeedback:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        author_id: { type: [string, 'null'] }
+        created_at: { type: string, format: date-time }
+        category: { type: string, enum: [wrong_contact, poor_fit, reply_classification, missing_information, question, other] }
+        body: { type: string }
+      required: [id, author_id, created_at, category, body]
     SalesLeadDetail:
       type: object
       properties:
+        feedback:
+          type: array
+          items:
+            $ref: '#/components/schemas/SalesLeadFeedback'
         lead:
           $ref: "#/components/schemas/SalesLead"
         messages:
@@ -55948,13 +56863,22 @@ components:
     SalesAction:
       type: object
       description: |
-        Archive preserves the conversation and shared notes. Reopen restores an
-        unassigned lead to New or an owned lead to Active. A Sales rep may undo
+        Assign reserves a new conversation for a representative without sending.
+        Release returns it to the unassigned queue. Any authorized SDR, AE or manager
+        may reassign or release a new conversation until its owner starts it.
+        Take sends the owner's introduction. Feedback
+        records an internal comment without changing ownership or sending email.
+        Read marks the conversation seen without assigning or sending.
+        Archive preserves the conversation and shared notes. Reopen restores a
+        never-started lead to New (retaining its assignment), or a previously started lead to Active. A Sales rep may undo
         their own latest archive of an unassigned lead, using its current version.
       properties:
         action:
           type: string
           enum:
+            - assign
+            - release
+            - feedback
             - take
             - handoff
             - archive
@@ -55963,6 +56887,9 @@ components:
             - details
             - read
             - retry_send
+        feedback_category:
+          type: string
+          enum: [wrong_contact, poor_fit, reply_classification, missing_information, question, other]
         message_id:
           type: string
           format: uuid
@@ -58538,7 +59465,7 @@ components:
     PartnerProgram:
       type: object
       required: [id, name, slug, kind, status, brand_id, landing_url, currency, credit_window_days, credit_model, codes_win, block_self_referrals, hold_days,
-        auto_approve, auto_accept, pay_browser_signups, min_payout_cents, payout_term_days, payout_methods, payout_tokens, terms_url, sales_source, postback_hint, portal_enabled, portal_subdomain, portal, portal_url, rules, groups,
+        auto_approve, auto_accept, pay_browser_signups, min_payout_cents, payout_term_days, payout_methods, payout_tokens, terms_url, sales_source, credits_from, postback_hint, portal_enabled, portal_subdomain, portal, portal_url, rules, groups,
         partners, imported_from, switched_over_at, lead_expiry_days, url_params, block_ad_clicks, block_social_clicks, blocked_countries, created_at, updated_at]
       properties:
         id: { type: string, format: uuid }
@@ -58550,6 +59477,7 @@ components:
         landing_url: { type: string, description: "Where partner links land; '' for none (short links then answer 404)." }
         currency: { type: string }
         credit_window_days: { type: integer, description: How long after a visit or click a conversion still credits the partner. }
+        credits_from: { type: [string, "null"], format: date-time, description: "Only conversions at or after this time credit partners. Earlier sales, sign-ups, leads and custom conversions return reason before_credits_from, with no referral or reward. Refunds are unaffected. null: no start time." }
         credit_model: { type: string, enum: [first, last], description: Which visit with a ref wins inside the window. }
         codes_win: { type: boolean, description: A promo code beats a link when a conversion carries both. }
         block_self_referrals: { type: boolean, description: "A partner's own sign-ups and sales earn them nothing (reason self_referral). On by default." }
@@ -58831,6 +59759,7 @@ components:
         landing_url: { type: string, maxLength: 2000 }
         currency: { type: string, description: "A three-letter code; USD when left out." }
         credit_window_days: { type: integer, minimum: 1, maximum: 365 }
+        credits_from: { type: [string, "null"], format: date-time, description: "Only conversions at or after this RFC 3339 time credit partners; earlier ones return reason before_credits_from. Refunds are unaffected. null clears the start time. Omitted: null on create, unchanged on update. Existing conversions and rewards are unchanged." }
         credit_model: { type: string, enum: [first, last] }
         codes_win: { type: boolean }
         block_self_referrals: { type: boolean, description: "true when left out on create." }
@@ -59281,7 +60210,7 @@ components:
       required: [credited, duplicate, partner_id, referral_id, conversion, rewards]
       properties:
         credited: { type: boolean }
-        reason: { type: string, enum: [no_partner, partner_inactive, program_inactive, self_referral, sale_not_found, currency, lead_expired, country_blocked] }
+        reason: { type: string, enum: [no_partner, partner_inactive, program_inactive, self_referral, sale_not_found, currency, lead_expired, country_blocked, before_credits_from] }
         duplicate: { type: boolean, description: "Already recorded with this external_id (or, for a lead, already a lead)." }
         partner_id: { type: [string, "null"], format: uuid }
         referral_id: { type: [string, "null"], format: uuid }
@@ -59483,7 +60412,7 @@ components:
         rows: { type: array, maxItems: 0, items: {}, description: "Empty: the fifth level has no children." }
     DrilldownReport:
       type: object
-      required: [from, to, timezone, model, conversion_time, source, currency, group_by, cost_available, cost_note, totals, rows, truncated]
+      required: [from, to, timezone, model, conversion_time, source, currency, group_by, cost_available, cost_note, totals, rows, truncated, unconverted_currencies, names]
       properties:
         from: { type: string, format: date }
         to: { type: string, format: date }
@@ -59498,6 +60427,8 @@ components:
         totals: { $ref: "#/components/schemas/DrilldownMetrics" }
         rows: { type: array, items: { $ref: "#/components/schemas/DrilldownRow" } }
         truncated: { type: boolean, description: "Rows past the limit were left out; the totals still count them." }
+        unconverted_currencies: { type: array, items: { type: string }, description: "Currencies whose revenue or cost is left out of every number, because there is no exchange rate from them to the report's currency. Empty when everything was counted." }
+        names: { type: object, additionalProperties: { type: string }, description: "The names of the things the report keys by id (tracker campaigns, traffic sources, offers, landers, paths, destinations), by id, for the ids in its rows and filters. An id that is gone or has no name has no entry. The CSV writes these names in place of the ids." }
     ReportViewSpec:
       type: object
       description: "The drill-down report's settings, as its query parameters name them, and the app's display settings."
@@ -63065,7 +63996,7 @@ components:
         ignored: { type: string, enum: ["off"], description: "Set when nothing was taken in because the workspace hasn't turned it on." }
     SiteKey:
       type: object
-      required: [id, name, key, brand_id, origins, excluded_params, previous_expires_at, events_today, bots_today, created_at, last_used_at, rotated_at, proxy_secret_at, snippet, tests, flicker_guard, own_domain]
+      required: [id, name, key, brand_id, origins, excluded_params, previous_expires_at, events_today, bots_today, created_at, last_used_at, rotated_at, proxy_secret_at, identify_secret_at, snippet, tests, capture_clicks, capture_forms, capture_errors, flicker_guard, own_domain]
       properties:
         id: { type: string, format: uuid }
         name: { type: string, description: Usually the site's domain. }
@@ -63080,10 +64011,69 @@ components:
         last_used_at: { type: [string, "null"], format: date-time }
         rotated_at: { type: [string, "null"], format: date-time }
         proxy_secret_at: { type: [string, "null"], format: date-time, description: "When the key's proxy secret was made (POST .../proxy-secret); null when it has none." }
+        identify_secret_at: { type: [string, "null"], format: date-time, description: "When the key's identify secret was made (POST .../identify-secret); null when browser identify is off." }
         snippet: { type: string, description: "The script tag to paste into the site's <head>. Lists the origins' domains in data-domains when there is more than one, so a visit can cross them." }
         tests: { type: boolean, description: "Run no-code A/B tests: the script asks for each visitor's versions on its own whenever a flag that is on has changes from the visual editor, with no data-flags on the tag. Off leaves flags to the page's own code (data-flags or outflare.flag)." }
+        capture_clicks: { type: boolean, description: "Autocapture: the script sends a click on a link or button as Element Clicked (its tag, label, id, classes and where a link goes, without the query string), with no code on the site. Off by default. An element with data-outflare-event is sent under that name either way." }
+        capture_forms: { type: boolean, description: "Autocapture: the script sends a form submit as Form Submitted (the form's id, name, address and number of fields; never what was typed). Off by default." }
+        capture_errors: { type: boolean, description: "The script sends the site's uncaught errors and rejected promises as Error Caught (type, message, stack, where it was thrown), which GET .../errors groups into issues. Email addresses and long keys are taken out first. Off by default. outflare.captureException(err) sends an error the page caught itself either way." }
         flicker_guard: { type: string, description: "Optional: a short script for the top of the site's <head>, above everything else. On a returning visitor's next visit it hides just the parts their test versions change, for a second at most, so they never see the original first." }
         own_domain: { $ref: "#/components/schemas/SiteOwnDomain" }
+    SourceMap:
+      type: object
+      required: [id, file, release, sources, bytes, created_at]
+      properties:
+        id: { type: string, format: uuid }
+        file: { type: string, description: "The built file it belongs to, as a path.", example: /assets/app-3f9a1c.js }
+        release: { type: string, description: "The build's name, or empty." }
+        sources: { type: integer, description: How many original files it names. }
+        bytes: { type: integer, description: Its size as kept, before compression. }
+        created_at: { type: string, format: date-time }
+    ClickAction:
+      type: object
+      required: [id, name, event, label, label_match, href_contains, element_id, class, path, enabled, matches_7d, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string, description: "The event's name, such as Signup Clicked." }
+        event: { type: string, description: "The name as reports know it, such as signup_clicked." }
+        label: { type: string, description: "The click's label (what the button or link says). Empty: any." }
+        label_match: { type: string, enum: [exact, contains] }
+        href_contains: { type: string, description: "A part of where the link goes. Empty: any." }
+        element_id: { type: string, description: "The element's id attribute. Empty: any." }
+        class: { type: string, description: "One class the element has. Empty: any." }
+        path: { type: string, description: "Only on this page; end with * for every page under it. Empty: every page." }
+        enabled: { type: boolean }
+        matches_7d: { type: integer, description: "How many of the last 7 days' captured clicks it matches (in the list; 0 elsewhere)." }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    ClickActionInput:
+      type: object
+      additionalProperties: false
+      properties:
+        name: { type: string, minLength: 1, maxLength: 100 }
+        label: { type: string, maxLength: 200 }
+        label_match: { type: string, enum: [exact, contains], description: "exact when left out." }
+        href_contains: { type: string, maxLength: 500 }
+        element_id: { type: string, maxLength: 200 }
+        class: { type: string, maxLength: 200 }
+        path: { type: string, maxLength: 200 }
+        enabled: { type: boolean, description: "On when left out." }
+    ErrorIssue:
+      type: object
+      description: "Errors on a brand's website or app that share a fingerprint."
+      required: [fingerprint, type, message, status, regressed, new, count, visitors, first_seen, last_seen, last_path]
+      properties:
+        fingerprint: { type: string }
+        type: { type: string, description: "The latest error's type, such as TypeError." }
+        message: { type: string, description: "The latest error's message." }
+        status: { type: string, enum: [open, resolved, ignored] }
+        regressed: { type: boolean, description: "Resolved once, and it happened again since." }
+        new: { type: boolean, description: "First seen inside the period." }
+        count: { type: integer, description: "Errors in the period." }
+        visitors: { type: integer, description: "Visitors it happened to in the period." }
+        first_seen: { type: string, format: date-time, description: "In the last 90 days." }
+        last_seen: { type: string, format: date-time }
+        last_path: { type: string, description: "The page of the latest error." }
     SiteOwnDomain:
       type: object
       description: "Whether the script is served from the site's own domain (a path the site forwards to Outflare), judged from the last 7 days (UTC) of events. Served that way, ad blockers leave events alone and Safari keeps the visitor's cookie for a year instead of seven days."
@@ -63125,7 +64115,7 @@ components:
       type: object
       required: [attribute, op]
       properties:
-        attribute: { type: string, description: "host, path, url, referrer, device (desktop, mobile, tablet), language, signed_in (true, false), query.<name> (a parameter of the page's address) or property.<name> (sent to evaluate)." }
+        attribute: { type: string, description: "host, path, url, referrer, device (desktop, mobile, tablet), language, signed_in (true, false), query.<name> (a parameter of the page's address) or property.<name> (sent to evaluate). Who the visitor is: user_id (your id for them), list (is or is_not, with the ids of People lists of the flag's brand) or person.<field> (a field of their record, compared as text). They are read from the brand's person the visitor's anonymous id or user id belongs to; a visitor nobody knows is in no list and has no fields." }
         op: { type: string, enum: [is, is_not, contains, not_contains, starts_with, ends_with, exists, not_exists] }
         values: { type: array, maxItems: 50, items: { type: string, maxLength: 500 }, description: "Any of these (case does not matter). None for exists and not_exists." }
     FlagInput:
@@ -63214,6 +64204,42 @@ components:
           type: object
           additionalProperties: { type: string, enum: [match, rules, group, rollout, off, no_subject] }
           description: Why, by flag key (evaluate only).
+    FlagDefinitions:
+      type: object
+      required: [flags, refresh_seconds]
+      properties:
+        flags:
+          type: array
+          items: { $ref: "#/components/schemas/FlagDefinition" }
+        refresh_seconds: { type: integer, description: "How often to read the definitions again.", example: 30 }
+    FlagDefinition:
+      type: object
+      required: [key, variants, rollout, rules, salt, group, group_from, group_to]
+      properties:
+        key: { type: string, example: pricing-headline }
+        variants:
+          type: array
+          items:
+            type: object
+            required: [key, weight]
+            properties:
+              key: { type: string }
+              weight: { type: integer }
+              payload: { description: "The version's content, when it has any." }
+        rollout: { type: integer, minimum: 0, maximum: 100, description: "The percent of visitors who pass the rules that get the flag." }
+        rules:
+          type: array
+          items:
+            type: object
+            required: [attribute, op]
+            properties:
+              attribute: { type: string, description: "host, path, url, referrer, device, language, signed_in, user_id, list, query.<name>, property.<name> or person.<field>. A server deciding in memory passes the lists and fields itself." }
+              op: { type: string, enum: [is, is_not, contains, not_contains, starts_with, ends_with, exists, not_exists] }
+              values: { type: [array, "null"], items: { type: string } }
+        salt: { type: string, description: "Mixed into the hash, so two flags split visitors independently. Not a secret." }
+        group: { type: string, description: "The exclusion group, or empty." }
+        group_from: { type: integer, description: "The first of the group's 10,000 buckets this flag owns." }
+        group_to: { type: integer, description: "One past the last bucket this flag owns." }
     SiteFlagDecisions:
       allOf:
         - { $ref: "#/components/schemas/FlagDecisions" }
@@ -63602,6 +64628,9 @@ components:
         origins: { type: array, maxItems: 20, items: { type: string } }
         excluded_params: { type: array, maxItems: 50, items: { type: string, maxLength: 100 }, description: "Query parameters to leave out of page addresses, such as plan or fb_*." }
         tests: { type: boolean, description: "Run no-code A/B tests on this site (on by default)." }
+        capture_clicks: { type: boolean, description: "Send clicks on links and buttons as Element Clicked, with no code on the site (off by default)." }
+        capture_forms: { type: boolean, description: "Send form submits as Form Submitted, with no code on the site (off by default). What a visitor typed is never read." }
+        capture_errors: { type: boolean, description: "Send the site's uncaught errors as Error Caught, for the Errors page (off by default)." }
     ConnectionHook:
       type: object
       description: A connection's live updates, its own webhook address.
@@ -64602,7 +65631,7 @@ components:
         updated_at: { type: string, format: date-time }
     AdConversionSend:
       type: object
-      required: [id, rule_id, connector, event_name, record_id, event_id, occurred_at, status, reason, match_keys, value_micros, currency, attempts, sent_at, created_at, transport, request_id]
+      required: [id, rule_id, connector, event_name, record_id, event_id, occurred_at, status, reason, match_keys, value_micros, currency, attempts, sent_at, created_at, transport, request_id, country, country_source, target_name, ad_account_id, record_name]
       properties:
         id: { type: string, format: uuid }
         rule_id: { type: string, format: uuid }
@@ -64621,11 +65650,19 @@ components:
         created_at: { type: string, format: date-time }
         transport: { type: string, enum: [data_manager, ads_api], description: "The path the send took: Google's Data Manager API, or the platform's older upload call." }
         request_id: { type: string, description: "The Data Manager request the send went in, when it did; its processing can be asked by it." }
+        country: { type: string, description: "The two-letter country the consent decision was made on; '' when nothing said where the person is." }
+        country_source:
+          type: string
+          enum: ["", visit, event, earlier_event, record]
+          description: "Where the country came from, best evidence first: the person's latest website visit, the event's own context, their most recent earlier event that carried a country or an IP address, or the country on their customer record."
+        target_name: { type: string, description: "The conversion the rule sends to, by the platform's name for it." }
+        ad_account_id: { type: string, format: uuid }
+        record_name: { type: string, description: "The person's name on their customer record; '' when the event belongs to nobody known." }
     AdSettings:
       type: object
       required: [consent_mode, updated_at]
       properties:
-        consent_mode: { type: string, enum: [opt_out, opt_in] }
+        consent_mode: { type: string, enum: [opt_out, opt_in, collected] }
         updated_at: { type: [string, "null"], format: date-time }
     AdEconomics:
       type: object
@@ -65665,6 +66702,20 @@ components:
         integration_id: { type: string, format: uuid }
         name: { type: string }
         connector: { type: string, example: dataforseo, description: "dataforseo or geonode for checks; seranking for imports." }
+        last_import:
+          type: object
+          description: "On a site's imports: what the last import of this site from the connection did. Absent before the first import."
+          required: [ran_at, outcome, project, keywords, added, skipped, projects_seen, error_code, error]
+          properties:
+            ran_at: { type: string, format: date-time }
+            outcome: { type: string, enum: [imported, no_project, failed], description: "imported: a project of the tracker matched the site. no_project: none of the account's projects is for this site. failed: the read failed (error_code)." }
+            project: { type: string, description: "The tracker's project that matched." }
+            keywords: { type: integer, description: "Keywords whose positions came in." }
+            added: { type: integer, description: "Keywords newly followed by this import." }
+            skipped: { type: array, items: { type: string }, description: "What could not be mapped, such as a search engine whose country is unknown (at most 20)." }
+            projects_seen: { type: array, items: { type: string }, description: "With no_project: the sites the account's projects are for (at most 50)." }
+            error_code: { type: string, description: "With failed: the kind of failure, such as auth, quota or unavailable." }
+            error: { type: string, description: "With failed: the tracker's own explanation, with the step that failed (reading the projects, the keywords, the positions...); empty for an internal error." }
     TrackedKeyword:
       type: object
       required: [id, keyword, country, device, engine, frequency, status, integration_id, position, url, previous_position, best_position, last_checked_at, last_error, target_url, created_at]
@@ -66408,9 +67459,10 @@ components:
           type: array
           items:
             type: object
-            required: [host, requests, search, user, training, bots, days]
+            required: [host, requests, search, user, training, bots, days, source]
             properties:
               host: { type: string, example: www.example.com }
+              source: { type: string, enum: [logs, server, both], description: "Where the counts came from: a connection's request logs, the site's own server (reportAIBotHits), or both on different days." }
               requests: { type: integer }
               search: { type: integer, description: Requests by AI search crawlers. }
               user: { type: integer, description: Requests AI assistants made for a person asking. }
@@ -68062,7 +69114,7 @@ components:
           items: { type: string, enum: [pbn, no_metrics, no_email] }
     LinkOrderDonor:
       type: object
-      required: [id, publisher_id, domain, pbn, best_link, country, languages, niches, casino_allowed, rel_offered, slot_types, duration, duration_days, tat_days, guarantee_days, vendor_id, source, domain_rating, traffic, spam_score, metrics_at, metrics_source, notes, intermediary, theme, site_since, site_age_years, metrics, direct_contact, archived_at, prices, created_at, updated_at]
+      required: [id, publisher_id, domain, pbn, best_link, country, languages, niches, casino_allowed, rel_offered, slot_types, duration, duration_days, tat_days, guarantee_days, vendor_id, source, domain_rating, traffic, spam_score, metrics_at, metrics_source, notes, intermediary, theme, site_since, site_age_years, metrics, direct_contact, email_search, archived_at, prices, created_at, updated_at]
       properties:
         id: { type: string, format: uuid }
         publisher_id: { type: string, format: uuid }
@@ -68093,6 +69145,14 @@ components:
         site_age_years: { type: [integer, "null"], description: "Whole years from site_since to today." }
         metrics: { $ref: "#/components/schemas/LinkOrderDonorMetrics" }
         direct_contact: { $ref: "#/components/schemas/LinkOrderDirectContact" }
+        email_search:
+          type: [object, "null"]
+          description: "OutflareBot's last search of the site for who to write to (POST .../catalog/find-emails); null before the first."
+          required: [at, status, emails]
+          properties:
+            at: { type: string, format: date-time }
+            status: { type: string, enum: [found, none, blocked, unreachable, opted_out, failed], description: "found: addresses kept; none: the site lists none; blocked: robots.txt; opted_out: the site opted out of OutflareBot; unreachable or failed: it could not be read." }
+            emails: { type: array, items: { type: string }, description: "What it found, best first: the advertising desk, then the editors, then a general mailbox. Also person records on the site's company." }
         archived_at: { type: [string, "null"], format: date-time }
         prices: { type: array, items: { $ref: "#/components/schemas/LinkOrderMoney" } }
         created_at: { type: string, format: date-time }
@@ -68321,7 +69381,7 @@ components:
       type: object
       required: [kind, competitor, keyword, position, your_position, volume, competitor_url, referring_domains]
       properties:
-        kind: { type: string, enum: [keyword_gap, competitor_links] }
+        kind: { type: string, enum: [near_top, keyword_gap, competitor_links], description: "near_top: SE Ranking has the page at 4 to 20 for the keyword (no competitor). keyword_gap: a competitor outranks it. competitor_links: sites link to a competitor's matching page." }
         competitor: { type: string }
         keyword: { type: string }
         position: { type: [number, "null"], description: "The competitor's stored position." }
@@ -69873,7 +70933,7 @@ components:
             type: object
             required: [task, name, description, model, price, price_source, custom]
             properties:
-              task: { type: string, enum: [plan, turn, check_in, reply_labelling, classify_domain, ai_visibility, social_replies, social_posts, email_verification, fix_tickets, review_replies, link_page_reading, ab_tests, link_pitches, knowledge_answers, support_replies, coverage_review, journeys, pr_stories, brand_knowledge, telegram_matching, telegram_summaries, mail_privacy, insights, event_names, conversation_signals] }
+              task: { type: string, enum: [sales_reply_draft, plan, turn, check_in, reply_labelling, classify_domain, ai_visibility, social_replies, social_posts, email_verification, fix_tickets, review_replies, link_page_reading, ab_tests, link_pitches, knowledge_answers, support_replies, coverage_review, journeys, pr_stories, brand_knowledge, telegram_matching, telegram_summaries, mail_privacy, insights, event_names, conversation_signals] }
               name: { type: string }
               description: { type: string }
               model: { type: [string, "null"], description: Null when no model can run yet. }
@@ -73259,6 +74319,16 @@ components:
         key: { type: string, example: won }
         label: { type: string, example: Won }
         archived: { type: boolean }
+        source: { type: string, description: "A sub-source's Source (option set sub_source only)." }
+    SubSource:
+      type: object
+      required: [key, label, source, archived, people]
+      properties:
+        key: { type: string, example: web_summit_2026 }
+        label: { type: string, example: Web Summit 2026 }
+        source: { type: string, enum: [cold, inbound, event, signup, invited, customer, other] }
+        archived: { type: boolean }
+        people: { type: integer, description: "How many of the brand's people have it (0 in a write's answer)." }
     OptionSet:
       type: object
       required: [key, name, builtin, options]
@@ -73513,7 +74583,7 @@ components:
         viewed_at: { type: [string, "null"], format: date-time }
     Heatmap:
       type: object
-      required: [path, days, device, clicks, total_clicks, scroll, views, height, recording_id, snapshot_at]
+      required: [path, days, device, clicks, total_clicks, scroll, views, height, recording_id, snapshot_at, screen, screens]
       properties:
         path: { type: string }
         days: { type: integer }
@@ -73536,6 +74606,36 @@ components:
         height: { type: integer, description: "The page's height in pixels, the tallest it was." }
         recording_id: { type: [string, "null"], format: uuid, description: "A recent recording of a visit that saw this page, to draw the page behind the heatmap when it has no picture of its own." }
         snapshot_at: { type: [string, "null"], format: date-time, description: "When the page's own picture for the heatmap was taken (GET .../heatmaps/snapshot). Null until a visitor's browser has sent one." }
+        screen: { type: string, description: "The screen shown, of a page whose content changes while its address stays the same. Empty for a plain page." }
+        screens:
+          type: array
+          description: "Every screen of the page with clicks, most clicked first. Empty for a plain page. A screen named \"\" is the clicks from before screens were told apart."
+          items:
+            type: object
+            required: [screen, clicks]
+            properties:
+              screen: { type: string }
+              clicks: { type: integer }
+    EventCount:
+      type: object
+      required: [name, events, people, last_at, sources]
+      properties:
+        name: { type: string }
+        events: { type: integer, description: How many events of this name were stored in the days asked for. }
+        people: { type: integer, description: How many different people (known or anonymous) sent them. }
+        last_at: { type: string, format: date-time, description: When the newest one happened. }
+        sources:
+          type: array
+          description: |
+            Where they came from, most events first: browser (the website script), api, transactions (the
+            payment.succeeded and payment.refunded events Outflare writes, once per payment, from orders, the
+            transactions API and billing connectors), or a connector's id.
+          items:
+            type: object
+            required: [source, events]
+            properties:
+              source: { type: string }
+              events: { type: integer }
     EventPlanProblem:
       type: object
       required: [event_name, kind, property, events, last_seen_at]
@@ -74030,10 +75130,10 @@ components:
             strict when left out: people do the steps in this order. any: they do them in any order, so step 1 is whichever they did first in the
             dates and step N means N of the steps done within the window; the chart counts how many of the steps people got through, and
             the steps are labelled "1 step", "2 steps" and so on. An any-order funnel takes no exclusions and no per-step time limits, and
-            a breakdown needs every step to be of the same kind.
+            a breakdown needs every step to be of the same kind, unless it is by a field of the person (person:<key>).
         date_range: { $ref: "#/components/schemas/InsightDateRange" }
         window: { $ref: "#/components/schemas/InsightWindow" }
-        breakdown: { type: string, maxLength: 200, description: "A field of step 1 to split people by (the catalog's breakdowns), param:<name> or property:<key> for an event step, or experiment:<flag key> for the version of an A/B test (the catalog's experiments)." }
+        breakdown: { type: string, maxLength: 200, description: "A field of step 1 to split people by (the catalog's breakdowns), param:<name> or property:<key> for an event step, or experiment:<flag key> for the version of an A/B test (the catalog's experiments). step:<n>:<field> splits by a field of a later step instead, such as step:2:property:plan: the value on the row that took each person to step n, and none for people who never got there (not for an any-order funnel). person:<key> splits by a field of the person's own record, such as person:lifecycle_stage (the catalog's person_fields; company_fields for a company funnel); browsers nobody has identified have none." }
         interval: { type: string, enum: [day, week, month], description: Adds conversion over time by when people did step 1. }
         ad_clicks:
           type: object
@@ -74112,9 +75212,15 @@ components:
         email: { type: string }
         breakdown: { type: string }
         times: { type: array, items: { type: string, format: date-time }, description: When they did each step they reached. }
+    InsightRecordField:
+      type: object
+      required: [key, label]
+      properties:
+        key: { type: string, example: lifecycle_stage }
+        label: { type: string, example: Lifecycle stage }
     InsightsCatalog:
       type: object
-      required: [events, conversions, networks, fields, breakdowns, experiments, measures, ad_metrics, source_metrics, analytics_connectors, intervals, ops, date_presets]
+      required: [events, conversions, networks, fields, breakdowns, person_fields, company_fields, experiments, measures, ad_metrics, source_metrics, analytics_connectors, intervals, ops, date_presets]
       properties:
         events:
           type: array
@@ -74147,14 +75253,23 @@ components:
               connected: { type: boolean }
         fields:
           type: object
-          required: [event, visit, payment]
+          required: [event, visit, payment, search]
           properties:
             event: { type: array, items: { type: string } }
             visit: { type: array, items: { type: string } }
             payment: { type: array, items: { type: string } }
+            search: { type: array, items: { type: string }, description: "What a search series is filtered and broken down by: query, page, country, device." }
         breakdowns:
           type: object
           additionalProperties: { type: array, items: { type: string } }
+        person_fields:
+          type: array
+          description: "The fields of the brand's people a funnel can be split by, as person:<key>: built-in and the brand's own fields that hold a choice, a yes/no, a number or text. Names, addresses, references and fields marked confidential or restricted are left out."
+          items: { $ref: "#/components/schemas/InsightRecordField" }
+        company_fields:
+          type: array
+          description: "The same for the brand's companies, for a funnel by company."
+          items: { $ref: "#/components/schemas/InsightRecordField" }
         experiments:
           type: array
           description: "A/B tests to split or filter by (running, or started in the last 180 days): field (experiment:<flag key>) is the version each person was first shown, or \"\" when they weren't in the test. Works for every step kind but ad."
@@ -74169,7 +75284,7 @@ components:
         ad_metrics: { type: array, items: { type: string }, description: Measures of an ad series. }
         source_metrics:
           type: object
-          description: "Measures of the series read from stored tool data, by kind: analytics, backlinks, link_orders."
+          description: "Measures of the series read from stored tool data, by kind: analytics, backlinks, link_orders, search."
           additionalProperties: { type: array, items: { type: string } }
         analytics_connectors: { type: array, items: { type: string }, description: "The analytics and search tools with daily numbers stored for the brand, for an analytics series' connector (google_search_console, bing_webmaster, google_analytics...)." }
         intervals: { type: array, items: { type: string }, description: Trend intervals. }
@@ -74182,8 +75297,8 @@ components:
       properties:
         kind:
           type: string
-          enum: [event, page, visit, conversion, payment, ad, analytics, backlinks, link_orders]
-          description: "analytics: the daily totals of the brand's analytics and search tools (Search Console, Bing Webmaster Tools, Google Analytics...). backlinks: its referring domains. link_orders: its paid link orders. These three read stored data only."
+          enum: [event, page, visit, conversion, payment, ad, analytics, backlinks, link_orders, search]
+          description: "search: Search Console's detail by query, page, country and device (filters and breakdown take those four; a series uses query, or country and device, not both). analytics: the daily totals of the brand's analytics and search tools (Search Console, Bing Webmaster Tools, Google Analytics...). backlinks: its referring domains. link_orders: its paid link orders. These three read stored data only."
         event: { type: string, maxLength: 100, description: For an event series. }
         conversion: { type: string, maxLength: 100, description: "For a conversion series: the conversion definition's key." }
         filters: { type: array, maxItems: 10, items: { $ref: "#/components/schemas/InsightFilter" } }
@@ -74191,7 +75306,7 @@ components:
         measure:
           type: string
           enum: [count, people, sum, average, median, p90, p99, min, max, per_person_average, per_person_median, per_person_max, weekly_active, monthly_active, clicks, impressions, spend, conversions, ctr, position, visitors, pageviews, sessions, referring_domains, dofollow_referring_domains, new_referring_domains, lost_referring_domains, committed, published, paid]
-          description: "count (default); people (distinct people: daily active by day); sum, average, median, p90, p99, min or max of a property; per_person_average, per_person_median or per_person_max of how many times each person did it in the period; weekly_active or monthly_active (distinct people in the 7 or 30 days up to the end of each period). For an ad series: clicks (default), impressions, spend or conversions. For an analytics series: clicks (default), impressions, ctr, position (impression-weighted), visitors (a sum of daily visitors), pageviews, sessions or conversions. For a backlinks series: referring_domains (default; live at the end of each period), dofollow_referring_domains, new_referring_domains or lost_referring_domains. For a link_orders series: spend (default; US dollars marked Paid), committed (US dollars approved), published or paid (orders)."
+          description: "count (default); people (distinct people: daily active by day); sum, average, median, p90, p99, min or max of a property; per_person_average, per_person_median or per_person_max of how many times each person did it in the period; weekly_active or monthly_active (distinct people in the 7 or 30 days up to the end of each period). For an ad series: clicks (default), impressions, spend or conversions. For an analytics series: clicks (default), impressions, ctr, position (impression-weighted), visitors (a sum of daily visitors), pageviews, sessions or conversions. For a backlinks series: referring_domains (default; live at the end of each period), dofollow_referring_domains, new_referring_domains or lost_referring_domains. For a link_orders series: spend (default; US dollars marked Paid), committed (US dollars approved), published or paid (orders). For a search series: clicks (default), impressions, ctr or position."
         property: { type: string, maxLength: 200, description: "What sum, average, median, p90, p99, min and max read: amount for payments, a property for events." }
         network: { type: string, description: "For an ad series: one ad network, or all when empty." }
         campaign: { type: string, maxLength: 200, description: "For an ad series: only campaigns whose name contains this." }
