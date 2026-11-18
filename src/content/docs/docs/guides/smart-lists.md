@@ -31,7 +31,7 @@ Every smart list refreshes on its own every 15 minutes, which also moves people 
 
 ## Who is in it
 
-Open a list to see its people. Each name opens that person's record. Beside it are their email, their lifetime value (everything they have paid, less refunds), the day they signed up and when they joined the list.
+Open a list to see its people. **Edit name and description** at the top renames the list and says what it is for. Each name opens that person's record. Beside it are their email, their lifetime value (everything they have paid, less refunds), the day they signed up and when they joined the list.
 
 **Columns** chooses which of these show, and adds the day the person was first seen. **Save as my default** keeps your choice for every list in this browser; **Back to standard columns** drops it.
 
