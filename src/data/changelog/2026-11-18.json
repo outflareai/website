@@ -2,7 +2,7 @@
 	"version": "2026.11.18",
 	"date": "2026-11-18",
 	"status": "in-progress",
-	"updated": "2026-11-18T12:44:28Z",
+	"updated": "2026-11-18T14:04:21Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -80,7 +80,28 @@
 			"edition": "open-source",
 			"text": "Recommended donors now hide sites already in one of your sequences, add checkboxes with Select all, and show each site's light and top-page traffic share. Orders need a green light before you approve or publish, and a site Ahrefs checked in the last 30 days is never pulled again.",
 			"at": "2026-11-18T12:44:28Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "The Campaigns table has a Room to grow column: the share of searches each Google search campaign missed last week to its budget and to rank. Resuming a paused campaign is now checked against your daily budget ceiling, like a raise.",
+			"at": "2026-11-18T14:04:21Z"
+		},
+		{
+			"kind": "launch",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Sales can now read the Slack channels your other tools post into, such as a website form. Each post becomes a person and company, a Sales conversation or a signal, and the queue shows which tool each one came from, filters by it in one click and marks the new ones; a Slack search on every conversation shows what your team already said; Outflare only reads Slack, using your own Slack app.",
+			"at": "2026-11-18T14:04:21Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Assigning a Sales conversation now makes that teammate the person's Owner, replacing any Owner set earlier, and unassigning it clears the Owner when it was still that teammate; each change is in the person's history. A conversation that has been taken can also be passed to another SDR or account manager by its owner or a manager, once no email for it is still being sent.",
+			"at": "2026-11-18T14:04:21Z"
 		}
 	],
-	"through": "f5bf668+0f3808a"
+	"through": "84c6654+23a1701"
 }
