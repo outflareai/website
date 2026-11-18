@@ -2,7 +2,7 @@
 	"version": "2026.11.18",
 	"date": "2026-11-18",
 	"status": "in-progress",
-	"updated": "2026-11-18T16:12:32Z",
+	"updated": "2026-11-18T16:28:40Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -157,7 +157,14 @@
 			"edition": "open-source",
 			"text": "Paid ads recommendations, verdicts and the Bidding strategies table now show money in your brand's currency, like the rest of Paid ads, when an ad account is billed in another one. A brand's target is also compared with spend in the same currency.",
 			"at": "2026-11-18T15:22:35Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Conversion rules on payments can now send first payments only, so an ad platform counts each new paying customer once and renewals or top-ups add nothing. Choose it under Paid ads → Send conversions back → Payments to send; repeat payments only is there too.",
+			"at": "2026-11-18T16:28:40Z"
 		}
 	],
-	"through": "9375e8a+7189760"
+	"through": "10f1bfe+6b72f52"
 }
