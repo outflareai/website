@@ -2,7 +2,7 @@
 	"version": "2026.11.18",
 	"date": "2026-11-18",
 	"status": "in-progress",
-	"updated": "2026-11-18T14:04:21Z",
+	"updated": "2026-11-18T14:50:01Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -101,7 +101,42 @@
 			"edition": "open-source",
 			"text": "Assigning a Sales conversation now makes that teammate the person's Owner, replacing any Owner set earlier, and unassigning it clears the Owner when it was still that teammate; each change is in the person's history. A conversation that has been taken can also be passed to another SDR or account manager by its owner or a manager, once no email for it is still being sent.",
 			"at": "2026-11-18T14:04:21Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Recommended donors in Link orders can now show 25, 50, 100 or 200 picks, so you can tick them all and find emails and send them to a sequence in one go.",
+			"at": "2026-11-18T14:50:01Z"
+		},
+		{
+			"kind": "launch",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "A new menu to try: a short rail of areas (Home, Inbox, Agents, Customers, Marketing, Analytics, Data, Company) with a menu beside it that shows only the pages of the area you are in. Press \"Try the new menu\" at the bottom of the sidebar, and \"Old menu\" on the rail to go back; your choice is remembered in this browser.",
+			"at": "2026-11-18T14:50:01Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Products add themselves from your events: an event that names a product and its category (`product` and `product_category`) adds the product with that category the first time it is seen, and keeps the category in step with later events. Events without a category are held for review as before.",
+			"at": "2026-11-18T14:50:01Z"
+		},
+		{
+			"kind": "fix",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Sales: taking a conversation now sends your introduction even when your own address is on the workspace blocklist. Before, a rep a sequencer's blocklist listed by address could never be copied on their own conversation, so the introduction failed on every retry.",
+			"at": "2026-11-18T14:50:01Z"
+		},
+		{
+			"kind": "fix",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "AI apps that ask before changes, such as Claude, can now read with any Outflare tool without an approval prompt: the new `call_read_tool` runs only tools that read, and `call_tool` stays the way to change things. Reading dashboards and their tiles is now in the core tool set.",
+			"at": "2026-11-18T14:50:01Z"
 		}
 	],
-	"through": "84c6654+23a1701"
+	"through": "ac12f38+7d51d67"
 }
