@@ -39,6 +39,16 @@ Get started has a **Star and follow Outflare** step before your first mission: *
 
 On a self-hosted server, `OUTFLARE_COMMUNITY_LINKS=off` turns them off for everyone, and `OUTFLARE_FOLLOW_URL=off` hides only **Follow us on X** (see [Configuration](/docs/self-hosting/configuration/)).
 
+## Try the new menu
+
+There are two menus, and you can switch between them whenever you like. The one you start with lists every part of Outflare in one sidebar. The new one (version 2) has a short rail of areas on the left (Home, Inbox, Agents, Customers, Marketing, Analytics, Data and Company, with Connectors and Settings at the bottom) and, beside it, only the pages of the area you are in.
+
+- **Switch to it:** press **Try the new menu** at the bottom of the sidebar.
+- **Go back:** press **Old menu** at the bottom of the rail.
+- Either way works from the command palette too (⌘K, then "menu").
+
+The choice is yours alone and is remembered in the browser you made it in; nobody else's menu changes. Every page is in both menus, at the same address.
+
 ## Skip anything, come back any time
 
 - **Skip this step** moves on and marks it skipped. Skipping turns nothing off.
