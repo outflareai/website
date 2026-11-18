@@ -158,7 +158,8 @@ All of them take `brand`. Money is in micros (1,000,000 = one unit).
 account a network made you open in Singapore dollars, say) is converted into
 the brand's currency, so its spend adds up with the rest. The Overview, the
 Campaigns tables and the totals of each campaign, ad group, ad, keyword and
-search term are in the brand's currency, at the latest daily reference rate
+search term, the money in a finding's and a verdict's text, and the cost on
+the Bidding strategies table are in the brand's currency, at the latest daily reference rate
 Outflare keeps (the European Central Bank's), and the page says so ("billed
 in SGD, shown in USD"). In the API each row says what its account is billed
 in (`account_currency`, or `currency` beside `report_currency` and
