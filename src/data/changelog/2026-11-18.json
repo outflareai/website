@@ -2,7 +2,7 @@
 	"version": "2026.11.18",
 	"date": "2026-11-18",
 	"status": "in-progress",
-	"updated": "2026-11-18T22:43:18Z",
+	"updated": "2026-11-18T23:18:29Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -290,7 +290,14 @@
 			"edition": "open-source",
 			"text": "Sales channels now show what matters for each source: pick the fields a Slack channel's posts lead with, and the queue shows those instead of a sentence about the form. Reps can mark a conversation Good, Poor fit or Junk, filter the queue by mark, and see the marks counted per source. New conversations can also be filtered to any teammate, with how many each one holds.",
 			"at": "2026-11-18T22:29:19Z"
+		},
+		{
+			"kind": "fix",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "The Sales queue row is easier to read on a laptop: a form's fields show their label above the value instead of squeezed beside it, the row's buttons stay on one line, and a form no longer repeats its own fields as text.",
+			"at": "2026-11-18T23:18:29Z"
 		}
 	],
-	"through": "8d2a3fd+08f5012"
+	"through": "bca26f6+99b710d"
 }
