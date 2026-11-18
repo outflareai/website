@@ -366,6 +366,24 @@ How it works:
 On the **Paid ads** page, **Send conversions back** adds and switches rules,
 sets who to send for, and shows the latest sends.
 
+### First payments only
+
+A rule on `payment.succeeded` chooses **Payments to send**:
+
+- **Every payment** (the default): first payments, renewals and top-ups alike.
+- **First payments only**: a customer's first ever payment for the brand and
+  nothing after it, marked as a new customer. Each new paying customer counts
+  once, so point it at a conversion action set to count **one** per click. A
+  renewal, a top-up or the same payment sent again adds nothing, because each
+  payment goes to the platform with one order id built from its payment id.
+- **Repeat payments only**: every payment after a customer's first, marked as
+  returning.
+
+Outflare decides which payment is the first from the brand's whole payment
+history, so import past payments ([Transactions](/docs/guides/transactions/))
+before you switch a first-payments rule on. In the API this is the rule's
+`feed_role`: `custom`, `first_payment` or `repeat_payment`.
+
 | Call | What it does |
 | --- | --- |
 | `GET /v1/workspaces/{ws}/ads/conversion-targets?account_id=` | Where an account's conversions can go, asked live from the platform, and any setup still needed |
