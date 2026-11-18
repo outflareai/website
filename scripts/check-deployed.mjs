@@ -9,6 +9,10 @@
 //     merged and included in the version production reports at /v1/meta
 //     (<engine commit>+<cloud commit>). The engine's old name,
 //     outflareai/outflare#NN, still counts: its pull requests moved with it.
+//   - When production reports the same commit twice, the engine is built
+//     from the Cloud repository, which took over the engine's code with
+//     everything merged there. A merged outflareai/engine#NN is then live,
+//     and new engine changes are named as outflareai/cloud#NN.
 //
 // Until then the check fails and says what it is waiting for. Re-run it once
 // the deploy is done. Reading the private repositories needs DEPLOY_CHECK_TOKEN.
@@ -54,6 +58,8 @@ const needs = body
 	.filter((line) => /\bNeeds\b:?[*_]*\s/i.test(line))
 	.flatMap((line) => [...line.matchAll(/(?:https:\/\/github\.com\/)?outflareai\/(engine|outflare|cloud)(?:#|\/pull\/)(\d+)/gi)])
 	.map((m) => ({ repo: m[1].toLowerCase() === 'cloud' ? 'cloud' : 'engine', number: Number(m[2]) }));
+// The same commit twice: the engine's code comes from the Cloud repository.
+const oneRepo = Boolean(engineLive) && engineLive === cloudLive;
 const gh = (path) =>
 	get(`https://api.github.com/repos/outflareai/${path}`, {
 		Accept: 'application/vnd.github+json',
@@ -67,6 +73,10 @@ for (const { repo, number } of needs) {
 		const pr = await gh(`${repo}/pulls/${number}`);
 		if (!pr.merged_at) {
 			problems.push(`${name} is not merged yet.`);
+			continue;
+		}
+		if (repo === 'engine' && oneRepo) {
+			console.log(`ok    ${name} is live (merged before the engine's code moved)`);
 			continue;
 		}
 		if (!live) {
