@@ -21,6 +21,16 @@ Each rule tests one thing about a person:
 
 Choose whether a person must match all the rules or any of them. Only people count: not companies, merged records or archived ones.
 
+### Groups: "and", "or" and "not" together
+
+To mix "and" with "or", or to leave people out, press **Add a group**. A group holds rules of its own and says how many of them must be true:
+
+- **All of these are true**
+- **Any of these is true**
+- **None of these is true**: anyone who matches a rule in the group is left out.
+
+For example, people who signed up and have neither paid nor been refunded: a rule "did signed_up", then a group set to **None of these is true** with "did payment.succeeded" and "did payment.refunded". A group can hold another group, and the count updates as you build it. Remove a group with **Remove group**.
+
 ## Brands
 
 A smart list for one brand holds that brand's people and the people shared by every brand. A list for every brand holds everyone. A member or token limited to some brands sees only its brands' people, and can only change its brands' lists.
