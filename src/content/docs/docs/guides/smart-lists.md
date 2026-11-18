@@ -29,6 +29,14 @@ A smart list for one brand holds that brand's people and the people shared by ev
 
 Every smart list refreshes on its own every 15 minutes, which also moves people in and out of time windows such as "in the last 90 days". **Refresh now** does it straight away. A list whose rules take too long to check shows that it couldn't update; narrow the rules, for example with a time window on an event. Deleting a list never deletes the people in it.
 
+## Who is in it
+
+Open a list to see its people. Each name opens that person's record. Beside it are their email, their lifetime value (everything they have paid, less refunds), the day they signed up and when they joined the list.
+
+**Columns** chooses which of these show, and adds the day the person was first seen. **Save as my default** keeps your choice for every list in this browser; **Back to standard columns** drops it.
+
+Lifetime value comes from your billing connection when you have one, and otherwise from the `payment.succeeded` and `payment.refunded` events your product sends, in the currency the person paid most in. The sign-up day is their first `signed_up` event, so it is blank for someone who has none.
+
 ## From the API and agents
 
 ```sh
