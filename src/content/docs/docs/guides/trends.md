@@ -21,7 +21,7 @@ Add up to six series. Each one is:
 - **Payments**: how many, how many people, or the total (revenue), average, median or a percentile of the amount, in your brand's currency. Tick **only first payments** for new customers.
 - **Ad numbers**: clicks, impressions, spend or the network's own conversions, for one ad network or all of them, and only campaigns whose name contains a word if you like. Spend is in the ad account's currency.
 
-Filter any series the same way as a funnel step: by the visit's network, channel, campaign, landing page, device or country; by a page's path or a query parameter; by any property of an event; by a payment's amount or product.
+Filter any series the same way as a funnel step: by the visit's network, channel, campaign, landing page, device or country; by a page's path or a query parameter; by any property of an event; by a payment's amount or product; by the product an event is about or its category; or by a field of the person or their company, such as the person's country or the company's industry.
 
 ## Measures
 
@@ -38,7 +38,7 @@ Totals are exact. A total of people counts each person once, even when they show
 
 - **Dates** and **By**: a moving range such as the last 30 days, by day, week or month.
 - **Show as**: lines, stacked areas, bars, stacked bars, bars across (each total as a bar), a ring of shares, a world map (when you break down by country), a number (the totals, for a dashboard tile) or a table.
-- **Break down by**: split every series by something, such as the campaign, the ad network or the country. Each group is its own line on the chart, six at a time: click a group under the chart to put it on or take it off. The 25 largest groups are listed, and the rest are "Everything else".
+- **Break down by**: split every series by something, such as the campaign, the ad network or the country. Each group is its own line on the chart, six at a time: click a group under the chart to put it on or take it off. The 25 largest groups are listed, and the rest are "Everything else". Besides the event's own fields, you can split by **The person's details** (any field on the person's record, such as country or plan) and **Their company's details** (a field of their company, such as industry), as they are now, and by the product or the product's category.
 - **Then by**: split each group again by a second field, such as country and then device.
 - **Formula**: a sum between the series by their letters, such as `A / B`. If A is ad spend and B is sign-ups, that is cost per sign-up. Use `+ - × ÷` and brackets.
 - **Compare with the period before**: also run the same length of time before, shown dashed, with the change on each total.

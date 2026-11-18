@@ -22,6 +22,10 @@ A product is something the brand sells, such as "Residential proxies". Each has:
 
 `POST /v1/brands/{brand}/products` adds one (MCP `create_product`), `PATCH .../products/{product}` changes it (in the web app, **Edit** on its row), and `POST .../archive` and `.../restore` archive and bring it back. An archived product keeps its history, but its events no longer move anyone. Changing products needs permission to manage the catalog.
 
+### Categories
+
+A product can belong to a **category**: a family of products, such as `proxies` or `web_data` (lowercase letters, digits, dots, dashes and underscores; empty for none). Set it when you add or edit a product, or with `PATCH /v1/brands/{brand}/products/{product}` and `{"category": "proxies"}`. `GET .../products?category=proxies` lists one category. [Trends](/docs/guides/trends/) split and filter events by it, and a [metric](/docs/guides/metrics/) can count one category's products only, such as GB used across every proxy product in the last 30 days. Stages stay per product.
+
 ### Which product an event is about
 
 An event names its product in its properties, as `product_id` (the product's id or key) or `product` (an alias):

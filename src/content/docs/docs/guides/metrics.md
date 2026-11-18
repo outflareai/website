@@ -63,5 +63,6 @@ In the web app, **CRM → Customer data → Metrics** turns metrics on and lists
 | `window_days`, `offset_days` | The last `window_days` days, today included, ending `offset_days` ago |
 | `levels` | `company`, `person` or both |
 | `per_product` | Also keep it per product (on by default) |
+| `product_category` | Count only events about products in this [category](/docs/guides/products-and-lifecycle/#categories), such as `proxies`, for a total across a family of products. Empty counts every product. In the app: **Products → Only proxies products**. |
 
 Changing what a metric counts refills it. `POST .../metrics/{metric}/archive` takes it off every record. To compare two periods, keep two metrics, such as `usage_7d` and `usage_prev_7d`, and compare them in a rule.
