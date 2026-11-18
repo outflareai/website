@@ -2,7 +2,7 @@
 	"version": "2026.11.18",
 	"date": "2026-11-18",
 	"status": "in-progress",
-	"updated": "2026-11-18T21:38:49Z",
+	"updated": "2026-11-18T21:52:11Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -255,7 +255,35 @@
 			"edition": "open-source",
 			"text": "Errors are easier to fix and far less noisy: one bug is one error in every browser and build, browser-extension and scanner noise is filtered (plus your own ignore rules), and each error shows the share of visitors it hits, its site, release and what the visitor did before. Emails about new errors are now off until you switch them on.",
 			"at": "2026-11-18T21:06:57Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Paid ads actions that can spend more are now proposed as experiments where the network can test them and the campaign converts often enough: the row says Experiment and its button is Test it first, so the change proves itself on half the campaign before you keep it.",
+			"at": "2026-11-18T21:52:11Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "The weekly digest now has a Paid ads section: spend, the sign-ups and new paying customers your ads brought, cost per new paying customer against the week before, your top campaigns, and what is waiting for a decision.",
+			"at": "2026-11-18T21:52:11Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Qualified sign-ups: a conversion rule on a sign-up can now send each one worth what people from the same country with the same kind of email went on to pay, and hold back the ones less likely to pay than your average. The rule form shows who pays after signing up, from your own history.",
+			"at": "2026-11-18T21:52:11Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Audiences now sync to ChatGPT Ads: Outflare makes a custom audience from one of your lists and keeps it up to date with hashed emails and phone numbers, like on Google, Meta, X and Reddit. Use it to exclude people who were refunded, since ChatGPT Ads can't take a conversion back.",
+			"at": "2026-11-18T21:52:11Z"
 		}
 	],
-	"through": "9831a94+83b397c"
+	"through": "c1513b6+7baf32b"
 }
