@@ -279,6 +279,10 @@ paths:
             type: string
             format: uuid
         - in: query
+          name: quality
+          description: "Only conversations a rep marked this way, or unrated for those nobody marked."
+          schema: { type: string, enum: [good, poor_fit, junk, unrated] }
+        - in: query
           name: cursor
           schema:
             type: string
@@ -714,6 +718,79 @@ paths:
                         id: { type: string }
                         name: { type: string }
                         private: { type: boolean }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/sales/feeds/{id}/fields:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { in: path, name: id, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: listSalesFeedFields
+      summary: Field labels a Sales channel's posts carry
+      description: |
+        Scope: customers.read. Needs a Sales role (SDR, account manager or manager); otherwise 403. The labels of the
+        fields in the channel's newest 50 posts (a form's questions, a ticket's fields), the most common first, at
+        most 40, to choose what the channel shows first, and the labels chosen now. 404 for a channel that is not on
+        the brand's list.
+      tags: [records]
+      x-outflare-access: { scope: customers.read, brand: true }
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, preview_fields]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [label, posts]
+                      properties:
+                        label: { type: string }
+                        posts: { type: integer, description: "How many of the posts read carry it." }
+                  preview_fields: { type: array, items: { type: string } }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/sales/feeds/{id}/layout:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { in: path, name: id, required: true, schema: { type: string, format: uuid } }
+    put:
+      operationId: putSalesFeedLayout
+      summary: Choose what a Sales channel's posts show first
+      description: |
+        Scope: customers.manage. Needs a Sales role (SDR, account manager or manager); otherwise 403. Saves the
+        ordered labels of the fields the channel's posts lead with in the queue (the first four) and on the
+        conversation page; an empty list lets Outflare pick. The whole team sees the same. 404 for a channel that is
+        not on the brand's list.
+      tags: [records]
+      x-outflare-access: { scope: customers.manage, brand: true }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [preview_fields]
+              properties:
+                preview_fields:
+                  type: array
+                  maxItems: 6
+                  items: { type: string, minLength: 1, maxLength: 120 }
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [id, preview_fields]
+                properties:
+                  id: { type: string, format: uuid }
+                  preview_fields: { type: array, items: { type: string } }
+        "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/sales/feeds/test:
     parameters: [{ $ref: "#/components/parameters/BrandID" }]
@@ -14214,6 +14291,8 @@ paths:
                 currency: { type: string, example: USD, description: "Empty uses the event's currency property, then the account's." }
                 enabled: { type: boolean }
                 feed_role: { type: string, enum: [custom, first_payment, repeat_payment], description: "Only for payment.succeeded. first_payment sends a person's first payment in the brand and nothing after it, so a new paying customer counts once (it tells the platform the customer is new); repeat_payment sends every later payment (returning); custom, the default, sends every payment. A payment with no person is never first or repeat." }
+                predicted_value: { type: boolean, description: "Send each event with what people like the person went on to pay (getBrandSignupQuality), in place of the rule's own value. Default false." }
+                qualified_only: { type: boolean, description: "Send only the events of people at least as likely to pay as the brand's average; the rest are skipped with the reason. Default false." }
       responses:
         "201":
           description: The rule.
@@ -14251,6 +14330,8 @@ paths:
                 currency: { type: string }
                 enabled: { type: boolean }
                 feed_role: { type: string, enum: [custom, first_payment, repeat_payment], description: "Only for payment.succeeded; the conversion feed's sign-up rule keeps its role. first_payment sends a person's first payment in the brand and nothing after it, so a new paying customer counts once (it tells the platform the customer is new); repeat_payment sends every later payment (returning); custom, the default, sends every payment. A payment with no person is never first or repeat." }
+                predicted_value: { type: boolean, description: "Send each event with what people like the person went on to pay." }
+                qualified_only: { type: boolean, description: "Send only the events of people at least as likely to pay as the brand's average." }
       responses:
         "200":
           description: The rule now.
@@ -15169,6 +15250,39 @@ paths:
         "404": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
         "422": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/ads/signup-quality:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+    get:
+      operationId: getBrandSignupQuality
+      x-outflare-access: { scope: analytics.read, brand: true }
+      summary: See who pays after signing up, by country and kind of email
+      description: |
+        Scope: analytics.read. The brand's own history for one customer
+        event (default signed_up): of the people who did it in the 90 days
+        that ended two days ago, how many paid (payment.succeeded) within 30
+        days, and what a payer paid on average in the brand's currency, by
+        the country they came from and the kind of email address they gave
+        (work, free, throwaway or unknown). predicted_share is what a new
+        sign-up in the group is given, pulled toward the brand's average
+        where the group is small; predicted_value_micros is that share of
+        the value per payer; qualified says the group is at least as likely
+        to pay as the average (a throwaway address never is). A conversion
+        rule with predicted_value or qualified_only decides from this.
+        enough is false below min_signups sign-ups or min_payers payers:
+        rules then send every sign-up with their own value.
+      tags: [ads]
+      parameters:
+        - { name: event, in: query, schema: { type: string, maxLength: 200, default: signed_up } }
+      responses:
+        "200":
+          description: The history.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SignupQuality" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/ads/feed-health:
     parameters:
@@ -58736,12 +58850,26 @@ components:
           description: "The app that posted the Slack post which started the conversation, by the name Slack gives it (a form tool, a CRM). Null when a person posted it or the conversation did not start from a Sales channel."
         latest_post:
           type: [object, "null"]
-          description: "The newest Slack post on the conversation that is not spam, set aside or deleted in Slack, for the queue row: the person's own message as the AI read it, else the AI's summary, else the post as written, cut to 1,200 characters. Filled by listSalesLeads and getSalesLead; null when the conversation has no such post (or it can't be read), and null in other answers."
+          description: "The newest Slack post on the conversation that is not spam, set aside or deleted in Slack, for the queue row. Filled by listSalesLeads and getSalesLead; null when the conversation has no such post (or it can't be read), and null in other answers."
           additionalProperties: false
-          required: [body, occurred_at]
+          required: [body, fields, occurred_at]
           properties:
-            body: { type: string }
+            body: { type: string, description: "What the person wrote in their own words, when it is not already one of the fields, cut to 1,200 characters. For a post with no fields: the AI's summary, else the post as written. Empty otherwise." }
+            fields:
+              type: array
+              maxItems: 4
+              description: "The fields the post's channel shows first (SalesFeedChannel.preview_fields), in order; one the post lacks has an empty value. With none chosen: the first three answered fields that are not the person's name, address, phone, company or website. Values are cut to 200 characters."
+              items:
+                type: object
+                required: [label, value]
+                properties:
+                  label: { type: string }
+                  value: { type: string }
             occurred_at: { type: string, format: date-time }
+        quality:
+          type: [string, "null"]
+          enum: [good, poor_fit, junk, null]
+          description: "A rep's mark on how good the conversation was (the rate action), or null when nobody marked it."
       required:
         - id
         - record_id
@@ -58843,6 +58971,8 @@ components:
         Take sends the owner's introduction. Feedback
         records an internal comment without changing ownership or sending email.
         Read marks the conversation seen without assigning or sending.
+        Rate marks how good the conversation was (`quality`: good, poor_fit, junk, or empty to clear), for anyone with
+        a Sales role who can see it; the version sent is not checked, and it does not move the conversation in its list.
         Archive preserves the conversation and shared notes. Reopen restores a
         never-started lead to New (retaining its assignment), or a previously started lead to Active. A Sales rep may undo
         their own latest archive of an unassigned lead, using its current version.
@@ -58861,6 +58991,11 @@ components:
             - details
             - read
             - retry_send
+            - rate
+        quality:
+          type: string
+          enum: ["", good, poor_fit, junk]
+          description: "For rate: the mark, or empty to clear it."
         feedback_category:
           type: string
           enum: [wrong_contact, poor_fit, reply_classification, missing_information, question, other]
@@ -58933,7 +59068,7 @@ components:
       enum: [new_person, handover, signal, context]
     SalesFeedChannel:
       type: object
-      required: [id, channel_id, channel_name, kind, signal_type, read_back_days, enabled, error_code, connection_removed, last_read_at, counts_7d]
+      required: [id, channel_id, channel_name, kind, signal_type, read_back_days, enabled, error_code, connection_removed, last_read_at, counts_7d, preview_fields]
       properties:
         id: { type: string, format: uuid }
         channel_id: { type: string }
@@ -58945,6 +59080,7 @@ components:
         error_code: { type: string, description: "Why the last read failed (slack_auth, slack_channel, slack_unavailable), or empty." }
         connection_removed: { type: boolean, description: "True when the channel's Slack connection was deleted. The channel and its posts are kept and it is not read until it is saved with a connection." }
         last_read_at: { type: [string, "null"], format: date-time }
+        preview_fields: { type: array, maxItems: 6, items: { type: string }, description: "The labels of the fields its posts show first, in order (putSalesFeedLayout); empty when Outflare picks." }
         counts_7d:
           type: object
           description: Posts of the last seven days by what became of them.
@@ -58973,7 +59109,7 @@ components:
               link: { type: string }
     SalesFeeds:
       type: object
-      required: [integration_id, ai, search, channels, sources]
+      required: [integration_id, ai, search, channels, sources, source_quality]
       properties:
         integration_id: { type: [string, "null"], format: uuid }
         ai: { type: string, enum: [on, connector_needed, ai_model_needed] }
@@ -58982,6 +59118,20 @@ components:
           type: array
           description: "The apps whose posts started the brand's conversations, most common first, at most 12: the values of listSalesLeads' source filter."
           items: { type: string }
+        source_quality:
+          type: array
+          maxItems: 20
+          description: "The last 30 days' conversations by where they came from and how reps marked them (the rate action), the busiest source first."
+          items:
+            type: object
+            required: [source, reply, total, good, poor_fit, junk]
+            properties:
+              source: { type: string, description: "The posting app's name. Empty with reply true for conversations that started from an email reply, and empty with reply false for a person's own post in a channel." }
+              reply: { type: boolean }
+              total: { type: integer }
+              good: { type: integer }
+              poor_fit: { type: integer }
+              junk: { type: integer }
         channels:
           type: array
           items: { $ref: "#/components/schemas/SalesFeedChannel" }
@@ -59026,7 +59176,7 @@ components:
     SalesFeedItem:
       type: object
       description: "One stored post from a Sales channel in Slack, with what became of it."
-      required: [id, kind, status, channel_id, channel_name, occurred_at, edited_at, deleted_in_slack, link, source, text, fields, summary, message, crm_link, candidates, replies, record_id, lead_id, spam_confidence]
+      required: [id, kind, status, channel_id, channel_name, occurred_at, edited_at, deleted_in_slack, link, source, text, fields, key_fields, summary, message, crm_link, candidates, replies, record_id, lead_id, spam_confidence]
       properties:
         id: { type: string, format: uuid }
         kind: { $ref: "#/components/schemas/SalesFeedKind" }
@@ -59045,6 +59195,16 @@ components:
         fields:
           type: array
           description: "The post's Label: value lines."
+          items:
+            type: object
+            required: [label, value]
+            properties:
+              label: { type: string }
+              value: { type: string }
+        key_fields:
+          type: array
+          maxItems: 6
+          description: "The fields its channel shows first, in order, chosen as SalesLead.latest_post.fields are."
           items:
             type: object
             required: [label, value]
@@ -59106,12 +59266,23 @@ components:
         new_count:
           type: integer
           description: "New conversations nobody owns yet, counted to 1000. 0 for someone with no Sales role."
+        new_owners:
+          type: array
+          maxItems: 100
+          description: "For queue=new: how many new conversations each teammate is assigned, the most first, so the team sees how they are shared out. Filter to one teammate's with `person`. Empty for other queues and for someone with no Sales role."
+          items:
+            type: object
+            required: [owner_id, count]
+            properties:
+              owner_id: { type: string, format: uuid }
+              count: { type: integer }
       required:
         - data
         - next_cursor
         - new_unseen
         - unread
         - new_count
+        - new_owners
     SearchViewFilters:
       type: object
       properties:
@@ -67770,8 +67941,18 @@ components:
     AdSuggestion:
       type: object
       description: One change Outflare suggests for a campaign, and once approved, how it did; also the alerts and automatic changes of the findings queue.
-      required: [id, campaign_id, campaign_name, account_id, account_name, connector, currency, brand_id, kind, status, reason, evidence, proposed, change_id, test_id, decided_by, decided_at, measure_from, measure_until, window_note, verdict, verdict_note, result, judged_at, created_at, updated_at, autonomy, unit, impact_micros, shadow, applied_auto, reverted_at, revert_change_id, rule, rule_version, feedback, feedback_note, feedback_at]
+      required: [id, campaign_id, campaign_name, account_id, account_name, connector, currency, brand_id, kind, status, reason, evidence, proposed, change_id, test_id, decided_by, decided_at, measure_from, measure_until, window_note, verdict, verdict_note, result, judged_at, created_at, updated_at, autonomy, unit, impact_micros, shadow, applied_auto, reverted_at, revert_change_id, rule, rule_version, feedback, feedback_note, feedback_at, test_first]
       properties:
+        test_first:
+          description: "Set on an open finding that is better tested inside the network than made outright: it can spend more, the network can test that kind of change, and the campaign converts often enough for an even split to reach an answer. Approve with test true to start it. Null otherwise."
+          oneOf:
+            - type: object
+              required: [kind, days, note]
+              properties:
+                kind: { type: string, enum: [budget, bidding] }
+                days: { type: integer, description: "How long the test would run." }
+                note: { type: string }
+            - { type: "null" }
         feedback: { type: string, enum: ["", good, bad], description: "What a person said about this advice (rateAdFinding); '' when nobody has." }
         feedback_note: { type: string, description: "Their reason, also kept as one of the brand's memories." }
         feedback_at: { type: [string, "null"], format: date-time }
@@ -67955,7 +68136,7 @@ components:
         name: { type: string }
     AdConversionRule:
       type: object
-      required: [id, ad_account_id, connector, event_name, conversion, conversion_name, target_id, target_name, event_type, value_property, value_unit, fixed_value_micros, currency, enabled, sent_30d, skipped_30d, failed_30d, queued, last_sent_at, created_at, updated_at, feed_role, customer_type]
+      required: [id, ad_account_id, connector, event_name, conversion, conversion_name, target_id, target_name, event_type, value_property, value_unit, fixed_value_micros, currency, enabled, sent_30d, skipped_30d, failed_30d, queued, last_sent_at, created_at, updated_at, feed_role, customer_type, predicted_value, qualified_only]
       properties:
         id: { type: string, format: uuid }
         ad_account_id: { type: string, format: uuid }
@@ -67963,6 +68144,8 @@ components:
         event_name: { type: string, example: order_completed }
         feed_role: { type: string, enum: [custom, signup, first_payment, repeat_payment], description: "The rule's part in Outflare's conversion feed (createBrandAdFeed); custom for a rule made by hand." }
         customer_type: { type: string, enum: ["", new, returning, auto], description: "What the rule tells Google about the person: nothing, a new customer, a returning one, or worked out per event from their earlier payments." }
+        predicted_value: { type: boolean, description: "The rule sends each event with what people like the person went on to pay (getBrandSignupQuality)." }
+        qualified_only: { type: boolean, description: "The rule sends only the events of people at least as likely to pay as the brand's average." }
         conversion: { type: [string, "null"], description: "The conversion definition it sends, by key; null for a bare event." }
         conversion_name: { type: [string, "null"] }
         target_id: { type: string }
@@ -68255,6 +68438,36 @@ components:
         reason: { type: string, description: The platform's code. }
         label: { type: string, description: The code in words. }
         count: { type: integer }
+    SignupQuality:
+      type: object
+      required: [event, from, to, signups, paid, paid_share, value_per_payer_micros, currency, enough, min_signups, min_payers, pay_days, segments]
+      properties:
+        event: { type: string }
+        from: { type: string, format: date-time }
+        to: { type: string, format: date-time }
+        signups: { type: integer }
+        paid: { type: integer }
+        paid_share: { type: number, description: "paid over signups, 0 to 1." }
+        value_per_payer_micros: { type: integer, format: int64, description: "What a payer paid in their first pay_days days, on average, in currency; payments in another currency are left out." }
+        currency: { type: string }
+        enough: { type: boolean, description: "False while there is too little history to predict from." }
+        min_signups: { type: integer }
+        min_payers: { type: integer }
+        pay_days: { type: integer }
+        segments:
+          type: array
+          items:
+            type: object
+            required: [country, email_kind, signups, paid, paid_share, predicted_share, predicted_value_micros, qualified]
+            properties:
+              country: { type: string, description: "ISO 3166-1 alpha-2, or empty when unknown." }
+              email_kind: { type: string, enum: [work, free, throwaway, unknown] }
+              signups: { type: integer }
+              paid: { type: integer }
+              paid_share: { type: number }
+              predicted_share: { type: number }
+              predicted_value_micros: { type: integer, format: int64 }
+              qualified: { type: boolean }
     AdFeedHealth:
       type: object
       required: [days, campaigns, ratio_7d, baseline_28d, drifted, has_ledger]
