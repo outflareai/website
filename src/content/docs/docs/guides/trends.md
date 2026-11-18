@@ -49,7 +49,7 @@ Totals are exact. A total of people counts each person once, even when they show
 - **Smooth over**: a moving average of 3, 7, 14 or 28 periods, to see through day-to-day noise.
 - **A second axis on the right**: read one series against its own scale, for numbers of a different size such as spend beside sign-ups.
 
-Hover the chart for a card with the exact numbers for that day, week or month, the period before and the change. Save a trend for everyone in the brand with a name; a saved trend keeps only its series and settings, so every view counts again and it is never out of date. Saved trends can go on a [dashboard](/docs/guides/dashboards/).
+Hover the chart for a card with the exact numbers for that day, week or month, the period before and the change. Save a trend for everyone in the brand with a name; a saved trend keeps only its series and settings, so every view counts again and it is never out of date. Saved trends can go on a [dashboard](/docs/guides/dashboards/). The Trends page opens on the list of saved trends: click one to open it, or **New trend** to start one.
 
 ## The forecast
 

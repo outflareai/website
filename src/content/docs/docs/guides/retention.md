@@ -23,7 +23,7 @@ In the app, open **Analytics** in the sidebar, then **Retention**. Retention run
 - The **triangle** has one row per cohort: how many people started, and the share who came back in period 0 (the start period itself), 1, 2 and so on. Darker is better. A dot is a period that hasn't begun yet.
 - Each person counts once per period, however often they came back in it.
 
-Save a question for everyone in the brand with a name; it keeps only the question, so every view counts again. Saved questions can go on a [dashboard](/docs/guides/dashboards/).
+Save a question for everyone in the brand with a name; it keeps only the question, so every view counts again. Saved questions can go on a [dashboard](/docs/guides/dashboards/). The Retention page opens on the list of saved questions: click one to open it, or **New retention question** to start one.
 
 ## Lifecycle
 

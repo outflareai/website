@@ -63,6 +63,8 @@ Under the steps, **Leave out people who…** drops from the whole funnel everyon
 
 ## Save it, and link to it
 
+The Funnels page opens on a list of your saved funnels: each one's name, its steps and when it last changed, with a search box once the list is long. Click a funnel to open it, or **New funnel** to start one. **All funnels** at the top of a funnel takes you back to the list.
+
 Nothing saves by itself. While you build or change a funnel you are working on a draft: the chart updates as you go, and the bar at the top says **Not saved**, **Saved** or **Unsaved changes**.
 
 - **Save** keeps a funnel for everyone in the brand, with a name. **Save changes** updates the saved funnel you have open, and only then does anyone else see the change.
@@ -71,7 +73,7 @@ Nothing saves by itself. While you build or change a funnel you are working on a
 
 Every funnel has its own address. A saved funnel's address opens that funnel, and a draft's address carries its steps and settings, so **Copy link** gives a teammate exactly what you are looking at, saved or not. Back, forward and reload keep your place. A link to a funnel that was deleted says so and offers the way back to the list.
 
-Choose a moving date range, such as the last 30 days, and a saved funnel stays current. It keeps only its steps and settings: every view counts again, so it is never out of date. [Trends](/docs/guides/trends/), [retention](/docs/guides/retention/) and [paths](/docs/guides/paths/) save and link the same way.
+Choose a moving date range, such as the last 30 days, and a saved funnel stays current. It keeps only its steps and settings: every view counts again, so it is never out of date. [Trends](/docs/guides/trends/), [retention](/docs/guides/retention/) and [paths](/docs/guides/paths/) open on a list, save and link the same way.
 
 ## Who can do what
 

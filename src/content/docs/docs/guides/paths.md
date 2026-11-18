@@ -27,7 +27,7 @@ In the app, open **Analytics** in the sidebar, then **Paths**. Paths run inside 
 - Towards an end, the end is the last column and shorter paths start further right.
 - Each person counts once per step.
 
-Save a question for everyone in the brand with a name; it keeps only the question, so every view counts again. Saved paths can go on a [dashboard](/docs/guides/dashboards/).
+Save a question for everyone in the brand with a name; it keeps only the question, so every view counts again. Saved paths can go on a [dashboard](/docs/guides/dashboards/). The Paths page opens on the list of saved questions: click one to open it, or **New paths question** to start one.
 
 ## Who can do what
 
