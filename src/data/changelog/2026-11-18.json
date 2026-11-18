@@ -2,7 +2,7 @@
 	"version": "2026.11.18",
 	"date": "2026-11-18",
 	"status": "in-progress",
-	"updated": "2026-11-18T15:17:47Z",
+	"updated": "2026-11-18T15:22:35Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -143,7 +143,21 @@
 			"edition": "open-source",
 			"text": "Connect your AI app with tool groups to list a whole area's tools up front, such as `https://app.outflare.ai/mcp?tools=core,analytics,seo`; every other tool stays one search away. Tools marked read-only can now never make a change: Outflare refuses it, so apps that run reads without asking stay safe.",
 			"at": "2026-11-18T15:17:47Z"
+		},
+		{
+			"kind": "fix",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "An analytics or Search Console site nobody placed now belongs to the brand whose website it is, instead of the connection's brand or the workspace's first brand. When one Google sign-in reads the Search Console properties of several brands, a brand's search reports and dashboards no longer list another brand's pages and clicks.",
+			"at": "2026-11-18T15:22:35Z"
+		},
+		{
+			"kind": "fix",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Paid ads recommendations, verdicts and the Bidding strategies table now show money in your brand's currency, like the rest of Paid ads, when an ad account is billed in another one. A brand's target is also compared with spend in the same currency.",
+			"at": "2026-11-18T15:22:35Z"
 		}
 	],
-	"through": "f88b667+38c5b6b"
+	"through": "b24b817+49d6dc8"
 }
