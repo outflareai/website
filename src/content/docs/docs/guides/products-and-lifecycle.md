@@ -36,7 +36,13 @@ An event names its product in its properties, as `product_id` (the product's id 
 
 Billing connections name the product on subscription events by its billing id, which matches a `billing:` alias. You don't need Stripe: products can come from a billing connection, the API, the names in your events, or be added by hand.
 
-A name no product has yet is **held** for review, with how often and when it was seen, and drives nothing until someone maps it. `GET /v1/brands/{brand}/product-names?status=held` (MCP `list_product_names`) lists them, and `PATCH .../product-names/{name}` maps one to a product or ignores it.
+An event can also add its product by itself. When it sends the product's category as `product_category` next to `product`, and the name matches no product yet, Outflare adds the product with that name as its key, a readable name made from it ("Residential proxies" from `residential_proxies`), that category and churn mode `inactivity`. If later events give the product another category, it moves to that one, so the events stay the source of truth. Browser events never add products, a name someone ignored is never added, and turning off event names as a product source turns this off too.
+
+```json
+{"type": "track", "userId": "u_42", "event": "Product Usage", "properties": {"product": "residential_proxies", "product_category": "proxies"}}
+```
+
+A name no product has yet, sent without a category, is **held** for review, with how often and when it was seen, and drives nothing until someone maps it. `GET /v1/brands/{brand}/product-names?status=held` (MCP `list_product_names`) lists them, and `PATCH .../product-names/{name}` maps one to a product or ignores it.
 
 ## Stages
 
