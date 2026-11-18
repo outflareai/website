@@ -19,6 +19,8 @@ https://app.outflare.ai/mcp
 
 On a self-hosted server it is `https://<your server>/mcp`. There is nothing to install and no key to copy. The app sends you to Outflare to sign in and approve it.
 
+Your app lists Outflare's core tools and finds the rest when it needs them. To list a whole area's tools up front, such as dashboards and SEO, add groups to the URL: `https://app.outflare.ai/mcp?tools=core,analytics,seo`. See [Which tools your app sees](/docs/agents/mcp/#which-tools-your-app-sees).
+
 ## Let your AI set it up
 
 Don't want to click through settings? Under **Or let your AI set it up**, click **Copy prompt** and paste it into Claude, Claude Code, Cursor or ChatGPT (or click **Ask Claude** or **Ask ChatGPT** to open it there). An app that can change its own settings, like Claude Code, adds Outflare itself; a chat app walks you through each click. Then you approve Outflare in your browser and it tells you what it found.
