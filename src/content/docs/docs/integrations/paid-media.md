@@ -147,8 +147,8 @@ It shows spend, clicks, CTR, cost per click and platform conversions for 7, 28 o
 | `PUT /v1/workspaces/{ws}/ads/accounts/{id}/target` | Set the target for every campaign of an account without its own (`analytics.manage`) |
 | `GET /v1/brands/{brand}/ads/items` | Ad sets and ad groups (`level=ad_group`) or ads (`level=ad`), ranked by spend, with their campaign; `campaign_id` or `parent_id` narrows them |
 | `GET /v1/brands/{brand}/ads/conversion-actions` | Platform conversions by action, per connector and currency; `entity_id` gives one campaign's, ad set's or ad's |
-| `GET /v1/brands/{brand}/ads/keywords` | Google search keywords ranked by spend; `campaign_id` or `ad_group_id` narrows them |
-| `GET /v1/brands/{brand}/ads/search-terms` | What people searched that showed a Google ad, with the keyword it matched, ranked by spend |
+| `GET /v1/brands/{brand}/ads/keywords` | Google search keywords ranked by spend; `campaign_id` or `ad_group_id` narrows them. Each also carries Outflare's own count of who its clicks brought: `signups` in the range, how many of those have paid since (`signups_paid`, `paid_share`), `new_payers` and `cost_per_new_payer_micros` |
+| `GET /v1/brands/{brand}/ads/search-terms` | What people searched that showed a Google ad, with the keyword it matched, ranked by spend. `keyword_signups`, `keyword_signups_paid` and `keyword_paid_share` are the matched keyword's own numbers: a network doesn't say which search a click came from |
 | `GET /v1/brands/{brand}/ads/summary` | Totals grouped by `connector`, `brand`, `account` or `day`, per currency; `entity_id` gives one campaign's, ad set's or ad's numbers alone |
 | `POST /v1/workspaces/{ws}/ads/sync` | Sync now instead of within six hours |
 
@@ -323,7 +323,9 @@ How it works:
   email or phone the conversion was sent with. Platforms that can't change a
   conversion after taking it skip the adjustment and say so: Meta has no way
   to take a conversion back, so keep refunded customers out of Meta with an
-  audience you exclude.
+  audience set to **Never show them ads** ([Audiences](#audiences-one-list-several-ad-networks)):
+  make a list of the people who were refunded, and Outflare excludes it on
+  every campaign.
 - The value comes from an event property (in major units, 12.50, or minor units,
   1250) or a fixed value; the currency from the rule, the event's `currency`
   property or the account's.
@@ -363,6 +365,16 @@ How it works:
   (`record_name`). In the web app the log is its own screen, **Paid ads → Setup →
   Send log**: filter by result or rule, read what happened in plain words,
   open the person from any row, and download it as CSV.
+- **Sent against counted.** Above the log, a table compares, for each
+  conversion action a rule sends to, the conversions the network accepted
+  with what the network counts for that action, over 7, 14, 30 or 90 days
+  ending two days ago (networks report a conversion a day or two late). It
+  shows how many sends carried the network's own click id, the only ones it
+  can count, the share of those it counted, and a status: Counted, Under half
+  counted, None counted, Too few to judge (under 10 sends with a click id) or
+  Not reported (the network doesn't report by conversion action; today only
+  Google Ads does). `GET /v1/brands/{brand}/ads/conversion-check?days=`
+  returns the same rows with the numbers per day.
 
 On the **Paid ads** page, **Send conversions back** adds and switches rules,
 sets who to send for, and shows the latest sends.
@@ -373,12 +385,13 @@ sets who to send for, and shows the latest sends.
 | `GET`, `POST /v1/workspaces/{ws}/ads/conversion-rules` | List rules with their last 30 days, or add one |
 | `PATCH`, `DELETE /v1/workspaces/{ws}/ads/conversion-rules/{id}` | Change, switch off or delete a rule |
 | `GET /v1/workspaces/{ws}/ads/conversion-sends` | The send log, newest first |
+| `GET /v1/brands/{brand}/ads/conversion-check?days=` | Per conversion action, conversions sent against what the network counts, with a status and the same per day |
 | `GET`, `PUT /v1/brands/{brand}/ads/settings` | The brand's `consent_mode`: `opt_out`, `opt_in` or `collected` (the workspace route is deprecated and acts on the first brand) |
 
 The MCP tools are `list_ad_conversion_targets`, `list_ad_conversion_rules`,
 `create_ad_conversion_rule`, `update_ad_conversion_rule`,
-`delete_ad_conversion_rule`, `list_ad_conversion_sends`, `get_ad_settings` and
-`set_ad_settings`. X and LinkedIn follow once their API access is approved.
+`delete_ad_conversion_rule`, `list_ad_conversion_sends`, `get_ad_settings`,
+`set_ad_settings` and `get_ad_conversion_check`. X and LinkedIn follow once their API access is approved.
 
 Outbrain Ads only reads: the Amplify API has no call that takes conversions.
 Outbrain's click id (`ob_click_id`) is still recorded on each visit, so its
@@ -417,8 +430,23 @@ connected ([Platforms](#platforms)).
 - **Turning it off or deleting it** stops the syncs. The lists already on the
   networks stay as they are; delete them there if they are no longer wanted.
 
-Use the list on the network like any other: add it to a campaign or exclude it
-([Targeting](#targeting), on a campaign's page).
+- **Never show them ads.** An audience can be people no campaign should show
+  to, such as everyone who was refunded (`exclude: true`). Once its list is on
+  the network, each sync queues the list as an exclusion on every active
+  campaign of the ad account that hasn't had it, so a new campaign is covered
+  within a day. Each one is a change in the campaign's history
+  (`exclusion_add`, kind `audience`), like any exclusion. Take it off one
+  campaign (`POST .../ads/campaigns/{id}/exclusions` with `kind: audience`,
+  the list's id on the network as `value` and `action: remove`) and it stays
+  off that campaign. Choosing the other option again takes it out of the
+  campaigns Outflare put it on. Google Ads (a negative customer list on the
+  campaign; Performance Max takes none, and its change says so) and Meta Ads
+  (excluded on each ad set) take this from here (`can_exclude`). On the other
+  networks the list is still kept up to date, and you exclude it on your
+  campaigns there.
+
+Use any other list on the network as usual: add it to a campaign
+([Targeting](#targeting), on a campaign's page) or exclude it.
 
 ## Audiences from journeys
 
