@@ -14,7 +14,7 @@ An alert says something needs a person now. Outflare raises one once for each th
 | Hot replies (`reply.hot`) | A reply is labelled interested, meeting booked or question, by the built-in rules, a person, or [your own AI model](/docs/guides/inbox/#ai-labelling-with-your-own-key) at 80% or more. A label waiting for review alerts once someone confirms it. | The person the reply is assigned to, else whoever made the sequence. |
 | Hot website visitors (`visitor.hot`) | A known person or company reaches your hot score on the website, at most once a week each ([website visitors](/docs/guides/website-visitors/)). | The owners and admins. |
 | A number crossed a line (`insight.threshold`) | A saved trend's number went over a line you set under [Trends](/docs/guides/trends/#alert-on-a-number), once per crossing. | Whoever set the alert up, else the owners and admins. |
-| New errors (`error.new_issue`) | Your site or server threw an error nobody has seen before, or one you resolved came back ([Errors](/docs/guides/errors/)). At most ten an hour for a brand. | Everyone who can read analytics in the app; the owners and admins by email. |
+| New errors (`error.new_issue`) | Your site or server threw an error nobody has seen before, or one you resolved came back ([Errors](/docs/guides/errors/)). At most ten an hour for a brand. | Everyone who can read analytics in the app. Emails are off until you switch them on, on the Errors page or here; then the owners and admins. |
 | Customers waiting on Telegram (`telegram.waiting`) | A customer wrote to a [company Telegram account](/docs/guides/team/#summaries-and-alerts) and nobody has answered for four hours, once per wait. | The account's holder, else the owners and admins. |
 | Telegram account handovers (`telegram.handover`) | A synced company Telegram account was given to someone; its recent customer chats are summarised for them. | The new holder, else the owners and admins. |
 
@@ -30,7 +30,7 @@ Each alert is:
 
 Alert emails come from Outflare's account email, the one that sends sign-in links, so there is nothing to set up. They say what happened and link to it, and never quote the reply. Each person gets at most 50 a day; the rest wait in the app. Whoever caused an alert, such as the person who labelled the reply, isn't emailed about it.
 
-Under **Settings → Alerts**, owners and admins choose who gets each kind by email: **The person it's for** (the default; owners and admins when there is nobody in particular), **Owners and admins**, or **Nobody**. Anyone can **Mute** a kind for themselves.
+Under **Settings → Alerts**, owners and admins choose who gets each kind by email: **The person it's for** (the default for every kind but new errors, whose emails start as Nobody; owners and admins when there is nobody in particular), **Owners and admins**, or **Nobody**. Anyone can **Mute** a kind for themselves.
 
 A brand can choose differently from the workspace through the API:
 
