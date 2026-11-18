@@ -2,7 +2,7 @@
 	"version": "2026.11.18",
 	"date": "2026-11-18",
 	"status": "in-progress",
-	"updated": "2026-11-18T14:50:01Z",
+	"updated": "2026-11-18T15:17:47Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -136,7 +136,14 @@
 			"edition": "open-source",
 			"text": "AI apps that ask before changes, such as Claude, can now read with any Outflare tool without an approval prompt: the new `call_read_tool` runs only tools that read, and `call_tool` stays the way to change things. Reading dashboards and their tiles is now in the core tool set.",
 			"at": "2026-11-18T14:50:01Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "Connect your AI app with tool groups to list a whole area's tools up front, such as `https://app.outflare.ai/mcp?tools=core,analytics,seo`; every other tool stays one search away. Tools marked read-only can now never make a change: Outflare refuses it, so apps that run reads without asking stay safe.",
+			"at": "2026-11-18T15:17:47Z"
 		}
 	],
-	"through": "ac12f38+7d51d67"
+	"through": "f88b667+38c5b6b"
 }
