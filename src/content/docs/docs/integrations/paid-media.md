@@ -253,6 +253,36 @@ One that doesn't qualify is never sent and never appears in the send log.
 Archiving the definition stops the rule. In the app, **Add a rule** offers the
 definitions first.
 
+### Qualified sign-ups with a predicted value
+
+A sign-up carries no money, so an ad platform that is told about every
+sign-up bids as hard for the people who never pay as for the ones who do. A
+rule on an event such as `signed_up` has two switches for that, both off by
+default:
+
+- **Send a predicted value** (`predicted_value`): each event is sent worth
+  what people like the person went on to pay, in the brand's currency, in
+  place of the rule's own value.
+- **Send qualified ones only** (`qualified_only`): events from people less
+  likely to pay than the brand's average are skipped, and the send log says
+  why. A throwaway email address is never qualified.
+
+Both decide from the brand's own history, read with
+`GET /v1/brands/{brand}/ads/signup-quality?event=signed_up`: of the people
+who did the event in the 90 days that ended two days ago, how many paid
+(`payment.succeeded`) within 30 days and what a payer paid on average, by the
+country they came from and the kind of email address they gave (work, free,
+throwaway or unknown, from Outflare's own classifier; no lookup leaves the
+server). A group's share is pulled toward the brand's average where the
+group is small, so twenty people from one country never swing a prediction.
+The predicted value is that share of what a payer paid.
+
+With fewer than 100 people or 10 payers in the window (`enough` is false)
+nothing is predicted: every event is sent, with the rule's own value. The
+history is read again every hour. The rule form shows the history under
+**Who pays after this event**, with the breakdown by country and email. The
+MCP tool is `get_signup_quality`.
+
 | Platform | Where it goes | Matched on | Also needs |
 | --- | --- | --- | --- |
 | Google Ads | A conversion action that takes uploaded clicks (Upload clicks) | `gclid`, `gbraid` or `wbraid`; hashed email and phone (enhanced conversions for leads) | The sign-in needs Google Ads access that can upload |
@@ -430,10 +460,15 @@ connected ([Platforms](#platforms)).
 - **What Outflare does on the network.** Through your own connection it
   makes a customer list named "<name> (Outflare)" on each ad account (a
   Google Ads Customer Match list, a Meta custom audience, an X custom
-  audience, a Reddit customer list), adds the people in
-  the list, and once a day sends what changed: people who joined go in,
-  people who left come out. Only hashed emails and phone numbers leave
-  Outflare.
+  audience, a Reddit customer list, a ChatGPT Ads custom audience), adds the
+  people in the list, and once a day sends what changed: people who joined go
+  in, people who left come out. Only hashed emails and phone numbers leave
+  Outflare. On ChatGPT Ads the list is a custom audience filled through your
+  connection's Advertiser API key; which campaigns target or exclude it is
+  chosen in OpenAI Ads Manager, and OpenAI doesn't offer custom audiences on
+  campaigns shown in the EEA or Switzerland. OpenAI takes no conversion back,
+  so a list of the people who were refunded, excluded on your campaigns
+  there, is how a refund reaches it.
 - **Consent.** The same rules as sending conversions, for ad data and ad
   personalisation: someone who may not be added is left out, and someone who
   withdraws consent is taken out at the next sync.
@@ -442,7 +477,7 @@ connected ([Platforms](#platforms)).
   matched. Networks hide the number for small lists and take a day or two to
   count a new one.
 - **Networks that take a file.** A network Outflare can't fill a list on, such
-  as ChatGPT Ads, takes an upload instead: **Download file**
+  as TikTok Ads, takes an upload instead: **Download file**
   (`GET .../ads/audiences/{id}/file`) gives a CSV with the columns
   `email_sha256` and `phone_number_sha256`, never a plain email or phone.
 - **Turning it off or deleting it** stops the syncs. The lists already on the
@@ -526,6 +561,25 @@ When the window ends the change is judged against as many days just before it: *
 
 **Savings that apply on their own.** An extension can let an agent approve suggestions that only spend less (a lower budget, a pause, a negative keyword) for a brand; `/v1/meta` then lists `ad_suggestions_auto`. Anything that can spend more always waits for a person, a suggestion on an account every brand shares never applies on its own, the agent's grant still applies, and the change is measured and judged like any other. `ad_suggestion.approved` carries `auto: true` for these. On Outflare Cloud, this is [Paid ads Autopilot](#paid-ads-autopilot).
 
+## In the weekly digest
+
+A brand with ad spend gets a **Paid ads** section in its
+[digest](/docs/guides/digests/) (weekly on Mondays unless changed, in the
+app, as the `digest.ready` webhook and by email when the brand chose that):
+ad spend, clicks, the sign-ups and new paying customers the ads brought and
+the cost per new paying customer, each beside the period before, in the
+brand's currency. Under them are the three campaigns that spent the most
+with what each brought (marked good or bad against the brand's target cost
+per new paying customer), how many alerts are open, how many recommendations
+wait for a decision, and how many of the changes measured that period
+worked. Sign-ups and paying customers are Outflare's own count, not the
+platform's. Spend in a currency with no exchange rate is left out rather
+than added as if it were the brand's. Section id `paid_ads`.
+
+In the app, **Paid ads → Set up** has a **Weekly report** card that says
+when the digest is made, who gets it by email, and opens the Digests page
+to change either.
+
 ## Tests
 
 A before-and-after comparison can be thrown off by anything else that changed that week. A test avoids that: the network itself splits one campaign between how it is and a **trial** that tries one thing differently, on the same days, so the two compare fairly. Start one on the **Experiments** tab, or press **Test it first** on a budget suggestion instead of approving it.
@@ -547,6 +601,16 @@ A trial whose conversions cost more than twice the target three days running is 
 | `POST /v1/brands/{brand}/ads/tests/{id}/keep` | Apply the trial's change to the campaign and end the test (`ads.manage`) |
 | `POST /v1/brands/{brand}/ads/tests/{id}/roll-back` | End the test and leave the campaign as it was (`ads.manage`) |
 | `POST /v1/brands/{brand}/ads/suggestions/{id}/approve` with `{"test": true}` | Test a budget suggestion instead of making it (`ads.manage`) |
+
+**Proposed experiments.** A recommendation that can spend more is offered
+as an experiment instead of a plain approval when the network can test
+that kind of change (a bid target on Google Ads, a budget on Meta) and the
+campaign converts often enough for an even split to reach an answer within
+six weeks. Its row under Actions has the type **Experiment** and its main
+button is **Test it first**; **Make the change now** is under **More**. In
+the API the finding carries `test_first` (`kind`, `days`, `note`); approve
+it with `{"test": true}` to start the test. Changes that only save money
+are made, not tested.
 
 X Ads has no tests here: X splits an audience only between campaigns that already exist and offers no way to copy a campaign with its ads, so change an X budget directly and compare the days before and after.
 
