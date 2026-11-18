@@ -2,7 +2,7 @@
 	"version": "2026.11.18",
 	"date": "2026-11-18",
 	"status": "in-progress",
-	"updated": "2026-11-18T12:29:41Z",
+	"updated": "2026-11-18T12:44:28Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -73,7 +73,14 @@
 			"edition": "open-source",
 			"text": "The website script can load your ChatGPT Ads pixel for you: turn on \"Load the ChatGPT Ads pixel\" on a site's script and it loads the pixel of the brand's ChatGPT Ads connection, counts page views, and passes the signed-in visitor's hashed email and ID, with no pixel code on your site.",
 			"at": "2026-11-18T12:29:41Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Recommended donors now hide sites already in one of your sequences, add checkboxes with Select all, and show each site's light and top-page traffic share. Orders need a green light before you approve or publish, and a site Ahrefs checked in the last 30 days is never pulled again.",
+			"at": "2026-11-18T12:44:28Z"
 		}
 	],
-	"through": "dd7ac97+2d7868d"
+	"through": "f5bf668+0f3808a"
 }
