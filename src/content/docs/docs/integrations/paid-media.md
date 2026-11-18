@@ -112,7 +112,7 @@ numbers. Each run stores:
   `omni_purchase` and the pixel's own; custom conversions are listed as
   `custom.<id>` and aren't in the conversions total. Google's are its
   conversion actions, by name.
-- **Google search keywords and search terms**: each keyword that showed an
+- **Google and Microsoft search keywords and search terms**: each keyword that showed an
   ad, with its match type and numbers per day, and what people searched, with
   the keyword it matched. Google leaves out searches too few people made.
 - **Spend in the costs ledger**: one entry per campaign (never per ad set or ad) per day, channel
@@ -137,7 +137,7 @@ In the app, open **Paid ads** in the sidebar. The page is for one goal: more pay
 | **Experiments** | Tests the ad network splits fairly, and how each change you approved turned out. |
 | **Settings** | A row of its pages sits under the tabs (General, Tracking, Send conversions, Send log, Ad accounts, Change history). General is one table with a status on each line: ad accounts, recommendations, conversions sent to the networks, the send log, tracking, the counting window, which customers' revenue counts, and the change history. |
 
-It shows spend, clicks, CTR, cost per click and platform conversions for 7, 28 or 90 days, by day, platform and campaign, with each account's brand and sync switch. Each campaign shows the visits, conversions and revenue Outflare's own attribution credits to it beside what the platform reports. Click a campaign and it opens as a page of its own, like a level in the ad platform, with a trail back (All campaigns, then the campaign, then the ad group): its numbers and trend by day, its conversions by type, its ad groups or ad sets and its ads, and for Google its keywords and search terms. Click an ad group or ad set for its own page with only its ads. Each page has its own address, so the browser's back button and shared links work. Paid visits whose campaign id matches no campaign in a connected account are listed on their own, with why that happens. An ad whose links lack the tracking template is marked. A connection that still needs a developer token asks for it at the top.
+It shows spend, clicks, CTR, cost per click and platform conversions for 7, 28 or 90 days, by day, platform and campaign, with each account's brand and sync switch. Each campaign shows the visits, conversions and revenue Outflare's own attribution credits to it beside what the platform reports. Click a campaign and it opens as a page of its own, like a level in the ad platform, with a trail back (All campaigns, then the campaign, then the ad group): its numbers and trend by day, its conversions by type, its ad groups or ad sets and its ads, and for Google and Microsoft Advertising its keywords and search terms. On a Microsoft campaign you can exclude a search as a negative keyword, add a search as a keyword, and pause an ad group; on X you can pause a line item. Click an ad group or ad set for its own page with only its ads. Each page has its own address, so the browser's back button and shared links work. Paid visits whose campaign id matches no campaign in a connected account are listed on their own, with why that happens. An ad whose links lack the tracking template is marked. A connection that still needs a developer token asks for it at the top.
 
 | Call | What it answers |
 | --- | --- |
@@ -317,8 +317,12 @@ How it works:
   refund restates its value to what is left (in proportion to the value sent),
   and a full refund retracts it, so bidding learns from net revenue. Google
   may not know a conversion for a few hours after taking it, so a refused
-  adjustment is tried again, up to 8 times over about a day. Platforms that
-  can't change a conversion after taking it skip the adjustment and say so.
+  adjustment is tried again, up to 8 times over about a day. Microsoft
+  Advertising is changed the same way, found by the click id or the hashed
+  email or phone the conversion was sent with. Platforms that can't change a
+  conversion after taking it skip the adjustment and say so: Meta has no way
+  to take a conversion back, so keep refunded customers out of Meta with an
+  audience you exclude.
 - The value comes from an event property (in major units, 12.50, or minor units,
   1250) or a fixed value; the currency from the rule, the event's `currency`
   property or the account's.
@@ -393,7 +397,8 @@ connected ([Platforms](#platforms)).
 
 - **What Outflare does on the network.** Through your own connection it
   makes a customer list named "<name> (Outflare)" on each ad account (a
-  Google Ads Customer Match list, a Meta custom audience), adds the people in
+  Google Ads Customer Match list, a Meta custom audience, an X custom
+  audience, a Reddit customer list), adds the people in
   the list, and once a day sends what changed: people who joined go in,
   people who left come out. Only hashed emails and phone numbers leave
   Outflare.
