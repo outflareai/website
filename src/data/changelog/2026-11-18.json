@@ -2,7 +2,7 @@
 	"version": "2026.11.18",
 	"date": "2026-11-18",
 	"status": "in-progress",
-	"updated": "2026-11-18T14:50:01Z",
+	"updated": "2026-11-18T20:48:22Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -136,7 +136,77 @@
 			"edition": "open-source",
 			"text": "AI apps that ask before changes, such as Claude, can now read with any Outflare tool without an approval prompt: the new `call_read_tool` runs only tools that read, and `call_tool` stays the way to change things. Reading dashboards and their tiles is now in the core tool set.",
 			"at": "2026-11-18T14:50:01Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "Connect your AI app with tool groups to list a whole area's tools up front, such as `https://app.outflare.ai/mcp?tools=core,analytics,seo`; every other tool stays one search away. Tools marked read-only can now never make a change: Outflare refuses it, so apps that run reads without asking stay safe.",
+			"at": "2026-11-18T15:17:47Z"
+		},
+		{
+			"kind": "fix",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "An analytics or Search Console site nobody placed now belongs to the brand whose website it is, instead of the connection's brand or the workspace's first brand. When one Google sign-in reads the Search Console properties of several brands, a brand's search reports and dashboards no longer list another brand's pages and clicks.",
+			"at": "2026-11-18T15:22:35Z"
+		},
+		{
+			"kind": "fix",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Paid ads recommendations, verdicts and the Bidding strategies table now show money in your brand's currency, like the rest of Paid ads, when an ad account is billed in another one. A brand's target is also compared with spend in the same currency.",
+			"at": "2026-11-18T15:22:35Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Conversion rules on payments can now send first payments only, so an ad platform counts each new paying customer once and renewals or top-ups add nothing. Choose it under Paid ads → Send conversions back → Payments to send; repeat payments only is there too.",
+			"at": "2026-11-18T17:02:21Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "outreach",
+			"edition": "open-source",
+			"text": "Adding people to an EmailBison campaign now checks the campaign first (active, with sequence steps, sending days and connected senders) and holds people while it isn't ready or has used its senders' daily capacity. Someone EmailBison already holds is left out instead of added, and new contacts go in together, with a note saying where they came from.",
+			"at": "2026-11-18T19:10:53Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "connectors",
+			"edition": "open-source",
+			"text": "The Product account lookup and Outreach blocklist connectors can now check a company by its domain alone, before anyone there is known: the lookup asks for the company's domain, and the blocklist checks it against the service's daily domains export. The Lead finder shows companies' A to D grades beside their fit.",
+			"at": "2026-11-18T19:10:53Z"
+		},
+		{
+			"kind": "fix",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Treg: when Treg has no room for a call it is asked again after 2, 4 and 8 seconds, then the same call goes to your other Treg connection, for finding and for verifying an email. Verification now waits for Treg's slower answers, and a busy Treg no longer slows your connection down.",
+			"at": "2026-11-18T19:10:53Z"
+		},
+		{
+			"kind": "fix",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Background work no longer waits behind a bulk email verification. Verification now runs on its own few workers, and addresses a verifier could not answer are asked again after five minutes instead of at once, so a slow or busy verifier can no longer hold up syncs, sends and alerts for half an hour at a time.",
+			"at": "2026-11-18T19:10:53Z"
+		},
+		{
+			"kind": "fix",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "A connected sequencer's draft campaign can now be linked to a sequence before anyone starts it there: name it in `link_campaigns` on `POST /v1/workspaces/{ws}/platforms/{id}/sync` (or the `sync_platform` MCP tool) and it comes in as a draft sequence, so it can be chosen as a campaign. Syncs still link live campaigns by themselves and leave other drafts out.",
+			"at": "2026-11-18T20:29:09Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Smart lists can group rules with all, any or none, and test page visits, other lists, email consent, event counts and properties. The new builder has searchable pickers, reads the rules back as a sentence, and can write them from a description on your workspace's own AI model.",
+			"at": "2026-11-18T20:48:22Z"
 		}
 	],
-	"through": "ac12f38+7d51d67"
+	"through": "0563496+f351e64"
 }

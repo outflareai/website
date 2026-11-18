@@ -21,6 +21,44 @@ It calls the same API with a scoped token, so:
 - every email still goes through the [policy check](/docs/concepts/policy-check/), however the agent is prompted;
 - every change is in the audit log under the token's name.
 
+### Which tools your app sees
+
+Outflare has well over a thousand tools, and apps cap or struggle with long lists: ChatGPT keeps only the first 200, and every listed tool takes room in the model's context on every message. So by default your app lists about 55 core tools (context, leads and records, sequences and the inbox, lifecycle email, reports and dashboards, connectors and playbooks) and three that reach everything else:
+
+| Tool | What it does |
+| --- | --- |
+| `find_tools` | Search every Outflare tool by what you want to do, such as "check rankings". Each match says whether it only reads (`read_only`) |
+| `call_read_tool` | Run any tool that only reads. It is marked read-only, so apps that ask before every change (such as Claude when your organization requires approval) run it without asking. It refuses tools that change things |
+| `call_tool` | Run any tool, including ones that change things. Apps may ask you before each call |
+
+A tool marked read-only can never change anything: Outflare refuses any request from one that isn't a read, a preview or a query, so letting reads run without asking is safe.
+
+To list a whole area's tools up front as well, add groups to the address, separated by commas: `https://app.outflare.ai/mcp?tools=core,analytics,seo`. Each group with the core set stays under 180 tools, so it fits in every app. When running the server yourself, set `OUTFLARE_MCP_TOOLS=core,analytics,seo` instead.
+
+| Group | Tools |
+| --- | --- |
+| `analytics` | Dashboards, insights (trends, funnels, retention, paths), saved queries and site analytics |
+| `events` | Events and their plan, destinations, website visitors, recordings, heatmaps, errors and the consent banner |
+| `experiments` | A/B tests and feature flags |
+| `seo` | SEO sites, crawls, fixes, rankings, Search Console, page targets and SEO experiments |
+| `ai_visibility` | How AI answers mention the brand: prompts, runs, samples and pages |
+| `links` | Backlinks, link prospects, link building and link orders |
+| `competitors` | Competitors, their pricing and search gaps |
+| `ads` | Ad accounts, campaigns, keywords, conversions, audiences and ad findings |
+| `tracking` | Attribution, tracking links, offers, landers, flows, traffic sources and postbacks |
+| `email` | Lifecycle email: templates, broadcasts, topics, email domains and providers, journeys and kits |
+| `outreach` | Cold email: sequences, the inbox, mailboxes, domains, senders, allocation, warm-up and suppressions |
+| `leads` | Leads, lead lists, smart lists, ideal customer profiles and email finding and verification |
+| `crm` | Customer records, fields, imports, merges, bulk edits, deals and meetings |
+| `revenue` | Revenue, sales team, commissions, metrics, scores, routing, signals, rules, products and spend |
+| `support` | Knowledge, help centres, the support inbox and assistant, chat widgets and review requests |
+| `social` | Social accounts and posts, Reddit and reviews |
+| `pr` | Digital PR: stories, pitches, journalists and news searches |
+| `coverage` | Coverage: publishers, placements, agreements, invoices and reports |
+| `partners` | Partners and affiliates: programs, rewards, payouts and portals |
+
+To list every tool, use `?tools=all` (or `OUTFLARE_MCP_TOOLS=all`), for apps that search tools themselves, such as Claude Code.
+
 ### Run it on your computer
 
 The hosted server at `/mcp` is the easy way ([Connect your AI](/docs/agents/connect/)). Run the server yourself instead when your app only starts local servers, or to pin it to one brand. It is not on npm yet. Build it from the repository (Node 18 or later):
