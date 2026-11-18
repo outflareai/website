@@ -2,7 +2,7 @@
 	"version": "2026.11.18",
 	"date": "2026-11-18",
 	"status": "in-progress",
-	"updated": "2026-11-18T10:17:06Z",
+	"updated": "2026-11-18T10:19:49Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -38,7 +38,14 @@
 			"edition": "open-source",
 			"text": "A list's page has Edit name and description, so any list can be renamed and described where you read it.",
 			"at": "2026-11-18T10:17:06Z"
+		},
+		{
+			"kind": "fix",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Email finding and verification through Treg: a provider that is busy for a moment (HTTP 429) is asked again in place, then later, instead of being read as an empty balance. A busy finder no longer stops a run, and a busy verifier no longer stores a good address as risky from the built-in checks.",
+			"at": "2026-11-18T10:19:49Z"
 		}
 	],
-	"through": "df41ee3+dae4323"
+	"through": "60e4b6f+1ee1917"
 }
