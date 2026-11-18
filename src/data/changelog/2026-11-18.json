@@ -2,7 +2,7 @@
 	"version": "2026.11.18",
 	"date": "2026-11-18",
 	"status": "in-progress",
-	"updated": "2026-11-18T19:05:59Z",
+	"updated": "2026-11-18T19:10:53Z",
 	"items": [
 		{
 			"kind": "launch",
@@ -164,7 +164,35 @@
 			"edition": "open-source",
 			"text": "Conversion rules on payments can now send first payments only, so an ad platform counts each new paying customer once and renewals or top-ups add nothing. Choose it under Paid ads → Send conversions back → Payments to send; repeat payments only is there too.",
 			"at": "2026-11-18T17:02:21Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "outreach",
+			"edition": "open-source",
+			"text": "Adding people to an EmailBison campaign now checks the campaign first (active, with sequence steps, sending days and connected senders) and holds people while it isn't ready or has used its senders' daily capacity. Someone EmailBison already holds is left out instead of added, and new contacts go in together, with a note saying where they came from.",
+			"at": "2026-11-18T19:10:53Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "connectors",
+			"edition": "open-source",
+			"text": "The Product account lookup and Outreach blocklist connectors can now check a company by its domain alone, before anyone there is known: the lookup asks for the company's domain, and the blocklist checks it against the service's daily domains export. The Lead finder shows companies' A to D grades beside their fit.",
+			"at": "2026-11-18T19:10:53Z"
+		},
+		{
+			"kind": "fix",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Treg: when Treg has no room for a call it is asked again after 2, 4 and 8 seconds, then the same call goes to your other Treg connection, for finding and for verifying an email. Verification now waits for Treg's slower answers, and a busy Treg no longer slows your connection down.",
+			"at": "2026-11-18T19:10:53Z"
+		},
+		{
+			"kind": "fix",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Background work no longer waits behind a bulk email verification. Verification now runs on its own few workers, and addresses a verifier could not answer are asked again after five minutes instead of at once, so a slow or busy verifier can no longer hold up syncs, sends and alerts for half an hour at a time.",
+			"at": "2026-11-18T19:10:53Z"
 		}
 	],
-	"through": "10f1bfe+eb072dd"
+	"through": "5691dd3+fc3d0c7"
 }
