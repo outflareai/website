@@ -2,7 +2,7 @@
 	"version": "2026.11.19",
 	"date": "2026-11-19",
 	"status": "in-progress",
-	"updated": "2026-11-19T09:28:16Z",
+	"updated": "2026-11-19T09:55:02Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -10,7 +10,14 @@
 			"edition": "open-source",
 			"text": "The Sales queue's source and channel filters now take several at once: pick any two or three sources, or channels, and the list shows conversations from any of them.",
 			"at": "2026-11-19T09:28:16Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "connectors",
+			"edition": "open-source",
+			"text": "People research can be told which roles to look for first, such as head of IT or CTO, so a company's functional heads are found before its other executives.",
+			"at": "2026-11-19T09:55:02Z"
 		}
 	],
-	"through": "bc9f731+bc9f731"
+	"through": "0b38d00+0b38d00"
 }
