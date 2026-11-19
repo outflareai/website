@@ -74,3 +74,7 @@ A file kept as a `person` or a `voice` can't be used until someone confirms the 
 ## For agents
 
 The MCP server has `list_generation_providers`, `list_generation_voices`, `create_brand_generation`, `get_brand_generation` and `list_brand_generations`. An agent is told that every request costs the brand money, to make only what was asked for, and to ask which model to use.
+
+## Ads from saved recipes
+
+To make ads the same way every time, and to see which prompt makes the better ones, save the prompt as a skill and make creatives from it: see [Skills and creatives](/docs/guides/skills-and-creatives/).
