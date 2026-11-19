@@ -2,7 +2,7 @@
 	"version": "2026.11.19",
 	"date": "2026-11-19",
 	"status": "in-progress",
-	"updated": "2026-11-19T11:17:08Z",
+	"updated": "2026-11-19T12:14:12Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -24,7 +24,14 @@
 			"edition": "open-source",
 			"text": "Sales alerts: Outflare can post every new Sales conversation to a Slack channel you pick, with the person, their website, the source and the fields that matter, and keeps the message current with emojis for seen, assigned, talking, handed over and archived. You choose which sources are posted. New conversations also shows how many arrived since the last one you looked at.",
 			"at": "2026-11-19T10:52:35Z"
+		},
+		{
+			"kind": "fix",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Sales feed: a Slack post that arrives in the same moment as a channel's first read now shows up on the next read, a couple of minutes later, instead of waiting for the hourly check.",
+			"at": "2026-11-19T12:14:12Z"
 		}
 	],
-	"through": "bb1187c+bb1187c"
+	"through": "59137e2+59137e2"
 }
