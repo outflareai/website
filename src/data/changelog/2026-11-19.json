@@ -2,7 +2,7 @@
 	"version": "2026.11.19",
 	"date": "2026-11-19",
 	"status": "in-progress",
-	"updated": "2026-11-19T13:22:30Z",
+	"updated": "2026-11-19T14:07:26Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -45,7 +45,21 @@
 			"edition": "open-source",
 			"text": "Conversions sent to Meta, TikTok, Snapchat, Pinterest, Reddit and X now carry the person's IP address and browser beside the click id and hashed identifiers, so the networks match more of them to an ad. The send log shows them as `ip_address` and `user_agent`.",
 			"at": "2026-11-19T13:22:30Z"
+		},
+		{
+			"kind": "fix",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Tracker destinations now get the click id (ofclk) exactly once, even when a lander or offer URL says ofclk={click_id}, and a URL with any other ofclk is refused with the reason. Offers have a \"Click id delivery\" setting, so a page of your own no longer shows \"Missing click id\".",
+			"at": "2026-11-19T13:32:44Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "The website script can load your Meta and TikTok pixels: two new switches on Website tracking, off by default. It sends each conversion a page causes to the pixel with the same ID Outflare's server sends, so the platform counts it once and matches more conversions to an ad. No pixel code on your site.",
+			"at": "2026-11-19T14:07:26Z"
 		}
 	],
-	"through": "8c73f5b+8c73f5b"
+	"through": "d0b80c2+d0b80c2"
 }

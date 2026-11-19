@@ -5,7 +5,7 @@ sidebar:
   order: 1.6
 ---
 
-<span class="pill shipped">Shipped</span> Query in the web app (**CRM → Query**), the REST API and the MCP server. Search in the REST API and the MCP server, with the meaning-based search switch under Settings.
+<span class="pill shipped">Shipped</span> Query in the web app (**Data → Queries**, with plain-English questions and a builder that needs no SQL), the REST API and the MCP server. Search in the REST API and the MCP server, with the meaning-based search switch under Settings.
 
 Search and Query read the same data you see everywhere else in Outflare: [customer records](/docs/guides/customer-records/), outreach, replies, meetings, deals, lifecycle email and website visits. Search finds things by their words, or by what they mean. Query answers questions with SQL, such as "win rate by source this quarter", in one exact answer instead of many pages of lists. Both run inside your Outflare database, so there is no other service and nothing to sync.
 
@@ -41,7 +41,7 @@ When a person or company is deleted, merged or archived, or a reply, meeting or 
 
 ## Query
 
-A query belongs to one brand. Open **CRM → Query**, send `POST /v1/brands/{brand}/query` with `{"sql": "select stage, count(*) from deals group by stage"}`, or ask your agent (MCP `run_query`). `GET .../query/tables` (MCP `list_query_tables`) lists the tables and their columns. The older `/v1/brands/{brand}/query` still works for now.
+A query belongs to one brand. Open **Data → Queries**, send `POST /v1/brands/{brand}/query` with `{"sql": "select stage, count(*) from deals group by stage"}`, or ask your agent (MCP `run_query`). `GET .../query/tables` (MCP `list_query_tables`) lists the tables and their columns. The older `/v1/brands/{brand}/query` still works for now.
 
 | Tables | What they hold |
 | --- | --- |
@@ -61,17 +61,25 @@ A query belongs to one brand. Open **CRM → Query**, send `POST /v1/brands/{bra
 - A query is one `SELECT`. It never changes anything, so an agent kept to missions can run it without one.
 - Up to 100 rows come back by default, and at most 1,000. A query running over 15 seconds is stopped, so count and group rather than list.
 
-### Query Studio
+### Queries in the app
 
-**CRM → Query** is an editor for the brand picked in the sidebar. It lists your saved queries, the tables with their columns, and each record type's fields, and it completes table and column names as you type. Cmd/Ctrl+Enter runs the query. Results come back as a table or as a bar, line or area chart, and anyone who can run queries can download them as CSV (up to 10,000 rows).
+**Data → Queries** works on the brand picked in the sidebar. It lists your saved queries; each one opens on its own page, with Save and Cancel.
+
+**Describe it in English.** Type what you want, such as "customers who spent over $500 in total: their email, user id, sign-up date and lifetime spend, biggest spenders first", and press **Build it**. Your workspace's own AI model (connect one under [AI models](/docs/agents/ai-models/); Outflare never supplies a key, and the box says what to connect when there is none) turns it into a builder, or into SQL when a builder can't say it, or tells you which data is missing. It sees your table and field names, never your customers' data, and Outflare runs every answer once, with your permissions, before you see it. On a query you already have, describe a change: "also show their country". The API is `POST /v1/brands/{brand}/query/ask`, then `GET .../query/ask/{question}` for the answer.
+
+**The builder** makes a query without SQL: pick the table to start from, the columns (including totals from related tables, such as each person's total payments, shown as money), filters, the order and how many rows. Results update as you change it. The **SQL** tab shows the SQL it writes; editing it by hand turns the builder off for that query. `POST /v1/brands/{brand}/query/build` answers a builder's SQL.
+
+**Make it a list.** A saved query that starts from people or companies links each row to the person or company, and **Make it a list** turns it into a dynamic list that stays up to date, ready for sequences, broadcasts and ad audiences.
+
+**SQL** stays there for anyone who wants it: the editor completes table and column names, Cmd/Ctrl+Enter runs the query, and beside it are the tables with their columns and each record type's fields. Results come back as a table or as a bar, line or area chart, and anyone who can run queries can download them as CSV (up to 10,000 rows).
 
 ### Saved queries
 
-Save a query to run it again. A saved query is private to you until you share it with the brand. Every change to its SQL or chart is a new version, and every version is kept, so you can open, run or restore an old one. Use `GET`/`POST /v1/brands/{brand}/queries` and `POST .../queries/{saved_query}/run`, or the MCP tools `list_saved_queries`, `get_saved_query`, `run_saved_query` and `save_query`. Saving needs permission to manage customers.
+Save a query to run it again. A saved query is private to you until you share it with the brand. Every change to its SQL, builder, description or chart is a new version, and every version is kept, so you can open, run or restore an old one. Use `GET`/`POST /v1/brands/{brand}/queries` and `POST .../queries/{saved_query}/run`, or the MCP tools `list_saved_queries`, `get_saved_query`, `run_saved_query` and `save_query`. Saving needs permission to manage customers.
 
 ### Published endpoints
 
-Owners and admins can publish a saved query as an endpoint that another system, such as a BI tool or a warehouse job, calls with an API token made for the brand that holds only `query.endpoints`:
+Owners and admins can publish a saved query (from its menu) as an endpoint, listed under **Data → Endpoints**, that another system, such as a BI tool or a warehouse job, calls with an API token made for the brand that holds only `query.endpoints`:
 
 ```sh
 curl -X POST https://app.outflare.ai/v1/brands/$BRAND/query-endpoints/new-signups/run \
