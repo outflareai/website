@@ -131,7 +131,7 @@ In the app, open **Paid ads** in the sidebar. The page is for one goal: more pay
 | --- | --- |
 | **Overview** | Pick all networks, one network or one ad account at the top, and everything below follows it. One sentence says where you stand against your target, then cost per new customer, cost per sign-up, new customers, spend, revenue and return. Campaigns named for your brand are judged apart from everything else, so a cheap average doesn't hide an expensive campaign. **Do this next** lists the three open actions with the biggest effect, and a funnel shows ad clicks, sign-ups and first payments. Every number reads the same rows, so they can't disagree. |
 | **Actions** | One table of what to do: **Fix** (something is broken), **Cut waste**, **Grow** and **Experiment**, each with why, the expected effect and one main button. Views: To do, In progress, Done and Dismissed. A switch turns recommendations on or off; while off, what Outflare would have recommended is under Preview. Nothing changes in an ad account until you approve it, and a budget raise shows the budget before and after and the most it can add a month. |
-| **Campaigns** | Every campaign with what it spent and brought; open one for its ad groups, ads, keywords and searches. Tables start on **All enabled**, with a **Status** filter (All enabled, All but removed, All) and two total rows under each: one for the rows shown and one for all of them. For Google Ads, an enabled campaign, ad group or ad also says whether it is really serving, in Google's words (Eligible, Limited by budget, Limited by bidding, Learning, Not eligible), with Google's reasons on hover, and the table has Google's Optimization score. |
+| **Campaigns** | Every campaign with what it spent and brought; open one for its ad groups, ads, keywords and searches. Tables start on **All enabled**, with a **Status** filter (All enabled, All but removed, All) and two total rows under each: one for the rows shown and one for all of them. For Google Ads, an enabled campaign, ad group or ad also says whether it is really serving, in Google's words (Eligible, Limited by budget, Limited by bidding, Learning, Not eligible), with Google's reasons on hover, and the table has Google's Optimization score and **Room to grow**: the share of searches a search campaign missed over the last 7 days because its budget ran out, and because others ranked higher. Sort by it to see where a raise would buy the most. |
 | **Customers** | The people your ads brought, and which campaign each came from. |
 | **Audiences** | Lists of your people sent to the ad networks you choose ([Audiences](#audiences-one-list-several-ad-networks)). |
 | **Experiments** | Tests the ad network splits fairly, and how each change you approved turned out. |
@@ -147,8 +147,8 @@ It shows spend, clicks, CTR, cost per click and platform conversions for 7, 28 o
 | `PUT /v1/workspaces/{ws}/ads/accounts/{id}/target` | Set the target for every campaign of an account without its own (`analytics.manage`) |
 | `GET /v1/brands/{brand}/ads/items` | Ad sets and ad groups (`level=ad_group`) or ads (`level=ad`), ranked by spend, with their campaign; `campaign_id` or `parent_id` narrows them |
 | `GET /v1/brands/{brand}/ads/conversion-actions` | Platform conversions by action, per connector and currency; `entity_id` gives one campaign's, ad set's or ad's |
-| `GET /v1/brands/{brand}/ads/keywords` | Google search keywords ranked by spend; `campaign_id` or `ad_group_id` narrows them |
-| `GET /v1/brands/{brand}/ads/search-terms` | What people searched that showed a Google ad, with the keyword it matched, ranked by spend |
+| `GET /v1/brands/{brand}/ads/keywords` | Google search keywords ranked by spend; `campaign_id` or `ad_group_id` narrows them. Each also carries Outflare's own count of who its clicks brought: `signups` in the range, how many of those have paid since (`signups_paid`, `paid_share`), `new_payers` and `cost_per_new_payer_micros` |
+| `GET /v1/brands/{brand}/ads/search-terms` | What people searched that showed a Google ad, with the keyword it matched, ranked by spend. `keyword_signups`, `keyword_signups_paid` and `keyword_paid_share` are the matched keyword's own numbers: a network doesn't say which search a click came from |
 | `GET /v1/brands/{brand}/ads/summary` | Totals grouped by `connector`, `brand`, `account` or `day`, per currency; `entity_id` gives one campaign's, ad set's or ad's numbers alone |
 | `POST /v1/workspaces/{ws}/ads/sync` | Sync now instead of within six hours |
 
@@ -158,7 +158,8 @@ All of them take `brand`. Money is in micros (1,000,000 = one unit).
 account a network made you open in Singapore dollars, say) is converted into
 the brand's currency, so its spend adds up with the rest. The Overview, the
 Campaigns tables and the totals of each campaign, ad group, ad, keyword and
-search term are in the brand's currency, at the latest daily reference rate
+search term, the money in a finding's and a verdict's text, and the cost on
+the Bidding strategies table are in the brand's currency, at the latest daily reference rate
 Outflare keeps (the European Central Bank's), and the page says so ("billed
 in SGD, shown in USD"). In the API each row says what its account is billed
 in (`account_currency`, or `currency` beside `report_currency` and
@@ -252,18 +253,50 @@ One that doesn't qualify is never sent and never appears in the send log.
 Archiving the definition stops the rule. In the app, **Add a rule** offers the
 definitions first.
 
+### Qualified sign-ups with a predicted value
+
+A sign-up carries no money, so an ad platform that is told about every
+sign-up bids as hard for the people who never pay as for the ones who do. A
+rule on an event such as `signed_up` has two switches for that, both off by
+default:
+
+- **Send a predicted value** (`predicted_value`): each event is sent worth
+  what people like the person went on to pay, in the brand's currency, in
+  place of the rule's own value.
+- **Send qualified ones only** (`qualified_only`): events from people less
+  likely to pay than the brand's average are skipped, and the send log says
+  why. A throwaway email address is never qualified.
+
+Both decide from the brand's own history, read with
+`GET /v1/brands/{brand}/ads/signup-quality?event=signed_up`: of the people
+who did the event in the 90 days that ended two days ago, how many paid
+(`payment.succeeded`) within 30 days and what a payer paid on average, by the
+country they came from and the kind of email address they gave (work, free,
+throwaway or unknown, from Outflare's own classifier; no lookup leaves the
+server). A group's share is pulled toward the brand's average where the
+group is small, so twenty people from one country never swing a prediction.
+The predicted value is that share of what a payer paid.
+
+With fewer than 100 people or 10 payers in the window (`enough` is false)
+nothing is predicted: every event is sent, with the rule's own value. The
+history is read again every hour. The rule form shows the history under
+**Who pays after this event**, with the breakdown by country and email. The
+MCP tool is `get_signup_quality`.
+
 | Platform | Where it goes | Matched on | Also needs |
 | --- | --- | --- | --- |
 | Google Ads | A conversion action that takes uploaded clicks (Upload clicks) | `gclid`, `gbraid` or `wbraid`; hashed email and phone (enhanced conversions for leads) | The sign-in needs Google Ads access that can upload |
-| Meta Ads | A pixel (dataset), as a standard event such as Purchase or Lead | `fbc` (from `fbclid`), `fbp`, hashed email, phone and record id | The system user assigned to the pixel |
+| Meta Ads | A pixel (dataset), as a standard event such as Purchase or Lead | `fbc` (from `fbclid`), `fbp`, hashed email, phone and record id, and the person's IP address and browser | The system user assigned to the pixel |
 | Microsoft Advertising | An offline conversion goal | `msclkid`; hashed email and phone | The developer token above |
-| Reddit Ads | Your pixel, through the Conversions API, as SignUp, Lead, Purchase and so on | `rdt_cid`, hashed email and record id | Your own pixel ID and Conversions API access token, from Reddit Ads Manager → Events Manager. A connection with a token but no pixel ID still sends through Reddit's older endpoint, so add the pixel ID before Reddit retires it. |
-| X Ads | A conversion event on your pixel, through the Conversions API, by its Event ID from Events Manager | `twclid`, hashed email and phone | The pixel ID and Event IDs on the connection, from X Ads Manager → Tools → Events Manager. Conversions are sent with the connection's keys, or with a Conversion API access token from Events Manager if you add one |
-| TikTok Ads | A pixel, through the Events API, as CompletePayment, CompleteRegistration, SubmitForm and so on | `ttclid`, the `_ttp` cookie (`ttp`), hashed email, phone and record id | The sign-in's Pixel and Events access; if TikTok refuses it, an Events API access token from Events Manager on the connection |
-| Snapchat Ads | A Snap Pixel, through the Conversions API, as PURCHASE, SIGN_UP, SUBSCRIBE and so on | `ScCid`, the `_scid` cookie (`scid`), hashed email, phone and record id | The sign-in's access; if Snapchat refuses it, a Conversions API token from Ads Manager → Business Details on the connection |
+| Reddit Ads | Your pixel, through the Conversions API, as SignUp, Lead, Purchase and so on | `rdt_cid`, hashed email and record id, and the person's IP address and browser | Your own pixel ID and Conversions API access token, from Reddit Ads Manager → Events Manager. A connection with a token but no pixel ID still sends through Reddit's older endpoint, so add the pixel ID before Reddit retires it. |
+| X Ads | A conversion event on your pixel, through the Conversions API, by its Event ID from Events Manager | `twclid`, hashed email and phone, and the person's IP address and browser (only when both are known) | The pixel ID and Event IDs on the connection, from X Ads Manager → Tools → Events Manager. Conversions are sent with the connection's keys, or with a Conversion API access token from Events Manager if you add one |
+| TikTok Ads | A pixel, through the Events API, as CompletePayment, CompleteRegistration, SubmitForm and so on | `ttclid`, the `_ttp` cookie (`ttp`), hashed email, phone and record id, and the person's IP address and browser | The sign-in's Pixel and Events access; if TikTok refuses it, an Events API access token from Events Manager on the connection |
+| Snapchat Ads | A Snap Pixel, through the Conversions API, as PURCHASE, SIGN_UP, SUBSCRIBE and so on | `ScCid`, the `_scid` cookie (`scid`), hashed email, phone and record id, and the person's IP address and browser | The sign-in's access; if Snapchat refuses it, a Conversions API token from Ads Manager → Business Details on the connection |
 | Taboola Ads | An active event-based conversion (Realize → Tracking, "Create conversions using code"), by its event name, as a server-to-server action | `tblci` only | Nothing: the bulk S2S endpoint takes no token |
-| Pinterest Ads | The Conversions API, as checkout, signup, lead and so on | `epik`, hashed email, phone and record id | The workspace's own conversion access token, from Pinterest Ads Manager → Conversions |
+| Pinterest Ads | The Conversions API, as checkout, signup, lead and so on | `epik`, hashed email, phone and record id, and the person's IP address and browser | The workspace's own conversion access token, from Pinterest Ads Manager → Conversions |
 | ChatGPT Ads | Your pixel, through OpenAI's Conversions API, as `registration_completed`, `order_created`, `lead_created`, `subscription_created` and so on | `oppref`, the pixel's browser reference, hashed email, phone and record id; beside them the IP address the event's own context carries (`context.ip`), the person's browser (from the event, else from their latest visit recorded by the Outflare site script, so your server doesn't need to send it) and their country, unhashed as OpenAI asks | Your own pixel ID and conversion key from OpenAI Ads Manager → Conversions, and your website address. OpenAI takes conversions from the last 7 days only. |
+
+The IP address and browser are the ones the event's own context carries (`context.ip`, `context.userAgent`); the browser falls back to the one the site script stored on the person's latest earlier event, up to 90 days back. They go to Meta, TikTok, Snapchat, Pinterest, Reddit, X and ChatGPT Ads, unhashed as each asks, only beside a click id or an identifier, never as the only thing sent, and only when the conversion passes the consent check below. The send log lists them as `ip_address` and `user_agent`. On server events, send the user's own address and browser in `context`, not your server's.
 
 Taboola matches only on its click id: a conversion with no `tblci` from the
 click is skipped. Taboola accepts each batch at once and processes it later
@@ -322,7 +355,9 @@ How it works:
   email or phone the conversion was sent with. Platforms that can't change a
   conversion after taking it skip the adjustment and say so: Meta has no way
   to take a conversion back, so keep refunded customers out of Meta with an
-  audience you exclude.
+  audience set to **Never show them ads** ([Audiences](#audiences-one-list-several-ad-networks)):
+  make a list of the people who were refunded, and Outflare excludes it on
+  every campaign.
 - The value comes from an event property (in major units, 12.50, or minor units,
   1250) or a fixed value; the currency from the rule, the event's `currency`
   property or the account's.
@@ -362,9 +397,37 @@ How it works:
   (`record_name`). In the web app the log is its own screen, **Paid ads → Setup →
   Send log**: filter by result or rule, read what happened in plain words,
   open the person from any row, and download it as CSV.
+- **Sent against counted.** Above the log, a table compares, for each
+  conversion action a rule sends to, the conversions the network accepted
+  with what the network counts for that action, over 7, 14, 30 or 90 days
+  ending two days ago (networks report a conversion a day or two late). It
+  shows how many sends carried the network's own click id, the only ones it
+  can count, the share of those it counted, and a status: Counted, Under half
+  counted, None counted, Too few to judge (under 10 sends with a click id) or
+  Not reported (the network doesn't report by conversion action; today only
+  Google Ads does). `GET /v1/brands/{brand}/ads/conversion-check?days=`
+  returns the same rows with the numbers per day.
 
 On the **Paid ads** page, **Send conversions back** adds and switches rules,
 sets who to send for, and shows the latest sends.
+
+### First payments only
+
+A rule on `payment.succeeded` chooses **Payments to send**:
+
+- **Every payment** (the default): first payments, renewals and top-ups alike.
+- **First payments only**: a customer's first ever payment for the brand and
+  nothing after it, marked as a new customer. Each new paying customer counts
+  once, so point it at a conversion action set to count **one** per click. A
+  renewal, a top-up or the same payment sent again adds nothing, because each
+  payment goes to the platform with one order id built from its payment id.
+- **Repeat payments only**: every payment after a customer's first, marked as
+  returning.
+
+Outflare decides which payment is the first from the brand's whole payment
+history, so import past payments ([Transactions](/docs/guides/transactions/))
+before you switch a first-payments rule on. In the API this is the rule's
+`feed_role`: `custom`, `first_payment` or `repeat_payment`.
 
 | Call | What it does |
 | --- | --- |
@@ -372,12 +435,13 @@ sets who to send for, and shows the latest sends.
 | `GET`, `POST /v1/workspaces/{ws}/ads/conversion-rules` | List rules with their last 30 days, or add one |
 | `PATCH`, `DELETE /v1/workspaces/{ws}/ads/conversion-rules/{id}` | Change, switch off or delete a rule |
 | `GET /v1/workspaces/{ws}/ads/conversion-sends` | The send log, newest first |
+| `GET /v1/brands/{brand}/ads/conversion-check?days=` | Per conversion action, conversions sent against what the network counts, with a status and the same per day |
 | `GET`, `PUT /v1/brands/{brand}/ads/settings` | The brand's `consent_mode`: `opt_out`, `opt_in` or `collected` (the workspace route is deprecated and acts on the first brand) |
 
 The MCP tools are `list_ad_conversion_targets`, `list_ad_conversion_rules`,
 `create_ad_conversion_rule`, `update_ad_conversion_rule`,
-`delete_ad_conversion_rule`, `list_ad_conversion_sends`, `get_ad_settings` and
-`set_ad_settings`. X and LinkedIn follow once their API access is approved.
+`delete_ad_conversion_rule`, `list_ad_conversion_sends`, `get_ad_settings`,
+`set_ad_settings` and `get_ad_conversion_check`. X and LinkedIn follow once their API access is approved.
 
 Outbrain Ads only reads: the Amplify API has no call that takes conversions.
 Outbrain's click id (`ob_click_id`) is still recorded on each visit, so its
@@ -398,10 +462,15 @@ connected ([Platforms](#platforms)).
 - **What Outflare does on the network.** Through your own connection it
   makes a customer list named "<name> (Outflare)" on each ad account (a
   Google Ads Customer Match list, a Meta custom audience, an X custom
-  audience, a Reddit customer list), adds the people in
-  the list, and once a day sends what changed: people who joined go in,
-  people who left come out. Only hashed emails and phone numbers leave
-  Outflare.
+  audience, a Reddit customer list, a ChatGPT Ads custom audience), adds the
+  people in the list, and once a day sends what changed: people who joined go
+  in, people who left come out. Only hashed emails and phone numbers leave
+  Outflare. On ChatGPT Ads the list is a custom audience filled through your
+  connection's Advertiser API key; which campaigns target or exclude it is
+  chosen in OpenAI Ads Manager, and OpenAI doesn't offer custom audiences on
+  campaigns shown in the EEA or Switzerland. OpenAI takes no conversion back,
+  so a list of the people who were refunded, excluded on your campaigns
+  there, is how a refund reaches it.
 - **Consent.** The same rules as sending conversions, for ad data and ad
   personalisation: someone who may not be added is left out, and someone who
   withdraws consent is taken out at the next sync.
@@ -410,14 +479,29 @@ connected ([Platforms](#platforms)).
   matched. Networks hide the number for small lists and take a day or two to
   count a new one.
 - **Networks that take a file.** A network Outflare can't fill a list on, such
-  as ChatGPT Ads, takes an upload instead: **Download file**
+  as TikTok Ads, takes an upload instead: **Download file**
   (`GET .../ads/audiences/{id}/file`) gives a CSV with the columns
   `email_sha256` and `phone_number_sha256`, never a plain email or phone.
 - **Turning it off or deleting it** stops the syncs. The lists already on the
   networks stay as they are; delete them there if they are no longer wanted.
 
-Use the list on the network like any other: add it to a campaign or exclude it
-([Targeting](#targeting), on a campaign's page).
+- **Never show them ads.** An audience can be people no campaign should show
+  to, such as everyone who was refunded (`exclude: true`). Once its list is on
+  the network, each sync queues the list as an exclusion on every active
+  campaign of the ad account that hasn't had it, so a new campaign is covered
+  within a day. Each one is a change in the campaign's history
+  (`exclusion_add`, kind `audience`), like any exclusion. Take it off one
+  campaign (`POST .../ads/campaigns/{id}/exclusions` with `kind: audience`,
+  the list's id on the network as `value` and `action: remove`) and it stays
+  off that campaign. Choosing the other option again takes it out of the
+  campaigns Outflare put it on. Google Ads (a negative customer list on the
+  campaign; Performance Max takes none, and its change says so) and Meta Ads
+  (excluded on each ad set) take this from here (`can_exclude`). On the other
+  networks the list is still kept up to date, and you exclude it on your
+  campaigns there.
+
+Use any other list on the network as usual: add it to a campaign
+([Targeting](#targeting), on a campaign's page) or exclude it.
 
 ## Audiences from journeys
 
@@ -479,6 +563,25 @@ When the window ends the change is judged against as many days just before it: *
 
 **Savings that apply on their own.** An extension can let an agent approve suggestions that only spend less (a lower budget, a pause, a negative keyword) for a brand; `/v1/meta` then lists `ad_suggestions_auto`. Anything that can spend more always waits for a person, a suggestion on an account every brand shares never applies on its own, the agent's grant still applies, and the change is measured and judged like any other. `ad_suggestion.approved` carries `auto: true` for these. On Outflare Cloud, this is [Paid ads Autopilot](#paid-ads-autopilot).
 
+## In the weekly digest
+
+A brand with ad spend gets a **Paid ads** section in its
+[digest](/docs/guides/digests/) (weekly on Mondays unless changed, in the
+app, as the `digest.ready` webhook and by email when the brand chose that):
+ad spend, clicks, the sign-ups and new paying customers the ads brought and
+the cost per new paying customer, each beside the period before, in the
+brand's currency. Under them are the three campaigns that spent the most
+with what each brought (marked good or bad against the brand's target cost
+per new paying customer), how many alerts are open, how many recommendations
+wait for a decision, and how many of the changes measured that period
+worked. Sign-ups and paying customers are Outflare's own count, not the
+platform's. Spend in a currency with no exchange rate is left out rather
+than added as if it were the brand's. Section id `paid_ads`.
+
+In the app, **Paid ads → Set up** has a **Weekly report** card that says
+when the digest is made, who gets it by email, and opens the Digests page
+to change either.
+
 ## Tests
 
 A before-and-after comparison can be thrown off by anything else that changed that week. A test avoids that: the network itself splits one campaign between how it is and a **trial** that tries one thing differently, on the same days, so the two compare fairly. Start one on the **Experiments** tab, or press **Test it first** on a budget suggestion instead of approving it.
@@ -501,6 +604,16 @@ A trial whose conversions cost more than twice the target three days running is 
 | `POST /v1/brands/{brand}/ads/tests/{id}/roll-back` | End the test and leave the campaign as it was (`ads.manage`) |
 | `POST /v1/brands/{brand}/ads/suggestions/{id}/approve` with `{"test": true}` | Test a budget suggestion instead of making it (`ads.manage`) |
 
+**Proposed experiments.** A recommendation that can spend more is offered
+as an experiment instead of a plain approval when the network can test
+that kind of change (a bid target on Google Ads, a budget on Meta) and the
+campaign converts often enough for an even split to reach an answer within
+six weeks. Its row under Actions has the type **Experiment** and its main
+button is **Test it first**; **Make the change now** is under **More**. In
+the API the finding carries `test_first` (`kind`, `days`, `note`); approve
+it with `{"test": true}` to start the test. Changes that only save money
+are made, not tested.
+
 X Ads has no tests here: X splits an audience only between campaigns that already exist and offers no way to copy a campaign with its ads, so change an X budget directly and compare the days before and after.
 
 ## Managing campaigns
@@ -518,7 +631,7 @@ limit is refused with a reason:
 | Call | What it does |
 | --- | --- |
 | `POST /v1/brands/{brand}/ads/campaigns/{id}/pause` | Pause a campaign (`ads.manage`) |
-| `POST /v1/brands/{brand}/ads/campaigns/{id}/resume` | Run a paused campaign again (`ads.manage`) |
+| `POST /v1/brands/{brand}/ads/campaigns/{id}/resume` | Run a paused campaign again (`ads.manage`). When its budget would take the brand's running budgets over the daily budget ceiling, it answers 409 `ad_budget_ceiling`; a signed-in person can confirm and go ahead |
 | `PATCH /v1/brands/{brand}/ads/campaigns/{id}` | Set its daily budget, `daily_budget_micros` in the account's currency (`ads.manage`) |
 | `POST /v1/brands/{brand}/ads/pause-all` | The kill switch: pause every active campaign of the brand at once, on every platform that can be changed, as one batch (`ads.manage`) |
 | `GET /v1/brands/{brand}/ads/changes` | Every change asked for, by network (`connector`), account (`account_id`), campaign, status or brand (`analytics.read`) |

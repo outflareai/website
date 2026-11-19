@@ -175,6 +175,21 @@ The browser's earlier visits then join that person. A signature only works for t
 
 A third switch, **Capture errors**, sends the errors your pages throw. It is also at the top of the Errors page. See [Errors](/docs/guides/errors/).
 
+## Ad pixels without code
+
+The script can load an ad platform's pixel for you, so your site carries no pixel snippet and your developers pass no user data to it. Today that is the ChatGPT Ads pixel.
+
+1. Connect your own ChatGPT Ads account for the brand and fill in its **Pixel ID** (Paid ads, Accounts, Connections).
+2. On Website tracking, turn on **Load the ChatGPT Ads pixel** on the site's script. Until the connection has a Pixel ID, the switch stays off and says where to add it.
+
+From the next page a visitor opens, the script loads the pixel once the page has loaded, counts each page view with it, and gives it the signed-in visitor's hashed email address, phone number and id. The hashes are made on Outflare's server, the same ones their conversions carry, so the script never sees an email address. A browser gets them only once your product has identified the person on it ([Identify from the browser](#identify-from-the-browser), or an identify from your server that names the visitor's `anonymousId`).
+
+Nothing loads without the visitor's consent to marketing, and withdrawing it tells the pixel. Someone whose ad data may not be sent has none passed, as with conversions.
+
+If a page still carries the pixel's own snippet, the script leaves it in charge and only adds the user data. Once the switch is on, take that snippet off the site so page views are counted once. Sign-ups and purchases still go from Outflare's server, not from the page.
+
+A site with a Content Security Policy allows `https://bzrcdn.openai.com` in `script-src` and `connect-src`, and `https://bzr.openai.com` in `connect-src` and `img-src`. `data-pixels="off"` on the tag stops the script loading any pixel on that page.
+
 ## Safe to put in a page
 
 The site key is public by design. It can only add anonymous page views and track events:
