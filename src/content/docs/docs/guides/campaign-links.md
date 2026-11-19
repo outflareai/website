@@ -67,6 +67,19 @@ For an email with no brand, links to any of your brands' sites count. Links to o
 
 In a sequence, links are tagged before [click tracking](/docs/guides/tracking-domains/) wraps them, so the person still lands on the tagged page, and your unsubscribe link is left alone. Visits from cold email then show under **Outbound email** in [Channels](/docs/guides/attribution/), by sequence.
 
+## Rotate landers and offers
+
+A redirect link can send its clicks to more than one page. Its list of destinations has two parts, and each is split on its own:
+
+- **Landers** get the ad click. One lander is picked by the landers' weights.
+- **Offers and pages** get the click on the lander's call to action. One is picked by their weights.
+
+So 25 landers and 31 offers at the same weight get 1/25 and 1/31 of the clicks each, and every lander can lead to every offer. You don't need to split the traffic by country or device to fit them in. A list takes up to 100 landers and up to 100 offers and pages; a save with more is refused and says which part is over, so nothing is ever dropped quietly.
+
+In the editor, **Add several landers** and **Add several offers** add many at once, each row shows its share of the clicks to one decimal, and a lander or offer that is in the list more than once is marked **Listed twice**, because it gets more than one share. A weight of 0 or a daily click cap of 0 stops a row, and the others share its clicks. When every offer is stopped or capped, or a list has landers and no offers, the lander's call to action goes to the link's own page; the editor warns you about a list like that.
+
+Over the API, `PUT /v1/brands/{brand}/tracking-campaigns/{id}/links/{link}/destinations` saves the list and `GET` reads it back; the MCP tools are `set_tracking_link_destinations` and `get_tracking_link_destinations`.
+
 ## Who can do what
 
 Everyone in the workspace can see campaigns and links (`analytics.read`). Owners, admins and operators can make and change them (`analytics.manage`).
