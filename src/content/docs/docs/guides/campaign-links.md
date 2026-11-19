@@ -78,7 +78,7 @@ So 25 landers and 31 offers at the same weight get 1/25 and 1/31 of the clicks e
 
 In the editor, **Add several landers** and **Add several offers** add many at once, each row shows its share of the clicks to one decimal, and a lander or offer that is in the list more than once is marked **Listed twice**, because it gets more than one share. A weight of 0 or a daily click cap of 0 stops a row, and the others share its clicks. When every offer is stopped or capped, or a list has landers and no offers, the lander's call to action goes to the link's own page; the editor warns you about a list like that.
 
-Over the API, `PUT /v1/brands/{brand}/tracking-campaigns/{id}/links/{link}/destinations` saves the list and `GET` reads it back; the MCP tools are `set_tracking_link_destinations` and `get_tracking_link_destinations`.
+Over the API, `PUT /v1/brands/{brand}/tracking-campaigns/{id}/links/{link}/destinations` saves the list and `GET` reads it back; the MCP tools are `set_tracking_link_destinations` and `list_tracking_link_destinations`.
 
 ## Who can do what
 
