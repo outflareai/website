@@ -1,6 +1,6 @@
 <!--
 Keep the Handoff current on every push while this is unfinished (AGENTS.md, "Unfinished work lives on GitHub").
-Write it for an agent that has never seen the conversation. This repository is PUBLIC: no chat or thread links, quotes, internal names, real people or production details. Private context goes in the paired engine or Cloud pull request. Write "none" rather than deleting a line.
+Write it for an agent that has never seen the conversation. This repository is PUBLIC: no chat or thread links, quotes, internal names, real people or production details. Private context goes in the paired pull request in outflareai/cloud. Write "none" rather than deleting a line.
 Put the `unfinished` label on this pull request until the work is done.
 -->
 
@@ -22,7 +22,7 @@ Put the `unfinished` label on this pull request until the work is done.
 -
 
 **Waiting on:** <a person, a decision, another pull request, or nothing>
-**Needs:** <outflareai/engine#NN or outflareai/cloud#NN, or none>
+**Needs:** <outflareai/cloud#NN, or none>
 **Run and test:** <commands, test data, pages to open>
 **Last updated:** <date>
 
