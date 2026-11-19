@@ -2,7 +2,7 @@
 	"version": "2026.11.19",
 	"date": "2026-11-19",
 	"status": "in-progress",
-	"updated": "2026-11-19T12:34:05Z",
+	"updated": "2026-11-19T13:22:30Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -38,7 +38,14 @@
 			"edition": "open-source",
 			"text": "Tracker → Setup now shows the brand's tracking domain right on the page, so you can add and verify it without leaving Ads. It is the same domain your emails use, one per brand, and both Domains and Tracker → Setup now say so.",
 			"at": "2026-11-19T12:34:05Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Conversions sent to Meta, TikTok, Snapchat, Pinterest, Reddit and X now carry the person's IP address and browser beside the click id and hashed identifiers, so the networks match more of them to an ad. The send log shows them as `ip_address` and `user_agent`.",
+			"at": "2026-11-19T13:22:30Z"
 		}
 	],
-	"through": "87266c1+87266c1"
+	"through": "8c73f5b+8c73f5b"
 }
