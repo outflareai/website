@@ -2,7 +2,7 @@
 	"version": "2026.11.20",
 	"date": "2026-11-20",
 	"status": "in-progress",
-	"updated": "2026-11-20T21:55:17Z",
+	"updated": "2026-11-20T22:10:51Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -206,7 +206,14 @@
 			"edition": "cloud",
 			"text": "A brand's agent no longer loses the website knowledge and findings when the brand's notes are long. The notes are shortened first, and the agent is told what was left out.",
 			"at": "2026-11-20T21:55:17Z"
+		},
+		{
+			"kind": "launch",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Discovery lanes now have a Lane leaderboard in Sales reporting: each lane of a profile with what it found, how much was new, what passed, its cost and its lesson, the shared record agents read, and a page per lane to approve, reject, pause, resume or reprioritise it. Agents get MCP tools to read the board, claim lanes, upload with per-company answers and score what they learned.",
+			"at": "2026-11-20T22:10:51Z"
 		}
 	],
-	"through": "f491771+f491771"
+	"through": "a7a9c31+a7a9c31"
 }
