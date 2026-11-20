@@ -47,6 +47,16 @@ Connecting fal.ai or ElevenLabs checks the key without spending anything; Eleven
 
 The answer is the request with `status: queued`. Read it (`GET /v1/brands/{brand}/generations/{id}`) until it is `done`, when `asset_id` is the brand file, or `failed`, when `error_code` and `error` say why. A picture or a recording takes seconds to a few minutes; a video can take many minutes.
 
+## Starting from your own files
+
+`references` on a request names brand files the model should start from: a product screenshot, a frame of a real video, an ad you liked. Each is `{"asset_id": "…", "as": "image_urls"}`, where `as` is the model's own name for that input (left out: `image_urls`, `video_urls` or `audio_urls` by the file's type). Outflare hands the files to the provider on your account and the model's page says what it accepts. Up to 12 files; with files, the prompt may be left out when the model allows it. ElevenLabs takes none.
+
+This is how a look stays the same: keep a picture you like and name it as a reference the next time. `GET /v1/brands/{brand}/generations?asset_id=…` lists what a file was made by and used in.
+
+## The recipe of every file
+
+Each finished request keeps its recipe: `request` is exactly what was sent to the provider and `response` what came back, next to the prompt, the model, the options and the references. `POST /v1/brands/{brand}/generations/{id}/reuse` runs a recipe again as a new request, with any field you send changed (another prompt, another reference), and `recipe_of` on the new one says where it came from.
+
 ## Paid once
 
 A request is sent to the provider once. A video that renders for minutes is asked about until it is ready, never started again. If Outflare is interrupted between sending a request and noting the answer, the request fails with `generation_interrupted` instead of being sent a second time: check the provider's own history before asking again.
@@ -62,6 +72,7 @@ A provider that hasn't finished in 45 minutes fails the request with `generation
 | `connector_quota` | The account is out of credit or rate limited. |
 | `connector_unavailable` | The provider couldn't be reached after several tries. |
 | `connector_needed` | The connection was removed before the request ran. |
+| `reference_missing` | A file named in `references` is gone, not ready, or a person or voice without confirmed consent. |
 | `generation_failed` | The provider's model ended without a file. |
 | `generation_timed_out`, `generation_interrupted` | See above. |
 | `generation_wrong_file` | The provider answered with another type of file than was asked for. |
@@ -73,8 +84,12 @@ A file kept as a `person` or a `voice` can't be used until someone confirms the 
 
 ## For agents
 
-The MCP server has `list_generation_providers`, `list_generation_voices`, `create_brand_generation`, `get_brand_generation` and `list_brand_generations`. An agent is told that every request costs the brand money, to make only what was asked for, and to ask which model to use.
+The MCP server has `list_generation_providers`, `list_generation_voices`, `create_brand_generation`, `reuse_brand_generation`, `get_brand_generation` and `list_brand_generations`. An agent is told that every request costs the brand money, to make only what was asked for, and to ask which model to use.
 
 ## Ads from saved recipes
 
 To make ads the same way every time, and to see which prompt makes the better ones, save the prompt as a skill and make creatives from it: see [Skills and creatives](/docs/guides/skills-and-creatives/).
+
+## Talking videos
+
+A person saying a script to the camera is made in stages from these requests: see [Talking videos](/docs/guides/talking-videos/).
