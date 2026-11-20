@@ -7,7 +7,7 @@ sidebar:
 
 <span class="pill shipped">Shipped</span> Brands with their own context, records, mailboxes and analytics, in the web app, the REST API and the MCP server.
 
-Many companies market more than one business. Geonode runs geonode.com and repocket.com, and also makes games, on the web, on phones and on TVs. Separate workspaces would mean connecting every tool twice and inviting every person twice, and nobody could see everything at once. So a workspace can hold **brands** instead.
+Many companies market more than one business. Northpeak runs northpeak.example and summitly.example, and also makes games, on the web, on phones and on TVs. Separate workspaces would mean connecting every tool twice and inviting every person twice, and nobody could see everything at once. So a workspace can hold **brands** instead.
 
 Each brand has its own website (its point of truth), its own context for agents, and its own sequences, lead lists, domains and mailboxes. Brands share only your team, your billing and the tools you connect, so nobody switches accounts or keys. Everything else, including leads and the unsubscribe list, belongs to one brand. You can also keep a person or an API token to some brands, so a brand's agency or contractor sees only that brand.
 
@@ -29,17 +29,17 @@ Outflare also fills in the brand's logo and main colour from its own website, un
 
 Each brand's page has **About**: what it is, who it's for, goals, voice, rules and notes. Agents read it on top of the company's context:
 
-- Rules add to the company's rules and never replace them, so "Never mention Geonode" for Repocket keeps every company-wide rule.
+- Rules add to the company's rules and never replace them, so "Never mention Northpeak" for Summitly keeps every company-wide rule.
 - The other fields win over the company's where you fill them in, such as a friendlier voice for a consumer app.
 - **How our brands relate**, on the Company page, says what the brands share and when one may mention another.
 
-Memories belong to the company or to a brand. An agent working on Repocket reads the company's memories and Repocket's, never Geonode's. See [Memory and status](/docs/agents/memory/).
+Memories belong to the company or to a brand. An agent working on Summitly reads the company's memories and Summitly's, never Northpeak's. See [Memory and status](/docs/agents/memory/).
 
 ## Decide what belongs to each brand
 
 Every sending domain, mailbox, ad account and analytics site belongs to exactly one brand. Brands share only the team, billing and connections; nothing else is shared between them. Something new goes to the brand you're working in, or, when Outflare can't tell (an ad account found by a sync, say), to your first brand. Move it to another brand from **Settings → Brands**, or with `POST /brands/{brand}/add`. A domain brings its mailboxes.
 
-A brand's mailboxes send for any of that brand's sequences, and never for another brand's, so Repocket never emails from a Geonode domain.
+A brand's mailboxes send for any of that brand's sequences, and never for another brand's, so Summitly never emails from a Northpeak domain.
 
 What a brand is for (its offer, its audience) goes in its context, who it sells to in [ideal customer profiles](/docs/guides/ideal-customers/), and each sequence has its own switch and daily send limit. Outflare used to have projects between a brand and its sequences; they were removed ([Projects were removed](/docs/guides/projects/)).
 
@@ -47,7 +47,7 @@ What a brand is for (its offer, its audience) goes in its context, who it sells 
 
 Like a project in PostHog, you work on one brand at a time. The brand picker sits at the top of the sidebar, under your workspace (on a phone, in the top bar), and narrows every page to that brand: sequences, lead lists, mailboxes, domains, agents, playbook automations, connectors, SEO, analytics, reports, ad platforms, site audits and search. There is no view across all brands: Outflare opens on the brand you picked last, or your first brand.
 
-The brand is part of every link, after the workspace: `app.outflare.ai/acme/repocket/seo`. A link you share opens on the same brand, and older links ending in `?brand=repocket` still work. Pages for the whole workspace, such as Members and API tokens, have no brand in their link. Because handles sit in links, a brand's handle can't be the name of a page, such as `seo` or `members`.
+The brand is part of every link, after the workspace: `app.outflare.ai/acme/summitly/seo`. A link you share opens on the same brand, and older links ending in `?brand=summitly` still work. Pages for the whole workspace, such as Members and API tokens, have no brand in their link. Because handles sit in links, a brand's handle can't be the name of a page, such as `seo` or `members`.
 
 Switching brand reloads the page you're on with that brand's records. If you had something open that belongs to the other brand, such as a site audit or a sequence, you go back to that page's list for the new brand.
 
@@ -66,11 +66,11 @@ Connectors belong to the workspace, so you connect Google Analytics, Search Cons
 You can narrow it down on the **Connectors** page, where the **Used by** column says who uses each connection. Open **More → Choose who uses it** to pick:
 
 - **Shared from the workspace**: every brand, or only the brands you tick.
-- **One brand's own**: for a brand with an account of its own, say Repocket's own Plausible. Only that brand uses it, and it takes the place of the shared Plausible for Repocket alone. The other brands keep the shared one.
+- **One brand's own**: for a brand with an account of its own, say Summitly's own Plausible. Only that brand uses it, and it takes the place of the shared Plausible for Summitly alone. The other brands keep the shared one.
 
-With one brand picked, Connectors lists what that brand uses and marks each one as **Shared from workspace**, **Split by site** or the brand's own. A split connection (Google Analytics, Search Console, ad accounts) imports nothing into a brand wholesale. Each of its sites or accounts belongs to one brand, and **More → Choose {brand}'s sites** picks which ones. **Disconnect for every brand** removes the connection from the whole workspace, so to stop a site counting for one brand, choose its sites instead. When you connect something new there, choose **Every brand** or **Only Repocket**. Someone kept to some brands only sees the connections their brands use.
+With one brand picked, Connectors lists what that brand uses and marks each one as **Shared from workspace**, **Split by site** or the brand's own. A split connection (Google Analytics, Search Console, ad accounts) imports nothing into a brand wholesale. Each of its sites or accounts belongs to one brand, and **More → Choose {brand}'s sites** picks which ones. **Disconnect for every brand** removes the connection from the whole workspace, so to stop a site counting for one brand, choose its sites instead. When you connect something new there, choose **Every brand** or **Only Summitly**. Someone kept to some brands only sees the connections their brands use.
 
-In the API, every connection has `brand_id` (set on a brand's own) and `brand_ids` (the brands a shared one is shared with; empty means every brand). `GET /v1/workspaces/{ws}/integrations?brand=repocket` lists what a brand uses. Set who uses a connection with `brand_id` or `brand_ids` on `POST` or `PATCH /integrations`, or `?brand=` on the sign-in link. The MCP tools are `list_integrations` and `update_integration`.
+In the API, every connection has `brand_id` (set on a brand's own) and `brand_ids` (the brands a shared one is shared with; empty means every brand). `GET /v1/workspaces/{ws}/integrations?brand=summitly` lists what a brand uses. Set who uses a connection with `brand_id` or `brand_ids` on `POST` or `PATCH /integrations`, or `?brand=` on the sign-in link. The MCP tools are `list_integrations` and `update_integration`.
 
 ### Connections with no brand
 
@@ -86,15 +86,15 @@ A workspace sets up domains in several places: each brand's website, SEO sites, 
 - `needs_attention`: the purposes with a use still pending or failing, such as a sending domain whose DNS records aren't in place yet.
 - `record_id`: the company record with this domain, when there is one.
 
-Add `?brand=repocket` for one brand's domains, or `?purpose=cold_email` for one kind. Someone kept to some brands sees their brands' domains and the shared ones. It needs scope `workspace.read`; the MCP tool is `list_workspace_domains`.
+Add `?brand=summitly` for one brand's domains, or `?purpose=cold_email` for one kind. Someone kept to some brands sees their brands' domains and the shared ones. It needs scope `workspace.read`; the MCP tool is `list_workspace_domains`.
 
 To look up a domain someone else owns (is it free mail, a disposable address, a company?), use `GET /v1/workspaces/{ws}/domain-lookups/{domain}`. It is the same lookup as before, under a clearer name.
 
 ## Analytics by brand
 
-Each site in your analytics tools, such as a GA4 property, a Search Console site or a PostHog project, belongs to one brand: the one you picked for it, else the brand whose website it is, else the brand of the connection it was read through, else your first brand. A site is a brand's website when its domain is one of the brand's domains or a subdomain of one, so `sc-domain:repocket.com` and app.repocket.com are Repocket's. So when one Google sign-in can read the Search Console properties of several of your brands, each property's clicks and pages show only under its own brand, even if nobody picked. Pick or change a site's brand yourself (`PUT /v1/workspaces/{ws}/analytics/{id}/site-brand`); `auto` goes back to the brand whose website it is.
+Each site in your analytics tools, such as a GA4 property, a Search Console site or a PostHog project, belongs to one brand: the one you picked for it, else the brand whose website it is, else the brand of the connection it was read through, else your first brand. A site is a brand's website when its domain is one of the brand's domains or a subdomain of one, so `sc-domain:summitly.example` and app.summitly.example are Summitly's. So when one Google sign-in can read the Search Console properties of several of your brands, each property's clicks and pages show only under its own brand, even if nobody picked. Pick or change a site's brand yourself (`PUT /v1/workspaces/{ws}/analytics/{id}/site-brand`); `auto` goes back to the brand whose website it is.
 
-You connect Google Analytics (or any analytics tool) once for the workspace, and every property ends up in one of two places: a brand, or **Don't import**. Outflare suggests a brand for each and says why ("Matches repocket.com", "Name matches"), and nothing is imported until every property has a choice. A property no brand fits can start one: **New brand from this site** makes a brand named after it, with its domain as the website. Outflare never makes a brand on its own.
+You connect Google Analytics (or any analytics tool) once for the workspace, and every property ends up in one of two places: a brand, or **Don't import**. Outflare suggests a brand for each and says why ("Matches summitly.example", "Name matches"), and nothing is imported until every property has a choice. A property no brand fits can start one: **New brand from this site** makes a brand named after it, with its domain as the website. Outflare never makes a brand on its own.
 
 With one brand picked and no analytics counting for it yet, the Analytics page offers **Pick from Google Analytics**: it uses the connection you already have, with no second sign-in, and lists only that brand's properties and the ones no brand has yet. Someone kept to some brands, or their API token, can only place properties in their own brands, never another brand's property. Campaigns inside a brand are told apart with UTM tags on their links, not with separate properties.
 
@@ -102,17 +102,17 @@ With one brand picked and no analytics counting for it yet, the Analytics page o
 
 Each brand has its own leads and its own unsubscribe list, so the same person can be a lead of two brands, and an unsubscribe from one brand doesn't stop the other. You can keep two brands from cold emailing the same person close together: open **Settings → Brands**, turn on **Contacting the same person** and choose how many days to wait (1 to 365).
 
-With the rule on, a brand's sequence skips anyone another brand emailed within that many days. Their enrollment shows as blocked with the reason `other_brand:geonode`, naming the brand that got there first. The rule checks only first emails, so follow-ups already under way carry on, and sequences shared by every brand don't count. To check before you enroll, call `POST /recipients/check` with `brand`.
+With the rule on, a brand's sequence skips anyone another brand emailed within that many days. Their enrollment shows as blocked with the reason `other_brand:northpeak`, naming the brand that got there first. The rule checks only first emails, so follow-ups already under way carry on, and sequences shared by every brand don't count. To check before you enroll, call `POST /recipients/check` with `brand`.
 
 ## Reports by brand
 
 **Sending reports**, **Cost per meeting**, attribution and the email overview show only the brand picked in the sidebar. In the API they are brand routes: `GET /v1/brands/{brand}/reports`, `/outcomes/report`, `/outcomes/export`, `/email-overview` and `/attribution/...`. A send, reply or meeting counts for its sequence's brand. Spend tied only to a mailbox or domain counts for that mailbox's or domain's brand.
 
-The audit log and the events feed take `?brand=`, and every event and webhook payload carries `brand_id` when the changed record has a brand. A webhook can be kept to one brand: pick it under **Which brands** in Settings → Webhooks, or send `"brand": "repocket"` when you create it.
+The audit log and the events feed take `?brand=`, and every event and webhook payload carries `brand_id` when the changed record has a brand. A webhook can be kept to one brand: pick it under **Which brands** in Settings → Webhooks, or send `"brand": "summitly"` when you create it.
 
 ## Keep people and tokens to some brands
 
-Owners and admins always see every brand. An operator or viewer can be kept to some brands: in **Settings → Members**, pick their brands in the Brands column, or pick them on the invite. An API token can be kept to one brand: choose it under **Which brands** when you create the token (`"brand": "repocket"` in the API). An MCP connection is a token, so the same goes for an agent.
+Owners and admins always see every brand. An operator or viewer can be kept to some brands: in **Settings → Members**, pick their brands in the Brands column, or pick them on the invite. An API token can be kept to one brand: choose it under **Which brands** when you create the token (`"brand": "summitly"` in the API). An MCP connection is a token, so the same goes for an agent.
 
 Someone kept to some brands:
 
@@ -142,7 +142,7 @@ What belongs to a brand lives under `/v1/brands/{brand}/`, where `{brand}` is th
 | Links found on its website | `POST /brands/{brand}/links/discover`, `GET /brands/{brand}/link-suggestions` | `find_brand_links`, `list_brand_link_suggestions`, `add_brand_link`, `dismiss_brand_link` |
 | Logo and colour from its website | `POST /brands/{brand}/look/find` | `find_brand_look` |
 | A brand's own context | `GET`/`PATCH /brands/{brand}/context` | `get_brand_context`, `update_brand_context` |
-| Company and brand context together | `GET /context?brand=repocket` | `get_context` with `brand` |
+| Company and brand context together | `GET /context?brand=summitly` | `get_context` with `brand` |
 | Move records to a brand | `POST /brands/{brand}/add` | `add_to_brand` |
 | Keep a member to some brands | `PATCH /members/{user}` with `brand_ids` | (people only, in the app or API) |
 | A token for one brand | `POST /tokens` with `brand` | (in the app or API) |
@@ -150,13 +150,13 @@ What belongs to a brand lives under `/v1/brands/{brand}/`, where `{brand}` is th
 | A brand's reports | `GET /v1/brands/{brand}/reports`, `GET /v1/brands/{brand}/outcomes/report` | `get_report`, `get_outcomes_report` |
 | Analytics sites by brand | `GET /analytics/site-brands`, `PUT /analytics/{id}/site-brand` | `list_analytics_site_brands`, `set_analytics_site_brand` |
 
-`{brand}` is the brand's handle (such as `repocket`) or its id. Brand data is under `/v1/brands/{brand}/…`. The few workspace lists that take `?brand=` accept a handle or id, or `none` for records in no brand. Set `OUTFLARE_BRAND` on the MCP server to make one brand its default.
+`{brand}` is the brand's handle (such as `summitly`) or its id. Brand data is under `/v1/brands/{brand}/…`. The few workspace lists that take `?brand=` accept a handle or id, or `none` for records in no brand. Set `OUTFLARE_BRAND` on the MCP server to make one brand its default.
 
 ```sh
 curl -X POST https://app.outflare.ai/v1/workspaces/$WS/brands \
   -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" \
-  -d '{"name": "Repocket", "website": "repocket.com", "platforms": ["web", "ios", "android"],
-       "links": [{"url": "https://apps.apple.com/app/repocket/id1234567890"}, {"url": "https://www.amazon.com/dp/B0EXAMPLE", "kind": "tv_app", "label": "Fire TV"}]}'
+  -d '{"name": "Summitly", "website": "summitly.example", "platforms": ["web", "ios", "android"],
+       "links": [{"url": "https://apps.apple.com/app/summitly/id1234567890"}, {"url": "https://www.amazon.com/dp/B0EXAMPLE", "kind": "tv_app", "label": "Fire TV"}]}'
 ```
 
 ## Coming next
