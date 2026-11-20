@@ -125,13 +125,14 @@ are not added up across platforms as if they were.
 
 ## Reading it
 
-In the app, open **Paid ads** in the sidebar. The page is for one goal: more paying customers at or under your target cost. It has seven tabs, each with its own address, and one date menu (Today, Yesterday, the last 7, 28, 30 or 90 days, this month, last month or a custom range).
+In the app, open **Paid ads** in the sidebar. The page is for one goal: more paying customers at or under your target cost. It has eight tabs, each with its own address, and one date menu (Today, Yesterday, the last 7, 28, 30 or 90 days, this month, last month or a custom range).
 
 | Tab | What it is for |
 | --- | --- |
 | **Overview** | Pick all networks, one network or one ad account at the top, and everything below follows it. One sentence says where you stand against your target, then your numbers (cost per new customer, cost per sign-up, new customers, spend, revenue and return unless you [choose others](#the-overviews-numbers)), each against the period before and your target. Campaigns named for your brand are judged apart from everything else, so a cheap average doesn't hide an expensive campaign. **Do this next** lists the three open actions with the biggest effect, and a funnel shows ad clicks, sign-ups and first payments. Every number reads the same rows, so they can't disagree. |
 | **Actions** | One table of what to do: **Fix** (something is broken), **Cut waste**, **Grow** and **Experiment**, each with why, the expected effect and one main button. Views: To do, In progress, Done and Dismissed. A switch turns recommendations on or off; while off, what Outflare would have recommended is under Preview. Nothing changes in an ad account until you approve it, and a budget raise shows the budget before and after and the most it can add a month. |
 | **Campaigns** | Every campaign with what it spent and brought; open one for its ad groups, ads, keywords and searches. Tables start on **All enabled**, with a **Status** filter (All enabled, All but removed, All) and two total rows under each: one for the rows shown and one for all of them. **All** includes paused campaigns that have never spent. Tick rows (or the box in the header to tick every row shown) to change many at once: campaigns can be paused, resumed, given a new daily budget or removed; ad groups and ads paused or resumed; and, on Google Ads, ads and keywords removed. Before anything changes, a confirmation lists each row with its status and what it spent over the last 30 days. For Google Ads, an enabled campaign, ad group or ad also says whether it is really serving, in Google's words (Eligible, Limited by budget, Limited by bidding, Learning, Not eligible), with Google's reasons on hover, and the table has Google's Optimization score and **Room to grow**: the share of searches a search campaign missed over the last 7 days because its budget ran out, and because others ranked higher. Sort by it to see where a raise would buy the most. |
+| **Creatives** | Every ad as a large preview, scored step by step, with a verdict: scale, keep, fix, stop or too early ([Creatives](#creatives-which-ads-to-scale-fix-or-stop)). |
 | **Customers** | The people your ads brought, and which campaign each came from. |
 | **Audiences** | Lists of your people sent to the ad networks you choose ([Audiences](#audiences-one-list-several-ad-networks)). |
 | **Experiments** | Tests the ad network splits fairly, and how each change you approved turned out. |
@@ -262,6 +263,32 @@ Outflare ties a visit to a person only by what the browser itself says: a sign-i
 - **A verdict**: worth testing (right at least 90% of the time and at least 5% more people credited), not worth it, or not enough data.
 
 Outflare stores no IP address or user agent with a visit, so the check is coarser than what such tools use; read its accuracy as a lower bound. In the API: `GET /v1/brands/{brand}/ads/match-check?days=30` (MCP: `get_ads_match_check`).
+
+## Creatives: which ads to scale, fix or stop
+
+**Paid ads → Creatives** shows every ad that ran in the period as a large preview with its verdict, most spend first. Switch between **Gallery** and **List** at the top right; Outflare remembers your choice for the brand. Filter by verdict or by network.
+
+Each ad is scored step by step, so you can see where it loses people:
+
+| Step | What it measures | Shown for |
+| --- | --- | --- |
+| Hook | Plays past the opening, out of everyone who saw it | Video |
+| Hold | Plays to the end, out of plays past the opening | Video |
+| Click | Clicks, out of everyone who saw it | All ads |
+| Sign up | Sign-ups, out of clicks | All ads |
+| Pay | First payments, out of sign-ups | All ads |
+
+A step gets a grade against the usual rate of your own ads on the same network over the same days: **A** at 1.3 times usual or more, **B** from 0.9, **C** from 0.6 and **D** below. A step has no grade until it has enough data. Sign-ups and payments are Outflare's own count, not the network's.
+
+The verdict follows from the grades and your target cost per new paying customer:
+
+- **Scale**: at or under the target with at least two new paying customers and no D.
+- **Keep**: doing its job; nothing to change.
+- **Fix**: one step is graded C or D. The card names the weakest one.
+- **Stop**: it spent twice the target without one paying customer, or costs over 1.5 times the target.
+- **Too early**: not enough data yet.
+
+Without a target no ad is marked Scale or Stop. **Pause** pauses the ad in the network after you confirm; **Open campaign** takes you to its campaign to change the budget. In the API: `GET /v1/brands/{brand}/ads/creatives/results` (MCP: `list_ad_creative_results`).
 
 ## Sending conversions back
 
