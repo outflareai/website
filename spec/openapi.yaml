@@ -266,18 +266,20 @@ paths:
           schema: { $ref: "#/components/schemas/SalesFeedKind" }
         - in: query
           name: source
-          description: "Only conversations started by a post from this app, by its name as SalesFeeds.sources lists it."
-          schema: { type: string, maxLength: 60 }
+          description: "Only conversations started by a post from one of these apps, by name as SalesFeeds.sources lists them. Repeat the parameter for several (source=A&source=B), at most 12. With arrived=reply, conversations from those apps or from an email reply."
+          style: form
+          explode: true
+          schema: { type: array, maxItems: 12, items: { type: string, maxLength: 60 } }
         - in: query
           name: arrived
-          description: "channel: only conversations started by a post in a Sales channel. reply: only those that started from an email reply."
+          description: "channel: only conversations started by a post in a Sales channel. reply: only those that started from an email reply, or, with source, those and the conversations from the named apps."
           schema: { type: string, enum: [channel, reply] }
         - in: query
           name: feed_channel
-          description: "Only conversations started by a post in this Sales channel (sales_feed_channels id)."
-          schema:
-            type: string
-            format: uuid
+          description: "Only conversations started by a post in one of these Sales channels (sales_feed_channels ids). Repeat the parameter for several, at most 50."
+          style: form
+          explode: true
+          schema: { type: array, maxItems: 50, items: { type: string, format: uuid } }
         - in: query
           name: quality
           description: "Only conversations a rep marked this way, or unrated for those nobody marked."
@@ -718,6 +720,45 @@ paths:
                         id: { type: string }
                         name: { type: string }
                         private: { type: boolean }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/sales/feeds/alerts:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    put:
+      operationId: putSalesAlerts
+      summary: Choose where new Sales conversations are posted in Slack
+      description: |
+        Scope: members.manage. Sales alerts post one message per new Sales conversation to one Slack channel, through
+        the brand's Slack (sales channels) connection, and keep it current: the message names the person, their
+        company and website, where they came from, the fields their channel shows first and the owner, and emojis say
+        where the conversation stands (eyes: seen; raising_hand: assigned; speech_balloon: an introduction was sent;
+        handshake: handed to an account manager; tada: customer; +1, -1, wastebasket: marked good, poor fit, junk;
+        x: archived). Only conversations that arrive after alerts are turned on are posted. `feed_channels` are the
+        Sales channels whose conversations are posted (the brand's others are not) and `replies` says whether
+        conversations from email replies are. The Slack app needs the bot scopes chat:write and reactions:write and
+        must be in the channel. 400 when the app can't see the channel, or it is one of the Sales channels Outflare
+        reads. Returns the settings.
+      tags: [records]
+      x-outflare-access: { scope: members.manage, brand: true }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [enabled, channel_id, replies, feed_channels]
+              properties:
+                enabled: { type: boolean }
+                channel_id: { type: string, maxLength: 40, description: "The Slack channel's id, from listSalesFeedChannels. Empty with enabled false." }
+                replies: { type: boolean }
+                feed_channels: { type: array, maxItems: 50, items: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SalesAlerts" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/sales/feeds/{id}/fields:
     parameters:
@@ -7541,7 +7582,7 @@ paths:
             schema:
               type: object
               properties:
-                url: { type: string, maxLength: 2000, description: "The page, such as https://example.com/pricing. The campaign's landing page when left out. It can carry tokens a redirect click fills in, such as https://example.com/offer?sub={field1}&cid={click_id} (destination_tokens in GET .../traffic-source-templates); a word in braces that isn't a token is refused." }
+                url: { type: string, maxLength: 2000, description: "The page, such as https://example.com/pricing. The campaign's landing page when left out. It can carry tokens a redirect click fills in, such as https://example.com/offer?sub={field1}&cid={click_id} (destination_tokens in GET .../traffic-source-templates); a word in braces that isn't a token is refused. Outflare adds the campaign's utm_* tags, ofc and the click id (ofclk) to every destination itself, once: any the URL has are dropped when it is saved, ofclk={click_id} included, and any other ofclk is refused. To pass the click id to a network, use its own parameter, such as subid={click_id}." }
                 content: { type: string, maxLength: 80, description: "utm_content: which ad, button or post, such as hero-cta. Cleaned to lowercase." }
                 term: { type: string, maxLength: 80, description: "utm_term: the keyword, for search ads." }
                 redirect: { type: boolean, description: "Give the link a short redirect link. The campaign's redirect_links when left out." }
@@ -7590,7 +7631,10 @@ paths:
       description: |
         Scope: analytics.manage. Replaces the list: a destination with its `id` is changed and keeps today's count; one
         without is added; one left out is taken off the link (its clicks still say where they went). An empty list sends
-        every click to the link's own page. Only a link with a redirect link takes destinations. Other servers follow
+        every click to the link's own page. Only a link with a redirect link takes destinations. A list takes up to 100
+        landers, and up to 100 offers and pages: a click goes to one lander by the landers' weights, and its call to
+        action to one offer or page by theirs, so each stage's shares are its own. Landers with no offers or pages
+        send /click to the link's own page. Other servers follow
         the change within a few minutes.
       tags: [analytics]
       requestBody:
@@ -7603,13 +7647,13 @@ paths:
               properties:
                 destinations:
                   type: array
-                  maxItems: 20
+                  maxItems: 200
                   items:
                     type: object
                     properties:
                       id: { type: string, format: uuid, description: "One of the link's destinations, to change it; leave it out to add one." }
                       name: { type: string, maxLength: 120, description: "What reports call it; '' shows the page." }
-                      url: { type: string, maxLength: 2000, description: "The page, which can carry tokens such as {click_id} and {field1}. It gets the campaign's tags, as the link's page does. Required unless offer_id is given." }
+                      url: { type: string, maxLength: 2000, description: "The page, which can carry tokens such as {click_id} and {field1}. It gets the campaign's tags, as the link's page does. Required unless offer_id is given. Outflare adds the campaign's utm_* tags, ofc and the click id (ofclk) to every destination itself, once: any the URL has are dropped when it is saved, ofclk={click_id} included, and any other ofclk is refused. To pass the click id to a network, use its own parameter, such as subid={click_id}." }
                       offer_id: { type: string, format: uuid, description: "Send it to one of the brand's active offers (GET .../offers) instead of url: its URL is the offer's, with the click id its network takes, and the offer's cap and fallback apply." }
                       lander_id: { type: string, format: uuid, description: "Make it one of the brand's active landers (GET .../landers) instead of url. A list with landers sends each click to one of its landers, and the landers' calls to action (/click, /click/N) to its other destinations." }
                       weight: { type: integer, minimum: 0, maximum: 10000, description: "Its share of the clicks against the others' weights; 100 when left out, 0 sends it none." }
@@ -7791,7 +7835,7 @@ paths:
                       destinations:
                         type: array
                         minItems: 1
-                        maxItems: 20
+                        maxItems: 200
                         items:
                           type: object
                           properties:
@@ -7911,7 +7955,7 @@ paths:
               properties:
                 name: { type: string, maxLength: 120 }
                 paths: { type: array, maxItems: 10, items: { $ref: "#/components/schemas/TrackingPathInput" } }
-                destinations: { type: array, maxItems: 20, items: { $ref: "#/components/schemas/TrackingDestinationInput" } }
+                destinations: { type: array, maxItems: 200, items: { $ref: "#/components/schemas/TrackingDestinationInput" } }
       responses:
         "201":
           description: The flow.
@@ -7987,7 +8031,7 @@ paths:
               type: object
               required: [destinations]
               properties:
-                destinations: { type: array, maxItems: 20, items: { $ref: "#/components/schemas/TrackingDestinationInput" } }
+                destinations: { type: array, maxItems: 200, items: { $ref: "#/components/schemas/TrackingDestinationInput" } }
       responses:
         "200":
           description: The flow now.
@@ -8340,6 +8384,34 @@ paths:
                 properties:
                   data: { type: array, items: { $ref: "#/components/schemas/LanderClick" } }
                   next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/destination-preview:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    get:
+      operationId: previewDestination
+      x-outflare-access: { scope: analytics.read, brand: true }
+      summary: Preview where a tracker click would go
+      description: |
+        Scope: analytics.read. Shows the address a tracker click would go on to for a URL as you wrote it, before or after
+        saving it on a lander, an offer or a link: what Outflare adds (ofclk, the click's id, once; the campaign's utm_* and
+        ofc), what it replaces and what it leaves alone. It is built by the redirect's own code for a made-up click
+        (`sample_click_id`), so it matches what a real click gets, and it counts nothing: no click, no visit. A URL that
+        can't be saved (one that sets ofclk to anything but {click_id}) is refused here with the same message. For an
+        offer, preview its `tracking_url`.
+      tags: [analytics]
+      parameters:
+        - { name: destination, in: query, required: true, schema: { type: string }, description: "The destination URL as written, tokens such as {click_id} included." }
+        - { name: campaign, in: query, schema: { type: string }, description: "A tracking campaign's id, slug or ofc code, for its tags. Without one the preview has no utm_* and no ofc." }
+        - { name: content, in: query, schema: { type: string }, description: "The link's content, sent as utm_content." }
+        - { name: term, in: query, schema: { type: string }, description: "The link's term, sent as utm_term." }
+      responses:
+        "200":
+          description: The preview.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DestinationPreview" }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
@@ -33328,7 +33400,7 @@ paths:
                       forms: { type: boolean, description: "Send form submits as Form Submitted." }
                   pixels:
                     type: object
-                    description: "Only when the key loads ad pixels (its chatgpt_pixel) and the brand's connection names one: the pixels the script should load."
+                    description: "Only when the key loads ad pixels (its chatgpt_pixel, meta_pixel or tiktok_pixel) and the brand has one: the pixels the script should load."
                     properties:
                       chatgpt:
                         type: object
@@ -33344,6 +33416,60 @@ paths:
                               external_id_sha256: { type: string, description: "The person's Outflare record id, hashed." }
                               email_sha256: { type: string, description: "Their newest verified email address, lowercased and hashed." }
                               phone_number_sha256: { type: string, description: "Their phone number's digits, hashed." }
+                      meta:
+                        type: object
+                        description: "Meta's pixel."
+                        required: [id, events]
+                        properties:
+                          id: { type: string, description: "The pixel the brand's conversions for this platform go to." }
+                          events:
+                            type: object
+                            description: "The conversions a page's own track call can cause, by the event's catalog name (order_completed): the script sends each to the pixel with the track call's messageId as its event id, the one the server sends the same conversion with."
+                            additionalProperties:
+                              type: object
+                              required: [type]
+                              properties:
+                                type: { type: string, description: "The platform's event, such as Purchase or CompleteRegistration." }
+                                value_property: { type: string, description: "The event property that holds the value, when the conversion takes it from one." }
+                                value_unit: { type: string, enum: [major, minor], description: "With value_property: whether it is in major units (12.50) or minor units (1250)." }
+                                value: { type: number, description: "A fixed value, in major units, when the conversion has one." }
+                                currency: { type: string, description: "The conversion's own currency; empty to use the event's currency property, then account_currency." }
+                                account_currency: { type: string, description: "The ad account's currency." }
+                          user:
+                            type: object
+                            description: "Only for a browser the brand's own product signed a person in on, whose ad data may be sent: the hashes the pixel takes, under the platform's own names. Lowercase hex SHA-256; never the values themselves."
+                            required: [external_id]
+                            properties:
+                              external_id: { type: string, description: "The person's Outflare record id, hashed." }
+                              em: { type: string, description: "Their newest verified email address, lowercased and hashed." }
+                              ph: { type: string, description: "Their phone number's digits, hashed." }
+                      tiktok:
+                        type: object
+                        description: "TikTok's pixel."
+                        required: [id, events]
+                        properties:
+                          id: { type: string, description: "The pixel the brand's conversions for this platform go to." }
+                          events:
+                            type: object
+                            description: "The conversions a page's own track call can cause, by the event's catalog name (order_completed): the script sends each to the pixel with the track call's messageId as its event id, the one the server sends the same conversion with."
+                            additionalProperties:
+                              type: object
+                              required: [type]
+                              properties:
+                                type: { type: string, description: "The platform's event, such as Purchase or CompleteRegistration." }
+                                value_property: { type: string, description: "The event property that holds the value, when the conversion takes it from one." }
+                                value_unit: { type: string, enum: [major, minor], description: "With value_property: whether it is in major units (12.50) or minor units (1250)." }
+                                value: { type: number, description: "A fixed value, in major units, when the conversion has one." }
+                                currency: { type: string, description: "The conversion's own currency; empty to use the event's currency property, then account_currency." }
+                                account_currency: { type: string, description: "The ad account's currency." }
+                          user:
+                            type: object
+                            description: "Only for a browser the brand's own product signed a person in on, whose ad data may be sent: the hashes the pixel takes, under the platform's own names. Lowercase hex SHA-256; never the values themselves."
+                            required: [external_id]
+                            properties:
+                              external_id: { type: string, description: "The person's Outflare record id, hashed." }
+                              email: { type: string, description: "Their newest verified email address, lowercased and hashed." }
+                              phone_number: { type: string, description: "Their phone number in E.164 form, hashed." }
         default: { $ref: "#/components/responses/Error" }
     options:
       operationId: sendSiteEventsPreflight
@@ -39514,6 +39640,74 @@ paths:
                       activity: { type: integer, description: "Leads, cold emails, replies, meetings, deals, lifecycle emails, broadcast sends and journey runs that moved to the record kept." }
         "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/data/catalog:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+    get:
+      operationId: getBrandDataCatalog
+      x-outflare-access: { brand: true }
+      summary: Describe the brand's data
+      description: |
+        Any caller in the workspace. The data catalog: every table Query reads for this brand (and each of its record
+        types), grouped by area (customers, revenue, ads, analytics, outreach, email, seo, coverage, social, content, agents,
+        workspace), with what a row is, where its rows come from, the read scope it needs and whether you hold it,
+        its time column, example questions with their SQL, and, read live from the data with your own access, how
+        many rows it holds and the first and last date they cover. Read it before writing SQL; read one table's
+        columns with GET .../data/catalog/{table}. Answers are kept up to five minutes; fresh=true reads them again.
+      tags: [query]
+      parameters:
+        - { name: fresh, in: query, schema: { type: boolean }, description: "true reads the numbers again instead of the copy kept for up to five minutes." }
+      responses:
+        "200":
+          description: The catalog.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [brand_id, areas, data, computed_at, note, how_to_use]
+                properties:
+                  brand_id: { type: string, format: uuid }
+                  areas: { type: array, items: { type: string }, description: The areas, in the order the tables are listed. }
+                  data: { type: array, items: { $ref: "#/components/schemas/DataCatalogTable" } }
+                  computed_at: { type: string, format: date-time, description: When the numbers were read. }
+                  note: { type: [string, "null"], description: "Set when the numbers couldn't all be read, and what to do instead." }
+                  how_to_use: { type: string, description: How to go from the catalog to a query. }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/data/catalog/{table}:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: table, in: path, required: true, schema: { type: string }, description: "A table's name, from GET .../data/catalog." }
+    get:
+      operationId: getBrandDataCatalogTable
+      x-outflare-access: { brand: true }
+      summary: Describe one table of the brand's data
+      description: |
+        Any caller in the workspace. One table of the data catalog with every column explained: what it means, its
+        unit (minor units and the currency column they are in, UTC times, days), what an id joins to, and whether it
+        holds personal data. When you hold the table's read scope it also says, read live from the data with your
+        own access, how many rows the table holds, the dates they cover, what share of rows fill each column, and
+        the most common values of columns such as status, source or channel (from up to 100,000 rows). A table you
+        can't read is described without numbers, and note says which scope it needs. An unknown table is
+        not_found.
+      tags: [query]
+      parameters:
+        - { name: fresh, in: query, schema: { type: boolean }, description: "true reads the numbers again instead of the copy kept for up to five minutes." }
+      responses:
+        "200":
+          description: The table.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [table, columns, computed_at, note]
+                properties:
+                  table: { $ref: "#/components/schemas/DataCatalogTable" }
+                  columns: { type: array, items: { $ref: "#/components/schemas/DataCatalogColumn" } }
+                  computed_at: { type: string, format: date-time }
+                  note: { type: [string, "null"] }
+        default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/query/tables:
     parameters:
       - { $ref: "#/components/parameters/BrandID" }
@@ -39799,6 +39993,23 @@ paths:
               schema: { $ref: "#/components/schemas/QueryEndpoint" }
         "202": { $ref: "#/components/responses/MissionHeld" }
         "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    delete:
+      operationId: deleteQueryEndpoint
+      x-outflare-access: { scope: customers.manage, brand: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Delete a query endpoint
+      description: |
+        Scope: customers.manage, owners and admins only, signed in (403 admin_only). Removes the endpoint for good:
+        calls to its address answer 404, its slug can be used again, and its call log is deleted with it. Its saved
+        query is kept. The audit log keeps query_endpoint.deleted with its slug, saved query, version and how many
+        calls it had. To stop calls for a while instead, turn it off (status disabled).
+      tags: [query]
+      responses:
+        "204": { description: Deleted. }
+        "202": { $ref: "#/components/responses/MissionHeld" }
         "403": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
@@ -59068,7 +59279,7 @@ components:
       enum: [new_person, handover, signal, context]
     SalesFeedChannel:
       type: object
-      required: [id, channel_id, channel_name, kind, signal_type, read_back_days, enabled, error_code, connection_removed, last_read_at, counts_7d, preview_fields]
+      required: [id, channel_id, channel_name, kind, signal_type, read_back_days, enabled, error_code, connection_removed, last_read_at, counts_7d, preview_fields, alert]
       properties:
         id: { type: string, format: uuid }
         channel_id: { type: string }
@@ -59081,6 +59292,7 @@ components:
         connection_removed: { type: boolean, description: "True when the channel's Slack connection was deleted. The channel and its posts are kept and it is not read until it is saved with a connection." }
         last_read_at: { type: [string, "null"], format: date-time }
         preview_fields: { type: array, maxItems: 6, items: { type: string }, description: "The labels of the fields its posts show first, in order (putSalesFeedLayout); empty when Outflare picks." }
+        alert: { type: boolean, description: "Whether the conversations it starts are posted as Sales alerts, when the brand has those on (putSalesAlerts)." }
         counts_7d:
           type: object
           description: Posts of the last seven days by what became of them.
@@ -59109,7 +59321,7 @@ components:
               link: { type: string }
     SalesFeeds:
       type: object
-      required: [integration_id, ai, search, channels, sources, source_quality]
+      required: [integration_id, ai, search, channels, sources, source_quality, alerts]
       properties:
         integration_id: { type: [string, "null"], format: uuid }
         ai: { type: string, enum: [on, connector_needed, ai_model_needed] }
@@ -59118,6 +59330,7 @@ components:
           type: array
           description: "The apps whose posts started the brand's conversations, most common first, at most 12: the values of listSalesLeads' source filter."
           items: { type: string }
+        alerts: { $ref: "#/components/schemas/SalesAlerts" }
         source_quality:
           type: array
           maxItems: 20
@@ -59135,6 +59348,16 @@ components:
         channels:
           type: array
           items: { $ref: "#/components/schemas/SalesFeedChannel" }
+    SalesAlerts:
+      type: object
+      description: "Where the brand's new Sales conversations are posted in Slack, and which (putSalesAlerts)."
+      required: [enabled, channel_id, channel_name, replies, error_code]
+      properties:
+        enabled: { type: boolean }
+        channel_id: { type: string }
+        channel_name: { type: string }
+        replies: { type: boolean, description: "Whether conversations that started from an email reply are posted." }
+        error_code: { type: string, description: "Why the last post failed, or empty. slack_auth: Slack refused the token, or the app lacks the scopes chat:write and reactions:write. slack_channel: the app is not in the channel, or it was archived." }
     SalesFeedsInput:
       type: object
       additionalProperties: false
@@ -59266,6 +59489,13 @@ components:
         new_count:
           type: integer
           description: "New conversations nobody owns yet, counted to 1000. 0 for someone with no Sales role."
+        new_since_seen:
+          type: integer
+          description: "For queue=new: how many new conversations arrived since the caller last looked at one (last_seen_at), counted to 1000; every new one when they never did. 0 for other queues and for someone with no Sales role."
+        last_seen_at:
+          type: [string, "null"]
+          format: date-time
+          description: "For queue=new: when the caller last looked at a conversation (opened it, marked it seen, or opened one of its links from the queue). Null when they never did, and for other queues."
         new_owners:
           type: array
           maxItems: 100
@@ -59283,6 +59513,8 @@ components:
         - unread
         - new_count
         - new_owners
+        - new_since_seen
+        - last_seen_at
     SearchViewFilters:
       type: object
       properties:
@@ -62795,7 +63027,7 @@ components:
         weights:
           type: array
           minItems: 1
-          maxItems: 220
+          maxItems: 2200
           items:
             type: object
             required: [destination_id, weight]
@@ -63042,7 +63274,7 @@ components:
         created_at: { type: string, format: date-time }
     TrackerConversion:
       type: object
-      required: [id, source_id, click_key, campaign_id, link_id, offer_id, fraud_reasons, clicked_at, transaction_id, type, status, payout, currency, params, record_id, postbacks, converted_at, updated_at]
+      required: [id, source_id, click_key, campaign_id, link_id, offer_id, fraud_reasons, clicked_at, transaction_id, type, status, payout, currency, params, record_id, postbacks, network_postback, converted_at, updated_at]
       properties:
         id: { type: string, format: uuid }
         source_id: { type: string, format: uuid }
@@ -63060,11 +63292,12 @@ components:
         params: { type: object, additionalProperties: { type: string }, description: "p1 to p20, by number." }
         record_id: { type: [string, "null"], format: uuid, description: "The person, when the click's visit knew them." }
         postbacks: { type: integer, description: "How many postbacks named its transaction id." }
+        network_postback: { type: string, enum: [sent, queued, failed, no_traffic_source, no_postback_url, suspect, awaiting_lookup, filtered, below_minimum], description: "What became of telling its campaign's traffic source. sent, queued or failed: its latest send (the traffic source's postbacks list has it). Otherwise why none was made: no_traffic_source (its campaign has no active traffic source), no_postback_url (the source has none, or its URL still holds REPLACE), suspect (it or its click has a fraud reason), awaiting_lookup (its click's address is still being looked up), filtered (a status or type the source's postback rules leave out) or below_minimum (a payout under the rules' minimum)." }
         converted_at: { type: string, format: date-time }
         updated_at: { type: string, format: date-time }
     TrackerOffer:
       type: object
-      required: [id, brand_id, name, url, source_id, payout_mode, payout, currency, country_payouts, conversion_type, daily_cap, cap_kind, fallback_offer_id, status, missing_click_id, tracking_url, clicks_today, conversions_today, cap_reached, destinations, check_enabled, check_status, check_code, checked_at, broken_since, created_at, updated_at]
+      required: [id, brand_id, name, url, source_id, payout_mode, payout, currency, country_payouts, conversion_type, daily_cap, cap_kind, fallback_offer_id, status, click_id_delivery, click_id_via, missing_click_id, tracking_url, clicks_today, conversions_today, cap_reached, destinations, check_enabled, check_status, check_code, checked_at, broken_since, created_at, updated_at]
       properties:
         id: { type: string, format: uuid }
         brand_id: { type: string, format: uuid }
@@ -63076,12 +63309,14 @@ components:
         currency: { type: string }
         country_payouts: { type: object, additionalProperties: { type: string }, description: "Payouts by the click's country, such as {\"US\": \"3.25\"}, before payout." }
         conversion_type: { type: string, description: "The type a postback that names none gets; '' leaves it as conversion." }
-        daily_cap: { type: [integer, "null"], description: "Clicks or conversions a day (UTC) it takes; null for no cap, 0 stops it." }
+        daily_cap: { type: [integer, "null"], description: "Clicks or conversions a day, in the brand's reporting time zone, it takes; null for no cap, 0 stops it." }
         cap_kind: { type: string, enum: [clicks, conversions] }
         fallback_offer_id: { type: [string, "null"], format: uuid, description: "Where its clicks go while it is capped." }
         status: { type: string, enum: [active, archived] }
-        missing_click_id: { type: boolean, description: "The URL carries no {click_id} and its network adds none, so a postback can't name the click." }
-        tracking_url: { type: string, description: "The URL a click goes to: url with the click id its network takes added." }
+        click_id_delivery: { type: string, enum: [auto, first_party, affiliate, unattributed], description: "The offer's setting for how the click id reaches whoever reports its conversions: auto (worked out from the URL), first_party (a page of the brand's own reads the ofclk every redirect adds), affiliate (someone else's page: the URL passes {click_id} on in the network's parameter) or unattributed (no conversion is expected to name the click)." }
+        click_id_via: { type: string, enum: [template, network, ofclk, none], description: "What click_id_delivery comes to for this URL: template ({click_id} in the URL), network (its postback source's click id parameter, added in tracking_url), ofclk (the redirect's own parameter, for first_party, or for auto when the page is on one of the brand's domains or tracking domains) or none." }
+        missing_click_id: { type: boolean, description: "A conversion is expected to name the click and nothing carries its id: click_id_via is none and click_id_delivery isn't unattributed. Never true for a first-party offer, since a redirect adds the click's ofclk to every destination." }
+        tracking_url: { type: string, description: "url with the click id parameter its network takes added, tokens still unfilled. A redirect fills the tokens and adds the campaign's utm_* tags, ofc and the click's ofclk, each once." }
         clicks_today: { type: integer, description: "Its clicks today in the brand's reporting time zone, without link scanners and previews." }
         conversions_today: { type: integer, description: "Its conversions today (UTC), without declined ones." }
         cap_reached: { type: boolean }
@@ -63093,11 +63328,37 @@ components:
         broken_since: { type: [string, "null"], format: date-time, description: "When the failed checks began; null while it answers." }
         created_at: { type: string, format: date-time }
         updated_at: { type: string, format: date-time }
+    DestinationPreview:
+      type: object
+      required: [configured_url, saved_url, effective_url, campaign_id, sample_click_id, parameters, replaced]
+      properties:
+        configured_url: { type: string, description: "The URL as it was given." }
+        saved_url: { type: string, description: "What saving it keeps: without the parameters Outflare owns (ofclk, ofc, utm_*)." }
+        effective_url: { type: string, description: "Where a click would go, for the sample click." }
+        campaign_id: { type: [string, "null"], format: uuid, description: "The campaign whose tags it carries; null when none was named." }
+        sample_click_id: { type: string, description: "The made-up click id in effective_url. No real click has it." }
+        parameters:
+          type: array
+          description: "effective_url's query parameters, in order."
+          items:
+            type: object
+            required: [name, value, source]
+            properties:
+              name: { type: string }
+              value: { type: string }
+              source:
+                type: string
+                enum: [click, campaign, link, token, url]
+                description: "Who set it: click (ofclk), campaign (utm_source, utm_medium, utm_campaign, ofc), link (utm_content, utm_term), token (the URL's own parameter, with a token filled in for the click) or url (as written)."
+        replaced:
+          type: array
+          items: { type: string }
+          description: "Parameters the URL set that Outflare owns, so the written values were dropped."
     TrackerOfferInput:
       type: object
       properties:
         name: { type: string, maxLength: 120 }
-        url: { type: string, maxLength: 2000, description: "The offer's page; it can carry tokens such as {click_id}." }
+        url: { type: string, maxLength: 2000, description: "The offer's page; it can carry tokens such as {click_id}. Outflare adds the campaign's utm_* tags, ofc and the click id (ofclk) to every destination itself, once: any the URL has are dropped when it is saved, ofclk={click_id} included, and any other ofclk is refused. To pass the click id to a network, use its own parameter, such as subid={click_id}." }
         source_id: { type: string, description: "One of the brand's postback sources (its affiliate network); '' for none." }
         payout_mode: { type: string, enum: [postback, fixed] }
         payout: { type: [number, string], description: "In the currency's main unit, such as 12.50." }
@@ -63109,12 +63370,13 @@ components:
         fallback_offer_id: { type: string, description: "Another of the brand's active offers; '' for none." }
         status: { type: string, enum: [active, archived], description: "Update only. An offer that is a link's destination can't be archived." }
         check_enabled: { type: boolean, description: "Whether Outflare asks for the offer's page every six hours to see that it still answers; true when left out. Switch it off for a network that mustn't see requests without a visitor behind them." }
+        click_id_delivery: { type: string, enum: [auto, first_party, affiliate, unattributed], description: "How the click id reaches whoever reports the offer's conversions, which decides missing_click_id; auto when left out. first_party: a page of the brand's own, which reads the ofclk a redirect adds, so the URL needs no {click_id}. affiliate: someone else's page, whose URL must pass {click_id} on. unattributed: no conversion is expected to name the click." }
     TrackingDestinationInput:
       type: object
       properties:
         id: { type: string, format: uuid, description: "One of these destinations, to change it and keep today's count; leave it out to add one." }
         name: { type: string, maxLength: 120 }
-        url: { type: string, maxLength: 2000, description: "The page, which can carry tokens such as {click_id}. Required unless offer_id or lander_id is given." }
+        url: { type: string, maxLength: 2000, description: "The page, which can carry tokens such as {click_id}. Required unless offer_id or lander_id is given. Outflare adds the campaign's utm_* tags, ofc and the click id (ofclk) to every destination itself, once: any the URL has are dropped when it is saved, ofclk={click_id} included, and any other ofclk is refused. To pass the click id to a network, use its own parameter, such as subid={click_id}." }
         offer_id: { type: string, format: uuid, description: "One of the brand's active offers, instead of url." }
         lander_id: { type: string, format: uuid, description: "One of the brand's active landers, instead of url." }
         weight: { type: integer, minimum: 0, maximum: 10000, description: "100 when left out; 0 sends it no clicks." }
@@ -63127,7 +63389,7 @@ components:
         name: { type: string, maxLength: 120 }
         active: { type: boolean, description: "Off skips the path; true when left out." }
         conditions: { type: array, minItems: 1, maxItems: 20, items: { $ref: "#/components/schemas/TrackingPathCondition" } }
-        destinations: { type: array, minItems: 1, maxItems: 20, items: { $ref: "#/components/schemas/TrackingDestinationInput" } }
+        destinations: { type: array, minItems: 1, maxItems: 200, items: { $ref: "#/components/schemas/TrackingDestinationInput" } }
     TrackerFlow:
       type: object
       required: [id, brand_id, name, status, links, paths, destinations, needs_domain, created_at, updated_at]
@@ -63174,7 +63436,7 @@ components:
       type: object
       properties:
         name: { type: string, maxLength: 120 }
-        url: { type: string, maxLength: 2000 }
+        url: { type: string, maxLength: 2000, description: "The lander's page; it can carry tokens such as {click_id}. Outflare adds the campaign's utm_* tags, ofc and the click id (ofclk) to every destination itself, once: any the URL has are dropped when it is saved, ofclk={click_id} included, and any other ofclk is refused. To pass the click id to a network, use its own parameter, such as subid={click_id}." }
         ctas: { type: integer, minimum: 1, maximum: 100, description: "1 when left out." }
         status: { type: string, enum: [active, archived], description: "Update only. A lander that is a link's destination can't be archived." }
     LanderClick:
@@ -63295,7 +63557,7 @@ components:
         resend: { type: boolean, description: "Send a conversion again when its status or payout changes." }
     TrafficSourcePostbackSend:
       type: object
-      required: [id, conversion_id, status, payout, url, http_status, error, attempts, sent_at, created_at]
+      required: [id, conversion_id, status, payout, url, http_status, error, attempts, sent_at, created_at, warning]
       properties:
         id: { type: string, format: uuid }
         conversion_id: { type: string, format: uuid }
@@ -63307,6 +63569,7 @@ components:
         attempts: { type: integer }
         sent_at: { type: [string, "null"], format: date-time }
         created_at: { type: string, format: date-time }
+        warning: { type: string, enum: ["", no_source_click_id], description: "no_source_click_id when the source's postback URL asks for {source_click_id} and the conversion's click arrived without the network's click id, so the network can't tell which click to credit; '' otherwise." }
     TrackerCostUpdate:
       type: object
       description: What a tracker campaign cost over a period, as entered, and how sharing it out over the clicks went.
@@ -66314,7 +66577,7 @@ components:
         ignored: { type: string, enum: ["off"], description: "Set when nothing was taken in because the workspace hasn't turned it on." }
     SiteKey:
       type: object
-      required: [id, name, key, brand_id, origins, excluded_params, previous_expires_at, events_today, bots_today, created_at, last_used_at, rotated_at, proxy_secret_at, identify_secret_at, snippet, tests, capture_clicks, capture_forms, capture_errors, chatgpt_pixel, chatgpt_pixel_id, flicker_guard, own_domain]
+      required: [id, name, key, brand_id, origins, excluded_params, previous_expires_at, events_today, bots_today, created_at, last_used_at, rotated_at, proxy_secret_at, identify_secret_at, snippet, tests, capture_clicks, capture_forms, capture_errors, chatgpt_pixel, chatgpt_pixel_id, meta_pixel, meta_pixel_id, tiktok_pixel, tiktok_pixel_id, flicker_guard, own_domain]
       properties:
         id: { type: string, format: uuid }
         name: { type: string, description: Usually the site's domain. }
@@ -66337,6 +66600,10 @@ components:
         capture_errors: { type: boolean, description: "The script sends the site's uncaught errors and rejected promises as Error Caught (type, message, stack, where it was thrown), which GET .../errors groups into issues. Email addresses and long keys are taken out first. Off by default. outflare.captureException(err) sends an error the page caught itself either way." }
         chatgpt_pixel: { type: boolean, description: "The script loads the ChatGPT Ads pixel (OpenAI's Measurement Pixel) for the Pixel ID on the brand's own ChatGPT Ads connection, counts page views with it, and gives it the signed-in visitor's hashed email, phone and id, so the site needs no pixel snippet. Only with the visitor's consent to marketing. Off by default." }
         chatgpt_pixel_id: { type: string, description: "The Pixel ID on the brand's ChatGPT Ads connection; empty when the brand has no such connection or it names no pixel, and then chatgpt_pixel can't be turned on." }
+        meta_pixel: { type: boolean, description: "The script loads Meta's pixel, the one the brand's Meta Ads conversions go to, counts page views with it, gives it the signed-in visitor's hashed email, phone and id, and sends it each conversion a page's own event causes with the id the server sends that conversion with, so Meta counts it once. Only with the visitor's consent to marketing. Off by default." }
+        meta_pixel_id: { type: string, description: "The pixel the brand's Meta Ads conversions go to; empty when the brand sends Meta Ads no conversions, and then meta_pixel can't be turned on." }
+        tiktok_pixel: { type: boolean, description: "The same for TikTok's pixel, the one the brand's TikTok Ads conversions go to. Off by default." }
+        tiktok_pixel_id: { type: string, description: "The pixel the brand's TikTok Ads conversions go to; empty when the brand sends TikTok Ads no conversions, and then tiktok_pixel can't be turned on." }
         flicker_guard: { type: string, description: "Optional: a short script for the top of the site's <head>, above everything else. On a returning visitor's next visit it hides just the parts their test versions change, for a second at most, so they never see the original first." }
         own_domain: { $ref: "#/components/schemas/SiteOwnDomain" }
     SourceMap:
@@ -67026,6 +67293,8 @@ components:
         capture_forms: { type: boolean, description: "Send form submits as Form Submitted, with no code on the site (off by default). What a visitor typed is never read." }
         capture_errors: { type: boolean, description: "Send the site's uncaught errors as Error Caught, for the Errors page (off by default)." }
         chatgpt_pixel: { type: boolean, description: "Load the brand's ChatGPT Ads pixel from the script, with the signed-in visitor's hashed email and id (off by default). Refused with invalid_request until the brand's ChatGPT Ads connection has a Pixel ID." }
+        meta_pixel: { type: boolean, description: "Load the pixel the brand's Meta Ads conversions go to from the script, and send it the conversions a page causes with the server's event id (off by default). Refused with invalid_request until the brand sends Meta Ads a conversion." }
+        tiktok_pixel: { type: boolean, description: "Load the pixel the brand's TikTok Ads conversions go to from the script, and send it the conversions a page causes with the server's event id (off by default). Refused with invalid_request until the brand sends TikTok Ads a conversion." }
     ConnectionHook:
       type: object
       description: A connection's live updates, its own webhook address.
@@ -77646,6 +77915,53 @@ components:
               properties:
                 code: { type: string }
                 message: { type: string }
+    DataCatalogTable:
+      type: object
+      additionalProperties: false
+      required: [name, area, description, source, scope, available, rows, first_at, last_at, columns, examples]
+      properties:
+        name: { type: string, description: "The table's name in SQL." }
+        area: { type: string, description: "customers, revenue, ads, analytics, outreach, email, seo, coverage, social, content, agents or workspace." }
+        description: { type: string, description: What one row is. }
+        source: { type: string, description: Where its rows come from. }
+        scope: { type: string, description: The read scope it needs. }
+        available: { type: boolean, description: Whether you can read it. }
+        time_column: { type: string, description: The column that dates its rows, when it has one. }
+        rows: { type: [integer, "null"], description: "How many rows it holds for this brand; null when you can't read it or counting failed." }
+        first_at: { type: [string, "null"], description: The earliest value of its time column. }
+        last_at: { type: [string, "null"], description: The latest value of its time column, which says how fresh it is. }
+        columns: { type: integer, description: How many columns it has. }
+        examples:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [question, sql]
+            properties:
+              question: { type: string }
+              sql: { type: string }
+    DataCatalogColumn:
+      type: object
+      additionalProperties: false
+      required: [name, type, description, personal, filled]
+      properties:
+        name: { type: string }
+        type: { type: string, description: "Its Postgres type." }
+        description: { type: string, description: What it means. }
+        joins_to: { type: string, description: "What an id column points at, such as people.id." }
+        unit: { type: string, description: "Its unit, such as minor units of a currency column, a UTC timestamp or days." }
+        personal: { type: boolean, description: Whether it holds personal data. }
+        filled: { type: [number, "null"], description: "The share of rows (0 to 1) where it is set; null without numbers." }
+        values:
+          type: array
+          description: Its most common values, for columns such as status, source or channel.
+          items:
+            type: object
+            additionalProperties: false
+            required: [value, rows]
+            properties:
+              value: { description: The value. }
+              rows: { type: integer }
     QueryTable:
       type: object
       required: [name, description, scope, available, columns]
