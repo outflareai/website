@@ -71,10 +71,47 @@ For a redo the voice reads only that stretch, the video model renders only that 
 
 A redo costs a short voice-over, its word timings and a few seconds of video: a fraction of the whole.
 
+Add `note` to an edit to say what is wrong in your own words. The video model is told it, and it is kept in the video's history.
+
+## Keep the fix or go back
+
+A fix never replaces your video by itself. When it is ready it waits as a new version (`waiting_version` on the video), and the video stays as it was until a person answers:
+
+- `POST .../videos/{video}/fix/keep` makes the fix the video. The version before it is kept. `{"remember": true}` also saves how the fix spelled its words for the voice, so every later voice-over says them that way.
+- `POST .../videos/{video}/fix/go-back` leaves the video as it was. `reason` and `note` say why, and the fix stays among the versions with them. `{"try_again": true}` makes the same fix again with your note told to the video model (and `say` to the voice), which costs another short voice-over and stretch of video.
+
+`versions` on a video lists every version with its number and state. `POST .../videos/{video}/versions/{number}/restore` makes any earlier version, or a fix you turned down, the video again; the one it replaces is kept.
+
+## Like it and make more
+
+`POST .../videos/{video}/rating` records `liked` or `not_this` with a `reason` (an empty rating takes it back). It is an opinion, separate from anything else: liked marks what to make more of.
+
+`POST .../videos/{video}/variations` makes more of a video that works. Each value makes one new video that is the same except for one thing:
+
+| `change` | Each value is |
+| --- | --- |
+| `first_line` | A new first sentence for the script |
+| `direction` | How it looks and moves |
+| `scene` | The id of another scene picture |
+| `voice` | Another voice id |
+
+Up to five at a time. Each is a whole new video and costs what a video costs. `GET .../videos?family={video}` lists a video and its variations together.
+
+## Lessons
+
+Something you say once can hold for everything made later. `GET` and `POST /v1/brands/{brand}/creative-lessons` list and add the brand's lessons, and `DELETE .../creative-lessons/{lesson}` stops one being used:
+
+- `{"kind": "say", "word": "Northpeak", "say": "north peek"}` is read that way by every voice-over.
+- `{"kind": "rule", "rule": "No stock-photo smiles", "applies_to": "image"}` is added to every prompt for pictures, videos (`video`) or both (`all`).
+
+## One history
+
+`GET .../videos/{video}/history` lists everything that happened to a video, newest first, with who did it and what they said: made, each fix asked for, each fix kept, turned down or failed, versions gone back to, likes and variations.
+
 ## Self-hosting
 
 The steps Outflare does itself (closing pauses, the phone-camera look, captions and edits) need `ffmpeg` and `ffprobe` on the server, with the H.264 and AAC encoders. Without them videos are still made, as the model made them, each video's `notes` says what was left out, and edits answer `not_configured`. Files are kept in the server's object storage (`OUTFLARE_S3_*`).
 
 ## For agents
 
-The MCP server has `create_brand_video`, `get_brand_video`, `list_brand_videos`, `edit_brand_video`, `retry_brand_video`, `update_brand_video` and `delete_brand_video`. An agent is told that every stage costs the brand money, to make only what was asked for, and to ask which models to use.
+The MCP server has `create_brand_video`, `get_brand_video`, `list_brand_videos`, `edit_brand_video`, `retry_brand_video`, `update_brand_video` and `delete_brand_video`, and for the answers `keep_brand_video_fix`, `go_back_brand_video_fix`, `restore_brand_video_version`, `rate_brand_video`, `create_brand_video_variations`, `get_brand_video_history`, `list_creative_lessons`, `add_creative_lesson` and `remove_creative_lesson`. An agent shows a waiting fix and asks: it keeps one or goes back only when the person said so. An agent is told that every stage costs the brand money, to make only what was asked for, and to ask which models to use.

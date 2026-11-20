@@ -72,6 +72,8 @@ The prompt is filled in and sent to the brand's AI account once. A bracket with 
 
 `POST .../creatives/{creative}/approve` and `.../reject` record the answer. Nothing reaches an ad network without a yes. `PATCH` renames a creative or changes its tags and words; no new picture is made or paid for.
 
+`POST .../creatives/{creative}/rating` records `liked` or `not_this` with a `reason`, separate from approving (an empty rating takes it back). A reason worth keeping can be saved as a rule for every new picture ([Lessons](/docs/guides/talking-videos/#lessons)): rules are added to every prompt by themselves. `GET .../creatives/{creative}/history` lists everything that happened to a creative, newest first, with who did it: made, its words changed, approved, rejected with the reason, liked or not.
+
 The list filters by `status`, `skill_id`, `kind`, `persona`, `pain`, `tag` and `q` (part of a name or headline).
 
 ## The finished ad
@@ -91,4 +93,4 @@ A brand keeps at most 100 skills, each with up to 4 prompts and 500 versions. Cr
 
 ## For agents
 
-The MCP server has a tool for each call: `list_creative_skills`, `get_creative_skill`, `list_creative_skill_versions`, `create_creative_skill`, `update_creative_skill`, `list_creatives`, `get_creative`, `create_creative`, `update_creative`, `approve_creative` and `reject_creative`. An agent writes the headline as the prompt's `copy` says, makes only what the person asked for, and approves only when the person said so.
+The MCP server has a tool for each call: `list_creative_skills`, `get_creative_skill`, `list_creative_skill_versions`, `create_creative_skill`, `update_creative_skill`, `list_creatives`, `get_creative`, `create_creative`, `update_creative`, `approve_creative`, `reject_creative`, `rate_creative` and `get_creative_history`. An agent writes the headline as the prompt's `copy` says, makes only what the person asked for, and approves only when the person said so.
