@@ -80,6 +80,16 @@ In the editor, **Add several landers** and **Add several offers** add many at on
 
 Over the API, `PUT /v1/brands/{brand}/tracking-campaigns/{id}/links/{link}/destinations` saves the list and `GET` reads it back; the MCP tools are `set_tracking_link_destinations` and `list_tracking_link_destinations`.
 
+## Manage offers and landers
+
+**Tracker → Offers** and **Tracker → Landers** list everything your links can send clicks to, with today's clicks, how many links use each one, and whether its page is online. Search the list, and use **Edit**, **Duplicate** and **Delete** on any row. Clicking a row opens it in the page, with a **Back** button to the list and an address of its own that you can share.
+
+**Delete** works on one row or on every row you tick. You can delete an offer or lander that links still use: it comes off those links, the others in each list share its clicks, and reports keep its numbers. The confirmation says when a link is sending clicks to it now.
+
+Traffic sources, affiliate networks and rows in **Tracker → Logs** open the same way, in the page with a **Back** button. In **Tracker → Report**, **Columns** opens the custom columns above the table, so you see each column as you add it.
+
+Over the API, `DELETE /v1/brands/{brand}/offers/{id}` and `DELETE /v1/brands/{brand}/landers/{id}` delete one; the MCP tools are `delete_offer` and `delete_lander`.
+
 ## Who can do what
 
 Everyone in the workspace can see campaigns and links (`analytics.read`). Owners, admins and operators can make and change them (`analytics.manage`).
