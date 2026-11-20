@@ -2,7 +2,7 @@
 	"version": "2026.11.20",
 	"date": "2026-11-20",
 	"status": "in-progress",
-	"updated": "2026-11-20T16:38:32Z",
+	"updated": "2026-11-20T17:10:34Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -17,7 +17,49 @@
 			"edition": "open-source",
 			"text": "A rate limit answer (HTTP 429) from Geonode, Parallel, EmailBison, Blitz or an email verifier is now waited out, honouring its Retry-After, instead of being read as an empty account; only out of credits (HTTP 402) still stops work for a person. Long provider calls (Treg, Geonode, Parallel) are no longer cut off after 30 seconds, and a finder call that timed out is never remembered as \"no email\".",
 			"at": "2026-11-20T16:38:32Z"
+		},
+		{
+			"kind": "fix",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "A query for one brand now shows only that brand in every table: visits, spend, backlinks, reviews, social posts, link prospects, link orders and organic conversions used to show the other brands you can see too.",
+			"at": "2026-11-20T17:10:34Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "Agents can export a query's results as CSV over MCP (export_query_csv), up to 10,000 rows, for lists longer than run_query returns.",
+			"at": "2026-11-20T17:10:34Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "Agent work, tests, journeys, social and content in SQL: Queries and agents can now read agent runs and missions with their updates and reports, the action log, what agents learned, A/B tests, insights and alerts, journey steps, social accounts and posts, content, email templates and suppressions. Each table is explained in the data catalog.",
+			"at": "2026-11-20T17:10:34Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "Customers, sales, support and partners in SQL: Queries and agents can now read every record's field history, merges, lists and members, scores and signals, sales leads and commissions, CRM tasks, meetings and emails (without content), MRR by day, support conversations (without bodies), and partner programs, referrals, rewards and payouts. Each table is explained in the data catalog.",
+			"at": "2026-11-20T17:10:34Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "Search, SEO and AI visibility in SQL: Queries and agents can now read Search Console clicks, URL inspections, Core Web Vitals, crawls, rank checks, competitors, AI visibility prompts, answers, mentions and citations, AI crawler visits, web analytics, page speed, heatmaps, site visitors, experiments and session recording details. Each table is explained in the data catalog.",
+			"at": "2026-11-20T17:10:34Z"
+		},
+		{
+			"kind": "launch",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "Data catalog: Data → Catalog, and the MCP tool describe_brand_data, show every table of a brand's data that Queries and agents read with SQL: what it holds, where it comes from, how many rows and how fresh, and what each column means, with its unit, what it joins to, how often it is filled and its common values. Agents now get run_query and the catalog in their default tools.",
+			"at": "2026-11-20T17:10:34Z"
 		}
 	],
-	"through": "37393b6+37393b6"
+	"through": "dab62a8+dab62a8"
 }
