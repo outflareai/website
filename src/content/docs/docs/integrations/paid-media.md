@@ -368,16 +368,16 @@ How it works:
   says yes). Elsewhere the workspace's setting decides: **Everyone,
   unless they opted out** (`opt_out`, the default) or **Only people who said
   yes** (`opt_in`). Anyone who withdrew consent is never sent.
-  A brand whose own site already asks every visitor for consent to ad data,
-  but hasn't yet passed those answers to Outflare, can choose **Everyone:
-  our site already collects consent** (`collected`). Conversions are then
+  A brand whose own site already asks every visitor for consent to ad data
+  and personalised ads, but hasn't yet passed those answers to Outflare, can
+  choose **Everyone: our site already collects consent** (`collected`). Conversions are then
   sent for everyone, in every country and when the country is unknown,
   marked as consented; people who withdrew are still never sent. It is the
   brand's own statement about its site, so only a signed-in person can
   choose it (an API token or an agent gets `403`), the web app asks to
-  confirm, and the change is in the audit log. It covers conversions, not
-  adding people to ad audiences, which keeps asking for consent to ad
-  personalisation.
+  confirm, and the change is in the audit log. It covers ad audiences too:
+  people are added for everyone, as consented to ad personalisation, except
+  those who withdrew.
   A person's country is their latest website visit's. For someone the site
   script never saw, such as a purchase sent only from your server, it is the
   event's own: `context.location.country` (two letters, such as `US`), else
