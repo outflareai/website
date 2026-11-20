@@ -2,7 +2,7 @@
 	"version": "2026.11.20",
 	"date": "2026-11-20",
 	"status": "in-progress",
-	"updated": "2026-11-20T17:10:34Z",
+	"updated": "2026-11-20T17:48:58Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -59,7 +59,28 @@
 			"edition": "open-source",
 			"text": "Data catalog: Data → Catalog, and the MCP tool describe_brand_data, show every table of a brand's data that Queries and agents read with SQL: what it holds, where it comes from, how many rows and how fresh, and what each column means, with its unit, what it joins to, how often it is filled and its common values. Agents now get run_query and the catalog in their default tools.",
 			"at": "2026-11-20T17:10:34Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Tracker conversions now say whether the traffic source was told, and if not, why (suspect, filtered by the postback rules, no traffic source and so on). A postback that carries both the network's own click id as cid and Outflare's ofclk credits the click, and a send that went out without the network's click id is marked.",
+			"at": "2026-11-20T17:48:58Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Preview where a tracker click would go. The offer and lander forms, the API (`GET /v1/brands/{brand}/destination-preview`) and the MCP tool `preview_destination` show the final address for a URL as you wrote it: the click id and campaign tags Outflare adds, anything it replaces, and what it leaves alone. A preview counts no click.",
+			"at": "2026-11-20T17:48:58Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "Owners and admins can now delete a published query endpoint, from the Endpoints list or its own page, after a confirmation. Its address stops answering and can be used again, its call log goes with it, and the saved query and the audit record stay. Turning an endpoint off still pauses it instead.",
+			"at": "2026-11-20T17:48:58Z"
 		}
 	],
-	"through": "dab62a8+dab62a8"
+	"through": "6922be2+6922be2"
 }
