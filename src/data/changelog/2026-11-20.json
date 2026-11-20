@@ -2,7 +2,7 @@
 	"version": "2026.11.20",
 	"date": "2026-11-20",
 	"status": "in-progress",
-	"updated": "2026-11-20T19:41:22Z",
+	"updated": "2026-11-20T20:17:42Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -87,7 +87,119 @@
 			"edition": "open-source",
 			"text": "The send log in Paid ads shows Meta's match quality: a score out of 10 for each event you send, how it moved against the week before, which identifiers went with it and what Meta says to fix. A low or falling score raises an alert.",
 			"at": "2026-11-20T19:41:22Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Agents can read the creative studio through SQL: the brand's files, provider requests, talking videos with their stages and versions, creatives, skills, lessons and each creative's history are in Query and the data catalog, behind `content.read`.",
+			"at": "2026-11-20T20:17:42Z"
+		},
+		{
+			"kind": "fix",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Conversions sent back to ad networks now carry the ad click id from the person's own earlier events, such as the click id your server sent with their sign-up, so a payment sent from your server can be tied to the ad that brought them even when no website visit was linked to them.",
+			"at": "2026-11-20T20:17:42Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Talking videos and creatives keep everything you say about them: a fix waits for your keep or go back, every version can be gone back to, you can like one or say \"not this\" with a reason, make variations of one that works, and teach lessons (how to say a word, rules for prompts) that every later creative follows. One history per creative shows all of it.",
+			"at": "2026-11-20T20:17:42Z"
+		},
+		{
+			"kind": "launch",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "Brand profile: a new first page under Company that keeps what your agents know about the brand (company, offer, customers, personas, positioning, proof, competitors, objections, voice, goals, channels and rules) as separate facts. What an agent finds waits for a person's yes before it is ever said to a customer, and every change is kept in a history.",
+			"at": "2026-11-20T20:17:42Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "Pictures, video and voice keep their recipe and take references: every request stores what was sent to the provider and what came back, can be made again with one thing changed, and can name brand files (a frame of a real video, a person, an ad you liked) to make the new file from, so a person or a scene stays the same.",
+			"at": "2026-11-20T20:17:42Z"
+		},
+		{
+			"kind": "launch",
+			"area": "api",
+			"edition": "open-source",
+			"text": "Talking videos: over the API and MCP, a brand can make a video of a person saying a script on its own ElevenLabs and fal.ai accounts, with an upscale, the look of a phone camera and captions, then fix or remove a word without making the whole video again.",
+			"at": "2026-11-20T20:17:42Z"
+		},
+		{
+			"kind": "fix",
+			"area": "lifecycle",
+			"edition": "open-source",
+			"text": "A payment counted from an Order Completed event now takes the product the order names, so a company's first order moves it to active on that product. A payment sent first without a product picks it up from its order.",
+			"at": "2026-11-20T20:17:42Z"
+		},
+		{
+			"kind": "launch",
+			"area": "api",
+			"edition": "open-source",
+			"text": "Skills and creatives: over the API and MCP, a brand can save a recipe for one kind of ad and make ads from it on its own AI account. Recipes are versioned, two to four prompts can run side by side as a split test, and each ad waits for a person's yes or no. Outflare lays the words and logo over the picture, so one picture gives every size.",
+			"at": "2026-11-20T20:17:42Z"
+		},
+		{
+			"kind": "launch",
+			"area": "api",
+			"edition": "open-source",
+			"text": "Pictures, video and voice on your own AI accounts: over the API and MCP, a brand can ask its own OpenAI, fal.ai or ElevenLabs account for a picture, a video or a voice recording, and the file is kept with the brand's files. fal.ai and ElevenLabs are new connections under Connectors. You choose the model, each request is sent once so nothing is paid twice, and you pay the provider directly.",
+			"at": "2026-11-20T20:17:42Z"
+		},
+		{
+			"kind": "fix",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Long forms in pop-up windows, such as connecting Google Workspace, now scroll, so the buttons at the bottom can always be reached.",
+			"at": "2026-11-20T20:17:42Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "The box that fills in a smart list from a description is now a clear text field with its own heading, so it is obvious where to type.",
+			"at": "2026-11-20T20:17:42Z"
+		},
+		{
+			"kind": "launch",
+			"area": "api",
+			"edition": "open-source",
+			"text": "Brand files: each brand can keep its logos, fonts, product shots, screenshots, example ads, voices and pictures of people in one place, over the API and MCP, for ads and other content to be built from. A voice or a person's picture can't be used until someone confirms that person agreed.",
+			"at": "2026-11-20T20:17:42Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "The new menu (a rail of areas with a menu for the area you are in) is now the menu everyone starts with. The old single sidebar is one click away: press \"Old menu\" at the bottom of the rail, and your choice is remembered in this browser. Data's menu also links straight to Events and their sources, and Transactions.",
+			"at": "2026-11-20T20:17:42Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Alerts: mute or unmute many kinds of alert for yourself in one click. Narrow the list with Show or search, then Mute all for me, or tick only the ones you want; Undo puts them back.",
+			"at": "2026-11-20T20:17:42Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Tracker campaigns: the campaign URL now sits at the top of a campaign's page with a Copy URL button, on every tab. The page has a clear Back to campaigns button, its tabs are named Settings, Landers and offers, and Tracking parameters, and Settings uses the full width.",
+			"at": "2026-11-20T20:17:42Z"
+		},
+		{
+			"kind": "fix",
+			"area": "agents",
+			"edition": "cloud",
+			"text": "A brand's agent no longer loses the website knowledge and findings when the brand's notes are long. The notes are shortened first, and the agent is told what was left out.",
+			"at": "2026-11-20T20:17:42Z"
 		}
 	],
-	"through": "604380f+604380f"
+	"through": "20c0797+20c0797"
 }
