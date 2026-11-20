@@ -1,0 +1,660 @@
+---
+// Blog post: why Outflare was built, how it fits together and what it changes for each team.
+// Generated from the team's draft; the logos are in public/blog/why-we-built-outflare/.
+// Fictional people and companies only (AGENTS.md): Ana Ruiz at Acme, Northpeak, Example Co.
+import Marketing from '../../layouts/Marketing.astro';
+import { site } from '../../data/project';
+import { organizationId } from '../../lib/schema';
+import { posts } from '../../data/blog';
+
+const post = posts.find((p) => p.slug === 'why-we-built-outflare')!;
+const article = {
+	'@context': 'https://schema.org',
+	'@type': 'BlogPosting',
+	headline: post.title,
+	description: post.description,
+	datePublished: post.published,
+	dateModified: post.updated,
+	url: `${site.url}/blog/${post.slug}/`,
+	author: { '@id': organizationId },
+	publisher: { '@id': organizationId },
+};
+---
+
+<Marketing
+	title={`${post.title} | Outflare blog`}
+	description={post.description}
+	crumbs={[{ name: 'Blog', path: '/blog/' }, { name: post.title, path: `/blog/${post.slug}/` }]}
+	schema={[article]}
+>
+<article class="post px-4 sm:px-6">
+
+<div class="col hero">
+  <p class="eyebrow">Why we built it</p>
+  <h1>One tool. One customer. No more copy and paste.</h1>
+  <p class="dek">We ran growth on a dozen tools, and every one kept its own copy of the customer. This is why we replaced them with Outflare, how it fits together, and what it changes for each team.</p>
+  <p class="meta"><span>12 minute read</span><span>Last updated 20 November 2026</span></p>
+  <nav class="toc" aria-label="Sections">
+    <a href="#started">Where we started</a><a href="#broke">What broke</a><a href="#idea">The idea</a><a href="#data">The data engine</a><a href="#automations">If this, then that</a><a href="#story">One customer</a><a href="#fits">How it fits</a><a href="#agent">The brand agent</a><a href="#see">See everything</a><a href="#teams">Your team</a><a href="#replaced">What it replaces</a><a href="#next">What's next</a>
+  </nav>
+</div>
+
+<section class="part col" id="started">
+  <p class="eyebrow">1 · Where we started</p>
+  <h2>Twelve tools to find, win and keep a customer</h2>
+  <div class="prose">
+    <p>Every tool on this list was a good choice when we picked it. Each one solved one job well. The trouble only showed when you looked at them together.</p>
+  </div>
+  <div class="tools">
+    <div class="tool"><div class="lg"><img src="/blog/why-we-built-outflare/attio.svg" alt=""><b>Attio</b></div><p class="job">CRM</p></div>
+    <div class="tool"><div class="lg"><img src="/blog/why-we-built-outflare/resend.svg" alt=""><b>Resend</b></div><p class="job">Product email</p></div>
+    <div class="tool"><div class="lg"><img src="/blog/why-we-built-outflare/webengage.png" alt=""><b>WebEngage</b></div><p class="job">Marketing automation</p></div>
+    <div class="tool"><div class="lg"><img src="/blog/why-we-built-outflare/google_analytics.svg" alt=""><b>Google Analytics</b></div><p class="job">Website analytics</p></div>
+    <div class="tool"><div class="lg"><img src="/blog/why-we-built-outflare/posthog.svg" alt=""><b>PostHog</b></div><p class="job">Product analytics, A/B tests</p></div>
+    <div class="tool"><div class="lg"><b>Internal tools</b></div><p class="job">Warehouse and reporting</p></div>
+    <div class="tool"><div class="lg"><img src="/blog/why-we-built-outflare/tolt.svg" alt=""><b>Tolt</b></div><p class="job">Affiliates</p></div>
+    <div class="tool"><div class="lg"><img src="/blog/why-we-built-outflare/emailbison.svg" alt=""><b>EmailBison</b></div><p class="job">Cold outreach</p></div>
+    <div class="tool"><div class="lg"><img src="/blog/why-we-built-outflare/inboxkit.png" alt=""><b>Inbox Kit</b></div><p class="job">Outreach mailboxes</p></div>
+    <div class="tool"><div class="lg"><img src="/blog/why-we-built-outflare/agentmail.png" alt=""><b>AgentMail</b></div><p class="job">Email for AI agents</p></div>
+    <div class="tool"><div class="lg"><img src="/blog/why-we-built-outflare/clickflare.png" alt=""><b>ClickFlare</b></div><p class="job">Ad click tracker</p></div>
+    <div class="tool future"><div class="lg"><img src="/blog/why-we-built-outflare/intercom.svg" alt=""><b>Intercom + Fin</b></div><p class="job">Support chat and AI</p></div>
+  </div>
+</section>
+
+<section class="part col" id="broke">
+  <p class="eyebrow">2 · What broke</p>
+  <h2>Twelve tools meant twelve copies of every customer</h2>
+  <p>None of these tools shared one idea of who a customer is. So the same person ended up as a different row in each tool, with a different story in each. Here is what one made-up customer looked like across our stack.</p>
+  <div class="rows scroll" role="region" aria-label="One customer in five tools" tabindex="0">
+    <table>
+      <tr><th>Tool</th><th>Who it thinks they are</th><th>Where they came from</th><th>Status</th></tr>
+      <tr><td><span class="tl2"><img src="/blog/why-we-built-outflare/attio.svg" alt="">Attio</span></td><td>Ana Ruiz, Acme</td><td><span class="clash">Outbound</span></td><td>Open deal</td></tr>
+      <tr><td><span class="tl2"><img src="/blog/why-we-built-outflare/posthog.svg" alt="">PostHog</span></td><td>Anonymous user 48213</td><td><span class="clash">Google / cpc</span></td><td>Active</td></tr>
+      <tr><td><span class="tl2"><img src="/blog/why-we-built-outflare/emailbison.svg" alt="">EmailBison</span></td><td>ana@acme.example</td><td>Campaign Q4 list</td><td><span class="clash">Not interested</span></td></tr>
+      <tr><td><span class="tl2"><img src="/blog/why-we-built-outflare/tolt.svg" alt="">Tolt</span></td><td>Referral #7731</td><td><span class="clash">Partner link</span></td><td>Paid</td></tr>
+      <tr><td><span class="tl2"><img src="/blog/why-we-built-outflare/intercom.svg" alt="">Intercom</span></td><td>Ana R.</td><td>Unknown</td><td>Free plan?</td></tr>
+    </table>
+  </div>
+  <p class="small muted">Example data. Four tools, four different answers to "where did this customer come from?"</p>
+  <div class="problems">
+    <div class="problem"><h3>Sales couldn't see the ad</h3><p>A lead replied, but which campaign brought them, and what they did on the site, lived in two other tools.</p></div>
+    <div class="problem"><h3>Support couldn't see the money</h3><p>A customer opened a chat. Their plan, payments and last sales email were somewhere else.</p></div>
+    <div class="problem"><h3>Reports were built by hand</h3><p>Every "what worked?" meant exports from four tools, a spreadsheet, and an argument about whose number was right.</p></div>
+  </div>
+</section>
+
+<section class="part" id="idea">
+  <div class="col prose">
+    <p class="eyebrow">3 · The idea</p>
+    <h2>Everything lands on one customer record</h2>
+    <p>Outflare keeps one record for each person and each company. Everything that happens, from a website visit to a payment to a Telegram chat with sales, is written onto that same record once. Every team reads from it, and the logic on top (automations, routing, alerts, reports and the AI agent) works from it too.</p>
+  </div>
+  <div class="wide flow" role="img" aria-label="Data and conversations flow into one customer record, which feeds the logic layer">
+    <div class="stack">
+      <p class="lbl">Data</p>
+      <div class="src"><span class="dot"></span>Product events</div>
+      <div class="src"><img src="/blog/why-we-built-outflare/stripe.svg" alt="">Transactions</div>
+      <div class="src"><span class="dot"></span>Website visits</div>
+      <div class="src"><img src="/blog/why-we-built-outflare/google_ads.svg" alt="">Ads and partners</div>
+      <p class="lbl">Conversations</p>
+      <div class="src"><span class="dot"></span>Support email and chat</div>
+      <div class="src"><span class="dot"></span>Outreach replies</div>
+      <div class="src"><img src="/blog/why-we-built-outflare/google_mail.svg" alt="">Team email and meetings</div>
+      <div class="src"><img src="/blog/why-we-built-outflare/telegram.svg" alt=""><img src="/blog/why-we-built-outflare/slack.svg" alt="">Telegram and Slack</div>
+    </div>
+    <div class="arrow"><svg viewBox="0 0 48 24" aria-hidden="true"><path d="M2 12H44M36 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="record">
+      <div class="who"><span class="avatar">AR</span><div><b>Ana Ruiz · Acme</b><span class="small muted">One customer record</span></div></div>
+      <ol class="tl">
+        <li>Clicked a Google ad, read pricing<span>Website · ad click kept</span></li>
+        <li>Signed up<span>Product event</span></li>
+        <li>Replied to outreach: interested<span>Inbox · owner assigned</span></li>
+        <li>Paid for a plan<span>Transaction · partner credited</span></li>
+        <li>Telegram chat with sales<span>Conversation</span></li>
+        <li>Support chat about API access<span>Inbox</span></li>
+      </ol>
+    </div>
+    <div class="arrow"><svg viewBox="0 0 48 24" aria-hidden="true"><path d="M2 12H44M36 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="logic">
+      <h3>The logic layer</h3>
+      <ul><li>Automations and journeys</li><li>Routing and owners</li><li>Signals and alerts</li><li>Attribution and reports</li><li>The brand agent</li></ul>
+    </div>
+  </div>
+  <div class="col"><p class="pull">Nothing is copied between tools, so nothing goes out of date. Every team sees the same person and every report counts them the same way.</p></div>
+</section>
+
+<section class="part" id="data">
+  <div class="col prose">
+    <p class="eyebrow">4 · The data engine</p>
+    <h2>All our events and transactions, in one database</h2>
+    <p>Think of Outflare as our own data warehouse, except it's already connected to everything that acts on the data. Our product sends its events, our billing sends its payments, and our conversations arrive on their own. They all land in one central database, on the right person and company. Every module reads from that same database, so nothing has to be exported, synced or rebuilt.</p>
+  </div>
+  <div class="wide engine" role="img" aria-label="Events, transactions and conversations flow into one central database, which feeds every module and can be sent on to a warehouse">
+    <div>
+      <div class="ingroup"><p class="lbl">From our product</p><div class="chiprow"><span class="chip">Website script</span><span class="chip">Server SDKs: Node, Python, Go, Ruby, PHP</span><span class="chip">Mobile SDKs</span></div></div>
+      <div class="ingroup"><p class="lbl">From billing</p><div class="chiprow"><span class="chip"><img src="/blog/why-we-built-outflare/stripe.svg" alt="">Stripe</span><span class="chip">Transactions API</span><span class="chip">Order events</span></div></div>
+      <div class="ingroup"><p class="lbl">From conversations</p><div class="chiprow"><span class="chip"><img src="/blog/why-we-built-outflare/google_mail.svg" alt="">Team email and meetings</span><span class="chip">Website chat</span><span class="chip">Outreach replies</span><span class="chip"><img src="/blog/why-we-built-outflare/telegram.svg" alt="">Telegram</span></div></div>
+      <div class="ingroup"><p class="lbl">From ads and imports</p><div class="chiprow"><span class="chip"><img src="/blog/why-we-built-outflare/google_ads.svg" alt="">Ad clicks and spend</span><span class="chip"><img src="/blog/why-we-built-outflare/attio.svg" alt="">Attio import</span><span class="chip">CSV</span></div></div>
+    </div>
+    <div class="arrow"><svg viewBox="0 0 48 24" aria-hidden="true"><path d="M2 12H44M36 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="db">
+      <div><h3>One central database</h3><p class="sub">Per brand, on every person and company</p></div>
+      <div class="dbrow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L4 14h7l-1 8 9-12h-7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><div><b>Events</b><span>Every action, named and counted in the Event list, with typos caught.</span></div></div>
+      <div class="dbrow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18v12H3zM12 9.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M6 9v.01M18 15v.01" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><div><b>Transactions</b><span>Every payment, refund and plan change, each counted once.</span></div></div>
+      <div class="dbrow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM2 21v-1a6 6 0 0 1 12 0v1M16 3.5a4 4 0 0 1 0 7M22 21v-1a6 6 0 0 0-4-5.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><div><b>People and companies</b><span>One record each, with the full history of every change.</span></div></div>
+      <div class="dbrow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 21l1.9-5.4A8 8 0 1 1 21 12z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><div><b>Conversations</b><span>Email, chat, Telegram and replies, on the record they're about.</span></div></div>
+      <div class="dbrow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18M6 16l4-5 3 3 5-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><div><b>Metrics and scores</b><span>Worked out live: spend in 30 days, usage this week, last seen, health.</span></div></div>
+      <p class="dbask">Ask it anything: in SQL with Query, or in plain English with "Ask a question".</p>
+    </div>
+    <div class="arrow"><svg viewBox="0 0 48 24" aria-hidden="true"><path d="M2 12H44M36 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="feeds">
+      <div class="feed">Rules<small>Turn events into triggers</small></div>
+      <div class="feed">Journeys<small>Emails and steps</small></div>
+      <div class="feed">Signals and alerts<small>Who needs a person now</small></div>
+      <div class="feed">Routing<small>Who owns each lead</small></div>
+      <div class="feed">Smart lists<small>Always up to date</small></div>
+      <div class="feed">Dashboards<small>Any number, any chart</small></div>
+      <div class="feed">Tracker<small>Every ad click, with its id</small></div><div class="feed">Attribution<small>Which channel paid off</small></div>
+      <div class="feed">Ad conversions<small>Ad networks learn</small></div>
+      <div class="feed">Partners<small>Commission credited</small></div>
+      <div class="feed">The brand agent<small>Sees all of it</small></div>
+    </div>
+  </div>
+  <div class="wide outrow"><span>And out again, when we want it elsewhere:</span><span class="chip"><img src="/blog/why-we-built-outflare/bigquery.svg" alt="">BigQuery</span><span class="chip"><img src="/blog/why-we-built-outflare/snowflake.svg" alt="">Snowflake</span><span class="chip"><img src="/blog/why-we-built-outflare/google_analytics.svg" alt="">GA4</span><span class="chip"><img src="/blog/why-we-built-outflare/slack.svg" alt="">Slack</span><span class="chip">Webhooks</span></div>
+  <div class="col"><p class="pull">We send each event once. Every module, report and automation uses that same event, so the numbers always agree.</p></div>
+</section>
+
+<section class="part" id="automations">
+  <div class="col prose">
+    <p class="eyebrow">5 · If this, then that</p>
+    <h2>Automations that read like a sentence</h2>
+    <p>Because every event lands in one place, any of them can start an automation. Each one has three parts, and you build it by filling in the blanks.</p>
+  </div>
+  <div class="wide anatomy">
+    <div class="part3"><span class="k">WHEN</span><b>Something happens</b><p>An event, a field changing, something <em>not</em> happening in time, or someone joining a list.</p></div>
+    <div class="arrow"><svg viewBox="0 0 48 24" aria-hidden="true"><path d="M2 12H44M36 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="part3"><span class="k">IF</span><b>It's the right person</b><p>Plan, country, usage, score, owner, renewal date, or anything else on their record.</p></div>
+    <div class="arrow"><svg viewBox="0 0 48 24" aria-hidden="true"><path d="M2 12H44M36 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="part3 then"><span class="k">THEN</span><b>Outflare does the work</b><p>Send an email, wait, branch, set a field, assign an owner, move a deal, start a sequence, raise a signal, alert Slack, call a webhook.</p></div>
+  </div>
+  <div class="wide triggers">
+    <div class="trig"><b>It happens</b><p>"Someone pays for the Pro plan."</p></div>
+    <div class="trig"><b>It changes</b><p>"A company becomes a customer."</p></div>
+    <div class="trig"><b>It doesn't happen</b><p>"Signed up, but no first API call within 7 days."</p></div>
+    <div class="trig"><b>They join a list</b><p>"Paying, but no login in 30 days."</p></div>
+  </div>
+  <div class="wide recipes">
+    <div class="recipe"><span class="for">Onboarding</span><h3>Rescue a stalled sign-up</h3>
+      <div class="ln"><span class="w when">WHEN</span><span>Someone signs up and doesn't make a first request within 7 days</span></div>
+      <div class="ln"><span class="w if">IF</span><span>They aren't on an enterprise plan</span></div>
+      <div class="ln"><span class="w then">THEN</span><span>Send the setup email, wait 3 days, and if they still haven't started, put them in their owner's Needs attention list</span></div></div>
+    <div class="recipe"><span class="for">Retention</span><h3>Catch churn before it happens</h3>
+      <div class="ln"><span class="w when">WHEN</span><span>A paying company's usage falls more than 30% on the week before</span></div>
+      <div class="ln"><span class="w if">IF</span><span>They spent money in the last 30 days</span></div>
+      <div class="ln"><span class="w then">THEN</span><span>Raise a churn risk signal for the account owner, with a due date, and post it to Slack</span></div></div>
+    <div class="recipe"><span class="for">Sales</span><h3>Never miss a hot reply</h3>
+      <div class="ln"><span class="w when">WHEN</span><span>An outreach reply is read as interested or asking for a meeting</span></div>
+      <div class="ln"><span class="w if">IF</span><span>The lead has no owner yet</span></div>
+      <div class="ln"><span class="w then">THEN</span><span>Route it to whoever is working now and has room, move the deal on, and alert them by email and Slack</span></div></div>
+    <div class="recipe"><span class="for">Revenue</span><h3>Renewals that open themselves</h3>
+      <div class="ln"><span class="w when">WHEN</span><span>A company's renewal date comes within 60 days</span></div>
+      <div class="ln"><span class="w if">IF</span><span>Their health score isn't low</span></div>
+      <div class="ln"><span class="w then">THEN</span><span>Open a renewal deal with its value and date, for the owner to work</span></div></div>
+    <div class="recipe"><span class="for">Growth</span><h3>Every payment teaches the ads</h3>
+      <div class="ln"><span class="w when">WHEN</span><span>A payment succeeds</span></div>
+      <div class="ln"><span class="w if">IF</span><span>They came from an ad or a partner link</span></div>
+      <div class="ln"><span class="w then">THEN</span><span>Tell Google Ads the value, credit the partner's commission, and add the revenue to the channel's report</span></div></div>
+    <div class="recipe"><span class="for">Support</span><h3>No customer left waiting</h3>
+      <div class="ln"><span class="w when">WHEN</span><span>A customer writes on Telegram and nobody answers for 4 hours</span></div>
+      <div class="ln"><span class="w if">IF</span><span>The chat is with a company account</span></div>
+      <div class="ln"><span class="w then">THEN</span><span>Alert the account's holder, and the admins if they're away</span></div></div>
+  </div>
+  <div class="col safe"><span>Dry-run any rule over the last 7, 30 or 90 days first</span><span>See exactly who it fired for</span><span>Holdout groups show what it really changed</span><span>Every change lands in the record's history</span></div>
+</section>
+
+
+<section class="part" id="story">
+  <div class="col prose">
+    <p class="eyebrow">6 · One customer, one timeline</p>
+    <h2>Each step feeds the next, on its own</h2>
+    <p>Follow one customer from first click to first support question. Each step is recorded once, and the next team picks it up without anyone copying anything.</p>
+  </div>
+  <ol class="wide story">
+    <li><b>Clicks a Google ad</b><p>Our own tracker keeps the ad click and its click id on their visit.</p><span class="was">Used to live in ClickFlare</span></li>
+    <li><b>Reads pricing</b><p>Recordings and heatmaps show what they looked at.</p><span class="was">PostHog, Google Analytics</span></li>
+    <li><b>Signs up</b><p>The ad gets the credit, and Google Ads is told, so its bidding learns.</p><span class="was">PostHog, ClickFlare</span></li>
+    <li><b>Replies to sales</b><p>The reply lands in the Inbox on the same person, with an owner.</p><span class="was">EmailBison, Attio</span></li>
+    <li><b>Pays</b><p>Revenue shows on their record. A partner who sent them is credited commission.</p><span class="was">Tolt, internal reports</span></li>
+    <li><b>Asks support</b><p>Support sees their plan, payments and every past email.</p><span class="was">Intercom</span></li>
+  </ol>
+</section>
+
+<section class="part" id="fits">
+  <div class="col prose">
+    <p class="eyebrow">7 · How it fits together</p>
+    <h2>Four layers, read top to bottom</h2>
+    <p>We work in the app. Each brand has an AI agent in the harness below it. The agent and the team use the same modules, and the modules connect to the tools we already have, on our own accounts.</p>
+  </div>
+  <div class="wide arch">
+    <div class="tiers">
+      <div class="tier"><div class="name"><span class="num">1</span>The app</div><div class="pills"><span class="pill">Web app</span><span class="pill">One Inbox</span><span class="pill">Agent chat</span><span class="pill">Chrome side panel</span></div></div>
+      <div class="down"><svg viewBox="0 0 14 22" aria-hidden="true"><path d="M7 1V19M2 14l5 6 5-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>We set goals and approve changes</div>
+      <div class="tier harness"><div class="name"><span class="num">2</span>Agent harness</div><div><div class="loopline"><span class="s">Goal</span><span class="a">→</span><span class="s">Plan</span><span class="a">→</span><span class="s">Act</span><span class="a">→</span><span class="s">Our OK</span><span class="a">→</span><span class="s">Learn</span><span class="a">↺</span></div><p class="cap">One AI agent per brand, on our own AI key</p></div></div>
+      <div class="down"><svg viewBox="0 0 14 22" aria-hidden="true"><path d="M7 1V19M2 14l5 6 5-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>It uses the same tools we do</div>
+      <div class="tier"><div class="name"><span class="num">3</span>Modules</div><div class="pills"><span class="pill">CRM</span><span class="pill">Inbox</span><span class="pill">Outreach</span><span class="pill">Journeys</span><span class="pill">Analytics</span><span class="pill">Recordings</span><span class="pill">A/B tests</span><span class="pill">Paid ads</span><span class="pill">Tracker</span><span class="pill">SEO</span><span class="pill">Partners</span><span class="pill">Support</span><span class="pill">Mailboxes</span><span class="pill">Social</span><span class="pill">Reviews</span></div></div>
+      <div class="down"><svg viewBox="0 0 14 22" aria-hidden="true"><path d="M7 1V19M2 14l5 6 5-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>They connect to the tools we already use, on our own accounts</div>
+      <div class="tier"><div class="name"><span class="num">4</span>Connectors</div><div class="logos">
+        <img src="/blog/why-we-built-outflare/google_ads.svg" alt="Google Ads" title="Google Ads"><img src="/blog/why-we-built-outflare/meta_ads.svg" alt="Meta Ads" title="Meta Ads"><img src="/blog/why-we-built-outflare/linkedin.svg" alt="LinkedIn" title="LinkedIn"><img src="/blog/why-we-built-outflare/reddit.svg" alt="Reddit" title="Reddit"><img src="/blog/why-we-built-outflare/x.svg" alt="X" title="X"><img src="/blog/why-we-built-outflare/stripe.svg" alt="Stripe" title="Stripe"><img src="/blog/why-we-built-outflare/google_mail.svg" alt="Gmail" title="Gmail"><img src="/blog/why-we-built-outflare/telegram.svg" alt="Telegram" title="Telegram"><img src="/blog/why-we-built-outflare/amazon_ses.svg" alt="Amazon SES" title="Amazon SES"><img src="/blog/why-we-built-outflare/google_analytics.svg" alt="Google Analytics" title="Google Analytics"><img src="/blog/why-we-built-outflare/google_search_console.svg" alt="Search Console" title="Search Console"><img src="/blog/why-we-built-outflare/ahrefs.svg" alt="Ahrefs" title="Ahrefs"><img src="/blog/why-we-built-outflare/slack.svg" alt="Slack" title="Slack"><img src="/blog/why-we-built-outflare/cloudflare.svg" alt="Cloudflare" title="Cloudflare">
+      </div></div>
+    </div>
+    <aside class="plug">
+      <p class="eyebrow">Open by API and MCP</p>
+      <h3>Other AI tools can plug in too</h3>
+      <p>Every module is also an API and an MCP tool. Claude, ChatGPT, Gemini or our own scripts can use Outflare, under the same rules and the same approvals.</p>
+      <div class="logos"><img src="/blog/why-we-built-outflare/claude.svg" alt="Claude" title="Claude"><img src="/blog/why-we-built-outflare/openai.svg" alt="ChatGPT" title="ChatGPT"><img src="/blog/why-we-built-outflare/gemini.svg" alt="Gemini" title="Gemini"></div>
+    </aside>
+  </div>
+</section>
+
+<section class="part" id="agent">
+  <div class="col prose">
+    <p class="eyebrow">8 · The brand agent</p>
+    <h2>An AI agent per brand, working every day</h2>
+    <p class="small muted">The brand agent and the click tracker are part of <a href="/docs/project/open-source-and-cloud/">Outflare Cloud</a>.</p>
+    <p>This is the biggest change. Tools wait for someone to use them. The brand agent works toward a goal we give it, using the same modules we use. It can do this well only because everything is in one place, so it sees the whole customer instead of one tool's slice.</p>
+  </div>
+  <div class="wide" style="display:flex;flex-direction:column;gap:10px">
+    <div class="loop">
+      <div class="step key"><span class="n">STEP 1</span><b>Goal</b><p>We set it: more sign-ups, more meetings, more from paid ads.</p></div>
+      <div class="step"><span class="n">STEP 2</span><b>Plan</b><p>It reads the brand, its numbers and what worked before.</p></div>
+      <div class="step"><span class="n">STEP 3</span><b>Act</b><p>It uses the modules: CRM, ads, email, SEO, tests.</p></div>
+      <div class="step key"><span class="n">STEP 4</span><b>Our OK</b><p>Changes wait for us until we allow that kind of change.</p></div>
+      <div class="step"><span class="n">STEP 5</span><b>Learn</b><p>It compares the number before and after, and remembers.</p></div>
+    </div>
+    <div class="return"><svg viewBox="0 0 400 28" preserveAspectRatio="none" aria-hidden="true"><path d="M396 4 V16 H4 V4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M0 8 L4 2 L8 8" fill="none" stroke="currentColor" stroke-width="2"/></svg><span>Then round again</span></div>
+  </div>
+  <div class="col guards">
+    <div class="guard"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 11h12v10H6zM8 11V7a4 4 0 0 1 8 0v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><p>It can't approve its own changes, or touch mailboxes, connections or keys.</p></div>
+    <div class="guard"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6zM8.5 12l2.5 2.5 4.5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><p>Every email passes the policy check. Spend stays under our caps.</p></div>
+    <div class="guard"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 7a4 4 0 1 1-3.9 4.9L3 20v-3h3v-3h3l1.1-1.1A4 4 0 0 1 15 7zM16 8h.01" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><p>It runs on our own AI key, and every change is logged with the reason.</p></div>
+  </div>
+</section>
+
+<section class="part" id="see">
+  <div class="col prose">
+    <p class="eyebrow">9 · See everything</p>
+    <h2>Any number, on one dashboard, without asking engineering</h2>
+    <p>Every report reads the same database, so a question that used to need exports from four tools is now one tile. Build a dashboard from events, revenue, deals and signals, filter the whole thing at once, and share it by link.</p>
+  </div>
+  <div class="wide dash" role="img" aria-label="Example dashboard with sign-ups by channel, revenue, trial to paid funnel and open signals">
+    <div class="bar0"><b>Growth this month</b><span>Example numbers · Last 30 days · All channels</span></div>
+    <div class="tile w2"><span class="tt">SIGN-UPS BY CHANNEL</span>
+      <div class="hb"><span>Google Ads</span><i style="width:100%"></i><span>412</span></div>
+      <div class="hb"><span>Organic search</span><i style="width:71%"></i><span>293</span></div>
+      <div class="hb"><span>Partners</span><i style="width:38%"></i><span>156</span></div>
+      <div class="hb"><span>Outreach</span><i style="width:22%"></i><span>91</span></div>
+      <div class="hb"><span>Reddit</span><i style="width:12%"></i><span>48</span></div></div>
+    <div class="tile"><span class="tt">REVENUE</span><span class="bn">$84.2k</span><span class="delta">+12% on last month</span>
+      <svg viewBox="0 0 120 56" preserveAspectRatio="none" aria-hidden="true"><path d="M0 46 L15 42 L30 44 L45 36 L60 38 L75 28 L90 30 L105 20 L120 14 L120 56 L0 56Z" fill="var(--accent-soft)"/><path d="M0 46 L15 42 L30 44 L45 36 L60 38 L75 28 L90 30 L105 20 L120 14" fill="none" stroke="var(--accent)" stroke-width="2"/><circle cx="118" cy="14" r="3" fill="var(--accent)"/></svg></div>
+    <div class="tile"><span class="tt">TRIAL TO PAID</span>
+      <div class="fun"><div style="width:100%"><span>Signed up</span><span>1,000</span></div><div style="width:68%"><span>Active</span><span>680</span></div><div style="width:40%"><span>Paid</span><span>212</span></div></div></div>
+    <div class="tile w2"><span class="tt">NEEDS ATTENTION</span>
+      <div class="sig"><div><span class="p r">Churn risk</span>Acme · usage down 41% · owner Sam</div><div><span class="p g">Ready to upgrade</span>Northpeak · hit plan limit twice</div><div><span class="p r">Late</span>Example Co · renewal in 21 days, no deal</div></div></div>
+    <div class="tile"><span class="tt">HOT REPLIES TODAY</span><span class="bn">7</span><span class="delta">All assigned</span></div>
+    <div class="tile"><span class="tt">COST PER SIGN-UP</span><span class="bn">$18.40</span><span class="delta">−9% on last month</span></div>
+  </div>
+  <div class="col seeall">
+    <div><b>Ask a question</b><p>Type "sign-ups by country last month" and get the chart. It runs on our own AI, and the AI never sees customer data.</p></div>
+    <div><b>Query in SQL</b><p>Every table, from events to transactions to replies, for anything a dashboard can't do yet.</p></div>
+    <div><b>Funnels, retention, paths</b><p>Where people drop off, and who comes back, on the same people sales sees.</p></div>
+    <div><b>Alerts on any number</b><p>Set a line on a trend and get told the moment it's crossed.</p></div>
+    <div><b>A weekly digest</b><p>The numbers that matter, by email, every week.</p></div>
+    <div><b>Custom metrics and scores</b><p>Define "API calls in 30 days" or a health score once, and use it everywhere.</p></div>
+  </div>
+</section>
+
+<section class="part" id="teams">
+  <div class="col prose">
+    <p class="eyebrow">10 · What it means for your team</p>
+    <h2>Why use this over the tool you have now?</h2>
+    <p>Each team had a tool it liked. Here is what each one gets in Outflare that its old tool could never give it, because the old tool only saw its own slice.</p>
+  </div>
+  <div class="wide deeps">
+
+    <div class="deep">
+      <div class="hd"><p class="eyebrow">Sales</p><h3>Why not just Attio?</h3><p class="q">Attio only knows what someone typed into it. Outflare's record also holds what the person did in our product, what they paid, which ad or partner brought them, and every email, chat, Telegram message and outreach reply. Nobody types any of it in.</p></div>
+      <div class="vs"><table>
+        <tr><th>The question</th><th>In Attio</th><th>In Outflare</th></tr>
+        <tr><td>Where did they come from?</td><td>Whatever someone typed</td><td>The ad, partner or outreach email, recorded on its own</td></tr>
+        <tr><td>Are they using the product?</td><td>No idea</td><td>Usage this week, last seen and active days, on the record</td></tr>
+        <tr><td>Have they paid?</td><td>Not unless someone updates it</td><td>Every payment, refund and plan change from billing, live</td></tr>
+        <tr><td>Who should own them?</td><td>Assigned by hand</td><td>Routing rules that know working hours, capacity and who's away</td></tr>
+        <tr><td>What needs me today?</td><td>A list you filter yourself</td><td>Needs attention: signals with due dates, escalated if missed</td></tr>
+      </table></div>
+      <div class="blk"><h4>Runs on its own</h4><ul><li><b>Hot replies</b> are labelled and sent to their owner by email and Slack.</li><li><b>New leads</b> go to whoever is working and has room.</li><li><b>Churn risk and upgrade signals</b> appear when usage moves.</li><li><b>Renewal deals</b> open 60 days out.</li><li><b>Our own AI reads conversations</b> and flags what sales should act on.</li></ul></div>
+      <div class="blk"><h4>What you can see</h4><ul><li><b>One People list</b> with owner, deals, source and spend.</li><li><b>One Inbox</b> for outreach replies and team email, sorted by meaning.</li><li><b>Before reaching out:</b> already a customer, open deal, who emailed last.</li><li><b>The Chrome side panel</b> shows the same record next to any Gmail thread.</li></ul></div>
+    </div>
+
+    <div class="deep">
+      <div class="hd"><p class="eyebrow">Marketing</p><h3>Why not WebEngage, Google Analytics, ClickFlare and Tolt?</h3><p class="q">Four tools each told a different story about the same customer. In Outflare the people you see in a report are the people you can email, and every channel is judged on real revenue, not clicks.</p></div>
+      <div class="vs"><table>
+        <tr><th>The question</th><th>Before</th><th>In Outflare</th></tr>
+        <tr><td>Which channel made money?</td><td>Exports from three tools and a spreadsheet</td><td>Visits, sign-ups, revenue and cost per channel, one credit rule</td></tr>
+        <tr><td>Do the ads know what worked?</td><td>Clicks and sign-ups at best</td><td>Real payments and their value sent back to the ad networks</td></tr>
+        <tr><td>Who gets the win-back email?</td><td>A list exported and uploaded</td><td>A smart list that updates itself from live usage</td></tr>
+        <tr><td>Did the email change anything?</td><td>Open rates</td><td>Holdout groups show what it really changed</td></tr>
+      </table></div>
+      <div class="blk"><h4>Runs on its own</h4><ul><li><b>Onboarding journeys</b> start on sign-up and stop when they activate.</li><li><b>Win-back</b> starts when someone joins "Paying, no login in 30 days".</li><li><b>Partners are credited</b> from payments we already record.</li><li><b>Ad conversions</b> are sent with their value, in the right currency.</li></ul></div>
+      <div class="blk"><h4>What you can see</h4><ul><li><b>Channels and attribution</b> from first click to payment.</li><li><b>Our own click tracker</b>, replacing ClickFlare: campaign links, tracked redirects, landers and offers.</li><li><b>Spend</b> from every ad account.</li><li><b>A/B tests</b> on pages, with no code.</li><li><b>Journeys and broadcasts</b> with what each one earned.</li></ul></div>
+    </div>
+
+    <div class="deep">
+      <div class="hd"><p class="eyebrow">Product</p><h3>Why not PostHog and our own reporting tools?</h3><p class="q">PostHog sees what people click. It doesn't know who they are to sales, what they pay or what they said to support. Outflare puts product events on the same record as everything else, and gives us the warehouse and reports we were building ourselves.</p></div>
+      <div class="vs"><table>
+        <tr><th>The question</th><th>Before</th><th>In Outflare</th></tr>
+        <tr><td>Where do events go?</td><td>PostHog, GA and our own pipeline, separately</td><td>One SDK, once, then on to BigQuery or Snowflake if we want</td></tr>
+        <tr><td>Why do people leave?</td><td>Funnels with anonymous ids</td><td>Funnels, retention, recordings and heatmaps on named customers</td></tr>
+        <tr><td>Can I trust the event names?</td><td>Nobody checks</td><td>An Event list with counts, sources and typo checks</td></tr>
+        <tr><td>Who builds the report?</td><td>An engineer, eventually</td><td>Anyone: a dashboard, SQL, or a question in plain English</td></tr>
+      </table></div>
+      <div class="blk"><h4>Runs on its own</h4><ul><li><b>Metrics</b> like usage this week or last seen are kept up to date on every record.</li><li><b>Rules</b> turn "didn't do X within 7 days" into an event anyone can act on.</li><li><b>Feature flags</b> roll out to the right people.</li></ul></div>
+      <div class="blk"><h4>What you can see</h4><ul><li><b>Every event</b> with who did it and what they pay.</li><li><b>Session recordings and heatmaps</b>, with keys and passwords hidden.</li><li><b>Experiments</b> with results you can trust.</li></ul></div>
+    </div>
+
+    <div class="deep">
+      <div class="hd"><p class="eyebrow">Support</p><h3>Why not Intercom on its own?</h3><p class="q">Intercom shows the chat. Outflare shows the chat next to the customer's plan, payments, product usage and every email sales sent them, so the answer is right the first time and the upsell isn't missed.</p></div>
+      <div class="vs"><table>
+        <tr><th>The question</th><th>Before</th><th>In Outflare</th></tr>
+        <tr><td>What do they pay?</td><td>Check Stripe in another tab</td><td>Plan, payments and refunds beside the chat</td></tr>
+        <tr><td>What did sales promise?</td><td>Ask in Slack</td><td>Every sales email and meeting on the same record</td></tr>
+        <tr><td>Are they about to leave?</td><td>You find out when they cancel</td><td>Usage trend and health score on screen</td></tr>
+        <tr><td>Is this a sales lead?</td><td>Forward it and hope</td><td>"Flag for sales" puts it in the owner's queue</td></tr>
+      </table></div>
+      <div class="blk"><h4>Runs on its own</h4><ul><li><b>AI drafts answers</b> from help content we approve, on our own key, and hands off when unsure.</li><li><b>Waiting customers</b> on Telegram trigger an alert after 4 hours.</li><li><b>Upgrade and churn signals</b> are raised from what customers say.</li></ul></div>
+      <div class="blk"><h4>What you can see</h4><ul><li><b>One Inbox shared with sales</b>, with views, owners, notes and saved replies.</li><li><b>What they did on the site</b> before they asked.</li><li><b>Next:</b> website chat moves over from Intercom and Fin.</li></ul></div>
+    </div>
+
+  </div>
+</section>
+
+<section class="part col" id="replaced">
+  <p class="eyebrow">11 · What it replaces</p>
+  <h2>Eleven tools, one place</h2>
+  <div class="scroll" role="region" aria-label="Tools replaced" tabindex="0">
+    <table class="replace">
+      <tr><th>Job</th><th>Before</th><th>In Outflare</th></tr>
+      <tr><td>CRM</td><td><span class="lgs"><img src="/blog/why-we-built-outflare/attio.svg" alt=""></span>Attio</td><td>People, companies, deals</td></tr>
+      <tr><td>Product email</td><td><span class="lgs"><img src="/blog/why-we-built-outflare/resend.svg" alt=""></span>Resend</td><td>Lifecycle email on our own Amazon SES</td></tr>
+      <tr><td>Marketing automation</td><td><span class="lgs"><img src="/blog/why-we-built-outflare/webengage.png" alt=""></span>WebEngage</td><td>Journeys and broadcasts</td></tr>
+      <tr><td>Analytics</td><td><span class="lgs"><img src="/blog/why-we-built-outflare/google_analytics.svg" alt=""><img src="/blog/why-we-built-outflare/posthog.svg" alt=""></span>Google Analytics, PostHog</td><td>Analytics, funnels, recordings, heatmaps</td></tr>
+      <tr><td>A/B tests</td><td><span class="lgs"><img src="/blog/why-we-built-outflare/posthog.svg" alt=""></span>PostHog</td><td>A/B tests and feature flags</td></tr>
+      <tr><td>Warehouse and reporting</td><td>Internal tools</td><td>Dashboards and Query, with <span class="lgs"><img src="/blog/why-we-built-outflare/bigquery.svg" alt=""><img src="/blog/why-we-built-outflare/snowflake.svg" alt=""></span>BigQuery and Snowflake</td></tr>
+      <tr><td>Affiliates</td><td><span class="lgs"><img src="/blog/why-we-built-outflare/tolt.svg" alt=""></span>Tolt</td><td>Partners</td></tr>
+      <tr><td>Cold outreach</td><td><span class="lgs"><img src="/blog/why-we-built-outflare/emailbison.svg" alt=""></span>EmailBison</td><td>Sequences and Inbox</td></tr>
+      <tr><td>Outreach mailboxes</td><td><span class="lgs"><img src="/blog/why-we-built-outflare/inboxkit.png" alt=""></span>Inbox Kit</td><td>Outreach mailboxes</td></tr>
+      <tr><td>Email for AI agents</td><td><span class="lgs"><img src="/blog/why-we-built-outflare/agentmail.png" alt=""></span>AgentMail</td><td>Agent Mail</td></tr>
+      <tr><td>Ad click tracking</td><td><span class="lgs"><img src="/blog/why-we-built-outflare/clickflare.png" alt=""></span>ClickFlare</td><td>Our own tracker: campaign links, tracked redirects with click ids, landers, offers and conversions</td></tr>
+    </table>
+  </div>
+  <p class="start">And this is just to start with.</p>
+</section>
+
+
+
+<section class="part col" id="money">
+  <p class="eyebrow">12 · And yes, it costs less</p>
+  <h2>Built to grow revenue. The savings come on the side.</h2>
+  <p>Outflare wasn't built to cut costs. It was built so every team acts on the full picture, which is what grows revenue. Paying for fewer tools is a bonus: eight subscriptions we no longer need, and internal reporting tools nobody has to maintain.</p>
+  <p class="small muted">Outflare runs on your own accounts: your own AI key, your own email provider and your own ad accounts. You pay those providers directly.</p>
+</section>
+
+<section class="part col" id="next">
+  <p class="eyebrow">13 · What's next</p>
+  <h2>One place to work from, starting now</h2>
+  <div class="next">
+    <div class="card"><h3 class="hl"><img src="/blog/why-we-built-outflare/intercom.svg" alt="">Intercom and Fin</h3><p>Website chat and the support assistant move into the same Inbox.</p></div>
+    <div class="card"><h3>The brand agent</h3><p>An agent per brand that works toward our goals and asks before it changes anything.</p></div>
+    <div class="card"><h3>From you</h3><p>Work from Outflare instead of the old tools, and say the moment something is missing.</p></div>
+  </div>
+  <p><a class="btn btn-primary" href="https://app.outflare.ai/signup">Try Outflare</a> <a class="btn btn-outline" href="/docs/quickstart/">Read the quickstart</a></p>
+  <div>
+    <h3 style="font-size:16px;margin-bottom:8px">Updates to this post</h3>
+    <ul class="log"><li>20 November 2026: published on outflare.ai.</li><li>19 November 2026: ClickFlare replaced by our own click tracker; logos for every tool.</li><li>17 November 2026: added the data engine, automations, dashboards, and a deeper look at each team.</li><li>17 November 2026: first version.</li></ul>
+  </div>
+</section>
+
+</article>
+</Marketing>
+
+<style is:global>
+.post{--bg:var(--background);--surface:var(--card);--fg:var(--foreground);--muted:var(--muted-foreground);--line:var(--border);
+--accent:var(--color-brand-strong);--accent-soft:color-mix(in oklch,var(--color-brand) 14%,transparent);--accent-ink:var(--color-brand-strong);
+--warn:var(--destructive);--warn-soft:color-mix(in oklch,var(--destructive) 14%,transparent);--logo-tile:#fff;
+--display:var(--font-sans);--body:var(--font-sans);font-size:17px;line-height:1.65;color:var(--fg)}
+[data-theme="dark"] .post{--accent:var(--color-brand);--accent-ink:var(--color-brand)}
+.post section.part{scroll-margin-top:72px}
+.post .hero h1{letter-spacing:-.03em}
+.post .btn{margin-right:8px}
+.post .blk ul,.post .log,.post .team ul{list-style:disc}
+
+.post .col{max-width:720px;width:100%;margin:0 auto}
+.post .wide{max-width:1040px;width:100%;margin:0 auto}
+.post h1,.post h2,.post h3{font-family:var(--display);text-wrap:balance;line-height:1.15;margin:0}
+.post h1{font-size:clamp(40px,7vw,64px);font-weight:700;letter-spacing:-.02em}
+.post h2{font-size:clamp(28px,4vw,36px);font-weight:600;letter-spacing:-.01em}
+.post h3{font-size:19px;font-weight:600}
+.post p{margin:0}
+.post a{color:var(--accent-ink)}
+.post .eyebrow{font-family:var(--display);font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.post .muted{color:var(--muted)}
+.post .small{font-size:14px}
+.post .hero{padding-block:72px 40px;display:flex;flex-direction:column;gap:20px}
+.post .dek{font-size:21px;line-height:1.5;color:var(--muted);max-width:620px}
+.post .meta{display:flex;gap:16px;flex-wrap:wrap;font-size:14px;color:var(--muted)}
+.post .toc{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.post .toc a{font-size:14px;text-decoration:none;color:var(--fg);border:1px solid var(--line);border-radius:999px;padding:4px 12px;background:var(--surface)}
+.post .toc a:hover,.post .toc a:focus-visible{border-color:var(--accent);color:var(--accent-ink)}
+.post section.part{padding-block:56px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:24px}
+.post .prose{display:flex;flex-direction:column;gap:16px}
+.post .pull{font-family:var(--display);font-size:26px;line-height:1.3;font-weight:500;border-left:3px solid var(--accent);padding-left:20px;max-width:640px}
+.post .tools{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.post .tool{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.post .tool .lg{height:28px;display:flex;align-items:center;gap:8px}
+.post .tool .lg img{height:24px;width:24px;object-fit:contain;background:var(--logo-tile);border-radius:6px;padding:2px}
+.post .tool .lg b{font-family:var(--display);font-weight:600;font-size:16px}
+.post .tool .job{font-size:13px;color:var(--muted);line-height:1.35}
+.post .tool.future{border-style:dashed}
+.post .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.post table{border-collapse:collapse;width:100%;font-size:15px;font-variant-numeric:tabular-nums}
+.post th,.post td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+.post th{font-family:var(--display);font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.post .rows{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 8px 4px;min-width:0}
+.post .rows table{min-width:620px}
+.post .clash{color:var(--warn);background:var(--warn-soft);border-radius:4px;padding:1px 6px;white-space:nowrap}
+.post .problems{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.post .problem{border-top:3px solid var(--warn);padding-top:14px;display:flex;flex-direction:column;gap:6px}
+.post .problem p{color:var(--muted);font-size:15px}
+.post .flow{display:grid;grid-template-columns:1fr 64px 1.25fr 64px 1fr;align-items:center;gap:0}
+.post .flow .stack{display:flex;flex-direction:column;gap:8px}
+.post .flow .lbl{font-family:var(--display);font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+.post .src{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:14px;display:flex;align-items:center;gap:8px}
+.post .src img{width:18px;height:18px;object-fit:contain;background:var(--logo-tile);border-radius:4px;padding:1px}
+.post .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex:none}
+.post .arrow{display:flex;justify-content:center;color:var(--accent)}
+.post .arrow svg{width:48px;height:24px}
+.post .record{background:var(--surface);border:2px solid var(--accent);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:12px;box-shadow:0 10px 30px -18px rgba(30,138,74,.6)}
+.post .who{display:flex;gap:12px;align-items:center}
+.post .avatar{width:40px;height:40px;border-radius:50%;background:var(--accent-soft);color:var(--accent-ink);display:grid;place-items:center;font-family:var(--display);font-weight:700}
+.post .who b{font-family:var(--display);font-size:17px;display:block;line-height:1.2}
+.post .tl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:0;border-left:2px solid var(--accent-soft);margin-left:6px}
+.post .tl li{position:relative;padding:5px 0 5px 16px;font-size:14px;line-height:1.4}
+.post .tl li::before{content:"";position:absolute;left:-6px;top:11px;width:10px;height:10px;border-radius:50%;background:var(--accent)}
+.post .tl li span{color:var(--muted);font-size:12px;display:block}
+.post .logic{background:var(--fg);color:var(--bg);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:10px}
+.post .logic h3{color:var(--bg);font-size:17px}
+.post .logic ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;font-size:14px}
+.post .logic li{display:flex;gap:8px;align-items:center}
+.post .logic li::before{content:"";width:6px;height:6px;border-radius:2px;background:var(--accent);flex:none}
+.post .story{list-style:none;margin:0 auto;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;counter-reset:s}
+.post .story li{counter-increment:s;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:6px}
+.post .story li::before{content:counter(s);font-family:var(--display);font-weight:700;color:var(--accent);font-size:22px;line-height:1}
+.post .story b{font-family:var(--display);font-size:16px;line-height:1.25}
+.post .story p{font-size:14px;color:var(--muted);line-height:1.45}
+.post .story .was{font-size:12px;color:var(--warn);margin-top:auto;padding-top:6px;border-top:1px dashed var(--line)}
+.post .arch{display:grid;grid-template-columns:1fr 260px;gap:16px;align-items:stretch}
+.post .tiers{display:flex;flex-direction:column;gap:0;min-width:0}
+.post .tier{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:grid;grid-template-columns:150px 1fr;gap:16px;align-items:center}
+.post .tier .name{display:flex;gap:10px;align-items:center;font-family:var(--display);font-weight:600;font-size:17px}
+.post .num{width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:14px;font-weight:700;flex:none}
+.post .tier.harness{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.post .pills{display:flex;flex-wrap:wrap;gap:6px}
+.post .pill{font-size:13px;border:1px solid var(--line);border-radius:999px;padding:3px 10px;background:var(--bg)}
+.post .loopline{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:14px}
+.post .loopline .s{background:var(--accent);color:#fff;border-radius:999px;padding:3px 12px;font-weight:600}
+.post .loopline .a{opacity:.7}
+.post .cap{font-size:13px;opacity:.75;margin-top:6px}
+.post .down{display:flex;align-items:center;gap:10px;padding:6px 0 6px 30px;font-size:13px;color:var(--muted)}
+.post .down svg{width:14px;height:22px;color:var(--accent);flex:none}
+.post .logos{display:flex;flex-wrap:wrap;gap:8px}
+.post .logos img{width:30px;height:30px;object-fit:contain;background:var(--logo-tile);border:1px solid var(--line);border-radius:8px;padding:4px}
+.post .plug{border:2px dashed var(--accent);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:10px;justify-content:center}
+.post .plug h3{font-size:18px}
+.post .plug p{font-size:14px;color:var(--muted)}
+.post .loop{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;position:relative}
+.post .step{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:6px;position:relative}
+.post .step.key{border-color:var(--accent);background:var(--accent-soft)}
+.post .step .n{font-family:var(--display);font-weight:700;color:var(--accent);font-size:13px;letter-spacing:.08em}
+.post .step b{font-family:var(--display);font-size:17px}
+.post .step p{font-size:14px;color:var(--muted);line-height:1.45}
+.post .return{display:flex;align-items:center;gap:10px;color:var(--accent-ink);font-size:14px;font-weight:600}
+.post .return svg{width:100%;height:28px;color:var(--accent);flex:1}
+.post .guards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.post .guard{display:flex;gap:12px;align-items:flex-start;font-size:15px}
+.post .guard svg{width:22px;height:22px;color:var(--accent);flex:none;margin-top:2px}
+.post .replace td:nth-child(2){color:var(--muted);text-decoration:line-through;text-decoration-color:var(--warn)}
+.post .replace td:nth-child(3){font-weight:500}
+.post .replace .lgs{display:inline-flex;gap:4px;vertical-align:middle;margin-right:6px}
+.post .replace .lgs img{width:18px;height:18px;object-fit:contain;background:var(--logo-tile);border-radius:4px;padding:1px}
+.post .start{font-family:var(--display);font-size:22px;font-weight:600;color:var(--accent-ink)}
+.post .teams{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.post .team{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:10px}
+.post .team ul{margin:0;padding-left:18px;font-size:15px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
+.post .team ul b{color:var(--fg);font-weight:600}
+.post .money{display:grid;grid-template-columns:240px 1fr;gap:32px;align-items:start}
+.post .big{font-family:var(--display);font-size:56px;font-weight:700;line-height:1;color:var(--accent-ink);font-variant-numeric:tabular-nums}
+.post .bars{display:flex;flex-direction:column;gap:8px;font-size:14px;font-variant-numeric:tabular-nums}
+.post .bar{display:grid;grid-template-columns:150px 1fr 64px;gap:10px;align-items:center}
+.post .bar .track{height:12px;background:var(--accent-soft);border-radius:3px;overflow:hidden}
+.post .bar .fill{height:100%;background:var(--accent);border-radius:3px}
+.post .bar .v{text-align:right}
+.post .bar .est{color:var(--muted);font-size:12px}
+.post .next{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.post .next .card{border-top:3px solid var(--accent);padding-top:14px;display:flex;flex-direction:column;gap:6px}
+.post .next .card p{color:var(--muted);font-size:15px}
+.post .log{font-size:14px;color:var(--muted)}
+.post .log li{margin-bottom:4px}
+@media (max-width:820px){.post .flow{grid-template-columns:1fr;gap:4px}
+.post .flow .arrow svg{transform:rotate(90deg)}
+.post .arch{grid-template-columns:1fr}
+.post .tier{grid-template-columns:1fr;gap:10px}
+.post .loop{grid-template-columns:1fr 1fr}
+.post .money{grid-template-columns:1fr}}
+@media (max-width:480px){.post .loop{grid-template-columns:1fr}
+.post .bar{grid-template-columns:110px 1fr 56px}
+.post{font-size:16px}}
+.post .engine{display:grid;grid-template-columns:1fr 48px 1.15fr 48px 1fr;align-items:stretch;gap:0}
+.post .engine .arrow{align-self:center}
+.post .ingroup{display:flex;flex-direction:column;gap:6px}
+.post .ingroup+.ingroup{margin-top:14px}
+.post .ingroup .lbl{font-family:var(--display);font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.post .chiprow{display:flex;flex-wrap:wrap;gap:6px}
+.post .chip{display:inline-flex;align-items:center;gap:6px;font-size:13px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:4px 10px}
+.post .chip img{width:16px;height:16px;object-fit:contain;background:var(--logo-tile);border-radius:3px;padding:1px}
+.post .db{background:var(--fg);color:var(--bg);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.post .db h3{color:var(--bg);font-size:20px}
+.post .db .sub{font-size:13px;opacity:.7}
+.post .dbrow{display:grid;grid-template-columns:22px 1fr;gap:10px;align-items:start;border-top:1px solid rgba(127,127,127,.3);padding-top:10px}
+.post .dbrow svg{width:20px;height:20px;color:var(--accent)}
+.post .dbrow b{font-family:var(--display);font-weight:600;font-size:15px;display:block}
+.post .dbrow span{font-size:13px;opacity:.75;line-height:1.4;display:block}
+.post .dbask{background:var(--accent);color:#fff;border-radius:10px;padding:10px 12px;font-size:13px;font-weight:600}
+.post .feeds{display:grid;grid-template-columns:1fr 1fr;gap:6px;align-content:center}
+.post .feed{background:var(--accent-soft);color:var(--accent-ink);border-radius:8px;padding:8px 10px;font-size:13px;font-weight:600;line-height:1.3}
+.post .feed small{display:block;font-weight:400;color:var(--muted);font-size:12px}
+.post .outrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-end;margin-top:14px;font-size:13px;color:var(--muted)}
+.post .anatomy{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:10px;align-items:stretch}
+.post .part3{border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:6px;border:1px solid var(--line);background:var(--surface)}
+.post .part3 .k{font-family:var(--display);font-weight:700;font-size:13px;letter-spacing:.12em;color:var(--accent)}
+.post .part3 p{font-size:14px;color:var(--muted)}
+.post .part3.then{background:var(--accent-soft);border-color:var(--accent)}
+.post .anatomy .arrow svg{width:32px}
+.post .triggers{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.post .trig{border-top:3px solid var(--accent);padding-top:10px;display:flex;flex-direction:column;gap:4px}
+.post .trig b{font-family:var(--display);font-size:16px}
+.post .trig p{font-size:14px;color:var(--muted);line-height:1.45}
+.post .recipes{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.post .recipe{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.post .recipe .for{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.post .recipe h3{font-size:17px}
+.post .ln{display:grid;grid-template-columns:52px 1fr;gap:8px;font-size:14px;line-height:1.45}
+.post .ln .w{font-family:var(--display);font-weight:700;font-size:12px;letter-spacing:.08em;padding-top:2px}
+.post .ln .w.when{color:var(--muted)}
+.post .ln .w.if{color:var(--muted)}
+.post .ln .w.then{color:var(--accent)}
+.post .ln code{font-size:12.5px;background:var(--accent-soft);color:var(--accent-ink);padding:1px 5px;border-radius:4px}
+.post .safe{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:14px;color:var(--muted)}
+.post .safe span::before{content:"✓ ";color:var(--accent);font-weight:700}
+.post .dash{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.post .dash .bar0{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.post .dash .bar0 b{font-family:var(--display);color:var(--fg);font-size:16px}
+.post .tile{border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:8px;background:var(--bg);min-width:0}
+.post .tile.w2{grid-column:span 2}
+.post .tile .tt{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.04em}
+.post .tile .bn{font-family:var(--display);font-size:30px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.post .tile .delta{font-size:12px;color:var(--accent-ink);font-weight:600}
+.post .tile svg{width:100%;height:56px;display:block}
+.post .hb{display:grid;grid-template-columns:90px 1fr 36px;gap:8px;align-items:center;font-size:12px;font-variant-numeric:tabular-nums}
+.post .hb i{display:block;height:9px;background:var(--accent);border-radius:2px}
+.post .fun{display:flex;flex-direction:column;gap:5px;font-size:12px}
+.post .fun div{display:flex;justify-content:space-between;background:var(--accent-soft);border-radius:4px;padding:3px 8px;color:var(--accent-ink);font-weight:600}
+.post .sig{display:flex;flex-direction:column;gap:6px;font-size:12px}
+.post .sig div{display:flex;gap:8px;align-items:center}
+.post .sig .p{font-size:11px;border-radius:999px;padding:1px 8px;font-weight:600;white-space:nowrap}
+.post .p.r{background:var(--warn-soft);color:var(--warn)}
+.post .p.g{background:var(--accent-soft);color:var(--accent-ink)}
+.post .seeall{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.post .seeall div{display:flex;flex-direction:column;gap:4px}
+.post .seeall b{font-family:var(--display);font-size:16px}
+.post .seeall p{font-size:14px;color:var(--muted)}
+.post .deep{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:24px;display:grid;grid-template-columns:1fr 1fr;gap:20px 28px}
+.post .deep .hd{grid-column:1/-1;display:flex;flex-direction:column;gap:8px}
+.post .deep .hd h3{font-size:24px}
+.post .deep .hd p.q{font-size:16px;max-width:760px}
+.post .vs{grid-column:1/-1;overflow-x:auto}
+.post .vs table{min-width:560px;font-size:14px}
+.post .vs td:nth-child(2){color:var(--muted)}
+.post .vs td:nth-child(3){color:var(--fg)}
+.post .vs th:nth-child(3){color:var(--accent)}
+.post .blk{display:flex;flex-direction:column;gap:8px;min-width:0}
+.post .blk h4{margin:0;font-family:var(--display);font-size:13px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.post .blk ul{margin:0;padding-left:18px;font-size:14px;color:var(--muted);display:flex;flex-direction:column;gap:6px;line-height:1.5}
+.post .blk ul b{color:var(--fg);font-weight:600}
+.post .deeps{display:flex;flex-direction:column;gap:20px}
+@media (max-width:900px){.post .engine{grid-template-columns:1fr;gap:6px}
+.post .engine .arrow svg{transform:rotate(90deg)}
+.post .anatomy{grid-template-columns:1fr}
+.post .anatomy .arrow svg{transform:rotate(90deg)}
+.post .triggers{grid-template-columns:1fr 1fr}
+.post .dash{grid-template-columns:1fr 1fr}
+.post .deep{grid-template-columns:1fr}
+.post .outrow{justify-content:flex-start}}
+@media (max-width:480px){.post .triggers,.post .dash{grid-template-columns:1fr}
+.post .tile.w2{grid-column:auto}
+.post .feeds{grid-template-columns:1fr}
+.post .deep{padding:16px}
+.post .recipes{grid-template-columns:1fr}}
+.post .tl2,.post .bl,.post .hl{display:inline-flex;align-items:center;gap:6px}
+.post .tl2 img,.post .bl img{width:18px;height:18px;object-fit:contain;background:var(--logo-tile);border-radius:4px;padding:1px;flex:none}
+.post .hl img{width:22px;height:22px;object-fit:contain;background:var(--logo-tile);border-radius:5px;padding:2px}
+.post .chip img{width:16px;height:16px}
+</style>

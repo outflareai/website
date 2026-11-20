@@ -8387,6 +8387,34 @@ paths:
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/destination-preview:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    get:
+      operationId: previewDestination
+      x-outflare-access: { scope: analytics.read, brand: true }
+      summary: Preview where a tracker click would go
+      description: |
+        Scope: analytics.read. Shows the address a tracker click would go on to for a URL as you wrote it, before or after
+        saving it on a lander, an offer or a link: what Outflare adds (ofclk, the click's id, once; the campaign's utm_* and
+        ofc), what it replaces and what it leaves alone. It is built by the redirect's own code for a made-up click
+        (`sample_click_id`), so it matches what a real click gets, and it counts nothing: no click, no visit. A URL that
+        can't be saved (one that sets ofclk to anything but {click_id}) is refused here with the same message. For an
+        offer, preview its `tracking_url`.
+      tags: [analytics]
+      parameters:
+        - { name: destination, in: query, required: true, schema: { type: string }, description: "The destination URL as written, tokens such as {click_id} included." }
+        - { name: campaign, in: query, schema: { type: string }, description: "A tracking campaign's id, slug or ofc code, for its tags. Without one the preview has no utm_* and no ofc." }
+        - { name: content, in: query, schema: { type: string }, description: "The link's content, sent as utm_content." }
+        - { name: term, in: query, schema: { type: string }, description: "The link's term, sent as utm_term." }
+      responses:
+        "200":
+          description: The preview.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DestinationPreview" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/offers:
     parameters: [{ $ref: "#/components/parameters/BrandID" }]
     get:
@@ -39612,6 +39640,74 @@ paths:
                       activity: { type: integer, description: "Leads, cold emails, replies, meetings, deals, lifecycle emails, broadcast sends and journey runs that moved to the record kept." }
         "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/data/catalog:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+    get:
+      operationId: getBrandDataCatalog
+      x-outflare-access: { brand: true }
+      summary: Describe the brand's data
+      description: |
+        Any caller in the workspace. The data catalog: every table Query reads for this brand (and each of its record
+        types), grouped by area (customers, revenue, ads, analytics, outreach, email, seo, coverage, social, content, agents,
+        workspace), with what a row is, where its rows come from, the read scope it needs and whether you hold it,
+        its time column, example questions with their SQL, and, read live from the data with your own access, how
+        many rows it holds and the first and last date they cover. Read it before writing SQL; read one table's
+        columns with GET .../data/catalog/{table}. Answers are kept up to five minutes; fresh=true reads them again.
+      tags: [query]
+      parameters:
+        - { name: fresh, in: query, schema: { type: boolean }, description: "true reads the numbers again instead of the copy kept for up to five minutes." }
+      responses:
+        "200":
+          description: The catalog.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [brand_id, areas, data, computed_at, note, how_to_use]
+                properties:
+                  brand_id: { type: string, format: uuid }
+                  areas: { type: array, items: { type: string }, description: The areas, in the order the tables are listed. }
+                  data: { type: array, items: { $ref: "#/components/schemas/DataCatalogTable" } }
+                  computed_at: { type: string, format: date-time, description: When the numbers were read. }
+                  note: { type: [string, "null"], description: "Set when the numbers couldn't all be read, and what to do instead." }
+                  how_to_use: { type: string, description: How to go from the catalog to a query. }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/data/catalog/{table}:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: table, in: path, required: true, schema: { type: string }, description: "A table's name, from GET .../data/catalog." }
+    get:
+      operationId: getBrandDataCatalogTable
+      x-outflare-access: { brand: true }
+      summary: Describe one table of the brand's data
+      description: |
+        Any caller in the workspace. One table of the data catalog with every column explained: what it means, its
+        unit (minor units and the currency column they are in, UTC times, days), what an id joins to, and whether it
+        holds personal data. When you hold the table's read scope it also says, read live from the data with your
+        own access, how many rows the table holds, the dates they cover, what share of rows fill each column, and
+        the most common values of columns such as status, source or channel (from up to 100,000 rows). A table you
+        can't read is described without numbers, and note says which scope it needs. An unknown table is
+        not_found.
+      tags: [query]
+      parameters:
+        - { name: fresh, in: query, schema: { type: boolean }, description: "true reads the numbers again instead of the copy kept for up to five minutes." }
+      responses:
+        "200":
+          description: The table.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [table, columns, computed_at, note]
+                properties:
+                  table: { $ref: "#/components/schemas/DataCatalogTable" }
+                  columns: { type: array, items: { $ref: "#/components/schemas/DataCatalogColumn" } }
+                  computed_at: { type: string, format: date-time }
+                  note: { type: [string, "null"] }
+        default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/query/tables:
     parameters:
       - { $ref: "#/components/parameters/BrandID" }
@@ -39897,6 +39993,23 @@ paths:
               schema: { $ref: "#/components/schemas/QueryEndpoint" }
         "202": { $ref: "#/components/responses/MissionHeld" }
         "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    delete:
+      operationId: deleteQueryEndpoint
+      x-outflare-access: { scope: customers.manage, brand: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Delete a query endpoint
+      description: |
+        Scope: customers.manage, owners and admins only, signed in (403 admin_only). Removes the endpoint for good:
+        calls to its address answer 404, its slug can be used again, and its call log is deleted with it. Its saved
+        query is kept. The audit log keeps query_endpoint.deleted with its slug, saved query, version and how many
+        calls it had. To stop calls for a while instead, turn it off (status disabled).
+      tags: [query]
+      responses:
+        "204": { description: Deleted. }
+        "202": { $ref: "#/components/responses/MissionHeld" }
         "403": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
@@ -63161,7 +63274,7 @@ components:
         created_at: { type: string, format: date-time }
     TrackerConversion:
       type: object
-      required: [id, source_id, click_key, campaign_id, link_id, offer_id, fraud_reasons, clicked_at, transaction_id, type, status, payout, currency, params, record_id, postbacks, converted_at, updated_at]
+      required: [id, source_id, click_key, campaign_id, link_id, offer_id, fraud_reasons, clicked_at, transaction_id, type, status, payout, currency, params, record_id, postbacks, network_postback, converted_at, updated_at]
       properties:
         id: { type: string, format: uuid }
         source_id: { type: string, format: uuid }
@@ -63179,6 +63292,7 @@ components:
         params: { type: object, additionalProperties: { type: string }, description: "p1 to p20, by number." }
         record_id: { type: [string, "null"], format: uuid, description: "The person, when the click's visit knew them." }
         postbacks: { type: integer, description: "How many postbacks named its transaction id." }
+        network_postback: { type: string, enum: [sent, queued, failed, no_traffic_source, no_postback_url, suspect, awaiting_lookup, filtered, below_minimum], description: "What became of telling its campaign's traffic source. sent, queued or failed: its latest send (the traffic source's postbacks list has it). Otherwise why none was made: no_traffic_source (its campaign has no active traffic source), no_postback_url (the source has none, or its URL still holds REPLACE), suspect (it or its click has a fraud reason), awaiting_lookup (its click's address is still being looked up), filtered (a status or type the source's postback rules leave out) or below_minimum (a payout under the rules' minimum)." }
         converted_at: { type: string, format: date-time }
         updated_at: { type: string, format: date-time }
     TrackerOffer:
@@ -63214,6 +63328,32 @@ components:
         broken_since: { type: [string, "null"], format: date-time, description: "When the failed checks began; null while it answers." }
         created_at: { type: string, format: date-time }
         updated_at: { type: string, format: date-time }
+    DestinationPreview:
+      type: object
+      required: [configured_url, saved_url, effective_url, campaign_id, sample_click_id, parameters, replaced]
+      properties:
+        configured_url: { type: string, description: "The URL as it was given." }
+        saved_url: { type: string, description: "What saving it keeps: without the parameters Outflare owns (ofclk, ofc, utm_*)." }
+        effective_url: { type: string, description: "Where a click would go, for the sample click." }
+        campaign_id: { type: [string, "null"], format: uuid, description: "The campaign whose tags it carries; null when none was named." }
+        sample_click_id: { type: string, description: "The made-up click id in effective_url. No real click has it." }
+        parameters:
+          type: array
+          description: "effective_url's query parameters, in order."
+          items:
+            type: object
+            required: [name, value, source]
+            properties:
+              name: { type: string }
+              value: { type: string }
+              source:
+                type: string
+                enum: [click, campaign, link, token, url]
+                description: "Who set it: click (ofclk), campaign (utm_source, utm_medium, utm_campaign, ofc), link (utm_content, utm_term), token (the URL's own parameter, with a token filled in for the click) or url (as written)."
+        replaced:
+          type: array
+          items: { type: string }
+          description: "Parameters the URL set that Outflare owns, so the written values were dropped."
     TrackerOfferInput:
       type: object
       properties:
@@ -63417,7 +63557,7 @@ components:
         resend: { type: boolean, description: "Send a conversion again when its status or payout changes." }
     TrafficSourcePostbackSend:
       type: object
-      required: [id, conversion_id, status, payout, url, http_status, error, attempts, sent_at, created_at]
+      required: [id, conversion_id, status, payout, url, http_status, error, attempts, sent_at, created_at, warning]
       properties:
         id: { type: string, format: uuid }
         conversion_id: { type: string, format: uuid }
@@ -63429,6 +63569,7 @@ components:
         attempts: { type: integer }
         sent_at: { type: [string, "null"], format: date-time }
         created_at: { type: string, format: date-time }
+        warning: { type: string, enum: ["", no_source_click_id], description: "no_source_click_id when the source's postback URL asks for {source_click_id} and the conversion's click arrived without the network's click id, so the network can't tell which click to credit; '' otherwise." }
     TrackerCostUpdate:
       type: object
       description: What a tracker campaign cost over a period, as entered, and how sharing it out over the clicks went.
@@ -77774,6 +77915,53 @@ components:
               properties:
                 code: { type: string }
                 message: { type: string }
+    DataCatalogTable:
+      type: object
+      additionalProperties: false
+      required: [name, area, description, source, scope, available, rows, first_at, last_at, columns, examples]
+      properties:
+        name: { type: string, description: "The table's name in SQL." }
+        area: { type: string, description: "customers, revenue, ads, analytics, outreach, email, seo, coverage, social, content, agents or workspace." }
+        description: { type: string, description: What one row is. }
+        source: { type: string, description: Where its rows come from. }
+        scope: { type: string, description: The read scope it needs. }
+        available: { type: boolean, description: Whether you can read it. }
+        time_column: { type: string, description: The column that dates its rows, when it has one. }
+        rows: { type: [integer, "null"], description: "How many rows it holds for this brand; null when you can't read it or counting failed." }
+        first_at: { type: [string, "null"], description: The earliest value of its time column. }
+        last_at: { type: [string, "null"], description: The latest value of its time column, which says how fresh it is. }
+        columns: { type: integer, description: How many columns it has. }
+        examples:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [question, sql]
+            properties:
+              question: { type: string }
+              sql: { type: string }
+    DataCatalogColumn:
+      type: object
+      additionalProperties: false
+      required: [name, type, description, personal, filled]
+      properties:
+        name: { type: string }
+        type: { type: string, description: "Its Postgres type." }
+        description: { type: string, description: What it means. }
+        joins_to: { type: string, description: "What an id column points at, such as people.id." }
+        unit: { type: string, description: "Its unit, such as minor units of a currency column, a UTC timestamp or days." }
+        personal: { type: boolean, description: Whether it holds personal data. }
+        filled: { type: [number, "null"], description: "The share of rows (0 to 1) where it is set; null without numbers." }
+        values:
+          type: array
+          description: Its most common values, for columns such as status, source or channel.
+          items:
+            type: object
+            additionalProperties: false
+            required: [value, rows]
+            properties:
+              value: { description: The value. }
+              rows: { type: integer }
     QueryTable:
       type: object
       required: [name, description, scope, available, columns]

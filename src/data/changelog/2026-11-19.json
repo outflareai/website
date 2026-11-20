@@ -1,8 +1,8 @@
 {
 	"version": "2026.11.19",
 	"date": "2026-11-19",
-	"status": "in-progress",
-	"updated": "2026-11-19T14:07:26Z",
+	"status": "final",
+	"updated": "2026-11-20T16:38:32Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -59,7 +59,35 @@
 			"edition": "open-source",
 			"text": "The website script can load your Meta and TikTok pixels: two new switches on Website tracking, off by default. It sends each conversion a page causes to the pixel with the same ID Outflare's server sends, so the platform counts it once and matches more conversions to an ad. No pixel code on your site.",
 			"at": "2026-11-19T14:07:26Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "The smart list builder is simpler: say who to include and who to leave out, pick each condition's kind from one menu, switch \"and\" and \"or\" with a click, and see the live count and the list in plain words beside it.",
+			"at": "2026-11-19T14:32:06Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "connectors",
+			"edition": "open-source",
+			"text": "Treg's email finder lookups and address checks are now booked in the spend ledger at the cost Treg reports for each call, to the millionth of a dollar, instead of as credits with no price, so Outcomes shows what they really cost.",
+			"at": "2026-11-19T14:32:06Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Tracker routing takes up to 100 landers and 100 offers or pages in each list, up from 20 in all. Landers and offers are split on their own, so 25 landers and 31 offers at the same weight get 1/25 and 1/31 of the clicks each. The routing editor adds several at once, shows shares to one decimal and marks one that is listed twice.",
+			"at": "2026-11-19T14:32:06Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Smart list rules: event filters now offer the properties your events actually carry, money filters take whole amounts (100 for $100), time windows and counts take any number, and the \"holds nearly everyone\" warning also covers lists that match any rule.",
+			"at": "2026-11-19T14:32:06Z"
 		}
 	],
-	"through": "d0b80c2+d0b80c2"
+	"through": "df8b9a5+df8b9a5"
 }
