@@ -227,6 +227,12 @@ same rows. It takes `level` (`campaign`, `adset` or `ad`), `from`, `to`,
 spend; other platforms sync campaigns only, so their ad sets and ads come with
 first-party numbers but no name or spend.
 
+### Counting by another attribution model
+
+Outflare ties each sign-up to the last ad click before it. To see the same campaigns under another of your attribution models, pick it under **Also count by** on the Campaigns table. Outflare remembers the choice per brand. The table then shows three answers side by side: the last ad click, the model you picked, and the network's own count (**Network says**).
+
+A model splits a conversion between visits, so its sign-ups can be a fraction. In the API, pass `model=` to `GET /v1/brands/{brand}/ads/performance` (`first_touch`, `linear`, `last_non_direct`, or the id of one of your own models): each row also carries `model_signups`, `model_revenue`, `model_cost_per_signup_micros` and `model_roas`.
+
 ## Sending conversions back
 
 A conversion rule sends one customer event (such as `signed_up` or
