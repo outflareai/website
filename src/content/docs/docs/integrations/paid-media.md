@@ -241,6 +241,15 @@ The Overview opens on six numbers: cost per new customer, cost per sign-up, new 
 
 A monthly target is judged by the share of a month the range covers, so 50 new customers a month is 47 for a range of 28 days. A cost within a tenth of its target is on target; under it there is room to spend more; over it costs too much. The monthly budget is only compared against: nothing stops spending, which is what the daily budget ceiling is for.
 
+### How far video ads are watched
+
+For video ads, Meta and TikTok also say how far people watched. Turn on the columns **Watched**, **Hook rate**, **Hold rate** and **Watched to the end** in the campaign, ad set and ad tables:
+
+- **Hook rate**: video views out of everyone who saw the ad. It says how often the opening stops the scroll. A view is 3 seconds or more on Meta and 2 on TikTok.
+- **Hold rate**: plays that kept going (Meta's ThruPlays, 15 seconds or the whole video; 6 seconds or more on TikTok) out of video views.
+
+The columns are empty for ads without a video. In the API the rows carry `video_views`, `video_thruplays`, `video_p25` to `video_p100`, `hook_rate` and `hold_rate`.
+
 ## Sending conversions back
 
 A conversion rule sends one customer event (such as `signed_up` or
