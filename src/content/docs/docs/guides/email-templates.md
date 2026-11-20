@@ -31,6 +31,10 @@ Every published version is kept. **Load into draft** brings an old one back. You
 | `{{{receipt_html}}}` | HTML you built yourself, not escaped |
 | `{{#if coupon}}…{{else}}…{{/if}}` | A part shown only when it is set |
 | `{{unsubscribe_url}}` | The one-click unsubscribe link (lifecycle email) |
+| `{{brand_address}}` | The brand's postal address on one line, from its [business details](/docs/agents/memory/#business-details) |
+| `{{brand_legal_name}}` | The brand's legal name, or its name when none is set |
+
+Lifecycle email always ends with an unsubscribe link and, once the brand has saved a postal address, its legal name and address, as anti-spam laws such as CAN-SPAM and Australia's Spam Act ask. Put `{{unsubscribe_url}}` or `{{brand_address}}` in your own footer to place them yourself; otherwise Outflare adds them at the end.
 
 Each variable can be:
 
