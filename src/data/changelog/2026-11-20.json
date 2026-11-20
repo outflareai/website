@@ -2,7 +2,7 @@
 	"version": "2026.11.20",
 	"date": "2026-11-20",
 	"status": "in-progress",
-	"updated": "2026-11-20T17:48:58Z",
+	"updated": "2026-11-20T19:41:22Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -80,7 +80,14 @@
 			"edition": "open-source",
 			"text": "Owners and admins can now delete a published query endpoint, from the Endpoints list or its own page, after a confirmation. Its address stops answering and can be used again, its call log goes with it, and the saved query and the audit record stay. Turning an endpoint off still pauses it instead.",
 			"at": "2026-11-20T17:48:58Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "The send log in Paid ads shows Meta's match quality: a score out of 10 for each event you send, how it moved against the week before, which identifiers went with it and what Meta says to fix. A low or falling score raises an alert.",
+			"at": "2026-11-20T19:41:22Z"
 		}
 	],
-	"through": "6922be2+6922be2"
+	"through": "604380f+604380f"
 }
