@@ -1881,6 +1881,80 @@ paths:
         "204": { description: Removed. It no longer signs you in. }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/me/menu:
+    get:
+      operationId: getMenu
+      x-outflare-access: { signed_in: true }
+      summary: What you pinned to your menu, and what you opened last
+      description: |
+        The web app's menu keeps two short lists for the signed-in person: the pages and things they pinned, in
+        their order, and the things they opened last, newest first. Both belong to the person, so they are the same
+        in every browser. Each entry is a `ref`: a page's id (`sequences`), or a path of ids to one thing inside a
+        page. Titles are not stored.
+      tags: [access]
+      responses:
+        "200":
+          description: The person's pins and recents.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Menu" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/me/menu/pins:
+    put:
+      operationId: saveMenuPins
+      x-outflare-access: { signed_in: true }
+      summary: Replace what you pinned to your menu
+      description: Saves the list as sent, in its order; a ref sent twice is kept once. Up to 100 pins.
+      tags: [access]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [pins]
+              properties:
+                pins: { type: array, maxItems: 100, items: { type: string, maxLength: 400 } }
+      responses:
+        "200":
+          description: The pins as saved.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [pins]
+                properties:
+                  pins: { type: array, items: { type: string } }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/me/menu/recents:
+    post:
+      operationId: addMenuRecent
+      x-outflare-access: { signed_in: true }
+      summary: Note that you opened something
+      description: Puts the ref at the top of your recents. The newest 50 are kept.
+      tags: [access]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ref]
+              properties:
+                ref: { type: string, maxLength: 400 }
+      responses:
+        "204": { description: Noted. }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    delete:
+      operationId: clearMenuRecents
+      x-outflare-access: { signed_in: true }
+      summary: Clear your recents
+      tags: [access]
+      responses:
+        "204": { description: Cleared. Your pins stay. }
+        default: { $ref: "#/components/responses/Error" }
   /v1/me/table-views:
     get:
       operationId: listTableViews
@@ -25015,8 +25089,42 @@ paths:
               type: object
               properties:
                 enabled: { type: boolean }
-                sources: { type: array, items: { type: string, enum: [reddit, news, web] } }
+                sources: { type: array, items: { type: string, enum: [reddit, news, web, youtube, podcasts] } }
                 scan_every_hours: { type: integer, minimum: 1, maximum: 168 }
+      responses:
+        "200":
+          description: The overview.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/MentionsOverview" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/mentions/listen-for:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    patch:
+      operationId: updateMentionListenFor
+      x-outflare-access: { scope: social.manage, brand: true }
+      summary: Change what mentions listen for
+      description: |
+        Scope: social.manage. Changes one row of listen_for: the brand's own
+        (competitor_id empty or null) or a tracked competitor's. Turn it off,
+        add terms by hand, or skip automatic terms (by default only the whole
+        website, and the name when it is a brand name). The next scan uses
+        it. Answers the overview.
+      tags: [social]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                competitor_id: { type: [string, "null"], description: The competitor's id; empty or null for the brand's own row. }
+                listening: { type: boolean }
+                added_terms: { type: array, maxItems: 50, items: { type: string, minLength: 3, maxLength: 200 } }
+                skipped_terms: { type: array, maxItems: 50, items: { type: string, minLength: 3, maxLength: 200 } }
       responses:
         "200":
           description: The overview.
@@ -28088,7 +28196,8 @@ paths:
       description: |
         Scope: outcomes.read. Rows for a warehouse or a spreadsheet, as CSV
         (default) or newline-delimited JSON. Up to 100,000 rows per call;
-        narrow from and to for more. The report dataset takes the report's
+        when there are more, the file stops there and says so in
+        X-Outflare-Truncated: narrow from and to for the rest. The report dataset takes the report's
         query parameters and defaults to group_by=sequence.
       tags: [outcomes]
       parameters:
@@ -28101,10 +28210,45 @@ paths:
       responses:
         "200":
           description: The file.
+          headers:
+            X-Outflare-Truncated:
+              description: "\"true\" when there were more rows than one call returns, so the file stops at the row limit: narrow from and to for the rest."
+              schema: { type: string, enum: ["true"] }
+            X-Outflare-Row-Limit:
+              description: The most rows one call returns, sent with X-Outflare-Truncated.
+              schema: { type: string }
           content:
             text/csv: { schema: { type: string } }
             application/x-ndjson: { schema: { type: string } }
         "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/usage:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+    get:
+      operationId: getBrandUsage
+      x-outflare-access: { scope: workspace.read, brand: true }
+      summary: What a brand stores and tracks, against its limits
+      description: |
+        Scope: workspace.read. This month's usage of the brand and of its
+        whole workspace: website and product events and tracker clicks
+        since the 1st (UTC), and the contacts and session recordings kept
+        now. Counts are refreshed every hour. Limits belong to the
+        workspace, so its brands share them; a server without limits (a
+        self-hosted one, unless an extension adds them) returns `limit`
+        null and every `status` ok. `status` is near when most of a limit
+        is used and reached when it is used up or something was refused
+        recently; then `stops` says what stops, and `refused_since` and
+        `refused` say since when and how many were refused this month.
+        `raise` is the page where the limit is raised, when the server has
+        one.
+      tags: [workspaces]
+      responses:
+        "200":
+          description: The brand's usage.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BrandUsage" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/outcomes/syncs:
     parameters:
@@ -38707,7 +38851,7 @@ paths:
               additionalProperties: false
               properties:
                 funnel: { $ref: "#/components/schemas/FunnelSpec" }
-                step: { type: integer, minimum: 1, maximum: 10 }
+                step: { type: integer, minimum: 1, maximum: 20 }
                 dropped: { type: boolean, default: false }
                 breakdown: { type: string }
                 limit: { type: integer, minimum: 1, maximum: 500, default: 50 }
@@ -38748,7 +38892,7 @@ paths:
               additionalProperties: false
               properties:
                 funnel: { $ref: "#/components/schemas/FunnelSpec" }
-                step: { type: integer, minimum: 1, maximum: 10 }
+                step: { type: integer, minimum: 1, maximum: 20 }
                 dropped: { type: boolean, default: false }
                 breakdown: { type: string }
                 name: { type: string, minLength: 1, maxLength: 200, description: The new list's name. }
@@ -38792,7 +38936,7 @@ paths:
               additionalProperties: false
               properties:
                 funnel: { $ref: "#/components/schemas/FunnelSpec" }
-                step: { type: integer, minimum: 2, maximum: 10, description: The step reached; the last when left out. }
+                step: { type: integer, minimum: 2, maximum: 20, description: The step reached; the last when left out. }
                 limit: { type: integer, minimum: 1, maximum: 50, default: 10, description: How many items each way. }
       responses:
         "200":
@@ -38800,6 +38944,45 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/CorrelationResult" }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/insights/funnel/checks:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    post:
+      operationId: runFunnelChecks
+      parameters: [{ $ref: "#/components/parameters/ReportTimezone" }]
+      x-outflare-access: { scope: analytics.read, brand: true }
+      summary: Check a funnel's data
+      description: |
+        Scope: analytics.read. Looks at each step on its own, apart from the funnel, to tell a drop-off that is
+        people leaving from one the tracking caused. steps has, for every step, everyone who did it in the dates,
+        the two-step funnel of it and the step before, how many of its people have nothing on record before it, and
+        when its data last arrived. data lists what looks wrong: a step nothing has arrived for (never_received), a
+        step whose data used to arrive and has stopped (stopped), and a step many people did with nothing on record
+        before it, which usually means it is sent under a different id (unlinked). For funnels in order.
+        Runs for at most 30 seconds (query_timeout).
+      tags: [insights]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [funnel]
+              additionalProperties: false
+              properties:
+                funnel: { $ref: "#/components/schemas/FunnelSpec" }
+      responses:
+        "200":
+          description: What was found, by step.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [steps, data]
+                properties:
+                  steps: { type: array, description: Every step looked at on its own., items: { $ref: "#/components/schemas/FunnelStepData" } }
+                  data: { type: array, description: What the checks found, items: { $ref: "#/components/schemas/FunnelCheck" } }
         "400": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/insights/paths:
@@ -41094,6 +41277,44 @@ paths:
         "400": { $ref: "#/components/responses/Error" }
         "403": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/query-endpoints/describe:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+    post:
+      operationId: describeQueryEndpoint
+      x-outflare-access: { scope: customers.read, brand: true }
+      summary: Describe a query endpoint in plain English
+      description: |
+        Scope: customers.read. Writes a description of what an endpoint for a saved query returns, from the query
+        itself: the table it reads, its filters, the parameters callers send, its order and its row limit. It is
+        written by rules, not by an AI model, so it costs nothing and is the same every time. Nothing is saved:
+        publishing with no description uses this one, and you can change it.
+      tags: [query]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [saved_query_id]
+              properties:
+                saved_query_id: { type: string, format: uuid }
+                version: { type: integer, minimum: 1, description: The saved query's version; its current one when left out. }
+                params: { type: array, maxItems: 20, items: { $ref: "#/components/schemas/QueryEndpointParam" }, description: "The parameters, in order ($1, $2, …), as the endpoint will declare them." }
+                row_cap: { type: integer, minimum: 1, maximum: 10000 }
+      responses:
+        "200":
+          description: The description.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [description]
+                properties:
+                  description: { type: string, example: "People whose country is the country you send, newest first. Returns name, email and country, up to 500 rows." }
+        "400": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/query-endpoints/{endpoint}:
     parameters:
@@ -46084,6 +46305,64 @@ paths:
         "404": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
         "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/creative-skill-drafts:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    post:
+      operationId: draftCreativeSkill
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      x-outflare-access: { scope: content.manage, brand: true }
+      summary: Draft a skill from an ad described in words
+      description: |
+        Scope: content.manage. Turns a description such as "an ad for developers whose requests keep getting blocked;
+        lead with our success rate" into the draft of a skill: a name, the prompt for the picture and how to write the
+        words over it. The workspace's own AI model writes it from the description and what the brand says about
+        itself (its context and personas), never from customers. It runs in a job on the workspace's own AI key and
+        inside its spend limits: the answer is the draft, queued; read it with GET .../creative-skill-drafts/{draft}
+        until its status is ready or failed. Nothing is made and no skill is saved until someone saves the draft
+        (POST .../creative-skills, with a picture model of the workspace's choosing). Without an AI model connected it
+        answers 409 and says which connection to add.
+      tags: [brands]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [description]
+              properties:
+                description: { type: string, maxLength: 1000, description: "The ad you want, in your own words." }
+      responses:
+        "202":
+          description: The draft, queued.
+          content:
+            application/json:
+              schema: { oneOf: [{ $ref: "#/components/schemas/CreativeSkillDraft" }, { $ref: "#/components/schemas/MissionHeld" }] }
+        "400": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/creative-skill-drafts/{draft}:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: draft, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getCreativeSkillDraft
+      x-outflare-access: { scope: content.read, brand: true }
+      summary: Get a skill drafted from a description
+      description: |
+        Scope: content.read. A draft asked for with POST .../creative-skill-drafts: queued or running while the model
+        works, then ready with a name, a one-line summary, the picture prompt and how to write the words, or failed
+        with why. Words in curly brackets are fill-ins the model left for a person, such as a number it wasn't given.
+        Save it as a skill with POST .../creative-skills.
+      tags: [brands]
+      responses:
+        "200":
+          description: The draft.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CreativeSkillDraft" }
+        "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/creative-skills/{skill}:
     parameters:
@@ -66689,6 +66968,20 @@ components:
         created_by: { type: [string, "null"], format: uuid }
         created_at: { type: string, format: date-time }
         creatives: { type: integer, description: "How many creatives this version made." }
+    CreativeSkillDraft:
+      type: object
+      required: [id, description, status, error, name, summary, picture, copy, created_at, finished_at]
+      properties:
+        id: { type: string, format: uuid }
+        description: { type: string }
+        status: { type: string, enum: [queued, running, ready, failed] }
+        error: { type: string, description: "Why it failed, in words a person can act on; empty otherwise." }
+        name: { type: string, description: "A name for the skill; empty until ready." }
+        summary: { type: string, description: "One line on the ads the skill would make." }
+        picture: { type: string, description: "The prompt for the picture." }
+        copy: { type: string, description: "How to write the headline, second line and button laid over the picture." }
+        created_at: { type: string, format: date-time }
+        finished_at: { type: [string, "null"], format: date-time }
     CreativeSkill:
       type: object
       required: [id, brand_id, name, description, kind, enabled, version, split_test, current, creatives, archived_at, created_at, updated_at]
@@ -72249,6 +72542,21 @@ components:
         impression_share_location: { type: string, description: "A target impression share strategy's place on the page." }
         impression_share: { type: number, description: "The share of searches it aims to show in, 0 to 1." }
         max_cpc_micros: { type: integer, format: int64, description: "The most it pays for a click (target_impression_share, target_spend)." }
+    Menu:
+      type: object
+      description: What a person pinned to their menu in the web app, and what they opened last.
+      required: [pins, recents]
+      properties:
+        pins: { type: array, items: { type: string }, description: "Refs of the pinned pages and things, in the person's order." }
+        recents:
+          type: array
+          description: The things the person opened last, newest first.
+          items:
+            type: object
+            required: [ref, opened_at]
+            properties:
+              ref: { type: string }
+              opened_at: { type: string, format: date-time }
     TableView:
       type: object
       description: The columns a person saved as their default for one named table of the web app.
@@ -74747,7 +75055,7 @@ components:
         reach: { type: [integer, "null"], description: "Their audience where it was said (subscribers, followers, listeners), when known." }
         score: { type: integer, minimum: 0, maximum: 100, description: "How worth a look it is: competitor mentions, bigger audiences, videos and episodes, and fresh ones rank higher." }
         status: { $ref: "#/components/schemas/MentionStatus" }
-        origin: { type: string, enum: [social_items, news, presence, manual], description: What found it. }
+        origin: { type: string, enum: [social_items, news, presence, manual, video_search, podcast_search], description: What found it. }
         published_at: { type: [string, "null"], format: date-time }
         found_at: { type: string, format: date-time }
         status_changed_at: { type: string, format: date-time }
@@ -74767,7 +75075,7 @@ components:
             type: object
             required: [id, name, on, ready, setup_tab, setup_hint]
             properties:
-              id: { type: string, enum: [reddit, news, web] }
+              id: { type: string, enum: [reddit, news, web, youtube, podcasts] }
               name: { type: string }
               on: { type: boolean, description: The brand's settings read it. }
               ready: { type: boolean, description: "Something feeds it: an active Reddit watch, an active news search, a tracked competitor." }
@@ -74778,12 +75086,16 @@ components:
           description: The brand first, then each tracked competitor from the Competitors page.
           items:
             type: object
-            required: [about, competitor_id, name, terms]
+            required: [about, competitor_id, name, listening, terms, auto_terms, added_terms, skipped_terms]
             properties:
               about: { type: string, enum: [brand, competitor] }
               competitor_id: { type: [string, "null"], format: uuid }
               name: { type: string }
-              terms: { type: array, items: { type: string } }
+              listening: { type: boolean, description: Scans listen for this row. False when someone turned it off. }
+              terms: { type: array, items: { type: string }, description: What scans listen for. Empty when the row is off. }
+              auto_terms: { type: array, items: { type: string }, description: "The automatic terms: the whole website, and the name when it is a brand name rather than everyday words." }
+              added_terms: { type: array, items: { type: string }, description: Terms added by hand. }
+              skipped_terms: { type: array, items: { type: string }, description: Automatic terms someone took out. }
         totals:
           type: object
           required: [total, new, new_this_week, contacted, replied, on_board, people]
@@ -77012,7 +77324,7 @@ components:
               kind: { type: string, description: "The channel (x, linkedin, youtube and others) or review platform (trustpilot, g2, capterra, sourceforge, google)." }
               url: { type: string }
               state: { type: string, enum: [suggested, confirmed, dismissed] }
-              source: { type: string, enum: [home_page, manual], description: "home_page: linked from the competitor's home page; manual: added by a person." }
+              source: { type: string, enum: [home_page, manual, mentions], description: "home_page: linked from the competitor's home page; manual: added by a person; mentions: the mention listener found videos the competitor posted there itself." }
               followers: { type: ["integer", "null"], description: "A social profile's headline count (followers, subscribers, members) at the last read." }
               followers_change_28d: { type: ["integer", "null"] }
               score: { type: ["number", "null"], description: "A review page's rating out of 5 at the last read." }
@@ -77989,7 +78301,7 @@ components:
             type: object
             required: [task, name, description, model, price, price_source, custom]
             properties:
-              task: { type: string, enum: [sales_reply_draft, plan, turn, check_in, reply_labelling, classify_domain, ai_visibility, social_replies, social_posts, email_verification, fix_tickets, review_replies, link_page_reading, ab_tests, link_pitches, knowledge_answers, support_replies, coverage_review, journeys, pr_stories, brand_knowledge, telegram_matching, telegram_summaries, mail_privacy, insights, queries, event_names, conversation_signals, lead_channels, smart_lists] }
+              task: { type: string, enum: [sales_reply_draft, plan, turn, check_in, reply_labelling, classify_domain, ai_visibility, social_replies, social_posts, email_verification, fix_tickets, review_replies, link_page_reading, ab_tests, link_pitches, knowledge_answers, support_replies, coverage_review, journeys, pr_stories, brand_knowledge, telegram_matching, telegram_summaries, mail_privacy, insights, queries, event_names, conversation_signals, lead_channels, smart_lists, creative_prompts] }
               name: { type: string }
               description: { type: string }
               model: { type: [string, "null"], description: Null when no model can run yet. }
@@ -78112,6 +78424,38 @@ components:
         monthly_limit: { type: [number, "null"], description: Per calendar month (UTC); null is no limit. }
         hard_stop: { type: boolean, description: "Calls stop at a limit; false only warns." }
         default: { type: boolean, description: "Nobody set limits: the connector's starting limit applies (Ahrefs 10,000 API units, DataForSEO US$10 a month), or none." }
+    BrandUsage:
+      type: object
+      required: [month, items, raise]
+      properties:
+        month: { type: string, example: "2026-11", description: "The month counted, YYYY-MM (UTC)." }
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/BrandUsageItem" }
+        raise:
+          description: Where the limits are raised, when the server has such a page.
+          oneOf:
+            - type: "null"
+            - type: object
+              required: [label, path]
+              properties:
+                label: { type: string }
+                path: { type: string, description: "A page of the server's own (starting with /), or a tab of the workspace." }
+    BrandUsageItem:
+      type: object
+      required: [metric, name, unit, period, brand, workspace, limit, status, stops, refused_since, refused]
+      properties:
+        metric: { type: string, enum: [tracked_events, tracker_clicks, records, recordings_mb] }
+        name: { type: string }
+        unit: { type: string, enum: [event, click, record, MB] }
+        period: { type: string, enum: [month, stored], description: "month: counted since the 1st (UTC); stored: kept now." }
+        brand: { type: integer, format: int64, description: The brand's own usage. }
+        workspace: { type: integer, format: int64, description: "The whole workspace's usage, every brand's together: what the limit counts." }
+        limit: { type: [integer, "null"], format: int64, description: "The workspace's limit; null for none." }
+        status: { type: string, enum: [ok, near, reached] }
+        stops: { type: string, description: "What stops at the limit, in a few words; empty without a limit." }
+        refused_since: { type: [string, "null"], format: date-time, description: "When the limit first refused something this month, while it is reached." }
+        refused: { type: integer, format: int64, description: "How many were refused this month, while it is reached." }
     AIUsage:
       type: object
       required: [month, spent_cents, monthly_limit_cents, hard_stop, total, tools, models, days, recent, retention_days]
@@ -78796,6 +79140,12 @@ components:
         may_take_mailboxes: { type: boolean, description: "Whether its sequences may take mailboxes from lower-priority sequences without the owner's approval. Off by default." }
         default_team_id: { type: [string, "null"], format: uuid, description: Team for sequences it creates without one. }
         action_gate: { type: boolean, description: "Its changes go through the action layer: run, held for a person or refused by the grants a person set for it (listActionGrants)." }
+        created_by:
+          type: [object, "null"]
+          description: "The person who created the token. Null when it isn't known: another token or an agent made it, or the person's account has been deleted."
+          properties:
+            id: { type: string, format: uuid, description: The user id. }
+            name: { type: string, description: "Their name, or their email address when they have no name." }
     APITokenLimits:
       type: object
       properties:
@@ -82263,7 +82613,7 @@ components:
         version: { type: integer, minimum: 1, description: The saved query's version it runs. Default its current one. }
         slug: { type: string, pattern: "^[a-z0-9][a-z0-9-]{0,62}$", description: "Publish only: its address, unique in the brand." }
         name: { type: string, minLength: 1, maxLength: 200 }
-        description: { type: string, maxLength: 2000 }
+        description: { type: string, maxLength: 2000, description: "What it returns, in plain English. Publishing without one writes it from the query (POST .../query-endpoints/describe)." }
         params: { type: array, maxItems: 20, items: { $ref: "#/components/schemas/QueryEndpointParam" }, description: "Bound in order as $1, $2, …" }
         row_cap: { type: integer, minimum: 1, maximum: 10000, description: The most rows a call returns. Default 1000. }
         rate_per_minute: { type: integer, minimum: 1, maximum: 600, description: Calls a minute per token. Default 60. }
@@ -82443,7 +82793,7 @@ components:
       properties:
         value: { type: integer, minimum: 1 }
         unit: { type: string, enum: [minute, hour, day, week] }
-        from: { type: integer, minimum: 1, maximum: 9 }
+        from: { type: integer, minimum: 1, maximum: 19 }
     FunnelStep:
       type: object
       required: [kind]
@@ -82468,6 +82818,38 @@ components:
             Show the step without making it a gate: people who skipped it still go on to the next step and count there, and
             the step's result says how many skipped it. Leave it out for a required step. Not for step 1, the last step or
             an any-order funnel, and no time limit or exclusion may count from an optional step.
+    FunnelStepData:
+      type: object
+      required: [step, people, last_received_at, per_day]
+      description: One step of a funnel looked at on its own.
+      properties:
+        step: { type: integer, minimum: 1, maximum: 20, description: The step, counted from 1. }
+        people: { type: integer, description: Everyone who did the step in the dates, whether or not they did the steps before it. }
+        last_received_at: { type: [string, "null"], format: date-time, description: When the step's data last arrived; null when it never has. }
+        per_day: { type: integer, description: About how many arrived a day in the two weeks up to then. }
+        from_previous:
+          type: object
+          required: [started, reached]
+          description: The two-step funnel of this step and the one before it. Not on step 1.
+          properties:
+            started: { type: integer, description: People who did the step before in the dates. }
+            reached: { type: integer, description: How many of them then did this step in time. }
+        nothing_before: { type: integer, description: "How many of people have no event, page view or visit on record before this step. Not on step 1 or for companies." }
+    FunnelCheck:
+      type: object
+      required: [step, kind]
+      description: Something in a step's data that makes its numbers doubtful.
+      properties:
+        step: { type: integer, minimum: 1, maximum: 20, description: The step, counted from 1. }
+        kind:
+          type: string
+          enum: [never_received, stopped, unlinked]
+          description: |
+            never_received: nothing matching the step has arrived in the last 90 days. stopped: it used to arrive and
+            has not for longer than its usual gaps. unlinked: many people did it with nothing on record before it.
+        last_received_at: { type: string, format: date-time, description: "stopped: when the last one arrived." }
+        daily_before: { type: integer, description: "stopped: about how many arrived a day before it stopped." }
+        people: { type: integer, description: "unlinked: how many did this step in the dates with nothing on record before it." }
     FunnelExclusion:
       type: object
       required: [kind, from, to]
@@ -82480,8 +82862,8 @@ components:
         event: { type: string, maxLength: 100 }
         conversion: { type: string, maxLength: 40 }
         filters: { type: array, maxItems: 20, items: { $ref: "#/components/schemas/InsightFilter" } }
-        from: { type: integer, minimum: 1, maximum: 9, description: A step number, counted from 1. }
-        to: { type: integer, minimum: 2, maximum: 10, description: A later step number. }
+        from: { type: integer, minimum: 1, maximum: 19, description: A step number, counted from 1. }
+        to: { type: integer, minimum: 2, maximum: 20, description: A later step number. }
     CorrelationItem:
       type: object
       required: [kind, name, converted, dropped, converted_rate, dropped_rate, odds_ratio]
@@ -82577,7 +82959,7 @@ components:
       required: [steps]
       additionalProperties: false
       properties:
-        steps: { type: array, minItems: 2, maxItems: 10, items: { $ref: "#/components/schemas/FunnelStep" } }
+        steps: { type: array, minItems: 2, maxItems: 20, items: { $ref: "#/components/schemas/FunnelStep" } }
         exclusions:
           type: array
           maxItems: 5
