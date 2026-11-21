@@ -2,7 +2,7 @@
 	"version": "2026.11.21",
 	"date": "2026-11-21",
 	"status": "in-progress",
-	"updated": "2026-11-21T13:09:52Z",
+	"updated": "2026-11-21T13:36:37Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -290,7 +290,14 @@
 			"edition": "open-source",
 			"text": "Publishing a query endpoint now writes its description for you, in plain English, from the query's filters, parameters, order and row limit, and keeps it up to date as you name the parameters. Change it as you like, or press Write it again. Endpoints show their description in the list, and the API's new describe call writes one without publishing.",
 			"at": "2026-11-21T13:09:52Z"
+		},
+		{
+			"kind": "fix",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Object storage's start-up check no longer fails on its own file name, storage calls retry a failure that passes, AI visibility says once when a chosen connection is gone instead of failing every prompt, reading a long Slack sales post no longer cuts the AI's answer short, and crashes from browser extensions are no longer counted as the app's.",
+			"at": "2026-11-21T13:36:37Z"
 		}
 	],
-	"through": "5bc8c86+5bc8c86"
+	"through": "931c54c+931c54c"
 }
