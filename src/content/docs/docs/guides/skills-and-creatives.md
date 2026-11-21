@@ -5,11 +5,30 @@ sidebar:
   order: 1.8
 ---
 
-<span class="pill shipped">Shipped</span> In the REST API and the MCP server. Pages for it in the web app come next.
+<span class="pill shipped">Shipped</span> In the web app under **Paid ads**, on the **Creatives** tab (Start here, Library, Skills and prompts, Brand kit), in the REST API and in the MCP server.
 
 A brand makes its ads from **skills**: saved recipes for one kind of ad each. A **creative** is one ad made from a skill, for one persona and one pain. Every creative records the skill, the version and the prompt that made it, plus its tags, so results can later be compared by any of them: which prompt, which persona, which opening pays.
 
 The picture or video is made on the brand's own AI account ([Pictures, video and voice](/docs/guides/pictures-video-voice/)) and kept with the [brand's files](/docs/guides/brand-files/). Outflare has no AI account of its own for this: without a connected provider nothing is made, and the answer names what to connect.
+
+## Start here
+
+**Start here** leads the Creatives pages for a brand's first ad. It shows four steps and which one is next:
+
+1. **Add your brand files**: your logo and a few screenshots of your product, in the Brand kit.
+2. **Connect your AI accounts**: one account that makes pictures is enough to start. It is your own account and the provider bills you; Outflare has none of its own, so nothing is made until one is connected under Connectors ([Pictures, video and voice](/docs/guides/pictures-video-voice/)).
+3. **Pick a starter skill**: Problem first, One number, or Before and after. Each is added with one click and comes with two prompts sharing the creatives between them, plus rules that keep pictures from looking AI-made. You can read the prompts before adding one.
+4. **Make your first creative**: open the skill, press **Make a creative**, and say who it is for, the pain and one proof.
+
+Type the picture model's id once, as your AI account names it; Outflare has no default. A starter skill is an ordinary skill once added, so everything below applies to it. Ideas for the first creative come from the personas in the [brand profile](/docs/guides/brand-profile/).
+
+### Say what you want
+
+Under the starter skills is a box for an ad described in your own words, such as "an ad for hikers tired of heavy packs; lead with our weight". **Write the prompt** has the workspace's own AI model draft a skill from it: a name, the prompt for the picture and how to write the words over it. It reads your description and what the brand says about itself (its context and personas), never your customers. Where it needs a number or a proof it wasn't given, it leaves a fill-in in curly brackets instead of inventing one.
+
+Read the draft, change anything and press **Save as a skill**. Until then nothing is saved, and no picture is made or paid for. The draft runs on your own AI model connection and counts toward your AI spend limits (AI tool **Creative prompts**); without one connected, the box says so and links to Connectors.
+
+Over the API, `POST /v1/brands/{brand}/creative-skill-drafts` with a `description` queues a draft, and `GET /v1/brands/{brand}/creative-skill-drafts/{draft}` reads it until its `status` is `ready` or `failed`. Save it with `POST /v1/brands/{brand}/creative-skills` and the picture model you choose.
 
 ## Skills
 
@@ -93,4 +112,4 @@ A brand keeps at most 100 skills, each with up to 4 prompts and 500 versions. Cr
 
 ## For agents
 
-The MCP server has a tool for each call: `list_creative_skills`, `get_creative_skill`, `list_creative_skill_versions`, `create_creative_skill`, `update_creative_skill`, `list_creatives`, `get_creative`, `create_creative`, `update_creative`, `approve_creative`, `reject_creative`, `rate_creative` and `get_creative_history`. An agent writes the headline as the prompt's `copy` says, makes only what the person asked for, and approves only when the person said so.
+The MCP server has a tool for each call: `list_creative_skills`, `get_creative_skill`, `list_creative_skill_versions`, `create_creative_skill`, `update_creative_skill`, `list_creatives`, `get_creative`, `create_creative`, `update_creative`, `approve_creative`, `reject_creative`, `rate_creative` and `get_creative_history`, plus `draft_creative_skill` and `get_creative_skill_draft` to draft a skill from an ad described in words. An agent writes the headline as the prompt's `copy` says, makes only what the person asked for, and approves only when the person said so.
