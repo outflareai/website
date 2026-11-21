@@ -2,7 +2,7 @@
 	"version": "2026.11.21",
 	"date": "2026-11-21",
 	"status": "in-progress",
-	"updated": "2026-11-21T07:28:42Z",
+	"updated": "2026-11-21T08:06:51Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -206,7 +206,14 @@
 			"edition": "open-source",
 			"text": "Paid ads has holdout tests, on the Experiments tab: keep your ads out of a few countries for some weeks, and Outflare compares sign-ups there with everywhere else to say how many sign-ups the ads really add. Outflare only counts; you exclude the countries on your campaigns.",
 			"at": "2026-11-21T07:28:42Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Paid ads has a new Creatives tab. Every ad is shown as a large preview and scored step by step (hook, hold, click, sign-up, pay) against your own usual rates, with a verdict: scale, keep, fix, stop or too early. Switch between gallery and list, filter by verdict, and pause an ad from its card.",
+			"at": "2026-11-21T08:06:51Z"
 		}
 	],
-	"through": "2c2e400+2c2e400"
+	"through": "12f037d+12f037d"
 }
