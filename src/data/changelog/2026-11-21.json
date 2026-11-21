@@ -2,7 +2,7 @@
 	"version": "2026.11.21",
 	"date": "2026-11-21",
 	"status": "in-progress",
-	"updated": "2026-11-21T10:47:50Z",
+	"updated": "2026-11-21T16:17:28Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -255,7 +255,112 @@
 			"edition": "open-source",
 			"text": "Every person now has a Lead source category, Inbound or Outbound, worked out from their Source, so you can filter People and the Sales queue by it. People who arrive through a Sales channel get Source Inbound and the channel as their Sub-source.",
 			"at": "2026-11-21T10:35:04Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Start here in Paid ads, Creatives: four steps to a brand's first ad with what is next, and starter skills (Problem first, One number, Before and after) added with one click, each with two prompts to split test.",
+			"at": "2026-11-21T12:52:27Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "social",
+			"edition": "open-source",
+			"text": "Mentions on YouTube: with YouTube on under Social → Mentions → Sources, each scan searches YouTube for videos naming your brand or a tracked competitor through your own web search connection, then reads each new video's captions, so a mention shows who made the video, its views, what was said around the name and the second it was said.",
+			"at": "2026-11-21T12:52:27Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Alerts: several alerts of the same kind at once now come as one email that lists them, instead of one email each. A lander or offer that stops answering is emailed to the person who added it, not every owner and admin.",
+			"at": "2026-11-21T13:09:52Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "The Partnerships tab that holds every offer, link order and agreement is now called Offers, so it isn't confused with Deals in CRM. Old links to the tab still open it.",
+			"at": "2026-11-21T13:09:52Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Publishing a query endpoint now writes its description for you, in plain English, from the query's filters, parameters, order and row limit, and keeps it up to date as you name the parameters. Change it as you like, or press Write it again. Endpoints show their description in the list, and the API's new describe call writes one without publishing.",
+			"at": "2026-11-21T13:09:52Z"
+		},
+		{
+			"kind": "fix",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Object storage's start-up check no longer fails on its own file name, storage calls retry a failure that passes, AI visibility says once when a chosen connection is gone instead of failing every prompt, reading a long Slack sales post no longer cuts the AI's answer short, and crashes from browser extensions are no longer counted as the app's.",
+			"at": "2026-11-21T13:36:37Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "social",
+			"edition": "open-source",
+			"text": "Mentions now find podcast episodes that name your brand or a competitor, on your own free Podcast Index key, and leave out what brands post on their own channels. You choose per brand or competitor what Mentions listens for.",
+			"at": "2026-11-21T14:08:49Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "general",
+			"edition": "open-source",
+			"text": "The menu's rail has more areas, so each one lists fewer pages: CRM, Partnerships, Automations, Email, Search, Social and Ads replace Customers and Marketing. Visitors moved to Analytics, Competitors moved to Company, and the Email group is now called Customer email. On a short screen the rail scrolls.",
+			"at": "2026-11-21T15:51:50Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "general",
+			"edition": "open-source",
+			"text": "The menu now shows Pinned and Recents for the area you are in. \"Pin to menu\" in the top bar pins the page or the report, funnel or other thing you have open, and the things you opened last are listed under your pins. Both are saved to your account, so they follow you to any computer.",
+			"at": "2026-11-21T15:51:50Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "SEO targets: the page and its target keyword are now separate columns, each sortable, with a filter row under the headers for page, keyword, status, intent, page type and band.",
+			"at": "2026-11-21T15:51:50Z"
+		},
+		{
+			"kind": "fix",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Website tracking no longer fails a visitor's events when a page title or URL holds a hidden null character, cookie reports skip it too, EmailBison now gets your opt-out list as the CSV upload its API expects, and an expired desktop sign-in or a search provider out of credits counts as yours to fix rather than an error.",
+			"at": "2026-11-21T16:12:15Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Funnels now say whether a drop-off can be trusted. They warn when a step's data stopped, never arrived or isn't linked to the earlier steps, and Check this step shows each step on its own and opens the funnel from that step in a tab. Long funnels open as a list that names the biggest drop.",
+			"at": "2026-11-21T16:12:15Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Say what you want, on Start here in Paid ads, Creatives: describe an ad in your own words and your own AI model drafts a skill (picture prompt and words) to read, change and save. Nothing is made until you do.",
+			"at": "2026-11-21T16:12:15Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Funnels can now have up to 20 steps instead of 10, so a long journey such as ad visit, download, install, sign-up and first use fits in one funnel. A long funnel scrolls sideways on the Funnels page instead of squeezing its bars.",
+			"at": "2026-11-21T16:12:15Z"
+		},
+		{
+			"kind": "fix",
+			"area": "agents",
+			"edition": "cloud",
+			"text": "The brand agent now reads your whole Brand profile. A well-filled profile was longer than the agent's reading limit, so the confirmed facts and personas at the end were cut off; the limit is higher, and when a brand's context is still too long the notes and what was read from the website give way before anything a person confirmed.",
+			"at": "2026-11-21T16:12:15Z"
 		}
 	],
-	"through": "7040361+7040361"
+	"through": "fefbff0+fefbff0"
 }

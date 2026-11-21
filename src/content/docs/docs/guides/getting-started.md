@@ -39,15 +39,23 @@ Get started has a **Star and follow Outflare** step before your first mission: *
 
 On a self-hosted server, `OUTFLARE_COMMUNITY_LINKS=off` turns them off for everyone, and `OUTFLARE_FOLLOW_URL=off` hides only **Follow us on X** (see [Configuration](/docs/self-hosting/configuration/)).
 
-## Try the new menu
+## The menu
 
-There are two menus, and you can switch between them whenever you like. The one you start with lists every part of Outflare in one sidebar. The new one (version 2) has a short rail of areas on the left (Home, Inbox, Agents, Customers, Marketing, Analytics, Data and Company, with Connectors and Settings at the bottom) and, beside it, only the pages of the area you are in.
+The menu has a short rail of areas on the left (Home, Inbox and Agents, then CRM, Partnerships, Automations, Email, Search, Social, Ads, Analytics, Data and Company, with Connectors and Settings at the bottom) and, beside it, only the pages of the area you are in.
 
-- **Switch to it:** press **Try the new menu** at the bottom of the sidebar.
-- **Go back:** press **Old menu** at the bottom of the rail.
-- Either way works from the command palette too (⌘K, then "menu").
+Prefer the older menu, with every part of Outflare in one sidebar? Press **Old menu** at the bottom of the rail. **Switch to the new menu** at the bottom of that sidebar brings the rail back, and both work from the command palette too (⌘K, then "menu").
 
 The choice is yours alone and is remembered in the browser you made it in; nobody else's menu changes. Every page is in both menus, at the same address.
+
+### Pinned and Recents
+
+Keep what you use most at the top of the menu:
+
+- **Pin to menu**, in the bar at the top of every page, pins the page you are on. When you have something open inside a page, such as a sequence, a report or a funnel, it pins that instead. Press it again (it reads **Pinned**) to unpin.
+- **Pinned** lists your pins for the area you are in.
+- **Recents** lists the last things you opened in that area, with how long ago. **Clear** empties it; your pins stay.
+
+Pins and recents are saved to your account, so they are the same on every computer you sign in on. Something pinned inside a page shows on the workspace and brand it belongs to.
 
 ## Skip anything, come back any time
 
