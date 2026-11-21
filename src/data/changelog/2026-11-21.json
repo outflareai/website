@@ -2,7 +2,7 @@
 	"version": "2026.11.21",
 	"date": "2026-11-21",
 	"status": "in-progress",
-	"updated": "2026-11-21T00:07:11Z",
+	"updated": "2026-11-21T00:43:43Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -59,7 +59,70 @@
 			"edition": "open-source",
 			"text": "The connect dialog keeps a long key and a long error inside the box. When Meta has switched off API access for the app a token was made for, Meta Ads now says so in plain words, with what to do next.",
 			"at": "2026-11-21T00:07:11Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Meta Ads: a conversion rule can now send InitiateCheckout, AddPaymentInfo, AddToCart, ViewContent and Search, so the steps before a purchase reach your pixel too.",
+			"at": "2026-11-21T00:43:43Z"
+		},
+		{
+			"kind": "fix",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Paid ads: a sign-up whose last visit kept the ad's click id but lost its campaign (a sign-up page on another domain, or a click Google's click report leaves out) is now credited to the campaign of the earlier landing with the same click id. Sign-ups already recorded as \"Campaign unknown\" this way are filled in on the next run.",
+			"at": "2026-11-21T00:43:43Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Paid ads tables have a tick on every row and a \"select all\" in the header. Tick campaigns to pause, resume, change the budget of or remove them together; ad groups and ads to pause or resume them (and remove ads on Google Ads); keywords to remove them. One confirmation lists each one with its status and what it spent in the last 30 days, and removing follows the removal permission.",
+			"at": "2026-11-21T00:43:43Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Removing an ad campaign, ad or keyword is now a permission: a role setting for people, the `ads.remove` scope for API tokens, and Off, Ask or On for each agent, optionally only for paused campaigns, disapproved ads or items that spent nothing. Refusals name the missing permission, and each removal is audited with a snapshot.",
+			"at": "2026-11-21T00:43:43Z"
+		},
+		{
+			"kind": "fix",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Paid ads tables set to \"All\" now list every campaign, ad group and ad, including paused ones that never spent. Before, a campaign with no spend in the dates shown was left out whatever the status filter said. The API takes `idle=true` on the campaign, ad and performance lists for the same.",
+			"at": "2026-11-21T00:43:43Z"
+		},
+		{
+			"kind": "fix",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Country and language names show in English, as the rest of the app, instead of following the browser's language.",
+			"at": "2026-11-21T00:43:43Z"
+		},
+		{
+			"kind": "launch",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "A new Partnerships menu puts working with other sites in one place, in the order the work happens: Find, Deals (every offer, link order and agreement on one board), Live, Affiliates, Payments (everything you owe in one list) and Results. Old Presence, Partners and Link order links still work.",
+			"at": "2026-11-21T00:43:43Z"
+		},
+		{
+			"kind": "launch",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "SEO overview has a Targets view: each page's target keyword with its Search Console position and change, a 12-week trend, tracked rank by country, other pages competing for it, and whether it is in the title and H1. Tiles count targets in the top 3, top 10 and 11–20 and filter the table.",
+			"at": "2026-11-21T00:43:43Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "agents",
+			"edition": "cloud",
+			"text": "The agent chat has a copy button under every reply, and on each code block and table in it. Each conversation shows a short ID in its header: copy it to share the chat, or copy or download the whole conversation as Markdown, with the API calls behind each reply. Tables whose cells contain a \"|\" no longer break apart.",
+			"at": "2026-11-21T00:43:43Z"
 		}
 	],
-	"through": "825b906+825b906"
+	"through": "fdfb710+fdfb710"
 }
