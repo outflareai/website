@@ -81,7 +81,7 @@ if (problems.length) {
 	console.error('These look like real email addresses (AGENTS.md, "What may go in a public repository"):\n');
 	for (const p of problems) console.error('  ' + p);
 	console.error('\nUse a fake address at example.com or a .example, .test or .invalid domain, such as ana@acme.example.');
-	console.error('A real address or domain that belongs here goes in scripts/fake-data-allowed.txt, with a reason, in a pull request Jack approves.');
+	console.error('A real address or domain that belongs here goes in scripts/fake-data-allowed.txt, with a reason, in a pull request the owner approves.');
 	process.exit(1);
 }
 console.log('No real email addresses added.');
