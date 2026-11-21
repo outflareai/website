@@ -2,7 +2,7 @@
 	"version": "2026.11.21",
 	"date": "2026-11-21",
 	"status": "in-progress",
-	"updated": "2026-11-21T05:40:47Z",
+	"updated": "2026-11-21T06:14:47Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -192,7 +192,14 @@
 			"edition": "open-source",
 			"text": "Paid ads syncs how far people watch your Meta and TikTok video ads: plays that count as watched, the quarters reached, and from them a hook rate and a hold rate per campaign, ad set and ad. Turn the columns on in the tables under Columns.",
 			"at": "2026-11-21T05:40:47Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Paid ads, Settings, Tracking has a new dry run: would matching visits by network and device find more ad customers? It reads the visits you already have and says how many more people an ad would be credited with, and how often that guess is right. Nothing is collected, joined or changed.",
+			"at": "2026-11-21T06:14:47Z"
 		}
 	],
-	"through": "06ade2b+06ade2b"
+	"through": "5a073e7+5a073e7"
 }
