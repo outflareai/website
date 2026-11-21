@@ -660,6 +660,31 @@ are made, not tested.
 
 X Ads has no tests here: X splits an audience only between campaigns that already exist and offers no way to copy a campaign with its ads, so change an X budget directly and compare the days before and after.
 
+## Holdout tests
+
+Attribution says which ad a person clicked before they signed up. It can't say whether they would have signed up anyway. A holdout test answers that by going without: keep your ads out of a few countries for some weeks, and Outflare compares sign-ups from those countries with sign-ups from everywhere else, before and during. If the other countries held steady and the held-out ones dropped, the drop is what the ads were adding there.
+
+1. On **Paid ads → Experiments → Holdout tests**, press **New holdout**. Pick the countries, the first and last day (7 to 90 days), and whether every network's ads are off there or only one's. Pick countries that together bring a steady share of your sign-ups (at least 30 over as many days as the holdout runs), and not your biggest one.
+2. Exclude those countries on every campaign for the same days, in the network or on the campaign's page. **Outflare changes no campaign for a holdout**; it only counts.
+3. Read the result as it fills in. Take the exclusions off when it ends, or press **End today** to end it early.
+
+| Result | Meaning |
+| --- | --- |
+| The ads add sign-ups | The drop is more than chance explains. |
+| The ads add little | A real drop, but under a third of what the ads are credited with. |
+| No difference found | The held-out countries did about as well without ads. |
+| Ads still showing there | Paid clicks kept arriving from the held-out countries: check that every campaign excludes them. |
+| Too few sign-ups to say | Under 30 sign-ups before the start, there or elsewhere. |
+
+Each result also says how many sign-ups the ads were adding and what share that is of the sign-ups attribution had credited to them: 80% means four in five credited sign-ups were really won by the ads, and the fifth would have come anyway.
+
+| Call | What it does |
+| --- | --- |
+| `GET /v1/brands/{brand}/ads/holdouts` | The brand's holdouts with their results (MCP: `list_ad_holdouts`) |
+| `POST /v1/brands/{brand}/ads/holdouts` | Note a holdout: `name`, `countries`, `starts_on`, `ends_on` and an optional `connector` (`create_ad_holdout`) |
+| `POST /v1/brands/{brand}/ads/holdouts/{id}/end` | End a running holdout today (`end_ad_holdout`) |
+| `DELETE /v1/brands/{brand}/ads/holdouts/{id}` | Delete the note (`delete_ad_holdout`) |
+
 ## Managing campaigns
 
 Three changes, on Google Ads, Meta, Microsoft Advertising, LinkedIn,
