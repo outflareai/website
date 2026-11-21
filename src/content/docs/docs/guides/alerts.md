@@ -32,6 +32,8 @@ Alert emails come from Outflare's account email, the one that sends sign-in link
 
 Under **Settings → Alerts**, owners and admins choose who gets each kind by email: **The person it's for** (the default for every kind but new errors, whose emails start as Nobody; owners and admins when there is nobody in particular), **Owners and admins**, or **Nobody**. Anyone can **Mute** a kind for themselves.
 
+To mute many kinds at once, use **Show** (for example **Not muted for me**, or by who gets the email) or the search box to narrow the list. Then click **Mute all for me**, which mutes every kind shown in one click. Tick boxes let you pick only some, and **Undo** puts back exactly what that click changed. **Unmute all for me** works the same way.
+
 A brand can choose differently from the workspace through the API:
 
 ```sh
@@ -60,7 +62,7 @@ Send both as `null` to stop posting.
 
 `GET /v1/brands/{brand}/alerts` lists alerts, newest first, with a `title`, a line of `text` and the app `path` that has each one. Filter with `kind` and page with `before` (`next_before` from the last page). You see the kinds your role can read: hot replies need `inbox.read`, hot visitors `customers.read`, and brand-limited people see their brands' alerts and the shared ones.
 
-`GET /v1/brands/{brand}/alerts/settings` shows the kinds and who gets each, and `PUT /v1/brands/{brand}/alerts/mutes` with `kind` and `muted` mutes one for you. Agents use `list_alerts`, `get_alert_settings`, `set_alert_settings`, `list_alert_channels` and `mute_alerts`.
+`GET /v1/brands/{brand}/alerts/settings` shows the kinds and who gets each, and `PUT /v1/brands/{brand}/alerts/mutes` with `kind` and `muted` mutes one for you, or with `kinds` (a list, all or none) mutes many at once. Agents use `list_alerts`, `get_alert_settings`, `set_alert_settings`, `list_alert_channels` and `mute_alerts`.
 
 ## In your CRM
 

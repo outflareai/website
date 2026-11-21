@@ -104,7 +104,7 @@ PostHog and HubSpot used to be two connectors each (`posthog_cloud`, `hubspot_pr
 
 `GET /v1/workspaces/{ws}/connections` lists every account the workspace has connected, in one shape: connectors (the same as `GET /integrations`) and the Google and Microsoft sign-ins for mailboxes (the same as `GET /oauth-connections`). Each entry says its `kind` (`integration` or `mailbox_oauth`), `connector` (for example `hubspot`, or `google` for a mailbox sign-in), `name`, `category`, `status` and `brand_id`, and its `id` opens it in its own list. Add `?category=crm` for one category; `mailboxes` includes the mailbox sign-ins.
 
-With `?brand=repocket` it lists the connections that brand uses. Mailbox sign-ins belong to the whole workspace, so they are left out when a brand is picked or the caller is kept to some brands. It needs scope `integrations.read`; the MCP tool is `list_connections`.
+With `?brand=summitly` it lists the connections that brand uses. Mailbox sign-ins belong to the whole workspace, so they are left out when a brand is picked or the caller is kept to some brands. It needs scope `integrations.read`; the MCP tool is `list_connections`.
 
 ## Let an agent connect things
 

@@ -10,6 +10,7 @@
 // check is a backstop: Cloud lines are published only when their note says so.
 import { readFileSync, readdirSync, writeFileSync, mkdirSync, existsSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
+import { createHash } from 'node:crypto';
 
 const root = new URL('..', import.meta.url).pathname;
 const dataDir = join(root, 'src/data/changelog');
@@ -36,6 +37,29 @@ const private_ = [
 	[/\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/i, 'an internal id'],
 	[/\b(users|customers|workspaces|signups|sign-ups)\b[^.]*\b\d{2,}\b|\b\d{2,}\b[^.]*\b(users|customers|workspaces|signups|sign-ups)\b/i, 'a production number'],
 ];
+
+// Real customers, their brands, partners and people are never named in a public changelog,
+// not even as an example. The names are kept here only as SHA-256 hashes of the lowercase
+// word, so this public file doesn't list them; Outflare Cloud passes its fuller private
+// list in CHANGELOG_PRIVATE_NAMES (a file, one name per line) when it writes a day.
+const realNameHashes = new Set([
+	'53ebdaa0114088a121815671084f5846800761b6934320ce66a754f19947d286',
+	'1be22ec382ad1d4b07a57f96c135bd20fa8d372b4b90523ec5a5d0864e8cae3e',
+	'b4339ff6c9f7bc5920532a5778377093b75c71daa4c05be791cd30553b2cafd0',
+]);
+const sha256 = (s) => createHash('sha256').update(s).digest('hex');
+const privateNames = (() => {
+	const f = process.env.CHANGELOG_PRIVATE_NAMES;
+	if (!f) return [];
+	return readFileSync(f, 'utf8').split('\n').map((l) => l.trim().toLowerCase()).filter((l) => l && !l.startsWith('#'));
+})();
+// Whether text names a real customer, brand, partner or person. Never says which.
+export function namesSomeoneReal(text) {
+	const lower = (text ?? '').toLowerCase();
+	const words = lower.match(/[a-z0-9]+/g) ?? [];
+	if (words.some((w) => realNameHashes.has(sha256(w)))) return true;
+	return privateNames.some((n) => new RegExp(`(^|[^a-z0-9])${n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}($|[^a-z0-9])`).test(lower));
+}
 
 function load() {
 	return readdirSync(dataDir)
@@ -67,6 +91,7 @@ function problemsIn(file, d) {
 		if (i.at && !(i.at.startsWith(d.date) && /Z$/.test(i.at))) bad(`${at}: at must be a UTC time on ${d.date}`);
 		if (i.kind === 'security' && !securityWording.test(i.text)) bad(`${at}: security lines say only "Security improvements to <area>."`);
 		for (const [re, what] of private_) if (re.test(i.text ?? '')) bad(`${at}: looks like ${what}`);
+		if (namesSomeoneReal(i.text)) bad(`${at}: names a real customer, brand, partner or person: describe it generically (for example "your web data connection")`);
 	}
 	return out;
 }
