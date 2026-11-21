@@ -2,7 +2,7 @@
 	"version": "2026.11.21",
 	"date": "2026-11-21",
 	"status": "in-progress",
-	"updated": "2026-11-21T18:28:37Z",
+	"updated": "2026-11-21T18:36:51Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -381,7 +381,14 @@
 			"edition": "open-source",
 			"text": "The Lane leaderboard no longer shows an agent's guess of how many companies a lane could hold. It was a rough number that read like a limit; each lane now shows what it found, what passed, what it cost and what it taught.",
 			"at": "2026-11-21T18:28:37Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Every table's toolbar is in the same order: search, filters, then how many rows there are, Columns and the CSV download. Columns now opens a dialog where you show, hide and reorder columns, and nothing changes until you press Save. Tick \"Make this my default view\" to keep the columns and their order with your account.",
+			"at": "2026-11-21T18:36:51Z"
 		}
 	],
-	"through": "6d3c6b7+6d3c6b7"
+	"through": "3afb9c9+3afb9c9"
 }
