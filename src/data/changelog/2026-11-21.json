@@ -2,7 +2,7 @@
 	"version": "2026.11.21",
 	"date": "2026-11-21",
 	"status": "in-progress",
-	"updated": "2026-11-21T16:17:28Z",
+	"updated": "2026-11-21T16:39:21Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -360,7 +360,14 @@
 			"edition": "cloud",
 			"text": "The brand agent now reads your whole Brand profile. A well-filled profile was longer than the agent's reading limit, so the confirmed facts and personas at the end were cut off; the limit is higher, and when a brand's context is still too long the notes and what was read from the website give way before anything a person confirmed.",
 			"at": "2026-11-21T16:12:15Z"
+		},
+		{
+			"kind": "launch",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Each brand has a Usage and limits page under Settings showing its events, tracker clicks, contacts and recordings against its workspace's limits. When a limit stops something being stored, a red banner shows on every page and owners and admins get a critical alert; a warning comes first when a limit is close.",
+			"at": "2026-11-21T16:39:21Z"
 		}
 	],
-	"through": "fefbff0+fefbff0"
+	"through": "1476dc0+1476dc0"
 }
