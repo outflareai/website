@@ -2,7 +2,7 @@
 	"version": "2026.11.21",
 	"date": "2026-11-21",
 	"status": "in-progress",
-	"updated": "2026-11-21T12:52:27Z",
+	"updated": "2026-11-21T13:09:52Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -269,7 +269,28 @@
 			"edition": "open-source",
 			"text": "Mentions on YouTube: with YouTube on under Social → Mentions → Sources, each scan searches YouTube for videos naming your brand or a tracked competitor through your own web search connection, then reads each new video's captions, so a mention shows who made the video, its views, what was said around the name and the second it was said.",
 			"at": "2026-11-21T12:52:27Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Alerts: several alerts of the same kind at once now come as one email that lists them, instead of one email each. A lander or offer that stops answering is emailed to the person who added it, not every owner and admin.",
+			"at": "2026-11-21T13:09:52Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "The Partnerships tab that holds every offer, link order and agreement is now called Offers, so it isn't confused with Deals in CRM. Old links to the tab still open it.",
+			"at": "2026-11-21T13:09:52Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Publishing a query endpoint now writes its description for you, in plain English, from the query's filters, parameters, order and row limit, and keeps it up to date as you name the parameters. Change it as you like, or press Write it again. Endpoints show their description in the list, and the API's new describe call writes one without publishing.",
+			"at": "2026-11-21T13:09:52Z"
 		}
 	],
-	"through": "95e2328+95e2328"
+	"through": "5bc8c86+5bc8c86"
 }
