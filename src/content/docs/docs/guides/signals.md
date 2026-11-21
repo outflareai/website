@@ -5,7 +5,7 @@ sidebar:
   order: 1.6
 ---
 
-<span class="pill shipped">Shipped</span> In the web app (**Customers → Needs attention**), the REST API and the MCP server.
+<span class="pill shipped">Shipped</span> In the web app (**CRM → Needs attention**), the REST API and the MCP server.
 
 A **signal** is something about a person or a company that someone should act on: a customer whose usage dropped, an account ready for a bigger plan, a renewal coming up, a failed payment. Each signal has an owner, a due date and, once it is closed, an outcome, so a brand can see what was acted on and whether it helped.
 

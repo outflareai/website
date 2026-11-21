@@ -7,7 +7,7 @@ sidebar:
 
 <span class="pill shipped">Shipped</span> In the web app, the REST API and the MCP server.
 
-**Visitors** (in the sidebar after CRM) shows which companies and people came to your website, what they looked at and who is ready to talk. It is built on [website tracking](/docs/guides/website-tracking/): add your site and the snippet first.
+**Visitors** (under **Analytics**) shows which companies and people came to your website, what they looked at and who is ready to talk. It is built on [website tracking](/docs/guides/website-tracking/): add your site and the snippet first.
 
 ## How visitors are named
 

@@ -9,7 +9,7 @@ sidebar:
 
 Outflare keeps one list of the sites you compete with for each of your websites, and tells you what changes at them. The same list is used everywhere: [Presence](/docs/guides/coverage/) scans where they appear, [AI visibility](/docs/guides/ai-visibility/) counts them in AI answers, and agents read it. Every day Outflare suggests new ones; say yes or no. Track the ones that matter, and Outflare follows their numbers and what they publish.
 
-In the app, open **Competitors** in the sidebar: **Overview** ranks you against them, and **Competitors** is the list.
+In the app, open **Competitors** under **Company**: **Overview** ranks you against them, and **Competitors** is the list.
 
 ## What you need
 
