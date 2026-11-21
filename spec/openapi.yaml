@@ -8368,6 +8368,22 @@ paths:
         "409": { $ref: "#/components/responses/Error" }
         "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
+    delete:
+      operationId: deleteLander
+      x-outflare-access: { scope: analytics.manage, brand: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Delete a lander
+      description: "Scope: analytics.manage. Takes the lander off every link and flow that sends to it and archives it, so it leaves the brand's list. Its clicks and conversions stay in the reports under its name. PATCH status active brings it back, but not onto the links it was on."
+      tags: [analytics]
+      responses:
+        "200":
+          description: The lander, archived.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TrackerLander" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/lander-clicks:
     parameters: [{ $ref: "#/components/parameters/BrandID" }]
     get:
@@ -8515,6 +8531,22 @@ paths:
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+    delete:
+      operationId: deleteOffer
+      x-outflare-access: { scope: analytics.manage, brand: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Delete an offer
+      description: "Scope: analytics.manage. Takes the offer off every link and flow that sends to it and archives it, so it leaves the brand's list. Its clicks and conversions stay in the reports under its name. PATCH status active brings it back, but not onto the links it was on."
+      tags: [analytics]
+      responses:
+        "200":
+          description: The offer, archived.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TrackerOffer" }
+        "404": { $ref: "#/components/responses/Error" }
         "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/postback-sources:
@@ -15744,7 +15776,7 @@ paths:
       operationId: getBrandAdSettings
       x-outflare-access: { scope: analytics.read, brand: true }
       summary: Read the paid media settings
-      description: "Scope: analytics.read. consent_mode decides who conversions are sent for outside the EEA, the UK and Switzerland: opt_out (the default) sends unless the person withdrew consent for ad data, opt_in only when they granted it. Inside those countries, and when a person's country is unknown, a grant is always needed. collected says the brand's own site already collects consent for ad data from everyone: conversions are sent for everyone, in every country, as granted, except people who withdrew."
+      description: "Scope: analytics.read. consent_mode decides who conversions are sent for outside the EEA, the UK and Switzerland: opt_out (the default) sends unless the person withdrew consent for ad data, opt_in only when they granted it. Inside those countries, and when a person's country is unknown, a grant is always needed. collected says the brand's own site already collects consent for ad data and ad personalisation from everyone: conversions are sent, and people join ad audiences, for everyone, in every country, as granted, except people who withdrew."
       tags: [ads]
       responses:
         "200":
