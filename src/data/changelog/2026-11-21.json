@@ -2,7 +2,7 @@
 	"version": "2026.11.21",
 	"date": "2026-11-21",
 	"status": "in-progress",
-	"updated": "2026-11-21T06:14:47Z",
+	"updated": "2026-11-21T07:28:42Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -199,7 +199,14 @@
 			"edition": "open-source",
 			"text": "Paid ads, Settings, Tracking has a new dry run: would matching visits by network and device find more ad customers? It reads the visits you already have and says how many more people an ad would be credited with, and how often that guess is right. Nothing is collected, joined or changed.",
 			"at": "2026-11-21T06:14:47Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Paid ads has holdout tests, on the Experiments tab: keep your ads out of a few countries for some weeks, and Outflare compares sign-ups there with everywhere else to say how many sign-ups the ads really add. Outflare only counts; you exclude the countries on your campaigns.",
+			"at": "2026-11-21T07:28:42Z"
 		}
 	],
-	"through": "5a073e7+5a073e7"
+	"through": "2c2e400+2c2e400"
 }
