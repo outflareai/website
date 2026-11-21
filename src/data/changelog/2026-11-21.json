@@ -2,7 +2,7 @@
 	"version": "2026.11.21",
 	"date": "2026-11-21",
 	"status": "in-progress",
-	"updated": "2026-11-21T01:32:03Z",
+	"updated": "2026-11-21T01:47:55Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -122,7 +122,14 @@
 			"edition": "cloud",
 			"text": "The agent chat has a copy button under every reply, and on each code block and table in it. Each conversation shows a short ID in its header: copy it to share the chat, or copy or download the whole conversation as Markdown, with the API calls behind each reply. Tables whose cells contain a \"|\" no longer break apart.",
 			"at": "2026-11-21T00:43:43Z"
+		},
+		{
+			"kind": "fix",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "Data, Catalog opens at once: the list of tables shows straight away and the row counts and dates fill in after, instead of the page waiting while every table is counted. Agents and the API can ask for the same with `numbers=false`.",
+			"at": "2026-11-21T01:47:55Z"
 		}
 	],
-	"through": "79a7a95+79a7a95"
+	"through": "b7c54b1+b7c54b1"
 }
