@@ -131,7 +131,7 @@ In the app, open **Paid ads** in the sidebar. The page is for one goal: more pay
 | --- | --- |
 | **Overview** | Pick all networks, one network or one ad account at the top, and everything below follows it. One sentence says where you stand against your target, then cost per new customer, cost per sign-up, new customers, spend, revenue and return. Campaigns named for your brand are judged apart from everything else, so a cheap average doesn't hide an expensive campaign. **Do this next** lists the three open actions with the biggest effect, and a funnel shows ad clicks, sign-ups and first payments. Every number reads the same rows, so they can't disagree. |
 | **Actions** | One table of what to do: **Fix** (something is broken), **Cut waste**, **Grow** and **Experiment**, each with why, the expected effect and one main button. Views: To do, In progress, Done and Dismissed. A switch turns recommendations on or off; while off, what Outflare would have recommended is under Preview. Nothing changes in an ad account until you approve it, and a budget raise shows the budget before and after and the most it can add a month. |
-| **Campaigns** | Every campaign with what it spent and brought; open one for its ad groups, ads, keywords and searches. Tables start on **All enabled**, with a **Status** filter (All enabled, All but removed, All) and two total rows under each: one for the rows shown and one for all of them. For Google Ads, an enabled campaign, ad group or ad also says whether it is really serving, in Google's words (Eligible, Limited by budget, Limited by bidding, Learning, Not eligible), with Google's reasons on hover, and the table has Google's Optimization score and **Room to grow**: the share of searches a search campaign missed over the last 7 days because its budget ran out, and because others ranked higher. Sort by it to see where a raise would buy the most. |
+| **Campaigns** | Every campaign with what it spent and brought; open one for its ad groups, ads, keywords and searches. Tables start on **All enabled**, with a **Status** filter (All enabled, All but removed, All) and two total rows under each: one for the rows shown and one for all of them. **All** includes paused campaigns that have never spent. Tick rows (or the box in the header to tick every row shown) to change many at once: campaigns can be paused, resumed, given a new daily budget or removed; ad groups and ads paused or resumed; and, on Google Ads, ads and keywords removed. Before anything changes, a confirmation lists each row with its status and what it spent over the last 30 days. For Google Ads, an enabled campaign, ad group or ad also says whether it is really serving, in Google's words (Eligible, Limited by budget, Limited by bidding, Learning, Not eligible), with Google's reasons on hover, and the table has Google's Optimization score and **Room to grow**: the share of searches a search campaign missed over the last 7 days because its budget ran out, and because others ranked higher. Sort by it to see where a raise would buy the most. |
 | **Customers** | The people your ads brought, and which campaign each came from. |
 | **Audiences** | Lists of your people sent to the ad networks you choose ([Audiences](#audiences-one-list-several-ad-networks)). |
 | **Experiments** | Tests the ad network splits fairly, and how each change you approved turned out. |
@@ -633,6 +633,9 @@ limit is refused with a reason:
 | `POST /v1/brands/{brand}/ads/campaigns/{id}/pause` | Pause a campaign (`ads.manage`) |
 | `POST /v1/brands/{brand}/ads/campaigns/{id}/resume` | Run a paused campaign again (`ads.manage`). When its budget would take the brand's running budgets over the daily budget ceiling, it answers 409 `ad_budget_ceiling`; a signed-in person can confirm and go ahead |
 | `PATCH /v1/brands/{brand}/ads/campaigns/{id}` | Set its daily budget, `daily_budget_micros` in the account's currency (`ads.manage`) |
+| `POST /v1/brands/{brand}/ads/campaigns/{id}/remove` | Remove a campaign on Google Ads, with `{"confirm": true}`. It can't be undone there (`ads.manage` and `ads.remove`) |
+| `POST /v1/brands/{brand}/ads/items/{id}/remove` | Remove an ad on Google Ads, with `{"confirm": true}` (`ads.manage` and `ads.remove`) |
+| `POST /v1/brands/{brand}/ads/keywords/{id}/remove` | Remove a keyword on Google Ads, with `{"confirm": true}` (`ads.manage` and `ads.remove`) |
 | `POST /v1/brands/{brand}/ads/pause-all` | The kill switch: pause every active campaign of the brand at once, on every platform that can be changed, as one batch (`ads.manage`) |
 | `GET /v1/brands/{brand}/ads/changes` | Every change asked for, by network (`connector`), account (`account_id`), campaign, status or brand (`analytics.read`) |
 
@@ -649,7 +652,13 @@ page each campaign has Pause, Resume and a budget field, and a brand has
 **Pause all ads**.
 
 `ads.manage` is its own scope, because it spends money. Operators have it;
-give it to a token on purpose. For an agent on the action layer
+give it to a token on purpose. Removing can't be undone, so it needs one more:
+`ads.remove`. Owners, Admins and Operators have it, a custom role has it only
+when its box is ticked, and a token only when it was given it. Without it a
+removal answers `403 permission_required` with the missing `permission`. Each
+removal is an audit event (`ad_campaign.removed` and the like) with a snapshot
+of what was removed: its name, status, campaign, ad group, the ad's text and
+links, and 30 days' spend. For an agent on the action layer
 ([actions.md](/docs/agents/missions/)):
 
 - a pause spends nothing, so it runs under the agent's grant;
@@ -659,7 +668,9 @@ give it to a token on purpose. For an agent on the action layer
   grant's daily spend cap, or the month (what it has spent plus the daily
   total for the rest of it) over its monthly cap, waits for a person. A run
   grant on ads paths gets $50 a day and $500 a month unless a person sets
-  its own caps.
+  its own caps;
+- a removal needs a grant that names it, and nothing broader covers one
+  ([Agent actions](/docs/agents/actions/)).
 
 Every change is an audit event and a webhook (`ad_campaign.paused`,
 `ad_campaign.resumed`, `ad_campaign.budget_changed`, `ads.paused_all`), and

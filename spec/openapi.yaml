@@ -6880,12 +6880,13 @@ paths:
       operationId: setBrandAlertMute
       x-outflare-access: { scope: workspace.read, brand: true }
       parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
-      summary: Mute or unmute a kind of alert for yourself
+      summary: Mute or unmute kinds of alert for yourself
       description: |
         Scope workspace.read. Stops (muted true) or restarts alert emails of
-        one kind from this brand to the caller: the signed-in person, or who
-        made the token. Each brand has its own mutes. Muted alerts still
-        show in the app.
+        one kind (`kind`), or of many kinds at once (`kinds`, all or none),
+        from this brand to the caller: the signed-in person, or who made the
+        token. Give `kind` or `kinds`, not both. Each brand has its own
+        mutes. Muted alerts still show in the app.
       tags: [alerts]
       requestBody:
         required: true
@@ -6894,21 +6895,29 @@ paths:
             schema:
               type: object
               additionalProperties: false
-              required: [kind, muted]
+              required: [muted]
               properties:
                 kind: { type: string, example: visitor.hot }
+                kinds:
+                  type: array
+                  minItems: 1
+                  maxItems: 200
+                  items: { type: string }
+                  example: [visitor.hot, reply.hot]
                 muted: { type: boolean }
       responses:
         "200":
-          description: The mute as it now is.
+          description: The mutes as they now are. `kind` answers a request with `kind`, `kinds` one with `kinds`; `changed` counts the kinds whose mute changed.
           content:
             application/json:
               schema:
                 type: object
-                required: [kind, muted]
+                required: [muted, changed]
                 properties:
                   kind: { type: string }
+                  kinds: { type: array, items: { type: string } }
                   muted: { type: boolean }
+                  changed: { type: integer }
         "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
   /v1/workspaces/{ws}/reply-rules:
@@ -8359,6 +8368,22 @@ paths:
         "409": { $ref: "#/components/responses/Error" }
         "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
+    delete:
+      operationId: deleteLander
+      x-outflare-access: { scope: analytics.manage, brand: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Delete a lander
+      description: "Scope: analytics.manage. Takes the lander off every link and flow that sends to it and archives it, so it leaves the brand's list. Its clicks and conversions stay in the reports under its name. PATCH status active brings it back, but not onto the links it was on."
+      tags: [analytics]
+      responses:
+        "200":
+          description: The lander, archived.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TrackerLander" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/lander-clicks:
     parameters: [{ $ref: "#/components/parameters/BrandID" }]
     get:
@@ -8506,6 +8531,22 @@ paths:
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+    delete:
+      operationId: deleteOffer
+      x-outflare-access: { scope: analytics.manage, brand: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Delete an offer
+      description: "Scope: analytics.manage. Takes the offer off every link and flow that sends to it and archives it, so it leaves the brand's list. Its clicks and conversions stay in the reports under its name. PATCH status active brings it back, but not onto the links it was on."
+      tags: [analytics]
+      responses:
+        "200":
+          description: The offer, archived.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TrackerOffer" }
+        "404": { $ref: "#/components/responses/Error" }
         "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/postback-sources:
@@ -11890,6 +11931,43 @@ paths:
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/ads/match-quality:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+    get:
+      operationId: getBrandAdMatchQuality
+      x-outflare-access: { scope: analytics.read, brand: true }
+      summary: How well the ad platforms match the brand's conversions
+      description: |
+        Scope: analytics.read. For each pixel the brand's conversion rules
+        send to, on a platform that reports it (Meta's event match quality),
+        and each event the platform scored: the latest `score` out of 10 for
+        how well the customer information sent matches the platform's
+        accounts, `score_before` (the average over the seven days before),
+        the share of events that carried each identifier (`keys`), what the
+        platform says is wrong and how to fix it (`issues`), and the score
+        per day over the last 30 days (`history`). `status` is `ok`, `low`
+        (under `low_under`), `fell` (`fell_by` or more under `score_before`)
+        or `none` (no score). `sent` says whether one of the brand's enabled
+        rules sends the event; a `low` or `fell` event that is sent also
+        raises the `ads.match_quality_low` alert, at most once a week. A
+        daily job reads the platform with the workspace's own connection;
+        this reads stored rows only, so a new rule shows here within a day.
+      tags: [ads]
+      responses:
+        "200":
+          description: One row per ad account, pixel and event; the events the rules send first, then lowest score first.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, low_under, fell_by]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/AdMatchQuality" } }
+                  low_under: { type: number, description: "The score under which an event reads low." }
+                  fell_by: { type: number, description: "How far under score_before a score reads fell." }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/ads/conversion-actions:
     parameters:
       - { $ref: "#/components/parameters/BrandID" }
@@ -13411,6 +13489,284 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/Finding" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/profile:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+    get:
+      operationId: getBrandProfile
+      x-outflare-access: { scope: workspace.read, brand: true }
+      summary: Read a brand's profile
+      description: |
+        Scope: workspace.read. The brand profile is what the brand's
+        agents know about the company: who it is, what it sells, who it
+        serves, why it is different and how it talks. It is kept as
+        separate facts in sections, plus personas. This returns every
+        section with how full it is, every fact that isn't retired and
+        every persona that isn't archived. A fact with `status: suggested`
+        was added by an agent and waits for a person to confirm it; only a
+        fact with `say_to_customers: true` may be used in anything a
+        customer reads.
+      tags: [context]
+      parameters:
+        - { $ref: "#/components/parameters/Fields" }
+      responses:
+        "200":
+          description: The profile.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BrandProfile" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/profile/facts:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+    get:
+      operationId: listProfileFacts
+      x-outflare-access: { scope: workspace.read, brand: true }
+      summary: List a brand profile's facts
+      description: |
+        Scope: workspace.read. Newest first. Without `status`, retired
+        facts are left out; `status: all` includes them. `due: true`
+        lists the ones past their review date.
+      tags: [context]
+      parameters:
+        - { name: section, in: query, schema: { $ref: "#/components/schemas/ProfileFactSection" } }
+        - { name: status, in: query, schema: { type: string, enum: [suggested, confirmed, retired, all] } }
+        - { name: due, in: query, description: "true: only facts past their review date.", schema: { type: boolean } }
+        - { name: limit, in: query, description: 1 to 200. Default 100., schema: { type: integer, minimum: 1, maximum: 200 } }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
+      responses:
+        "200":
+          description: Facts, newest first.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, next_cursor]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/ProfileFact" } }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createProfileFact
+      x-outflare-access: { scope: context.manage, brand: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Add a fact to a brand's profile
+      description: |
+        Scope: context.manage. One fact in plain words, in the section it
+        belongs to. A signed-in person's fact is confirmed unless they
+        ask for `status: suggested`. An API token's fact is always a
+        suggestion (source `agent` unless it says otherwise): a person
+        confirms it, and until then it is never used with customers. To
+        propose a change to a confirmed fact, add a suggestion with
+        `replaces_id`: confirming it writes it into that fact. A profile
+        keeps at most 500 facts.
+      tags: [context]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/ProfileFactInput"
+                - required: [section, text]
+      responses:
+        "201":
+          description: The fact.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ProfileFact" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/profile/facts/{id}:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getProfileFact
+      x-outflare-access: { scope: workspace.read, brand: true }
+      summary: Read a profile fact
+      description: "Scope: workspace.read."
+      tags: [context]
+      responses:
+        "200":
+          description: The fact.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ProfileFact" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateProfileFact
+      x-outflare-access: { scope: context.manage, brand: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Change, confirm or retire a profile fact
+      description: |
+        Scope: context.manage. A person changes any field, confirms a
+        suggestion with `status: confirmed`, retires a fact that no
+        longer holds with `status: retired`, or brings one back. An API
+        token may only change or retire a suggestion: only a person
+        confirms, and only a person changes what a person confirmed.
+        Confirming a suggestion that has `replaces_id` writes its text
+        into that fact and retires the suggestion. A fact with
+        `context_field` mirrors that field of the brand's context:
+        changing one changes the other. Every change is kept
+        (listProfileChanges); nothing is deleted.
+      tags: [context]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ProfileFactInput" }
+      responses:
+        "200":
+          description: The fact.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ProfileFact" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/profile/changes:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+    get:
+      operationId: listProfileChanges
+      x-outflare-access: { scope: workspace.read, brand: true }
+      summary: List the history of a brand's profile
+      description: |
+        Scope: workspace.read. Every time a fact or a persona was added,
+        changed, confirmed, retired or brought back, newest first, with
+        who did it and what it said before and after.
+      tags: [context]
+      parameters:
+        - { name: fact_id, in: query, description: Only this fact's history., schema: { type: string, format: uuid } }
+        - { name: persona_id, in: query, description: Only this persona's history., schema: { type: string, format: uuid } }
+        - { name: limit, in: query, description: 1 to 200. Default 50., schema: { type: integer, minimum: 1, maximum: 200 } }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
+      responses:
+        "200":
+          description: Changes, newest first.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, next_cursor]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/ProfileChange" } }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/personas:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+    get:
+      operationId: listPersonas
+      x-outflare-access: { scope: workspace.read, brand: true }
+      summary: List a brand's personas
+      description: |
+        Scope: workspace.read. The kinds of people the brand sells to,
+        in the order the profile shows them. Without `status`, archived
+        ones are left out. A persona is a type, never a real person.
+      tags: [context]
+      parameters:
+        - { name: status, in: query, schema: { type: string, enum: [suggested, confirmed, archived, all] } }
+        - { $ref: "#/components/parameters/Fields" }
+      responses:
+        "200":
+          description: Personas.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/Persona" } }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createPersona
+      x-outflare-access: { scope: context.manage, brand: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Add a persona to a brand
+      description: |
+        Scope: context.manage. A signed-in person's persona is confirmed
+        unless they ask for `status: suggested`; an API token's is always
+        a suggestion a person confirms. A brand keeps at most 50 personas,
+        each with its own name.
+      tags: [context]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/PersonaInput"
+                - required: [name]
+      responses:
+        "201":
+          description: The persona.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Persona" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/personas/{id}:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getPersona
+      x-outflare-access: { scope: workspace.read, brand: true }
+      summary: Read a persona
+      description: "Scope: workspace.read."
+      tags: [context]
+      responses:
+        "200":
+          description: The persona.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Persona" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updatePersona
+      x-outflare-access: { scope: context.manage, brand: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Change, confirm or archive a persona
+      description: |
+        Scope: context.manage. A person changes any field, confirms a
+        suggestion, archives a persona the brand no longer sells to, or
+        brings one back. An API token may only change or archive a
+        suggestion. A list replaces the list it names. Every change is
+        kept (listProfileChanges).
+      tags: [context]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PersonaInput" }
+      responses:
+        "200":
+          description: The persona.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Persona" }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         "202": { $ref: "#/components/responses/MissionHeld" }
@@ -15420,7 +15776,7 @@ paths:
       operationId: getBrandAdSettings
       x-outflare-access: { scope: analytics.read, brand: true }
       summary: Read the paid media settings
-      description: "Scope: analytics.read. consent_mode decides who conversions are sent for outside the EEA, the UK and Switzerland: opt_out (the default) sends unless the person withdrew consent for ad data, opt_in only when they granted it. Inside those countries, and when a person's country is unknown, a grant is always needed. collected says the brand's own site already collects consent for ad data from everyone: conversions are sent for everyone, in every country, as granted, except people who withdrew."
+      description: "Scope: analytics.read. consent_mode decides who conversions are sent for outside the EEA, the UK and Switzerland: opt_out (the default) sends unless the person withdrew consent for ad data, opt_in only when they granted it. Inside those countries, and when a person's country is unknown, a grant is always needed. collected says the brand's own site already collects consent for ad data and ad personalisation from everyone: conversions are sent, and people join ad audiences, for everyone, in every country, as granted, except people who withdrew."
       tags: [ads]
       responses:
         "200":
@@ -43990,6 +44346,1281 @@ paths:
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/assets:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    get:
+      operationId: listBrandAssets
+      x-outflare-access: { scope: content.read, brand: true }
+      summary: List the brand's files
+      description: |
+        Scope: content.read. The files the brand keeps to build ads and other content from: logos, fonts, product shots,
+        screenshots, example ads, voices, pictures of people and screen recordings. Newest first. Archived files only with
+        archived=true. usable=true leaves out a voice or person nobody has confirmed consent for. storage is false on a
+        server with no object storage (OUTFLARE_S3_*), where files can't be uploaded.
+      tags: [brands]
+      parameters:
+        - { name: kind, in: query, description: "Only files of this kind.", schema: { $ref: "#/components/schemas/BrandAssetKind" } }
+        - { name: q, in: query, description: "Only files whose name contains this, or that have exactly this tag.", schema: { type: string } }
+        - { name: archived, in: query, schema: { type: boolean } }
+        - { name: usable, in: query, description: "Only files that may be used: consent confirmed where it is needed.", schema: { type: boolean } }
+      responses:
+        "200":
+          description: Files.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, storage]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/BrandAsset" } }
+                  storage: { type: boolean, description: "Whether this server has object storage, so files can be uploaded." }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: uploadBrandAsset
+      x-outflare-access: { scope: content.manage, brand: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Upload a file
+      description: |
+        Scope: content.manage. Adds a file to the brand, up to 50 MB: pictures (PNG, JPEG, GIF, WebP, SVG), videos (MP4,
+        WebM, MOV), sound (MP3, WAV, M4A, OGG) and fonts (TTF, OTF, WOFF, WOFF2). The type is worked out from the file's
+        bytes, never from its name, and has to fit the kind: a logo is a picture, a font a font, a voice a sound file.
+        Uploading a file the brand already has returns that file with 200 instead of adding it twice. A voice or person
+        isn't usable until consent is confirmed, here or with PATCH. 503 not_configured on a server with no object
+        storage. A brand keeps at most 5,000 files.
+      tags: [brands]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/BrandAssetUpload" }
+      responses:
+        "200":
+          description: The brand already had this file.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BrandAsset" }
+        "201":
+          description: The file.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BrandAsset" }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "503": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/assets/{asset}:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: asset, in: path, required: true, description: "The file's id.", schema: { type: string, format: uuid } }
+    get:
+      operationId: getBrandAsset
+      x-outflare-access: { scope: content.read, brand: true }
+      summary: Get a file's details
+      description: "Scope: content.read. What the file is; its bytes are at file_path."
+      tags: [brands]
+      responses:
+        "200":
+          description: The file.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BrandAsset" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateBrandAsset
+      x-outflare-access: { scope: content.manage, brand: true }
+      summary: Change a file's details
+      description: |
+        Scope: content.manage. Renames a file, changes its note, tags or kind (the file has to fit the new kind), and
+        confirms or takes back consent for a voice or person: consent.confirmed true records who confirmed it and when,
+        false makes the file unusable again. Send version to refuse the change (409) when someone else changed the file
+        since you read it. The bytes never change: upload a new file instead.
+      tags: [brands]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/BrandAssetChange" }
+      responses:
+        "200":
+          description: The file.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BrandAsset" }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+    delete:
+      operationId: deleteBrandAsset
+      x-outflare-access: { scope: content.manage, brand: true }
+      summary: Delete a file for good
+      description: |
+        Scope: content.manage. Removes the file, its bytes and every smaller copy from storage. It can't be undone; use
+        archive to only stop using a file. This is how a person's picture or voice is taken out when they no longer agree.
+      tags: [brands]
+      responses:
+        "204": { description: Deleted. }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "503": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/assets/{asset}/file:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: asset, in: path, required: true, description: "The file's id.", schema: { type: string, format: uuid } }
+    get:
+      operationId: downloadBrandAsset
+      x-outflare-access: { scope: content.read, brand: true }
+      summary: Download a file
+      description: |
+        Scope: content.read. The file's bytes, with the type worked out at upload. width asks for a smaller copy of a
+        picture (resizable true) no wider than that, as JPEG, or PNG when it has see-through parts; a picture already
+        narrower comes back at its own size. download=true asks the browser to save it instead of showing it.
+      tags: [brands]
+      parameters:
+        - { name: width, in: query, description: "A smaller copy this wide, for pictures.", schema: { type: integer, enum: [240, 480, 960, 1920] } }
+        - { name: download, in: query, schema: { type: boolean } }
+      responses:
+        "200":
+          description: The file.
+          content:
+            image/png: { schema: { type: string, format: binary } }
+            image/jpeg: { schema: { type: string, format: binary } }
+            image/gif: { schema: { type: string, format: binary } }
+            image/webp: { schema: { type: string, format: binary } }
+            image/svg+xml: { schema: { type: string, format: binary } }
+            video/mp4: { schema: { type: string, format: binary } }
+            video/webm: { schema: { type: string, format: binary } }
+            video/quicktime: { schema: { type: string, format: binary } }
+            audio/mpeg: { schema: { type: string, format: binary } }
+            audio/wave: { schema: { type: string, format: binary } }
+            audio/mp4: { schema: { type: string, format: binary } }
+            audio/ogg: { schema: { type: string, format: binary } }
+            font/ttf: { schema: { type: string, format: binary } }
+            font/otf: { schema: { type: string, format: binary } }
+            font/woff: { schema: { type: string, format: binary } }
+            font/woff2: { schema: { type: string, format: binary } }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "503": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/assets/{asset}/archive:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: asset, in: path, required: true, description: "The file's id.", schema: { type: string, format: uuid } }
+    post:
+      operationId: archiveBrandAsset
+      x-outflare-access: { scope: content.manage, brand: true }
+      summary: Archive a file
+      description: "Scope: content.manage. Keeps the file and its history but stops it being used for anything new."
+      tags: [brands]
+      responses:
+        "200":
+          description: The file.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BrandAsset" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/assets/{asset}/restore:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: asset, in: path, required: true, description: "The file's id.", schema: { type: string, format: uuid } }
+    post:
+      operationId: restoreBrandAsset
+      x-outflare-access: { scope: content.manage, brand: true }
+      summary: Restore an archived file
+      description: "Scope: content.manage."
+      tags: [brands]
+      responses:
+        "200":
+          description: The file.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BrandAsset" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/generations:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    get:
+      operationId: listBrandGenerations
+      x-outflare-access: { scope: content.read, brand: true }
+      summary: List what the brand asked its AI accounts to make
+      description: |
+        Scope: content.read. The pictures, videos and voice recordings the brand asked for, newest first, up to 200:
+        what was asked, which of the brand's own accounts made it, where it stands (queued, running, done, failed)
+        and, once done, the brand file it became (asset_id).
+      tags: [brands]
+      parameters:
+        - { name: kind, in: query, description: "Only this kind.", schema: { $ref: "#/components/schemas/BrandGenerationKind" } }
+        - { name: status, in: query, description: "Only requests in this state.", schema: { type: string, enum: [queued, running, done, failed] } }
+        - { name: asset_id, in: query, description: "Only the request that made this brand file: its recipe.", schema: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: Requests.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/BrandGeneration" } }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createBrandGeneration
+      x-outflare-access: { scope: content.manage, brand: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Make a picture, video or voice recording
+      description: |
+        Scope: content.manage. Asks one of the brand's own AI accounts for a file and keeps it with the brand's files:
+        a picture from OpenAI or fal.ai, a video from fal.ai, a voice recording from ElevenLabs. The request is queued
+        and answered at once with status queued; read it again until it is done (asset_id is the file) or failed
+        (error_code and error say why). A picture or recording takes seconds to a few minutes, a video up to many
+        minutes; a provider that hasn't finished in 45 minutes fails the request.
+
+        Every request runs on the workspace's own connection and is paid by the workspace to that provider: Outflare
+        has no account of its own for this. Without a connected provider for the kind the answer is 409
+        connector_needed, naming what to connect. model is always yours to choose (the provider's own id for it, for
+        fal.ai the model's endpoint such as owner/app/path): Outflare has no default, since providers retire models
+        often. options are the model's own settings, passed on as they are. A request is sent to the provider once and
+        never again, so nothing is paid twice; a brand makes at most 200 in 24 hours. 503 not_configured on a server
+        with no object storage.
+
+        references are brand files to make it from, so a person, a scene or a style stays the same from one file to
+        the next: a picture of a person in a kitchen, an ad the brand liked, a voice-over a video is made to, a video
+        to upscale. Each is handed to the provider with the request (fal.ai keeps it for a day) under the model's own
+        input name (as). A picture with references goes to OpenAI's image edit call.
+      tags: [brands]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/BrandGenerationRequest" }
+      responses:
+        "201":
+          description: The request, queued.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BrandGeneration" }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "503": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/generations/providers:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    get:
+      operationId: listBrandGenerationProviders
+      x-outflare-access: { scope: content.read, brand: true }
+      summary: List which AI accounts can make what for the brand
+      description: |
+        Scope: content.read. For each kind (image, video, voice): the providers that can make it, the usual one first,
+        and whether the brand has a working connection to each. A kind is ready once one of them is connected.
+        storage is false on a server with no object storage, where nothing can be made because it couldn't be kept.
+      tags: [brands]
+      responses:
+        "200":
+          description: Kinds and their providers.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, storage]
+                properties:
+                  storage: { type: boolean }
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [kind, ready, providers]
+                      properties:
+                        kind: { $ref: "#/components/schemas/BrandGenerationKind" }
+                        ready: { type: boolean, description: "At least one provider for this kind is connected." }
+                        providers:
+                          type: array
+                          items:
+                            type: object
+                            required: [provider, name, connected, integration_id]
+                            properties:
+                              provider: { type: string, description: "The connector to connect: openai, fal or elevenlabs." }
+                              name: { type: string }
+                              connected: { type: boolean }
+                              integration_id: { type: [string, "null"], format: uuid }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/generations/voices:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    get:
+      operationId: listBrandGenerationVoices
+      x-outflare-access: { scope: content.read, brand: true }
+      summary: List the voices of the brand's ElevenLabs account
+      description: |
+        Scope: content.read. Up to 100 voices the brand's own ElevenLabs account holds, by name, read from ElevenLabs
+        when asked. A voice's id is what a voice request names as voice. 409 connector_needed when ElevenLabs isn't
+        connected. Use a cloned voice of a real person only with that person's agreement.
+      tags: [brands]
+      responses:
+        "200":
+          description: Voices.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, provider]
+                properties:
+                  provider: { type: string }
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, name, category]
+                      properties:
+                        id: { type: string }
+                        name: { type: string }
+                        category: { type: string, description: "ElevenLabs's own grouping, such as premade, cloned, generated or professional." }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "422": { $ref: "#/components/responses/Error" }
+        "429": { $ref: "#/components/responses/Error" }
+        "502": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/generations/{generation}:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: generation, in: path, required: true, description: "The request's id.", schema: { type: string, format: uuid } }
+    get:
+      operationId: getBrandGeneration
+      x-outflare-access: { scope: content.read, brand: true }
+      summary: Get one request and where it stands
+      description: "Scope: content.read. Read it until status is done (asset_id is the brand file) or failed (error_code and error say why)."
+      tags: [brands]
+      responses:
+        "200":
+          description: The request.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BrandGeneration" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/generations/{generation}/reuse:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: generation, in: path, required: true, description: "The request whose recipe to use again.", schema: { type: string, format: uuid } }
+    post:
+      operationId: reuseBrandGeneration
+      x-outflare-access: { scope: content.manage, brand: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Make another file from the recipe of an earlier one
+      description: |
+        Scope: content.manage. Queues a new request with the same provider, model, prompt, settings and references as
+        an earlier one, with whatever the body changes: a liked picture again with a new headline in the prompt, the
+        same person in another scene. The new request names the earlier one in recipe_of; the earlier one stays as it
+        is. Paid by the workspace to the provider like any request. Answers like making one.
+      tags: [brands]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/BrandGenerationReuse" }
+      responses:
+        "201":
+          description: The new request, queued.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BrandGeneration" }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "503": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/videos:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    get:
+      operationId: listBrandVideos
+      x-outflare-access: { scope: content.read, brand: true }
+      summary: List the brand's talking videos
+      description: |
+        Scope: content.read. The talking videos the brand made or is making, newest first, up to 200, without their
+        steps. finishing says whether this server can close pauses, add the phone-camera look and captions, and edit
+        videos (it needs ffmpeg installed); storage whether it can keep files at all.
+      tags: [brands]
+      parameters:
+        - { name: status, in: query, description: "Only videos in this state.", schema: { type: string, enum: [working, ready, failed] } }
+        - { name: family, in: query, description: "The id of a video: only that video and the variations made of it.", schema: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: Videos.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, storage, finishing]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/BrandVideo" } }
+                  storage: { type: boolean }
+                  finishing: { type: boolean }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createBrandVideo
+      x-outflare-access: { scope: content.manage, brand: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Make a talking video from a script
+      description: |
+        Scope: content.manage. Makes a video of a person saying a script, stage by stage, on the brand's own accounts:
+
+        1. voice: the script is read out by the ElevenLabs voice you name.
+        2. words: long pauses are closed (finish.tighten), then ElevenLabs times every word. A word the voice read
+           differently from the script is listed in notes with its time.
+        3. render: the fal.ai video model you name makes the video to that voice-over, from the picture of the person
+           and scene (scene_asset_id), your direction and the script. Render small (the model's own resolution option,
+           such as 480p) to keep the cost down.
+        4. upscale: the fal.ai upscaler you name makes it large, when settings.upscale is given.
+        5. finish: the look of a phone camera (finish.phone_look) and burned-in captions (finish.captions), done on
+           the server with ffmpeg.
+
+        The answer is the video with status working; read it again until it is ready (final_asset_id is the finished
+        file among the brand's files) or failed (error_code and error say why, and POST .../retry starts again at the
+        stage that failed). Each stage keeps its file and, for a provider, its request with the recipe (steps), and a
+        stage is never sent twice.
+
+        Every model is yours to name: Outflare has no default and no account of its own, and each stage is paid by the
+        workspace to that provider. 409 connector_needed without ElevenLabs and fal.ai connected. The voice-over may
+        run as long as the video model takes in one request (settings.video.max_seconds, 30 when left out). On a
+        server without ffmpeg the video is made without the tighten and finish stages, and notes says so. A brand
+        makes at most 50 in 24 hours.
+      tags: [brands]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/BrandVideoRequest" }
+      responses:
+        "201":
+          description: The video, being made.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BrandVideo" }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "503": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/videos/{video}:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: video, in: path, required: true, description: "The video's id.", schema: { type: string, format: uuid } }
+    get:
+      operationId: getBrandVideo
+      x-outflare-access: { scope: content.read, brand: true }
+      summary: Get one talking video, its words and its steps
+      description: "Scope: content.read. The video with every word and its time (what an edit picks from), its notes, and what each stage did (steps)."
+      tags: [brands]
+      responses:
+        "200":
+          description: The video.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BrandVideo" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateBrandVideo
+      x-outflare-access: { scope: content.manage, brand: true }
+      summary: Rename a talking video
+      description: "Scope: content.manage. Only the name changes here. To change what is said, edit the video by its words."
+      tags: [brands]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [name]
+              properties:
+                name: { type: string, maxLength: 200 }
+      responses:
+        "200":
+          description: The video.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BrandVideo" }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+    delete:
+      operationId: deleteBrandVideo
+      x-outflare-access: { scope: content.manage, brand: true }
+      summary: Delete a talking video
+      description: "Scope: content.manage. Removes the video and its steps. The files it made stay among the brand's files, where each can be deleted."
+      tags: [brands]
+      responses:
+        "204": { description: Deleted. }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/videos/{video}/edits:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: video, in: path, required: true, description: "The video's id.", schema: { type: string, format: uuid } }
+    post:
+      operationId: editBrandVideo
+      x-outflare-access: { scope: content.manage, brand: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Edit a talking video by its words
+      description: |
+        Scope: content.manage. Changes a ready video without making the whole of it again. Pick words by their
+        position in the video's words (from and to, counted from 0):
+
+        - remove cuts them out of the video and closes the gap.
+        - redo has them said again and stitched in: for a word the voice read wrong, or words to change. text is what
+          to show in their place (left out: the same words); say is how to spell them for the voice when it reads them
+          wrong ("jee-oh-node"). The voice reads only that stretch, the video model renders only that stretch,
+          starting on the frame the old one started on, and it is upscaled and stitched in. A stretch shorter than two
+          seconds takes in the words next to it, since a video model renders no less.
+
+        Both end with the finish again (captions follow the new words). The video is working until the edit is done;
+        an edit that fails leaves the video ready as it was, with error saying why. One edit at a time: 409 while
+        another is being made. 409 not_configured on a server without ffmpeg, which cuts and stitches.
+
+        What the edit makes does not replace the video: it waits as a new version (waiting_version) until a person
+        says keep or go back, and the video stays as it was until then. 409 while a fix waits for that answer. note
+        is what is wrong, in the person's words: the video model is told it for the stretch, and it is kept in the
+        video's history.
+      tags: [brands]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [action, from, to]
+              properties:
+                action: { type: string, enum: [remove, redo] }
+                from: { type: integer, minimum: 0, description: "Position of the first word picked." }
+                to: { type: integer, minimum: 0, description: "Position of the last word picked." }
+                text: { type: string, maxLength: 1000, description: "For redo: the words to show in place of the picked ones." }
+                say: { type: string, maxLength: 1000, description: "For redo: how the voice should read them, spelled as they sound." }
+                note: { type: string, maxLength: 1000, description: "What is wrong, in the person's words." }
+      responses:
+        "200":
+          description: The video, working on the edit.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BrandVideo" }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "503": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/videos/{video}/retry:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: video, in: path, required: true, description: "The video's id.", schema: { type: string, format: uuid } }
+    post:
+      operationId: retryBrandVideo
+      x-outflare-access: { scope: content.manage, brand: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Try a failed talking video again
+      description: "Scope: content.manage. Starts a failed video again at the stage that failed. The stages already made are kept and not paid for again. 409 when the video did not fail."
+      tags: [brands]
+      responses:
+        "200":
+          description: The video, being made again.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BrandVideo" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/videos/{video}/fix/keep:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: video, in: path, required: true, description: "The video's id.", schema: { type: string, format: uuid } }
+    post:
+      operationId: keepBrandVideoFix
+      x-outflare-access: { scope: content.manage, brand: true }
+      summary: "Keep the fix to a talking video"
+      description: |
+        Scope: content.manage. A person's yes to the fix that waits: it becomes the video, and the version it replaces
+        is kept and can be gone back to. With remember, how the fix spelled its words for the voice (say) is saved as a
+        lesson, so every later voice-over of the brand says them that way. 409 when no fix waits. An agent keeps a fix
+        only when the person said to.
+      tags: [brands]
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                remember: { type: boolean, description: "Save how the fix spelled its words for the voice, for every later video." }
+      responses:
+        "200":
+          description: The video.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BrandVideo" }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/videos/{video}/fix/go-back:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: video, in: path, required: true, description: "The video's id.", schema: { type: string, format: uuid } }
+    post:
+      operationId: discardBrandVideoFix
+      x-outflare-access: { scope: content.manage, brand: true }
+      summary: "Go back from the fix to a talking video"
+      description: |
+        Scope: content.manage. A person's no to the fix that waits: the video stays as it was before the fix. The fix is
+        not deleted: it stays among the video's versions with reason and note, and can still be gone back to. With
+        try_again the same words are fixed again, with note told to the video model and say (if given) to the voice;
+        what that makes waits for an answer in turn. 409 when no fix waits; 409 not_configured for try_again on a server
+        without ffmpeg.
+      tags: [brands]
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                reason: { type: string, maxLength: 200, description: "Why, in a few words, such as Still said wrong, or Looks different from the rest." }
+                note: { type: string, maxLength: 1000, description: "What is wrong, in the person's words." }
+                try_again: { type: boolean, description: "Make the fix again, told what was wrong." }
+                say: { type: string, maxLength: 1000, description: "For try_again on a redo: how to spell the words for the voice this time." }
+      responses:
+        "200":
+          description: "The video: as before the fix, or working on the new try."
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BrandVideo" }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/videos/{video}/versions/{number}/restore:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: video, in: path, required: true, description: "The video's id.", schema: { type: string, format: uuid } }
+      - { name: number, in: path, required: true, description: "The version's number.", schema: { type: integer, minimum: 1 } }
+    post:
+      operationId: restoreBrandVideoVersion
+      x-outflare-access: { scope: content.manage, brand: true }
+      summary: "Go back to a version of a talking video"
+      description: |
+        Scope: content.manage. Makes an earlier version, or a fix that was turned down, the video again. The version it
+        replaces is kept, so nothing is lost by going back. 409 while the video is being made or a fix waits for an
+        answer, when it is that version already, or when the version's file was deleted.
+      tags: [brands]
+      responses:
+        "200":
+          description: The video.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BrandVideo" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/videos/{video}/rating:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: video, in: path, required: true, description: "The video's id.", schema: { type: string, format: uuid } }
+    post:
+      operationId: rateBrandVideo
+      x-outflare-access: { scope: content.manage, brand: true }
+      summary: "Like a talking video, or say not this"
+      description: |
+        Scope: content.manage. A person's opinion of the video, with why: liked marks what to make more of, not_this
+        what to stay away from. It changes nothing else, and is kept in the video's history each time it changes.
+      tags: [brands]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [rating]
+              properties:
+                rating: { type: string, enum: ["", liked, not_this], description: "Empty takes the answer back." }
+                reason: { type: string, maxLength: 500, description: "Why, in the person's words." }
+      responses:
+        "200":
+          description: The video.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BrandVideo" }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/videos/{video}/variations:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: video, in: path, required: true, description: "The video's id.", schema: { type: string, format: uuid } }
+    post:
+      operationId: createBrandVideoVariations
+      x-outflare-access: { scope: content.manage, brand: true }
+      summary: "Make variations of a talking video"
+      description: |
+        Scope: content.manage. More of a video that works: one new video per value, the same as this one except for the
+        one thing named by change. first_line replaces the script's first sentence; direction replaces how the video
+        looks and moves; scene is the id of another scene picture among the brand's files; voice is the id of another
+        voice. Each is a video of its own, made from the start on the brand's own accounts, with variation_of pointing
+        at the first video of the family (a variation of a variation joins the same family) and variation_change saying
+        what differs. GET the videos with family=<id> to see them side by side. Counts toward the brand's daily limit.
+      tags: [brands]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [change, values]
+              properties:
+                change: { type: string, enum: [first_line, direction, scene, voice] }
+                values: { type: array, minItems: 1, maxItems: 5, items: { type: string, minLength: 1, maxLength: 10000 }, description: "One variation per value." }
+      responses:
+        "201":
+          description: The new videos, being made.
+          content:
+            application/json:
+              schema: 
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/BrandVideo" } }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "503": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/videos/{video}/history:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: video, in: path, required: true, description: "The video's id.", schema: { type: string, format: uuid } }
+    get:
+      operationId: listBrandVideoHistory
+      x-outflare-access: { scope: content.read, brand: true }
+      summary: "Read the history of a talking video"
+      description: |
+        Scope: content.read. Everything that happened to the video, newest first, up to 500: made, each fix asked for
+        and what was said about it, each fix that was ready, kept, turned down or failed, versions gone back to, likes,
+        and variations made of it, each with who did it and when.
+      tags: [brands]
+      responses:
+        "200":
+          description: History.
+          content:
+            application/json:
+              schema: 
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/CreativeHistoryEntry" } }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/creative-lessons:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    get:
+      operationId: listCreativeLessons
+      x-outflare-access: { scope: content.read, brand: true }
+      summary: "List what the brand taught its creatives"
+      description: |
+        Scope: content.read. The brand's lessons, newest first: how to say a word (kind say, given to every voice-over
+        from then on) and rules (kind rule, added to every prompt for pictures, videos or both).
+      tags: [brands]
+      responses:
+        "200":
+          description: Lessons.
+          content:
+            application/json:
+              schema: 
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/CreativeLesson" } }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: addCreativeLesson
+      x-outflare-access: { scope: content.manage, brand: true }
+      summary: "Teach the brand's creatives something"
+      description: |
+        Scope: content.manage. Saves something a person said once so it holds for every later creative. A say lesson
+        has word (as written) and say (spelled as it sounds): every voice-over reads the word that way; teaching the
+        same word again replaces the earlier spelling. A rule lesson has rule, a line added to every prompt, for
+        applies_to all (the default), image or video. source_type and source_id name the video or creative it was
+        learned on. A brand keeps up to 200.
+      tags: [brands]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [kind]
+              properties:
+                kind: { type: string, enum: [say, rule] }
+                word: { type: string, maxLength: 100 }
+                say: { type: string, maxLength: 200 }
+                rule: { type: string, maxLength: 500 }
+                applies_to: { type: string, enum: [all, image, video] }
+                source_type: { type: string, enum: [video, creative] }
+                source_id: { type: string, format: uuid }
+      responses:
+        "201":
+          description: The lesson.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CreativeLesson" }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/creative-lessons/{lesson}:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: lesson, in: path, required: true, description: "The lesson's id.", schema: { type: string, format: uuid } }
+    delete:
+      operationId: removeCreativeLesson
+      x-outflare-access: { scope: content.manage, brand: true }
+      summary: "Remove a lesson"
+      description: |
+        Scope: content.manage. The lesson is no longer used for new creatives. What was made with it stays as it is.
+      tags: [brands]
+      responses:
+        "204": { description: Removed. }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/creative-skills:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    get:
+      operationId: listCreativeSkills
+      x-outflare-access: { scope: content.read, brand: true }
+      summary: List the brand's skills for making ads
+      description: |
+        Scope: content.read. A skill is a saved recipe for one kind of ad: its prompts, the AI model and the sizes.
+        Each comes with its current version and how many creatives it has made, sorted by name. Archived skills only
+        with archived=true.
+      tags: [brands]
+      parameters:
+        - { name: archived, in: query, schema: { type: boolean } }
+      responses:
+        "200":
+          description: Skills.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/CreativeSkill" } }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createCreativeSkill
+      x-outflare-access: { scope: content.manage, brand: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Add a skill
+      description: |
+        Scope: content.manage. Saves a recipe for one kind of ad as version 1. variants holds one to four prompts;
+        with more than one taking a share, the skill is a split test and new creatives are shared between the
+        prompts. Words in curly brackets in a prompt or the rules ({persona}, {pain}, {hook}, {brand}, or any word of
+        your own such as {proof}) are filled in for each creative. model is the provider's own id for the AI model:
+        there is no default, since providers retire models often. Nothing is sent to a provider here. A brand keeps
+        at most 100 skills, each with its own name.
+      tags: [brands]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreativeSkillCreate" }
+      responses:
+        "201":
+          description: The skill.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CreativeSkill" }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/creative-skills/{skill}:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: skill, in: path, required: true, description: "The skill's id.", schema: { type: string, format: uuid } }
+    get:
+      operationId: getCreativeSkill
+      x-outflare-access: { scope: content.read, brand: true }
+      summary: Get a skill
+      description: "Scope: content.read. The skill with its current version: the prompts, the AI model, the sizes and the rules."
+      tags: [brands]
+      responses:
+        "200":
+          description: The skill.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CreativeSkill" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateCreativeSkill
+      x-outflare-access: { scope: content.manage, brand: true }
+      summary: Change a skill, or save a new version of it
+      description: |
+        Scope: content.manage. name, description, enabled and archived change in place. A change to the prompts
+        (variants), provider, model, options, sizes or rules is saved as a new version with your note, and every
+        earlier version stays as it was, so each creative still says exactly what made it. restore_version starts the
+        new version from an earlier one (going back is a new version too). Send version, the version you read, to have
+        the change refused with 409 when the skill has moved on since.
+      tags: [brands]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreativeSkillUpdate" }
+      responses:
+        "200":
+          description: The skill.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CreativeSkill" }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/creative-skills/{skill}/versions:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: skill, in: path, required: true, description: "The skill's id.", schema: { type: string, format: uuid } }
+    get:
+      operationId: listCreativeSkillVersions
+      x-outflare-access: { scope: content.read, brand: true }
+      summary: List a skill's versions
+      description: "Scope: content.read. Every saved version of the skill, newest first, with what changed and how many creatives each made. current is the number of the version in use."
+      tags: [brands]
+      responses:
+        "200":
+          description: Versions.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, current]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/CreativeSkillVersion" } }
+                  current: { type: integer }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/creatives:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    get:
+      operationId: listCreatives
+      x-outflare-access: { scope: content.read, brand: true }
+      summary: List the brand's creatives
+      description: |
+        Scope: content.read. The ads the brand made from its skills, newest first, up to 500: where each stands, who
+        and what it is for, the skill, version and prompt that made it, and the brand file it became (asset_id).
+      tags: [brands]
+      parameters:
+        - { name: status, in: query, schema: { $ref: "#/components/schemas/CreativeStatus" } }
+        - { name: skill_id, in: query, schema: { type: string, format: uuid } }
+        - { name: kind, in: query, schema: { type: string, enum: [image, video] } }
+        - { name: persona, in: query, description: "Only creatives for this persona.", schema: { type: string } }
+        - { name: pain, in: query, description: "Only creatives about this pain.", schema: { type: string } }
+        - { name: tag, in: query, description: "Only creatives with this tag.", schema: { type: string } }
+        - { name: q, in: query, description: "Part of a name or headline.", schema: { type: string } }
+      responses:
+        "200":
+          description: Creatives.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/Creative" } }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createCreative
+      x-outflare-access: { scope: content.manage, brand: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Make a creative from a skill
+      description: |
+        Scope: content.manage. Fills the skill's prompt in for one persona and one pain, and asks the brand's own AI
+        account for the picture or video. The answer comes at once with status making; read the creative again until
+        it is needs_review (asset_id is the file) or failed (error_code and error say why). It then waits for a
+        person's yes: nothing reaches an ad network without one.
+
+        The prompt is the one you name with variant, or else the one furthest behind its share, so a split test
+        fills evenly. A curly bracket with no word is refused with 400 before anything is sent, naming the bracket.
+        headline, subline and cta are the words laid over the picture: write them as the prompt's copy says. Every
+        creative runs on the workspace's own connection and is paid by the workspace to that provider: without one the
+        answer is 409 connector_needed. A skill that is off makes nothing (409).
+      tags: [brands]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreativeCreate" }
+      responses:
+        "201":
+          description: The creative, being made.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Creative" }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "503": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/creatives/{creative}:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: creative, in: path, required: true, description: "The creative's id.", schema: { type: string, format: uuid } }
+    get:
+      operationId: getCreative
+      x-outflare-access: { scope: content.read, brand: true }
+      summary: Get a creative
+      description: "Scope: content.read. One creative: where it stands, its words and tags, the prompt as it was sent, and what made it."
+      tags: [brands]
+      responses:
+        "200":
+          description: The creative.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Creative" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateCreative
+      x-outflare-access: { scope: content.manage, brand: true }
+      summary: Rename a creative or change its words and tags
+      description: "Scope: content.manage. Changes the name, the persona, pain and hook it is filed under, its tags, or the words laid over the picture. No new picture is made or paid for. Send version to have the change refused with 409 when the creative changed since you read it."
+      tags: [brands]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreativeUpdate" }
+      responses:
+        "200":
+          description: The creative.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Creative" }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/creatives/{creative}/ad:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: creative, in: path, required: true, description: "The creative's id.", schema: { type: string, format: uuid } }
+    get:
+      operationId: downloadCreativeAd
+      x-outflare-access: { scope: content.read, brand: true }
+      summary: Get a creative as a finished ad
+      description: |
+        Scope: content.read. The creative's picture cropped around its middle to the size asked for, with its
+        headline, second line and button and the brand's logo laid over it by Outflare. The picture itself carries no
+        words, so changing them (or asking for another size) costs nothing and makes no new picture. The ad is drawn
+        from the creative as it is now and no copy is kept; it uses the brand's newest logo and TTF or OTF font among
+        its files (a built-in font without one) and the brand's primary colour for the button. Pictures only: a
+        video creative is its own file. 409 while the creative has no picture yet.
+      tags: [brands]
+      parameters:
+        - { name: size, in: query, description: "The shape, as width:height, such as 1:1, 4:5, 9:16 or 16:9. Left out, the picture's own shape.", schema: { type: string } }
+        - { name: width, in: query, description: "How wide, in pixels.", schema: { type: integer, minimum: 240, maximum: 2160, default: 1080 } }
+        - { name: format, in: query, schema: { type: string, enum: [jpeg, png], default: jpeg } }
+        - { name: logo, in: query, description: "false leaves the logo out.", schema: { type: boolean } }
+        - { name: download, in: query, schema: { type: boolean } }
+      responses:
+        "200":
+          description: The ad.
+          content:
+            image/jpeg: { schema: { type: string, format: binary } }
+            image/png: { schema: { type: string, format: binary } }
+        "304": { description: "Unchanged since the ETag sent in If-None-Match." }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "503": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/creatives/{creative}/approve:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: creative, in: path, required: true, description: "The creative's id.", schema: { type: string, format: uuid } }
+    post:
+      operationId: approveCreative
+      x-outflare-access: { scope: content.manage, brand: true }
+      summary: Approve a creative
+      description: "Scope: content.manage. A person's yes: the creative may be used. Only a creative whose file was made can be approved (409 while it is being made, or when it failed). An agent approves only when the person said to."
+      tags: [brands]
+      responses:
+        "200":
+          description: The creative.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Creative" }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/creatives/{creative}/reject:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: creative, in: path, required: true, description: "The creative's id.", schema: { type: string, format: uuid } }
+    post:
+      operationId: rejectCreative
+      x-outflare-access: { scope: content.manage, brand: true }
+      summary: Reject a creative
+      description: "Scope: content.manage. A person's no, with the reason if they gave one. The creative and its file are kept. Only a creative whose file was made can be rejected."
+      tags: [brands]
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                reason: { type: string, maxLength: 500 }
+      responses:
+        "200":
+          description: The creative.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Creative" }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/creatives/{creative}/rating:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: creative, in: path, required: true, description: "The creative's id.", schema: { type: string, format: uuid } }
+    post:
+      operationId: rateCreative
+      x-outflare-access: { scope: content.manage, brand: true }
+      summary: "Like a creative, or say not this"
+      description: |
+        Scope: content.manage. A person's opinion of the creative, with why: liked marks what to make more of, not_this
+        what to stay away from. It is separate from approving: a creative can be approved to run and still not be one
+        to make more of. Kept in the creative's history each time it changes.
+      tags: [brands]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [rating]
+              properties:
+                rating: { type: string, enum: ["", liked, not_this], description: "Empty takes the answer back." }
+                reason: { type: string, maxLength: 500, description: "Why, in the person's words." }
+      responses:
+        "200":
+          description: The creative.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Creative" }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/creatives/{creative}/history:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: creative, in: path, required: true, description: "The creative's id.", schema: { type: string, format: uuid } }
+    get:
+      operationId: listCreativeHistory
+      x-outflare-access: { scope: content.read, brand: true }
+      summary: "Read the history of a creative"
+      description: |
+        Scope: content.read. Everything that happened to the creative, newest first, up to 500: made (with the note
+        given), its words changed, approved, rejected with the reason, liked or not, each with who did it and when.
+      tags: [brands]
+      responses:
+        "200":
+          description: History.
+          content:
+            application/json:
+              schema: 
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/CreativeHistoryEntry" } }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/products:
     parameters: [{ $ref: "#/components/parameters/BrandID" }]
     get:
@@ -63772,6 +65403,463 @@ components:
         fire: { type: string, enum: [every_time, once], description: "every_time (the default): each time the condition becomes true. once: once per record, ever." }
         cooldown_seconds: { type: integer, minimum: 0, maximum: 31536000, description: "At least this long between two firings for one record (default 0)." }
         manual_edits: { type: boolean, description: "Whether a change someone made by hand can fire a change rule. Off by default, so a correction sets nothing off." }
+    BrandAssetKind:
+      type: string
+      enum: [logo, font, product_shot, screenshot, example_ad, voice, person, recording, other]
+      description: |
+        What a file is for, which decides the files that fit: logo and screenshot are pictures; font is a font;
+        product_shot, example_ad and person are pictures or videos; voice is a sound file; recording is a video (a screen
+        recording of the product); other is any of them. voice and person need consent before they are usable.
+    BrandAssetConsent:
+      type: object
+      required: [needed, confirmed, at, by, note]
+      properties:
+        needed: { type: boolean, description: "The file shows or sounds like a real person (kind voice or person)." }
+        confirmed: { type: boolean }
+        at: { type: [string, "null"], format: date-time, description: "When consent was confirmed." }
+        by: { type: [string, "null"], format: uuid, description: "The actor who confirmed it." }
+        note: { type: string, description: "How the person agreed, such as a signed release." }
+    BrandAsset:
+      type: object
+      required: [id, brand_id, kind, name, note, tags, filename, content_type, family, bytes, sha256, width, height, resizable, source, consent, usable, file_path, archived_at, version, created_by, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        brand_id: { type: string, format: uuid }
+        kind: { $ref: "#/components/schemas/BrandAssetKind" }
+        name: { type: string }
+        note: { type: string }
+        tags: { type: array, items: { type: string } }
+        filename: { type: string, description: "The name the file was uploaded with." }
+        content_type: { type: string, description: "Worked out from the file's bytes, such as image/png." }
+        family: { type: string, enum: [image, video, audio, font] }
+        bytes: { type: integer, format: int64 }
+        sha256: { type: string, description: "The file's SHA-256, in hex." }
+        width: { type: [integer, "null"], description: "Pixels, for pictures." }
+        height: { type: [integer, "null"] }
+        resizable: { type: boolean, description: "Smaller copies can be asked for with width on the file." }
+        source: { type: string, enum: [upload, generated], description: "Uploaded by a person or agent, or made by Outflare." }
+        consent: { $ref: "#/components/schemas/BrandAssetConsent" }
+        usable: { type: boolean, description: "Not archived, and consent confirmed where it is needed. Only usable files go into ads and other content." }
+        file_path: { type: string, description: "Where the bytes are: GET this path." }
+        archived_at: { type: [string, "null"], format: date-time }
+        version: { type: integer }
+        created_by: { type: [string, "null"], format: uuid }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    BrandAssetConsentInput:
+      type: object
+      additionalProperties: false
+      properties:
+        confirmed: { type: boolean, description: "true: the person agreed to this use. false takes it back." }
+        note: { type: string, maxLength: 2000, description: "How they agreed, such as a signed release and its date." }
+    BrandAssetUpload:
+      type: object
+      additionalProperties: false
+      required: [kind, filename, data]
+      properties:
+        kind: { $ref: "#/components/schemas/BrandAssetKind" }
+        filename: { type: string, maxLength: 255, description: "The file's name, such as logo.png." }
+        data: { type: string, description: "The file, base64-encoded. Up to 50 MB before encoding." }
+        name: { type: string, maxLength: 200, description: "What to call it. The filename without its ending when left out." }
+        note: { type: string, maxLength: 2000 }
+        tags: { type: array, maxItems: 20, items: { type: string, maxLength: 50 } }
+        consent: { $ref: "#/components/schemas/BrandAssetConsentInput" }
+    BrandAssetChange:
+      type: object
+      additionalProperties: false
+      properties:
+        kind: { $ref: "#/components/schemas/BrandAssetKind" }
+        name: { type: string, maxLength: 200 }
+        note: { type: string, maxLength: 2000 }
+        tags: { type: array, maxItems: 20, items: { type: string, maxLength: 50 } }
+        consent: { $ref: "#/components/schemas/BrandAssetConsentInput" }
+        version: { type: integer, description: "The version you read; the change is refused (409) when the file has changed since." }
+    BrandGenerationKind:
+      type: string
+      enum: [image, video, voice]
+    BrandGeneration:
+      type: object
+      required: [id, brand_id, kind, provider, integration_id, model, prompt, voice, options, references, request, response, recipe_of, asset_kind, name, status, error_code, error, asset_id, usage, created_by, created_at, started_at, finished_at]
+      properties:
+        id: { type: string, format: uuid }
+        brand_id: { type: string, format: uuid }
+        kind: { $ref: "#/components/schemas/BrandGenerationKind" }
+        references: { type: array, items: { $ref: "#/components/schemas/BrandGenerationReference" }, description: "The brand files sent along as references." }
+        request: { type: [object, "null"], additionalProperties: true, description: "The recipe, first half: exactly what was sent to the provider (the endpoint and its input, with reference files as links or names, never a key). Null until it was sent." }
+        response: { type: [object, "null"], additionalProperties: true, description: "The recipe, second half: what the provider answered, without the file itself (a seed, the output format, usage). Null until it is done." }
+        recipe_of: { type: [string, "null"], format: uuid, description: "The earlier request whose recipe this one reuses." }
+        provider: { type: string, description: "The connector that makes it: openai, fal or elevenlabs." }
+        integration_id: { type: [string, "null"], format: uuid, description: "The connection it runs on; null once that connection is removed." }
+        model: { type: string }
+        prompt: { type: string }
+        voice: { type: string, description: "The provider's id of the voice, for a voice request; else empty." }
+        options: { type: object, additionalProperties: true }
+        asset_kind: { $ref: "#/components/schemas/BrandAssetKind" }
+        name: { type: string }
+        status: { type: string, enum: [queued, running, done, failed] }
+        error_code: { type: [string, "null"], description: "Why it failed, from the error catalog: connector_auth, connector_invalid (the provider refused the request, such as a prompt its rules don't allow), connector_quota, connector_unavailable, connector_needed, generation_failed, generation_timed_out, generation_interrupted, generation_wrong_file, reference_missing, unavailable or not_configured." }
+        error: { type: [string, "null"], description: "Why it failed, in words." }
+        asset_id: { type: [string, "null"], format: uuid, description: "The brand file it became, once done; null again if that file is deleted." }
+        usage: { type: object, additionalProperties: { type: number }, description: "What the provider reported it used: tokens, characters or billable units." }
+        created_by: { type: [string, "null"], format: uuid }
+        created_at: { type: string, format: date-time }
+        started_at: { type: [string, "null"], format: date-time }
+        finished_at: { type: [string, "null"], format: date-time }
+    BrandGenerationReference:
+      type: object
+      required: [asset_id]
+      additionalProperties: false
+      properties:
+        asset_id: { type: string, format: uuid, description: "A file of this brand: a picture, a video or a sound file. It must be usable: not archived, and with consent confirmed where it shows a person or is a voice." }
+        as: { type: string, maxLength: 60, description: "The model's own name for the input the file goes in, as its page lists it, such as image_urls, audio_urls or video_url. A name that ends in s takes several files. Left out: image_urls for a picture, video_urls for a video, audio_urls for a sound file. OpenAI ignores it: every reference is a picture to make the new one from." }
+    BrandGenerationReuse:
+      type: object
+      additionalProperties: false
+      description: "What to change in the recipe. Anything left out stays as it was."
+      properties:
+        prompt: { type: string, maxLength: 32000 }
+        model: { type: string, maxLength: 200 }
+        voice: { type: string, maxLength: 100 }
+        options: { type: object, additionalProperties: true }
+        references: { type: array, maxItems: 12, items: { $ref: "#/components/schemas/BrandGenerationReference" } }
+        asset_kind: { $ref: "#/components/schemas/BrandAssetKind" }
+        name: { type: string, maxLength: 200 }
+    BrandGenerationRequest:
+      type: object
+      additionalProperties: false
+      required: [kind, model]
+      properties:
+        kind: { $ref: "#/components/schemas/BrandGenerationKind" }
+        references: { type: array, maxItems: 12, items: { $ref: "#/components/schemas/BrandGenerationReference" }, description: "Brand files to make it from: a picture of a person or a scene to keep the same, a voice-over a video is made to, a video to upscale. Not for a voice." }
+        provider: { type: string, enum: [openai, fal, elevenlabs], description: "Which account makes it. Left out, the first one the brand has connected for the kind: OpenAI then fal.ai for a picture, fal.ai for a video, ElevenLabs for a voice." }
+        model: { type: string, maxLength: 200, description: "The provider's own id for the model, such as an OpenAI image model, a fal.ai endpoint (owner/app/path) or an ElevenLabs model id." }
+        prompt: { type: string, maxLength: 32000, description: "What to make; for a voice, the script to read out. Needed unless the model only works on a reference file, as an upscaler does." }
+        voice: { type: string, maxLength: 100, description: "For a voice: the id of the voice that reads the script, from the voices list." }
+        options: { type: object, additionalProperties: true, description: "The model's own settings, passed on as they are. OpenAI pictures: size, quality, background, output_format, output_compression, moderation, complexity. fal.ai: whatever the model's page lists, such as duration, aspect_ratio or image_url. ElevenLabs: output_format (MP3 only), language_code, voice_settings, seed, previous_text, next_text, apply_text_normalization." }
+        asset_kind: { $ref: "#/components/schemas/BrandAssetKind" }
+        name: { type: string, maxLength: 200, description: "The file's name among the brand's files. Left out, it is named by kind and time." }
+    BrandVideoModel:
+      type: object
+      additionalProperties: false
+      required: [model]
+      properties:
+        model: { type: string, maxLength: 200, description: "The provider's own id for the model." }
+        options: { type: object, additionalProperties: true, description: "The model's own settings, passed on as they are." }
+    BrandVideoSettings:
+      type: object
+      additionalProperties: false
+      required: [voice, words, video]
+      description: "The model of every stage. None has a default: providers rename and retire models, so each is yours to name."
+      properties:
+        voice:
+          type: object
+          additionalProperties: false
+          required: [model, voice]
+          properties:
+            model: { type: string, maxLength: 200, description: "The ElevenLabs speech model." }
+            voice: { type: string, maxLength: 100, description: "The id of the ElevenLabs voice that reads the script, from the voices list." }
+            options: { type: object, additionalProperties: true }
+        words:
+          type: object
+          additionalProperties: false
+          required: [model]
+          properties:
+            model: { type: string, maxLength: 200, description: "The ElevenLabs speech to text model that times every word." }
+        video:
+          type: object
+          additionalProperties: false
+          required: [model]
+          properties:
+            model: { type: string, maxLength: 200, description: "The fal.ai video model's endpoint (owner/app/path): one that takes a picture and a sound file as references." }
+            options: { type: object, additionalProperties: true, description: "The model's own settings, such as resolution, aspect_ratio or duration." }
+            scene_as: { type: string, maxLength: 60, description: "The model's name for its picture input. Left out: image_urls." }
+            audio_as: { type: string, maxLength: 60, description: "The model's name for its sound input. Left out: audio_urls." }
+            max_seconds: { type: number, minimum: 0, maximum: 600, description: "The longest voice-over the model takes in one request. Left out: 30." }
+        upscale:
+          type: object
+          additionalProperties: false
+          required: [model]
+          description: "Left out, the video stays the size it was rendered at."
+          properties:
+            model: { type: string, maxLength: 200, description: "The fal.ai upscaler's endpoint." }
+            options: { type: object, additionalProperties: true, description: "The upscaler's own settings, such as target_resolution." }
+            video_as: { type: string, maxLength: 60, description: "The upscaler's name for its video input. Left out: video_url." }
+        finish:
+          type: object
+          additionalProperties: false
+          description: "Work done on the server with ffmpeg."
+          properties:
+            tighten: { type: boolean, description: "Close long pauses in the voice-over before the video is made to it." }
+            phone_look: { type: boolean, description: "Give the picture the texture of a phone camera: 30 frames a second, a little grain and sharpening, a phone's compression." }
+            captions: { type: boolean, description: "Burn the words in as they are said." }
+    BrandVideoRequest:
+      type: object
+      additionalProperties: false
+      required: [script, settings]
+      properties:
+        name: { type: string, maxLength: 200 }
+        script: { type: string, minLength: 1, maxLength: 5000, description: "What the person says." }
+        direction: { type: string, maxLength: 10000, description: "How the video looks and moves: who, where, how they hold the camera." }
+        scene_asset_id: { type: string, format: uuid, description: "A picture among the brand's files of the person in the scene, which the video starts from. Make one from a frame of a real video and a different person with a picture request that names the frame as a reference." }
+        settings: { $ref: "#/components/schemas/BrandVideoSettings" }
+    BrandVideoWord:
+      type: object
+      required: [text, start, end]
+      properties:
+        text: { type: string }
+        start: { type: number, description: "When it starts, in seconds." }
+        end: { type: number }
+    BrandVideoStep:
+      type: object
+      required: [round, stage, status, generation_id, asset_id, detail, created_at, finished_at]
+      properties:
+        round: { type: integer, description: "0 for the first making, then the number of the edit." }
+        stage: { type: string, description: "voice, tighten, words, render, upscale, finish, or for an edit: edit_cut, edit_voice, edit_words, edit_frame, edit_render, edit_upscale, edit_stitch." }
+        status: { type: string, enum: [running, done, failed, skipped] }
+        generation_id: { type: [string, "null"], format: uuid, description: "The request to a provider this stage ran, which holds its recipe." }
+        asset_id: { type: [string, "null"], format: uuid, description: "The brand file the stage made." }
+        detail: { type: object, additionalProperties: true }
+        created_at: { type: string, format: date-time }
+        finished_at: { type: [string, "null"], format: date-time }
+    BrandVideo:
+      type: object
+      required: [id, brand_id, name, script, direction, scene_asset_id, settings, status, stage, round, edit, error_code, error, voice_asset_id, render_asset_id, base_asset_id, final_asset_id, words, seconds, notes, waiting_version, variation_of, variation_change, variations, rating, rating_reason, rated_at, versions, steps, created_by, created_at, updated_at, finished_at]
+      properties:
+        id: { type: string, format: uuid }
+        brand_id: { type: string, format: uuid }
+        name: { type: string }
+        script: { type: string }
+        direction: { type: string }
+        scene_asset_id: { type: [string, "null"], format: uuid }
+        settings: { $ref: "#/components/schemas/BrandVideoSettings" }
+        status: { type: string, enum: [working, ready, failed] }
+        stage: { type: string, description: "The stage being worked on, or that failed; done once ready." }
+        round: { type: integer, description: "How many edits it has been through." }
+        edit:
+          type: [object, "null"]
+          additionalProperties: true
+          description: "The edit being made: its action, the words picked (from, to), what it was widened to (first_word, last_word, start and end in seconds), and what it has made so far."
+        error_code: { type: [string, "null"], description: "Why it failed, or why the last edit was not made, from the error catalog: a generation's codes, video_too_long, video_failed, reference_missing or not_configured." }
+        error: { type: [string, "null"] }
+        voice_asset_id: { type: [string, "null"], format: uuid, description: "The voice-over." }
+        render_asset_id: { type: [string, "null"], format: uuid, description: "The video as the model first rendered it." }
+        base_asset_id: { type: [string, "null"], format: uuid, description: "The video as it stands before the finish: upscaled, and with every edit." }
+        final_asset_id: { type: [string, "null"], format: uuid, description: "The finished video." }
+        words: { type: array, items: { $ref: "#/components/schemas/BrandVideoWord" }, description: "Every word and when it is said. An edit picks words by their position here." }
+        seconds: { type: number, description: "When the last word ends." }
+        notes: { type: array, items: { type: string }, description: "Things to know: a stage that was left out, a word the voice read differently from the script." }
+        waiting_version: { type: [integer, "null"], description: "The number of the version a fix made that waits for keep or go back. Until the answer the video is as it was before the fix." }
+        variation_of: { type: [string, "null"], format: uuid, description: "The video this one is a variation of." }
+        variation_change: { type: object, additionalProperties: true, description: "For a variation: change (first_line, direction, scene or voice), value, and from, the video it was copied from." }
+        variations: { type: integer, description: "How many variations were made of it." }
+        rating: { type: string, enum: ["", liked, not_this] }
+        rating_reason: { type: string }
+        rated_at: { type: [string, "null"], format: date-time }
+        versions: { type: array, items: { $ref: "#/components/schemas/BrandVideoVersion" }, description: "Every version, newest first. Empty in lists." }
+        steps: { type: array, items: { $ref: "#/components/schemas/BrandVideoStep" }, description: "What each stage did, oldest first. Empty in lists." }
+        created_by: { type: [string, "null"], format: uuid }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+        finished_at: { type: [string, "null"], format: date-time }
+    BrandVideoVersion:
+      type: object
+      required: [number, state, base_asset_id, final_asset_id, words, seconds, notes, edit, reason, note, decided_by, decided_at, created_at]
+      properties:
+        number: { type: integer }
+        state: { type: string, enum: [current, waiting, before, gone_back], description: "current: what the video is now. waiting: a fix nobody has answered. before: an earlier version. gone_back: a fix that was turned down." }
+        base_asset_id: { type: [string, "null"], format: uuid }
+        final_asset_id: { type: [string, "null"], format: uuid, description: "The finished video of this version." }
+        words: { type: array, items: { $ref: "#/components/schemas/BrandVideoWord" } }
+        seconds: { type: number }
+        notes: { type: array, items: { type: string } }
+        edit: { type: [object, "null"], additionalProperties: true, description: "The edit that made it; null for the first version." }
+        reason: { type: string, description: "Why the person went back, when they did." }
+        note: { type: string }
+        decided_by: { type: [string, "null"], format: uuid }
+        decided_at: { type: [string, "null"], format: date-time }
+        created_at: { type: string, format: date-time }
+    CreativeHistoryEntry:
+      type: object
+      required: [id, kind, said, data, actor_id, actor_name, created_at]
+      properties:
+        id: { type: string, format: uuid }
+        kind: { type: string, description: "made, fix_asked, fix_ready, fix_failed, fix_kept, gone_back, version_restored, liked, not_this, rating_cleared, variation_made, words_changed, approved or rejected." }
+        said: { type: string, description: "What the person said, in their words." }
+        data: { type: object, additionalProperties: true, description: "What it is about, such as the version's number or the words picked." }
+        actor_id: { type: [string, "null"], format: uuid, description: "Who did it; null for something Outflare did by itself." }
+        actor_name: { type: [string, "null"] }
+        created_at: { type: string, format: date-time }
+    CreativeLesson:
+      type: object
+      required: [id, kind, word, say, rule, applies_to, source_type, source_id, created_by, created_at]
+      properties:
+        id: { type: string, format: uuid }
+        kind: { type: string, enum: [say, rule] }
+        word: { type: string }
+        say: { type: string }
+        rule: { type: string }
+        applies_to: { type: string, enum: [all, image, video] }
+        source_type: { type: string, enum: ["", video, creative] }
+        source_id: { type: [string, "null"], format: uuid }
+        created_by: { type: [string, "null"], format: uuid }
+        created_at: { type: string, format: date-time }
+    CreativeSkillVariant:
+      type: object
+      required: [key, name, picture, copy, share, fill_ins]
+      properties:
+        key: { type: string, description: "A, B, C or D, in order." }
+        name: { type: string }
+        picture: { type: string, description: "What the AI model is asked to make. Words in curly brackets are filled in for each creative." }
+        copy: { type: string, description: "How to write the headline, second line and button that are laid over the picture." }
+        share: { type: integer, description: "This prompt's part of new creatives, against the others' shares. 0 takes it out of the test." }
+        fill_ins: { type: array, items: { type: string }, description: "The curly brackets this prompt and the rules use, such as persona, pain and brand_fact." }
+    CreativeSkillVariantInput:
+      type: object
+      additionalProperties: false
+      required: [picture]
+      properties:
+        key: { type: string, description: "Ignored: keys are given in order." }
+        name: { type: string, maxLength: 100 }
+        picture: { type: string, minLength: 1, maxLength: 8000 }
+        copy: { type: string, maxLength: 4000 }
+        share: { type: integer, minimum: 0, maximum: 100 }
+        fill_ins: { type: array, items: { type: string }, description: "Ignored: worked out from the prompt." }
+    CreativeSkillVersion:
+      type: object
+      required: [version, note, provider, model, options, sizes, rules, variants, created_by, created_at, creatives]
+      properties:
+        version: { type: integer }
+        note: { type: string, description: "What changed, in the words of whoever saved it." }
+        provider: { type: string, description: "openai or fal; empty for the first one connected." }
+        model: { type: string }
+        options: { type: object, additionalProperties: true }
+        sizes: { type: array, items: { type: string } }
+        rules: { type: string }
+        variants: { type: array, items: { $ref: "#/components/schemas/CreativeSkillVariant" } }
+        created_by: { type: [string, "null"], format: uuid }
+        created_at: { type: string, format: date-time }
+        creatives: { type: integer, description: "How many creatives this version made." }
+    CreativeSkill:
+      type: object
+      required: [id, brand_id, name, description, kind, enabled, version, split_test, current, creatives, archived_at, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        brand_id: { type: string, format: uuid }
+        name: { type: string }
+        description: { type: string }
+        kind: { type: string, enum: [image, video], description: "What it makes." }
+        enabled: { type: boolean, description: "Off, the skill makes nothing." }
+        version: { type: integer, description: "The number of the current version." }
+        split_test: { type: boolean, description: "True while the current version has more than one prompt taking a share." }
+        current: { $ref: "#/components/schemas/CreativeSkillVersion" }
+        creatives: { type: integer, description: "How many creatives every version made." }
+        archived_at: { type: [string, "null"], format: date-time }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    CreativeSkillCreate:
+      type: object
+      additionalProperties: false
+      required: [name, kind, model, variants]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 100 }
+        description: { type: string, maxLength: 500 }
+        kind: { type: string, enum: [image, video] }
+        provider: { type: string, enum: ["", openai, fal], description: "Which of the brand's accounts makes it. Empty, the first one connected for the kind." }
+        model: { type: string, maxLength: 200, description: "The provider's own id for the AI model. There is no default." }
+        options: { type: object, additionalProperties: true, description: "The model's own settings, passed on as they are, such as size and quality." }
+        sizes: { type: array, maxItems: 8, items: { type: string }, description: "The shapes the ad is wanted in, such as 1:1, 4:5, 9:16 and 16:9." }
+        rules: { type: string, maxLength: 4000, description: "Added to every prompt of the version, such as what must never be in the picture. May use curly brackets." }
+        variants: { type: array, minItems: 1, maxItems: 4, items: { $ref: "#/components/schemas/CreativeSkillVariantInput" } }
+    CreativeSkillUpdate:
+      type: object
+      additionalProperties: false
+      properties:
+        name: { type: string, minLength: 1, maxLength: 100 }
+        description: { type: string, maxLength: 500 }
+        enabled: { type: boolean }
+        archived: { type: boolean }
+        note: { type: string, maxLength: 500, description: "What changed, kept with the new version." }
+        restore_version: { type: integer, description: "Start the new version from this earlier one." }
+        version: { type: integer, description: "The version you read; the change is refused if the skill has moved on." }
+        provider: { type: string, enum: ["", openai, fal], description: "Which of the brand's accounts makes it. Empty, the first one connected for the kind." }
+        model: { type: string, maxLength: 200, description: "The provider's own id for the AI model. There is no default." }
+        options: { type: object, additionalProperties: true, description: "The model's own settings, passed on as they are, such as size and quality." }
+        sizes: { type: array, maxItems: 8, items: { type: string }, description: "The shapes the ad is wanted in, such as 1:1, 4:5, 9:16 and 16:9." }
+        rules: { type: string, maxLength: 4000, description: "Added to every prompt of the version, such as what must never be in the picture. May use curly brackets." }
+        variants: { type: array, minItems: 1, maxItems: 4, items: { $ref: "#/components/schemas/CreativeSkillVariantInput" } }
+    CreativeStatus:
+      type: string
+      enum: [making, failed, needs_review, approved, rejected]
+      description: "making: the AI account is working on it. failed: it ended without a file. needs_review: it waits for a person. approved or rejected: a person's answer."
+    Creative:
+      type: object
+      required: [id, brand_id, code, name, kind, status, skill_id, skill_name, skill_version, variant, persona, pain, hook, tags, sizes, headline, subline, cta, prompt, generation_id, provider, model, error_code, error, asset_id, review_reason, reviewed_by, reviewed_at, rating, rating_reason, rated_at, version, created_by, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        brand_id: { type: string, format: uuid }
+        code: { type: string, description: "Its short name within the brand, such as CR-0142." }
+        name: { type: string }
+        kind: { type: string, enum: [image, video] }
+        status: { $ref: "#/components/schemas/CreativeStatus" }
+        skill_id: { type: [string, "null"], format: uuid }
+        skill_name: { type: [string, "null"] }
+        skill_version: { type: integer, description: "The version of the skill that made it." }
+        variant: { type: string, description: "The prompt of that version that made it: A, B, C or D." }
+        persona: { type: string }
+        pain: { type: string }
+        hook: { type: string }
+        tags: { type: array, items: { type: string } }
+        sizes: { type: array, items: { type: string }, description: "The shapes its skill wants the ad in, such as 1:1 and 4:5: each is a size to ask the finished ad for." }
+        headline: { type: string }
+        subline: { type: string }
+        cta: { type: string }
+        prompt: { type: string, description: "The prompt as it was sent, with every curly bracket filled in." }
+        generation_id: { type: [string, "null"], format: uuid, description: "The request to the brand's AI account." }
+        provider: { type: [string, "null"] }
+        model: { type: [string, "null"] }
+        error_code: { type: [string, "null"], description: "Why no file was made, as on a generation." }
+        error: { type: [string, "null"] }
+        asset_id: { type: [string, "null"], format: uuid, description: "The brand file it became, once made." }
+        review_reason: { type: string, description: "Why it was rejected, if a reason was given." }
+        reviewed_by: { type: [string, "null"], format: uuid }
+        reviewed_at: { type: [string, "null"], format: date-time }
+        rating: { type: string, enum: ["", liked, not_this], description: "A person's opinion, separate from approving." }
+        rating_reason: { type: string }
+        rated_at: { type: [string, "null"], format: date-time }
+        version: { type: integer }
+        created_by: { type: [string, "null"], format: uuid }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    CreativeCreate:
+      type: object
+      additionalProperties: false
+      required: [skill_id]
+      properties:
+        skill_id: { type: string, format: uuid }
+        variant: { type: string, description: "One of the skill's prompts, A to D. Left out, the one furthest behind its share." }
+        fill_ins: { type: object, additionalProperties: { type: string, maxLength: 1000 }, description: "The words for the prompt's curly brackets, beyond persona, pain, hook and brand: for {brand fact}, the key brand_fact or \"brand fact\"." }
+        note: { type: string, maxLength: 2000, description: "Added to the prompt for this creative only." }
+        name: { type: string, maxLength: 200 }
+        persona: { type: string, maxLength: 200, description: "Who the ad is for." }
+        pain: { type: string, maxLength: 200, description: "The one problem it is about." }
+        hook: { type: string, maxLength: 200, description: "How it opens, in a few words." }
+        tags: { type: array, maxItems: 20, items: { type: string, maxLength: 50 } }
+        headline: { type: string, maxLength: 200, description: "Laid over the picture." }
+        subline: { type: string, maxLength: 300, description: "The second line, laid over the picture." }
+        cta: { type: string, maxLength: 60, description: "The words on the button." }
+    CreativeUpdate:
+      type: object
+      additionalProperties: false
+      properties:
+        version: { type: integer, description: "The version you read; the change is refused if the creative changed since." }
+        name: { type: string, maxLength: 200 }
+        persona: { type: string, maxLength: 200, description: "Who the ad is for." }
+        pain: { type: string, maxLength: 200, description: "The one problem it is about." }
+        hook: { type: string, maxLength: 200, description: "How it opens, in a few words." }
+        tags: { type: array, maxItems: 20, items: { type: string, maxLength: 50 } }
+        headline: { type: string, maxLength: 200, description: "Laid over the picture." }
+        subline: { type: string, maxLength: 300, description: "The second line, laid over the picture." }
+        cta: { type: string, maxLength: 60, description: "The words on the button." }
     Product:
       type: object
       required: [id, brand_id, key, name, category, churn_mode, at_risk_days, churn_days, aliases, archived_at, version, created_at, updated_at]
@@ -66132,7 +68220,7 @@ components:
         created_at: { type: string, format: date-time }
     ConnectorCategory:
       type: string
-      enum: [email_verification, email_sending, sequencer, mailbox_provider, dns, tags, crm, data, signals, analytics, seo, social, cms, code, ads, payments, partners, calendar, registrar, warehouse, notification, messaging, knowledge, support, model, fraud, custom]
+      enum: [email_verification, email_sending, sequencer, mailbox_provider, dns, tags, crm, data, signals, analytics, seo, social, cms, code, ads, payments, partners, calendar, registrar, warehouse, notification, messaging, knowledge, support, model, media, fraud, custom]
     ConnectorField:
       type: object
       required: [name, label, secret, optional]
@@ -69053,6 +71141,52 @@ components:
               day: { type: string, format: date }
               sent: { type: integer }
               counted: { type: [number, "null"] }
+    AdMatchQuality:
+      type: object
+      description: What an ad platform says about how well one event's conversions on one pixel match its accounts.
+      required: [ad_account_id, account_name, connector, target_id, target_name, event, sent, day, score, score_before, status, keys, issues, fetched_at, history]
+      properties:
+        ad_account_id: { type: string, format: uuid }
+        account_name: { type: string }
+        connector: { type: string }
+        target_id: { type: string, description: "The pixel (dataset) on the platform." }
+        target_name: { type: string, description: "The pixel's name as on the conversion rule; empty when no rule names it." }
+        event: { type: string, description: "The platform's event name, such as Purchase." }
+        sent: { type: boolean, description: "Whether one of the brand's enabled conversion rules sends this event." }
+        day: { type: string, format: date, description: "The day the score was read." }
+        score: { type: [number, "null"], description: "Out of 10. Null when the platform gave none." }
+        score_before: { type: [number, "null"], description: "The average score over the seven days before day." }
+        status: { type: string, enum: [ok, low, fell, none] }
+        keys:
+          type: array
+          description: The share of events that carried each identifier, in percent.
+          items:
+            type: object
+            required: [key, percent]
+            properties:
+              key: { type: string, description: "The platform's name for the identifier, such as email, ip_address or fbc." }
+              percent: { type: number }
+        issues:
+          type: array
+          description: What the platform says is wrong, in its own words.
+          items:
+            type: object
+            required: [name, description, solution, percent]
+            properties:
+              name: { type: string }
+              description: { type: string }
+              solution: { type: string }
+              percent: { type: number, description: "The share of events it touches, in percent." }
+        fetched_at: { type: string, format: date-time }
+        history:
+          type: array
+          description: The score per day over the last 30 days, oldest first.
+          items:
+            type: object
+            required: [day, score]
+            properties:
+              day: { type: string, format: date }
+              score: { type: [number, "null"] }
     AdBiddingStrategyRow:
       description: A portfolio bidding strategy with its numbers over the range (R.130). Cost, average CPC and cost per conversion are in micros of report_currency (the brand's own currency); the strategy's targets stay in micros of currency.
       allOf:
@@ -76348,6 +78482,150 @@ components:
         review_at: { type: string, format: date-time, description: Defaults to 90 days from now. }
         status: { type: string, enum: [active, retired], description: On a change only. }
         retired_reason: { type: string, maxLength: 500, description: Why it no longer holds, with status retired. }
+    ProfileFactSection:
+      type: string
+      enum: [company, offer, customers, positioning, proof, competitors, objections, voice, goals, channels, rules]
+      description: The part of the profile a fact belongs to. Personas are their own records.
+    ProfileEvidence:
+      type: object
+      required: [note]
+      properties:
+        note: { type: string, minLength: 1, maxLength: 500, description: What it showed. }
+        ref: { type: string, maxLength: 500, description: "What it points at: a page, a document or a conversation." }
+    ProfileFact:
+      type: object
+      required: [id, brand_id, section, title, text, source, evidence, confidence, visibility, status, say_to_customers, replaces_id, context_field, review_at, due, confirmed_by, confirmed_at, retired_at, created_by, updated_by, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        brand_id: { type: string, format: uuid }
+        section: { $ref: "#/components/schemas/ProfileFactSection" }
+        title: { type: string, description: "A short name for the fact, such as \"What we sell\"." }
+        text: { type: string, description: "The fact, in plain words." }
+        source: { type: string, enum: [person, interview, website, conversation, agent, import, context], description: "Where it came from. `context` is a fact that started as one of the brand's context fields." }
+        evidence: { type: array, items: { $ref: "#/components/schemas/ProfileEvidence" } }
+        confidence: { type: string, enum: [low, medium, high] }
+        visibility: { type: string, enum: [customers, internal], description: "`customers`: may be said to customers. `internal`: for the team and its agents only." }
+        status: { type: string, enum: [suggested, confirmed, retired], description: "`suggested`: added by an agent and waiting for a person. `confirmed`: a person stands behind it." }
+        say_to_customers: { type: boolean, description: "True only when the fact is confirmed and its visibility is customers. The one test for using it in anything a customer reads." }
+        replaces_id: { type: [string, "null"], format: uuid, description: The confirmed fact this suggestion would replace. }
+        context_field: { type: [string, "null"], enum: [about, audience, goals, voice, rules, null], description: "Set when the fact mirrors that field of the brand's context: the two change together." }
+        review_at: { type: [string, "null"], format: date-time, description: When to look at it again. }
+        due: { type: boolean, description: True when it is past its review date. }
+        confirmed_by: { type: [string, "null"], description: Who confirmed it. }
+        confirmed_at: { type: [string, "null"], format: date-time }
+        retired_at: { type: [string, "null"], format: date-time }
+        created_by: { type: [string, "null"] }
+        updated_by: { type: [string, "null"] }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    ProfileFactInput:
+      type: object
+      properties:
+        section: { $ref: "#/components/schemas/ProfileFactSection" }
+        title: { type: string, maxLength: 200 }
+        text: { type: string, minLength: 1, maxLength: 4000, description: "One fact, in plain words. A fact that mirrors a context field may be as long as that field." }
+        source: { type: string, enum: [person, interview, website, conversation, agent, import], description: "On a new fact only. Defaults to person for a signed-in person and agent for an API token." }
+        evidence: { type: array, maxItems: 20, items: { $ref: "#/components/schemas/ProfileEvidence" }, description: Replaces the evidence on a change. }
+        confidence: { type: string, enum: [low, medium, high], description: Defaults to medium. }
+        visibility: { type: string, enum: [customers, internal], description: Defaults to internal. }
+        status: { type: string, enum: [suggested, confirmed, retired], description: "Only a signed-in person sets confirmed. A new fact is suggested or confirmed." }
+        replaces_id: { type: [string, "null"], format: uuid, description: "On a new suggestion only: the confirmed fact it would replace." }
+        review_at: { type: [string, "null"], format: date-time, description: When to look at it again; null clears it. }
+    ProfileSection:
+      type: object
+      required: [key, label, description, confirmed, suggested, due]
+      properties:
+        key: { type: string, enum: [company, offer, customers, personas, positioning, proof, competitors, objections, voice, goals, channels, rules] }
+        label: { type: string }
+        description: { type: string, description: What belongs in the section. }
+        confirmed: { type: integer, description: Confirmed facts (or personas) in it. }
+        suggested: { type: integer, description: Suggestions waiting for a person. }
+        due: { type: integer, description: Facts past their review date. }
+    BrandProfile:
+      type: object
+      required: [brand_id, sections, facts, personas, counts]
+      properties:
+        brand_id: { type: string, format: uuid }
+        sections: { type: array, items: { $ref: "#/components/schemas/ProfileSection" }, description: "The twelve sections, in the order the page shows them." }
+        facts: { type: array, items: { $ref: "#/components/schemas/ProfileFact" }, description: "Every fact that isn't retired, by section." }
+        personas: { type: array, items: { $ref: "#/components/schemas/Persona" }, description: "Every persona that isn't archived." }
+        counts:
+          type: object
+          required: [confirmed, suggested, due, sections_filled, sections_total]
+          properties:
+            confirmed: { type: integer }
+            suggested: { type: integer }
+            due: { type: integer }
+            sections_filled: { type: integer, description: Sections with at least one confirmed fact or persona. }
+            sections_total: { type: integer }
+    ProfileChange:
+      type: object
+      required: [id, fact_id, persona_id, action, before, after, actor, actor_type, created_at]
+      properties:
+        id: { type: string, format: uuid }
+        fact_id: { type: [string, "null"], format: uuid }
+        persona_id: { type: [string, "null"], format: uuid }
+        action: { type: string, enum: [created, updated, confirmed, retired, restored, imported] }
+        before: { type: object, additionalProperties: true, description: The fields that changed, as they were. }
+        after: { type: object, additionalProperties: true, description: The same fields as they are now. }
+        actor: { type: [string, "null"], description: Who made the change. }
+        actor_type: { type: [string, "null"], description: "human, api_token, agent or system." }
+        created_at: { type: string, format: date-time }
+    Persona:
+      type: object
+      required: [id, brand_id, name, role, summary, goals, pains, triggers, objections, channels, source, status, confirmed_by, confirmed_at, created_by, updated_by, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        brand_id: { type: string, format: uuid }
+        name: { type: string }
+        role: { type: string, description: "Who they are, in a line: their job and the kind of company." }
+        summary: { type: string }
+        goals: { type: array, items: { type: string }, description: What they want. }
+        pains: { type: array, items: { type: string }, description: What hurts today. }
+        triggers: { type: array, items: { type: string }, description: What makes them start looking. }
+        objections: { type: array, items: { type: string }, description: What holds them back. }
+        channels: { type: array, items: { type: string }, description: Where to reach them. }
+        source: { type: string, enum: [person, interview, website, conversation, agent, import] }
+        status: { type: string, enum: [suggested, confirmed, archived] }
+        confirmed_by: { type: [string, "null"] }
+        confirmed_at: { type: [string, "null"], format: date-time }
+        created_by: { type: [string, "null"] }
+        updated_by: { type: [string, "null"] }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    PersonaInput:
+      type: object
+      properties:
+        name: { type: string, minLength: 1, maxLength: 100 }
+        role: { type: string, maxLength: 200 }
+        summary: { type: string, maxLength: 4000 }
+        goals: { type: array, maxItems: 20, items: { type: string, maxLength: 500 } }
+        pains: { type: array, maxItems: 20, items: { type: string, maxLength: 500 } }
+        triggers: { type: array, maxItems: 20, items: { type: string, maxLength: 500 } }
+        objections: { type: array, maxItems: 20, items: { type: string, maxLength: 500 } }
+        channels: { type: array, maxItems: 20, items: { type: string, maxLength: 500 } }
+        source: { type: string, enum: [person, interview, website, conversation, agent, import], description: On a new persona only. }
+        status: { type: string, enum: [suggested, confirmed, archived], description: Only a signed-in person sets confirmed. }
+    ProfileBrief:
+      type: object
+      required: [section, title, text, say_to_customers]
+      properties:
+        section: { $ref: "#/components/schemas/ProfileFactSection" }
+        title: { type: string }
+        text: { type: string }
+        say_to_customers: { type: boolean, description: False for a fact that is for the team only. }
+    PersonaBrief:
+      type: object
+      required: [name, role, summary, goals, pains, triggers, objections, channels]
+      properties:
+        name: { type: string }
+        role: { type: string }
+        summary: { type: string }
+        goals: { type: array, items: { type: string } }
+        pains: { type: array, items: { type: string } }
+        triggers: { type: array, items: { type: string } }
+        objections: { type: array, items: { type: string } }
+        channels: { type: array, items: { type: string } }
     ContentItem:
       type: object
       required: [id, brand_id, title, slug, target, excerpt, tags, canonical_url, language, placement, seo, links, media, brief, revision, approved_by, approved_at, status, integration_id, external_id, url, cms_status, published_at, notes, created_by, created_at, updated_at]
@@ -80000,6 +82278,8 @@ components:
           description: Onboarding fields still empty.
         ask_for_missing: { type: boolean, description: "Whether to ask the person for the missing fields: false once they are filled or a person said not to ask." }
         findings: { type: array, items: { $ref: "#/components/schemas/Finding" }, description: "The brand's active findings, nearest review first, at most 20: what was learned about its marketing (listFindings)." }
+        profile: { type: array, items: { $ref: "#/components/schemas/ProfileBrief" }, description: "The brand profile's confirmed facts, at most 100 (getBrandProfile). Facts that mirror about, audience, goals, voice or rules are left out: those fields carry them." }
+        personas: { type: array, items: { $ref: "#/components/schemas/PersonaBrief" }, description: "The brand's confirmed personas, at most 20 (listPersonas)." }
         # ---- Knowledge sheet review (paid ads): the same as getBrandKnowledge, so an agent reading the brand sees whether the sheet is trusted.
         knowledge_reviewed_at: { type: [string, "null"], format: date-time, description: When a person last said the knowledge looks right (reviewBrandKnowledge). }
         knowledge_reviewed_by: { type: [string, "null"], description: The actor id of that person. }
