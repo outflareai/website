@@ -286,7 +286,7 @@ MCP tool is `get_signup_quality`.
 | Platform | Where it goes | Matched on | Also needs |
 | --- | --- | --- | --- |
 | Google Ads | A conversion action that takes uploaded clicks (Upload clicks) | `gclid`, `gbraid` or `wbraid`; hashed email and phone (enhanced conversions for leads) | The sign-in needs Google Ads access that can upload |
-| Meta Ads | A pixel (dataset), as a standard event such as Purchase or Lead | `fbc` (from `fbclid`), `fbp`, hashed email, phone and record id, and the person's IP address and browser | The system user assigned to the pixel |
+| Meta Ads | A pixel (dataset), as one of Meta's standard events: Purchase, Lead, CompleteRegistration, StartTrial, Subscribe, Contact, SubmitApplication, Schedule, InitiateCheckout, AddPaymentInfo, AddToCart, ViewContent or Search | `fbc` (from `fbclid`), `fbp`, hashed email, phone and record id, and the person's IP address and browser | The system user assigned to the pixel |
 | Microsoft Advertising | An offline conversion goal | `msclkid`; hashed email and phone | The developer token above |
 | Reddit Ads | Your pixel, through the Conversions API, as SignUp, Lead, Purchase and so on | `rdt_cid`, hashed email and record id, and the person's IP address and browser | Your own pixel ID and Conversions API access token, from Reddit Ads Manager → Events Manager. A connection with a token but no pixel ID still sends through Reddit's older endpoint, so add the pixel ID before Reddit retires it. |
 | X Ads | A conversion event on your pixel, through the Conversions API, by its Event ID from Events Manager | `twclid`, hashed email and phone, and the person's IP address and browser (only when both are known) | The pixel ID and Event IDs on the connection, from X Ads Manager → Tools → Events Manager. Conversions are sent with the connection's keys, or with a Conversion API access token from Events Manager if you add one |
@@ -368,16 +368,16 @@ How it works:
   says yes). Elsewhere the workspace's setting decides: **Everyone,
   unless they opted out** (`opt_out`, the default) or **Only people who said
   yes** (`opt_in`). Anyone who withdrew consent is never sent.
-  A brand whose own site already asks every visitor for consent to ad data,
-  but hasn't yet passed those answers to Outflare, can choose **Everyone:
-  our site already collects consent** (`collected`). Conversions are then
+  A brand whose own site already asks every visitor for consent to ad data
+  and personalised ads, but hasn't yet passed those answers to Outflare, can
+  choose **Everyone: our site already collects consent** (`collected`). Conversions are then
   sent for everyone, in every country and when the country is unknown,
   marked as consented; people who withdrew are still never sent. It is the
   brand's own statement about its site, so only a signed-in person can
   choose it (an API token or an agent gets `403`), the web app asks to
-  confirm, and the change is in the audit log. It covers conversions, not
-  adding people to ad audiences, which keeps asking for consent to ad
-  personalisation.
+  confirm, and the change is in the audit log. It covers ad audiences too:
+  people are added for everyone, as consented to ad personalisation, except
+  those who withdrew.
   A person's country is their latest website visit's. For someone the site
   script never saw, such as a purchase sent only from your server, it is the
   event's own: `context.location.country` (two letters, such as `US`), else
