@@ -2,7 +2,7 @@
 	"version": "2026.11.21",
 	"date": "2026-11-21",
 	"status": "in-progress",
-	"updated": "2026-11-21T09:40:12Z",
+	"updated": "2026-11-21T09:49:09Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -234,7 +234,14 @@
 			"edition": "open-source",
 			"text": "SEO overview has a Country pages view: pages made for a country, city or network, each with its target country, Search Console numbers in that country against the 28 days before, the tracked rank there and whether its keyword is tracked, grouped by template with median positions.",
 			"at": "2026-11-21T09:40:12Z"
+		},
+		{
+			"kind": "launch",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "SEO overview has a Technical view: issues from the latest site crawl counted in unique pages and templates (languages folded together), new and fixed since the crawl before, sorted by the search clicks of the pages they touch, with robots.txt changes, indexing, sitemaps and Core Web Vitals from real visits.",
+			"at": "2026-11-21T09:49:09Z"
 		}
 	],
-	"through": "9cdf979+9cdf979"
+	"through": "4d7b6c8+4d7b6c8"
 }
