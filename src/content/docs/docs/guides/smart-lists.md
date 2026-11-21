@@ -63,7 +63,7 @@ Every smart list refreshes on its own every 15 minutes, which also moves people 
 
 Open a list to see its people. **Edit name and description** at the top renames the list and says what it is for. Each name opens that person's record. Beside it are their email, their lifetime value (everything they have paid, less refunds), the day they signed up and when they joined the list.
 
-**Columns** chooses which of these show, and adds the day the person was first seen. **Save as my default** keeps your choice for every list with your account, so it is the same on every device you sign in on; **Back to standard columns** drops it.
+**Columns** opens a dialog where you choose which of these show and in which order, and add the day the person was first seen. Drag a column or use its arrows to move it; nothing changes until you press **Save**. With **Make this my default view** ticked, your choice is kept for every list with your account, so it is the same on every device you sign in on; **Reset to default**, then Save, drops it. Every table in Outflare has the same toolbar: search, filters, then the number of rows, Columns and the CSV download.
 
 Lifetime value comes from your billing connection when you have one, and otherwise from the `payment.succeeded` and `payment.refunded` events your product sends, in the currency the person paid most in. The sign-up day is their first `signed_up` event, so it is blank for someone who has none.
 
