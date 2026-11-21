@@ -49,6 +49,8 @@ To give the chat more room, drag its left edge (or focus the edge and use the ar
 
 While the agent is replying, the Send button becomes **Stop**. Press it after a typo or a change of mind, then send a new message. The reply ends within a couple of seconds, your message stays in the conversation marked **Stopped, not answered**, and the agent never answers it. Stop doesn't undo anything: changes the agent already made stay made, and changes waiting for your OK still wait. It only ends the reply to your message; to stop the agent's own scheduled work, pause the agent.
 
+Every reply has a **Copy** button, and so does each code block and table in it, so you can paste the agent's text somewhere else in one click. The conversation's ID sits at the top of the chat. Its menu copies the ID or a link to the conversation, copies the whole conversation as Markdown, or downloads it as a `.md` file. The Markdown keeps each reply with the changes the agent asked for and how each one ended, so you can share a conversation, or hand its ID to someone on your team, without retyping it.
+
 Each conversation's **⋯** menu pins it to the top of the list, renames it, archives it or deletes it. Archived conversations move to **Archived** at the bottom of the list and come back as soon as anyone writes in them. Pins and the archive are shared by everyone on the brand, like the conversations.
 
 ## Tasks
