@@ -45,7 +45,7 @@ Everything else uses your usual terms, which are the terms of your newest deal: 
 Clicking a deal opens its page:
 
 - **The creator's link**, to copy and send.
-- **The stage**: Found, Pitched, Talking, Terms agreed, Live, Paid, Results in. Press a stage to move the deal there.
+- **The stage**: Found, Pitched, Talking, Terms agreed, Live, Paid, Results in to start with. Press a stage to move the deal there. **Edit stages** renames them, moves them, adds your own and removes one, for this brand only. Each stage says what it means (just a step, the terms are agreed, the link is live, or the deal is stopped), and that meaning, not the name, is what dates a deal as agreed or live.
 - **What was agreed**, with **Edit**, and **Record a payment** for each payment you make. Outflare records payments; it never moves money.
 - **Videos carrying the link.** **Add videos** takes the links of the videos that should have your link, one per line. Open a video, look at its description, then mark it **In place** or **Missing**. **Missing only** lists the ones to chase.
 - **What it brought**: clicks, sign-ups, paying customers, sales and the cost per customer.
