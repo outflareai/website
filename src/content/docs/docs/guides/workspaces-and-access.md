@@ -84,7 +84,7 @@ These emails go through Postmark, Resend or Cloudflare Email Service (`EMAIL_FRO
 
 Scripts, integrations and agents use API tokens instead of a person's session. To connect Claude, ChatGPT or Cursor, use [Connect your AI](/docs/agents/connect/) instead: the app signs in, and its connection isn't listed under API tokens.
 
-Under **Settings → API tokens**, **New token** asks for a name, what it can do (**Read only**, **Can make changes**, or **Choose** to set each area to No, See or Change), anything riskier under **Also allow** (spending, approving missions, the suppression list, people, tokens, workspace settings), and when it expires (90 days unless you choose otherwise). Click a token later to rename it, change what it may do or its sending limits, or revoke it. A change applies on the token's next request. A token:
+Under **Settings → API tokens**, **New token** asks for a name, what it can do (**Read only**, **Can make changes**, or **Choose** to set each area to No, See or Change), anything riskier under **Also allow** (spending, approving missions, the suppression list, people, tokens, workspace settings), and when it expires (90 days unless you choose otherwise). The list shows who created each token, what it can do, and when it was last used and expires; a token made by another token or an agent, or by someone whose account was deleted, shows **Unknown** under **Created by**. Click a token later to rename it, change what it may do or its sending limits, or revoke it. A change applies on the token's next request. A token:
 
 - belongs to one workspace,
 - holds an explicit list of scopes, which can never exceed the scopes of the person who created it,
