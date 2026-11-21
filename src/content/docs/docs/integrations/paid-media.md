@@ -227,6 +227,12 @@ same rows. It takes `level` (`campaign`, `adset` or `ad`), `from`, `to`,
 spend; other platforms sync campaigns only, so their ad sets and ads come with
 first-party numbers but no name or spend.
 
+### Counting by another attribution model
+
+Outflare ties each sign-up to the last ad click before it. To see the same campaigns under another of your attribution models, pick it under **Also count by** on the Campaigns table. Outflare remembers the choice per brand. The table then shows three answers side by side: the last ad click, the model you picked, and the network's own count (**Network says**).
+
+A model splits a conversion between visits, so its sign-ups can be a fraction. In the API, pass `model=` to `GET /v1/brands/{brand}/ads/performance` (`first_touch`, `linear`, `last_non_direct`, or the id of one of your own models): each row also carries `model_signups`, `model_revenue`, `model_cost_per_signup_micros` and `model_roas`.
+
 ## Sending conversions back
 
 A conversion rule sends one customer event (such as `signed_up` or
@@ -446,6 +452,14 @@ The MCP tools are `list_ad_conversion_targets`, `list_ad_conversion_rules`,
 Outbrain Ads only reads: the Amplify API has no call that takes conversions.
 Outbrain's click id (`ob_click_id`) is still recorded on each visit, so its
 clicks count in Outflare's own attribution.
+
+### Match quality
+
+Sending a conversion is only half of it: the network also has to tie it to one of its own accounts. Once a network reports how well it can, **Paid ads → Settings → Send conversions** shows a second table. Today that is Meta's event match quality, a score out of 10 per event on each pixel you send to.
+
+Outflare reads it once a day with your own Meta connection and shows the latest score, the average over the week before, the share of events that carried each identifier (email, phone, IP address, browser, Meta's click id) and, in Meta's own words, what it found wrong and how to fix it. The status is **Good**, **Low** (under 6), **Fell** (a point or more under the week before) or **No score yet**. An event that reads Low or Fell raises an [alert](/docs/guides/alerts/), at most once a week per event.
+
+Your Meta token needs `ads_read` with `ads_management` or `business_management`, and its user needs access to the pixel. Without them the table stays empty and says why. `GET /v1/brands/{brand}/ads/match-quality` returns the same rows with the score per day over 30 days (MCP: `get_ad_match_quality`).
 
 ## Audiences: one list, several ad networks
 
