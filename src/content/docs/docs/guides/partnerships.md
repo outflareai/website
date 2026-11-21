@@ -16,7 +16,7 @@ Choose a [brand](/docs/guides/brands/), then open **Partnerships**. Each tab has
 | **Live** | See everywhere your brand appears right now, earned or paid. Outflare checks each page and tells you when a link or mention disappears. |
 | **Affiliates** | Run your referral, affiliate and influencer [partner programs](/docs/guides/partners/). |
 | **Payments** | See what you owe in three lists: needs you (a live link to approve, a commission due), waiting or held (not live yet, or the link was lost before payment), and paid. Outflare records payments; it never moves money. |
-| **Results** | See what you spent on links, how many paid links are live, the cost per paid link and how often a price was agreed, then the return on each link. |
+| **Results** | See how each creator deal is doing, then what you spent on links, how many paid links are live, the cost per paid link and how often a price was agreed, then the return on each link. |
 
 **New offer** on the Offers tab opens the offer form, and clicking a card opens it on a page of its own.
 
@@ -29,6 +29,32 @@ Choose a [brand](/docs/guides/brands/), then open **Partnerships**. Each tab has
 The site owner can answer your offer with changes, up to three times. They can change only the price, the page your link goes on, the link text and the publish date. Your URL, the link type, that the link is permanent and that payment comes only once it is live stay fixed.
 
 Their suggestion shows on the offer. **Accept these terms** agrees to it, and the new price is spread over the payments in the offer. **Answer with other terms** opens the offer so you can send back your own.
+
+## Deals with video creators
+
+A creator deal is for paying a creator to carry your link in their videos: in every video they already have, in one video, as a mention in a new video, or in a whole video about you. The creator is one of your [partners](/docs/guides/partners/), so they already have a partner link and earn your program's usual commission on everything it brings. The deal adds what you agreed and where it stands.
+
+On the Offers tab, **New creator deal** asks three things:
+
+1. **Who is the creator?** Choose one of your partners. If they are not a partner yet, add them under Affiliates first.
+2. **What will they do?** Link in every video, link in one video, mention in a new video, or a whole video about you.
+3. **What will you pay them?**
+
+Everything else uses your usual terms, which are the terms of your newest deal: how much you pay up front, how soon after the link goes live you pay the rest, how many months the link stays up, credits for the creator and what their viewers get. Your first deal starts with half up front, the rest within 7 days of going live, for 12 months. **Change** shows the terms so you can set them for this one deal. It also takes the short link on your own site, such as `northpeak.example/sam`, that sends viewers on to the creator's partner link. Outflare doesn't create that short link: set it up as a redirect on your site.
+
+Clicking a deal opens its page:
+
+- **The creator's link**, to copy and send.
+- **The stage**: Found, Pitched, Talking, Terms agreed, Live, Paid, Results in. Press a stage to move the deal there.
+- **What was agreed**, with **Edit**, and **Record a payment** for each payment you make. Outflare records payments; it never moves money.
+- **Videos carrying the link.** **Add videos** takes the links of the videos that should have your link, one per line. Open a video, look at its description, then mark it **In place** or **Missing**. **Missing only** lists the ones to chase.
+- **What it brought**: clicks, sign-ups, paying customers, sales and the cost per customer.
+
+The numbers on a deal are the creator's totals as a partner: everything their link has brought, counted when someone who came through it signs up or pays. A creator with two deals shows the same totals on both.
+
+The **Results** tab lists every creator with what you paid, clicks, customers, sales, cost per customer and a plain reading: working once sales cover what you paid, too early to tell in the first 30 days after going live, and not working after that when nobody has paid.
+
+Agents and the API use `/v1/brands/{brand}/creator-deals` and the MCP tools `list_creator_deals`, `create_creator_deal` and the others named after them. In Query the tables are `creator_deals` and `creator_deal_videos`.
 
 ## If a paid link is removed
 
