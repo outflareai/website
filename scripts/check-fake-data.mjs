@@ -4,9 +4,8 @@
 // example.com or a .example, .test or .invalid domain, so nobody's real
 // address, and no domain someone could register, ends up in public history.
 // The few real addresses and domains allowed are in
-// scripts/fake-data-allowed.txt. Geonode and Repocket are allowed as example
-// brand names and websites, but never in an email address: those would be
-// real people's inboxes.
+// scripts/fake-data-allowed.txt. Example brands are fictional (Northpeak,
+// Summitly) at .example domains.
 //
 // Checks the lines a pull request adds (git diff base...head) and its title
 // and description (PR_TITLE, PR_BODY), which are as public as the code.

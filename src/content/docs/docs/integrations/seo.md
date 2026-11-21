@@ -125,7 +125,7 @@ snapshot numbers chart every snapshot in the weeks picked, against the last
 snapshot before them.
 
 - **Branded search:** clicks on searches that name the brand: its name, its
-  handle or its domains' names, such as "repocket" for repocket.com. It needs
+  handle or its domains' names, such as "summitly" for summitly.example. It needs
   Google Search Console connected on your own account.
   Consoles hide rare searches, so this is a floor, not a total.
 - **Visitors**, from your analytics tools (GA4, Plausible and the like), and
