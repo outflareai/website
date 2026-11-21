@@ -47,6 +47,16 @@ Prefer the older menu, with every part of Outflare in one sidebar? Press **Old m
 
 The choice is yours alone and is remembered in the browser you made it in; nobody else's menu changes. Every page is in both menus, at the same address.
 
+### Pinned and Recents
+
+Keep what you use most at the top of the menu:
+
+- **Pin to menu**, in the bar at the top of every page, pins the page you are on. When you have something open inside a page, such as a sequence, a report or a funnel, it pins that instead. Press it again (it reads **Pinned**) to unpin.
+- **Pinned** lists your pins for the area you are in.
+- **Recents** lists the last things you opened in that area, with how long ago. **Clear** empties it; your pins stay.
+
+Pins and recents are saved to your account, so they are the same on every computer you sign in on. Something pinned inside a page shows on the workspace and brand it belongs to.
+
 ## Skip anything, come back any time
 
 - **Skip this step** moves on and marks it skipped. Skipping turns nothing off.
