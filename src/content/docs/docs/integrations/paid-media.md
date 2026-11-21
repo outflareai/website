@@ -250,6 +250,19 @@ For video ads, Meta and TikTok also say how far people watched. Turn on the colu
 
 The columns are empty for ads without a video. In the API the rows carry `video_views`, `video_thruplays`, `video_p25` to `video_p100`, `hook_rate` and `hold_rate`.
 
+### Would matching by network and device help?
+
+Outflare ties a visit to a person only by what the browser itself says: a sign-in, a click in an email it sent, or a visitor link. So someone who clicks an ad on a phone and signs up on a laptop is not credited to the ad. Some tools close that gap by guessing: two browsers on the same network, in the same place, on the same kind of device are called one person. Outflare doesn't do that. This check tells you what you would gain and risk if it did, before anything changes.
+
+**Paid ads → Settings → Tracking → Run the check** reads the visits you already have. It collects nothing new, joins nothing and changes no credit. It says:
+
+- **Would credit**: known people no ad is credited with today, for whom exactly one unknown browser with the same network, place and device clicked an ad shortly before.
+- **Could not decide**: people for whom more than one such browser fits, or who share a network with many others (an office, a mobile carrier).
+- **How often the guess is right**: tested on pairs of browsers whose owners are both known.
+- **A verdict**: worth testing (right at least 90% of the time and at least 5% more people credited), not worth it, or not enough data.
+
+Outflare stores no IP address or user agent with a visit, so the check is coarser than what such tools use; read its accuracy as a lower bound. In the API: `GET /v1/brands/{brand}/ads/match-check?days=30` (MCP: `get_ads_match_check`).
+
 ## Sending conversions back
 
 A conversion rule sends one customer event (such as `signed_up` or
