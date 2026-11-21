@@ -2,7 +2,7 @@
 	"version": "2026.11.21",
 	"date": "2026-11-21",
 	"status": "in-progress",
-	"updated": "2026-11-21T13:36:37Z",
+	"updated": "2026-11-21T14:08:49Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -297,7 +297,14 @@
 			"edition": "open-source",
 			"text": "Object storage's start-up check no longer fails on its own file name, storage calls retry a failure that passes, AI visibility says once when a chosen connection is gone instead of failing every prompt, reading a long Slack sales post no longer cuts the AI's answer short, and crashes from browser extensions are no longer counted as the app's.",
 			"at": "2026-11-21T13:36:37Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "social",
+			"edition": "open-source",
+			"text": "Mentions now find podcast episodes that name your brand or a competitor, on your own free Podcast Index key, and leave out what brands post on their own channels. You choose per brand or competitor what Mentions listens for.",
+			"at": "2026-11-21T14:08:49Z"
 		}
 	],
-	"through": "931c54c+931c54c"
+	"through": "2a13d55+2a13d55"
 }
