@@ -2,7 +2,7 @@
 	"version": "2026.11.21",
 	"date": "2026-11-21",
 	"status": "in-progress",
-	"updated": "2026-11-21T01:47:55Z",
+	"updated": "2026-11-21T10:47:50Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -129,7 +129,133 @@
 			"edition": "open-source",
 			"text": "Data, Catalog opens at once: the list of tables shows straight away and the row counts and dates fill in after, instead of the page waiting while every table is counted. Agents and the API can ask for the same with `numbers=false`.",
 			"at": "2026-11-21T01:47:55Z"
+		},
+		{
+			"kind": "launch",
+			"area": "social",
+			"edition": "open-source",
+			"text": "Mentions: see who names your brand or your tracked competitors in videos, podcasts, Reddit posts, forums and news, with the quote, who said it, their audience and a score, under Social → Mentions. It reads what your Reddit watches, news searches and competitor scans already found, and is off until you turn it on.",
+			"at": "2026-11-21T02:40:22Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Every error is now an event you can keep on your own server. Once someone is signed in, the web app sends its own events (an error shown, a crash, a page opened) to the server, so they reach your events workspace with or without PostHog. Errors and warnings the server only wrote to its log become events too, with where in the code they were logged.",
+			"at": "2026-11-21T03:15:33Z"
+		},
+		{
+			"kind": "fix",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Importing a Sales conversation for a person who has since been merged into another now continues on the merged person's conversation, instead of being refused with a conflict on every later send.",
+			"at": "2026-11-21T03:15:33Z"
+		},
+		{
+			"kind": "fix",
+			"area": "general",
+			"edition": "open-source",
+			"text": "A request the caller closed before the answer (a closed tab, a page left mid-load) is now logged as `client_closed` instead of a 500 server error, so the request log and error counts show only real failures.",
+			"at": "2026-11-21T03:15:33Z"
+		},
+		{
+			"kind": "fix",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Searching Slack from a Sales conversation now says what to change when Slack refuses the search token (it must be a person's token with the search:read scope), instead of reporting Slack as unavailable.",
+			"at": "2026-11-21T03:15:33Z"
+		},
+		{
+			"kind": "fix",
+			"area": "general",
+			"edition": "open-source",
+			"text": "The sidebar's badge check is no longer refused once a minute for people and tokens kept to some brands. They get no badges, which are about the whole workspace.",
+			"at": "2026-11-21T03:15:33Z"
+		},
+		{
+			"kind": "launch",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Partnership offers open as a full page and can start from a saved template. Each brand sets, on Partnerships → Payments, what happens when a paid link is removed after payment (restore or refund, a shrinking refund, or a warning), and every offer carries the rule it was sent with.",
+			"at": "2026-11-21T04:36:29Z"
+		},
+		{
+			"kind": "launch",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Site owners can suggest changes to a partnership offer up to three times: the price, their page, the link text and the publish date. Where the link points, that it's a normal link, that it stays up and that nothing is paid before it's live stay fixed. Accept the latest round to make it the agreement.",
+			"at": "2026-11-21T04:36:29Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Paid ads syncs how far people watch your Meta and TikTok video ads: plays that count as watched, the quarters reached, and from them a hook rate and a hold rate per campaign, ad set and ad. Turn the columns on in the tables under Columns.",
+			"at": "2026-11-21T05:40:47Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Paid ads, Settings, Tracking has a new dry run: would matching visits by network and device find more ad customers? It reads the visits you already have and says how many more people an ad would be credited with, and how often that guess is right. Nothing is collected, joined or changed.",
+			"at": "2026-11-21T06:14:47Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Paid ads has holdout tests, on the Experiments tab: keep your ads out of a few countries for some weeks, and Outflare compares sign-ups there with everywhere else to say how many sign-ups the ads really add. Outflare only counts; you exclude the countries on your campaigns.",
+			"at": "2026-11-21T07:28:42Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Paid ads has a new Creatives tab. Every ad is shown as a large preview and scored step by step (hook, hold, click, sign-up, pay) against your own usual rates, with a verdict: scale, keep, fix, stop or too early. Switch between gallery and list, filter by verdict, and pause an ad from its card.",
+			"at": "2026-11-21T08:06:51Z"
+		},
+		{
+			"kind": "launch",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Keyword targets can carry the page's search intent, page type and a Markdown summary of what the page holds, and a whole keyword map imports from a CSV file. SEO overview, Targets gives every page a status (on target, cannibalized, wrong intent, missing content) with the page that ranks instead and suggested fixes, and lists up to 10,000 pages per site.",
+			"at": "2026-11-21T09:03:19Z"
+		},
+		{
+			"kind": "launch",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "SEO overview has a Cannibalization view across a brand's sites: competing searches marked new, ongoing or gained a page against the 28 days before, resolved ones listed, same-language and cross-language searches apart, the page to keep (which you can now choose), split clicks, an estimated gain and the fix on the fixes list.",
+			"at": "2026-11-21T09:31:27Z"
+		},
+		{
+			"kind": "launch",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "SEO overview has a Country pages view: pages made for a country, city or network, each with its target country, Search Console numbers in that country against the 28 days before, the tracked rank there and whether its keyword is tracked, grouped by template with median positions.",
+			"at": "2026-11-21T09:40:12Z"
+		},
+		{
+			"kind": "launch",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "SEO overview has a Technical view: issues from the latest site crawl counted in unique pages and templates (languages folded together), new and fixed since the crawl before, sorted by the search clicks of the pages they touch, with robots.txt changes, indexing, sitemaps and Core Web Vitals from real visits.",
+			"at": "2026-11-21T09:49:09Z"
+		},
+		{
+			"kind": "launch",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "SEO overview has a Links view: referring domains week by week against your biggest tracked competitors, linking domains won and lost a week, links lost in the last 30 days with bought ones first, bought links whose live check failed or found another anchor or page, and the anchor profile of live links.",
+			"at": "2026-11-21T09:59:08Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Every person now has a Lead source category, Inbound or Outbound, worked out from their Source, so you can filter People and the Sales queue by it. People who arrive through a Sales channel get Source Inbound and the channel as their Sub-source.",
+			"at": "2026-11-21T10:35:04Z"
 		}
 	],
-	"through": "b7c54b1+b7c54b1"
+	"through": "7040361+7040361"
 }

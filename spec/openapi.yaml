@@ -281,6 +281,10 @@ paths:
           explode: true
           schema: { type: array, maxItems: 50, items: { type: string, format: uuid } }
         - in: query
+          name: source_category
+          description: "Only conversations whose person has this lead source category (their built-in field source_category, worked out from their Source)."
+          schema: { type: string, enum: [inbound, outbound] }
+        - in: query
           name: quality
           description: "Only conversations a rep marked this way, or unrated for those nobody marked."
           schema: { type: string, enum: [good, poor_fit, junk, unrated] }
@@ -400,7 +404,8 @@ paths:
         OR) so the page can open Slack's own search. A hit is kept only when its channel is public or one of the brand's
         Sales channels; direct messages, group messages and other private channels are dropped. `author` is the Slack
         user id and `text` is cut to 500 characters. A conversation the caller may not see is 404. A Slack failure is
-        answered with the connector error.
+        answered with the connector error: 422 `connector_auth` when Slack refuses the search token (it must be a
+        person's token with the search:read scope, not the app's bot token).
       tags: [records]
       x-outflare-access: { scope: customers.read, brand: true }
       responses:
@@ -1602,6 +1607,49 @@ paths:
         "401": { $ref: "#/components/responses/Error" }
         "429": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/ui-events:
+    post:
+      operationId: recordUiEvents
+      x-outflare-access: { signed_in: true }
+      summary: Record the web app's own events
+      description: |
+        For the web app, signed in. Records what happens only in the browser (an error shown, a crash, a request
+        that got no answer, a page opened, a step with no request) as product events, like the server's own
+        (docs/product-analytics.md), so they reach wherever the operator keeps events. Up to 50 at a time. A name
+        is `ui.` and a past-tense verb in snake_case; properties are ids, codes, counts and fixed labels, each a
+        string (cut at 200 characters), a number or a boolean, never names, addresses or typed text. `outcome`
+        (failure or error) and `error_code` in the properties become the event's own. workspace_id is kept only
+        when the person is a member of that workspace.
+      tags: [access]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [events]
+              properties:
+                workspace_id: { type: string, format: uuid, description: The workspace the person has open. }
+                surface: { type: string, enum: [web, desktop_app], default: web }
+                events:
+                  type: array
+                  minItems: 1
+                  maxItems: 50
+                  items:
+                    type: object
+                    additionalProperties: false
+                    required: [name]
+                    properties:
+                      name: { type: string, pattern: "^ui\\.[a-z0-9_]{1,60}$", example: ui.error_shown }
+                      occurred_at: { type: string, format: date-time, description: "When it happened, kept when within the last day; otherwise now." }
+                      properties:
+                        type: object
+                        maxProperties: 30
+                        additionalProperties: { type: [string, number, boolean, "null"] }
+      responses:
+        "204": { description: Recorded. }
+        default: { $ref: "#/components/responses/Error" }
   /v1/auth/logout:
     post:
       operationId: logout
@@ -2668,12 +2716,12 @@ paths:
     parameters: [{ $ref: "#/components/parameters/Workspace" }]
     get:
       operationId: getMenuBadges
-      x-outflare-access: { scope: workspace.read }
+      x-outflare-access: { scope: workspace.read, brand_limited: true }
       summary: Badges for extension sidebar links
       description: |
         Scope: workspace.read. Short texts a server extension shows next to its own sidebar links (`menu_links` in
         GET /v1/me) for this workspace, by link id, such as the hosted Cloud's account balance next to Plan and
-        billing. Empty on servers without such an extension.
+        billing. Empty on servers without such an extension, and for a caller kept to some brands.
       tags: [access]
       responses:
         "200":
@@ -5348,6 +5396,65 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/SuppressionSync" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/guard-list-syncs:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listGuardListSyncs
+      x-outflare-access: { scope: leads.read }
+      summary: How fresh the opt-out list's copy of each contact guard's list is
+      description: |
+        Scope: leads.read. Every connected contact guard whose whole list can
+        be read (the product account lookup's account feed, the outreach
+        blocklist's exports). A job reads each into the opt-out list on its
+        own schedule (source <connector>_sync, reason customer or blocklist):
+        a feed only reads what is new since its last cursor, a snapshot is
+        read whole and what left it is removed (only entries it added). The
+        copy answers for companies in place of the guard while it is fresh:
+        the whole list was read once and the last sync succeeded within
+        twice its interval. The live check before anyone is added to a
+        campaign still asks the guard.
+      tags: [suppression]
+      responses:
+        "200":
+          description: The syncs.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/GuardListSync" } }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/guard-list-syncs/{integration}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: integration, in: path, required: true, schema: { type: string, format: uuid } }
+    patch:
+      operationId: updateGuardListSync
+      x-outflare-access: { scope: suppressions.manage }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Turn a contact guard's list sync on or off, or change how often it runs
+      description: "Scope: suppressions.manage. On by default, every 5 minutes for a feed and 30 for a snapshot. Recorded as guard_list_sync.updated."
+      tags: [suppression]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enabled: { type: boolean }
+                interval_minutes: { type: [integer, "null"], minimum: 1, maximum: 1440, description: "How often it is read; null for the default." }
+      responses:
+        "200":
+          description: The sync.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/GuardListSync" }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         "202": { $ref: "#/components/responses/MissionHeld" }
@@ -15987,6 +16094,225 @@ paths:
               schema: { $ref: "#/components/schemas/AdSetup" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/ads/holdouts:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+    get:
+      operationId: listAdHoldouts
+      x-outflare-access: { scope: analytics.read, brand: true }
+      summary: Holdout tests, and what the ads were really adding
+      description: |
+        Scope: analytics.read. A holdout says how many sign-ups the ads add that would not have happened anyway. The
+        brand keeps its ads out of some countries for a while (it changes the campaigns' places itself; Outflare
+        changes nothing), and each holdout's result compares sign-ups from every source in those countries (held)
+        with everywhere else (rest), over the same number of days before the start and since. expected_signups is
+        what the held countries would have had with the ads on, lift_signups how many fewer they had, and
+        incrementality the lift over the sign-ups attribution credited to ads there before. verdict: scheduled,
+        not_enough_data (under 30 sign-ups on a side before), leaked (paid clicks kept arriving from the held
+        countries), ads_add, ads_add_little (under a third of what the ads are credited with) or no_difference. A
+        sign-up's country is that of the person's latest visit; days are UTC. The newest 50, latest start first.
+      tags: [ads]
+      responses:
+        "200":
+          description: The holdouts.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/AdHoldout" } }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createAdHoldout
+      x-outflare-access: { scope: analytics.manage, brand: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Note a holdout test
+      description: |
+        Scope: analytics.manage. Notes which countries the brand keeps its ads out of, and from when to when (7 to 90
+        days). It changes no campaign: exclude the countries on each campaign yourself (setBrandAdCampaignLocations on
+        Google Ads, or in the network) for the same days. connector narrows the holdout to one network's ads; empty
+        is every network. Recorded as ad_holdout.created.
+      tags: [ads]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [name, countries, starts_on, ends_on]
+              properties:
+                name: { type: string, minLength: 1, maxLength: 120 }
+                connector: { type: string, maxLength: 40, description: "An ad network's connector, such as google_ads. Empty: every network." }
+                countries: { type: array, minItems: 1, maxItems: 50, items: { type: string, pattern: "^[A-Za-z]{2}$" } }
+                starts_on: { type: string, format: date }
+                ends_on: { type: string, format: date }
+      responses:
+        "201":
+          description: The holdout.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdHoldout" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/ads/holdouts/{id}/end:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: endAdHoldout
+      x-outflare-access: { scope: analytics.manage, brand: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: End a running holdout today
+      description: |
+        Scope: analytics.manage. Sets the holdout's last day to today (UTC), for when the ads go back on early. 409
+        `conflict` unless it is running. Recorded as ad_holdout.ended.
+      tags: [ads]
+      responses:
+        "200":
+          description: The holdout.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdHoldout" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/ads/holdouts/{id}:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    delete:
+      operationId: deleteAdHoldout
+      x-outflare-access: { scope: analytics.manage, brand: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Delete a holdout
+      description: "Scope: analytics.manage. Removes the note; visits and events are untouched. Recorded as ad_holdout.deleted."
+      tags: [ads]
+      responses:
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "204": { description: Deleted. }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/ads/creatives/results:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+    get:
+      operationId: listAdCreativeResults
+      x-outflare-access: { scope: analytics.read, brand: true }
+      summary: Every ad scored step by step, with a verdict
+      description: |
+        Scope: analytics.read. The brand's ads that ran in the range (the last 28 days unless from and to say
+        otherwise), most spend first, each with the numbers of getAdsPerformance at the ad level plus what the network
+        says it shows (type, headline, text, url, thumbnail_url) and its steps. A step is where an ad wins or loses
+        people: hook (video: plays past the opening over impressions), hold (video: plays to the end over plays past
+        the opening), click (clicks over impressions), sign_up (sign-ups over clicks) and pay (first payments over
+        sign-ups). Each has its rate, the usual rate of all the brand's ads on the same network over the same days,
+        and a grade against it: A at 1.3 times usual or more, B from 0.9, C from 0.6, D below, and empty while its
+        base is too small (1,000 impressions, 100 plays, 50 clicks, 10 sign-ups). verdict is scale (at or under the
+        target cost per new paying customer with at least two payers and no D), stop (twice the target spent with
+        no payer, or over 1.5 times the target), fix (a step graded C or D: weakest_step), keep, or too_early. Without
+        a target cost per new paying customer no ad is scale or stop.
+      tags: [ads]
+      parameters:
+        - { name: from, in: query, schema: { type: string, format: date } }
+        - { name: to, in: query, schema: { type: string, format: date } }
+        - { name: connector, in: query, description: "One network, such as meta_ads.", schema: { type: string } }
+      responses:
+        "200":
+          description: The ads.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [from, to, currency, target_cost_per_payer_micros, summary, data]
+                properties:
+                  from: { type: string, format: date }
+                  to: { type: string, format: date }
+                  currency: { type: string }
+                  target_cost_per_payer_micros: { type: [integer, "null"], format: int64 }
+                  summary:
+                    type: object
+                    required: [total, scale, keep, fix, stop, too_early]
+                    properties:
+                      total: { type: integer }
+                      scale: { type: integer }
+                      keep: { type: integer }
+                      fix: { type: integer }
+                      stop: { type: integer }
+                      too_early: { type: integer }
+                  data: { type: array, items: { $ref: "#/components/schemas/AdCreativeResult" } }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/ads/business:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+    get:
+      operationId: getAdsBusiness
+      x-outflare-access: { scope: analytics.read, brand: true }
+      summary: All ad spend against all revenue, with payback by month
+      description: |
+        Scope: analytics.read. The whole business over the range (the last 28 days unless from and to say otherwise),
+        with no attribution in its headline numbers: every payment less every refund, from ads or not, against what
+        every network charged (revenue_per_spend), and every person whose first payment fell in the range against that
+        spend (cost_per_new_customer_micros). previous is the same number of days just before. weeks has the spend by
+        network and the revenue of each week, named by its Monday. networks sets the conversions each network says it
+        won (platform_conversions) beside the new paying customers Outflare traced to its clicks (new_payers).
+        cohorts is the month of to and the four before it: the people who first paid in the month, the month's ad
+        spend over them (cost_each_micros), and what a customer had paid 30, 60, 90 and 120 days after their first
+        payment (cohort_days), averaged over those who have had that long and null until half the month's customers
+        have. payback_days is when that revenue reaches the cost; payback_estimated says it hasn't yet and the number
+        carries the pace so far forward. Money is micros of currency, the brand's; money in a currency with no
+        exchange rate is in none of the numbers and is named in left_out_currencies. target_roas is the brand's
+        return on ad spend to aim for.
+      tags: [ads]
+      parameters:
+        - { name: from, in: query, schema: { type: string, format: date } }
+        - { name: to, in: query, schema: { type: string, format: date } }
+      responses:
+        "200":
+          description: The report.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdBusiness" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/ads/match-check:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+    get:
+      operationId: getAdsMatchCheck
+      x-outflare-access: { scope: analytics.read, brand: true }
+      summary: A dry run of joining visits by network and device
+      description: |
+        Scope: analytics.read. Outflare ties a visit to a person only by what the browser itself says (a sign-in, an
+        email click, a visitor link), so someone who clicks an ad in one browser and signs up in another is not
+        credited to the ad. This reads the visits already stored and answers, without collecting or joining anything,
+        how many more people an ad would be credited with if visits from the same network, place and kind of device
+        were treated as one person, and how often that guess is wrong where the truth is known. A visit's signature
+        is its network (ASN), country, region, city, time zone, device type, browser, system, device brand and model;
+        never an address or a user agent. A signature more than 50 browsers share counts as ambiguous. days is how
+        far back to read (30, at most 90); window_days is the brand's acquisition window. verdict is worth_testing
+        when the guess was right for at least 90% of known pairs and would credit at least 5% more people,
+        not_worth_it otherwise, and not_enough_data under 20 people or 20 known pairs.
+      tags: [ads]
+      parameters:
+        - { name: days, in: query, schema: { type: integer, minimum: 1, maximum: 90, default: 30 } }
+      responses:
+        "200":
+          description: What the dry run found.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdMatchCheck" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   # ---- Paid ads findings by brand (plans/paid-ads, verdicts): the decision
   # queue ranked for a person, with approve, dismiss, acknowledge and
   # revert. The same rows and handlers as the brand's ads/suggestions
@@ -16560,6 +16886,183 @@ paths:
                   previous_to: { type: string, format: date }
                   data: { type: array, items: { $ref: "#/components/schemas/SEOOverviewBrand" } }
                   notes: { type: array, items: { type: string } }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/seo/links:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+    get:
+      operationId: getBrandSEOLinks
+      x-outflare-access: { scope: analytics.read, brand: true }
+      summary: Links at a glance
+      description: |
+        Scope: analytics.read. Weekly referring domains over 13 weeks for the brand's domains and its biggest tracked competitors (from
+        the SEO snapshots, Ahrefs first), with the change against a week and four weeks before; new, lost and regained links and their
+        domains a week over 12 weeks (backlink events); links lost in the last 30 days, bought ones first; bought links (link orders)
+        whose live check failed, found another target or anchor, or has not run for 3 days; and the anchor profile of live links.
+        Reads only what is stored.
+      tags: [seo]
+      responses:
+        "200":
+          description: The report.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SEOLinks" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/seo/technical:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+    get:
+      operationId: getBrandSEOTechnical
+      x-outflare-access: { scope: analytics.read, brand: true }
+      summary: Technical SEO at a glance
+      description: |
+        Scope: analytics.read. What the latest finished crawl of each of the brand's sites found, by audit rule: unique pages (not
+        occurrences), templates with the language part taken out, pages new and fixed against the crawl before, and the Search Console
+        clicks of the pages it touches (most clicks first). With robots.txt changes between the two crawls, indexing from the latest
+        snapshots, Search Console sitemaps, and Core Web Vitals from real visits per page and device. Reads only what is stored.
+      tags: [seo]
+      responses:
+        "200":
+          description: The report.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SEOTechnical" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/seo/country-pages:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+    get:
+      operationId: getBrandSEOCountryPages
+      x-outflare-access: { scope: seo.read, brand: true }
+      summary: How country pages rank in their country
+      description: |
+        Scope: seo.read. The brand's pages under a path (prefix), each with its target country (where its target keyword is tracked,
+        else where Search Console shows it most), Search Console's clicks, impressions, CTR and position in that country over the 28 days
+        to the newest stored day against the 28 before, the tracked rank there, a band and whether it is untracked; grouped by template
+        (the path without its last part) with median positions. Reads only what is stored.
+      tags: [seo]
+      parameters:
+        - { name: prefix, in: query, description: "A path the pages start with, such as /proxies/.", schema: { type: string, maxLength: 500 } }
+      responses:
+        "200":
+          description: The pages.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SEOCountryPages" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/seo/cannibalisation:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+    get:
+      operationId: getBrandSEOCannibalisation
+      x-outflare-access: { scope: seo.read, brand: true }
+      summary: Searches the brand's pages compete for
+      description: |
+        Scope: seo.read. Every search two or more of the brand's pages compete for over the 28 days to the newest stored Search Console
+        day, against the 28 days before: new, ongoing or gained a page, and the ones that resolved. Each with its pages, the page to keep
+        (chosen by a person, else the one that targets the search, else the one with the most clicks), whether the pages share a language,
+        the clicks the other pages take, a modeled gain, and its fix on the fixes list. Reads only what is stored.
+      tags: [seo]
+      responses:
+        "200":
+          description: The clusters.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SEOCannibalisation" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/seo-sites/{site}/cannibalisation/primary:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: site, in: path, required: true, schema: { type: string, format: uuid } }
+    put:
+      operationId: setBrandCannibalPrimary
+      x-outflare-access: { scope: seo.manage, brand: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Choose the page to keep for a search
+      description: "Scope: seo.manage. The page of the site to keep for a search its pages compete for, over the one Outflare picks; an empty url goes back to Outflare's pick."
+      tags: [seo]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [query, url]
+              properties:
+                query: { type: string, maxLength: 500 }
+                url: { type: string, maxLength: 2000, description: "A page of the site, or empty to clear." }
+      responses:
+        "200":
+          description: The choice.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [query, url]
+                properties:
+                  query: { type: string }
+                  url: { type: string }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/seo/declining:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+    get:
+      operationId: getBrandSEODeclining
+      x-outflare-access: { scope: analytics.read, brand: true }
+      summary: Pages losing search clicks
+      description: |
+        Scope: analytics.read. The brand's pages whose Search Console clicks fell over the last 7 or 28 days to the newest stored day
+        against the same length before (at least 30% with 50 clicks before, or 100 clicks whatever the share), sorted into new, still
+        declining and recovering by the period before that. Each with impressions, position and CTR against before and what moved most,
+        the country, device and query that lost most, first-touch sign-ups and revenue, a modeled loss (clicks lost times revenue per
+        organic click), a technical flag from the latest crawl and the other pages shown for its losing query. Reads only what is stored.
+      tags: [seo]
+      parameters:
+        - { name: days, in: query, schema: { type: integer, enum: [7, 28], default: 7 } }
+      responses:
+        "200":
+          description: The pages.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SEODeclining" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/seo/money:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+    get:
+      operationId: getBrandSEOMoney
+      x-outflare-access: { scope: analytics.read, brand: true }
+      summary: Search gaps in dollars
+      description: |
+        Scope: analytics.read. Over the 28 days to the newest stored Search Console day: the pages that lost clicks against the 28 days
+        before, with the modeled loss and the page's own first-touch revenue change; the query and page pairs in positions 4 to 20 worth
+        moving to position 3; and the pairs shown often but clicked less than their position earns. Dollars are clicks times revenue per
+        organic click (first-touch organic revenue over Search Console clicks in the same 28 days) unless `rpc` sets it. Queries naming the
+        brand are left out unless `branded` is true. Each row says how many of the brand's link orders of the last 90 days, not lost, point
+        at its page. Reads only what is stored, so it calls and costs nothing.
+      tags: [seo]
+      parameters:
+        - { name: rpc, in: query, description: "Revenue per organic click in USD to use instead of the measured one.", schema: { type: number, minimum: 0, maximum: 10000 } }
+        - { name: branded, in: query, description: "Keep queries that name the brand.", schema: { type: boolean, default: false } }
+      responses:
+        "200":
+          description: The gaps.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SEOMoney" }
         "400": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
@@ -22108,6 +22611,9 @@ paths:
                 keyword: { type: string, maxLength: 200, description: "Required to set a target. Kept lowercase.", example: proxy pricing }
                 secondary: { type: array, maxItems: 10, items: { type: string, maxLength: 200 }, description: Other keywords the page should also rank for. }
                 status: { type: string, enum: [set, dismissed], default: set }
+                intent: { type: string, enum: ["", informational, commercial, transactional, navigational], description: "The search intent the page answers; empty clears it." }
+                page_type: { type: string, enum: ["", homepage, product, pricing, use-case, comparison, blog, location, tool, docs, other], description: "The kind of page; empty clears it." }
+                summary: { type: string, maxLength: 20000, description: "Markdown: what the page holds (headings, plans and prices, features, calls to action, questions answered); empty clears it." }
       responses:
         "200":
           description: The target.
@@ -22153,11 +22659,89 @@ paths:
         "404": { $ref: "#/components/responses/Error" }
         "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/seo-sites/{site}/targets/import:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: site, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: importBrandPageTargets
+      x-outflare-access: { scope: seo.manage, brand: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Import a site's keyword map
+      description: |
+        Scope: seo.manage. Sets the targets of up to 1000 pages at once, such as a keyword map from a spreadsheet: each row a page with
+        its keyword, secondary keywords, intent, page type and summary. A page that has a target keeps whatever its row leaves out; a new
+        page needs a keyword. Rows that are wrong are skipped and listed with their index; the rest are saved together. Send a bigger map
+        in parts.
+      tags: [seo]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [targets]
+              properties:
+                targets:
+                  type: array
+                  minItems: 1
+                  maxItems: 1000
+                  items:
+                    type: object
+                    required: [url]
+                    properties:
+                      url: { type: string, maxLength: 2000 }
+                      keyword: { type: string, maxLength: 200 }
+                      secondary: { type: array, maxItems: 10, items: { type: string, maxLength: 200 } }
+                      status: { type: string, enum: [set, dismissed] }
+                      intent: { type: string, maxLength: 40, description: "informational, commercial, transactional or navigational, in any letter case; empty clears it. A row with another value is skipped and listed." }
+                      page_type: { type: string, enum: ["", homepage, product, pricing, use-case, comparison, blog, location, tool, docs, other] }
+                      summary: { type: string, maxLength: 20000 }
+      responses:
+        "200":
+          description: What was saved, and the rows that were not.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [created, updated, skipped, errors]
+                properties:
+                  created: { type: integer }
+                  updated: { type: integer }
+                  skipped: { type: integer }
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      required: [index, url, message]
+                      properties:
+                        index: { type: integer, description: "The row's place in targets, from 0." }
+                        url: { type: string }
+                        message: { type: string }
+        "400": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/seo-sites/{site}/targets/{target}:
     parameters:
       - { $ref: "#/components/parameters/BrandID" }
       - { name: site, in: path, required: true, schema: { type: string, format: uuid } }
       - { name: target, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getBrandPageTarget
+      x-outflare-access: { scope: seo.read, brand: true }
+      summary: Read one page's keyword target
+      description: "Scope: seo.read. The target as it is listed, with its summary."
+      tags: [seo]
+      responses:
+        "200":
+          description: The target.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PageTarget" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
     patch:
       operationId: updateBrandPageTarget
       x-outflare-access: { scope: seo.manage, brand: true }
@@ -22175,6 +22759,9 @@ paths:
                 keyword: { type: string, maxLength: 200 }
                 secondary: { type: array, maxItems: 10, items: { type: string, maxLength: 200 } }
                 status: { type: string, enum: [set, dismissed] }
+                intent: { type: string, enum: ["", informational, commercial, transactional, navigational], description: "The search intent the page answers; empty clears it." }
+                page_type: { type: string, enum: ["", homepage, product, pricing, use-case, comparison, blog, location, tool, docs, other], description: "The kind of page; empty clears it." }
+                summary: { type: string, maxLength: 20000, description: "Markdown: what the page holds (headings, plans and prices, features, calls to action, questions answered); empty clears it." }
       responses:
         "200":
           description: The target.
@@ -45100,7 +45687,7 @@ paths:
         - remove cuts them out of the video and closes the gap.
         - redo has them said again and stitched in: for a word the voice read wrong, or words to change. text is what
           to show in their place (left out: the same words); say is how to spell them for the voice when it reads them
-          wrong ("jee-oh-node"). The voice reads only that stretch, the video model renders only that stretch,
+          wrong ("north-peek"). The voice reads only that stretch, the video model renders only that stretch,
           starting on the frame the old one started on, and it is upscaled and stitched in. A stretch shorter than two
           seconds takes in the words next to it, since a video model renders no less.
 
@@ -56008,8 +56595,8 @@ paths:
       x-outflare-access:
         scope: partners.manage
         brand: true
-      summary: Revise, invite, verify a deliverable or approve a milestone
-      description: Manual approval is mandatory. verify anchors a deliverable's required live period; approve creates rewards only after its milestone wait. Accepted agreements cannot be edited. invite returns an unguessable preview URL; the recipient must verify their email to accept.
+      summary: Revise, invite, accept a counter-offer, verify a deliverable or approve a milestone
+      description: Manual approval is mandatory. verify anchors a deliverable's required live period; approve creates rewards only after its milestone wait. Accepted agreements cannot be edited. invite returns an unguessable preview URL; the recipient must verify their email to accept. A recipient may counter an offer up to 3 times, changing only the price and, per deliverable, their page, the link text and the publish date (progress.counters); accept_counter writes the latest counter into the terms and makes it the agreement, spreading a new price over the paid milestones in their current proportions. To answer with other terms, revise and invite again.
       tags:
       - partners
       requestBody:
@@ -56027,6 +56614,7 @@ paths:
                   enum:
                   - revise
                   - invite
+                  - accept_counter
                   - verify
                   - approve
                   - complete
@@ -56049,6 +56637,165 @@ paths:
               schema:
                 allOf:
                 - $ref: '#/components/schemas/PartnerProposal'
+        '202':
+          $ref: '#/components/responses/MissionHeld'
+        default:
+          $ref: '#/components/responses/Error'
+  /v1/brands/{brand}/partner-link-rule:
+    parameters:
+    - $ref: '#/components/parameters/BrandID'
+    get:
+      operationId: getBrandPartnerLinkRule
+      x-outflare-access:
+        scope: partners.read
+        brand: true
+      summary: Get the brand's rule for a paid link removed after payment
+      description: The default, until the brand sets one, is restore within 14 days or refund, for the first 12 months. The rule is copied into each offer when it is sent.
+      tags:
+      - partners
+      responses:
+        '200':
+          description: The rule.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartnerLinkRule'
+        default:
+          $ref: '#/components/responses/Error'
+    put:
+      operationId: setBrandPartnerLinkRule
+      x-outflare-access:
+        scope: partners.manage
+        brand: true
+      summary: Set the brand's rule for a paid link removed after payment
+      description: Applies to offers sent from now on; offers already sent keep the rule they were sent with.
+      tags:
+      - partners
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PartnerLinkRule'
+      responses:
+        '200':
+          description: The rule.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartnerLinkRule'
+        '202':
+          $ref: '#/components/responses/MissionHeld'
+        default:
+          $ref: '#/components/responses/Error'
+  /v1/brands/{brand}/partner-offer-templates:
+    parameters:
+    - $ref: '#/components/parameters/BrandID'
+    get:
+      operationId: listBrandPartnerOfferTemplates
+      x-outflare-access:
+        scope: partners.read
+        brand: true
+      summary: List the brand's saved offer templates
+      tags:
+      - partners
+      responses:
+        '200':
+          description: Templates by name.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PartnerOfferTemplate'
+        default:
+          $ref: '#/components/responses/Error'
+    post:
+      operationId: createBrandPartnerOfferTemplate
+      x-outflare-access:
+        scope: partners.manage
+        brand: true
+      summary: Save an offer template
+      description: A template holds the same terms as an offer, without a recipient. Starting an offer from it copies the terms into the form.
+      tags:
+      - partners
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PartnerOfferTemplateInput'
+      responses:
+        '200':
+          description: The template.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartnerOfferTemplate'
+        '202':
+          $ref: '#/components/responses/MissionHeld'
+        default:
+          $ref: '#/components/responses/Error'
+  /v1/brands/{brand}/partner-offer-templates/{template}:
+    parameters:
+    - $ref: '#/components/parameters/BrandID'
+    - name: template
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    put:
+      operationId: updateBrandPartnerOfferTemplate
+      x-outflare-access:
+        scope: partners.manage
+        brand: true
+      summary: Replace an offer template
+      tags:
+      - partners
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PartnerOfferTemplateInput'
+      responses:
+        '200':
+          description: The template.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartnerOfferTemplate'
+        '202':
+          $ref: '#/components/responses/MissionHeld'
+        default:
+          $ref: '#/components/responses/Error'
+    delete:
+      operationId: deleteBrandPartnerOfferTemplate
+      x-outflare-access:
+        scope: partners.manage
+        brand: true
+      summary: Delete an offer template
+      description: Offers already made from it are not changed.
+      tags:
+      - partners
+      responses:
+        '200':
+          description: Deleted.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - deleted
+                properties:
+                  deleted:
+                    type: boolean
         '202':
           $ref: '#/components/responses/MissionHeld'
         default:
@@ -60889,6 +61636,10 @@ components:
         feed_source:
           type: [string, "null"]
           description: "The app that posted the Slack post which started the conversation, by the name Slack gives it (a form tool, a CRM). Null when a person posted it or the conversation did not start from a Sales channel."
+        source_category:
+          type: [string, "null"]
+          enum: [inbound, outbound, null]
+          description: "The person's lead source category: inbound (they came to the brand) or outbound (the brand went to them), worked out from their Source. Null when their Source has none (Invited, Customer, Other, or not set)."
         latest_post:
           type: [object, "null"]
           description: "The newest Slack post on the conversation that is not spam, set aside or deleted in Slack, for the queue row. Filled by listSalesLeads and getSalesLead; null when the conversation has no such post (or it can't be read), and null in other answers."
@@ -70767,7 +71518,7 @@ components:
     AdEconomics:
       type: object
       description: "A brand's paid ads economics (plans/paid-ads). Money in micros of currency."
-      required: [brand_id, currency, target_cost_per_payer_micros, target_cost_per_signup_micros, acquisition_window_days, payback_months, gross_margin_percent, shadow_mode, daily_budget_ceiling_micros, set, updated_by, created_at, updated_at]
+      required: [brand_id, currency, target_cost_per_payer_micros, target_cost_per_signup_micros, acquisition_window_days, payback_months, gross_margin_percent, shadow_mode, daily_budget_ceiling_micros, target_new_payers_monthly, monthly_budget_micros, target_revenue_monthly_micros, target_roas, overview_numbers, set, updated_by, created_at, updated_at]
       properties:
         brand_id: { type: string, format: uuid }
         currency: { type: string }
@@ -70778,6 +71529,14 @@ components:
         gross_margin_percent: { type: [integer, "null"], minimum: 1, maximum: 100 }
         shadow_mode: { type: boolean, description: Rules only record what they would do until this is off. }
         daily_budget_ceiling_micros: { type: [integer, "null"], format: int64, description: "The most the daily budgets of the brand's active campaigns may add up to. A raise past it answers 409 ad_budget_ceiling. Null: no ceiling." }
+        target_new_payers_monthly: { type: [integer, "null"], description: "New paying customers the brand wants from ads in a month. The Overview judges a range against the share of a month (30 days) it covers. Null until set." }
+        monthly_budget_micros: { type: [integer, "null"], format: int64, description: "The most the brand means to spend on ads in a month. Only the Overview compares against it; nothing is stopped. Null until set." }
+        target_revenue_monthly_micros: { type: [integer, "null"], format: int64, description: "Revenue the brand wants from ads in a month. Null until set." }
+        target_roas: { type: [number, "null"], description: "Revenue over spend the brand aims for: 3 means three times the spend. Null until set." }
+        overview_numbers:
+          type: array
+          description: "The numbers the Paid ads Overview shows, in order. Empty shows the usual six: cost_per_payer, cost_per_signup, new_payers, spend, revenue, roas."
+          items: { type: string, enum: [cost_per_payer, cost_per_signup, new_payers, spend, revenue, roas, signups, clicks, cost_per_click, signup_rate, platform_conversions] }
         set: { type: boolean, description: False while the brand reads the defaults. }
         updated_by: { type: [string, "null"], format: uuid }
         created_at: { type: string, format: date-time }
@@ -70795,6 +71554,15 @@ components:
         gross_margin_percent: { type: [integer, "null"], minimum: 1, maximum: 100 }
         shadow_mode: { type: boolean, description: "Turning it off needs a person's session (403 person_only otherwise)." }
         daily_budget_ceiling_micros: { type: [integer, "null"], format: int64, minimum: 1, maximum: 1000000000000, description: "Raising or clearing it needs a person's session (403 person_only otherwise)." }
+        target_new_payers_monthly: { type: [integer, "null"], minimum: 1 }
+        monthly_budget_micros: { type: [integer, "null"], format: int64, minimum: 1 }
+        target_revenue_monthly_micros: { type: [integer, "null"], format: int64, minimum: 1 }
+        target_roas: { type: [number, "null"], exclusiveMinimum: 0, maximum: 1000 }
+        overview_numbers:
+          type: array
+          maxItems: 8
+          description: Each number once. An empty list goes back to the usual six.
+          items: { type: string, enum: [cost_per_payer, cost_per_signup, new_payers, spend, revenue, roas, signups, clicks, cost_per_click, signup_rate, platform_conversions] }
     MinorMoney:
       type: object
       description: An amount in one currency, in minor units (cents). Never converted or added across currencies.
@@ -70883,6 +71651,152 @@ components:
       properties:
         queued: { type: boolean, description: "True when a run was queued; false when this hour's already ran or is queued (at most one an hour)." }
         next_at: { type: string, format: date-time, description: When the next run may be queued. }
+    AdHoldoutSide:
+      type: object
+      required: [signups, ad_signups, paid_visits]
+      properties:
+        signups: { type: integer, description: "Sign-ups from every source." }
+        ad_signups: { type: integer, description: "Of those, the ones an ad is credited with." }
+        paid_visits: { type: integer, description: "Visits that arrived from a paid click." }
+    AdHoldout:
+      type: object
+      required: [id, name, connector, countries, starts_on, ends_on, status, created_at, result]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        connector: { type: string, description: "Empty: every network." }
+        countries: { type: array, items: { type: string } }
+        starts_on: { type: string, format: date }
+        ends_on: { type: string, format: date }
+        status: { type: string, enum: [scheduled, running, finished] }
+        created_at: { type: string, format: date-time }
+        result:
+          type: object
+          required: [days, before_from, through, held_before, held_during, rest_before, rest_during, expected_signups, lift_signups, incrementality, leaked, verdict]
+          properties:
+            days: { type: integer, description: "Days compared on each side of the start." }
+            before_from: { type: string, description: "First day of the days before; empty while scheduled." }
+            through: { type: string, description: "Last day counted; empty while scheduled." }
+            held_before: { $ref: "#/components/schemas/AdHoldoutSide" }
+            held_during: { $ref: "#/components/schemas/AdHoldoutSide" }
+            rest_before: { $ref: "#/components/schemas/AdHoldoutSide" }
+            rest_during: { $ref: "#/components/schemas/AdHoldoutSide" }
+            expected_signups: { type: [number, "null"] }
+            lift_signups: { type: [number, "null"] }
+            incrementality: { type: [number, "null"] }
+            leaked: { type: boolean }
+            verdict: { type: string, enum: [scheduled, not_enough_data, leaked, ads_add, ads_add_little, no_difference] }
+    AdBusinessTotals:
+      type: object
+      required: [revenue_micros, spend_micros, revenue_per_spend, new_customers, new_customers_from_ads, cost_per_new_customer_micros]
+      properties:
+        revenue_micros: { type: integer, format: int64 }
+        spend_micros: { type: integer, format: int64 }
+        revenue_per_spend: { type: [number, "null"] }
+        new_customers: { type: integer }
+        new_customers_from_ads: { type: integer }
+        cost_per_new_customer_micros: { type: [integer, "null"], format: int64 }
+    AdBusiness:
+      type: object
+      required: [from, to, currency, target_roas, cohort_days, totals, previous, weeks, networks, cohorts, left_out_currencies]
+      properties:
+        from: { type: string, format: date }
+        to: { type: string, format: date }
+        currency: { type: string }
+        target_roas: { type: [number, "null"] }
+        cohort_days: { type: array, items: { type: integer } }
+        totals: { $ref: "#/components/schemas/AdBusinessTotals" }
+        previous: { $ref: "#/components/schemas/AdBusinessTotals" }
+        weeks:
+          type: array
+          items:
+            type: object
+            required: [week, revenue_micros, spend_micros, spend]
+            properties:
+              week: { type: string, format: date }
+              revenue_micros: { type: integer, format: int64 }
+              spend_micros: { type: integer, format: int64 }
+              spend:
+                type: array
+                items:
+                  type: object
+                  required: [connector, spend_micros]
+                  properties:
+                    connector: { type: string }
+                    spend_micros: { type: integer, format: int64 }
+        networks:
+          type: array
+          items:
+            type: object
+            required: [connector, spend_micros, share, platform_conversions, new_payers, cost_per_new_payer_micros]
+            properties:
+              connector: { type: string }
+              spend_micros: { type: integer, format: int64 }
+              share: { type: number }
+              platform_conversions: { type: number }
+              new_payers: { type: integer }
+              cost_per_new_payer_micros: { type: [integer, "null"], format: int64 }
+        cohorts:
+          type: array
+          items:
+            type: object
+            required: [month, new_customers, spend_micros, cost_each_micros, revenue_each_micros, payback_days, payback_estimated]
+            properties:
+              month: { type: string, description: "The month, as 2026-10." }
+              new_customers: { type: integer }
+              spend_micros: { type: integer, format: int64 }
+              cost_each_micros: { type: [integer, "null"], format: int64 }
+              revenue_each_micros: { type: array, items: { type: [integer, "null"], format: int64 } }
+              payback_days: { type: [integer, "null"] }
+              payback_estimated: { type: boolean }
+        left_out_currencies: { type: array, items: { type: string } }
+    AdCreativeResult:
+      allOf:
+        - { $ref: "#/components/schemas/AdPerformanceRow" }
+        - type: object
+          required: [campaign_name, type, headline, text, url, thumbnail_url, video, steps, verdict, weakest_step]
+          properties:
+            campaign_name: { type: string }
+            type: { type: string }
+            headline: { type: string }
+            text: { type: string }
+            url: { type: string }
+            thumbnail_url: { type: string }
+            video: { type: boolean }
+            steps:
+              type: array
+              items:
+                type: object
+                required: [id, count, base, rate, usual, grade]
+                properties:
+                  id: { type: string, enum: [hook, hold, click, sign_up, pay] }
+                  count: { type: integer, format: int64 }
+                  base: { type: integer, format: int64 }
+                  rate: { type: [number, "null"] }
+                  usual: { type: [number, "null"] }
+                  grade: { type: string, enum: ["", A, B, C, D] }
+            verdict: { type: string, enum: [scale, keep, fix, stop, too_early] }
+            weakest_step: { type: string, enum: ["", hook, hold, click, sign_up, pay] }
+    AdMatchCheck:
+      type: object
+      required: [days, window_days, visits, visits_usable, browsers, browsers_unique, people, people_credited, would_credit, ambiguous, no_match, known_pairs, known_pairs_right, since, accuracy, verdict]
+      properties:
+        days: { type: integer, description: "Days read." }
+        window_days: { type: integer, description: "The brand's acquisition window." }
+        visits: { type: integer, description: "Visits in the period." }
+        visits_usable: { type: integer, description: "Visits with a signature (a known network and browser)." }
+        browsers: { type: integer, description: "Browsers with a signature." }
+        browsers_unique: { type: integer, description: "Browsers that share their signature with no other browser." }
+        people: { type: integer, description: "People known by name who visited in the period." }
+        people_credited: { type: integer, description: "Of those, the people an ad is already credited with." }
+        would_credit: { type: integer, description: "People no ad is credited with, for whom exactly one unknown browser with the same signature clicked an ad within the window before." }
+        ambiguous: { type: integer, description: "People for whom more than one such browser did, or whose signature is too common." }
+        no_match: { type: integer, description: "People for whom none did." }
+        known_pairs: { type: integer, description: "Pairs of browsers with the same signature that each belong to a known person." }
+        known_pairs_right: { type: integer, description: "Of those pairs, the ones that are the same person." }
+        since: { type: string, format: date-time }
+        accuracy: { type: [number, "null"], description: "known_pairs_right over known_pairs; null without a pair." }
+        verdict: { type: string, enum: [worth_testing, not_worth_it, not_enough_data] }
     AdSetup:
       type: object
       required: [brand_id, steps, done, total, ready, checked_at]
@@ -70979,13 +71893,17 @@ components:
               conversions: { type: number }
     AdPerformanceDay:
       type: object
-      required: [day, currency, spend_micros, signups, new_payers]
+      required: [day, currency, spend_micros, signups, new_payers, clicks, impressions, platform_conversions, revenue_micros]
       properties:
         day: { type: string, format: date }
         currency: { type: string }
         spend_micros: { type: integer, format: int64 }
         signups: { type: integer }
         new_payers: { type: integer }
+        clicks: { type: integer, format: int64 }
+        impressions: { type: integer, format: int64 }
+        platform_conversions: { type: number, description: The networks' own count for the day. }
+        revenue_micros: { type: integer, format: int64, description: "Revenue the campaigns' customers paid that day (new and returning, as customers narrows it), in micros of currency. Payments in a currency with no rate are left out." }
     AdConversionSendStatus:
       type: object
       required: [state, detail, request_id, records, errors, warnings, checked_at]
@@ -71071,7 +71989,7 @@ components:
       type: object
       description: "Money in micros (millionths) of the currency. Conversions, conversion value and platform_roas are what the platform claims: never add them across platforms."
       required: [spend_micros, impressions, clicks, conversions, conversion_value_micros, cpc_micros, ctr, cost_per_conversion_micros, platform_roas, daily_reach, frequency, link_clicks, landing_page_views, video_views,
-        all_conversions, all_conversion_value_micros]
+        video_thruplays, video_p25, video_p50, video_p75, video_p100, hook_rate, hold_rate, all_conversions, all_conversion_value_micros]
       properties:
         spend_micros: { type: integer, format: int64 }
         impressions: { type: integer, format: int64 }
@@ -71086,7 +72004,14 @@ components:
         frequency: { type: [number, "null"], description: "Impressions over daily_reach: how often the average day's person saw it." }
         link_clicks: { type: [integer, "null"], format: int64, description: "Meta: clicks on the ad's links, beside clicks of any kind." }
         landing_page_views: { type: [integer, "null"], format: int64, description: "Meta: link clicks whose page loaded." }
-        video_views: { type: [integer, "null"], format: int64, description: "Meta: video plays of 3 seconds or more." }
+        video_views: { type: [integer, "null"], format: int64, description: "Video plays long enough to count: 3 seconds or more on Meta, 2 seconds or more on TikTok. Null where no day had it." }
+        video_thruplays: { type: [integer, "null"], format: int64, description: "Video plays to the end or long enough to count as watched: Meta's ThruPlays (15 seconds or the whole video), TikTok's plays of 6 seconds or more." }
+        video_p25: { type: [integer, "null"], format: int64, description: Video plays that reached a quarter of the video. }
+        video_p50: { type: [integer, "null"], format: int64, description: Video plays that reached half of the video. }
+        video_p75: { type: [integer, "null"], format: int64, description: Video plays that reached three quarters of the video. }
+        video_p100: { type: [integer, "null"], format: int64, description: Video plays that reached the end. }
+        hook_rate: { type: [number, "null"], description: "0 to 1: video_views over the impressions of the days that had them. How often the opening stops the scroll." }
+        hold_rate: { type: [number, "null"], description: "0 to 1: video_thruplays over video_views. How many of those who stopped kept watching." }
         all_conversions: { type: [number, "null"], description: "Every conversion the platform counted, its secondary conversion actions included (Google's all conversions); conversions are the primary ones its bidding uses. Null where no day had it, and on keywords and search terms." }
         all_conversion_value_micros: { type: [integer, "null"], format: int64 }
     AdCampaign:
@@ -72097,9 +73022,13 @@ components:
         created_at: { type: string, format: date-time }
     PageTarget:
       type: object
-      required: [id, url, keyword, secondary, status, origin, checks, search, created_at, updated_at]
+      required: [id, url, keyword, secondary, status, origin, intent, page_type, summary_length, checks, search, created_at, updated_at]
       properties:
         id: { type: [string, "null"], format: uuid, description: "null for a suggestion." }
+        intent: { type: string, enum: ["", informational, commercial, transactional, navigational], description: "The search intent the page answers; empty when not set." }
+        page_type: { type: string, enum: ["", homepage, product, pricing, use-case, comparison, blog, location, tool, docs, other], description: "Empty when not set." }
+        summary_length: { type: integer, description: "Characters in the page's summary; 0 when it has none." }
+        summary: { type: string, description: "Markdown summary of what the page holds; only when one target is read or written." }
         url: { type: string, example: "https://www.example.com/pricing" }
         keyword: { type: string, example: proxy pricing, description: "Lowercase. Empty on a dismissed page with no keyword." }
         secondary: { type: array, items: { type: string } }
@@ -76226,6 +77155,453 @@ components:
         previous: { type: [number, "null"], description: "The weeks before added up, or the last snapshot before them (in trends, at least 4 weeks older)." }
         change: { type: [number, "null"], description: "(current - previous) / previous; 0.12 is 12% up." }
         direction: { type: string, enum: [up, down, flat, unknown], description: "Within 3% is flat; unknown when either side has no data." }
+    SEOLinks:
+      type: object
+      required: [summary, series, velocity, lost, orders, anchors, notes]
+      properties:
+        summary:
+          type: object
+          required: [referring_domains, rd_wow, rd_mom, new_domains_week, lost_domains_week, lost_links, lost_paid, bought_live, bought_total, bought_problems]
+          properties:
+            referring_domains: { type: [number, "null"], description: "The brand's domains added up, latest week." }
+            rd_wow: { type: [number, "null"], description: Change against the week before; null for a brand with several domains. }
+            rd_mom: { type: [number, "null"], description: Change against four weeks before. }
+            new_domains_week: { type: integer }
+            lost_domains_week: { type: integer }
+            lost_links: { type: integer }
+            lost_paid: { type: integer }
+            bought_live: { type: integer }
+            bought_total: { type: integer }
+            bought_problems: { type: integer }
+        series:
+          type: array
+          description: The brand's domains first, then up to 8 competitors with the most referring domains.
+          items:
+            type: object
+            required: [host, competitor, connector, points, latest, wow, mom]
+            properties:
+              host: { type: string }
+              competitor: { type: boolean }
+              connector: { type: string }
+              points:
+                type: array
+                items:
+                  type: object
+                  required: [week, referring_domains]
+                  properties:
+                    week: { type: string, format: date, description: The Monday of the week. }
+                    referring_domains: { type: number }
+              latest: { type: [number, "null"] }
+              wow: { type: [number, "null"] }
+              mom: { type: [number, "null"] }
+        velocity:
+          type: array
+          description: Oldest first; the last is the current week.
+          items:
+            type: object
+            required: [week, new, lost, regained, new_domains, lost_domains]
+            properties:
+              week: { type: string, format: date }
+              new: { type: integer }
+              lost: { type: integer }
+              regained: { type: integer }
+              new_domains: { type: integer }
+              lost_domains: { type: integer }
+        lost:
+          type: array
+          description: Bought first, then strongest; at most 200.
+          items:
+            type: object
+            required: [source_url, source_domain, target_url, anchor, source_rating, first_seen_at, lost_at, order_id]
+            properties:
+              source_url: { type: string }
+              source_domain: { type: string }
+              target_url: { type: string }
+              anchor: { type: string }
+              source_rating: { type: [number, "null"] }
+              first_seen_at: { type: [string, "null"], format: date-time }
+              lost_at: { type: string, format: date-time }
+              order_id: { type: [string, "null"], format: uuid, description: The link order published on this page, when it was bought. }
+        orders:
+          type: array
+          description: Bought links with a problem.
+          items:
+            type: object
+            required: [id, status, target_url, published_url, anchor, live_anchor, checked_at, problems]
+            properties:
+              id: { type: string, format: uuid }
+              status: { type: string }
+              target_url: { type: string }
+              published_url: { type: string }
+              anchor: { type: string, description: The ordered anchor. }
+              live_anchor: { type: string, description: The anchor the last check found. }
+              checked_at: { type: [string, "null"], format: date-time }
+              problems: { type: array, items: { type: string, enum: [lost, not_live, wrong_target, anchor_mismatch, unchecked] } }
+        anchors:
+          type: object
+          description: Live links by kind of anchor.
+          required: [branded, url, generic, exact, partial, other, empty]
+          properties:
+            branded: { type: integer }
+            url: { type: integer }
+            generic: { type: integer }
+            exact: { type: integer }
+            partial: { type: integer }
+            other: { type: integer }
+            empty: { type: integer }
+        notes: { type: array, items: { type: string } }
+    SEOTechnical:
+      type: object
+      required: [sites, rules, sitemaps, vitals, summary, notes]
+      properties:
+        sites:
+          type: array
+          items:
+            type: object
+            required: [site_id, host, crawl_id, crawled_at, pages, previous_crawl_id, previous_crawled_at, robots_changed, indexable, indexed, not_indexed, previous_indexed, indexed_day]
+            properties:
+              site_id: { type: string, format: uuid }
+              host: { type: string }
+              crawl_id: { type: [string, "null"], format: uuid, description: The latest finished crawl. }
+              crawled_at: { type: [string, "null"], format: date-time }
+              pages: { type: integer, description: Pages the latest crawl fetched. }
+              previous_crawl_id: { type: [string, "null"], format: uuid }
+              previous_crawled_at: { type: [string, "null"], format: date-time }
+              robots_changed: { type: array, items: { type: string }, description: Hosts whose robots.txt changed between the two crawls. }
+              indexable: { type: [integer, "null"] }
+              indexed: { type: [integer, "null"] }
+              not_indexed: { type: [integer, "null"] }
+              previous_indexed: { type: [integer, "null"], description: Indexed pages in the snapshot before. }
+              indexed_day: { type: [string, "null"], format: date }
+        rules:
+          type: array
+          description: Most clicks first, then errors, then most pages; at most 200.
+          items:
+            type: object
+            required: [rule, title, category, severity, pages, previous_pages, new_pages, fixed_pages, templates, clicks, top_pages]
+            properties:
+              rule: { type: string }
+              title: { type: string }
+              category: { type: string }
+              severity: { type: string, enum: [error, warning, notice] }
+              pages: { type: integer, description: Unique pages in the latest crawl. }
+              previous_pages: { type: integer }
+              new_pages: { type: integer, description: Pages with it now that both crawls reached and that did not have it before. }
+              fixed_pages: { type: integer, description: Pages that had it and no longer do, among those the latest crawl reached. }
+              templates: { type: integer, description: "Templates, the language part of the path taken out." }
+              clicks: { type: number, description: Search Console clicks over 28 days of the pages it touches. }
+              top_pages:
+                type: array
+                items:
+                  type: object
+                  required: [url, clicks]
+                  properties:
+                    url: { type: string }
+                    clicks: { type: number }
+        sitemaps:
+          type: array
+          items:
+            type: object
+            required: [host, path, submitted, indexed, errors, warnings, last_read]
+            properties:
+              host: { type: string }
+              path: { type: string }
+              submitted: { type: integer }
+              indexed: { type: integer }
+              errors: { type: integer }
+              warnings: { type: integer }
+              last_read: { type: [string, "null"], format: date-time }
+        vitals:
+          type: array
+          description: Worst first; at most 30.
+          items:
+            type: object
+            required: [path, device, visits, lcp_ms, inp_ms, cls, poor]
+            properties:
+              path: { type: string }
+              device: { type: string }
+              visits: { type: integer }
+              lcp_ms: { type: [number, "null"] }
+              inp_ms: { type: [number, "null"] }
+              cls: { type: [number, "null"] }
+              poor: { type: array, items: { type: string, enum: [lcp, inp, cls] } }
+        summary:
+          type: object
+          required: [errors, warnings, notices, new_pages, fixed_pages, robots_changed, poor_vitals, sitemap_errors]
+          properties:
+            errors: { type: integer }
+            warnings: { type: integer }
+            notices: { type: integer }
+            new_pages: { type: integer }
+            fixed_pages: { type: integer }
+            robots_changed: { type: integer }
+            poor_vitals: { type: integer }
+            sitemap_errors: { type: integer }
+        notes: { type: array, items: { type: string } }
+    SEOCountryMetrics:
+      type: object
+      required: [clicks, impressions, ctr, position]
+      properties:
+        clicks: { type: number }
+        impressions: { type: number }
+        ctr: { type: [number, "null"] }
+        position: { type: [number, "null"] }
+    SEOCountryPages:
+      type: object
+      required: [prefix, from, to, previous_from, previous_to, templates, pages, summary, notes]
+      properties:
+        prefix: { type: string }
+        from: { type: [string, "null"], format: date }
+        to: { type: [string, "null"], format: date }
+        previous_from: { type: [string, "null"], format: date }
+        previous_to: { type: [string, "null"], format: date }
+        templates:
+          type: array
+          items:
+            type: object
+            required: [template, pages, clicks, previous_clicks, median_position, median_previous, top10, striking, untracked]
+            properties:
+              template: { type: string }
+              pages: { type: integer }
+              clicks: { type: number }
+              previous_clicks: { type: number }
+              median_position: { type: [number, "null"] }
+              median_previous: { type: [number, "null"] }
+              top10: { type: integer }
+              striking: { type: integer }
+              untracked: { type: integer }
+        template_choices:
+          type: array
+          description: Templates with at least three pages, to use as a prefix.
+          items:
+            type: object
+            required: [template, pages]
+            properties:
+              template: { type: string }
+              pages: { type: integer }
+        pages:
+          type: array
+          description: Most impressions first; at most 500.
+          items:
+            type: object
+            required: [url, path, template, locale, target_country, country_from, keyword, current, previous, all_countries, tracked_position, tracked_previous, tracked_url, tracked_day, position, band, untracked]
+            properties:
+              url: { type: string }
+              path: { type: string }
+              template: { type: string }
+              locale: { type: string }
+              target_country: { type: string, description: "ISO 3166-1 alpha-3, lowercase." }
+              country_from: { type: string, enum: [tracked, search] }
+              keyword: { type: string }
+              current: { $ref: "#/components/schemas/SEOCountryMetrics" }
+              previous: { $ref: "#/components/schemas/SEOCountryMetrics" }
+              all_countries: { $ref: "#/components/schemas/SEOCountryMetrics" }
+              tracked_position: { type: [integer, "null"] }
+              tracked_previous: { type: [integer, "null"] }
+              tracked_url: { type: string }
+              tracked_day: { type: [string, "null"], format: date }
+              position: { type: [number, "null"] }
+              band: { type: string, enum: [top3, top10, striking, beyond, none] }
+              untracked: { type: boolean }
+        summary:
+          type: object
+          required: [pages, top3, top10, striking, beyond, none, untracked]
+          properties:
+            pages: { type: integer }
+            top3: { type: integer }
+            top10: { type: integer }
+            striking: { type: integer }
+            beyond: { type: integer }
+            none: { type: integer }
+            untracked: { type: integer }
+        notes: { type: array, items: { type: string } }
+    SEOCannibalisation:
+      type: object
+      required: [search_through, clusters, resolved, summary, notes]
+      properties:
+        search_through: { type: [string, "null"], format: date }
+        clusters:
+          type: array
+          items:
+            type: object
+            required: [site_id, host, query, clicks, impressions, pages, keep, keep_reason, state, previous_pages, locale, split_clicks, estimated_gain, fix]
+            properties:
+              site_id: { type: string, format: uuid }
+              host: { type: string }
+              query: { type: string }
+              clicks: { type: integer }
+              impressions: { type: integer }
+              pages:
+                type: array
+                items:
+                  type: object
+                  required: [url, clicks, impressions, position, share, target]
+                  properties:
+                    url: { type: string }
+                    clicks: { type: integer }
+                    impressions: { type: integer }
+                    position: { type: number }
+                    share: { type: number }
+                    target: { type: boolean }
+              keep: { type: string }
+              keep_reason: { type: string, enum: [chosen, target, clicks] }
+              state: { type: string, enum: [new, ongoing, gained_page] }
+              previous_pages: { type: integer }
+              locale: { type: string, enum: [same_locale, cross_locale] }
+              split_clicks: { type: integer, description: Clicks the pages other than the one to keep got. }
+              estimated_gain: { type: integer, description: "Clicks if the page to keep got every impression at its own CTR, less the clicks now." }
+              fix:
+                oneOf:
+                  - type: "null"
+                  - type: object
+                    required: [id, status]
+                    properties:
+                      id: { type: string, format: uuid }
+                      status: { type: string, enum: [open, in_progress, done] }
+        resolved:
+          type: array
+          items:
+            type: object
+            required: [site_id, host, query, pages]
+            properties:
+              site_id: { type: string, format: uuid }
+              host: { type: string }
+              query: { type: string }
+              pages: { type: integer }
+        summary:
+          type: object
+          required: [open, new, gained_page, resolved, on_fixes, not_on_fixes, three_or_more, cross_locale, split_clicks, estimated_gain]
+          properties:
+            open: { type: integer }
+            new: { type: integer }
+            gained_page: { type: integer }
+            resolved: { type: integer }
+            on_fixes: { type: integer }
+            not_on_fixes: { type: integer }
+            three_or_more: { type: integer }
+            cross_locale: { type: integer }
+            split_clicks: { type: integer }
+            estimated_gain: { type: integer }
+        notes: { type: array, items: { type: string } }
+    SEODeclineSplit:
+      type: object
+      required: [key, clicks, previous_clicks]
+      properties:
+        key: { type: string }
+        clicks: { type: number }
+        previous_clicks: { type: number }
+    SEODeclining:
+      type: object
+      required: [days, from, to, previous_from, previous_to, rpc, summary, pages, notes]
+      properties:
+        days: { type: integer }
+        from: { type: [string, "null"], format: date }
+        to: { type: [string, "null"], format: date }
+        previous_from: { type: [string, "null"], format: date }
+        previous_to: { type: [string, "null"], format: date }
+        rpc: { type: [number, "null"], description: Revenue per organic click used for the modeled loss. }
+        summary:
+          type: object
+          required: [new, still, recovering, clicks_lost, modeled_loss]
+          properties:
+            new: { type: number }
+            still: { type: number }
+            recovering: { type: number }
+            clicks_lost: { type: number }
+            modeled_loss: { type: number }
+        pages:
+          type: array
+          description: Most clicks lost first; at most 200.
+          items:
+            type: object
+            required: [host, path, url, cohort, clicks, previous_clicks, earlier_clicks, change, impressions, previous_impressions, position, previous_position, ctr, previous_ctr, driver, signups, previous_signups, revenue, previous_revenue, modeled_loss, top_country, top_device, top_query, countries, technical, competing_pages]
+            properties:
+              host: { type: string }
+              path: { type: string }
+              url: { type: string }
+              cohort: { type: string, enum: [new, still, recovering] }
+              clicks: { type: number }
+              previous_clicks: { type: number }
+              earlier_clicks: { type: number, description: Clicks in the period before the previous one. }
+              change: { type: number, description: "Clicks against before, -1 to any; 0 without clicks before." }
+              impressions: { type: number }
+              previous_impressions: { type: number }
+              position: { type: [number, "null"] }
+              previous_position: { type: [number, "null"] }
+              ctr: { type: [number, "null"] }
+              previous_ctr: { type: [number, "null"] }
+              driver: { type: string, enum: [clicks, impressions, position, ctr], description: What moved most. }
+              signups: { type: [number, "null"] }
+              previous_signups: { type: [number, "null"] }
+              revenue: { type: [number, "null"] }
+              previous_revenue: { type: [number, "null"] }
+              modeled_loss: { type: number, description: "Clicks lost times rpc; 0 for a recovering page." }
+              top_country: { oneOf: [{ $ref: "#/components/schemas/SEODeclineSplit" }, { type: "null" }] }
+              top_device: { oneOf: [{ $ref: "#/components/schemas/SEODeclineSplit" }, { type: "null" }] }
+              top_query: { oneOf: [{ $ref: "#/components/schemas/SEODeclineSplit" }, { type: "null" }] }
+              countries: { type: array, description: "Up to five countries that lost most, ISO 3166-1 alpha-3.", items: { $ref: "#/components/schemas/SEODeclineSplit" } }
+              technical: { type: string, enum: ["", server_error, not_found, redirect, noindex], description: From the latest finished crawl. }
+              competing_pages: { type: integer, description: Other pages with at least 10 impressions for the top losing query. }
+        notes: { type: array, items: { type: string } }
+    SEOMoneyQuery:
+      type: object
+      required: [query, url, impressions, clicks, ctr, position, expected_ctr, extra_clicks, extra_revenue, link_orders]
+      properties:
+        query: { type: string }
+        url: { type: string }
+        impressions: { type: number }
+        clicks: { type: number }
+        ctr: { type: number }
+        position: { type: number }
+        expected_ctr: { type: number, description: The expected CTR for its position. }
+        extra_clicks: { type: number, description: "Clicks it would gain: at position 3 (positions), or at the expected CTR (low_ctr)." }
+        extra_revenue: { type: number, description: extra_clicks times rpc. }
+        link_orders: { type: integer }
+        target_position: { type: integer, description: The position the gain is counted at (positions only). }
+        target_ctr: { type: number }
+    SEOMoney:
+      type: object
+      required: [search_through, from, to, previous_from, previous_to, rpc, rpc_source, organic_revenue, organic_clicks, totals, losing_pages, positions, low_ctr, expected_ctr, notes]
+      properties:
+        search_through: { type: [string, "null"], format: date }
+        from: { type: [string, "null"], format: date }
+        to: { type: [string, "null"], format: date }
+        previous_from: { type: [string, "null"], format: date }
+        previous_to: { type: [string, "null"], format: date }
+        rpc: { type: [number, "null"], description: Revenue per organic click in USD used for every dollar figure. }
+        rpc_source: { type: string, enum: [measured, set, none], description: "measured from the brand's own data, set by the caller, or none (no revenue or clicks)." }
+        organic_revenue: { type: [number, "null"], description: First-touch organic revenue in the 28 days. }
+        organic_clicks: { type: [number, "null"], description: Search Console clicks in the 28 days. }
+        totals:
+          type: object
+          required: [lost, positions_4_20, low_ctr]
+          properties:
+            lost: { type: number }
+            positions_4_20: { type: number }
+            low_ctr: { type: number }
+        losing_pages:
+          type: array
+          description: Pages with at least 10 fewer clicks than in the 28 days before, most lost first; at most 100.
+          items:
+            type: object
+            required: [host, path, clicks, previous_clicks, lost_clicks, modeled_loss, revenue, previous_revenue, revenue_change, position, previous_position, link_orders]
+            properties:
+              host: { type: string }
+              path: { type: string }
+              clicks: { type: number }
+              previous_clicks: { type: number }
+              lost_clicks: { type: number }
+              modeled_loss: { type: number, description: lost_clicks times rpc. }
+              revenue: { type: [number, "null"] }
+              previous_revenue: { type: [number, "null"] }
+              revenue_change: { type: [number, "null"], description: The page's own first-touch revenue change; null when it has none. }
+              position: { type: [number, "null"] }
+              previous_position: { type: [number, "null"] }
+              link_orders: { type: integer }
+        positions: { type: array, description: "Query and page pairs in positions 4 to 20 with at least 100 impressions, most extra clicks first; at most 100.", items: { $ref: "#/components/schemas/SEOMoneyQuery" } }
+        low_ctr: { type: array, description: "Pairs with at least 1000 impressions and a CTR under 70% of the expected; at most 100.", items: { $ref: "#/components/schemas/SEOMoneyQuery" } }
+        expected_ctr: { type: array, description: "The expected CTR curve, positions 1 to 20.", items: { type: number } }
+        notes: { type: array, items: { type: string } }
     SEOTargetWindow:
       type: object
       required: [clicks, impressions, position]
@@ -76260,7 +77636,7 @@ components:
           type: array
           items:
             type: object
-            required: [id, site_id, host, url, primary, secondary, tracked, competing, checks, band, trend, updated_at]
+            required: [id, site_id, host, url, primary, secondary, tracked, competing, checks, intent, page_type, summary_length, status, owner, suggestions, band, trend, updated_at]
             properties:
               id: { type: string, format: uuid }
               site_id: { type: string, format: uuid }
@@ -76301,12 +77677,29 @@ components:
                   in_title: { type: [boolean, "null"] }
                   in_h1: { type: [boolean, "null"] }
                   in_description: { type: [boolean, "null"] }
+              intent: { type: string, enum: ["", informational, commercial, transactional, navigational] }
+              page_type: { type: string, enum: ["", homepage, product, pricing, use-case, comparison, blog, location, tool, docs, other] }
+              summary_length: { type: integer }
+              status:
+                type: string
+                enum: [on_target, cannibalized, wrong_intent, missing_content, no_data]
+                description: "The first that applies: cannibalized (another page gets more impressions for the keyword, or the rank tracker finds another page), wrong_intent (the page type rarely answers the intent), missing_content (the keyword not in the title or H1, or a secondary keyword not in the summary), no_data (no impressions, rank or crawl), else on_target."
+              owner: { type: [string, "null"], description: The page that ranks for the keyword instead, when cannibalized. }
+              suggestions:
+                type: array
+                items:
+                  type: object
+                  required: [kind, text]
+                  properties:
+                    kind: { type: string, enum: [title, h1, description, internal_link, retarget, intent, cover, summary, striking] }
+                    text: { type: string }
+                    url: { type: string, description: The other page it is about. }
               band: { type: string, enum: [top3, top10, striking, beyond, none], description: "From the newest tracked rank, else Search Console's position. striking is 11 to 20." }
               trend: { type: string, enum: [improved, declined, steady, unknown], description: "Search Console's 28-day position against the 28 days before, by 1 or more." }
               updated_at: { type: string, format: date-time }
         summary:
           type: object
-          required: [targets, top3, top10, striking, beyond, none, improved, declined, competing, missing_on_page, untracked]
+          required: [targets, top3, top10, striking, beyond, none, improved, declined, competing, missing_on_page, untracked, on_target, cannibalized, wrong_intent, missing_content, no_data, no_summary]
           properties:
             targets: { type: integer }
             top3: { type: integer }
@@ -76319,6 +77712,12 @@ components:
             competing: { type: integer, description: Targets with another page competing for the keyword. }
             missing_on_page: { type: integer, description: Targets whose keyword is missing from the title or H1. }
             untracked: { type: integer, description: Targets whose keyword the rank tracker does not check. }
+            on_target: { type: integer }
+            cannibalized: { type: integer }
+            wrong_intent: { type: integer }
+            missing_content: { type: integer }
+            no_data: { type: integer }
+            no_summary: { type: integer, description: Targets without a page summary. }
         notes: { type: array, items: { type: string } }
     SEOBoardMetrics:
       type: object
@@ -76377,16 +77776,24 @@ components:
               previous_revenue: { type: [number, "null"] }
         countries:
           type: array
-          description: "Search Console clicks by country for the picked tile, most first. Conversions have no country."
+          description: |
+            Search Console clicks by country for the picked tile, most first, with first-touch Organic Search sessions, their average
+            time on the site, signups, payments and revenue by the visitor's country from the brand's analytics tool (PostHog). A country
+            that paid without stored clicks is added after the others.
           items:
             type: object
-            required: [country, clicks, impressions, position, previous_clicks]
+            required: [country, clicks, impressions, position, previous_clicks, organic_sessions, avg_session_seconds, signups, payments, revenue_usd]
             properties:
               country: { type: string, description: "ISO 3166-1 alpha-3, lowercase, as Search Console names it." }
               clicks: { type: number }
               impressions: { type: number }
               position: { type: [number, "null"] }
               previous_clicks: { type: number }
+              organic_sessions: { type: integer }
+              avg_session_seconds: { type: [number, "null"], description: Average time on the site of those sessions. }
+              signups: { type: integer }
+              payments: { type: integer }
+              revenue_usd: { type: number, description: "US dollars, only USD payments, each counted once." }
         notes: { type: array, items: { type: string } }
     SEOOverviewSource:
       type: object
@@ -78256,6 +79663,34 @@ components:
         pushed_at: { type: [string, "null"], format: date-time }
         pulled_count: { type: integer }
         pushed_count: { type: integer }
+        last_error: { type: [string, "null"] }
+        error_code: { type: [string, "null"] }
+    GuardListSync:
+      type: object
+      required: [integration_id, connector, name, mode, reason, source, enabled, interval_minutes, default_interval_minutes, fresh, running,
+        backfilled_at, attempted_at, succeeded_at, retry_at, last_added, last_removed, last_duration_ms, added_count, removed_count, entries, last_error, error_code]
+      properties:
+        integration_id: { type: string, format: uuid }
+        connector: { type: string, example: accountlookup }
+        name: { type: string }
+        mode: { type: string, enum: [feed, snapshot], description: "feed: each sync reads only what came after the last cursor. snapshot: each sync reads the whole list, and entries that left it are removed." }
+        reason: { $ref: "#/components/schemas/SuppressionReason" }
+        source: { type: string, description: "The source its opt-out list entries carry: <connector>_sync." }
+        enabled: { type: boolean }
+        interval_minutes: { type: integer, description: How often it is read. }
+        default_interval_minutes: { type: integer }
+        fresh: { type: boolean, description: "The copy stands in for the guard when companies are checked: the whole list was read once and the last sync succeeded within twice the interval." }
+        running: { type: boolean }
+        backfilled_at: { type: [string, "null"], format: date-time, description: When the whole list had first been read. }
+        attempted_at: { type: [string, "null"], format: date-time }
+        succeeded_at: { type: [string, "null"], format: date-time }
+        retry_at: { type: [string, "null"], format: date-time, description: "After a failure, when it is tried again." }
+        last_added: { type: integer }
+        last_removed: { type: integer }
+        last_duration_ms: { type: integer }
+        added_count: { type: integer }
+        removed_count: { type: integer }
+        entries: { type: integer, description: How many opt-out list entries came from it. }
         last_error: { type: [string, "null"] }
         error_code: { type: [string, "null"] }
     EmailGuardrails:
@@ -83733,6 +85168,11 @@ components:
             key: { type: string, description: "PostHog project key (public, it ships to the browser).", example: phc_abc123 }
             api_host: { type: string, example: /ingest }
             ui_host: { type: string, example: "https://us.posthog.com" }
+        ui_events:
+          type: boolean
+          description: |
+            Present and true when the server keeps events (OUTFLARE_EVENTS_WORKSPACE or OUTFLARE_POSTHOG_KEY). The web
+            app then posts its own events to POST /v1/ui-events once someone is signed in.
     Passkey:
       type: object
       required: [id, name, created_at, last_used_at, synced]
@@ -87801,6 +89241,68 @@ components:
                 type: integer
                 minimum: 0
                 maximum: 3650
+        removal:
+          readOnly: true
+          description: The brand's rule for a paid link removed after payment, copied in when the offer is sent. Ignored on input.
+          allOf:
+          - $ref: '#/components/schemas/PartnerLinkRule'
+    PartnerLinkRule:
+      type: object
+      required:
+      - removal
+      - restore_days
+      - guarantee_months
+      properties:
+        removal:
+          type: string
+          enum:
+          - restore_or_refund
+          - restore_or_refund_forever
+          - shrinking_refund
+          - warn_only
+          description: restore_or_refund asks the site owner to restore the link within restore_days or refund it, for guarantee_months after it goes live; restore_or_refund_forever has no time limit; shrinking_refund lowers the refund evenly to nothing over guarantee_months; warn_only only tells you.
+        restore_days:
+          type: integer
+          minimum: 1
+          maximum: 90
+        guarantee_months:
+          type: integer
+          minimum: 1
+          maximum: 120
+    PartnerOfferTemplateInput:
+      type: object
+      required:
+      - name
+      - config
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+        config:
+          $ref: '#/components/schemas/PartnerProposalConfig'
+    PartnerOfferTemplate:
+      type: object
+      required:
+      - id
+      - name
+      - config
+      - created_at
+      - updated_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        config:
+          $ref: '#/components/schemas/PartnerProposalConfig'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
     PartnerProposal:
       type: object
       required:
@@ -87844,6 +89346,7 @@ components:
         progress:
           type: object
           additionalProperties: true
+          description: Delivery, milestone and quote state. counters lists the recipient's counter-offers in order (round, amount_cents with 0 meaning the offered price, changes per deliverable id with placement_url, link_text and deadline, note, at, accepted_at); status is quote_received while the latest one waits for you.
         accepted_at:
           type:
           - string

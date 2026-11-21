@@ -125,13 +125,15 @@ are not added up across platforms as if they were.
 
 ## Reading it
 
-In the app, open **Paid ads** in the sidebar. The page is for one goal: more paying customers at or under your target cost. It has seven tabs, each with its own address, and one date menu (Today, Yesterday, the last 7, 28, 30 or 90 days, this month, last month or a custom range).
+In the app, open **Paid ads** in the sidebar. The page is for one goal: more paying customers at or under your target cost. It has nine tabs, each with its own address, and one date menu (Today, Yesterday, the last 7, 28, 30 or 90 days, this month, last month or a custom range).
 
 | Tab | What it is for |
 | --- | --- |
-| **Overview** | Pick all networks, one network or one ad account at the top, and everything below follows it. One sentence says where you stand against your target, then cost per new customer, cost per sign-up, new customers, spend, revenue and return. Campaigns named for your brand are judged apart from everything else, so a cheap average doesn't hide an expensive campaign. **Do this next** lists the three open actions with the biggest effect, and a funnel shows ad clicks, sign-ups and first payments. Every number reads the same rows, so they can't disagree. |
+| **Overview** | Pick all networks, one network or one ad account at the top, and everything below follows it. One sentence says where you stand against your target, then your numbers (cost per new customer, cost per sign-up, new customers, spend, revenue and return unless you [choose others](#the-overviews-numbers)), each against the period before and your target. Campaigns named for your brand are judged apart from everything else, so a cheap average doesn't hide an expensive campaign. **Do this next** lists the three open actions with the biggest effect, and a funnel shows ad clicks, sign-ups and first payments. Every number reads the same rows, so they can't disagree. |
+| **Whole business** | All your ad spend against all your revenue, whichever ad got the credit, with payback by month ([Whole business](#whole-business-all-ad-spend-against-all-revenue)). |
 | **Actions** | One table of what to do: **Fix** (something is broken), **Cut waste**, **Grow** and **Experiment**, each with why, the expected effect and one main button. Views: To do, In progress, Done and Dismissed. A switch turns recommendations on or off; while off, what Outflare would have recommended is under Preview. Nothing changes in an ad account until you approve it, and a budget raise shows the budget before and after and the most it can add a month. |
 | **Campaigns** | Every campaign with what it spent and brought; open one for its ad groups, ads, keywords and searches. Tables start on **All enabled**, with a **Status** filter (All enabled, All but removed, All) and two total rows under each: one for the rows shown and one for all of them. **All** includes paused campaigns that have never spent. Tick rows (or the box in the header to tick every row shown) to change many at once: campaigns can be paused, resumed, given a new daily budget or removed; ad groups and ads paused or resumed; and, on Google Ads, ads and keywords removed. Before anything changes, a confirmation lists each row with its status and what it spent over the last 30 days. For Google Ads, an enabled campaign, ad group or ad also says whether it is really serving, in Google's words (Eligible, Limited by budget, Limited by bidding, Learning, Not eligible), with Google's reasons on hover, and the table has Google's Optimization score and **Room to grow**: the share of searches a search campaign missed over the last 7 days because its budget ran out, and because others ranked higher. Sort by it to see where a raise would buy the most. |
+| **Creatives** | Every ad as a large preview, scored step by step, with a verdict: scale, keep, fix, stop or too early ([Creatives](#creatives-which-ads-to-scale-fix-or-stop)). |
 | **Customers** | The people your ads brought, and which campaign each came from. |
 | **Audiences** | Lists of your people sent to the ad networks you choose ([Audiences](#audiences-one-list-several-ad-networks)). |
 | **Experiments** | Tests the ad network splits fairly, and how each change you approved turned out. |
@@ -226,6 +228,79 @@ same rows. It takes `level` (`campaign`, `adset` or `ad`), `from`, `to`,
 `model` and `brand`. Meta and Google ad sets and ads come with their names and
 spend; other platforms sync campaigns only, so their ad sets and ads come with
 first-party numbers but no name or spend.
+
+### Counting by another attribution model
+
+Outflare ties each sign-up to the last ad click before it. To see the same campaigns under another of your attribution models, pick it under **Also count by** on the Campaigns table. Outflare remembers the choice per brand. The table then shows three answers side by side: the last ad click, the model you picked, and the network's own count (**Network says**).
+
+A model splits a conversion between visits, so its sign-ups can be a fraction. In the API, pass `model=` to `GET /v1/brands/{brand}/ads/performance` (`first_touch`, `linear`, `last_non_direct`, or the id of one of your own models): each row also carries `model_signups`, `model_revenue`, `model_cost_per_signup_micros` and `model_roas`.
+
+### The Overview's numbers
+
+The Overview opens on six numbers: cost per new customer, cost per sign-up, new customers, spend, revenue and return on ad spend. Each shows its change against the period it is compared with, the old number, a small chart of the range, and a coloured word against your target for it. **Compared with** switches between the days straight before the range and the same days a year earlier.
+
+**Choose numbers** opens a panel where you pick up to eight numbers (sign-ups, clicks, cost per click, click to sign-up rate and the networks' own conversions are the others), put them in order and set a target beside each. Nothing changes until you press **Save**.
+
+A monthly target is judged by the share of a month the range covers, so 50 new customers a month is 47 for a range of 28 days. A cost within a tenth of its target is on target; under it there is room to spend more; over it costs too much. The monthly budget is only compared against: nothing stops spending, which is what the daily budget ceiling is for.
+
+### How far video ads are watched
+
+For video ads, Meta and TikTok also say how far people watched. Turn on the columns **Watched**, **Hook rate**, **Hold rate** and **Watched to the end** in the campaign, ad set and ad tables:
+
+- **Hook rate**: video views out of everyone who saw the ad. It says how often the opening stops the scroll. A view is 3 seconds or more on Meta and 2 on TikTok.
+- **Hold rate**: plays that kept going (Meta's ThruPlays, 15 seconds or the whole video; 6 seconds or more on TikTok) out of video views.
+
+The columns are empty for ads without a video. In the API the rows carry `video_views`, `video_thruplays`, `video_p25` to `video_p100`, `hook_rate` and `hold_rate`.
+
+### Would matching by network and device help?
+
+Outflare ties a visit to a person only by what the browser itself says: a sign-in, a click in an email it sent, or a visitor link. So someone who clicks an ad on a phone and signs up on a laptop is not credited to the ad. Some tools close that gap by guessing: two browsers on the same network, in the same place, on the same kind of device are called one person. Outflare doesn't do that. This check tells you what you would gain and risk if it did, before anything changes.
+
+**Paid ads → Settings → Tracking → Run the check** reads the visits you already have. It collects nothing new, joins nothing and changes no credit. It says:
+
+- **Would credit**: known people no ad is credited with today, for whom exactly one unknown browser with the same network, place and device clicked an ad shortly before.
+- **Could not decide**: people for whom more than one such browser fits, or who share a network with many others (an office, a mobile carrier).
+- **How often the guess is right**: tested on pairs of browsers whose owners are both known.
+- **A verdict**: worth testing (right at least 90% of the time and at least 5% more people credited), not worth it, or not enough data.
+
+Outflare stores no IP address or user agent with a visit, so the check is coarser than what such tools use; read its accuracy as a lower bound. In the API: `GET /v1/brands/{brand}/ads/match-check?days=30` (MCP: `get_ads_match_check`).
+
+## Whole business: all ad spend against all revenue
+
+**Paid ads → Whole business** leaves attribution out of its headline. It sets every payment the brand received (less refunds, from ads or not) against what every connected network charged in the same days: "Every $1 of ads brought back $3.90 in revenue." No network's own counting can move that number.
+
+- **The five numbers**: total revenue, ad spend on all networks, revenue per unit of ad spend (judged against your return on ad spend target), new customers from all sources (people whose first ever payment fell in the range, and how many of them an ad click brought), and the blended cost per new customer. Each is compared with the same number of days just before.
+- **Ad spend against total revenue, by week**: a bar per week with a colour per network, and all revenue as a line over it.
+- **Where the money went**: per network, its spend and share, the conversions the network says it won, and the new paying customers Outflare traced to its clicks. Two networks can claim the same customer, so their total is often higher than the real one.
+- **Do new customers pay back what they cost?** One row per month for the last five: the people who first paid that month, the month's ad spend divided by them, and what a customer had paid 30, 60, 90 and 120 days after their first payment. A column fills in once at least half of the month's customers have had that long. **Paid back in** is the day that revenue reaches the cost; "about" means the month isn't there yet and the number carries its pace so far forward.
+
+Everything is in the brand's currency. Money in a currency with no exchange rate is left out, and **How this is counted** names it. **Download CSV** saves every number on the page. In the API: `GET /v1/brands/{brand}/ads/business` (MCP: `get_ads_business`).
+
+## Creatives: which ads to scale, fix or stop
+
+**Paid ads → Creatives** shows every ad that ran in the period as a large preview with its verdict, most spend first. Switch between **Gallery** and **List** at the top right; Outflare remembers your choice for the brand. Filter by verdict or by network.
+
+Each ad is scored step by step, so you can see where it loses people:
+
+| Step | What it measures | Shown for |
+| --- | --- | --- |
+| Hook | Plays past the opening, out of everyone who saw it | Video |
+| Hold | Plays to the end, out of plays past the opening | Video |
+| Click | Clicks, out of everyone who saw it | All ads |
+| Sign up | Sign-ups, out of clicks | All ads |
+| Pay | First payments, out of sign-ups | All ads |
+
+A step gets a grade against the usual rate of your own ads on the same network over the same days: **A** at 1.3 times usual or more, **B** from 0.9, **C** from 0.6 and **D** below. A step has no grade until it has enough data. Sign-ups and payments are Outflare's own count, not the network's.
+
+The verdict follows from the grades and your target cost per new paying customer:
+
+- **Scale**: at or under the target with at least two new paying customers and no D.
+- **Keep**: doing its job; nothing to change.
+- **Fix**: one step is graded C or D. The card names the weakest one.
+- **Stop**: it spent twice the target without one paying customer, or costs over 1.5 times the target.
+- **Too early**: not enough data yet.
+
+Without a target no ad is marked Scale or Stop. **Pause** pauses the ad in the network after you confirm; **Open campaign** takes you to its campaign to change the budget. In the API: `GET /v1/brands/{brand}/ads/creatives/results` (MCP: `list_ad_creative_results`).
 
 ## Sending conversions back
 
@@ -447,6 +522,14 @@ Outbrain Ads only reads: the Amplify API has no call that takes conversions.
 Outbrain's click id (`ob_click_id`) is still recorded on each visit, so its
 clicks count in Outflare's own attribution.
 
+### Match quality
+
+Sending a conversion is only half of it: the network also has to tie it to one of its own accounts. Once a network reports how well it can, **Paid ads → Settings → Send conversions** shows a second table. Today that is Meta's event match quality, a score out of 10 per event on each pixel you send to.
+
+Outflare reads it once a day with your own Meta connection and shows the latest score, the average over the week before, the share of events that carried each identifier (email, phone, IP address, browser, Meta's click id) and, in Meta's own words, what it found wrong and how to fix it. The status is **Good**, **Low** (under 6), **Fell** (a point or more under the week before) or **No score yet**. An event that reads Low or Fell raises an [alert](/docs/guides/alerts/), at most once a week per event.
+
+Your Meta token needs `ads_read` with `ads_management` or `business_management`, and its user needs access to the pixel. Without them the table stays empty and says why. `GET /v1/brands/{brand}/ads/match-quality` returns the same rows with the score per day over 30 days (MCP: `get_ad_match_quality`).
+
 ## Audiences: one list, several ad networks
 
 An **audience** is one of the brand's lists of people (a smart list such as
@@ -615,6 +698,31 @@ it with `{"test": true}` to start the test. Changes that only save money
 are made, not tested.
 
 X Ads has no tests here: X splits an audience only between campaigns that already exist and offers no way to copy a campaign with its ads, so change an X budget directly and compare the days before and after.
+
+## Holdout tests
+
+Attribution says which ad a person clicked before they signed up. It can't say whether they would have signed up anyway. A holdout test answers that by going without: keep your ads out of a few countries for some weeks, and Outflare compares sign-ups from those countries with sign-ups from everywhere else, before and during. If the other countries held steady and the held-out ones dropped, the drop is what the ads were adding there.
+
+1. On **Paid ads → Experiments → Holdout tests**, press **New holdout**. Pick the countries, the first and last day (7 to 90 days), and whether every network's ads are off there or only one's. Pick countries that together bring a steady share of your sign-ups (at least 30 over as many days as the holdout runs), and not your biggest one.
+2. Exclude those countries on every campaign for the same days, in the network or on the campaign's page. **Outflare changes no campaign for a holdout**; it only counts.
+3. Read the result as it fills in. Take the exclusions off when it ends, or press **End today** to end it early.
+
+| Result | Meaning |
+| --- | --- |
+| The ads add sign-ups | The drop is more than chance explains. |
+| The ads add little | A real drop, but under a third of what the ads are credited with. |
+| No difference found | The held-out countries did about as well without ads. |
+| Ads still showing there | Paid clicks kept arriving from the held-out countries: check that every campaign excludes them. |
+| Too few sign-ups to say | Under 30 sign-ups before the start, there or elsewhere. |
+
+Each result also says how many sign-ups the ads were adding and what share that is of the sign-ups attribution had credited to them: 80% means four in five credited sign-ups were really won by the ads, and the fifth would have come anyway.
+
+| Call | What it does |
+| --- | --- |
+| `GET /v1/brands/{brand}/ads/holdouts` | The brand's holdouts with their results (MCP: `list_ad_holdouts`) |
+| `POST /v1/brands/{brand}/ads/holdouts` | Note a holdout: `name`, `countries`, `starts_on`, `ends_on` and an optional `connector` (`create_ad_holdout`) |
+| `POST /v1/brands/{brand}/ads/holdouts/{id}/end` | End a running holdout today (`end_ad_holdout`) |
+| `DELETE /v1/brands/{brand}/ads/holdouts/{id}` | Delete the note (`delete_ad_holdout`) |
 
 ## Managing campaigns
 
