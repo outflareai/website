@@ -2,7 +2,7 @@
 	"version": "2026.11.21",
 	"date": "2026-11-21",
 	"status": "in-progress",
-	"updated": "2026-11-21T15:51:50Z",
+	"updated": "2026-11-21T16:12:15Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -325,7 +325,42 @@
 			"edition": "open-source",
 			"text": "SEO targets: the page and its target keyword are now separate columns, each sortable, with a filter row under the headers for page, keyword, status, intent, page type and band.",
 			"at": "2026-11-21T15:51:50Z"
+		},
+		{
+			"kind": "fix",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Website tracking no longer fails a visitor's events when a page title or URL holds a hidden null character, cookie reports skip it too, EmailBison now gets your opt-out list as the CSV upload its API expects, and an expired desktop sign-in or a search provider out of credits counts as yours to fix rather than an error.",
+			"at": "2026-11-21T16:12:15Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Funnels now say whether a drop-off can be trusted. They warn when a step's data stopped, never arrived or isn't linked to the earlier steps, and Check this step shows each step on its own and opens the funnel from that step in a tab. Long funnels open as a list that names the biggest drop.",
+			"at": "2026-11-21T16:12:15Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Say what you want, on Start here in Paid ads, Creatives: describe an ad in your own words and your own AI model drafts a skill (picture prompt and words) to read, change and save. Nothing is made until you do.",
+			"at": "2026-11-21T16:12:15Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Funnels can now have up to 20 steps instead of 10, so a long journey such as ad visit, download, install, sign-up and first use fits in one funnel. A long funnel scrolls sideways on the Funnels page instead of squeezing its bars.",
+			"at": "2026-11-21T16:12:15Z"
+		},
+		{
+			"kind": "fix",
+			"area": "agents",
+			"edition": "cloud",
+			"text": "The brand agent now reads your whole Brand profile. A well-filled profile was longer than the agent's reading limit, so the confirmed facts and personas at the end were cut off; the limit is higher, and when a brand's context is still too long the notes and what was read from the website give way before anything a person confirmed.",
+			"at": "2026-11-21T16:12:15Z"
 		}
 	],
-	"through": "6a25606+6a25606"
+	"through": "7a2eb8b+7a2eb8b"
 }
