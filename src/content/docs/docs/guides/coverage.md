@@ -7,7 +7,7 @@ sidebar:
 
 Presence shows everywhere your brand appears online, and the publishers, agencies, partners and creators behind it. Use it for earned articles, comparisons, profiles, case studies, backlinks, influencer posts, YouTube videos, forum threads, MCP directory and app store listings, paid editorial, newsletters and advertising. It was called Coverage before, and the API still uses that name.
 
-Choose a [brand](/docs/guides/brands/), then open **Outreach → Presence**. Its records belong to that brand. CRM permissions still control which contacts and conversations you can see.
+Choose a [brand](/docs/guides/brands/), then open **Partnerships → Live** (see [Partnerships](/docs/guides/partnerships/)). Its records belong to that brand. CRM permissions still control which contacts and conversations you can see.
 
 ## Find the right screen
 

@@ -9,7 +9,7 @@ sidebar:
 
 A partner program pays people who send you customers: affiliates, referrers and influencers. Each brand runs its own programs. A partner is a person in your [customer records](/docs/guides/customer-records/), and so is every customer they refer, so the CRM, attribution and lifecycle email all see the same people.
 
-Open **Partners** in a brand to make a program, add partners and set the rewards (a fixed amount for a sign-up, a percentage of each sale, or a bounty for any event you choose).
+Open **Partnerships → Affiliates** in a brand to make a program, add partners and set the rewards (a fixed amount for a sign-up, a percentage of each sale, or a bounty for any event you choose).
 
 **Program settings** (top right of the Partners page) opens a page of its own, in tabs: General, Payouts, Tracking, Fraud, Portal and Import. Change what you need on any tab and press **Save changes** at the foot of the page.
 
