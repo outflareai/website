@@ -40238,6 +40238,352 @@ paths:
         "400": { $ref: "#/components/responses/Error" }
         "409": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/coupons:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    get:
+      operationId: listBrandCoupons
+      x-outflare-access: { scope: partners.read, brand: true }
+      summary: List coupons
+      description: |
+        Scope: partners.read. The brand's coupons, newest first, each with the partner who earns from it and its
+        numbers (uses, paying customers, revenue, commission). summary counts the whole list, whatever the filters.
+
+        To copy coupons made in Outflare into your own product, call this with home=outflare and
+        updated_since set to the time of your last call, or listen for the coupon.created, coupon.updated and
+        coupon.deleted webhooks (docs/coupons.md).
+      tags: [coupons]
+      parameters:
+        - { name: q, in: query, description: "Search the code, the name, and the partner's name or email.", schema: { type: string, maxLength: 200 } }
+        - { name: status, in: query, description: Only coupons in this state., schema: { type: string, enum: [active, ending_soon, scheduled, ended, off, limit_reached, no_partner] } }
+        - { name: home, in: query, description: "Only coupons made there: outflare, product (your own product) or stripe.", schema: { type: string, enum: [outflare, product, stripe] } }
+        - { name: partner, in: query, description: Only this partner's coupons., schema: { type: string, format: uuid } }
+        - { name: updated_since, in: query, description: Only coupons made or changed at or after this time., schema: { type: string, format: date-time } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
+      responses:
+        "200":
+          description: Coupons.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, next_cursor, summary]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/Coupon" } }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+                  summary:
+                    type: object
+                    required: [total, active, ending_soon, ended, no_partner, uses_30d, uses_no_click_30d, unknown_codes, unknown_uses]
+                    properties:
+                      total: { type: integer }
+                      active: { type: integer }
+                      ending_soon: { type: integer, description: Ending within 14 days. }
+                      ended: { type: integer }
+                      no_partner: { type: integer, description: Coupons nobody earns from. }
+                      uses_30d: { type: integer }
+                      uses_no_click_30d: { type: integer, description: "Uses in the last 30 days by customers who never came through a partner's link." }
+                      unknown_codes: { type: integer, description: Codes customers used that are not on the list. }
+                      unknown_uses: { type: integer }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createBrandCoupon
+      x-outflare-access: { scope: partners.manage, brand: true }
+      summary: Create a coupon in Outflare
+      description: |
+        Scope: partners.manage. Adds a coupon made in Outflare (home outflare). code is required, and nothing else. partner_id
+        is the partner who earns when a customer uses the code; leave it out for a general offer. Uses of the
+        same code reported before it was added (unknown codes) become its uses.
+
+        Your product hears of it by the coupon.created webhook, or reads it from the list. A coupon your own
+        product makes is sent with PUT .../coupons/{coupon} instead. Sends coupon.created.
+      tags: [coupons]
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CouponInput" }
+      responses:
+        "201":
+          description: The coupon.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Coupon" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "400": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/coupons/{coupon}:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: coupon, in: path, required: true, description: "The coupon's id, or its code (any case).", schema: { type: string } }
+    get:
+      operationId: getBrandCoupon
+      x-outflare-access: { scope: partners.read, brand: true }
+      summary: Get a coupon
+      description: "Scope: partners.read. One coupon, by id or by code."
+      tags: [coupons]
+      responses:
+        "200":
+          description: The coupon.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Coupon" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateBrandCoupon
+      x-outflare-access: { scope: partners.manage, brand: true }
+      summary: Change a coupon
+      description: |
+        Scope: partners.manage. Changes only the fields sent. Who earns from the coupon (partner_id, clickless,
+        after_end) can be changed on any coupon. What the coupon is (name, gives, audience, dates, limits,
+        enabled) can only be changed here for a coupon made in Outflare: one made in your product is changed
+        there and sent again (409 otherwise). resolve settles a conflict. Sends coupon.updated.
+      tags: [coupons]
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CouponInput" }
+      responses:
+        "200":
+          description: The coupon.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Coupon" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    put:
+      operationId: putBrandCoupon
+      x-outflare-access: { scope: partners.conversions, brand: true }
+      summary: Send a coupon from your product
+      description: |
+        Scope: partners.conversions. For a coupon your own product makes: send it when it is created and
+        every time it changes, with its code in the address. The body is the whole coupon, so a field left
+        out goes back to its default. The first call adds it (201, home product); later calls update it
+        (200). Sending the same body again changes nothing.
+
+        Who earns from the coupon is chosen in Outflare, so partner_id, clickless and after_end are not
+        accepted here. When the code was already made in Outflare, the brand's rule decides
+        (GET .../coupon-settings, duplicate): by default the older coupon stays, the brand's team is asked
+        which to keep, and the answer is 409. Sends coupon.created or coupon.updated.
+      tags: [coupons]
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CouponDetailsInput" }
+      responses:
+        "200":
+          description: The coupon, updated.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Coupon" }
+        "201":
+          description: The coupon, added.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Coupon" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "400": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    delete:
+      operationId: deleteBrandCoupon
+      x-outflare-access: { scope: partners.manage, brand: true }
+      summary: Delete a coupon
+      description: |
+        Scope: partners.manage. Takes the coupon off the list. Its uses stay, as uses of a code that is not on
+        the list, and customers it brought stay with their partner. To stop a code without losing its
+        history, switch it off instead (enabled false). Sends coupon.deleted.
+      tags: [coupons]
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      responses:
+        "204": { description: Deleted. }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/coupons/{coupon}/check:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: coupon, in: path, required: true, description: "The code the customer typed (any case).", schema: { type: string } }
+    post:
+      operationId: checkBrandCoupon
+      x-outflare-access: { scope: partners.conversions, brand: true }
+      summary: Check a code at checkout
+      description: |
+        Scope: partners.conversions. Answers whether a code may be used right now, and what it gives, so a
+        checkout can ask before it accepts the code. It changes nothing and counts no use: report the use on
+        the payment (POST .../transactions, coupon). A code that is not on the list answers valid false with
+        reason unknown, never 404.
+      tags: [coupons]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                user_id: { type: string, maxLength: 200, description: "Your own id for the customer, to check the per-customer limit and new-customers-only." }
+                record_id: { type: string, format: uuid, description: "The customer's record, instead of user_id." }
+                amount_minor: { type: integer, minimum: 0, description: "The order's amount before the coupon, in minor units, to check the coupon's minimum." }
+      responses:
+        "200":
+          description: Whether the code may be used.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CouponCheck" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/coupons/{coupon}/uses:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: coupon, in: path, required: true, description: "The coupon's id, or its code.", schema: { type: string } }
+    get:
+      operationId: listBrandCouponUses
+      x-outflare-access: { scope: partners.read, brand: true }
+      summary: List a coupon's uses
+      description: "Scope: partners.read. Every sign-up and payment the code was used on, newest first, with what it gave, the payment, whether the customer also clicked the partner's link, and what the partner earned."
+      tags: [coupons]
+      parameters:
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Fields" }
+      responses:
+        "200":
+          description: Uses.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, next_cursor]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/CouponUse" } }
+                  next_cursor: { $ref: "#/components/schemas/NextCursor" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/coupon-bulk-edits:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    post:
+      operationId: bulkEditBrandCoupons
+      x-outflare-access: { scope: partners.manage, brand: true }
+      summary: Change several coupons at once
+      description: |
+        Scope: partners.manage. Switches coupons on or off, gives them to a partner or sets their end date,
+        all in one go. A coupon made in your product keeps its own switch and end date (it counts as
+        skipped); its partner can still be set. Sends coupon.updated for each coupon changed.
+      tags: [coupons]
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ids]
+              additionalProperties: false
+              properties:
+                ids: { type: array, minItems: 1, maxItems: 500, items: { type: string, format: uuid } }
+                enabled: { type: boolean }
+                partner_id: { type: [string, "null"], format: uuid, description: "The partner who earns from them; null takes the partner off." }
+                ends_at: { type: [string, "null"], format: date-time }
+      responses:
+        "200":
+          description: How many changed.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [changed, skipped]
+                properties:
+                  changed: { type: integer }
+                  skipped: { type: integer, description: "Coupons left as they were: not found, or made in your product." }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/coupon-uses/unknown:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    get:
+      operationId: listBrandUnknownCouponCodes
+      x-outflare-access: { scope: partners.read, brand: true }
+      summary: List codes customers used that are not on the list
+      description: "Scope: partners.read. Codes reported on sign-ups and payments that the brand's coupon list doesn't hold, most used first (at most 500). Adding a coupon with that code makes them its uses."
+      tags: [coupons]
+      responses:
+        "200":
+          description: Unknown codes.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [code, uses, signups, payments, first_used_at, last_used_at]
+                      properties:
+                        code: { type: string }
+                        uses: { type: integer }
+                        signups: { type: integer }
+                        payments: { type: integer }
+                        first_used_at: { type: string, format: date-time }
+                        last_used_at: { type: string, format: date-time }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/coupon-settings:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    get:
+      operationId: getBrandCouponSettings
+      x-outflare-access: { scope: partners.read, brand: true }
+      summary: Get how coupons connect to your product
+      description: "Scope: partners.read. Where the brand makes its coupons, what happens in the unusual cases, and status: what Outflare has seen working (coupons and uses received, messages sent), so a setup page can tick each step by itself."
+      tags: [coupons]
+      responses:
+        "200":
+          description: The settings.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CouponSettings" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateBrandCouponSettings
+      x-outflare-access: { scope: partners.manage, brand: true }
+      summary: Change how coupons connect to your product
+      description: "Scope: partners.manage. Changes only the fields sent. Sends coupon_settings.updated to the audit log."
+      tags: [coupons]
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                mode: { type: string, enum: [outflare, product, both] }
+                unknown_code: { type: string, enum: [ask, add] }
+                duplicate: { type: string, enum: [keep_older, outflare, product] }
+      responses:
+        "200":
+          description: The settings.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CouponSettings" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/internal-people:
     parameters: [{ $ref: "#/components/parameters/BrandID" }]
     get:
@@ -60975,6 +61321,54 @@ webhooks:
             schema: { $ref: "#/components/schemas/WebhookEvent" }
       responses:
         "200": { description: Any 2xx answer means received; anything else is retried. }
+  coupon.created:
+    post:
+      operationId: webhook_coupon_created
+      summary: "A coupon was added to a brand's list, in Outflare or by the brand's product (docs/coupons.md). The target is the coupon; data has brand_id, code, name, gives (kind, percent_bp, amount_minor, currency, credits, perk), audience, starts_at, ends_at, max_uses, max_uses_per_customer, min_amount_minor, enabled, home (outflare, product or stripe: where it was made), partner_id (the partner who earns from it, or null), clickless and after_end."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  coupon.updated:
+    post:
+      operationId: webhook_coupon_updated
+      summary: "A coupon changed: what it gives, its dates or limits, whether it accepts uses, or the partner who earns from it. data is as for coupon.created, as it is now."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  coupon.deleted:
+    post:
+      operationId: webhook_coupon_deleted
+      summary: "A coupon was deleted from a brand's list. Its uses stay. data is as for coupon.created, as it was."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
+  coupon.used:
+    post:
+      operationId: webhook_coupon_used
+      summary: "A customer used a coupon code on a sign-up or a payment, reported once however it arrived. The target is the use; data has brand_id, coupon_id (null for a code that is not on the list), code, kind (signup or payment), record_id (the customer), transaction_id, discount_minor, currency, credits, reported_by (api, events or conversions) and occurred_at."
+      tags: [webhooks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WebhookEvent" }
+      responses:
+        "200": { description: Any 2xx answer means received; anything else is retried. }
   coverage_record.created:
     post:
       operationId: webhook_coverage_record_created
@@ -63327,7 +63721,7 @@ components:
       required: [id, type, created_at, workspace_id, actor, target, request_id, data]
       properties:
         id: { type: string, description: "Unique per event, and the webhook-id header. Use it to ignore repeats.", example: evt_48213 }
-        type: { type: string, enum: [lead.replied, lead.unsubscribed, inbox.replied, inbox.updated, inbox.classified, lead.bounced, mailbox.auto_paused, lead.created, lead.updated, lead.deleted, leads.imported, suppressions.added, suppression.removed, lead_list.created, lead_list.leads_added, lead_list.run_started, lead_list.build_done, lead_list.build_failed, lead_list.refresh_done, lead_list.refresh_failed, lead_list.enrich_done, lead_list.enrich_failed, import.done, import.failed, sequence.created, sequence.updated, sequence.activated, sequence.paused, sequence.archived, sequence.deleted, sequence.steps_updated, sequence.leads_enrolled, enrollment.stopped, mailbox.imported, mailbox.updated, mailbox.paused, mailbox.resumed, mailbox.stage_changed, mailbox.deleted, domain.added, domain.paused, domain.resumed, domain.removed, email.queued, email.sent, email.delivered, email.bounced, email.complained, email.failed, email.suppressed, email.cancelled, email.unsubscribed, email.opened, email.clicked, email.preferences_changed, email_domain.verified, email_domain.verification_failed, email_provider.events_failed, email_template.published, meeting.created, meeting.updated, meeting.deleted, deal.created, deal.updated, deal.deleted, spend.recorded, integration.connected, integration.updated, integration.disconnected, connect_request.created, deploy.detected, deploy.failed, digest.ready, ai_budget.warned, ai_budget.reached, connection_limit.warned, connection_limit.reached, ad_campaign.paused, ad_campaign.resumed, ad_campaign.budget_changed, ads.paused_all, experiment.started, experiment.concluded, mission.created, mission.updated, mission.submitted, mission.approved, mission.paused, mission.resumed, mission.stopped, mission.completed, mission.action_held, mission.action_approved, mission.action_rejected, agent_run.created, agent_run.updated, agent_run.paused, agent_run.resumed, agent_run.stopped, agent_run.completed, action.held, action.approved, action.rejected, playbook.started, playbook_automation.created, playbook_automation.updated, playbook_automation.approved, playbook_automation.paused, playbook_automation.held, playbook_automation.ran, playbook_automation.deleted, infra.plan_created, infra.plan_approved, infra.ordered, infra.order_failed, infra.domains_bought, infra.mailbox_joined, infra.plan_warming, infra.plan_ready, infra.plan_cancelled, fix.found, fix.updated, fix.started, fix.verify_requested, fix.confirmed, fix.reopened, record.created, record.bulk_created, record.bulk_updated, record.updated, record.merged, identity.verified, identity.closed, relationship.added, relationship.ended, consent.granted, consent.withdrawn, consent.bulk_withdrawn, privacy_export.ready, record.soft_deleted, deletion.restored, record.unmerged, batch.undone, brand.created, brand.updated, knowledge.created, knowledge.updated, knowledge.deleted, knowledge.restored, content.approved, content.delivered, email_broadcast.created, email_broadcast.started, email_broadcast.sent, email_broadcast.failed, email_broadcast.cancelled, journey.created, journey.updated, journey_run.entered, journey_run.exited, rule.created, rule.updated, rule.activated, rule.paused, rule.archived, rule.fired, lifecycle.moved, transaction.created, transaction.updated, transaction.deleted, brand_setup.installed, brand_setup.install_failed, install.issue_opened, install.issue_resolved, seo_site.created, seo_site.verified, seo_site.unverified, seo_site.deleted, crawl.started, crawl.stopped, crawl.done, link_pitch.drafted, link_pitch.approved, link_pitch.rejected, link_prospect.overdue, backlink.new, backlink.lost, backlink.regained, competitor.page_removed, competitor_link.new, outbound_link.broken, asset.published, mention.found, link_prospect.found, link_prospect.checked, link_prospect.excluded, link_prospect.pitched, link_prospect.replied, link_prospect.agreed, link_prospect.live, link_prospect.declined, link_prospect.removed, link_prospect.reopened, link_prospect.updated, link_prospect.deleted, social_action.drafted, social_action.approved, social_action.rejected, social_action.done, social_action.failed, review.posted, review.replied, review.reply_drafted, review_momentum.changed, alert.raised, visitor.became_hot, partner_program.created, partner_program.updated, partner_program.rules_updated, partner.created, partner.updated, partner_referral.created, tracker_conversion.created, tracker_conversion.updated, partner_conversion.created, partner_reward.created, partner_reward.approved, partner_reward.rejected, partner_reward.reversed, partner_reward.fulfilled, partner_flag.raised, partner_flag.cleared, partner_flag.confirmed, partner_payout.created, partner_payout.paid, partner_payout.canceled, coverage_record.created, coverage_record.updated, coverage_record.imported, coverage_record.check_queued, coverage_record.checked, coverage_record.review_queued, coverage_record.reviewed, coverage_record.approved, coverage_record.discovered, coverage_record.confirmed, coverage_record.deleted, link_order.approved, link_order.published, link_order.checked, link_order.paid, link_order.verified, link_order.lost, link_order.replacement_opened, workspace.updated, webhook.test] }
+        type: { type: string, enum: [lead.replied, lead.unsubscribed, inbox.replied, inbox.updated, inbox.classified, lead.bounced, mailbox.auto_paused, lead.created, lead.updated, lead.deleted, leads.imported, suppressions.added, suppression.removed, lead_list.created, lead_list.leads_added, lead_list.run_started, lead_list.build_done, lead_list.build_failed, lead_list.refresh_done, lead_list.refresh_failed, lead_list.enrich_done, lead_list.enrich_failed, import.done, import.failed, sequence.created, sequence.updated, sequence.activated, sequence.paused, sequence.archived, sequence.deleted, sequence.steps_updated, sequence.leads_enrolled, enrollment.stopped, mailbox.imported, mailbox.updated, mailbox.paused, mailbox.resumed, mailbox.stage_changed, mailbox.deleted, domain.added, domain.paused, domain.resumed, domain.removed, email.queued, email.sent, email.delivered, email.bounced, email.complained, email.failed, email.suppressed, email.cancelled, email.unsubscribed, email.opened, email.clicked, email.preferences_changed, email_domain.verified, email_domain.verification_failed, email_provider.events_failed, email_template.published, meeting.created, meeting.updated, meeting.deleted, deal.created, deal.updated, deal.deleted, spend.recorded, integration.connected, integration.updated, integration.disconnected, connect_request.created, deploy.detected, deploy.failed, digest.ready, ai_budget.warned, ai_budget.reached, connection_limit.warned, connection_limit.reached, ad_campaign.paused, ad_campaign.resumed, ad_campaign.budget_changed, ads.paused_all, experiment.started, experiment.concluded, mission.created, mission.updated, mission.submitted, mission.approved, mission.paused, mission.resumed, mission.stopped, mission.completed, mission.action_held, mission.action_approved, mission.action_rejected, agent_run.created, agent_run.updated, agent_run.paused, agent_run.resumed, agent_run.stopped, agent_run.completed, action.held, action.approved, action.rejected, playbook.started, playbook_automation.created, playbook_automation.updated, playbook_automation.approved, playbook_automation.paused, playbook_automation.held, playbook_automation.ran, playbook_automation.deleted, infra.plan_created, infra.plan_approved, infra.ordered, infra.order_failed, infra.domains_bought, infra.mailbox_joined, infra.plan_warming, infra.plan_ready, infra.plan_cancelled, fix.found, fix.updated, fix.started, fix.verify_requested, fix.confirmed, fix.reopened, record.created, record.bulk_created, record.bulk_updated, record.updated, record.merged, identity.verified, identity.closed, relationship.added, relationship.ended, consent.granted, consent.withdrawn, consent.bulk_withdrawn, privacy_export.ready, record.soft_deleted, deletion.restored, record.unmerged, batch.undone, brand.created, brand.updated, knowledge.created, knowledge.updated, knowledge.deleted, knowledge.restored, content.approved, content.delivered, email_broadcast.created, email_broadcast.started, email_broadcast.sent, email_broadcast.failed, email_broadcast.cancelled, journey.created, journey.updated, journey_run.entered, journey_run.exited, rule.created, rule.updated, rule.activated, rule.paused, rule.archived, rule.fired, lifecycle.moved, transaction.created, transaction.updated, transaction.deleted, brand_setup.installed, brand_setup.install_failed, install.issue_opened, install.issue_resolved, seo_site.created, seo_site.verified, seo_site.unverified, seo_site.deleted, crawl.started, crawl.stopped, crawl.done, link_pitch.drafted, link_pitch.approved, link_pitch.rejected, link_prospect.overdue, backlink.new, backlink.lost, backlink.regained, competitor.page_removed, competitor_link.new, outbound_link.broken, asset.published, mention.found, link_prospect.found, link_prospect.checked, link_prospect.excluded, link_prospect.pitched, link_prospect.replied, link_prospect.agreed, link_prospect.live, link_prospect.declined, link_prospect.removed, link_prospect.reopened, link_prospect.updated, link_prospect.deleted, social_action.drafted, social_action.approved, social_action.rejected, social_action.done, social_action.failed, review.posted, review.replied, review.reply_drafted, review_momentum.changed, alert.raised, visitor.became_hot, partner_program.created, partner_program.updated, partner_program.rules_updated, partner.created, partner.updated, partner_referral.created, tracker_conversion.created, tracker_conversion.updated, partner_conversion.created, partner_reward.created, partner_reward.approved, partner_reward.rejected, partner_reward.reversed, partner_reward.fulfilled, partner_flag.raised, partner_flag.cleared, partner_flag.confirmed, partner_payout.created, partner_payout.paid, partner_payout.canceled, coupon.created, coupon.updated, coupon.deleted, coupon.used, coverage_record.created, coverage_record.updated, coverage_record.imported, coverage_record.check_queued, coverage_record.checked, coverage_record.review_queued, coverage_record.reviewed, coverage_record.approved, coverage_record.discovered, coverage_record.confirmed, coverage_record.deleted, link_order.approved, link_order.published, link_order.checked, link_order.paid, link_order.verified, link_order.lost, link_order.replacement_opened, workspace.updated, webhook.test] }
         created_at: { type: string, format: date-time }
         workspace_id: { type: string, format: uuid }
         actor: { $ref: "#/components/schemas/WebhookRef" }
@@ -65612,7 +66006,7 @@ components:
       required: [credited, duplicate, partner_id, referral_id, conversion, rewards]
       properties:
         credited: { type: boolean }
-        reason: { type: string, enum: [no_partner, partner_inactive, program_inactive, self_referral, sale_not_found, currency, lead_expired, country_blocked, before_credits_from] }
+        reason: { type: string, enum: [no_partner, partner_inactive, program_inactive, self_referral, sale_not_found, currency, lead_expired, country_blocked, before_credits_from, coupon_ended] }
         duplicate: { type: boolean, description: "Already recorded with this external_id (or, for a lead, already a lead)." }
         partner_id: { type: [string, "null"], format: uuid }
         referral_id: { type: [string, "null"], format: uuid }
@@ -83567,7 +83961,7 @@ components:
         canceled_at: { type: string, format: date-time, description: "When it ended, for status canceled. Now by default." }
     Transaction:
       type: object
-      required: [id, brand_id, record_id, kind, status, amount_minor, currency, brand_amount_minor, brand_currency, product_id, source, source_id, refund_of, description, occurred_at, created_at, updated_at]
+      required: [id, brand_id, record_id, kind, status, amount_minor, currency, brand_amount_minor, brand_currency, product_id, source, source_id, refund_of, description, occurred_at, created_at, updated_at, coupon]
       properties:
         id: { type: string, format: uuid }
         brand_id: { type: string, format: uuid }
@@ -83586,6 +83980,16 @@ components:
         occurred_at: { type: string, format: date-time }
         created_at: { type: string, format: date-time }
         updated_at: { type: [string, "null"], format: date-time, description: "When its status last changed, or null." }
+        coupon:
+          description: "The coupon the customer used on it, when one was reported (docs/coupons.md); otherwise null."
+          oneOf:
+            - { type: "null" }
+            - type: object
+              required: [code, known, has_partner]
+              properties:
+                code: { type: string, description: "The code, as the brand's coupon list spells it." }
+                known: { type: boolean, description: "false when the code is not on the brand's coupon list: the use is still stored, and the brand's team is shown the code." }
+                has_partner: { type: boolean, description: "The coupon belongs to a partner, who is credited for the payment by their program's rules." }
     TransactionInput:
       type: object
       required: [kind, amount_minor, currency, source_id]
@@ -83602,6 +84006,178 @@ components:
         refund_of: { type: string, maxLength: 200, description: "A refund or chargeback: the payment it gives back, by any id it has: its source_id (an order's order_id), its Order Completed event's messageId, or Outflare's transaction id. It is saved as the payment's source_id. A refund whose payment isn't in yet waits (Developer setup lists it) and counts when the payment arrives." }
         description: { type: string, maxLength: 500 }
         occurred_at: { type: string, format: date-time, description: "When it happened; now by default." }
+        coupon:
+          type: object
+          description: "A payment only: the coupon the customer used on it and what it gave them. It is stored as one use of the coupon however often the payment is sent, and the partner the coupon belongs to is credited for the payment (docs/coupons.md). A code that is not on the brand's coupon list is still stored."
+          required: [code]
+          additionalProperties: false
+          properties:
+            code: { type: string, pattern: "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$", description: "The code the customer typed; the case doesn't matter." }
+            discount_minor: { type: integer, minimum: 0, description: "What the coupon took off the price, in the payment's minor unit." }
+            credits: { type: integer, minimum: 0, description: How many credits of your product the coupon gave. }
+            perk: { type: string, maxLength: 300, description: "Anything else it gave, in words." }
+    CouponGives:
+      type: object
+      description: What the coupon gives the customer. Only the fields of its kind are used.
+      required: [kind]
+      properties:
+        kind: { type: string, enum: [percent, amount, credits, perk, none], description: "percent off, money off, free credits, something else described in words (perk), or none when Outflare was not told." }
+        percent_bp: { type: integer, minimum: 0, maximum: 10000, description: "kind percent: the discount in hundredths of a percent, so 2000 is 20%." }
+        amount_minor: { type: integer, minimum: 0, description: "kind amount: the money off, in the currency's minor unit (cents)." }
+        currency: { type: string, description: "kind amount: its three-letter currency; the brand's when left out." }
+        credits: { type: integer, minimum: 0, description: "kind credits: how many credits of your product it gives." }
+        perk: { type: string, maxLength: 300, description: "kind perk: what it gives, in words, such as \"First month free\"." }
+    CouponDetailsInput:
+      type: object
+      description: What a coupon is. Who earns from it is not part of it.
+      additionalProperties: false
+      properties:
+        name: { type: string, maxLength: 120, description: A note for your team; customers never see it. }
+        gives: { $ref: "#/components/schemas/CouponGives" }
+        audience: { type: string, enum: [everyone, new_customers], description: "new_customers: only people who have not paid yet. everyone by default." }
+        starts_at: { type: [string, "null"], format: date-time, description: "When it starts working; null is straight away." }
+        ends_at: { type: [string, "null"], format: date-time, description: "When it stops working; null is never." }
+        max_uses: { type: [integer, "null"], minimum: 1, description: "How many times it can be used in all; null is no limit." }
+        max_uses_per_customer: { type: [integer, "null"], minimum: 1 }
+        min_amount_minor: { type: [integer, "null"], minimum: 1, description: "The smallest order it works on, in the brand's minor units." }
+        enabled: { type: boolean, description: "false switches it off without deleting it. true by default." }
+    CouponInput:
+      type: object
+      additionalProperties: false
+      properties:
+        code: { type: string, pattern: "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$", description: "What the customer types. Letters, digits, - and _; the case doesn't matter. It can't be changed later." }
+        name: { type: string, maxLength: 120 }
+        gives: { $ref: "#/components/schemas/CouponGives" }
+        audience: { type: string, enum: [everyone, new_customers] }
+        starts_at: { type: [string, "null"], format: date-time }
+        ends_at: { type: [string, "null"], format: date-time }
+        max_uses: { type: [integer, "null"], minimum: 1 }
+        max_uses_per_customer: { type: [integer, "null"], minimum: 1 }
+        min_amount_minor: { type: [integer, "null"], minimum: 1 }
+        enabled: { type: boolean }
+        partner_id: { type: [string, "null"], format: uuid, description: "The partner who earns when a customer uses the code (a partner's id, from GET .../partners); null takes them off." }
+        clickless: { type: boolean, description: "true (the default): the code alone earns the partner, with no link click. false: the code earns nothing by itself; a customer who clicked the partner's link is still theirs." }
+        after_end: { type: string, enum: [keep, stop], description: "Once ends_at has passed: keep (the default) goes on paying the partner for customers who used the code in time, by the program's rules; stop ends it." }
+        resolve: { type: string, enum: [mine, theirs], description: "Only for a coupon with a conflict: mine keeps it as it is, theirs takes the other version." }
+    Coupon:
+      type: object
+      required: [id, brand_id, code, name, gives, audience, starts_at, ends_at, max_uses, max_uses_per_customer, min_amount_minor, enabled, status, home, partner, clickless, after_end, conflict, stats, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        brand_id: { type: string, format: uuid }
+        code: { type: string }
+        name: { type: string }
+        gives: { $ref: "#/components/schemas/CouponGives" }
+        audience: { type: string, enum: [everyone, new_customers] }
+        starts_at: { type: [string, "null"], format: date-time }
+        ends_at: { type: [string, "null"], format: date-time }
+        max_uses: { type: [integer, "null"] }
+        max_uses_per_customer: { type: [integer, "null"] }
+        min_amount_minor: { type: [integer, "null"] }
+        enabled: { type: boolean }
+        status: { type: string, enum: [active, scheduled, ended, "off", limit_reached], description: "Worked out from enabled, the dates and the uses so far." }
+        home: { type: string, enum: [outflare, product, stripe], description: "Where the coupon was made, which is where it is changed: Outflare, your own product, or the billing account." }
+        partner:
+          type: [object, "null"]
+          description: The partner who earns from the code, or null for a general offer.
+          required: [id, name, email, program_id, program, kind]
+          properties:
+            id: { type: string, format: uuid }
+            name: { type: string }
+            email: { type: string }
+            program_id: { type: string, format: uuid }
+            program: { type: string }
+            kind: { type: string, description: "The program's kind, such as affiliate." }
+        clickless: { type: boolean, description: The code alone earns the partner. }
+        after_end: { type: string, enum: [keep, stop] }
+        conflict:
+          description: "The other side's version of the same code, when it was made both in Outflare and in your product and someone has to choose (PATCH with resolve); otherwise null."
+          oneOf:
+            - { type: "null" }
+            - { $ref: "#/components/schemas/CouponDetails" }
+        stats:
+          type: object
+          required: [uses, uses_no_click, uses_30d, signups, customers, revenue_minor, currency, commission_cents, commission_unpaid_cents, commission_currency]
+          properties:
+            uses: { type: integer }
+            uses_no_click: { type: integer, description: "Uses by customers who never came through the partner's link." }
+            uses_30d: { type: integer }
+            signups: { type: integer }
+            customers: { type: integer, description: People who used the code and have paid since. }
+            revenue_minor: { type: integer, description: "What those customers have paid, in the brand's currency." }
+            currency: { type: string }
+            commission_cents: { type: integer, description: What the partner earned from customers the code brought. }
+            commission_unpaid_cents: { type: integer }
+            commission_currency: { type: string }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    CouponDetails:
+      type: object
+      required: [name, gives, audience, starts_at, ends_at, max_uses, max_uses_per_customer, min_amount_minor, enabled]
+      properties:
+        name: { type: string }
+        gives: { $ref: "#/components/schemas/CouponGives" }
+        audience: { type: string }
+        starts_at: { type: [string, "null"], format: date-time }
+        ends_at: { type: [string, "null"], format: date-time }
+        max_uses: { type: [integer, "null"] }
+        max_uses_per_customer: { type: [integer, "null"] }
+        min_amount_minor: { type: [integer, "null"] }
+        enabled: { type: boolean }
+    CouponCheck:
+      type: object
+      required: [valid, reason, code, gives]
+      properties:
+        valid: { type: boolean }
+        reason: { type: string, enum: ["", unknown, "off", not_started, ended, limit_reached, used_by_customer, not_a_new_customer, below_minimum], description: "Why not; empty when valid." }
+        code: { type: string, description: "The code as the list spells it." }
+        gives:
+          oneOf:
+            - { type: "null" }
+            - { $ref: "#/components/schemas/CouponGives" }
+    CouponUse:
+      type: object
+      required: [id, coupon_id, code, record_id, customer, kind, transaction_id, discount_minor, currency, credits, perk, payment_minor, payment_currency, reported_by, link_click_at, commission_cents, occurred_at]
+      properties:
+        id: { type: string, format: uuid }
+        coupon_id: { type: [string, "null"], format: uuid }
+        code: { type: string }
+        record_id: { type: [string, "null"], format: uuid, description: The customer. }
+        customer: { type: string, description: "The customer's name, else their email." }
+        kind: { type: string, enum: [signup, payment] }
+        transaction_id: { type: [string, "null"], format: uuid }
+        discount_minor: { type: [integer, "null"], description: "What the coupon took off the price, when reported." }
+        currency: { type: string }
+        credits: { type: [integer, "null"], description: "Credits the coupon gave, when reported." }
+        perk: { type: string }
+        payment_minor: { type: [integer, "null"], description: "The payment's amount." }
+        payment_currency: { type: string }
+        reported_by: { type: string, enum: [api, events, conversions], description: "How Outflare heard of it: a transaction sent to the API, an event, or the conversions API." }
+        link_click_at: { type: [string, "null"], format: date-time, description: "When the customer came through the partner's link; null when the code is all that ties them to the partner." }
+        commission_cents: { type: [integer, "null"], description: What the partner earned from this payment. }
+        occurred_at: { type: string, format: date-time }
+    CouponSettings:
+      type: object
+      required: [mode, unknown_code, duplicate, status]
+      properties:
+        mode: { type: string, enum: [outflare, product, both], description: "Where the brand makes coupons: in Outflare, in its own product, or both. outflare refuses coupons sent by PUT." }
+        unknown_code: { type: string, enum: [ask, add], description: "A customer used a code that is not on the list: ask keeps the use and shows the code for someone to add; add puts the code on the list by itself." }
+        duplicate: { type: string, enum: [keep_older, outflare, product], description: "Your product sends a code that was already made in Outflare: keep_older keeps the first and asks someone to choose, outflare keeps Outflare's, product takes your product's." }
+        status:
+          type: object
+          required: [coupons_made_here, coupons_made_in_product, last_coupon_received_at, last_use_received_at, uses_30d, last_check_at, webhook_on, last_webhook_sent_at, unknown_codes, conflicts, billing_connected]
+          properties:
+            coupons_made_here: { type: integer }
+            coupons_made_in_product: { type: integer }
+            last_coupon_received_at: { type: [string, "null"], format: date-time, description: When your product last sent a coupon. }
+            last_use_received_at: { type: [string, "null"], format: date-time, description: When a coupon use was last reported. }
+            uses_30d: { type: integer }
+            last_check_at: { type: [string, "null"], format: date-time, description: When a checkout last asked about a code. }
+            webhook_on: { type: boolean, description: An enabled webhook receives the coupon events. }
+            last_webhook_sent_at: { type: [string, "null"], format: date-time }
+            unknown_codes: { type: integer }
+            conflicts: { type: integer, description: Coupons waiting for someone to choose a version. }
+            billing_connected: { type: boolean, description: A billing account that can hold promo codes is connected. }
     FieldSourceValue:
       type: object
       required: [field, source, value, seen_at, current]
