@@ -47,6 +47,14 @@ This site deploys on every push to main (Cloudflare Pages), but app.outflare.ai 
 4. **Never say "live" or "deployed"** about a feature until production's `/v1/meta` version contains it.
 5. **No releases from here.** Self-hosted releases are cut, tagged and published to `outflareai/outflare` automatically once a day, once every check passes. Nobody tags or publishes by hand, from here or anywhere else.
 
+## Working with the owner (hard rule)
+
+The owner often builds by prompting Claude Code and other agents across many threads at once, and comes back to skim. A thread that waits silently for them can sit stuck for hours when all it needed was a yes. So every agent working for the owner, in a chat, a project thread or a coding session:
+
+- **Asks one question at a time, with context.** Say what you are deciding and why it matters, then ask the single question with clickable answers (the tool's multiple choice or decision card, with the option you recommend marked) rather than a question they have to type an answer to. Never several questions in one message: ask the most important one, and the next only after it is answered.
+- **Says exactly why it stopped.** When a thread stops, the message says what the blocker is and the one thing you need from the owner to move on, with a link to it. Bring it to their attention in the place they read (the project chat or the main conversation), never only inside the thread: don't assume they will open threads to find out why one stopped.
+- **Asks for the go-ahead in so many words.** When the work is built and waits only for their approval ("ship it", "merge it", "go"), say so plainly and ask: "Waiting for your approval. Can I ship it now?", as a decision card with Yes as an option where the tool has one. Never end on a line like "ready when you are" or "waiting for you to say ship it" and leave it at that.
+
 ## Unfinished work lives on GitHub (hard rule)
 
 Half-finished work must survive a lost session and a switch to another coding agent (Claude Code, Codex, Cursor) or a person. So it never lives only in one agent's session, a local branch, or a bundle or patch file in a shared folder. A draft pull request for real work is not a parked draft (see "No history from elsewhere, no private branches"): it is work in progress that someone will finish.
