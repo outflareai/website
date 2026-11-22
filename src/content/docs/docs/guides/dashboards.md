@@ -31,6 +31,18 @@ Through the API, `POST /v1/brands/{brand}/insights/ask` with `{"question": "…"
 
 Every tile runs its insight again when you open the page, with the dashboard's dates in place of its own, so nothing on a dashboard is ever out of date. Choose the dates at the top: a moving range such as the last 30 days, fixed dates, or **each tile's own dates** to let every insight keep what it was saved with. Tick **Compare with the period before** to show every trend against the same length of time before it.
 
+## A saved query as a tile
+
+Some numbers don't fit a chart builder: your largest customers and how long since each last paid, who is due to buy again before the month ends, one table joined to another. Save that as a [query](/docs/guides/query-and-search/) under Data, Queries, and put it on the dashboard beside the charts.
+
+**Add tile** lists the brand's saved queries under **Saved queries**. Press **Add**, and the tile shows the chart saved with the query when it has one, otherwise its rows as a table (up to 200), with **Open the query** to change it. Rows for a person or company link to their page. The tile runs the query again each time the dashboard opens.
+
+- **It keeps its own dates.** The query says which dates it covers, so the dashboard's dates, comparison and filters don't change it.
+- **It is shared with the team.** Everyone who opens the dashboard runs the query, so a private query is shared with the brand first (the app asks), and it stays shared while it is on a dashboard.
+- **A share link shows only its name.** The rows are for the brand's signed-in team.
+
+Agents add one with `add_dashboard_tile` and `saved_query_id`; through the API it is `POST /v1/brands/{brand}/dashboards/{dashboard}/tiles` with `saved_query_id`.
+
 ## Filter the whole dashboard
 
 Press **+ Filter** next to the dates to show every tile for just some events: a field such as `plan` or `utm_source`, a comparison and a value (`plan` is `pro`). Up to five filters show as chips at the top; the × takes one off. They apply to every event and page view in the dashboard's trends, funnels, retention and lifecycle tiles, and on its share link and in the digest too. Visits, payments, conversions, ad numbers and paths keep only their own filters.
