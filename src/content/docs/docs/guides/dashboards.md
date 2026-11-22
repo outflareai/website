@@ -15,6 +15,10 @@ In the app, open **Analytics** in the sidebar, then **Dashboards**. Type a name 
 
 **Analytics → All reports** lists everything saved for the brand in one table: dashboards, funnels, trends, retention and paths questions, and saved Tracker reports. Search by name, narrow the list by type or by who made it, and sort by when each last changed or when you last opened it. A row opens the report, and **New** starts a dashboard, funnel, trend, retention or paths question.
 
+Every saved report has its own address, lifecycle and stickiness questions and saved Tracker reports included, so you can link to one, pin it, and find it again under Recents.
+
+**Tags** group reports that belong together. In the Tags column, choose **Add tag** and type a few words of your own, such as a launch or a weekly meeting, with commas between them. Select a tag on any row, or pick one from the **Tag** menu, to see only the reports that have it.
+
 ## Ask a question
 
 At the top of Dashboards is a box: type what you want to know ("How many people opened the app each week, by plan?") and press **Ask**. You get a chart with a sentence on how it was built. **Open in the builder** to change it, or **Save this chart** to keep it and put it on a dashboard.
