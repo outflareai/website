@@ -32,7 +32,11 @@ const private_ = [
 	[/\b\d{1,3}(\.\d{1,3}){3}\b/, 'an IP address'],
 	[/https?:\/\/(?!(outflare\.ai|app\.outflare\.ai|github\.com\/outflareai)\b)/i, 'a link outside outflare.ai and github.com/outflareai'],
 	[/\b[\w-]+\.(railway\.(app|internal)|up\.railway\.app|internal|local|svc)\b/i, 'an internal hostname'],
-	[/\b(railway|cloudflare account|staff|admin console|\/admin|bugwatch|billing|invoice|revenue|costs? tab|abuse|fraud|turnstile|secret key|OUTFLARE_SECRET_KEY)\b/i, 'a hosted-only or internal subject'],
+	[/\b(railway|cloudflare account|admin console|\/admin|bugwatch|billing|invoice|costs? tab|abuse|fraud|turnstile|secret key|OUTFLARE_SECRET_KEY)\b/i, 'a hosted-only or internal subject'],
+	// "Staff" and "revenue" are product words (the Staff directory, revenue in reports), so only
+	// the hosted service's own are held back: its staff console and tools, and its own revenue.
+	[/\bstaff[- ](console|only|tools?|pages?|logs?|api|keys?|accounts?|sign-?in)\b|\b(outflare(['’]s)?|our|cloud) staff\b/i, 'a hosted-only or internal subject'],
+	[/\b(outflare(['’]s)?|our|company) (monthly |annual |recurring )*revenue\b/i, 'a hosted-only or internal subject'],
 	[/\b(oft|ofa|ofs|ofi|sk|pk|ghp|gho|xox[abp])_[A-Za-z0-9_-]{8,}/, 'something that looks like a key or token'],
 	[/\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/i, 'an internal id'],
 	[/\b(users|customers|workspaces|signups|sign-ups)\b[^.]*\b\d{2,}\b|\b\d{2,}\b[^.]*\b(users|customers|workspaces|signups|sign-ups)\b/i, 'a production number'],
