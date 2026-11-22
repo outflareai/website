@@ -2,7 +2,7 @@
 	"version": "2026.11.22",
 	"date": "2026-11-22",
 	"status": "in-progress",
-	"updated": "2026-11-22T13:43:08Z",
+	"updated": "2026-11-22T14:10:16Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -73,7 +73,14 @@
 			"edition": "open-source",
 			"text": "Distribution: a new Analytics page shows how customers are spread by what they paid, how often they pay or the days between payments, with the median beside the average. Split it, click a range to see who is in it, save it or put it on a dashboard. Agents use `run_distribution`.",
 			"at": "2026-11-22T13:43:08Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Retention has a Money view: of the customers who first paid in a month, see what the same customers paid in each month after, as a share of their first month, as amounts or per starting customer. Split it, save it or put it on a dashboard. Agents read it as `kept` from `run_lifetime_value`.",
+			"at": "2026-11-22T14:10:16Z"
 		}
 	],
-	"through": "39a0649+39a0649"
+	"through": "88b823c+88b823c"
 }
