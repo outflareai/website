@@ -13821,6 +13821,57 @@ paths:
         "404": { $ref: "#/components/responses/Error" }
         "202": { $ref: "#/components/responses/MissionHeld" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/profile/facts/{id}/split:
+    parameters:
+      - { $ref: "#/components/parameters/BrandID" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: splitProfileFact
+      x-outflare-access: { scope: context.manage, brand: true }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Split a profile fact into separate facts
+      description: |
+        Scope: context.manage. Turns one fact that holds several
+        statements into one fact per statement, so each can be
+        confirmed, retired and allowed for customers on its own. With
+        no `parts`, the text is split at its list items ("- ", "* ",
+        "1. ") and paragraphs. The new facts keep the fact's section,
+        source, evidence, confidence, visibility and status, and stand
+        where it stood. The fact itself is retired, not deleted, and
+        its history says what it became. An API token may only split a
+        suggestion. A fact with `context_field` mirrors a field of the
+        brand's context and can't be split.
+      tags: [context]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                parts:
+                  type: array
+                  minItems: 2
+                  maxItems: 50
+                  description: The text of each new fact. Left out, the fact is split at its list items and paragraphs.
+                  items: { type: string, maxLength: 4000 }
+      responses:
+        "200":
+          description: The retired fact and the facts it became, in order.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [retired, facts]
+                properties:
+                  retired: { $ref: "#/components/schemas/ProfileFact" }
+                  facts:
+                    type: array
+                    items: { $ref: "#/components/schemas/ProfileFact" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/profile/changes:
     parameters:
       - { $ref: "#/components/parameters/BrandID" }
@@ -39720,6 +39771,114 @@ paths:
               schema: { $ref: "#/components/schemas/StickinessResult" }
         "400": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/insights/distribution:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    post:
+      operationId: runDistribution
+      parameters: [{ $ref: "#/components/parameters/ReportTimezone" }]
+      x-outflare-access: { scope: analytics.read, brand: true }
+      summary: Run a distribution question
+      description: |
+        Scope: analytics.read. How customers are spread. One number per customer over the dates (`measure`: what they
+        paid, less refunds and chargebacks unless `gross`; their average payment; how many times they paid; the days
+        between their payments, for those who paid more than once; the days since their last payment), counted into
+        ranges (`buckets`), with the average, the median, the value nine customers in ten are at or under (`p90`) and
+        how much of the total the top tenth of customers carry (`top_share`). The ranges are round numbers chosen from
+        the data unless `buckets` gives the edges. `breakdown` splits the customers by a field of their first payment
+        in the dates or of their record. Money is in the brand's currency, in minor units. Payments with no customer,
+        and amounts with no exchange rate to the brand's currency yet, are left out. Runs for at most 30 seconds
+        (query_timeout).
+      tags: [insights]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/DistributionSpec" }
+      responses:
+        "200":
+          description: The customers in each range.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DistributionResult" }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/insights/distribution/customers:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    post:
+      operationId: listDistributionCustomers
+      parameters: [{ $ref: "#/components/parameters/ReportTimezone" }]
+      x-outflare-access: { scope: customers.read, brand: true }
+      summary: List the customers in one range of a distribution
+      description: |
+        Scope: customers.read. The customers of a distribution question whose number is from `from` up to, not
+        including, `to` (no upper end without `to`), largest first, at most 200. `group` keeps one value of the
+        question's breakdown.
+      tags: [insights]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [spec, from]
+              properties:
+                spec: { $ref: "#/components/schemas/DistributionSpec" }
+                from: { type: integer, description: "The start of the range, in the measure's unit." }
+                to: { type: [integer, "null"], description: "The end of the range, not included." }
+                group: { type: [string, "null"], description: 'One value of the breakdown; "" for customers without one.' }
+      responses:
+        "200":
+          description: The customers, largest first.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, unit]
+                properties:
+                  unit: { type: string, enum: [money, count, days] }
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [record_id, name, value]
+                      properties:
+                        record_id: { type: string, format: uuid }
+                        name: { type: string }
+                        value: { type: integer, description: "The customer's number, in the measure's unit (minor units for money)." }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/brands/{brand}/insights/lifetime-value:
+    parameters: [{ $ref: "#/components/parameters/BrandID" }]
+    post:
+      operationId: runLifetimeValue
+      parameters: [{ $ref: "#/components/parameters/ReportTimezone" }]
+      x-outflare-access: { scope: analytics.read, brand: true }
+      summary: Run a lifetime value question
+      description: |
+        Scope: analytics.read. What a customer is worth. Of the people and companies whose first payment fell in the
+        dates, everything each has paid since, less refunds and chargebacks (payments only with `gross`), in the brand's
+        currency: the total, average and median per customer to date, how many paid more than once, and the average
+        per customer adding up week by week or month by month after their first payment (`curve`). Each period's part
+        is what the customers who have reached that period paid in it, over how many they are, so customers too new
+        for a period neither add to it nor pull it down; `partial` marks a point some of them are still inside.
+        `cohorts` gives the same curve for the customers who first paid in each calendar week or month, and
+        `breakdown` splits everything by a field of the first payment (its product, the channel the payer first came
+        from) or of the payer's record. Payments with no customer, and amounts with no exchange rate to the brand's
+        currency yet, are left out. Runs for at most 30 seconds (query_timeout).
+      tags: [insights]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/LifetimeValueSpec" }
+      responses:
+        "200":
+          description: The value per customer.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/LifetimeValueResult" }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/dashboards:
     parameters: [{ $ref: "#/components/parameters/BrandID" }]
     get:
@@ -39823,7 +39982,7 @@ paths:
       operationId: addDashboardTile
       x-outflare-access: { scope: analytics.manage, brand: true }
       summary: Add a tile
-      description: "Scope: analytics.manage. A saved insight of the brand (insight_id), a saved report that is shared with the team (report_view_id) or a note. Placed below everything unless x, y, w and h say where, on a 12-column grid."
+      description: "Scope: analytics.manage. A saved insight of the brand (insight_id), a saved report that is shared with the team (report_view_id), a saved query that is shared with the brand (saved_query_id) or a note. Placed below everything unless x, y, w and h say where, on a 12-column grid."
       tags: [insights]
       requestBody:
         required: true
@@ -39976,6 +40135,8 @@ paths:
                   - { $ref: "#/components/schemas/PathsResult" }
                   - { $ref: "#/components/schemas/LifecycleResult" }
                   - { $ref: "#/components/schemas/StickinessResult" }
+                  - { $ref: "#/components/schemas/LifetimeValueResult" }
+                  - { $ref: "#/components/schemas/DistributionResult" }
         "400": { $ref: "#/components/responses/Error" }
         "401": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
@@ -40073,7 +40234,7 @@ paths:
       description: "Scope: analytics.read. The brand's saved insights, the latest changed first."
       tags: [insights]
       parameters:
-        - { name: kind, in: query, schema: { type: string, enum: [funnel, trend, retention, paths, lifecycle, stickiness] } }
+        - { name: kind, in: query, schema: { type: string, enum: [funnel, trend, retention, paths, lifecycle, stickiness, lifetime_value, distribution] } }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 500, default: 100 } }
         - { $ref: "#/components/parameters/Cursor" }
         - { $ref: "#/components/parameters/Fields" }
@@ -41910,6 +42071,7 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/SavedQuery" }
         "202": { $ref: "#/components/responses/MissionHeld" }
+        "409": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/queries/{saved_query}/archive:
     parameters:
@@ -43584,6 +43746,470 @@ paths:
               schema: { $ref: "#/components/schemas/TelegramSession" }
         "202": { $ref: "#/components/responses/MissionHeld" }
         "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/staff-details:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listStaffDetails
+      x-outflare-access: { scope: staff.private }
+      summary: List everyone with their private details
+      description: |
+        Scope: staff.private (owners only). Everyone in the team directory
+        with their private details, current agreement, what they were paid
+        and which details are missing, people who left last. The summary
+        counts people now, people per department and what current
+        agreements cost a month, converted to the reporting currency with
+        the daily reference rates.
+      tags: [team]
+      parameters:
+        - { name: currency, in: query, description: "The reporting currency, a three-letter code. Default USD.", schema: { type: string, example: EUR } }
+      responses:
+        "200":
+          description: People and the summary.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, summary]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/StaffDetails" } }
+                  summary: { $ref: "#/components/schemas/StaffSummary" }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createStaffDetails
+      x-outflare-access: { scope: staff.private }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Add a person with their private details
+      description: |
+        Scope: staff.private (owners only). One save for everything: the
+        team directory's fields, the private details and the first
+        agreement. A value that looks like a password, private key or
+        recovery phrase is refused.
+      tags: [team]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/StaffDetailsInput" }
+      responses:
+        "201":
+          description: The person.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/StaffDetails" }
+        "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/staff-details/export:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: exportStaffDetails
+      x-outflare-access: { scope: staff.private }
+      summary: Download everyone as a CSV
+      description: |
+        Scope: staff.private (owners only). Every person with every field,
+        dates as DD/Mon/YYYY. Cells that would start a spreadsheet formula
+        get a leading apostrophe; phone numbers keep their +.
+      tags: [team]
+      responses:
+        "200":
+          description: The file.
+          content:
+            text/csv: { schema: { type: string } }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/staff-details/{id}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, description: The person's id in the team directory., schema: { type: string, format: uuid } }
+    get:
+      operationId: getStaffDetails
+      x-outflare-access: { scope: staff.private }
+      summary: Get a person with their private details
+      description: "Scope: staff.private (owners only)."
+      tags: [team]
+      responses:
+        "200":
+          description: The person.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/StaffDetails" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateStaffDetails
+      x-outflare-access: { scope: staff.private }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Change a person and their private details
+      description: |
+        Scope: staff.private (owners only). Only the fields sent change.
+        `agreement` changes their current agreement, or starts the first
+        one. Nobody reports to themselves or in a circle; an agreement
+        can't end before it was signed.
+      tags: [team]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/StaffDetailsInput" }
+      responses:
+        "200":
+          description: The person.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/StaffDetails" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/staff-options:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listStaffOptions
+      x-outflare-access: { scope: staff.private }
+      summary: List the directory's editable lists
+      description: |
+        Scope: staff.private (owners only). The values of person_type,
+        hired_through and paid_by, in order, with the meaning code reads
+        for each. A list never changed shows its defaults.
+      tags: [team]
+      responses:
+        "200":
+          description: The lists.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/StaffOptions" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/staff-options/{list}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: list, in: path, required: true, schema: { type: string, enum: [person_type, hired_through, paid_by, organization_kind, pay_basis] } }
+    put:
+      operationId: replaceStaffOptions
+      x-outflare-access: { scope: staff.private }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Replace one of the directory's lists
+      description: |
+        Scope: staff.private (owners only). Sets the list's values in
+        order. A value left out that a record still uses stays, archived,
+        so the record keeps its label.
+      tags: [team]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [options]
+              properties:
+                options: { type: array, maxItems: 50, items: { $ref: "#/components/schemas/StaffOption" } }
+      responses:
+        "200":
+          description: The lists.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/StaffOptions" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/staff-organizations:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listStaffOrganizations
+      x-outflare-access: { scope: staff.private }
+      summary: List organisations people work through
+      description: |
+        Scope: staff.private (owners only). The company's own companies,
+        agencies, hiring platforms and service providers, active first,
+        with how many people each has now, its agreements and what it was
+        paid.
+      tags: [team]
+      parameters:
+        - { name: kind, in: query, description: A value of the organization_kind list., schema: { type: string } }
+        - { name: active, in: query, schema: { type: string, enum: ["true", "false"] } }
+      responses:
+        "200":
+          description: Organisations.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/StaffOrganization" } }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createStaffOrganization
+      x-outflare-access: { scope: staff.private }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Add an organisation
+      description: "Scope: staff.private (owners only). Names are unique in the workspace, ignoring case."
+      tags: [team]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/StaffOrganizationInput" }
+      responses:
+        "201":
+          description: The organisation.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/StaffOrganization" }
+        "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/staff-organizations/{id}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getStaffOrganization
+      x-outflare-access: { scope: staff.private }
+      summary: Get an organisation
+      description: "Scope: staff.private (owners only)."
+      tags: [team]
+      responses:
+        "200":
+          description: The organisation.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/StaffOrganization" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateStaffOrganization
+      x-outflare-access: { scope: staff.private }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Change an organisation
+      description: "Scope: staff.private (owners only). Only the fields sent change."
+      tags: [team]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/StaffOrganizationInput" }
+      responses:
+        "200":
+          description: The organisation.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/StaffOrganization" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+    delete:
+      operationId: deleteStaffOrganization
+      x-outflare-access: { scope: staff.private }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Remove an organisation added by mistake
+      description: "Scope: staff.private (owners only). One with recorded pay can't be removed: mark it inactive instead."
+      tags: [team]
+      responses:
+        "204": { description: Removed. }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/staff-agreements:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listStaffAgreements
+      x-outflare-access: { scope: staff.private }
+      summary: List agreements
+      description: |
+        Scope: staff.private (owners only). What the company agreed with
+        people and organisations, newest first. organization_id also
+        finds agreements made through that agency or platform.
+      tags: [team]
+      parameters:
+        - { name: staff_id, in: query, schema: { type: string, format: uuid } }
+        - { name: organization_id, in: query, schema: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: Agreements.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/StaffAgreement" } }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createStaffAgreement
+      x-outflare-access: { scope: staff.private }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Add an agreement
+      description: |
+        Scope: staff.private (owners only). With a person (staff_id) or an
+        organisation (organization_id), exactly one. It can't end before it
+        was signed or started. When pay changes, end the old agreement and
+        add a new one, so the history stays.
+      tags: [team]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/StaffAgreementInput" }
+      responses:
+        "201":
+          description: The agreement.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/StaffAgreement" }
+        "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/staff-agreements/{id}:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getStaffAgreement
+      x-outflare-access: { scope: staff.private }
+      summary: Get an agreement
+      description: "Scope: staff.private (owners only)."
+      tags: [team]
+      responses:
+        "200":
+          description: The agreement.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/StaffAgreement" }
+        "404": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateStaffAgreement
+      x-outflare-access: { scope: staff.private }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Change an agreement
+      description: "Scope: staff.private (owners only). Only the fields sent change; who it is with can't."
+      tags: [team]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/StaffAgreementInput" }
+      responses:
+        "200":
+          description: The agreement.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/StaffAgreement" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+    delete:
+      operationId: deleteStaffAgreement
+      x-outflare-access: { scope: staff.private }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Remove an agreement added by mistake
+      description: "Scope: staff.private (owners only). One that payments were made under can't be removed: set its end date instead."
+      tags: [team]
+      responses:
+        "204": { description: Removed. }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/staff-payments:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listStaffPayments
+      x-outflare-access: { scope: staff.private }
+      summary: List payments recorded
+      description: |
+        Scope: staff.private (owners only). Payments the company made to
+        people and organisations, newest first, at most 1,000. They are
+        records of money paid elsewhere: Outflare never sends money.
+      tags: [team]
+      parameters:
+        - { name: staff_id, in: query, schema: { type: string, format: uuid } }
+        - { name: organization_id, in: query, schema: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: Payments.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/StaffPayment" } }
+        "400": { $ref: "#/components/responses/Error" }
+        default: { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createStaffPayment
+      x-outflare-access: { scope: staff.private }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Record a payment
+      description: |
+        Scope: staff.private (owners only). Records a payment made
+        elsewhere; nothing is sent. A reference already recorded is
+        refused, so a bank line never counts twice.
+      tags: [team]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/StaffPaymentInput" }
+      responses:
+        "201":
+          description: The payment.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/StaffPayment" }
+        "400": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/staff-payments/{id}/reverse:
+    parameters:
+      - { $ref: "#/components/parameters/Workspace" }
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      operationId: reverseStaffPayment
+      x-outflare-access: { scope: staff.private }
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      summary: Reverse a payment recorded by mistake
+      description: "Scope: staff.private (owners only). Adds a reversing entry dated today; payments are never changed or removed."
+      tags: [team]
+      responses:
+        "201":
+          description: The reversing entry.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/StaffPayment" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "202": { $ref: "#/components/responses/MissionHeld" }
+        default: { $ref: "#/components/responses/Error" }
+  /v1/workspaces/{ws}/staff-changes:
+    parameters: [{ $ref: "#/components/parameters/Workspace" }]
+    get:
+      operationId: listStaffChanges
+      x-outflare-access: { scope: staff.private }
+      summary: List changes to private records
+      description: |
+        Scope: staff.private (owners only). Who changed which private
+        record and when, and the names of the fields that changed, newest
+        first, at most 500. Values are never kept.
+      tags: [team]
+      parameters:
+        - { name: staff_id, in: query, schema: { type: string, format: uuid } }
+        - { name: organization_id, in: query, schema: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: Changes.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/StaffChange" } }
+        "400": { $ref: "#/components/responses/Error" }
         default: { $ref: "#/components/responses/Error" }
   /v1/brands/{brand}/telegram-chats:
     parameters:
@@ -79697,7 +80323,7 @@ components:
         invites: { type: integer, description: Pending invites for this role. }
     Scope:
       type: string
-      enum: [workspace.read, workspace.manage, context.manage, members.read, members.manage, members.remove, roles.manage, tokens.manage, audit.read, mailboxes.read, mailboxes.manage, leads.read, leads.manage, content.read, content.manage, accounts.read, accounts.manage, browser.read, browser.manage, suppressions.manage, sequences.read, sequences.manage, inbox.read, inbox.manage, integrations.read, integrations.manage, outcomes.read, outcomes.manage, profiles.read, profiles.manage, infrastructure.read, infrastructure.manage, infrastructure.approve, analytics.read, analytics.manage, ads.manage, ads.remove, missions.read, missions.run, missions.approve, agents.read, agents.run, actions.read, actions.approve, actions.manage, coverage.read, coverage.manage, coverage.finance.read, coverage.finance.manage, coverage.approve, seo.read, seo.manage, social.read, social.manage, social.post, partners.read, partners.manage, partners.conversions, my_ai_accounts.read, my_ai_accounts.manage, ai_accounts.read, ai_accounts.manage, ai_spend.read, webhooks.read, webhooks.manage, emails.read, emails.send, emails.manage, customers.read, customers.manage, catalog.manage, query.endpoints]
+      enum: [workspace.read, workspace.manage, context.manage, members.read, members.manage, members.remove, roles.manage, tokens.manage, audit.read, mailboxes.read, mailboxes.manage, leads.read, leads.manage, content.read, content.manage, accounts.read, accounts.manage, browser.read, browser.manage, suppressions.manage, sequences.read, sequences.manage, inbox.read, inbox.manage, integrations.read, integrations.manage, outcomes.read, outcomes.manage, profiles.read, profiles.manage, infrastructure.read, infrastructure.manage, infrastructure.approve, analytics.read, analytics.manage, ads.manage, ads.remove, missions.read, missions.run, missions.approve, agents.read, agents.run, actions.read, actions.approve, actions.manage, coverage.read, coverage.manage, coverage.finance.read, coverage.finance.manage, coverage.approve, seo.read, seo.manage, social.read, social.manage, social.post, partners.read, partners.manage, partners.conversions, my_ai_accounts.read, my_ai_accounts.manage, ai_accounts.read, ai_accounts.manage, ai_spend.read, staff.private, webhooks.read, webhooks.manage, emails.read, emails.send, emails.manage, customers.read, customers.manage, catalog.manage, query.endpoints]
     Workspace:
       type: object
       required: [id, name, slug, test, records_edit_owners_only]
@@ -83859,6 +84485,8 @@ components:
         - { $ref: "#/components/schemas/PathsSpec" }
         - { $ref: "#/components/schemas/LifecycleSpec" }
         - { $ref: "#/components/schemas/StickinessSpec" }
+        - { $ref: "#/components/schemas/LifetimeValueSpec" }
+        - { $ref: "#/components/schemas/DistributionSpec" }
     LifecycleSpec:
       type: object
       required: [step]
@@ -83914,6 +84542,153 @@ components:
               share: { type: number, description: "Of everyone active in the dates, 0 to 1." }
               or_more: { type: boolean, description: "On the last bucket, when it also holds people with more periods." }
         average_periods: { type: [number, "null"], description: How many periods an active person had on average. }
+        from: { type: string, format: date-time }
+        to: { type: string, format: date-time }
+    DistributionSpec:
+      type: object
+      additionalProperties: false
+      properties:
+        date_range:
+          type: object
+          additionalProperties: false
+          description: "The dates of the payments counted: a preset that moves with today, or from and to (both included), at most three years apart. The last 12 months when empty."
+          properties:
+            preset: { type: string, enum: [last_12_months, last_24_months, last_36_months, today, yesterday, last_7_days, last_14_days, last_30_days, last_90_days, last_180_days, last_365_days, this_month, last_month, this_year] }
+            from: { type: string, format: date }
+            to: { type: string, format: date }
+        measure:
+          type: string
+          enum: [total_paid, average_payment, payments, days_between, days_since_last]
+          description: "The number per customer: what they paid in the dates, their average payment, how many times they paid, the average days between their payments (customers who paid more than once), or the days since their last payment. Default: total_paid."
+        breakdown: { type: string, description: "Split customers by a field of their first payment in the dates (the catalog's payment fields, such as product, product_category, source, first_channel) or of their record (person:<key>, company:<key>)." }
+        filters: { type: array, maxItems: 10, items: { $ref: "#/components/schemas/InsightFilter" }, description: Count the payments that pass every condition. }
+        gross: { type: boolean, description: "For total_paid, count payments only. By default refunds and chargebacks come off." }
+        buckets: { type: array, maxItems: 29, items: { type: integer, minimum: 1 }, description: "The edges between ranges, ascending, in the measure's unit (minor units for money). Chosen from the data when empty." }
+        limit: { type: integer, minimum: 1, maximum: 50, description: "How many groups of the breakdown come back, most customers first. Default: 10." }
+    DistributionResult:
+      type: object
+      required: [measure, unit, currency, gross, customers, total, average, median, p90, top_customers, top_share, buckets, groups, groups_total, from, to]
+      properties:
+        measure: { type: string, enum: [total_paid, average_payment, payments, days_between, days_since_last] }
+        unit: { type: string, enum: [money, count, days], description: "What every number is in: money in the currency's minor unit (cents), a count, or whole days." }
+        currency: { type: string, description: "The brand's currency.", example: USD }
+        gross: { type: boolean }
+        breakdown: { type: string }
+        customers: { type: integer, description: How many customers have a number. }
+        total: { type: integer, description: The sum of every customer's number. }
+        average: { type: integer }
+        median: { type: integer, description: "The middle customer's number: half are under it." }
+        p90: { type: integer, description: Nine customers in ten are at or under this. }
+        top_customers: { type: integer, description: The tenth of customers with the largest numbers. }
+        top_share: { type: number, description: "How much of total is theirs, 0 to 1." }
+        buckets:
+          type: array
+          description: The ranges, smallest first.
+          items:
+            type: object
+            required: [from, to, customers, share, total, total_share]
+            properties:
+              from: { type: integer, description: The start of the range. }
+              to: { type: [integer, "null"], description: "The end of the range, not included; null for the last range." }
+              customers: { type: integer }
+              share: { type: number, description: "customers of all customers, 0 to 1." }
+              total: { type: integer, description: The sum of these customers' numbers. }
+              total_share: { type: number, description: "total of every customer's, 0 to 1." }
+        groups:
+          type: array
+          description: "The breakdown's values, most customers first; empty without a breakdown."
+          items:
+            type: object
+            required: [value, customers, total, average, median, p90, buckets]
+            properties:
+              value: { type: string, description: 'The field''s value; "" for customers without one.' }
+              customers: { type: integer }
+              total: { type: integer }
+              average: { type: integer }
+              median: { type: integer }
+              p90: { type: integer }
+              buckets: { type: array, items: { type: integer }, description: "How many of its customers are in each range, in the order of buckets." }
+        groups_total: { type: integer, description: "How many values the breakdown has; more than groups holds when limit cut it." }
+        from: { type: string, format: date-time }
+        to: { type: string, format: date-time }
+    LifetimeValueSpec:
+      type: object
+      additionalProperties: false
+      properties:
+        date_range:
+          type: object
+          additionalProperties: false
+          description: "When the customers first paid: a preset that moves with today, or from and to (both included), at most three years apart. The month presets start on the first of a month, so every cohort is a whole month. The last 12 months when empty."
+          properties:
+            preset: { type: string, enum: [last_12_months, last_24_months, last_36_months, today, yesterday, last_7_days, last_14_days, last_30_days, last_90_days, last_180_days, last_365_days, this_month, last_month, this_year] }
+            from: { type: string, format: date }
+            to: { type: string, format: date }
+        interval: { type: string, enum: [week, month], description: "The period value adds up by after the first payment, and the cohorts customers first paid in. Default: month." }
+        periods: { type: integer, minimum: 1, maximum: 36, description: "How many periods after the first payment to follow. Default: 12." }
+        breakdown: { type: string, description: "Split customers by a field of their first payment (the catalog's payment fields, such as product, product_category, source, first_channel) or of their record (person:<key>, company:<key>)." }
+        filters: { type: array, maxItems: 10, items: { $ref: "#/components/schemas/InsightFilter" }, description: Keep the customers whose first payment passes every condition. }
+        gross: { type: boolean, description: "Count payments only. By default refunds and chargebacks come off." }
+        limit: { type: integer, minimum: 1, maximum: 50, description: "How many groups of the breakdown come back, most customers first. Default: 10." }
+        view: { type: string, enum: [value, retention], description: "How a saved report is drawn: value (the default) adds up per customer, retention shows what the same customers paid in each later period beside their first (each point's kept). The numbers that come back are the same." }
+    LifetimeValuePoint:
+      type: object
+      required: [period, value_minor, customers, partial]
+      properties:
+        period: { type: integer, description: "Counted from 1: the first week or month after the first payment." }
+        value_minor: { type: integer, description: "The average paid per customer by the end of the period, in the currency's minor unit (cents)." }
+        customers: { type: integer, description: "How many customers have reached this period: the ones this period's part is averaged over." }
+        partial: { type: boolean, description: "Some of them are still inside the period, so the value can still grow." }
+        kept:
+          type: object
+          description: "Money retention: what the customers who have finished this period paid in it, beside what the same customers paid in their first period. paid_minor over first_minor is the share of first-period money kept, which passes 1 when fewer customers pay more. Absent while nobody has finished the period."
+          required: [customers, first_minor, paid_minor, payers]
+          properties:
+            customers: { type: integer, description: How many customers have finished the period. }
+            first_minor: { type: integer, description: "What they paid in their first period, in the currency's minor unit (cents)." }
+            paid_minor: { type: integer, description: "What they paid in this period. Refunds come off the period they fall in." }
+            payers: { type: integer, description: How many of them paid in this period. }
+    LifetimeValueResult:
+      type: object
+      required: [interval, periods, currency, gross, customers, total_minor, average_minor, median_minor, repeat, repeat_share, curve, groups, groups_total, cohorts, from, to]
+      properties:
+        interval: { type: string, enum: [week, month] }
+        periods: { type: integer }
+        currency: { type: string, description: "The brand's currency, which every amount is in.", example: USD }
+        gross: { type: boolean }
+        breakdown: { type: string }
+        customers: { type: integer, description: How many customers these are. }
+        total_minor: { type: integer, description: "Everything they have paid to date, in the currency's minor unit (cents)." }
+        average_minor: { type: integer, description: "total_minor per customer." }
+        median_minor: { type: integer, description: "The middle customer's total: half paid less than this." }
+        repeat: { type: integer, description: How many paid more than once. }
+        repeat_share: { type: number, description: "repeat of customers, 0 to 1." }
+        curve: { type: array, description: "Every customer together, period by period, up to the last period any of them has reached.", items: { $ref: "#/components/schemas/LifetimeValuePoint" } }
+        groups:
+          type: array
+          description: "The breakdown's values, most customers first; empty without a breakdown."
+          items:
+            type: object
+            required: [value, customers, total_minor, average_minor, median_minor, repeat, repeat_share, curve]
+            properties:
+              value: { type: string, description: 'The field''s value; "" for customers without one.' }
+              customers: { type: integer, description: How many customers these are. }
+              total_minor: { type: integer, description: "Everything they have paid to date, in the currency's minor unit (cents)." }
+              average_minor: { type: integer, description: "total_minor per customer." }
+              median_minor: { type: integer, description: "The middle customer's total: half paid less than this." }
+              repeat: { type: integer, description: How many paid more than once. }
+              repeat_share: { type: number, description: "repeat of customers, 0 to 1." }
+              curve: { type: array, items: { $ref: "#/components/schemas/LifetimeValuePoint" } }
+        groups_total: { type: integer, description: "How many values the breakdown has; more than groups holds when limit cut it." }
+        cohorts:
+          type: array
+          description: The customers who first paid in each calendar week or month of the dates, oldest first.
+          items:
+            type: object
+            required: [start, customers, curve]
+            properties:
+              start: { type: string, format: date-time }
+              customers: { type: integer }
+              curve: { type: array, items: { $ref: "#/components/schemas/LifetimeValuePoint" } }
         from: { type: string, format: date-time }
         to: { type: string, format: date-time }
     RetentionSpec:
@@ -83975,8 +84750,8 @@ components:
         updated_at: { type: string, format: date-time }
     DashboardTile:
       type: object
-      description: A saved insight, a saved report, or a note.
-      required: [id, insight_id, insight, report_view_id, report_view, note, x, y, w, h, own_dates]
+      description: A saved insight, a saved report, a saved query, or a note.
+      required: [id, insight_id, insight, report_view_id, report_view, saved_query_id, saved_query, note, x, y, w, h, own_dates]
       properties:
         id: { type: string, format: uuid }
         insight_id: { type: [string, "null"], format: uuid }
@@ -83992,6 +84767,18 @@ components:
                 name: { type: string }
                 source: { type: string, enum: [site, tracker], description: "What it reports on: site visits or tracker clicks." }
                 group_by: { type: array, items: { type: string }, description: "Its levels." }
+            - { type: "null" }
+        saved_query_id: { type: [string, "null"], format: uuid, description: "The saved query this tile shows; run it with POST .../queries/{saved_query}/run, which needs customers.read." }
+        saved_query:
+          oneOf:
+            - type: object
+              required: [id, name, description, chart, archived]
+              properties:
+                id: { type: string, format: uuid }
+                name: { type: string }
+                description: { type: string }
+                chart: { oneOf: [{ $ref: "#/components/schemas/QueryChart" }, { type: "null" }], description: "How its results are drawn; null for a table." }
+                archived: { type: boolean, description: "The query was archived, so it no longer runs." }
             - { type: "null" }
         note: { type: string, description: Markdown, for a note tile. }
         x: { type: integer, minimum: 0, maximum: 11 }
@@ -84032,6 +84819,7 @@ components:
       properties:
         insight_id: { type: string, format: uuid, description: A saved insight of the brand. On a change, can't be set. }
         report_view_id: { type: string, format: uuid, description: "A saved report of the brand that is shared with the team (listBrandReportViews). On a change, can't be set." }
+        saved_query_id: { type: string, format: uuid, description: "A saved query of the brand that is shared with the brand (listSavedQueries, visibility brand). On a change, can't be set." }
         own_dates: { type: boolean, description: "Keep the insight's own dates on a dashboard that sets a date range. For a saved insight's tile only." }
         note: { type: string, maxLength: 4000 }
         x: { type: integer, minimum: 0, maximum: 11 }
@@ -84082,7 +84870,7 @@ components:
             required: [id, kind, name, display, note, x, y, w, h]
             properties:
               id: { type: string, format: uuid }
-              kind: { type: [string, "null"], enum: [funnel, trend, retention, paths, lifecycle, stickiness, report, null], description: "The insight's kind; report for a saved report, which is named here but never run from a link; null for a note, or a tile whose insight was deleted." }
+              kind: { type: [string, "null"], enum: [funnel, trend, retention, paths, lifecycle, stickiness, lifetime_value, distribution, report, query, null], description: "The insight's kind; report for a saved report and query for a saved query, which are named here but never run from a link; null for a note, or a tile whose insight was deleted." }
               name: { type: [string, "null"] }
               display: { type: [string, "null"], description: "How a trend is drawn (line, area, bar, stacked_bar, horizontal_bar, pie, map, number, table)." }
               view:
@@ -84139,7 +84927,7 @@ components:
       properties:
         id: { type: string, format: uuid }
         brand_id: { type: string, format: uuid }
-        kind: { type: string, enum: [funnel, trend, retention, paths, lifecycle, stickiness] }
+        kind: { type: string, enum: [funnel, trend, retention, paths, lifecycle, stickiness, lifetime_value, distribution] }
         name: { type: string }
         description: { type: string }
         spec: { $ref: "#/components/schemas/InsightSpec" }
@@ -84151,7 +84939,7 @@ components:
       required: [name, spec]
       additionalProperties: false
       properties:
-        kind: { type: string, enum: [funnel, trend, retention, paths, lifecycle, stickiness], default: funnel }
+        kind: { type: string, enum: [funnel, trend, retention, paths, lifecycle, stickiness, lifetime_value, distribution], default: funnel }
         name: { type: string, minLength: 1, maxLength: 120 }
         description: { type: string, maxLength: 1000 }
         spec: { $ref: "#/components/schemas/InsightSpec" }
@@ -85483,6 +86271,251 @@ components:
       properties:
         name: { type: string, maxLength: 100 }
         head_id: { type: [string, "null"], format: uuid }
+    MoneyTotal:
+      type: object
+      required: [currency, amount_minor]
+      properties:
+        currency: { type: string, example: EUR }
+        amount_minor: { type: integer, format: int64, description: In the currency's minor unit (cents). }
+    StaffDetails:
+      type: object
+      description: A person in the team directory with their private details (owners only).
+      required: [id, name, email, title, department_id, team_id, manager_id, user_id, status, started_on, left_on, person_type, schedule, country, company_id, agency_id, private_email, phone, whatsapp, telegram, other_contact, date_of_birth, address, on_slack, agreement, agreements, paid_so_far, last_paid_on, missing, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        email: { type: [string, "null"], description: Work email, lower case. }
+        title: { type: string, description: Their position. }
+        department_id: { type: [string, "null"], format: uuid }
+        team_id: { type: [string, "null"], format: uuid }
+        manager_id: { type: [string, "null"], format: uuid, description: Who they report to. }
+        user_id: { type: [string, "null"], format: uuid }
+        status: { type: string, enum: [active, leaving, left] }
+        started_on: { type: [string, "null"], format: date }
+        left_on: { type: [string, "null"], format: date }
+        person_type: { type: string, description: "A value of the person_type list (GET staff-options), or empty." }
+        schedule: { type: string, enum: [full_time, part_time, ""] }
+        country: { type: string, description: A two-letter ISO 3166 code, or empty., example: PT }
+        company_id: { type: [string, "null"], format: uuid, description: The company's own company (an organisation whose kind means our_company) they work for. }
+        agency_id: { type: [string, "null"], format: uuid, description: The agency that placed them. }
+        private_email: { type: string }
+        phone: { type: string, description: Starts with + and the country code. }
+        whatsapp: { type: string }
+        telegram: { type: string }
+        other_contact: { type: string }
+        date_of_birth: { type: [string, "null"], format: date }
+        address: { type: string }
+        on_slack: { type: [boolean, "null"], description: Null when not known. }
+        agreement:
+          description: Their current agreement (contract and pay), or the newest when none is current.
+          oneOf: [{ $ref: "#/components/schemas/StaffAgreement" }, { type: "null" }]
+        agreements: { type: integer, description: How many agreements they have had. }
+        paid_so_far: { type: array, items: { $ref: "#/components/schemas/MoneyTotal" }, description: The sum of payments recorded, per currency. }
+        last_paid_on: { type: [string, "null"], format: date }
+        missing: { type: array, items: { type: string }, description: "The details not filled in yet, by field name (agreement.amount_minor for the current agreement's)." }
+        updated_at: { type: string, format: date-time }
+    StaffDetailsInput:
+      type: object
+      description: Only the fields sent change.
+      properties:
+        name: { type: string, maxLength: 200 }
+        email: { type: [string, "null"] }
+        title: { type: string, maxLength: 200 }
+        department_id: { type: [string, "null"], format: uuid }
+        team_id: { type: [string, "null"], format: uuid }
+        manager_id: { type: [string, "null"], format: uuid }
+        user_id: { type: [string, "null"], format: uuid }
+        status: { type: string, enum: [active, leaving, left] }
+        started_on: { type: [string, "null"], format: date }
+        left_on: { type: [string, "null"], format: date }
+        person_type: { type: [string, "null"] }
+        schedule: { type: [string, "null"], enum: [full_time, part_time, "", null] }
+        country: { type: [string, "null"] }
+        company_id: { type: [string, "null"], format: uuid }
+        agency_id: { type: [string, "null"], format: uuid }
+        private_email: { type: [string, "null"] }
+        phone: { type: [string, "null"], example: "+44 7700 900123" }
+        whatsapp: { type: [string, "null"] }
+        telegram: { type: [string, "null"] }
+        other_contact: { type: [string, "null"], maxLength: 500 }
+        date_of_birth: { type: [string, "null"], format: date }
+        address: { type: [string, "null"], maxLength: 1000 }
+        on_slack: { type: [boolean, "null"] }
+        agreement: { $ref: "#/components/schemas/StaffAgreementInput" }
+    StaffSummary:
+      type: object
+      required: [people_now, currency, monthly_pay_minor, monthly_pay_people_minor, monthly_pay_organizations_minor, unconverted, by_department, by_currency]
+      properties:
+        people_now: { type: integer, description: People who haven't left. }
+        currency: { type: string, description: The reporting currency. }
+        monthly_pay_minor: { type: integer, format: int64, description: "What current agreements cost a month, people's and active organisations', in the reporting currency's minor unit." }
+        monthly_pay_people_minor: { type: integer, format: int64 }
+        monthly_pay_organizations_minor: { type: integer, format: int64 }
+        unconverted: { type: integer, description: Current agreements left out of the monthly figures (no amount or hours, or no rate for their currency). }
+        by_department:
+          type: array
+          items:
+            type: object
+            required: [department_id, people]
+            properties:
+              department_id: { type: [string, "null"], format: uuid }
+              people: { type: integer }
+        by_currency: { type: array, items: { $ref: "#/components/schemas/MoneyTotal" }, description: The monthly figure in each agreement's own currency. }
+    StaffOption:
+      type: object
+      required: [value, label, meaning]
+      properties:
+        value: { type: string, pattern: "^[a-z0-9_]{1,50}$" }
+        label: { type: string, maxLength: 100 }
+        meaning: { type: string, description: What code reads about the value (meanings lists the choices per list). }
+        archived: { type: boolean }
+    StaffOptions:
+      type: object
+      required: [lists, meanings]
+      properties:
+        lists:
+          type: object
+          additionalProperties: { type: array, items: { $ref: "#/components/schemas/StaffOption" } }
+        meanings:
+          type: object
+          additionalProperties: { type: array, items: { type: string } }
+    StaffOrganization:
+      type: object
+      description: An organisation people work through, or one of the company's own companies (owners only).
+      required: [id, name, kind, website, contact_name, email, phone, country, active, on_slack, notes, people, agreements, paid_so_far, last_paid_on, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        kind: { type: string, description: "A value of the workspace's organization_kind list (GET staff-options); its meaning (our_company, agency, platform, service_provider, other) is what Outflare reads." }
+        website: { type: string }
+        contact_name: { type: string }
+        email: { type: string }
+        phone: { type: string }
+        country: { type: string }
+        active: { type: boolean }
+        on_slack: { type: [boolean, "null"] }
+        notes: { type: string }
+        people: { type: integer, description: "People who haven't left and work for it (our_company) or were placed by it (agency)." }
+        agreements: { type: integer, description: Agreements with it or made through it. }
+        paid_so_far: { type: array, items: { $ref: "#/components/schemas/MoneyTotal" } }
+        last_paid_on: { type: [string, "null"], format: date }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    StaffOrganizationInput:
+      type: object
+      properties:
+        name: { type: string, maxLength: 200 }
+        kind: { type: string, description: "A value of the workspace's organization_kind list (GET staff-options); its meaning (our_company, agency, platform, service_provider, other) is what Outflare reads." }
+        website: { type: [string, "null"], maxLength: 500 }
+        contact_name: { type: [string, "null"], maxLength: 200 }
+        email: { type: [string, "null"] }
+        phone: { type: [string, "null"] }
+        country: { type: [string, "null"] }
+        active: { type: boolean }
+        on_slack: { type: [boolean, "null"] }
+        notes: { type: [string, "null"], maxLength: 5000 }
+    StaffAgreement:
+      type: object
+      description: What the company agreed with one person or one organisation, for a period (owners only).
+      required: [id, staff_id, organization_id, company_id, title, hired_through, via_id, signed_on, starts_on, ends_on, notice_period, document, pay_basis, amount_minor, currency, hours_per_month, commission_terms, pay_day, paid_by, paid_from, notes, current, monthly_minor, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        staff_id: { type: [string, "null"], format: uuid }
+        organization_id: { type: [string, "null"], format: uuid }
+        company_id: { type: [string, "null"], format: uuid, description: Which of the company's own companies the contract is with. }
+        title: { type: string }
+        hired_through: { type: string, description: A value of the hired_through list. }
+        via_id: { type: [string, "null"], format: uuid, description: The platform or agency hired through. }
+        signed_on: { type: [string, "null"], format: date }
+        starts_on: { type: [string, "null"], format: date }
+        ends_on: { type: [string, "null"], format: date }
+        notice_period: { type: string }
+        document: { type: string, description: "Where the signed copy is: a link or a place, never the file." }
+        pay_basis: { type: string, description: "A value of the pay_basis list (monthly, hourly or monthly_commission by default), or empty." }
+        amount_minor: { type: [integer, "null"], format: int64, description: "The monthly amount, or the hourly rate, in the currency's minor unit." }
+        currency: { type: string }
+        hours_per_month: { type: [number, "null"], description: Usual hours a month, for hourly pay. }
+        commission_terms: { type: string }
+        pay_day: { type: string }
+        paid_by: { type: string, description: A value of the paid_by list. }
+        paid_from: { type: string, description: The company account it is paid from. }
+        notes: { type: string }
+        current: { type: boolean, description: Started (or no start date) and not ended. }
+        monthly_minor: { type: [integer, "null"], format: int64, description: "What it costs a month in its own currency: the monthly amount, or the hourly rate times the usual hours." }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    StaffAgreementInput:
+      type: object
+      description: Only the fields sent change.
+      properties:
+        staff_id: { type: [string, "null"], format: uuid, description: Only when adding one. }
+        organization_id: { type: [string, "null"], format: uuid, description: Only when adding one. }
+        company_id: { type: [string, "null"], format: uuid }
+        title: { type: [string, "null"], maxLength: 200 }
+        hired_through: { type: [string, "null"] }
+        via_id: { type: [string, "null"], format: uuid }
+        signed_on: { type: [string, "null"], format: date }
+        starts_on: { type: [string, "null"], format: date }
+        ends_on: { type: [string, "null"], format: date }
+        notice_period: { type: [string, "null"], maxLength: 100 }
+        document: { type: [string, "null"], maxLength: 1000 }
+        pay_basis: { type: [string, "null"], description: "A value of the pay_basis list, or empty." }
+        amount_minor: { type: [integer, "null"], format: int64, minimum: 0 }
+        currency: { type: [string, "null"] }
+        hours_per_month: { type: [number, "null"] }
+        commission_terms: { type: [string, "null"], maxLength: 1000 }
+        pay_day: { type: [string, "null"], maxLength: 100 }
+        paid_by: { type: [string, "null"] }
+        paid_from: { type: [string, "null"], maxLength: 200 }
+        notes: { type: [string, "null"], maxLength: 5000 }
+    StaffPayment:
+      type: object
+      description: A payment the company made elsewhere, recorded here (owners only).
+      required: [id, staff_id, organization_id, agreement_id, paid_on, amount_minor, currency, method, source, reference, notes, reverses_id, reversed, created_at]
+      properties:
+        id: { type: string, format: uuid }
+        staff_id: { type: [string, "null"], format: uuid }
+        organization_id: { type: [string, "null"], format: uuid }
+        agreement_id: { type: [string, "null"], format: uuid }
+        paid_on: { type: string, format: date }
+        amount_minor: { type: integer, format: int64, description: Negative only on a reversal. }
+        currency: { type: string }
+        method: { type: string }
+        source: { type: string, enum: [typed, bank_import, suggestion] }
+        reference: { type: string, description: "The bank's own reference, so a payment is never recorded twice." }
+        notes: { type: string }
+        reverses_id: { type: [string, "null"], format: uuid }
+        reversed: { type: boolean }
+        created_at: { type: string, format: date-time }
+    StaffPaymentInput:
+      type: object
+      required: [paid_on, amount_minor, currency]
+      properties:
+        staff_id: { type: [string, "null"], format: uuid }
+        organization_id: { type: [string, "null"], format: uuid }
+        agreement_id: { type: [string, "null"], format: uuid }
+        paid_on: { type: string, format: date }
+        amount_minor: { type: integer, format: int64, minimum: 1 }
+        currency: { type: string }
+        method: { type: string, maxLength: 50 }
+        source: { type: string, enum: [typed, bank_import, suggestion] }
+        reference: { type: string, maxLength: 200 }
+        notes: { type: string, maxLength: 2000 }
+    StaffChange:
+      type: object
+      description: One change to a private record. Field names only, never values.
+      required: [id, subject, subject_id, staff_id, organization_id, action, fields, actor_id, actor_name, at]
+      properties:
+        id: { type: string, format: uuid }
+        subject: { type: string, enum: [person, organization, agreement, payment] }
+        subject_id: { type: string, format: uuid }
+        staff_id: { type: [string, "null"], format: uuid }
+        organization_id: { type: [string, "null"], format: uuid }
+        action: { type: string }
+        fields: { type: array, items: { type: string } }
+        actor_id: { type: [string, "null"], format: uuid }
+        actor_name: { type: [string, "null"] }
+        at: { type: string, format: date-time }
     StaffAccount:
       type: object
       description: A work account the company owns and hands to someone.
