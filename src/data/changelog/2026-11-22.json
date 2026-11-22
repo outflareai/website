@@ -2,7 +2,7 @@
 	"version": "2026.11.22",
 	"date": "2026-11-22",
 	"status": "in-progress",
-	"updated": "2026-11-22T15:36:04Z",
+	"updated": "2026-11-22T16:07:31Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -115,7 +115,21 @@
 			"edition": "open-source",
 			"text": "Outflare now warns you when a product event that came in most days stops arriving: Brand setup lists it under Needs attention, and it is sent as an alert, so you hear about a broken sender before your funnels and reports read too low.",
 			"at": "2026-11-22T15:36:04Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Every screen has a link of its own: pages sit under their area (for example /tracker/campaigns), and a page's tabs, an item's tabs and its layout are part of the link, so a pasted link opens exactly the screen you were on. A list's search and sorting travel in the link too. Links you saved before still open.",
+			"at": "2026-11-22T16:07:31Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "general",
+			"edition": "cloud",
+			"text": "On Outflare Cloud, the agent's open task, Agent Mail's tabs and the outreach mailboxes' tabs each have a link of their own, so a pasted link opens exactly that screen. Links you saved before still open.",
+			"at": "2026-11-22T16:07:31Z"
 		}
 	],
-	"through": "933c81d+933c81d"
+	"through": "f59fb55+f59fb55"
 }
