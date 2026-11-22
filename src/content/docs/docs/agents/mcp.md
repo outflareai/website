@@ -120,6 +120,7 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `update_context`, `remember`, `update_memory`, `forget` | Save the company context, remember something lasting, correct or forget a memory | Yes |
 | `list_brands` | The brands the company markets, each with its website, domains, platforms and what it owns. Empty for a one-brand company | |
 | `get_brand_context`, `update_brand_context` | Read or save what is true for one brand: about, audience, goals, voice, rules (added to the company's) and notes | Yes |
+| `list_projects`, `list_goals`, `list_tasks`, `list_decisions`, their `get_`, `create_`, `update_` and `delete_` tools, `record_decision`, `get_goal_settings` | The company's and each brand's [projects, goals, tasks and decisions](/docs/guides/goals/), with who can see each one; agents see only what their person may see | Yes |
 | `list_ideal_customer_profiles`, `get_ideal_customer_profile` | Who the workspace sells to: each profile's description, filters and brand | |
 | `get_outcomes_report` | Cost per reply, meeting and won deal, for the workspace or by sequence or brand, with what is estimated or unpriced | |
 | `list_meetings`, `list_deals` | Meetings and deals, with which sequence each counts for | |
