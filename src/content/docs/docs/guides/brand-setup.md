@@ -60,6 +60,7 @@ Outflare is new and moves fast: the website script gets new versions, API operat
 | Website script outdated | Pages still running an older copy of the script than the one Outflare serves |
 | Site not verified | A site whose DNS record hasn't been found |
 | Connection broken | A connected tool that needs signing in again |
+| Event stopped arriving | A product event that came in most days has gone quiet for a day and a half, so [funnels](/docs/guides/funnels/#can-i-trust-the-drop-off), reports and audiences that use it read too low. An event's usual quiet time, such as weekends, doesn't count (critical) |
 | Client outdated | The SDK, CLI or MCP server you use is older than the version Outflare supports (critical) or the latest one (warning) |
 | Deprecated API call | Your code still calls an operation marked deprecated |
 
