@@ -2,7 +2,7 @@
 	"version": "2026.11.22",
 	"date": "2026-11-22",
 	"status": "in-progress",
-	"updated": "2026-11-22T19:30:20Z",
+	"updated": "2026-11-22T19:49:59Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -157,7 +157,14 @@
 			"edition": "open-source",
 			"text": "Sales sequences: write up to five emails with day gaps (or let AI draft them), check each one for the person, and Outflare sends them from your own mailbox in the same thread until they reply. Sales managers set the sending days, hours and daily cap in Sales settings.",
 			"at": "2026-11-22T19:05:44Z"
+		},
+		{
+			"kind": "fix",
+			"area": "social",
+			"edition": "open-source",
+			"text": "Mentions now also clear videos from a brand's or competitor's own channel that earlier scans kept, and recognise channels such as \"Northpeak Official\" or \"@northpeakhq\" as the company's own.",
+			"at": "2026-11-22T19:49:59Z"
 		}
 	],
-	"through": "ad66876+ad66876"
+	"through": "ea38003+ea38003"
 }
