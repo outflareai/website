@@ -17,6 +17,7 @@ An alert says something needs a person now. Outflare raises one once for each th
 | New errors (`error.new_issue`) | Your site or server threw an error nobody has seen before, or one you resolved came back ([Errors](/docs/guides/errors/)). At most ten an hour for a brand. | Everyone who can read analytics in the app. Emails are off until you switch them on, on the Errors page or here; then the owners and admins. |
 | Customers waiting on Telegram (`telegram.waiting`) | A customer wrote to a [company Telegram account](/docs/guides/team/#summaries-and-alerts) and nobody has answered for four hours, once per wait. | The account's holder, else the owners and admins. |
 | Telegram account handovers (`telegram.handover`) | A synced company Telegram account was given to someone; its recent customer chats are summarised for them. | The new holder, else the owners and admins. |
+| An event stopped arriving (`events.stopped`) | A product event that came in most days hasn't arrived for a day and a half, whatever sends it: your website, your backend or an import. Once each time it stops; [Brand setup](/docs/guides/brand-setup/#when-something-goes-out-of-date) lists it until the event is back. | The owners and admins |
 
 Each alert is:
 
