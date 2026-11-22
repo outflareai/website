@@ -25,6 +25,16 @@ In the app, open **Analytics** in the sidebar, then **Retention**. Retention run
 
 Save a question for everyone in the brand with a name; it keeps only the question, so every view counts again. Saved questions can go on a [dashboard](/docs/guides/dashboards/). The Retention page opens on the list of saved questions: click one to open it, or **New retention question** to start one.
 
+## Money
+
+The **Money** view asks whether the same customers keep paying. Each row is the customers who first paid in a month, and each column a month after that: how much of their first month's spend they paid in that month. Read it as a **share** (100% means they still spend what they did at the start; above 100% means they spend more), as the **amount**, or per customer who was still paying.
+
+- **Customers** kept sits beside it: how many of them paid at all in that month. Money kept can hold up while customers fall, when the ones who stay spend more.
+- A month some customers are still inside is left out, so a row never reads low because it is early.
+- Split by a customer field, such as the product they bought first, to compare groups.
+
+Money questions save and go on dashboards as a **Money kept** tile.
+
 ## Lifecycle
 
 The **Lifecycle** view at the top of the page asks the other retention question: is the active base growing, and from where? Pick what counts as **active** (a visit, a page, an event, a conversion or a payment) and a period. Each day, week or month then shows, as one bar:
@@ -52,4 +62,4 @@ Everyone in the workspace can run retention (`analytics.read`). Owners, admins a
 
 ## For agents and scripts
 
-The REST API is `POST /v1/brands/{brand}/insights/retention` for cohorts `POST /v1/brands/{brand}/insights/lifecycle` for lifecycle and `POST /v1/brands/{brand}/insights/stickiness` for stickiness, and `/v1/brands/{brand}/insights` keeps saved questions with funnels and trends. See the [API reference](/docs/api/). The MCP tools are `run_retention`, `run_lifecycle` and `run_stickiness`, with `save_insight` and the other saved-insight tools. Ask your agent something like *"Of the people who signed up each week this quarter, what share came back the week after, and which cohort sticks best?"*
+The REST API is `POST /v1/brands/{brand}/insights/retention` for cohorts `POST /v1/brands/{brand}/insights/lifecycle` for lifecycle and `POST /v1/brands/{brand}/insights/stickiness` for stickiness, and `/v1/brands/{brand}/insights` keeps saved questions with funnels and trends. See the [API reference](/docs/api/). The MCP tools are `run_retention`, `run_lifecycle` and `run_stickiness`, with `save_insight` and the other saved-insight tools. The Money view is a lifetime value question: `POST /v1/brands/{brand}/insights/lifetime-value` (MCP `run_lifetime_value`) gives each period's `kept` numbers. Ask your agent something like *"Of the people who signed up each week this quarter, what share came back the week after, and which cohort sticks best?"*
