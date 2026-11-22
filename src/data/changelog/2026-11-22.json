@@ -2,7 +2,7 @@
 	"version": "2026.11.22",
 	"date": "2026-11-22",
 	"status": "in-progress",
-	"updated": "2026-11-22T22:36:27Z",
+	"updated": "2026-11-22T23:46:06Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -283,7 +283,14 @@
 			"edition": "open-source",
 			"text": "Website and app tracking: a full batch of 20 events with large properties is no longer refused as too big (the limit is now 512 KB a request), and a session recording or heatmap picture of a heavy page is split into parts the server takes, instead of the whole part being lost.",
 			"at": "2026-11-22T22:36:27Z"
+		},
+		{
+			"kind": "launch",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Projects, goals and tasks under Company: start projects run by a department, set goals for the company or a brand, add tasks, and note what was decided on each goal. Each item can be seen by everyone, one team, management or just you, with a default per kind.",
+			"at": "2026-11-22T23:46:06Z"
 		}
 	],
-	"through": "6419021+6419021"
+	"through": "984f098+984f098"
 }
