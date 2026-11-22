@@ -2,7 +2,7 @@
 	"version": "2026.11.22",
 	"date": "2026-11-22",
 	"status": "in-progress",
-	"updated": "2026-11-22T12:46:16Z",
+	"updated": "2026-11-22T13:43:08Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -66,7 +66,14 @@
 			"edition": "open-source",
 			"text": "Dashboards: a saved query can be a tile. Add tile lists the brand's saved queries, and the tile shows the query's chart or its rows as a table, so any list or number you can ask for sits beside your charts. Agents add one with `add_dashboard_tile` and `saved_query_id`.",
 			"at": "2026-11-22T12:46:16Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Distribution: a new Analytics page shows how customers are spread by what they paid, how often they pay or the days between payments, with the median beside the average. Split it, click a range to see who is in it, save it or put it on a dashboard. Agents use `run_distribution`.",
+			"at": "2026-11-22T13:43:08Z"
 		}
 	],
-	"through": "c0e245c+c0e245c"
+	"through": "39a0649+39a0649"
 }
