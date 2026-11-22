@@ -34,7 +34,7 @@ In the app, open **Analytics** in the sidebar, then **Distribution**. It runs in
 
 ## Save it and put it on a dashboard
 
-Name it and press **Save** to open it again from the page or from [All reports](/docs/guides/all-reports/). On a [dashboard](/docs/guides/dashboards/), **Add tile** has **Distribution**: the tile shows the average, the median and the bars. It keeps its own dates, because they decide which payments each customer's number is made of.
+Name it and press **Save** to open it again from the page or from All reports. On a [dashboard](/docs/guides/dashboards/), **Add tile** has **Distribution**: the tile shows the average, the median and the bars. It keeps its own dates, because they decide which payments each customer's number is made of.
 
 ## Agents and the API
 
