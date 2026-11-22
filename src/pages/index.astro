@@ -5,7 +5,8 @@ import { modules, moduleStatusLabel } from '../data/modules';
 import { integrations } from '../data/integrations';
 import { softwareApplication, website } from '../lib/schema';
 
-const liveModules = modules.filter((m) => m.status === 'live').length;
+const growthModules = modules.filter((m) => m.area === 'growth');
+const companyModules = modules.filter((m) => m.area === 'company');
 const liveConnectors = integrations.filter((i) => i.status === 'available').length;
 
 // Real screenshots of the web app (outflare web/), taken from a local demo
@@ -60,13 +61,13 @@ $ claude mcp add --transport http outflare https://app.outflare.ai/mcp
 		file: 'agent.ts',
 		code: `import { createClient } from '@outflare/sdk';
 
-const gtm = createClient({
+const outflare = createClient({
   baseUrl: 'https://app.outflare.ai',
   token: process.env.OUTFLARE_TOKEN, // analytics.read
 });
 
 // What moved on each website?
-const { data } = await gtm.GET('/v1/brands/{brand}/analytics/changes', {
+const { data } = await outflare.GET('/v1/brands/{brand}/analytics/changes', {
   params: { path: { brand: process.env.OUTFLARE_BRAND } },
 });
 
@@ -77,7 +78,7 @@ for (const w of data.websites) console.log(w.host, w.headline.join(' '));`,
 		label: 'curl',
 		file: 'terminal',
 		code: `# Every keyword a site ranks for, with the change since last week
-$ curl "$GTM/v1/workspaces/$WS/seo/history?report=keywords" \\
+$ curl "$OUTFLARE_URL/v1/workspaces/$WS/seo/history?report=keywords" \\
     -H "Authorization: Bearer $OUTFLARE_TOKEN"`,
 	},
 ];
@@ -101,9 +102,9 @@ const methodColor: Record<string, string> = {
 const moduleTag: Record<string, string> = { live: 'badge-live', building: 'badge-next', planned: 'badge-muted' };
 
 const principles = [
-	{ title: 'Connect what you already use', body: 'Sign in once with OAuth or paste a key, and Outflare reads from your analytics, search, CRM, calendar and data tools. No connector is required to start.' },
-	{ title: 'Ask, or hand over a goal', body: 'Ask a question from Claude, ChatGPT or Cursor, or hand the agent a goal. It reads your company and brand context first, so you never explain twice.' },
-	{ title: 'Stay in control', body: 'Agents work through scoped tokens, within send and spend limits, and wait for your approval where you choose. Every action is logged under who did it.' },
+	{ title: 'All your data in one place', body: 'Sign in once with OAuth or paste a key, and Outflare reads from your analytics, search, ads, CRM, calendar and data tools and keeps the history in one place. No connector is required to start.' },
+	{ title: 'Agents do the work', body: 'Ask a question from Claude, ChatGPT or Cursor, or hand the agent a goal. It reads your company and brand context first, so you never explain twice.' },
+	{ title: 'You approve', body: 'Agents work through scoped tokens, within send and spend limits, and wait for your approval where you choose. Every action is logged under who did it.' },
 ];
 
 const quickstart = [
@@ -116,8 +117,8 @@ const quickstart = [
 ---
 
 <Marketing
-	title="Outflare: the open-source AI marketing platform for people and agents"
-	description="An AI marketing agent you prompt from Claude, ChatGPT or Cursor. Outflare connects your analytics, SEO, CRM and email tools in one open-source workspace and does the work through one API. Hosted or self-hosted."
+	title="Outflare: run your company with AI agents"
+	description="Outflare is the open-source operating system for an online business. All your data in one place, AI agents do the work, you approve. It starts with growth: analytics, SEO, ads, outreach and CRM. Hosted or self-hosted."
 	schema={[website(), softwareApplication()]}
 >
 	<!-- Hero -->
@@ -126,15 +127,14 @@ const quickstart = [
 		<div class="relative mx-auto max-w-6xl px-4 pt-16 pb-10 text-center sm:px-6 sm:pt-24">
 			<a href="#modules" class="hit group inline-flex items-center gap-2 rounded-full border bg-background/80 py-1 pr-3 pl-1 text-xs text-muted-foreground shadow-xs backdrop-blur transition-colors hover:text-foreground">
 				<span class="badge badge-live rounded-full">Open source</span>
-				{liveModules} modules live, more on the way
+				Growth is live. Money, people and goals are coming
 				<span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">→</span>
 			</a>
 			<h1 class="mx-auto mt-6 max-w-4xl bg-gradient-to-b from-foreground to-foreground/65 bg-clip-text pb-1 text-4xl font-semibold tracking-tighter text-balance text-transparent sm:text-6xl sm:leading-[1.05]">
-				The GTM platform your agents can run.
+				Run your company with AI agents.
 			</h1>
 			<p class="mx-auto mt-5 max-w-2xl text-base text-pretty text-muted-foreground sm:text-lg">
-				Outflare brings your go-to-market into one workspace. Connect the tools you already use, see what's working across
-				your website, search and campaigns, and let your AI agents do the work through one API.
+				All your data in one place. Agents do the work. You approve.
 			</p>
 			<div class="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
 				<a href={app.url} data-signed-in data-track="dashboard_click" class="btn btn-primary btn-lg w-full sm:w-auto">
@@ -204,17 +204,35 @@ const quickstart = [
 	<!-- Modules -->
 	<section id="modules" class="mx-auto max-w-6xl scroll-mt-20 px-4 py-24 sm:px-6">
 		<p class="eyebrow"><span class="text-foreground">01</span> / Modules</p>
-		<h2 class="h2 mt-3 max-w-3xl">One workspace for your whole go-to-market.</h2>
+		<h2 class="h2 mt-3 max-w-3xl">One place for your whole company, starting with growth.</h2>
 		<p class="sub">Each module shares the same connectors, context, people and API, so a new one works with everything you've already set up. Use one, or all of them.</p>
-		<ul class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+		<h3 class="mt-12 text-lg font-semibold tracking-tight">Growth: live today</h3>
+		<p class="mt-1 text-sm text-muted-foreground">Find customers, win them and keep them, with every number in one place.</p>
+		<ul class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 			{
-				modules.map((m) => (
+				growthModules.map((m) => (
 					<li class={`card relative flex flex-col p-6 ${m.docs ? 'transition-colors has-[a:hover]:border-foreground/20' : ''}`}>
 						<div class="mb-4 flex items-center justify-between gap-2">
 							<span class="flex size-8 items-center justify-center rounded-md border bg-muted/60 text-muted-foreground"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={m.icon} /></span>
 							<span class={`badge ${moduleTag[m.status]}`}>{moduleStatusLabel[m.status]}</span>
 						</div>
 						{m.docs ? <a href={m.docs} class="font-semibold after:absolute after:inset-0 after:content-[''] hover:underline">{m.name}</a> : <h3 class="font-semibold">{m.name}</h3>}
+						<p class="mt-1.5 text-sm text-muted-foreground">{m.summary}</p>
+					</li>
+				))
+			}
+		</ul>
+		<h3 class="mt-14 text-lg font-semibold tracking-tight">The rest of the company: coming next</h3>
+		<p class="mt-1 text-sm text-muted-foreground">Money, people and goals join the same data, so agents can work on the whole business. Not live yet.</p>
+		<ul class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+			{
+				companyModules.map((m) => (
+					<li class="card relative flex flex-col border-dashed p-6">
+						<div class="mb-4 flex items-center justify-between gap-2">
+							<span class="flex size-8 items-center justify-center rounded-md border bg-muted/60 text-muted-foreground"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={m.icon} /></span>
+							<span class={`badge ${moduleTag[m.status]}`}>{moduleStatusLabel[m.status]}</span>
+						</div>
+						<h3 class="font-semibold">{m.name}</h3>
 						<p class="mt-1.5 text-sm text-muted-foreground">{m.summary}</p>
 					</li>
 				))
@@ -329,7 +347,7 @@ const quickstart = [
 	<section class="border-t">
 		<div class="mx-auto max-w-6xl px-4 py-24 sm:px-6">
 			<p class="eyebrow"><span class="text-foreground">05</span> / Open source</p>
-			<h2 class="h2 mt-3 max-w-3xl">The platform that holds your customer data should be one you can read.</h2>
+			<h2 class="h2 mt-3 max-w-3xl">The system that holds your company's data should be one you can read.</h2>
 			<div class="mt-12 grid gap-10 lg:grid-cols-[1fr_1.2fr]">
 				<dl class="grid content-start gap-6 sm:grid-cols-2">
 					<div><dt class="font-medium">You own the data</dt><dd class="mt-1 text-sm text-muted-foreground">Analytics history, leads, conversations and every action live in your Postgres.</dd></div>
@@ -342,7 +360,7 @@ const quickstart = [
 						<thead>
 							<tr class="border-b font-mono text-[11px] tracking-wide text-muted-foreground uppercase">
 								<th class="px-4 py-3 font-medium"><span class="sr-only">Compare</span></th>
-								<th class="px-4 py-3 font-medium">A typical GTM stack</th>
+								<th class="px-4 py-3 font-medium">A typical tool stack</th>
 								<th class="px-4 py-3 font-medium text-foreground">Outflare</th>
 							</tr>
 						</thead>
