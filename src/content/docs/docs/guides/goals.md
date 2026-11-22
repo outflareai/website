@@ -62,5 +62,5 @@ Someone kept to some brands sees the company's items and their brands', and chan
 ## For agents and developers
 
 - **API:** `/v1/workspaces/{ws}/projects`, `/goals`, `/tasks`, `/decisions` and `/goal-settings`, each item at `/{id}`. See the [API reference](/docs/api/).
-- **MCP:** `list_projects`, `list_goals`, `list_tasks`, `create_task`, `record_decision` and the rest ([MCP server](/docs/agents/mcp/)).
+- **MCP:** `list_company_projects`, `list_goals`, `list_tasks`, `create_task`, `record_decision` and the rest ([MCP server](/docs/agents/mcp/)).
 - **SQL:** the `work_projects`, `goals`, `work_tasks` and `decisions` tables, described in the data catalog.
