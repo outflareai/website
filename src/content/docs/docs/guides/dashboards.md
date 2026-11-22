@@ -11,6 +11,16 @@ A **dashboard** is one page of your saved [funnels](/docs/guides/funnels/), [tre
 
 In the app, open **Analytics** in the sidebar, then **Dashboards**. Type a name and press **Create** to start one.
 
+## Start from a template
+
+You don't have to build a dashboard tile by tile. Under **Start from a template** on the Dashboards page, each ready-made dashboard says what it adds, and **Add this dashboard** creates it in one click.
+
+- **Management report.** The monthly numbers a management team asks for, from your payments: revenue by month, new customers, new against returning revenue, revenue by product, order value (average and typical), paying customers, [lifetime value](/docs/guides/lifetime-value/), [money kept](/docs/guides/retention/) and [how customers are spread](/docs/guides/distribution/).
+
+A template only reads data every brand has, so it fills in as soon as payments arrive, with nothing to set up. Each report it adds is saved as your own: rename it, change it, move it or take it off like any other tile, and find it under **All reports**. Every tile keeps its own dates, a year by month. Adding a template again makes a second dashboard and never changes the first.
+
+Things that need a choice only you can make are left for you to add: your sign-up [funnel](/docs/guides/funnels/), customer [balances](/docs/guides/balances/) and a what-if [scenario](/docs/guides/scenarios/).
+
 ## All reports
 
 **Analytics → All reports** lists everything saved for the brand in one table: dashboards, funnels, trends, retention and paths questions, and saved Tracker reports. Search by name, narrow the list by type or by who made it, and sort by when each last changed or when you last opened it. A row opens the report, and **New** starts a dashboard, funnel, trend, retention or paths question.
@@ -81,4 +91,4 @@ Everyone in the workspace can open dashboards (`analytics.read`). Owners, admins
 
 ## For agents and scripts
 
-The REST API is `/v1/brands/{brand}/dashboards` for dashboards and `/v1/brands/{brand}/dashboards/{dashboard}/tiles` for their tiles. See the [API reference](/docs/api/). Sharing is `POST` and `DELETE /v1/brands/{brand}/dashboards/{dashboard}/share`. The MCP tools are `list_dashboards`, `get_dashboard`, `create_dashboard`, `update_dashboard`, `delete_dashboard`, `add_dashboard_tile`, `remove_dashboard_tile`, `share_dashboard` and `unshare_dashboard`. Ask your agent something like *"Make a Weekly numbers dashboard with the sign-up funnel and a cost-per-sign-up trend on it."*
+The REST API is `/v1/brands/{brand}/dashboards` for dashboards and `/v1/brands/{brand}/dashboards/{dashboard}/tiles` for their tiles. See the [API reference](/docs/api/). Sharing is `POST` and `DELETE /v1/brands/{brand}/dashboards/{dashboard}/share`. `GET /v1/brands/{brand}/dashboards/templates` lists the templates, and creating a dashboard with `template` set to a template's key starts from it. The MCP tools are `list_dashboards`, `list_dashboard_templates`, `get_dashboard`, `create_dashboard`, `update_dashboard`, `delete_dashboard`, `add_dashboard_tile`, `remove_dashboard_tile`, `share_dashboard` and `unshare_dashboard`. Ask your agent something like *"Make a Weekly numbers dashboard with the sign-up funnel and a cost-per-sign-up trend on it."*
