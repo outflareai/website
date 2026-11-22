@@ -13,13 +13,34 @@ A workspace holds everything for one team or client: mailboxes, pools, leads, li
 
 ### Workspace URL
 
-Each workspace has a short name for its URL, made from its name when it is created: a workspace called Acme opens at `https://app.outflare.ai/acme`, and each page follows it, such as `/acme/connectors` or `/acme/sequences`. Owners and admins can rename the workspace and change its URL under **Settings → General**. The URL can use 3 to 40 lowercase letters, numbers and dashes, and a few words the app needs for its own pages (such as `admin`, `signup` and `settings`) are taken.
+Each workspace has a short name for its URL, made from its name when it is created: a workspace called Acme opens at `https://app.outflare.ai/acme`, and each page follows it, such as `/acme/members`, or `/acme/summitly/outreach/sequences` for a page of the brand Summitly. Owners and admins can rename the workspace and change its URL under **Settings → General**. The URL can use 3 to 40 lowercase letters, numbers and dashes, and a few words the app needs for its own pages (such as `admin`, `signup` and `settings`) are taken.
 
 Changing the URL doesn't break links: the old one keeps leading to the workspace until another workspace takes it. Links from before workspace URLs existed (`/w/<workspace id>/...`) still work and switch to the new address.
 
-Sequences, lead lists, missions, sending servers, infrastructure plans, API tokens and webhooks get readable URLs too, made from their names: `/acme/sequences/q3-founders`. Two with the same name become `q3-founders` and `q3-founders-2`. Renaming one gives it a new URL, and its old URL still opens it, so shared links keep working.
+Sequences, lead lists, missions, sending servers, infrastructure plans, API tokens and webhooks get readable URLs too, made from their names: `/acme/summitly/outreach/sequences/q3-founders`. Two with the same name become `q3-founders` and `q3-founders-2`. Renaming one gives it a new URL, and its old URL still opens it, so shared links keep working.
 
-A connection's URL is named after what it connects, not what you called it: `/acme/connectors/posthog`, and `posthog-2` for a second PostHog account. The same URL opens the dialog to connect PostHog when nothing is connected yet, so you can share one link for "connect PostHog" or "our PostHog".
+A connection's URL is named after what it connects, not what you called it: `/acme/summitly/connectors/posthog`, and `posthog-2` for a second PostHog account. The same URL opens the dialog to connect PostHog when nothing is connected yet, so you can share one link for "connect PostHog" or "our PostHog".
+
+### A link to any screen
+
+Every screen has a link of its own, so you can send a teammate the link instead of "open this page, then click that tab". Copy it from the address bar: whoever opens it, and may see that screen, lands on exactly the same page, tab, item and layout, on the same brand.
+
+A link reads from big to small: the workspace, the brand, the area, the page, then what is open on it.
+
+| Link | Screen |
+| --- | --- |
+| `/acme/summitly/crm/people` | The People list |
+| `/acme/summitly/crm/people/{id}/activity` | One person, on the Activity tab |
+| `/acme/summitly/tracker/campaigns` | The Tracker's Campaigns page |
+| `/acme/summitly/seo/declining` | The SEO overview's Declining view |
+| `/acme/summitly/partners/{id}/payouts` | One partner, on the Payouts tab |
+| `/acme/summitly/company/brand/table` | Brands, as a table instead of cards |
+| `/acme/members` | Members, which belongs to the whole workspace |
+
+- **Tabs and layouts are part of the link.** A tab, a tab inside an item, and a layout such as list or gallery, board or table, each add a word to the link. The first tab of a page has no word.
+- **Searching and sorting a list are in the link too**, after a `?`: `?search=acme&order=-revenue` is the list searched for "acme", biggest revenue first. The link without them opens the same screen, unfiltered.
+- **Switching tabs is instant.** The address changes without loading a page, and Back and Forward step through the tabs you opened.
+- **Old links keep working.** A link from before a page moved (`/acme/summitly/tracker-campaigns`, or one ending in `?view=` or `#ideas`) opens the same screen and switches to today's address.
 
 ## Roles
 
