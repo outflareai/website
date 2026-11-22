@@ -2,7 +2,7 @@
 	"version": "2026.11.22",
 	"date": "2026-11-22",
 	"status": "in-progress",
-	"updated": "2026-11-22T14:29:50Z",
+	"updated": "2026-11-22T17:22:41Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -80,7 +80,63 @@
 			"edition": "open-source",
 			"text": "Retention has a Money view: of the customers who first paid in a month, see what the same customers paid in each month after, as a share of their first month, as amounts or per starting customer. Split it, save it or put it on a dashboard. Agents read it as `kept` from `run_lifetime_value`.",
 			"at": "2026-11-22T14:10:16Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Creator deals: a payment you record on a deal is now also kept as a paid fee under the creator on Partnerships, Payments and in your costs, so what you paid a creator is in one place. Outflare still moves no money.",
+			"at": "2026-11-22T14:44:45Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Scenarios: a new Analytics page for what-ifs. Put inputs such as sign-ups or a price on sliders, write plain formulas between them, and see the forecast month by month against things as they are today. An input can read today's value from a saved report. Save one to a dashboard. Agents use `run_scenario`.",
+			"at": "2026-11-22T15:08:40Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Balances: a new Analytics page shows what customers have paid for and not used yet, such as wallet money or credits. Say what goes in and what comes out, then see what is held now, how much sits untouched, the movement month by month and who holds the most. Agents use `run_balance`.",
+			"at": "2026-11-22T15:08:40Z"
+		},
+		{
+			"kind": "fix",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "The Paid ads Overview and Campaigns tables no longer show the notes written for the API (about micros and field names) under the numbers. On a brand's Agents page, Rules and the switches for removing ads now list only the agents that can act for that brand.",
+			"at": "2026-11-22T15:14:37Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Outflare now warns you when a product event that came in most days stops arriving: Brand setup lists it under Needs attention, and it is sent as an alert, so you hear about a broken sender before your funnels and reports read too low.",
+			"at": "2026-11-22T15:36:04Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Every screen has a link of its own: pages sit under their area (for example /tracker/campaigns), and a page's tabs, an item's tabs and its layout are part of the link, so a pasted link opens exactly the screen you were on. A list's search and sorting travel in the link too. Links you saved before still open.",
+			"at": "2026-11-22T16:07:31Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "general",
+			"edition": "cloud",
+			"text": "On Outflare Cloud, the agent's open task, Agent Mail's tabs and the outreach mailboxes' tabs each have a link of their own, so a pasted link opens exactly that screen. Links you saved before still open.",
+			"at": "2026-11-22T16:07:31Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "general",
+			"edition": "open-source",
+			"text": "More screens have a link of their own: the Team page's org chart, the log entry open in Logs, the record open in Coverage with its tab, and the prospect open in Link building. Links you saved before still open.",
+			"at": "2026-11-22T17:22:41Z"
 		}
 	],
-	"through": "70fa321+70fa321"
+	"through": "0765e49+0765e49"
 }
