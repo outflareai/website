@@ -47,7 +47,7 @@ What a brand is for (its offer, its audience) goes in its context, who it sells 
 
 Like a project in PostHog, you work on one brand at a time. The brand picker sits at the top of the sidebar, under your workspace (on a phone, in the top bar), and narrows every page to that brand: sequences, lead lists, mailboxes, domains, agents, playbook automations, connectors, SEO, analytics, reports, ad platforms, site audits and search. There is no view across all brands: Outflare opens on the brand you picked last, or your first brand.
 
-The brand is part of every link, after the workspace: `app.outflare.ai/acme/summitly/seo`. A link you share opens on the same brand, and older links ending in `?brand=summitly` still work. Pages for the whole workspace, such as Members and API tokens, have no brand in their link. Because handles sit in links, a brand's handle can't be the name of a page, such as `seo` or `members`.
+The brand is part of every link, after the workspace: `app.outflare.ai/acme/summitly/seo`. A link you share opens on the same brand and the same screen (see [A link to any screen](/docs/guides/workspaces-and-access/#a-link-to-any-screen)), and older links ending in `?brand=summitly` still work. Pages for the whole workspace, such as Members and API tokens, have no brand in their link. Because handles sit in links, a brand's handle can't be the name of a page or an area, such as `seo`, `outreach` or `members`.
 
 Switching brand reloads the page you're on with that brand's records. If you had something open that belongs to the other brand, such as a site audit or a sequence, you go back to that page's list for the new brand.
 
