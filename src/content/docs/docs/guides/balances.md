@@ -9,7 +9,7 @@ sidebar:
 
 When customers pay ahead (a wallet they top up, a pack of credits, prepaid usage), revenue and use are two different numbers. A **balance** is the gap between them: a running total for each customer of what went in, less what came out. It tells you how much you still owe in service, how much of it nobody is touching, and whether customers use what they buy.
 
-In the app, open **Analytics** in the sidebar, then **Balances**. It runs inside Outflare and calls no third-party service. It works from your [payments](/docs/guides/transactions/) and the [events](/docs/guides/events/) your product sends, for payments and events that name a customer.
+In the app, open **Analytics** in the sidebar, then **Balances**. It runs inside Outflare and calls no third-party service. It works from your [payments](/docs/guides/transactions/) and the events your product sends ([website tracking](/docs/guides/website-tracking/) or the API), for payments and events that name a customer.
 
 ## Set one up
 

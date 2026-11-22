@@ -2,7 +2,7 @@
 title: Scenarios
 description: What if. Put your inputs on sliders, write plain formulas between them, and see the forecast month by month against things as they are today.
 sidebar:
-  order: 9.8
+  order: 9.795
 ---
 
 <span class="pill shipped">Shipped</span> In the web app, the REST API and the MCP server.
