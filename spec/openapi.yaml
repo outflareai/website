@@ -1962,7 +1962,7 @@ paths:
       summary: The columns you saved as your default, per table
       description: |
         Each table of the web app that lets you save its columns has a name (`list-people`, `list-companies`). This
-        lists the views the signed-in person saved: for each, the ids of the columns they hid. A view belongs to the
+        lists the views the signed-in person saved: for each, the ids of the columns they hid and the order they put the columns in. A view belongs to the
         person, so it is the same in every browser and workspace.
       tags: [access]
       responses:
@@ -1983,7 +1983,7 @@ paths:
       operationId: saveTableView
       x-outflare-access: { signed_in: true }
       summary: Save a table's columns as your default
-      description: Replaces the signed-in person's view of this table. At most 200 views a person and 200 hidden columns a view.
+      description: Replaces the signed-in person's view of this table. At most 200 views a person and 200 columns a list.
       tags: [access]
       requestBody:
         required: true
@@ -1995,6 +1995,7 @@ paths:
               required: [hidden]
               properties:
                 hidden: { type: array, maxItems: 200, items: { type: string, maxLength: 80 }, description: "The ids of the columns to hide." }
+                order: { type: array, maxItems: 200, items: { type: string, maxLength: 80 }, description: "The ids of the columns in the order to show them. Leave it out, or empty, for the table's own order." }
       responses:
         "200":
           description: The view as saved.
@@ -57266,6 +57267,243 @@ paths:
           $ref: '#/components/responses/MissionHeld'
         default:
           $ref: '#/components/responses/Error'
+  /v1/brands/{brand}/creator-deals:
+    parameters:
+    - $ref: '#/components/parameters/BrandID'
+    get:
+      operationId: listBrandCreatorDeals
+      x-outflare-access:
+        scope: partners.read
+        brand: true
+      summary: "List the brand's creator deals, with their results"
+      description: "Newest first, at most 500. Each deal carries the creator's totals as a partner (clicks, sign-ups, paying customers, sales), so the list is also the results table. `usual_terms` is what a new deal gets when it leaves the terms out, the terms of the brand's newest deal. `stages` are the stages a deal can be in, which each brand can change."
+      tags:
+      - partners
+      responses:
+        '200':
+          description: "The deals."
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                - usual_terms
+                - stages
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CreatorDeal'
+                  usual_terms:
+                    $ref: '#/components/schemas/CreatorDealTerms'
+                  stages:
+                    type: array
+                    description: "The brand's creator deal stages, in order: its `creator_deal_stage` option list, or the defaults. Change them with the catalog's option list endpoints."
+                    items:
+                      $ref: '#/components/schemas/CatalogOption'
+        default:
+          $ref: '#/components/responses/Error'
+    post:
+      operationId: createBrandCreatorDeal
+      x-outflare-access:
+        scope: partners.manage
+        brand: true
+      summary: "Add a deal with a creator"
+      description: "The creator is one of the brand's partners (add one with `POST /v1/brands/{brand}/partners`), so the visits and sales their link brings earn the program's usual commission. Only `partner_id`, `kind` and `fee_cents` are needed, and the rest is the brand's usual terms. A new deal starts at the brand's first stage that means `agreed` unless `stage` says otherwise."
+      tags:
+      - partners
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatorDealCreate'
+      responses:
+        '201':
+          description: "The deal."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatorDeal'
+        '202':
+          $ref: '#/components/responses/MissionHeld'
+        default:
+          $ref: '#/components/responses/Error'
+  /v1/brands/{brand}/creator-deals/{id}:
+    parameters:
+    - $ref: '#/components/parameters/BrandID'
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getBrandCreatorDeal
+      x-outflare-access:
+        scope: partners.read
+        brand: true
+      summary: "Get a creator deal, with its videos"
+      description: "The deal, its results and every video its link should be in (`video_list`)."
+      tags:
+      - partners
+      responses:
+        '200':
+          description: "The deal."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatorDeal'
+        default:
+          $ref: '#/components/responses/Error'
+    patch:
+      operationId: updateBrandCreatorDeal
+      x-outflare-access:
+        scope: partners.manage
+        brand: true
+      summary: "Change a creator deal"
+      description: "Send only what changes: the stage, the fee, what has been paid, a term, the short link or the note. Moving to a stage that means `agreed` or `live` dates the deal the first time."
+      tags:
+      - partners
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatorDealUpdate'
+      responses:
+        '200':
+          description: "The deal."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatorDeal'
+        '202':
+          $ref: '#/components/responses/MissionHeld'
+        default:
+          $ref: '#/components/responses/Error'
+    delete:
+      operationId: deleteBrandCreatorDeal
+      x-outflare-access:
+        scope: partners.manage
+        brand: true
+      summary: "Delete a creator deal"
+      description: "Removes the deal and its videos. The creator stays a partner, with their link and everything it earned."
+      tags:
+      - partners
+      responses:
+        '200':
+          description: "Deleted."
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - deleted
+                properties:
+                  deleted:
+                    type: boolean
+        '202':
+          $ref: '#/components/responses/MissionHeld'
+        default:
+          $ref: '#/components/responses/Error'
+  /v1/brands/{brand}/creator-deals/{id}/videos:
+    parameters:
+    - $ref: '#/components/parameters/BrandID'
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: addBrandCreatorDealVideos
+      x-outflare-access:
+        scope: partners.manage
+        brand: true
+      summary: "Add the videos a deal covers"
+      description: "Up to 500 at a time, 2,000 per deal. A video the deal already has stays as it is."
+      tags:
+      - partners
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatorDealVideosAdd'
+      responses:
+        '200':
+          description: "The deal."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatorDeal'
+        '202':
+          $ref: '#/components/responses/MissionHeld'
+        default:
+          $ref: '#/components/responses/Error'
+  /v1/brands/{brand}/creator-deals/{id}/videos/{video}:
+    parameters:
+    - $ref: '#/components/parameters/BrandID'
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    - name: video
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    patch:
+      operationId: updateBrandCreatorDealVideo
+      x-outflare-access:
+        scope: partners.manage
+        brand: true
+      summary: "Say whether the link is in a video"
+      description: "Set `link_status` to `in_place` or `missing` after looking at the video, or change its title."
+      tags:
+      - partners
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatorDealVideoUpdate'
+      responses:
+        '200':
+          description: "The deal."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatorDeal'
+        '202':
+          $ref: '#/components/responses/MissionHeld'
+        default:
+          $ref: '#/components/responses/Error'
+    delete:
+      operationId: deleteBrandCreatorDealVideo
+      x-outflare-access:
+        scope: partners.manage
+        brand: true
+      summary: "Remove a video from a deal"
+      description: "The deal no longer covers the video."
+      tags:
+      - partners
+      responses:
+        '200':
+          description: "The deal."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatorDeal'
+        '202':
+          $ref: '#/components/responses/MissionHeld'
+        default:
+          $ref: '#/components/responses/Error'
   /v1/brands/{brand}/partner-link-rule:
     parameters:
     - $ref: '#/components/parameters/BrandID'
@@ -72954,10 +73192,11 @@ components:
     TableView:
       type: object
       description: The columns a person saved as their default for one named table of the web app.
-      required: [view, hidden]
+      required: [view, hidden, order]
       properties:
         view: { type: string, description: "The table's view name." }
         hidden: { type: array, items: { type: string }, description: "The ids of the columns the person hid." }
+        order: { type: array, items: { type: string }, description: "The ids of the columns in the order the person put them. Empty means the table's own order; a column not listed keeps its place after the listed ones." }
     AdConversionCheck:
       type: object
       description: One conversion action's sends against the ad network's own count over the checked days.
@@ -82378,6 +82617,7 @@ components:
         label: { type: string, example: Won }
         archived: { type: boolean }
         source: { type: string, description: "A sub-source's Source (option set sub_source only)." }
+        means: { type: string, example: live, description: "What the option means to Outflare, in the lists whose options do something, such as a creator deal stage (`creator_deal_stage`: `agreed`, `live`, `stopped`). It stays when the option is renamed; an edit that leaves it out keeps it. Absent for an option that only names something." }
     SubSource:
       type: object
       required: [key, label, source, archived, people]
@@ -82411,6 +82651,7 @@ components:
               key: { type: string }
               label: { type: string }
               archived: { type: boolean }
+              means: { type: string, pattern: "^[a-z0-9_]{1,40}$", description: "What the option means to Outflare, in the lists whose options do something (`creator_deal_stage`: `agreed`, `live`, `stopped`). Left out, an option keeps what it meant; `none` clears it." }
     EventDefinition:
       type: object
       required: [name, label, description, properties, status, sensitivity, owner_id, retention_days, destinations, first_seen_at, last_seen_at, seen_count, name_check, looks_like, check_reason, same_as, created_at, updated_at]
@@ -90204,6 +90445,298 @@ components:
           description: The brand's rule for a paid link removed after payment, copied in when the offer is sent. Ignored on input.
           allOf:
           - $ref: '#/components/schemas/PartnerLinkRule'
+    CreatorDealTerms:
+      type: object
+      description: "The terms a creator deal has beyond who, what and the fee."
+      required:
+      - upfront_percent
+      - pay_within_days
+      - months
+      - creator_credit_cents
+      - viewer_offer
+      properties:
+        upfront_percent:
+          type: integer
+          minimum: 0
+          maximum: 100
+          description: "The share of the fee paid before the link is live."
+        pay_within_days:
+          type: integer
+          minimum: 0
+          maximum: 365
+          description: "Days after the link is live by which the rest is paid."
+        months:
+          type: integer
+          minimum: 1
+          maximum: 120
+          description: "How many months the link stays up."
+        creator_credit_cents:
+          type: integer
+          format: int64
+          minimum: 0
+          description: "Product credits the creator gets, in minor units of the deal's currency."
+        viewer_offer:
+          type: string
+          maxLength: 500
+          description: "What the creator's viewers get, in words."
+    CreatorDealVideo:
+      type: object
+      required:
+      - id
+      - url
+      - title
+      - link_status
+      - checked_at
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        url:
+          type: string
+        title:
+          type: string
+        link_status:
+          type: string
+          enum:
+          - unchecked
+          - in_place
+          - missing
+          description: "Whether the deal's link was in the video when someone last looked."
+        checked_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+    CreatorDeal:
+      allOf:
+      - $ref: '#/components/schemas/CreatorDealTerms'
+      - type: object
+        required:
+        - id
+        - program_id
+        - partner_id
+        - record_id
+        - name
+        - partner_code
+        - kind
+        - stage
+        - stage_label
+        - stage_means
+        - fee_cents
+        - paid_cents
+        - currency
+        - link_url
+        - note
+        - agreed_at
+        - live_at
+        - created_at
+        - updated_at
+        - videos
+        - videos_in_place
+        - videos_missing
+        - results
+        properties:
+          id:
+            type: string
+            format: uuid
+          program_id:
+            type: string
+            format: uuid
+          partner_id:
+            type: string
+            format: uuid
+            description: "The creator, as one of the brand's partners."
+          record_id:
+            type: string
+            format: uuid
+            description: "The creator's customer record."
+          name:
+            type: string
+          partner_code:
+            type: string
+            description: "The creator's partner code, as in their partner link."
+          kind:
+            $ref: '#/components/schemas/CreatorDealKind'
+          stage:
+            $ref: '#/components/schemas/CreatorDealStage'
+          stage_label:
+            type: string
+            description: "What the brand calls the stage."
+          stage_means:
+            type: string
+            description: "What the stage means, whatever it is called: `agreed` (the terms are agreed), `live` (the link is up), `stopped` (the deal is over), or empty."
+          fee_cents:
+            type: integer
+            format: int64
+            description: "The agreed fee, in minor units of `currency`."
+          paid_cents:
+            type: integer
+            format: int64
+            description: "How much of the fee has been paid."
+          currency:
+            type: string
+            description: "The partner program's currency."
+          link_url:
+            type: string
+            description: "The short link on the brand's own site that sends viewers to the creator's partner link, or empty."
+          note:
+            type: string
+          agreed_at:
+            type:
+            - string
+            - 'null'
+            format: date-time
+          live_at:
+            type:
+            - string
+            - 'null'
+            format: date-time
+          created_at:
+            type: string
+            format: date-time
+          updated_at:
+            type: string
+            format: date-time
+          videos:
+            type: integer
+            description: "How many videos the deal covers."
+          videos_in_place:
+            type: integer
+            description: "How many had the link when last checked."
+          videos_missing:
+            type: integer
+            description: "How many did not."
+          results:
+            type: object
+            description: "The creator's totals as a partner, every click on their link and everyone it brought, not only since this deal."
+            required:
+            - clicks
+            - signups
+            - customers
+            - sales_cents
+            properties:
+              clicks:
+                type: integer
+              signups:
+                type: integer
+              customers:
+                type: integer
+                description: "People they brought who have paid."
+              sales_cents:
+                type: integer
+                format: int64
+                description: "Sales from those people, less refunds."
+          video_list:
+            type: array
+            description: "Every video of the deal, on a single deal only."
+            items:
+              $ref: '#/components/schemas/CreatorDealVideo'
+    CreatorDealKind:
+      type: string
+      enum:
+      - every_video
+      - one_video
+      - mention
+      - dedicated_video
+      description: "What the creator does. `every_video` puts the link in every video they have, `one_video` in one, `mention` is a mention in a new video and `dedicated_video` a whole video about the brand."
+    CreatorDealStage:
+      type: string
+      example: live
+      description: "Where the deal stands: the key of one of the brand's creator deal stages. The stages are the brand's `creator_deal_stage` option list in the catalog (`GET /v1/brands/{brand}/creator-deals` returns them as `stages`). A brand that has not made its own list has found, pitched, talking, agreed, live, paid, results and stopped."
+    CreatorDealUpdate:
+      type: object
+      properties:
+        kind:
+          $ref: '#/components/schemas/CreatorDealKind'
+        stage:
+          $ref: '#/components/schemas/CreatorDealStage'
+        fee_cents:
+          type: integer
+          format: int64
+          minimum: 0
+        paid_cents:
+          type: integer
+          format: int64
+          minimum: 0
+        upfront_percent:
+          type: integer
+          minimum: 0
+          maximum: 100
+        pay_within_days:
+          type: integer
+          minimum: 0
+          maximum: 365
+        months:
+          type: integer
+          minimum: 1
+          maximum: 120
+        creator_credit_cents:
+          type: integer
+          format: int64
+          minimum: 0
+        viewer_offer:
+          type: string
+          maxLength: 500
+        link_url:
+          type: string
+          description: "A public https address on the brand's own site, such as `https://northpeak.example/sam`, or empty for none."
+        note:
+          type: string
+          maxLength: 4000
+    CreatorDealCreate:
+      allOf:
+      - $ref: '#/components/schemas/CreatorDealUpdate'
+      - type: object
+        required:
+        - partner_id
+        - kind
+        properties:
+          partner_id:
+            type: string
+            format: uuid
+            description: "The creator, one of the brand's partners."
+    CreatorDealVideosAdd:
+      type: object
+      required:
+      - videos
+      properties:
+        videos:
+          type: array
+          minItems: 1
+          maxItems: 500
+          items:
+            type: object
+            required:
+            - url
+            properties:
+              url:
+                type: string
+                description: "The video's public https address."
+              title:
+                type: string
+                maxLength: 500
+              link_status:
+                type: string
+                enum:
+                - unchecked
+                - in_place
+                - missing
+    CreatorDealVideoUpdate:
+      type: object
+      properties:
+        link_status:
+          type: string
+          enum:
+          - unchecked
+          - in_place
+          - missing
+        title:
+          type: string
+          maxLength: 500
     PartnerLinkRule:
       type: object
       required:
