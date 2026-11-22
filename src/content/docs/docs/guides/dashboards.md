@@ -11,6 +11,10 @@ A **dashboard** is one page of your saved [funnels](/docs/guides/funnels/), [tre
 
 In the app, open **Analytics** in the sidebar, then **Dashboards**. Type a name and press **Create** to start one.
 
+## All reports
+
+**Analytics → All reports** lists everything saved for the brand in one table: dashboards, funnels, trends, retention and paths questions, and saved Tracker reports. Search by name, narrow the list by type or by who made it, and sort by when each last changed or when you last opened it. A row opens the report, and **New** starts a dashboard, funnel, trend, retention or paths question.
+
 ## Ask a question
 
 At the top of Dashboards is a box: type what you want to know ("How many people opened the app each week, by plan?") and press **Ask**. You get a chart with a sentence on how it was built. **Open in the builder** to change it, or **Save this chart** to keep it and put it on a dashboard.
