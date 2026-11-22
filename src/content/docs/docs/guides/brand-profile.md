@@ -42,6 +42,12 @@ A fact is one statement in plain words, such as "14-day free trial, no card need
 
 To add one, open a section and choose **Add a fact**. To change one, click it, edit, and choose **Save**. **Retire** takes a fact out of use. Nothing is deleted: a retired fact stays in the history.
 
+### Split a long fact
+
+If you pasted a whole list into one fact, split it so each line stands on its own. Open the fact's menu and choose **Split into separate facts**. Outflare shows each line as its own box: reword one, or empty a box to leave that line out, then choose **Split**. Each new fact starts with the old fact's settings, and from then on you can confirm it, retire it, or allow it for customers by itself. The old fact is retired and stays in the history.
+
+A list inside a fact shows as a list, in the overview and in each section. The five facts that come from About your company can't be split, because that text is kept whole.
+
 ## Only a person confirms
 
 Agents can add to the profile, but only as suggestions. A suggestion is used for planning only and is never said to a customer until a person confirms it. An agent cannot confirm its own suggestion, and cannot change a fact a person confirmed. It can only suggest a replacement.
@@ -78,8 +84,16 @@ curl -X POST "https://app.outflare.ai/v1/brands/$BRAND/profile/facts" \
        "evidence": [{"note": "The pricing page says so", "ref": "https://northpeak.example/pricing"}]}'
 ```
 
+Split a fact that holds several statements. With no `parts`, it is split at its list items and paragraphs. An API token can only split a suggestion:
+
+```sh
+curl -X POST "https://app.outflare.ai/v1/brands/$BRAND/profile/facts/$FACT/split" \
+  -H "Authorization: Bearer $OUTFLARE_TOKEN" -H "Content-Type: application/json" \
+  -d '{"parts": ["14-day free trial.", "No card needed."]}'
+```
+
 Reading needs the `workspace.read` scope and writing needs `context.manage`. In a fact, `say_to_customers` is true only when it is confirmed and marked for customers. That one field is the test for using a fact in anything a customer reads.
 
-Over MCP, agents use `get_brand_profile`, `suggest_profile_fact`, `update_profile_fact`, `list_personas`, `suggest_persona`, `update_persona` and `list_profile_changes`. The brand's context (`get_brand_context`) also carries the confirmed facts and personas.
+Over MCP, agents use `get_brand_profile`, `suggest_profile_fact`, `update_profile_fact`, `split_profile_fact`, `list_personas`, `suggest_persona`, `update_persona` and `list_profile_changes`. The brand's context (`get_brand_context`) also carries the confirmed facts and personas.
 
 The profile lives inside Outflare and calls no third-party service.
