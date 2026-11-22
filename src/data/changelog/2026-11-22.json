@@ -2,7 +2,7 @@
 	"version": "2026.11.22",
 	"date": "2026-11-22",
 	"status": "in-progress",
-	"updated": "2026-11-22T21:35:47Z",
+	"updated": "2026-11-22T21:48:43Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -178,7 +178,21 @@
 			"edition": "open-source",
 			"text": "Creator deals: Outflare now checks the link for you. Once a week it reads each video's description through your own page reading connection and marks the link in place or missing, and alerts you when a link that was there is gone. \"Check now\" on a deal does it straight away. A video you mark by hand is left as you set it.",
 			"at": "2026-11-22T21:35:47Z"
+		},
+		{
+			"kind": "fix",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "On Revenue, an account with no name now shows as \"No name\" and still opens the account, in Spending less, Spending more, Renewals and Revenue at risk. Before, the line had nothing to click.",
+			"at": "2026-11-22T21:48:43Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Saved reports can carry tags. Give a dashboard, funnel, trend or any other saved report a few words of your own, such as a launch or a weekly meeting, then narrow All reports to a tag with one click. The API and the MCP tools take `tags` when saving or changing a report.",
+			"at": "2026-11-22T21:48:43Z"
 		}
 	],
-	"through": "1ac543a+1ac543a"
+	"through": "96b7ed8+96b7ed8"
 }
