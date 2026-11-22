@@ -2,7 +2,7 @@
 	"version": "2026.11.22",
 	"date": "2026-11-22",
 	"status": "in-progress",
-	"updated": "2026-11-22T14:29:50Z",
+	"updated": "2026-11-22T14:44:45Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -80,7 +80,14 @@
 			"edition": "open-source",
 			"text": "Retention has a Money view: of the customers who first paid in a month, see what the same customers paid in each month after, as a share of their first month, as amounts or per starting customer. Split it, save it or put it on a dashboard. Agents read it as `kept` from `run_lifetime_value`.",
 			"at": "2026-11-22T14:10:16Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Creator deals: a payment you record on a deal is now also kept as a paid fee under the creator on Partnerships, Payments and in your costs, so what you paid a creator is in one place. Outflare still moves no money.",
+			"at": "2026-11-22T14:44:45Z"
 		}
 	],
-	"through": "70fa321+70fa321"
+	"through": "9cf61b5+9cf61b5"
 }
