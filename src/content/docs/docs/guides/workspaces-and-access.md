@@ -93,6 +93,21 @@ Under **Your account** (the menu under your name), anyone can add a passkey: Fac
 
 A passkey belongs to one web address, so passkeys turn on by themselves once `PUBLIC_URL` is an `https://` address (`login_methods` in `GET /v1/meta` then includes `passkey`), and stop working if that address changes. `PASSKEYS=off` turns them off. See [Configuration](/docs/self-hosting/configuration/).
 
+### Two-factor sign-in
+
+Under **Your account**, anyone can turn on two-factor sign-in: scan the QR code with an authenticator app (1Password, Google Authenticator, Authy or any app that makes 6-digit codes), type the code it shows, and save the 10 backup codes. From then on, signing in with a password or with Google asks for a code from the app. A backup code works once in its place, for when the phone is lost; **New backup codes** replaces the whole set.
+
+- **Remember this device for 7 days** on the code screen skips the code on that browser for a week. **Forget remembered devices** under Your account ends that everywhere, and so does turning two-factor off.
+- A [passkey](#passkeys) is a second step already, so a passkey sign-in asks for no code.
+- Ten wrong codes in 15 minutes are refused until the window passes (`429` with `Retry-After`).
+- API tokens, MCP and connected agents are not asked for a code: they never sign in with a password.
+
+**Required for everyone.** A workspace can require two-factor: people without it see the set-up screen before anything else in that workspace. An owner switches the rule under **Settings → General** (`require_two_factor` on `PATCH /v1/workspaces/{workspace}`, signed-in owners only). It is on unless an owner turns it off; a self-hosted server changes the default for workspaces that haven't chosen with `REQUIRE_TWO_FACTOR=false` ([Configuration](/docs/self-hosting/configuration/)).
+
+**A lost phone.** **Settings → Members** shows who has two-factor on. An owner can **Reset two-factor** for a member, who then sets it up again at their next sign-in. The reset only works when that owner owns every workspace the member belongs to, so one workspace can't weaken someone's sign-in for another.
+
+`GET /v1/me` shows `two_factor` and `two_factor_verified`; a session that still owes its code gets `401` with the code `two_factor_required` on every route until `POST /v1/auth/two-factor` succeeds.
+
 ### Confirming your email and resetting your password
 
 People who set a password get an email asking them to confirm their address; until they do, a banner offers to send the link again (`POST /v1/me/email-verification`). Each person gets at most one link a minute, five an hour and ten a day; the button counts down until the next one is allowed (`email_resend_after` on `GET /v1/me`). Google sign-ins are confirmed already. `GET /v1/me` shows `email_verified` and `has_password`.
