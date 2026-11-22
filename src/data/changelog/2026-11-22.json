@@ -2,7 +2,7 @@
 	"version": "2026.11.22",
 	"date": "2026-11-22",
 	"status": "in-progress",
-	"updated": "2026-11-22T14:44:45Z",
+	"updated": "2026-11-22T15:08:40Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -87,7 +87,21 @@
 			"edition": "open-source",
 			"text": "Creator deals: a payment you record on a deal is now also kept as a paid fee under the creator on Partnerships, Payments and in your costs, so what you paid a creator is in one place. Outflare still moves no money.",
 			"at": "2026-11-22T14:44:45Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Scenarios: a new Analytics page for what-ifs. Put inputs such as sign-ups or a price on sliders, write plain formulas between them, and see the forecast month by month against things as they are today. An input can read today's value from a saved report. Save one to a dashboard. Agents use `run_scenario`.",
+			"at": "2026-11-22T15:08:40Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Balances: a new Analytics page shows what customers have paid for and not used yet, such as wallet money or credits. Say what goes in and what comes out, then see what is held now, how much sits untouched, the movement month by month and who holds the most. Agents use `run_balance`.",
+			"at": "2026-11-22T15:08:40Z"
 		}
 	],
-	"through": "9cf61b5+9cf61b5"
+	"through": "ca185af+ca185af"
 }
