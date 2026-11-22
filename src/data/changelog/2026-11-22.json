@@ -2,7 +2,7 @@
 	"version": "2026.11.22",
 	"date": "2026-11-22",
 	"status": "in-progress",
-	"updated": "2026-11-22T21:48:43Z",
+	"updated": "2026-11-22T21:59:13Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -192,7 +192,70 @@
 			"edition": "open-source",
 			"text": "Saved reports can carry tags. Give a dashboard, funnel, trend or any other saved report a few words of your own, such as a launch or a weekly meeting, then narrow All reports to a tag with one click. The API and the MCP tools take `tags` when saving or changing a report.",
 			"at": "2026-11-22T21:48:43Z"
+		},
+		{
+			"kind": "fix",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Fewer false alarms: an AI visibility run whose model refuses the account's key now records it once per run instead of once per sample; a busy rate limit when syncing guard rules is recorded as a refusal, not an error; an ad suggestions signal read that failed for a passing reason is tried again on the next run; and the MCP server keeps a session open while its event stream is still connected.",
+			"at": "2026-11-22T21:59:13Z"
+		},
+		{
+			"kind": "fix",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "The Sales queue no longer fails to load when one conversation's latest message or note can't be read: that row shows no preview and the rest of the queue loads.",
+			"at": "2026-11-22T21:59:13Z"
+		},
+		{
+			"kind": "fix",
+			"area": "api",
+			"edition": "open-source",
+			"text": "SQL queries no longer fail now and then right after a restart, when several queries for the same workspace start at once.",
+			"at": "2026-11-22T21:59:13Z"
+		},
+		{
+			"kind": "fix",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Errors: when grouping is improved and two error issues become one, a status you set on either of them (ignored, resolved) now always carries over.",
+			"at": "2026-11-22T21:59:13Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Fewer false errors: a pipeline stage that will retry after a provider blip, a desktop app reporting the same expired sign-in again, a sequencer campaign that stays not ready and a donor site that doesn't answer are each recorded once as what they are, not as repeated errors.",
+			"at": "2026-11-22T21:59:13Z"
+		},
+		{
+			"kind": "fix",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Website tracking keeps the last events and recording a visitor sends as they leave a page, and heatmaps take pages with very long addresses. Looking up a record by an identity that isn't valid text now answers with a clear error, and the app no longer stops on a key press from a browser extension or autofill, or keeps calling the server while offline.",
+			"at": "2026-11-22T21:59:13Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Sales: choose who the first email goes to: the person's main address, another of their addresses, or one you type. Every recipient rule still applies, the answer lands in the same conversation, and later replies and sequence emails go to the same address.",
+			"at": "2026-11-22T21:59:13Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Sales: the number beside New conversations now counts what arrived since you last opened it, and clears when you open it. On the page, each source in the From row shows how many of its conversations are new since your last visit, and the filter for conversations that began from a campaign reply is named after the sequencer they came from.",
+			"at": "2026-11-22T21:59:13Z"
+		},
+		{
+			"kind": "launch",
+			"area": "connectors",
+			"edition": "open-source",
+			"text": "Connect any remote MCP server to your workspace, mark each of its tools as a read or a change, and agents can use it: reads run at once, changes wait for a person, and a new Read-only switch on any connection makes sure nothing ever changes on the other side.",
+			"at": "2026-11-22T21:59:13Z"
 		}
 	],
-	"through": "96b7ed8+96b7ed8"
+	"through": "d4e3de7+d4e3de7"
 }
