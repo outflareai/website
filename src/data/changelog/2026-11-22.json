@@ -2,7 +2,7 @@
 	"version": "2026.11.22",
 	"date": "2026-11-22",
 	"status": "in-progress",
-	"updated": "2026-11-22T15:14:37Z",
+	"updated": "2026-11-22T15:36:04Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -108,7 +108,14 @@
 			"edition": "open-source",
 			"text": "The Paid ads Overview and Campaigns tables no longer show the notes written for the API (about micros and field names) under the numbers. On a brand's Agents page, Rules and the switches for removing ads now list only the agents that can act for that brand.",
 			"at": "2026-11-22T15:14:37Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Outflare now warns you when a product event that came in most days stops arriving: Brand setup lists it under Needs attention, and it is sent as an alert, so you hear about a broken sender before your funnels and reports read too low.",
+			"at": "2026-11-22T15:36:04Z"
 		}
 	],
-	"through": "8a876db+8a876db"
+	"through": "933c81d+933c81d"
 }
