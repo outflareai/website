@@ -2,7 +2,7 @@
 	"version": "2026.11.22",
 	"date": "2026-11-22",
 	"status": "in-progress",
-	"updated": "2026-11-22T22:13:07Z",
+	"updated": "2026-11-22T22:36:27Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -262,7 +262,28 @@
 			"edition": "open-source",
 			"text": "Creator deals: each video you add to a deal now also appears in Presence as a placement of your brand, and Presence's page check is what reads it for the link. The deal's screen is the same; you can change how often a video is read on its placement.",
 			"at": "2026-11-22T22:13:07Z"
+		},
+		{
+			"kind": "fix",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Fewer false alarms: a write that succeeded on its second try is no longer a warning, waiting agent changes alert only when about to expire, a failed Sales send alerts once, a failed company lookup isn't retried on every page, and error events name the route.",
+			"at": "2026-11-22T22:36:27Z"
+		},
+		{
+			"kind": "fix",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Search Console: page-by-page syncs of large sites with long addresses no longer fail every day; rows are read in smaller pages.",
+			"at": "2026-11-22T22:36:27Z"
+		},
+		{
+			"kind": "fix",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Website and app tracking: a full batch of 20 events with large properties is no longer refused as too big (the limit is now 512 KB a request), and a session recording or heatmap picture of a heavy page is split into parts the server takes, instead of the whole part being lost.",
+			"at": "2026-11-22T22:36:27Z"
 		}
 	],
-	"through": "4bb6d68+4bb6d68"
+	"through": "6419021+6419021"
 }
