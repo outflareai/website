@@ -2,7 +2,7 @@
 	"version": "2026.11.22",
 	"date": "2026-11-22",
 	"status": "in-progress",
-	"updated": "2026-11-22T15:08:40Z",
+	"updated": "2026-11-22T15:14:37Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -101,7 +101,14 @@
 			"edition": "open-source",
 			"text": "Balances: a new Analytics page shows what customers have paid for and not used yet, such as wallet money or credits. Say what goes in and what comes out, then see what is held now, how much sits untouched, the movement month by month and who holds the most. Agents use `run_balance`.",
 			"at": "2026-11-22T15:08:40Z"
+		},
+		{
+			"kind": "fix",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "The Paid ads Overview and Campaigns tables no longer show the notes written for the API (about micros and field names) under the numbers. On a brand's Agents page, Rules and the switches for removing ads now list only the agents that can act for that brand.",
+			"at": "2026-11-22T15:14:37Z"
 		}
 	],
-	"through": "ca185af+ca185af"
+	"through": "8a876db+8a876db"
 }
