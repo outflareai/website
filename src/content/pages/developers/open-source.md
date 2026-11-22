@@ -1,10 +1,10 @@
 ---
-title: Open-source, self-hosted marketing platform · Outflare
+title: Open-source, self-hosted company operating system · Outflare
 description: "Outflare's engine is AGPL-3.0 and self-hosts with Docker Compose and Postgres; its SDKs are Apache-2.0. See what is open, what is Cloud and how to contribute."
-h1: An open-source marketing platform you can run yourself.
+h1: Run your company with AI agents, on your own server.
 label: Open source
 lede: The whole Outflare engine, its web app, API and every module in the docs are open source under AGPL-3.0. Run it on your own server with Docker Compose and Postgres, read the code that decides what it sends, and add your own connector with a YAML file.
-answer: Outflare is an open-source marketing platform. Its engine and web app are AGPL-3.0, and its SDKs and MCP server are Apache-2.0. You can self-host it for free with Docker Compose, as two containers (the engine and Postgres), or use Outflare Cloud at app.outflare.ai, which runs the same engine and is free during early access. Agents that keep working toward a target on their own, such as the PR autopilot, are Cloud only.
+answer: Outflare is the open-source operating system for an online business, starting with growth. Its engine and web app are AGPL-3.0, and its SDKs and MCP server are Apache-2.0. You can self-host it for free with Docker Compose, as two containers (the engine and Postgres), or use Outflare Cloud at app.outflare.ai, which runs the same engine and is free during early access. Agents that keep working toward a target on their own, such as the PR autopilot, are Cloud only.
 points:
   - "Engine and web app: AGPL-3.0; SDKs, MCP server and connectors: Apache-2.0"
   - Two containers to self-host, with Postgres the only dependency

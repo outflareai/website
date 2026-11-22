@@ -4,7 +4,7 @@ description: Outflare's MCP server gives Claude, ChatGPT, Cursor and other MCP a
 h1: The marketing MCP server for your AI app.
 label: MCP server
 lede: Connect Claude, ChatGPT, Cursor, VS Code or any MCP app to Outflare with one URL, then ask it to run your marketing. It works in your workspace with the same limits as a person.
-answer: Outflare's MCP server connects AI apps such as Claude, ChatGPT and Cursor to your marketing workspace. Add https://app.outflare.ai/mcp (or /mcp on your own server) as a custom connector, sign in and choose what the app may do. It then has 536 tools over the Outflare API, for leads, sequences, replies, mailboxes, SEO, analytics, missions and more, and every email still passes the policy check.
+answer: Outflare's MCP server connects AI apps such as Claude, ChatGPT and Cursor to your Outflare workspace. Add https://app.outflare.ai/mcp (or /mcp on your own server) as a custom connector, sign in and choose what the app may do. It then has 536 tools over the Outflare API, for leads, sequences, replies, mailboxes, SEO, analytics, missions and more, and every email still passes the policy check.
 points:
   - One URL, OAuth sign-in, nothing to install
   - 536 tools, one per API call

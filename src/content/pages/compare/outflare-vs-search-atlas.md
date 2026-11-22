@@ -3,7 +3,7 @@ title: Outflare vs Search Atlas (2026) · Outflare
 description: "Outflare vs Search Atlas: an all-in-one SEO platform with OTTO vs an open-source workspace on your own data accounts. Pricing, fixes, AI visibility and MCP."
 h1: Outflare vs Search Atlas
 label: Outflare vs Search Atlas
-lede: Search Atlas is a hosted SEO platform that calls itself an agentic marketing platform, with OTTO SEO applying fixes, plus content, local SEO, ads and LLM visibility on credit-based plans. Outflare is an open-source marketing workspace that tracks your sites on your own Search Console, Ahrefs, DataForSEO and Geonode accounts, next to analytics, CRM and outreach.
+lede: Search Atlas is a hosted SEO platform that calls itself an agentic marketing platform, with OTTO SEO applying fixes, plus content, local SEO, ads and LLM visibility on credit-based plans. Outflare is an open-source workspace for running your company with AI agents that tracks your sites on your own Search Console, Ahrefs, DataForSEO and Geonode accounts, next to analytics, CRM and outreach.
 answer: "Pick Search Atlas if you want one hosted subscription that audits your site, applies technical and on-page fixes through OTTO, writes content, manages local listings and ads, and tracks LLM visibility, with white label on its Pro and Agency plans. Pick Outflare if you want open-source SEO on your own accounts and pay-per-call data, with a fixes list that agents work through behind an approval gate, Search Console by page, rank tracking, competitors and AI visibility, in the same workspace as your analytics and outreach. Outflare has no Search Atlas connector, so they run side by side."
 points:
   - Search Atlas Starter was $99/month billed monthly, with a 7-day trial (checked November 2026)

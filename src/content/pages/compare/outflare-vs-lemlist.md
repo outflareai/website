@@ -1,6 +1,6 @@
 ---
 title: Outflare vs lemlist (2026) · Outflare
-description: "Outflare vs lemlist: multichannel outreach vs an open-source marketing workspace. Pricing, warm-up, lead data, API and MCP, and how to move over."
+description: "Outflare vs lemlist: multichannel outreach vs an open-source workspace for running your company with AI agents. Pricing, warm-up, lead data, API and MCP, and how to move over."
 h1: Outflare vs lemlist
 label: Outflare vs lemlist
 lede: lemlist is a hosted outreach tool for email, LinkedIn, calls and more, with its own warm-up and lead database. Outflare is an open-source workspace for cold email, analytics, SEO and CRM, with every account your own.
