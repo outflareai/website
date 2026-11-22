@@ -55,7 +55,7 @@ export default defineConfig({
 			title: 'Outflare',
 			// Keep in step with src/data/positioning.ts (the config can't import TypeScript).
 			description:
-				'Outflare is the open-source AI marketing platform for people and their agents: analytics, SEO, AI visibility, cold email, leads and more, through one API and MCP.',
+				'Outflare is the open-source operating system for an online business: all your data in one place, AI agents do the work, you approve. It starts with growth (analytics, SEO, ads, outreach, CRM), through one API and MCP.',
 			logo: { light: './src/assets/logo-light.svg', dark: './src/assets/logo-dark.svg', alt: 'Outflare', replacesTitle: true },
 			favicon: '/favicon.svg',
 			social: [{ icon: 'github', label: 'GitHub', href: repo }],

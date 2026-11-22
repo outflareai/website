@@ -3,10 +3,10 @@
 // positioning changes in one edit.
 export const positioning = {
 	// One line: what Outflare is.
-	tagline: 'The open-source AI marketing platform for people and their agents.',
+	tagline: 'Run your company with AI agents. All your data in one place. Agents do the work. You approve.',
 	// Two sentences for meta descriptions and llms.txt.
 	summary:
-		'Outflare is an AI agent you prompt that connects your tools and runs your marketing: website analytics, SEO, AI visibility, cold email, leads, inbox and more in one workspace. Use it from Claude, ChatGPT or Cursor through MCP, or through the OpenAPI 3.1 API; open source (AGPL-3.0) and self-hostable, or hosted at app.outflare.ai.',
+		"Outflare is the open-source operating system for an online business: all your company's data in one place, AI agents that do the work, and you approve what they do. It starts with growth (analytics, SEO, ads, outreach, CRM and inbox), with money, people and goals coming next; use it from Claude, ChatGPT or Cursor through MCP or the OpenAPI 3.1 API, self-hosted (AGPL-3.0) or hosted at app.outflare.ai.",
 	// The short form, for a card or an image alt text.
-	short: 'Outflare: the open-source AI marketing platform for people and agents',
+	short: 'Outflare: run your company with AI agents',
 };
