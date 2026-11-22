@@ -2,7 +2,7 @@
 	"version": "2026.11.22",
 	"date": "2026-11-22",
 	"status": "in-progress",
-	"updated": "2026-11-22T10:30:18Z",
+	"updated": "2026-11-22T10:50:15Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -52,7 +52,14 @@
 			"edition": "open-source",
 			"text": "Brand profile: a fact that holds a whole list can now be split into separate facts, so each line can be confirmed, retired or allowed for customers on its own. Lists inside a fact now show as lists, in the overview and in each section.",
 			"at": "2026-11-22T10:30:18Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Lifetime value: a new Analytics page shows what a customer is worth, from their first payment on, net of refunds. Split it by first product, first channel or any customer field, follow each month's new customers in a cohort table, save it and put it on a dashboard. Agents run it with `run_lifetime_value`.",
+			"at": "2026-11-22T10:50:15Z"
 		}
 	],
-	"through": "9b1c7b5+9b1c7b5"
+	"through": "20b943f+20b943f"
 }
