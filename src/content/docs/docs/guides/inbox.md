@@ -7,7 +7,7 @@ sidebar:
 
 <span class="pill shipped">Shipped</span> IMAP sync, one inbox across all mailboxes, stop on reply, opt-out and bounce handling, labelling replies by what they mean in four groups, assigning, snoozing, coloured tags, saved views, label webhooks, replying from the inbox, replies from EmailBison, AI labelling with your own AI key, reply rules that also move deals in your CRM, and [alerts](/docs/guides/alerts/) for hot replies. <span class="pill">Next</span> Other sequencers.
 
-Replies show in the same Inbox as your support conversations: see [Team inbox](/docs/guides/team-inbox/) for views, teams, notes, saved replies and working together.
+The Inbox holds replies to outreach; conversations with customers are in Support. Both work the same way: see [Team inbox](/docs/guides/team-inbox/) for views, teams, notes, saved replies and working together.
 
 ## How mail arrives
 
