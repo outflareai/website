@@ -68,6 +68,18 @@ Confirming gives the customer that Telegram account, so the next chat with them,
 - **Summaries.** Open a chat and press **Summarise**: your workspace's own AI (**Settings → AI**, Telegram summaries) writes what they want, what was agreed, what's still open and who owes the next message. It says when new messages came in since.
 - **Handovers.** When you give a synced account to someone else in **Settings → Team**, its customer chats from the last 30 days are summarised for them, and they get an alert pointing to the chats.
 
+## Staff: contracts, pay and organisations (owners only)
+
+**Company → Staff** keeps what the company knows about everyone who works for it: employees, freelancers, contractors, people on an employer of record and advisors, and the organisations it works through, such as its own companies, agencies, hiring platforms and service providers. Only the workspace's owners can see it or change it. The server enforces this for the web app, the API, MCP and the CSV export, and no other role or API token can be given access.
+
+- **Everyone** lists each person with their position, department and manager, their type and start date, their contract, and what they cost a month. Filter by department, show people who have left, choose columns, and download everything as a CSV. A person's page holds their contact details (work and private email, phone, address), their contract and pay, every agreement, the payments recorded and a change log.
+- **Organisations** lists agencies, suppliers, platforms and your own companies, with their contact, the people who came through them and what you have paid them. Each organisation has its own page with its details, agreements and payments.
+- **Org chart** shows who reports to whom.
+
+Add a person or an organisation with the button at the top. Add agreements and payments on their page. When pay changes, start a new agreement so the old one stays in the history. Payments are only records: Outflare never sends money and never writes to a bank, payroll, Google or an e-signature tool. For the signed copy, store a link or say where it is kept, never the file. The change log shows who changed which fields and when, never the values. A field that looks like a password or a recovery phrase is refused.
+
+Every screen has its own link to share with another owner: `/{workspace}/staff`, `/staff/org-chart`, `/staff/organisations`, and one for each person or organisation.
+
 ## API and MCP
 
 | What | REST API | MCP tools |
@@ -77,6 +89,7 @@ Confirming gives the customer that Telegram account, so the next chat with them,
 | Company accounts | `GET`/`POST .../staff-accounts`, `GET`/`PATCH`/`DELETE .../staff-accounts/{id}` | `list_staff_accounts`, `get_staff_account`, `create_staff_account`, `update_staff_account` |
 | Telegram sign-in | `GET`/`PATCH .../staff-accounts/{id}/telegram`, `POST .../telegram/connect`, `.../password`, `.../check`, `.../disconnect` | `get_telegram_session` |
 | Telegram sync | `POST .../staff-accounts/{id}/telegram/sync`, `POST .../telegram/sync/pause` | |
+| Private records (owners only) | `GET .../staff-details`, `GET`/`PATCH .../staff-details/{id}`, `GET .../staff-details/export` (CSV), `.../staff-options`, `.../staff-organizations`, `.../staff-agreements`, `.../staff-payments`, `GET .../staff-changes` | `list_staff_details`, `get_staff_details`, `update_staff_details`, `list_staff_organizations`, `create_staff_organization`, `list_staff_agreements`, `create_staff_agreement`, `list_staff_payments`, `record_staff_payment`, `list_staff_changes` |
 | Synced chats | `GET /v1/brands/{brand}/telegram-chats` (`match_status` and `mine` for the queue, `waiting` for customers waiting), `GET`/`PATCH .../telegram-chats/{id}`, `GET .../telegram-chats/{id}/messages`, `POST .../telegram-chats/{id}/match`, `POST .../telegram-chats/{id}/summary` | `list_telegram_chats`, `list_telegram_messages`, `update_telegram_chat`, `match_telegram_chat`, `summarize_telegram_chat` |
 
-Reading needs the `members.read` scope and changing needs `members.manage`, which owners and admins have. Synced chats need `customers.read`, and `customers.manage` to sort and match them. Every change is in the audit log.
+Reading needs the `members.read` scope and changing needs `members.manage`, which owners and admins have. Synced chats need `customers.read`, and `customers.manage` to sort and match them. Private records need the `staff.private` permission, which only the Owner role has. Every change is in the audit log.
