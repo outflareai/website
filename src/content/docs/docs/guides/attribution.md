@@ -80,7 +80,7 @@ A [journey's](/docs/guides/journeys/) random split can hold some people back on 
 
 ## On Home and in your digest
 
-**Home** shows the last 28 days across every channel, below **Needs you**: visits, conversions, revenue and cost, with a link to Channels. It appears once your site has visits, for anyone who can see the reports.
+**Home** shows the last 28 days across every channel, under **More numbers**: visits, conversions, revenue and cost, with a link to Channels. It appears once your site has visits, for anyone who can see the reports.
 
 Your [daily or weekly digest](/docs/guides/digests/) has a **Channels** section: visits, conversions, and revenue and cost in each currency, each next to the period before, and the three channels that brought the most conversions. Both use your default model.
 
