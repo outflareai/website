@@ -13,13 +13,13 @@ A workspace holds everything for one team or client: mailboxes, pools, leads, li
 
 ### Workspace URL
 
-Each workspace has a short name for its URL, made from its name when it is created: a workspace called Geonode opens at `https://app.outflare.ai/geonode`, and each page follows it, such as `/geonode/connectors` or `/geonode/sequences`. Owners and admins can rename the workspace and change its URL under **Settings → General**. The URL can use 3 to 40 lowercase letters, numbers and dashes, and a few words the app needs for its own pages (such as `admin`, `signup` and `settings`) are taken.
+Each workspace has a short name for its URL, made from its name when it is created: a workspace called Acme opens at `https://app.outflare.ai/acme`, and each page follows it, such as `/acme/connectors` or `/acme/sequences`. Owners and admins can rename the workspace and change its URL under **Settings → General**. The URL can use 3 to 40 lowercase letters, numbers and dashes, and a few words the app needs for its own pages (such as `admin`, `signup` and `settings`) are taken.
 
 Changing the URL doesn't break links: the old one keeps leading to the workspace until another workspace takes it. Links from before workspace URLs existed (`/w/<workspace id>/...`) still work and switch to the new address.
 
-Sequences, lead lists, missions, sending servers, infrastructure plans, API tokens and webhooks get readable URLs too, made from their names: `/geonode/sequences/q3-founders`. Two with the same name become `q3-founders` and `q3-founders-2`. Renaming one gives it a new URL, and its old URL still opens it, so shared links keep working.
+Sequences, lead lists, missions, sending servers, infrastructure plans, API tokens and webhooks get readable URLs too, made from their names: `/acme/sequences/q3-founders`. Two with the same name become `q3-founders` and `q3-founders-2`. Renaming one gives it a new URL, and its old URL still opens it, so shared links keep working.
 
-A connection's URL is named after what it connects, not what you called it: `/geonode/connectors/posthog`, and `posthog-2` for a second PostHog account. The same URL opens the dialog to connect PostHog when nothing is connected yet, so you can share one link for "connect PostHog" or "our PostHog".
+A connection's URL is named after what it connects, not what you called it: `/acme/connectors/posthog`, and `posthog-2` for a second PostHog account. The same URL opens the dialog to connect PostHog when nothing is connected yet, so you can share one link for "connect PostHog" or "our PostHog".
 
 ## Roles
 
@@ -84,7 +84,7 @@ These emails go through Postmark, Resend or Cloudflare Email Service (`EMAIL_FRO
 
 Scripts, integrations and agents use API tokens instead of a person's session. To connect Claude, ChatGPT or Cursor, use [Connect your AI](/docs/agents/connect/) instead: the app signs in, and its connection isn't listed under API tokens.
 
-Under **Settings → API tokens**, **New token** asks for a name, what it can do (**Read only**, **Can make changes**, or **Choose** to set each area to No, See or Change), anything riskier under **Also allow** (spending, approving missions, the suppression list, people, tokens, workspace settings), and when it expires (90 days unless you choose otherwise). Click a token later to rename it, change what it may do or its sending limits, or revoke it. A change applies on the token's next request. A token:
+Under **Settings → API tokens**, **New token** asks for a name, what it can do (**Read only**, **Can make changes**, or **Choose** to set each area to No, See or Change), anything riskier under **Also allow** (spending, approving missions, the suppression list, people, tokens, workspace settings), and when it expires (90 days unless you choose otherwise). The list shows who created each token, what it can do, and when it was last used and expires; a token made by another token or an agent, or by someone whose account was deleted, shows **Unknown** under **Created by**. Click a token later to rename it, change what it may do or its sending limits, or revoke it. A change applies on the token's next request. A token:
 
 - belongs to one workspace,
 - holds an explicit list of scopes, which can never exceed the scopes of the person who created it,

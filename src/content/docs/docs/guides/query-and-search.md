@@ -56,6 +56,30 @@ A query belongs to one brand. Open **Data → Queries**, send `POST /v1/brands/{
 | `products`, `lifecycle_states`, `lifecycle_moves`, `lifecycle_overall` | Products and where each company and person stands with each ([Products and lifecycle stages](/docs/guides/products-and-lifecycle/)) |
 | `metrics`, `metric_values` | Live totals per company and person ([Metrics](/docs/guides/metrics/)) |
 | `bulk_edits` | [Bulk edits](/docs/guides/bulk-edits/) and what they changed |
+| `attribute_changes`, `record_merges`, `field_definitions`, `option_sets`, `record_types` | Every record's full field history (old and new value, who and when), merges, and your fields and record types |
+| `smart_lists`, `smart_list_members`, `static_list_members`, `score_definitions`, `score_history`, `signals` | Lists and who is in them, scores per day, and signals such as buying intent or churn risk |
+| `sales_leads`, `sales_events`, `crm_activities`, `crm_calendar_events`, `crm_mail_messages` | Sales leads and what happened on them, tasks, and meetings and emails with customers, without their content |
+| `revenue_days`, `revenue_customers`, `revenue_forecast_history` | MRR per day with new, expansion and churned MRR, and the quarterly forecast week by week |
+| `support_conversations`, `support_messages`, `support_assistant_runs` | Support conversations with response times, SLA breaches and ratings, and what the AI agent did, without message bodies |
+| `partner_programs`, `partner_referrals`, `partner_conversions`, `partner_rewards`, `partner_payouts` | Partner and affiliate programs, referrals, credited sales, rewards and payouts |
+| `ad_accounts`, `ad_entities`, `ad_metrics_daily`, `ad_keywords`, `ad_search_terms_daily`, `ad_clicks` | Your ad accounts, campaigns, ad groups and ads with their daily spend, clicks and conversions, keywords and search terms. Amounts are in micros: divide by 1,000,000 |
+| `ad_acquisitions`, `ad_revenue`, `attribution_conversions`, `attribution_credits` | The ad click that brought each customer in, the revenue credited to it, and each conversion's credit per attribution model |
+| `tracking_campaigns`, `tracking_link_clicks`, `tracker_offers`, `tracker_conversions`, `tracker_network_costs` | Tracking links and their clicks, and the click tracker's offers, conversions and network costs |
+| `search_daily`, `url_inspections`, `crawl_pages`, `crawl_issues`, `tracked_keywords`, `rank_observations` | Search Console clicks by page and query, indexing, crawls, and rankings |
+| `seo_competitors`, `competitor_pages`, `ai_prompts`, `ai_samples`, `ai_mentions`, `ai_citations` | Competitors and their new pages, and AI visibility: each AI answer, the brands it named and the pages it cited |
+| `analytics_daily`, `page_vitals`, `heatmap_clicks`, `site_visitors`, `experiments`, `ab_tests` | Web analytics, page speed, heatmaps, site visitors, and experiments and A/B tests with their results |
+| `agent_runs`, `missions`, `mission_updates`, `actions`, `brand_findings` | What agents did: runs and missions with their plans and reports, the action log, and what they learned |
+| `social_accounts`, `social_publications`, `social_post_snapshots`, `content_items`, `journey_run_steps` | Social accounts and posts with their numbers over time, your content, and each step people took through journeys |
+
+This is a selection. The data catalog lists every table.
+
+### Data catalog
+
+**Data → Catalog** lists every table you can query for the brand: what a row is, where the rows come from, how many there are and how recent they are. Open a table to see every column explained: what it means, its unit (such as minor units of a currency, or micros), what it joins to, whether it holds personal data, how often it is filled and its most common values, with example questions and their SQL. The numbers are read live from your data with your own permissions, so the catalog never shows more than a query could.
+
+Agents read the same catalog with the MCP tool `describe_brand_data` (`GET /v1/brands/{brand}/data/catalog`, and `.../data/catalog/{table}` for one table), so they know what data exists before they write SQL. Agents get `run_query` and `describe_brand_data` by default. For a list longer than 1,000 rows, the MCP tool `export_query_csv` gives up to 10,000 rows as CSV.
+
+Every kind of data Outflare stores, brings in from a connection or computes is added to Query and the catalog as it ships. Secrets, sign-in details, message bodies and similar content are never in Query.
 
 - Projects were removed, so there is no `projects` view and no `project_id` column. A saved query that names either needs to drop it.
 - A query is one `SELECT`. It never changes anything, so an agent kept to missions can run it without one.
@@ -88,6 +112,7 @@ curl -X POST https://app.outflare.ai/v1/brands/$BRAND/query-endpoints/new-signup
 ```
 
 - Publish with `POST /v1/brands/{brand}/query-endpoints`, giving the saved query, a `slug`, its `params` (bound in order as `$1`, `$2`, …, never written into the SQL), a `row_cap` (up to 10,000) and a `rate_per_minute` per token.
+- Each endpoint has a plain-English description of what it returns. When you publish, Outflare writes it from the query: the table it reads, its filters, the parameters callers send, its order and its row limit, for example "People where country is the country you send, newest created first. Returns name, email and created, up to 1,000 rows a call. Callers send country (text)." It is written by rules, not by an AI model, so it costs nothing and needs no AI key. The publish form keeps it up to date as you name the parameters until you type in it, and **Write it again** puts the written one back, there and on the endpoint's page. Through the API, publishing without a `description` writes one, and `POST /v1/brands/{brand}/query-endpoints/describe` (MCP: `describe_query_endpoint`) writes one without publishing.
 - It reads what its publisher could read, and never another brand. It stays on the version it was published with until you move it.
 - Every call is logged, allowed or refused, for 90 days (`GET .../query-endpoints/{endpoint}/calls`). Over the rate limit it answers `429` with `Retry-After`.
 

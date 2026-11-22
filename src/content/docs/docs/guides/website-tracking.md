@@ -177,7 +177,7 @@ A third switch, **Capture errors**, sends the errors your pages throw. It is als
 
 ## Ad pixels without code
 
-The script can load an ad platform's pixel for you, so your site carries no pixel snippet and your developers pass no user data to it. Today that is the ChatGPT Ads pixel.
+The script can load an ad platform's pixel for you, so your site carries no pixel snippet and your developers pass no user data to it. Today that is the ChatGPT Ads pixel, described first, and the Meta and TikTok pixels, below.
 
 1. Connect your own ChatGPT Ads account for the brand and fill in its **Pixel ID** (Paid ads, Accounts, Connections).
 2. On Website tracking, turn on **Load the ChatGPT Ads pixel** on the site's script. Until the connection has a Pixel ID, the switch stays off and says where to add it.
@@ -189,6 +189,28 @@ Nothing loads without the visitor's consent to marketing, and withdrawing it tel
 If a page still carries the pixel's own snippet, the script leaves it in charge and only adds the user data. Once the switch is on, take that snippet off the site so page views are counted once. Sign-ups and purchases still go from Outflare's server, not from the page.
 
 A site with a Content Security Policy allows `https://bzrcdn.openai.com` in `script-src` and `connect-src`, and `https://bzr.openai.com` in `connect-src` and `img-src`. `data-pixels="off"` on the tag stops the script loading any pixel on that page.
+
+### Meta and TikTok pixels
+
+The same script can load your Meta pixel and your TikTok pixel. The reason to do it is matching. A conversion sent only from Outflare's server is matched on what the server knows, while the pixel in the browser also sees the platform's own cookies. With both, and the same event ID on each, the platform counts the conversion once and matches more of them to an ad.
+
+Both run on your own Meta Ads and TikTok Ads accounts, connected for the brand. See [Paid media](/docs/integrations/paid-media/).
+
+1. Send the brand's conversions to the platform first: Paid ads, Settings, Send conversions. Add a conversion for Meta Ads or TikTok Ads and pick its pixel. The pixel the script loads is always that one.
+2. On Website tracking, turn on **Load the Meta pixel** or **Load the TikTok pixel** on the site's script. Both are off by default. Until the brand sends that platform a conversion, the switch stays off and says where to add one.
+
+From the next page a visitor opens, the script:
+
+- loads the platform's pixel once the page has loaded and counts each page view with it, also when a single-page app changes pages;
+- gives it the signed-in visitor's hashed email address, phone number and ID when the pixel starts, under the same rules as the ChatGPT Ads pixel above. Someone who signs in during a visit is known to the pixel from the next page they open;
+- sends a conversion to the pixel when your page calls `outflare.track` with an event one of those conversions is made from, with the platform's event name (such as `Purchase`), its value, and the track call's `messageId` as the event ID. Outflare's server sends the same conversion with the same ID, so the platform keeps one;
+- loads nothing without the visitor's consent to marketing, and tells the pixel when they withdraw it.
+
+Only conversions the page can send exactly as the server does go from the page: one event, no conditions, and a value the event carries or a fixed one. Any other conversion goes from the server alone, as do events your server sends that no page tracked. Nothing is lost either way: the server sends every conversion whether or not the page did.
+
+If the page still carries the platform's own snippet, the script does nothing for that platform: it loads no second copy and sends no events, because the page's own code may send them already. Take the snippet off the site to let the script do it.
+
+A site with a Content Security Policy allows `https://connect.facebook.net` in `script-src` and `https://www.facebook.com` in `connect-src` and `img-src` for Meta, and `https://analytics.tiktok.com` in `script-src` and `connect-src` for TikTok.
 
 ## Safe to put in a page
 

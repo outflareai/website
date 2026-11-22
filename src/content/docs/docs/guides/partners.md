@@ -9,11 +9,13 @@ sidebar:
 
 A partner program pays people who send you customers: affiliates, referrers and influencers. Each brand runs its own programs. A partner is a person in your [customer records](/docs/guides/customer-records/), and so is every customer they refer, so the CRM, attribution and lifecycle email all see the same people.
 
-Open **Partners** in a brand to make a program, add partners and set the rewards (a fixed amount for a sign-up, a percentage of each sale, or a bounty for any event you choose).
+Open **Partnerships → Affiliates** in a brand to make a program, add partners and set the rewards (a fixed amount for a sign-up, a percentage of each sale, or a bounty for any event you choose).
 
 **Program settings** (top right of the Partners page) opens a page of its own, in tabs: General, Payouts, Tracking, Fraud, Portal and Import. Change what you need on any tab and press **Save changes** at the foot of the page.
 
 The **Portal** tab opens a hosted page where partners apply, sign in and see their links, rewards and payouts. Its link uses the portal's address, such as `https://app.outflare.ai/p/northpeak/`. Outflare suggests one from the program's name, and you can change it before you press **Save portal**. To use your own domain instead, such as `partners.example.com`, add it under **Your own domain** on the same tab and create the one DNS record it shows. HTTPS is set up for you. Some addresses, such as `app`, `docs` and `login`, are reserved.
+
+A partner can also earn from a coupon code, with no link click at all: see [Coupons](/docs/guides/coupons/).
 
 ## Partner links
 

@@ -19,7 +19,7 @@ A visit from before someone signed up counts for them once your site identifies 
 
 ## Steps
 
-Add up to ten steps. Each one is:
+Add up to 20 steps. Each one is:
 
 - **Website visit**: a visit, filtered by its ad network (from the ad's click id), channel, source, campaign, landing page, device, country and more.
 - **Event**: a product event by name, such as `signed_up`, filtered by any of its properties.
@@ -61,6 +61,26 @@ Under the steps, **Leave out people who…** drops from the whole funnel everyon
 - In that list, **Save as a list** puts everyone there with a record into a new static [list](/docs/guides/smart-lists/), to mail, score or compare. Visitors not signed in have no record and are skipped; the list says how many. *Signed up, never paid* as a list is a sequence waiting to happen.
 - **What did people who finished do differently?** compares, for everyone at step 1, the events, pages and properties of the people who reached a step with those who didn't. Properties are what your records say about identified people, such as `plan: pro` or `country: AU`, never anything that identifies one person (email, phone, name). Each row shows the share of each group who did or had it and how many times more likely finishing was (over 1 went with finishing, under 1 with dropping off). It runs when you press **Compare**, since it reads every event and page view, and leaves out anything fewer than three people did. For funnels of people, not companies.
 
+## Long funnels
+
+A funnel with more than eight steps opens as a **list**, one step a line with its whole name, how many people reached it, how many stopped before it and how long it took. **List** and **Bars** above the chart switch between the two for any funnel. A line over the steps names the **biggest drop**, so you know where to look first. In the editor, a long funnel shows each step as one line; click a step to change it.
+
+## Can I trust the drop-off?
+
+A journey across several systems (your ads, your website, an installer, your backend) only adds up when every system reports under an id that leads back to the same person, and keeps reporting. When one doesn't, the funnel shows a drop that never happened, and every step after it is too low as well. So Outflare also looks at each step on its own and says what it found on the line over the steps and on the step itself:
+
+- **Nothing has arrived** for a step: the event name is misspelt, or the system isn't sending.
+- **The data stopped**: a step's data used to arrive and has gone quiet. Every number from that step on is too low until it is back.
+- **Not linked to the earlier steps**: many people did the step with no visit, page view or event on record before it, so it is probably sent under a different id.
+
+**Check this step**, under any step in the list, shows the step's own numbers:
+
+- **Starting fresh at this step**: as if the funnel began there. Everyone who did the step counts, whatever they did before it, and you see how many went on to the next step, with this funnel's numbers beside it. A tracking problem higher up can't lower these numbers.
+- **Open a funnel that starts at this step** opens the rest of the journey in a tab over the chart, next to **Whole funnel**, so you can switch between them. The steps keep their numbers. From that tab, **Open it as a funnel of its own** makes it a new funnel you can change and save.
+- **Compared with this funnel**: how many did the step, how many the funnel counted, how many did it but weren't counted, and when its data last arrived.
+
+A step with a problem offers **Make this step optional**, so people who skip it still count at the next step while you fix the tracking. The check finds people who appear from nowhere at a step; it doesn't find an id that is wrong for only a few people.
+
 ## Save it, and link to it
 
 The Funnels page opens on a list of your saved funnels: each one's name, its steps and when it last changed, with a search box once the list is long. Click a funnel to open it, or **New funnel** to start one. **All funnels** at the top of a funnel takes you back to the list.
@@ -81,4 +101,4 @@ Everyone in the workspace can run funnels and the comparison (`analytics.read`);
 
 ## For agents and scripts
 
-The REST API is `POST /v1/brands/{brand}/insights/funnel` to run a funnel (with `exclusions`, `by`, `order` and `optional` on a step), `POST /v1/brands/{brand}/insights/funnel/people` for the people behind a step and `.../people/save` to keep them as a list, `.../funnel/correlation` for what converters did differently, `GET /v1/brands/{brand}/insights/catalog` for the events and fields you can use, and `/v1/brands/{brand}/insights` for saved funnels. See the [API reference](/docs/api/). The MCP tools are `get_insights_catalog`, `run_funnel`, `list_funnel_people`, `save_funnel_people`, `run_funnel_correlation`, `list_insights`, `get_insight`, `save_insight`, `update_insight` and `delete_insight`. Ask your agent something like *"Of the people who came from our Google ads last month, how many signed up, and how many of those paid within 3 days?"*
+The REST API is `POST /v1/brands/{brand}/insights/funnel` to run a funnel (with `exclusions`, `by`, `order` and `optional` on a step), `POST /v1/brands/{brand}/insights/funnel/people` for the people behind a step and `.../people/save` to keep them as a list, `.../funnel/correlation` for what converters did differently, `.../funnel/checks` for each step on its own and what looks wrong with its data, `GET /v1/brands/{brand}/insights/catalog` for the events and fields you can use, and `/v1/brands/{brand}/insights` for saved funnels. See the [API reference](/docs/api/). The MCP tools are `get_insights_catalog`, `run_funnel`, `check_funnel_data`, `list_funnel_people`, `save_funnel_people`, `run_funnel_correlation`, `list_insights`, `get_insight`, `save_insight`, `update_insight` and `delete_insight`. Ask your agent something like *"Of the people who came from our Google ads last month, how many signed up, and how many of those paid within 3 days?"*

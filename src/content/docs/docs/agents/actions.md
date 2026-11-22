@@ -73,6 +73,19 @@ When several rules match, the most specific decides, and on a tie the stricter o
 
 [Paid ads](/docs/integrations/paid-media/) have rules of their own on top: raising a campaign's daily budget by more than a fifth always waits for a person, and a pause always runs.
 
+Removing a campaign, an ad or a keyword can't be undone on the ad platform, so it is a permission of its own. Only a rule that names the removal decides it: `brands/*/ads/campaigns/*/remove`, `brands/*/ads/items/*/remove` (ads) or `brands/*/ads/keywords/*/remove`. A broad rule such as `**` never covers one, and with no such rule the agent's removal is refused with `403 permission_required` and the missing `permission`. On the Agents page each agent has the three as switches: **Off** (`refuse`), **Ask** (`hold`, a person approves each one) and **On** (`run`). A removal rule can carry `conditions`, and every one set must hold or the removal is refused:
+
+- **paused_campaign_only**: only in a paused campaign (for a campaign, only when it is paused).
+- **disapproved_only**: only ads the platform disapproved (for a campaign, only when all its ads are). Never a keyword.
+- **max_spend_micros**: only what spent at most this over the last 30 days, in millionths of the account's currency; `0` means never spent.
+
+```sh
+# Let the agent remove ads, but only disapproved ones that spent nothing.
+curl -X POST "$OUTFLARE_URL/v1/workspaces/$WS/action-grants" \
+  -H "Cookie: outflare_session=..." -H "Content-Type: application/json" \
+  -d '{"token_id": "'$AGENT'", "method": "POST", "path": "brands/*/ads/items/*/remove", "mode": "run", "conditions": {"disapproved_only": true, "max_spend_micros": 0}}'
+```
+
 ## Approve a pattern once
 
 When you approve a held change you can choose **Approve and remember**: changes that match the same fields run from then on, and anything outside the pattern still waits. Over the API, add `remember` to the approval:
