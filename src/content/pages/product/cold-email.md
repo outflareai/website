@@ -20,8 +20,8 @@ docs:
   - label: Switch from Instantly or Smartlead
     href: /docs/guides/switch-from-instantly-smartlead/
 faqs:
-  - q: Is Outflare a cold email tool or a whole marketing platform?
-    a: Both. Cold email is one module. It shares mailboxes, leads, customer records, the reply inbox and the API with the rest of Outflare, so the same workspace also reads your website analytics, SEO and CRM. You can use only the cold email part.
+  - q: Is Outflare a cold email tool or something bigger?
+    a: Both. Cold email is one module. It shares mailboxes, leads, customer records, the reply inbox and the API with the rest of Outflare, so the same workspace also reads your website analytics, SEO and CRM, and runs the rest of your company with AI agents. You can use only the cold email part.
   - q: Do I need to buy mailboxes from Outflare?
     a: No. Outflare never sells mailboxes or sending. You connect the Google Workspace, Microsoft 365 or SMTP mailboxes you already have, or buy them from any reseller and import their CSV.
   - q: Does Outflare warm up mailboxes?

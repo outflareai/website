@@ -3,7 +3,7 @@ title: Outflare vs Instantly (2026) · Outflare
 description: "Outflare vs Instantly: open source vs hosted, pricing, warm-up, lead data, API and MCP, and how to run both or switch without emailing anyone twice."
 h1: Outflare vs Instantly
 label: Outflare vs Instantly
-lede: Instantly is a hosted cold email platform with its own warm-up network, lead database and credits. Outflare is an open-source marketing workspace whose cold email runs on your own mailboxes and accounts. Many teams use both.
+lede: Instantly is a hosted cold email platform with its own warm-up network, lead database and credits. Outflare is an open-source workspace for running your company with AI agents whose cold email runs on your own mailboxes and accounts. Many teams use both.
 answer: Pick Instantly if you want a hosted, all-in-one cold email tool with built-in warm-up, a lead database and one bill. Pick Outflare if you want open-source software you can self-host, one policy check on every email for people and AI agents, and cold email in the same workspace as your analytics, SEO and CRM. Outflare connects to Instantly, so you can keep Instantly's warm-up and campaigns and manage mailboxes, replies and reporting from Outflare.
 points:
   - Instantly is hosted only; Outflare is AGPL-3.0 and free to self-host

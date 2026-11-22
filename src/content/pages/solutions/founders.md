@@ -1,10 +1,10 @@
 ---
-title: "AI marketing agent for founders doing it alone · Outflare"
-description: "Run outreach, SEO, analytics and lifecycle email alone with an AI agent in Outflare: your own AI key, plans you approve, and limits on sending and spend."
-h1: "Do all your marketing alone, with an agent that asks first."
+title: "Run your company with AI agents: Outflare for founders"
+description: "For founders of online businesses: all your data in one place, AI agents do the work, you approve. Starts with outreach, SEO, analytics and lifecycle email, on your own AI key."
+h1: "Run your company with AI agents that ask first."
 label: Founders
-lede: "Outflare puts your analytics, SEO, cold email, customer records and lifecycle email in one open-source workspace, and lets an AI agent work across all of it toward a goal you set, inside limits you approve."
-answer: "For a founder doing marketing alone, Outflare is one workspace where an AI agent works toward a goal you type in plain words, such as \"book 10 meetings with fintech CFOs in Australia by 30 November\". Your own AI model drafts the plan from your company's context, you approve it, and the agent works within the email and spend limits you set, waiting for you where you choose. You can also run it from Claude, ChatGPT or Cursor. Self-hosting is free, and Outflare Cloud is free during early access; you pay your own AI and data providers directly."
+lede: "Outflare is the operating system for an online business. It puts your company's data in one open-source workspace, starting with analytics, SEO, cold email, customer records and lifecycle email, and lets AI agents work across all of it toward a goal you set, inside limits you approve. Money, people and goals are coming next."
+answer: "For a founder of an online business, Outflare is one workspace where an AI agent works toward a goal you type in plain words, such as \"book 10 meetings with fintech CFOs in Australia by 30 November\". Your own AI model drafts the plan from your company's context, you approve it, and the agent works within the email and spend limits you set, waiting for you where you choose. You can also run it from Claude, ChatGPT or Cursor. Self-hosting is free, and Outflare Cloud is free during early access; you pay your own AI and data providers directly."
 points:
   - "Type a goal; your AI drafts a plan you approve"
   - "Email and spend limits, and approvals where you want them"

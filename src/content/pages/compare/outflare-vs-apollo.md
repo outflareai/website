@@ -1,6 +1,6 @@
 ---
 title: Outflare vs Apollo (2026) · Outflare
-description: "Outflare vs Apollo.io: a B2B data and sales platform vs an open-source marketing workspace. Pricing, data, sequences, MCP and using Apollo in Outflare."
+description: "Outflare vs Apollo.io: a B2B data and sales platform vs an open-source workspace for running your company with AI agents. Pricing, data, sequences, MCP and using Apollo in Outflare."
 h1: Outflare vs Apollo
 label: Outflare vs Apollo
 lede: Apollo is a hosted sales platform built on its own B2B contact database, with sequences, a dialer and an MCP server. Outflare has no contact data of its own; it builds lead lists from your own Apollo account and sends from your own mailboxes.

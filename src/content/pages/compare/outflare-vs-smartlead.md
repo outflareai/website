@@ -3,7 +3,7 @@ title: Outflare vs Smartlead (2026) · Outflare
 description: "Outflare vs Smartlead: open source vs hosted, pricing, warm-up, agency features, API and MCP, and how to run both or import Smartlead campaigns."
 h1: Outflare vs Smartlead
 label: Outflare vs Smartlead
-lede: Smartlead is a hosted cold email platform with unlimited mailboxes, a warm-up pool and client workspaces for agencies. Outflare is an open-source marketing workspace that sends from your own mailboxes and can run Smartlead's warm-up for you.
+lede: Smartlead is a hosted cold email platform with unlimited mailboxes, a warm-up pool and client workspaces for agencies. Outflare is an open-source workspace for running your company with AI agents that sends from your own mailboxes and can run Smartlead's warm-up for you.
 answer: Pick Smartlead if you want a hosted cold email tool with built-in warm-up, unlimited email accounts and white-label client workspaces for an agency. Pick Outflare if you want open-source software you can self-host, one policy check on every email for people and AI agents, and cold email next to your analytics, SEO and CRM. Outflare connects to Smartlead, so you can keep Smartlead's warm-up and manage mailboxes and reporting in Outflare, or import your campaigns and move over.
 points:
   - Smartlead is hosted only; Outflare is AGPL-3.0 and free to self-host
