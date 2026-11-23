@@ -2,7 +2,7 @@
 	"version": "2026.11.23",
 	"date": "2026-11-23",
 	"status": "in-progress",
-	"updated": "2026-11-23T15:31:36Z",
+	"updated": "2026-11-23T16:48:31Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -241,7 +241,21 @@
 			"edition": "open-source",
 			"text": "Coming back to Sales from a person's page, or from a conversation, shows the list as you left it, at once: the same tab, filters, search and place in the list. A person's page opened from a conversation has a link back to it, and a conversation opened from a person's page has a link back to the person.",
 			"at": "2026-11-23T15:31:36Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Sales templates and sequences keep directions for AI, which Write with AI and Personalize with AI follow. AI writes merge fields with fallbacks, the composer fills them in and shows what will be sent, and a send or sequence start with a field that has no value and no fallback is stopped with a fix offered on the spot.",
+			"at": "2026-11-23T16:48:31Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "CRM → Lead finder shows each day: companies judged, how many passed and their grades, how many have a verified contact, what was spent and what one verified contact cost. A cost that includes spend with no price yet is marked as a minimum.",
+			"at": "2026-11-23T16:48:31Z"
 		}
 	],
-	"through": "49eb05d+49eb05d"
+	"through": "e7c6290+e7c6290"
 }
