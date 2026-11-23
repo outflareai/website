@@ -1,0 +1,23 @@
+{
+	"version": "2026.11.23",
+	"date": "2026-11-23",
+	"status": "in-progress",
+	"updated": "2026-11-23T00:04:07Z",
+	"items": [
+		{
+			"kind": "improvement",
+			"area": "social",
+			"edition": "open-source",
+			"text": "Mentions can leave out a namesake: add words under \"Skip if it also says\" for the brand or a competitor, and posts, videos and episodes that also say one aren't kept. New mentions that say one are cleared on the next scan.",
+			"at": "2026-11-23T00:04:07Z"
+		},
+		{
+			"kind": "fix",
+			"area": "social",
+			"edition": "open-source",
+			"text": "YouTube and podcast mentions now search competitors with a real name first, and each scan carries on where the last stopped, so every competitor gets searched over a few scans instead of only the first ones in alphabetical order.",
+			"at": "2026-11-23T00:04:07Z"
+		}
+	],
+	"through": "436a9ed+436a9ed"
+}
