@@ -2,7 +2,7 @@
 	"version": "2026.11.23",
 	"date": "2026-11-23",
 	"status": "in-progress",
-	"updated": "2026-11-23T12:50:56Z",
+	"updated": "2026-11-23T13:04:12Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -192,7 +192,21 @@
 			"edition": "open-source",
 			"text": "Podcast mentions read transcripts written by speech to text tools as JSON, and quote what was said instead of the transcript's code.",
 			"at": "2026-11-23T12:50:56Z"
+		},
+		{
+			"kind": "fix",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Distribution: Total paid now starts as what customers paid, with refunds left out, so no range starts below zero. A new Refunds control switches between gross and net, and with refunds taken off the first range reads \"Under $10\". The Management report template's tile counts the same way.",
+			"at": "2026-11-23T13:04:12Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Support has its own permission, separate from the Inbox: a role can now see and answer support conversations without seeing replies to outreach, or the other way round. Everyone who could use the Inbox keeps Support until you change their role under Settings, Roles. API tokens use the new `support.read` and `support.manage` scopes.",
+			"at": "2026-11-23T13:04:12Z"
 		}
 	],
-	"through": "4572bc9+4572bc9"
+	"through": "147345c+147345c"
 }
