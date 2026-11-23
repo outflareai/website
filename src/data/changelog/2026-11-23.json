@@ -2,7 +2,7 @@
 	"version": "2026.11.23",
 	"date": "2026-11-23",
 	"status": "in-progress",
-	"updated": "2026-11-23T03:15:29Z",
+	"updated": "2026-11-23T03:20:32Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -52,7 +52,21 @@
 			"edition": "open-source",
 			"text": "Two-factor sign-in: add an authenticator app under Your account and type its code after your password, with ten backup codes for a lost phone, and \"Remember this device for 7 days\" so a trusted browser isn't asked every time. An owner can require it for everyone in the workspace, and reset it for a member who is locked out. Signing in with a passkey already counts.",
 			"at": "2026-11-23T03:15:29Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "A chat can show an AI reply that is sent through a tool while it is being written: Outflare's AI layer now streams tool calls as well as text, for Claude and OpenAI-compatible models.",
+			"at": "2026-11-23T03:20:32Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "agents",
+			"edition": "cloud",
+			"text": "The agent's chat shows a reply while it is being written, and long conversations keep working instead of being cut off. You can rate a reply, ask for it again, edit your last message, see the sources behind a reply, get charts in replies, and print a chat or save it as a PDF or Word file.",
+			"at": "2026-11-23T03:20:32Z"
 		}
 	],
-	"through": "396ba7c+396ba7c"
+	"through": "ebc7cb0+ebc7cb0"
 }
