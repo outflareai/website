@@ -2,7 +2,7 @@
 	"version": "2026.11.23",
 	"date": "2026-11-23",
 	"status": "in-progress",
-	"updated": "2026-11-23T21:13:12Z",
+	"updated": "2026-11-23T21:27:18Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -297,7 +297,14 @@
 			"edition": "open-source",
 			"text": "Mentions can listen to what's said in podcasts: pick a speech to text connection under Sources, Podcasts (Groq's free plan is enough), and episodes with no published transcript are written out on your own account, so names said only aloud are found with their second.",
 			"at": "2026-11-23T21:13:12Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Headline numbers on Channels, Outcomes, Organic conversions, Sending reports and AI answer share now show what they were in the period just before, on a \"Before:\" line under each number, so you can tell at a glance whether a number went up or down. The AI answer share API returns the earlier totals as `previous`.",
+			"at": "2026-11-23T21:27:18Z"
 		}
 	],
-	"through": "d1e66a1+d1e66a1"
+	"through": "4f625c9+4f625c9"
 }
