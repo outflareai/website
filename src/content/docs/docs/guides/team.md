@@ -20,6 +20,19 @@ Switch from **List** to **Org chart** to see who reports to whom, from the top d
 - **Removing** is for someone added by mistake. Someone who has held a company account can't be removed: mark them left instead, so the account's history stays whole.
 - Deleting a department keeps its people and teams; they just have no department.
 
+## Our team
+
+Everyone in the company sees **Company → Our team**: the people who work here now (never people who left), with their photo, position, department, a line on what they look after, their work email, the company Telegram account they hold, their GitHub username and a link to their Slack profile. Nothing private is on it.
+
+- **Fill it in.** Owners and admins open a person and choose **Edit** to write their responsibilities (up to 300 characters), GitHub username and Slack profile link (in Slack, open their profile, then **More → Copy link to profile**).
+- **Photos.** Choose **Upload photo** (PNG, JPEG, GIF or WebP, up to 10 MB). Without one, the photo of their Outflare sign-in is shown, and without either, their initials.
+
+## Members and the directory
+
+Everyone who signs in to Outflare is a person in the directory, so nobody is entered twice. When someone accepts an invite, their sign-in is linked to the person with the same work email, or a new person is added for them. **Add person** in Staff can also invite them to Outflare with a role, and a person's page in Staff shows whether they sign in and with which role.
+
+Someone with a sign-in who doesn't work for the company, such as an agency or a client's guest, can be removed from the directory or marked as left. They're added again only if they accept a new invite.
+
 ## Company accounts
 
 Accounts belong to the company, not the person. When someone leaves, their accounts pass to the next person, and each account keeps who held it and when.
@@ -88,7 +101,7 @@ Every screen has its own link to share with another owner: `/{workspace}/staff`,
 
 | What | REST API | MCP tools |
 | --- | --- | --- |
-| People | `GET`/`POST /v1/workspaces/{ws}/staff`, `GET`/`PATCH`/`DELETE .../staff/{id}` | `list_staff`, `get_staff_member`, `create_staff_member`, `update_staff_member` |
+| People | `GET`/`POST /v1/workspaces/{ws}/staff` (`status=current` for people who work here now), `GET`/`PATCH`/`DELETE .../staff/{id}`, `GET`/`PUT`/`DELETE .../staff/{id}/photo` | `list_staff`, `get_staff_member`, `create_staff_member`, `update_staff_member` |
 | Departments | `GET`/`POST .../departments`, `PATCH`/`DELETE .../departments/{id}` | `list_departments`, `create_department` |
 | Company accounts | `GET`/`POST .../staff-accounts`, `GET`/`PATCH`/`DELETE .../staff-accounts/{id}` | `list_staff_accounts`, `get_staff_account`, `create_staff_account`, `update_staff_account` |
 | Telegram sign-in | `GET`/`PATCH .../staff-accounts/{id}/telegram`, `POST .../telegram/connect`, `.../password`, `.../check`, `.../disconnect` | `get_telegram_session` |

@@ -41,7 +41,7 @@ On a self-hosted server, `OUTFLARE_COMMUNITY_LINKS=off` turns them off for every
 
 ## The menu
 
-The menu has a short rail of areas on the left (Home, Inbox and Agents, then CRM, Partnerships, Automations, Email, Search, Social, Ads, Analytics, Data and Company, with Connectors and Settings at the bottom) and, beside it, only the pages of the area you are in.
+The menu has a short rail of areas on the left (Home and Agents, then Customers, Growth, Support and Analytics for the brand you picked, then the company's own sections such as People, Goals and Company, with Connectors and Settings at the bottom) and, beside it, only the pages of the area you are in.
 
 Prefer the older menu, with every part of Outflare in one sidebar? Press **Old menu** at the bottom of the rail. **Switch to the new menu** at the bottom of that sidebar brings the rail back, and both work from search too (⌘K, then "menu").
 

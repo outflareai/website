@@ -53,8 +53,8 @@ Four permissions, which you can mix in [your own roles](/docs/guides/workspaces-
 | Permission | Lets you | Starting roles |
 | --- | --- | --- |
 | `goals.read` | See projects, goals, tasks and decisions | Everyone |
-| `goals.tasks` | Add, change and tick off tasks | Owners, admins, members |
-| `goals.manage` | Start projects, set goals, note decisions and change the defaults | Owners, admins |
+| `goals.tasks` | Add, change and tick off tasks, and note a decision on a goal | Owners, admins, members |
+| `goals.manage` | Start projects, set goals, change or replace decisions and change the defaults | Owners, admins |
 | `goals.management` | See items kept to management | Owners, admins |
 
 Someone kept to some brands sees the company's items and their brands', and changes only their brands'.

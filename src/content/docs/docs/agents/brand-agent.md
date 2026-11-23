@@ -55,7 +55,7 @@ Each conversation's **⋯** menu pins it to the top of the list, renames it, arc
 
 ## Tasks
 
-The Agents page shows the agent's tasks beside the chat. On top is **Needs you**: every question the agent has for you, each with a box to answer it right there, and every change waiting for your OK, each naming its task. Below is a table of the tasks with a status, how far the plan has got and when the agent last updated it. **Finished** shows the tasks that are done or dropped. The task count in the agent's bar opens the same list as a menu.
+The Agents page has one column for everything the agent is on, with the chat beside it. At the top are **New chat** and **New task**. **Tasks** lists each task with its status, the ones that need you first, and **Finished** unfolds the tasks that are done or dropped. **Chats** lists your conversations, with a search box. Below them, **Waiting for you** holds every change waiting for your OK, **History** what the agent did, and **What agents may do** your rules and standing instructions. Each of these has its own address, so you can bookmark it or send it to a teammate. On a phone the column folds into one button above the page.
 
 A task has one status, the same everywhere it shows:
 
@@ -91,14 +91,14 @@ Each task's page lists every change the agent made or asked for, and what became
 - **Failed**: it ran and didn't go through; the agent sees why.
 - **Blocked by a rule**: one of your rules stops changes like this.
 
-The rules you've added are under **Settings**, **Rules** on the Agents page, where you can remove them.
+The rules you've added are under **What agents may do**, **Rules** on the Agents page, where you can remove them.
 
 ## What you see
 
-- **Conversations**: your chats with the agent.
+- **Chats**: your conversations with the agent.
 - **Tasks**: each task with its status, its plan, what the agent tried for it and whether it worked.
-- **Settings**, **Standing instructions**: the rules the agent follows on every task, and what it has learned about the brand.
-- **Activity** and **Turns**: everything it read and changed, and what each working session did.
+- **What agents may do**, **Standing instructions**: the rules the agent follows on every task, and what it has learned about the brand.
+- **History**, **Agent activity** and **Agent turns**: everything it read and changed, and what each working session did.
 
 It alerts you when it finishes a task, when changes wait for you, and when it is stuck. You can pause, resume or stop it at any time. If it has no AI model or keeps failing, it pauses itself and says why.
 
