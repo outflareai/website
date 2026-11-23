@@ -2,7 +2,7 @@
 	"version": "2026.11.23",
 	"date": "2026-11-23",
 	"status": "in-progress",
-	"updated": "2026-11-23T13:14:04Z",
+	"updated": "2026-11-23T13:57:17Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -213,7 +213,14 @@
 			"edition": "open-source",
 			"text": "Finances can show the company's money in your own currency: an owner picks it on the Money page (US dollars until then), and every brand's money is converted at each day's exchange rate. Cost categories now have the same names on the Money and Outcomes pages.",
 			"at": "2026-11-23T13:14:04Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Sales templates can be for every source or only for conversations from chosen Sales channels, and writing a message starts by picking one (or writing from scratch). Templates and sequences fill in more fields, including the person's own form answers, with fallbacks, and the sequence preview shows which fields were empty.",
+			"at": "2026-11-23T13:57:17Z"
 		}
 	],
-	"through": "5b70a00+5b70a00"
+	"through": "8b239b6+8b239b6"
 }
