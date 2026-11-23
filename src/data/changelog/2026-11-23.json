@@ -2,7 +2,7 @@
 	"version": "2026.11.23",
 	"date": "2026-11-23",
 	"status": "in-progress",
-	"updated": "2026-11-23T16:48:31Z",
+	"updated": "2026-11-23T17:19:14Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -255,7 +255,14 @@
 			"edition": "open-source",
 			"text": "CRM → Lead finder shows each day: companies judged, how many passed and their grades, how many have a verified contact, what was spent and what one verified contact cost. A cost that includes spend with no price yet is marked as a minimum.",
 			"at": "2026-11-23T16:48:31Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "CRM → Lead finder says plainly when a search is waiting for tomorrow because it reached today's spend limit, and how many companies are waiting.",
+			"at": "2026-11-23T17:19:14Z"
 		}
 	],
-	"through": "e7c6290+e7c6290"
+	"through": "ae83388+ae83388"
 }
