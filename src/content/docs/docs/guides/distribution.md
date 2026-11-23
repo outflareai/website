@@ -19,6 +19,8 @@ In the app, open **Analytics** in the sidebar, then **Distribution**. It runs in
   - **Number of payments**.
   - **Days between payments**, for customers who paid more than once: how long they go before buying again.
   - **Days since last payment**: who has gone quiet.
+  - **Times they did an event**: how often each customer did something you track, such as running an export.
+  - **Usage: a number on an event**: pick the event and the number on it, such as the gigabytes on a usage event, to see who uses a little and who uses a lot. Splits are then by a field on the customer, and payment filters don't apply.
 - **In** the last 12, 24 or 36 months, this year, the last 30 or 90 days, or between two dates.
 - **Split by** the product, product category, channel or source of the customer's first payment in the dates, or any field on the customer.
 - **+ Filter** counts only some payments, such as one product. Add up to five; all of them must hold.

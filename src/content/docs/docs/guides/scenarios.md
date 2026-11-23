@@ -47,7 +47,7 @@ revenue       = customers * revenue_per_customer
 
 ## Save it and put it on a dashboard
 
-Name it and press **Save** to keep the inputs where you set them. On a [dashboard](/docs/guides/dashboards/), **Add tile** has **Scenario**: the tile shows the headline numbers and the two lines, and **Edit** opens the sliders. Today's values are read again each time, so the dashed line stays current.
+Name it and press **Save** to keep the inputs where you set them. On a [dashboard](/docs/guides/dashboards/), **Add tile** has **Scenario**: the tile shows the sliders, the headline numbers and the two lines. Moving a slider on the tile tries a number for whoever is looking and never changes the saved scenario; **Back to the saved scenario** resets it, and **Edit** opens the scenario to change it for good. Today's values are read again each time, so the dashed line stays current.
 
 ## Agents and the API
 

@@ -33,6 +33,7 @@ A customer never holds less than nothing: using more than they added leaves them
 - The **chart** shows, month by month, what came in, what was used and what was held at the end of the month.
 - **Split by** shows who holds the balance. Pick a field of the customer or their company, such as plan or country, and a table lists what each group holds, its share, how many customers it has, their median balance and how much sits untouched. Click a group to list its customers below.
 - **Biggest balances** lists who holds the most, with when each last topped up and last used, linked to their record. Tick the box to see only the untouched ones. This needs permission to read customers.
+- **On each customer's page**, a Balances card shows what that customer holds of every balance you have saved, with when they last added to it and last used it.
 
 ## Save it and put it on a dashboard
 
