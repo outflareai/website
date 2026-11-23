@@ -37,7 +37,7 @@ Every action is recorded in the audit log (`lead.replied`, `lead.unsubscribed`, 
 
 ## Read the inbox
 
-The **Inbox** tab lists replies and auto-replies from every mailbox, newest first, with the lead, company and sequence. Open one to see the whole conversation with that lead through that mailbox: what was sent and what came back, in order.
+**Replies** (under Growth, Outreach) lists replies and auto-replies from every mailbox, newest first, with the lead, company and sequence. Open one to see the whole conversation with that lead through that mailbox: what was sent and what came back, in order.
 
 ```sh
 curl "https://outflare.example.com/v1/brands/$BRAND/inbox?unread=true" -H "Authorization: Bearer $OUTFLARE_TOKEN"
