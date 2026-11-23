@@ -1,9 +1,9 @@
 ---
 title: Outflare vs HubSpot (2026) · Outflare
-description: "Outflare vs HubSpot: an open-source CRM and marketing workspace vs HubSpot's hubs. Pricing, contacts, email, API and MCP, and how to connect both."
+description: "Outflare vs HubSpot: an open-source workspace for running your company with AI agents vs HubSpot's hubs. Pricing, contacts, email, API and MCP, and how to connect both."
 h1: Outflare vs HubSpot
 label: Outflare vs HubSpot
-lede: HubSpot is a hosted CRM with hubs for marketing and sales, priced by seats and marketing contacts. Outflare is an open-source marketing workspace with its own CRM, cold and lifecycle email, analytics and SEO, and a HubSpot connector for teams that keep HubSpot.
+lede: HubSpot is a hosted CRM with hubs for marketing and sales, priced by seats and marketing contacts. Outflare is an open-source workspace for running your company with AI agents. It has its own CRM, cold and lifecycle email, analytics and SEO, and a HubSpot connector for teams that keep HubSpot.
 answer: Pick HubSpot if you want a hosted CRM suite with a free tier, an app marketplace, and sales and marketing tools that need no setup. Pick Outflare if you want open-source software you can self-host, cold email at volume, analytics and SEO in the same workspace, no per-seat or per-contact pricing, and AI agents that work through the same API with limits. You can also keep HubSpot as your CRM and connect it, so Outflare counts meetings and deals from outreach and writes interested replies back to HubSpot.
 points:
   - HubSpot's CRM is free for up to 2 users (checked November 2026)

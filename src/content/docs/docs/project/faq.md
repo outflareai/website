@@ -4,10 +4,10 @@ description: Common questions about Outflare.
 ---
 
 **What is Outflare?**
-An open-source go-to-market platform that people and AI agents share. It brings your website analytics, SEO, customer records, email, social and paid media into one workspace, and gives your agents one API to work through. See the [introduction](/docs/).
+The open-source operating system for an online business: all your data in one place, AI agents do the work, and you approve. It starts with growth, bringing your website analytics, SEO, customer records, email, social and paid media into one workspace, with money, people and goals coming next, and gives your agents one API to work through. See the [introduction](/docs/).
 
 **Who is it for?**
-Marketing and growth teams, agencies and GTM engineers who want their go-to-market in one place, their data in their own database, and agents and scripts working through a real API.
+Founders of online businesses, and the teams around them, who want their company's data in one place, in their own database if they choose, and agents doing the work through a real API while they approve.
 
 **How much does it cost?**
 Nothing. Self-hosting is free, and Outflare Cloud is free during early access. You bring your own API keys and pay those providers directly. See [Pricing](/pricing/).

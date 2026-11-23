@@ -15,6 +15,8 @@ Open **Partnerships → Affiliates** in a brand to make a program, add partners 
 
 The **Portal** tab opens a hosted page where partners apply, sign in and see their links, rewards and payouts. Its link uses the portal's address, such as `https://app.outflare.ai/p/northpeak/`. Outflare suggests one from the program's name, and you can change it before you press **Save portal**. To use your own domain instead, such as `partners.example.com`, add it under **Your own domain** on the same tab and create the one DNS record it shows. HTTPS is set up for you. Some addresses, such as `app`, `docs` and `login`, are reserved.
 
+A partner can also earn from a coupon code, with no link click at all: see [Coupons](/docs/guides/coupons/).
+
 ## Partner links
 
 Every partner has a code, such as `ana`.

@@ -128,8 +128,15 @@ const phKey = /^phc_[A-Za-z0-9_-]{10,80}$/.test(posthogKey) ? posthogKey : '';
 			if (!source) return;
 			window.outflareTrack('ai_referral_landed', { source: source, via: via, page: location.pathname });
 		})();
+		// Only the site's own scripts count: errors from a browser's own
+		// injected code (Firefox for iOS, Chrome on iOS) or an extension
+		// (wallets) come with no file or another origin's, and aren't ours.
 		window.addEventListener('error', function (e) {
-			window.outflareTrack('site_error', { page: location.pathname, message: String(e.message || '').slice(0, 200) });
+			var file = String(e.filename || '');
+			var msg = String(e.message || '');
+			if (!file || file.indexOf(location.origin + '/') !== 0) return;
+			if (/__firefox__|__gCrWeb|webkit\.messageHandlers|window\.ethereum|ethereum|solana|chrome-extension:|moz-extension:|safari-web-extension:/i.test(msg)) return;
+			window.outflareTrack('site_error', { page: location.pathname, message: msg.slice(0, 200) });
 		});
 	</script>
 )}

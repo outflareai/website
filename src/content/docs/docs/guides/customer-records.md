@@ -13,7 +13,7 @@ Moving from Attio? [Import it once](/docs/guides/move-from-attio/) and its peopl
 
 ## In the web app
 
-There is one list of people: **CRM → People**, cold contacts included. Next to it are **CRM → Companies** and, when your product has workspaces or teams, **CRM → Accounts** (see [People, accounts and companies](#people-accounts-and-companies)). Each has saved views, filters, columns you choose and the brand's headline scores. Search by name, email, phone or id. The **Show** menu switches between **Active**, **Held for review** (the people a visitor identification tool named, waiting for someone to approve them) and **Archived**. Tick rows to give them an owner (**Assign to…**), change them together (**Bulk edit**), or archive or restore them. A record opens as a full page.
+There is one list of people: **CRM → People**, cold contacts included. Next to it are **CRM → Companies** and, when your product has workspaces or teams, **CRM → Accounts** (see [People, accounts and companies](#people-accounts-and-companies)). Each has saved views, filters, columns you choose and the brand's headline scores. Search, **Filters**, your saved views and **Save view** sit in one row above the list. Search by name, email, phone or id. Inside **Filters**, **Show** switches between **Active**, **Held for review** (the people a visitor identification tool named, waiting for someone to approve them) and **Archived**. Tick rows to give them an owner (**Assign to…**), change them together (**Bulk edit**), or archive or restore them. A record opens as a full page.
 
 **CRM → Customer data** (or press `g` then `h`) holds what sits behind those records. It works inside the brand picked in the sidebar, links to the two lists, and has these tabs:
 

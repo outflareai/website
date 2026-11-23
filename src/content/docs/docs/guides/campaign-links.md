@@ -52,6 +52,40 @@ https://northpeak.example/pricing?plan=pro&utm_source=linkedin&utm_medium=cpc&ut
 
 Old campaign tags on the page are replaced, and its other parameters and `#section` are kept. Making the same link twice gives back the one you already have.
 
+## What Outflare adds to a redirect link's destination
+
+A redirect link sends each click on to a page: a lander, an offer, or the link's own page. Three kinds of parameter on that page's address belong to Outflare, and it adds each of them once:
+
+| Parameter | What it is | Who sets it |
+| --- | --- | --- |
+| `ofclk` | The click's id: 16 letters and digits. Your page or your postback uses it to say which click converted. | Outflare, on every destination |
+| `ofc` and `utm_*` | The campaign's id and tags | The campaign and the link |
+| Everything else, such as `plan=pro` or a network's `subid={click_id}` | Yours | You. Kept as written, repeats and `#section` included |
+
+So leave `ofclk`, `ofc` and `utm_*` out of the URLs you save. If you do write them:
+
+- `ofclk={click_id}`, `ofc` and `utm_*` are dropped when you save, because the redirect adds them anyway. The page never gets one twice.
+- Any other `ofclk`, such as a fixed value, is refused with a message that says why. It would name a different click from the real one.
+
+To hand the click id to an affiliate network, put the `{click_id}` token in the network's own parameter, for example `https://network.example/offer?id=7&subid={click_id}`. That stays exactly as you wrote it.
+
+### Click id delivery on an offer
+
+Each offer has a **Click id delivery** setting, which decides when Outflare warns you that the click id can't reach whoever reports the sale:
+
+- **Automatic** (the default). A page on one of the brand's own domains, or on one of its verified tracking domains, reads `ofclk` itself, so nothing is missing. Any other page needs `{click_id}` in its URL, or a postback source that adds it.
+- **Our own page**. Use this for a page of yours on a domain the brand doesn't list. No warning.
+- **Affiliate network**. The URL must pass `{click_id}` on, or the offer shows **Missing click id**.
+- **No conversions expected**. No warning.
+
+If your own pages show **Missing click id**, either add their domain to the brand (**Company**, then **Brands**, then **Other domains**) or set those offers to **Our own page**.
+
+### See what a click gets
+
+On the offer and lander forms, **Show what a click gets** shows the final address for the URL you typed and who set each parameter. It is built the same way as a real redirect, for a made-up click, and it counts no click and no visit.
+
+Over the API that is `GET /v1/brands/{brand}/destination-preview?destination=...&campaign=...`, and the MCP tool is `preview_destination`. An offer in the API carries `click_id_delivery`, `click_id_via` (how the id travels: `template`, `network`, `ofclk` or `none`) and `missing_click_id`.
+
 ## Links Outflare tags for you
 
 Some parts of Outflare tag their own links, so you don't make those campaigns by hand. Each makes one campaign per thing it sends, the first time it needs one, and lists it here with the rest:

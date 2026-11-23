@@ -63,7 +63,7 @@ Outflare is new and moves fast: the website script gets new versions, API operat
 | Client outdated | The SDK, CLI or MCP server you use is older than the version Outflare supports (critical) or the latest one (warning) |
 | Deprecated API call | Your code still calls an operation marked deprecated |
 
-Problems show at the top of the brand's setup page with a **Fix** button, and on Home under **Needs you**. Outflare clears each one when it's fixed.
+Problems show at the top of the brand's setup page with a **Fix** button, and on Home under **Needs setup**. Outflare clears each one when it's fixed.
 
 ## For agents and the API
 

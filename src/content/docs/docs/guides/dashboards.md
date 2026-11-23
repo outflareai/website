@@ -11,6 +11,24 @@ A **dashboard** is one page of your saved [funnels](/docs/guides/funnels/), [tre
 
 In the app, open **Analytics** in the sidebar, then **Dashboards**. Type a name and press **Create** to start one.
 
+## Start from a template
+
+You don't have to build a dashboard tile by tile. Under **Start from a template** on the Dashboards page, each ready-made dashboard says what it adds, and **Add this dashboard** creates it in one click.
+
+- **Management report.** The monthly numbers a management team asks for, from your payments: revenue by month, new customers, new against returning revenue, revenue by product, order value (average and typical), paying customers, [lifetime value](/docs/guides/lifetime-value/), [money kept](/docs/guides/retention/) and [how customers are spread](/docs/guides/distribution/).
+
+A template only reads data every brand has, so it fills in as soon as payments arrive, with nothing to set up. Each report it adds is saved as your own: rename it, change it, move it or take it off like any other tile, and find it under **All reports**. Every tile keeps its own dates, a year by month. Adding a template again makes a second dashboard and never changes the first.
+
+Things that need a choice only you can make are left for you to add: your sign-up [funnel](/docs/guides/funnels/), customer [balances](/docs/guides/balances/) and a what-if [scenario](/docs/guides/scenarios/).
+
+## All reports
+
+**Analytics → All reports** lists everything saved for the brand in one table: dashboards, funnels, trends, retention and paths questions, and saved Tracker reports. Search by name, narrow the list by type or by who made it, and sort by when each last changed or when you last opened it. A row opens the report, and **New** starts a dashboard, funnel, trend, retention or paths question.
+
+Every saved report has its own address, lifecycle and stickiness questions and saved Tracker reports included, so you can link to one, pin it, and find it again under Recents.
+
+**Tags** group reports that belong together. In the Tags column, choose **Add tag** and type a few words of your own, such as a launch or a weekly meeting, with commas between them. Select a tag on any row, or pick one from the **Tag** menu, to see only the reports that have it.
+
 ## Ask a question
 
 At the top of Dashboards is a box: type what you want to know ("How many people opened the app each week, by plan?") and press **Ask**. You get a chart with a sentence on how it was built. **Open in the builder** to change it, or **Save this chart** to keep it and put it on a dashboard.
@@ -26,6 +44,18 @@ Through the API, `POST /v1/brands/{brand}/insights/ask` with `{"question": "…"
 **Add tile** opens a page inside the dashboard: build a new trend, funnel, retention, paths or lifecycle chart right there (it is saved and added in one step), pick one you saved before, or write a note (a few lines of text, for what the page is for or what to look at first). A funnel tile takes the full width; the others half of it. A trend saved as a number shows its totals, with the change on the period before. A trend tile carries the brand's [notes on these dates](/docs/guides/trends/) as markers, so a jump or a dip on the dashboard has its reason beside it; a dashboard shared by link shows the numbers without the notes.
 
 Every tile runs its insight again when you open the page, with the dashboard's dates in place of its own, so nothing on a dashboard is ever out of date. Choose the dates at the top: a moving range such as the last 30 days, fixed dates, or **each tile's own dates** to let every insight keep what it was saved with. Tick **Compare with the period before** to show every trend against the same length of time before it.
+
+## A saved query as a tile
+
+Some numbers don't fit a chart builder: your largest customers and how long since each last paid, who is due to buy again before the month ends, one table joined to another. Save that as a [query](/docs/guides/query-and-search/) under Data, Queries, and put it on the dashboard beside the charts.
+
+**Add tile** lists the brand's saved queries under **Saved queries**. Press **Add**, and the tile shows the chart saved with the query when it has one, otherwise its rows as a table (up to 200), with **Open the query** to change it. Rows for a person or company link to their page. The tile runs the query again each time the dashboard opens.
+
+- **It keeps its own dates.** The query says which dates it covers, so the dashboard's dates, comparison and filters don't change it.
+- **It is shared with the team.** Everyone who opens the dashboard runs the query, so a private query is shared with the brand first (the app asks), and it stays shared while it is on a dashboard.
+- **A share link shows only its name.** The rows are for the brand's signed-in team.
+
+Agents add one with `add_dashboard_tile` and `saved_query_id`; through the API it is `POST /v1/brands/{brand}/dashboards/{dashboard}/tiles` with `saved_query_id`.
 
 ## Filter the whole dashboard
 
@@ -65,4 +95,4 @@ Everyone in the workspace can open dashboards (`analytics.read`). Owners, admins
 
 ## For agents and scripts
 
-The REST API is `/v1/brands/{brand}/dashboards` for dashboards and `/v1/brands/{brand}/dashboards/{dashboard}/tiles` for their tiles. See the [API reference](/docs/api/). Sharing is `POST` and `DELETE /v1/brands/{brand}/dashboards/{dashboard}/share`. The MCP tools are `list_dashboards`, `get_dashboard`, `create_dashboard`, `update_dashboard`, `delete_dashboard`, `add_dashboard_tile`, `remove_dashboard_tile`, `share_dashboard` and `unshare_dashboard`. Ask your agent something like *"Make a Weekly numbers dashboard with the sign-up funnel and a cost-per-sign-up trend on it."*
+The REST API is `/v1/brands/{brand}/dashboards` for dashboards and `/v1/brands/{brand}/dashboards/{dashboard}/tiles` for their tiles. See the [API reference](/docs/api/). Sharing is `POST` and `DELETE /v1/brands/{brand}/dashboards/{dashboard}/share`. `GET /v1/brands/{brand}/dashboards/templates` lists the templates, and creating a dashboard with `template` set to a template's key starts from it. The MCP tools are `list_dashboards`, `list_dashboard_templates`, `get_dashboard`, `create_dashboard`, `update_dashboard`, `delete_dashboard`, `add_dashboard_tile`, `remove_dashboard_tile`, `share_dashboard` and `unshare_dashboard`. Ask your agent something like *"Make a Weekly numbers dashboard with the sign-up funnel and a cost-per-sign-up trend on it."*

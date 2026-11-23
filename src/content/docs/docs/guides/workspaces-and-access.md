@@ -13,13 +13,34 @@ A workspace holds everything for one team or client: mailboxes, pools, leads, li
 
 ### Workspace URL
 
-Each workspace has a short name for its URL, made from its name when it is created: a workspace called Acme opens at `https://app.outflare.ai/acme`, and each page follows it, such as `/acme/connectors` or `/acme/sequences`. Owners and admins can rename the workspace and change its URL under **Settings → General**. The URL can use 3 to 40 lowercase letters, numbers and dashes, and a few words the app needs for its own pages (such as `admin`, `signup` and `settings`) are taken.
+Each workspace has a short name for its URL, made from its name when it is created: a workspace called Acme opens at `https://app.outflare.ai/acme`, and each page follows it, such as `/acme/members`, or `/acme/summitly/outreach/sequences` for a page of the brand Summitly. Owners and admins can rename the workspace and change its URL under **Settings → General**. The URL can use 3 to 40 lowercase letters, numbers and dashes, and a few words the app needs for its own pages (such as `admin`, `signup` and `settings`) are taken.
 
 Changing the URL doesn't break links: the old one keeps leading to the workspace until another workspace takes it. Links from before workspace URLs existed (`/w/<workspace id>/...`) still work and switch to the new address.
 
-Sequences, lead lists, missions, sending servers, infrastructure plans, API tokens and webhooks get readable URLs too, made from their names: `/acme/sequences/q3-founders`. Two with the same name become `q3-founders` and `q3-founders-2`. Renaming one gives it a new URL, and its old URL still opens it, so shared links keep working.
+Sequences, lead lists, missions, sending servers, infrastructure plans, API tokens and webhooks get readable URLs too, made from their names: `/acme/summitly/outreach/sequences/q3-founders`. Two with the same name become `q3-founders` and `q3-founders-2`. Renaming one gives it a new URL, and its old URL still opens it, so shared links keep working.
 
-A connection's URL is named after what it connects, not what you called it: `/acme/connectors/posthog`, and `posthog-2` for a second PostHog account. The same URL opens the dialog to connect PostHog when nothing is connected yet, so you can share one link for "connect PostHog" or "our PostHog".
+A connection's URL is named after what it connects, not what you called it: `/acme/summitly/connectors/posthog`, and `posthog-2` for a second PostHog account. The same URL opens the dialog to connect PostHog when nothing is connected yet, so you can share one link for "connect PostHog" or "our PostHog".
+
+### A link to any screen
+
+Every screen has a link of its own, so you can send a teammate the link instead of "open this page, then click that tab". Copy it from the address bar: whoever opens it, and may see that screen, lands on exactly the same page, tab, item and layout, on the same brand.
+
+A link reads from big to small: the workspace, the brand, the area, the page, then what is open on it.
+
+| Link | Screen |
+| --- | --- |
+| `/acme/summitly/crm/people` | The People list |
+| `/acme/summitly/crm/people/{id}/activity` | One person, on the Activity tab |
+| `/acme/summitly/tracker/campaigns` | The Tracker's Campaigns page |
+| `/acme/summitly/seo/declining` | The SEO overview's Declining view |
+| `/acme/summitly/partners/{id}/payouts` | One partner, on the Payouts tab |
+| `/acme/summitly/company/brand/table` | Brands, as a table instead of cards |
+| `/acme/members` | Members, which belongs to the whole workspace |
+
+- **Tabs and layouts are part of the link.** A tab, a tab inside an item, and a layout such as list or gallery, board or table, each add a word to the link. The first tab of a page has no word.
+- **Searching and sorting a list are in the link too**, after a `?`: `?search=acme&order=-revenue` is the list searched for "acme", biggest revenue first. The link without them opens the same screen, unfiltered.
+- **Switching tabs is instant.** The address changes without loading a page, and Back and Forward step through the tabs you opened.
+- **Old links keep working.** A link from before a page moved (`/acme/summitly/tracker-campaigns`, or one ending in `?view=` or `#ideas`) opens the same screen and switches to today's address.
 
 ## Roles
 
@@ -44,6 +65,19 @@ Change what Admin, Member or Viewer allows, or add roles of your own (a "Content
 API tokens never hold more than the person who made them, and never `members.remove` or `roles.manage`. Connected AI apps never get people, roles, tokens, workspace settings or approvals, whatever the role allows.
 
 In the API: `GET /v1/workspaces/{ws}/roles` lists the roles with their scopes (MCP: `list_roles`); `POST /roles`, `PATCH /roles/{role}` and `DELETE /roles/{role}` (`?move_to=` when it's in use) need `roles.manage`. Members and invites take `role` (a starting role) or `role_id` (one of the workspace's own roles).
+
+### A different role on one brand
+
+A person has one role in the workspace, and can be on another role for single brands: a Viewer of the workspace who is a Member on Summitly, or a Member who only views one brand. Open the person under **Settings → Members** (Edit), untick "Same role on every brand" and pick a role for each brand, or "No access".
+
+- On that brand, the brand's role decides what they can do. On every other brand their workspace role applies.
+- What belongs to the workspace and not to a brand (connections, mailboxes, settings) always follows the workspace role.
+- Only a role without workspace-wide permissions (settings, people, roles, API tokens or the audit log) can be a brand's role, and only for a person whose own role has none: an owner or admin is the same on every brand.
+- The rules above apply on each brand: you can't give what you don't have, and lowering someone on a brand needs **Remove people**.
+- API tokens a person made never do more on a brand than their role there allows.
+- Every change is in the audit log (`member.brand_roles_changed`).
+
+In the API: `PATCH /v1/workspaces/{ws}/members/{user}` takes `brand_roles` (`[{"brand_id": "summitly", "role": "operator"}]`), which replaces the person's roles on single brands; an empty list clears them. `GET /members` returns each member's `brand_roles`, and `GET /v1/workspaces/{ws}` returns your own, with the `scopes` each gives you on its brand.
 
 ## Invites
 
@@ -72,6 +106,21 @@ Under **Your account** (the menu under your name), anyone can add a passkey: Fac
 
 A passkey belongs to one web address, so passkeys turn on by themselves once `PUBLIC_URL` is an `https://` address (`login_methods` in `GET /v1/meta` then includes `passkey`), and stop working if that address changes. `PASSKEYS=off` turns them off. See [Configuration](/docs/self-hosting/configuration/).
 
+### Two-factor sign-in
+
+Under **Your account**, anyone can turn on two-factor sign-in: scan the QR code with an authenticator app (1Password, Google Authenticator, Authy or any app that makes 6-digit codes), type the code it shows, and save the 10 backup codes. From then on, signing in with a password or with Google asks for a code from the app. A backup code works once in its place, for when the phone is lost; **New backup codes** replaces the whole set.
+
+- **Remember this device for 7 days** on the code screen skips the code on that browser for a week. **Forget remembered devices** under Your account ends that everywhere, and so does turning two-factor off.
+- A [passkey](#passkeys) is a second step already, so a passkey sign-in asks for no code.
+- Ten wrong codes in 15 minutes are refused until the window passes (`429` with `Retry-After`).
+- API tokens, MCP and connected agents are not asked for a code: they never sign in with a password.
+
+**Required for everyone.** A workspace can require two-factor: people without it see the set-up screen before anything else in that workspace. An owner switches the rule under **Settings → General** (`require_two_factor` on `PATCH /v1/workspaces/{workspace}`, signed-in owners only). It is on unless an owner turns it off; a self-hosted server changes the default for workspaces that haven't chosen with `REQUIRE_TWO_FACTOR=false` ([Configuration](/docs/self-hosting/configuration/)).
+
+**A lost phone.** **Settings → Members** shows who has two-factor on. An owner can **Reset two-factor** for a member, who then sets it up again at their next sign-in. The reset only works when that owner owns every workspace the member belongs to, so one workspace can't weaken someone's sign-in for another.
+
+`GET /v1/me` shows `two_factor` and `two_factor_verified`; a session that still owes its code gets `401` with the code `two_factor_required` on every route until `POST /v1/auth/two-factor` succeeds.
+
 ### Confirming your email and resetting your password
 
 People who set a password get an email asking them to confirm their address; until they do, a banner offers to send the link again (`POST /v1/me/email-verification`). Each person gets at most one link a minute, five an hour and ten a day; the button counts down until the next one is allowed (`email_resend_after` on `GET /v1/me`). Google sign-ins are confirmed already. `GET /v1/me` shows `email_verified` and `has_password`.
@@ -84,7 +133,7 @@ These emails go through Postmark, Resend or Cloudflare Email Service (`EMAIL_FRO
 
 Scripts, integrations and agents use API tokens instead of a person's session. To connect Claude, ChatGPT or Cursor, use [Connect your AI](/docs/agents/connect/) instead: the app signs in, and its connection isn't listed under API tokens.
 
-Under **Settings → API tokens**, **New token** asks for a name, what it can do (**Read only**, **Can make changes**, or **Choose** to set each area to No, See or Change), anything riskier under **Also allow** (spending, approving missions, the suppression list, people, tokens, workspace settings), and when it expires (90 days unless you choose otherwise). Click a token later to rename it, change what it may do or its sending limits, or revoke it. A change applies on the token's next request. A token:
+Under **Settings → API tokens**, **New token** asks for a name, what it can do (**Read only**, **Can make changes**, or **Choose** to set each area to No, See or Change), anything riskier under **Also allow** (spending, approving missions, the suppression list, people, tokens, workspace settings), and when it expires (90 days unless you choose otherwise). The list shows who created each token, what it can do, and when it was last used and expires; a token made by another token or an agent, or by someone whose account was deleted, shows **Unknown** under **Created by**. Click a token later to rename it, change what it may do or its sending limits, or revoke it. A change applies on the token's next request. A token:
 
 - belongs to one workspace,
 - holds an explicit list of scopes, which can never exceed the scopes of the person who created it,
@@ -110,8 +159,10 @@ The scopes are:
 | `suppressions.manage` | Remove entries from the suppression list. Owners and admins only by default. |
 | `sequences.read` | List sequences, their leads and the message log; preview a sequence for a lead. |
 | `sequences.manage` | Create, change, activate, pause and delete sequences; add and stop leads. |
-| `inbox.read` | Read the inbox and conversations. |
+| `inbox.read` | Read the inbox: replies to outreach. |
 | `inbox.manage` | Mark messages read and reply from the inbox. |
+| `support.read` | Read Support: conversations with customers, its reports and settings. |
+| `support.manage` | Reply to customers, assign and close conversations, and change Support's settings. |
 | `integrations.read` | List connectors and their status. |
 | `integrations.manage` | Connect, change and disconnect connectors, which means handling their API keys. |
 | `outcomes.read` | Read meetings, deals, spend and cost reports; export them. |

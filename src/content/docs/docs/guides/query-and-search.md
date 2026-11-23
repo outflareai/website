@@ -112,6 +112,7 @@ curl -X POST https://app.outflare.ai/v1/brands/$BRAND/query-endpoints/new-signup
 ```
 
 - Publish with `POST /v1/brands/{brand}/query-endpoints`, giving the saved query, a `slug`, its `params` (bound in order as `$1`, `$2`, …, never written into the SQL), a `row_cap` (up to 10,000) and a `rate_per_minute` per token.
+- Each endpoint has a plain-English description of what it returns. When you publish, Outflare writes it from the query: the table it reads, its filters, the parameters callers send, its order and its row limit, for example "People where country is the country you send, newest created first. Returns name, email and created, up to 1,000 rows a call. Callers send country (text)." It is written by rules, not by an AI model, so it costs nothing and needs no AI key. The publish form keeps it up to date as you name the parameters until you type in it, and **Write it again** puts the written one back, there and on the endpoint's page. Through the API, publishing without a `description` writes one, and `POST /v1/brands/{brand}/query-endpoints/describe` (MCP: `describe_query_endpoint`) writes one without publishing.
 - It reads what its publisher could read, and never another brand. It stays on the version it was published with until you move it.
 - Every call is logged, allowed or refused, for 90 days (`GET .../query-endpoints/{endpoint}/calls`). Over the rate limit it answers `429` with `Retry-After`.
 

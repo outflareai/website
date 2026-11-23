@@ -5,7 +5,7 @@ sidebar:
   order: 1.9
 ---
 
-<span class="pill shipped">Shipped</span> In the REST API and the MCP server. Pages for it in the web app come next.
+<span class="pill shipped">Shipped</span> In the web app under **Paid ads**, on the **Creatives** tab (Talking videos), in the REST API and in the MCP server.
 
 A talking video is a person in a scene saying a script to the camera: the kind of ad that looks filmed on a phone. Outflare makes one stage by stage, keeps what every stage made, and lets you fix or remove a word afterwards without paying for the whole video again.
 

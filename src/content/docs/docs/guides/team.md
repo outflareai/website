@@ -20,6 +20,19 @@ Switch from **List** to **Org chart** to see who reports to whom, from the top d
 - **Removing** is for someone added by mistake. Someone who has held a company account can't be removed: mark them left instead, so the account's history stays whole.
 - Deleting a department keeps its people and teams; they just have no department.
 
+## Our team
+
+Everyone in the company sees **Company → Our team**: the people who work here now (never people who left), with their photo, position, department, a line on what they look after, their work email, the company Telegram account they hold, their GitHub username and a link to their Slack profile. Nothing private is on it.
+
+- **Fill it in.** Owners and admins open a person and choose **Edit** to write their responsibilities (up to 300 characters), GitHub username and Slack profile link (in Slack, open their profile, then **More → Copy link to profile**).
+- **Photos.** Choose **Upload photo** (PNG, JPEG, GIF or WebP, up to 10 MB). Without one, the photo of their Outflare sign-in is shown, and without either, their initials.
+
+## Members and the directory
+
+Everyone who signs in to Outflare is a person in the directory, so nobody is entered twice. When someone accepts an invite, their sign-in is linked to the person with the same work email, or a new person is added for them. **Add person** in Staff can also invite them to Outflare with a role, and a person's page in Staff shows whether they sign in and with which role.
+
+Someone with a sign-in who doesn't work for the company, such as an agency or a client's guest, can be removed from the directory or marked as left. They're added again only if they accept a new invite.
+
 ## Company accounts
 
 Accounts belong to the company, not the person. When someone leaves, their accounts pass to the next person, and each account keeps who held it and when.
@@ -68,15 +81,32 @@ Confirming gives the customer that Telegram account, so the next chat with them,
 - **Summaries.** Open a chat and press **Summarise**: your workspace's own AI (**Settings → AI**, Telegram summaries) writes what they want, what was agreed, what's still open and who owes the next message. It says when new messages came in since.
 - **Handovers.** When you give a synced account to someone else in **Settings → Team**, its customer chats from the last 30 days are summarised for them, and they get an alert pointing to the chats.
 
+## Staff: contracts, pay and organisations (owners only)
+
+**Company → Staff** keeps what the company knows about everyone who works for it: employees, freelancers, contractors, people on an employer of record and advisors, and the organisations it works through, such as its own companies, agencies, hiring platforms and service providers. Only the workspace's owners can see it or change it. The server enforces this for the web app, the API, MCP and the CSV export, and no other role or API token can be given access.
+
+- **Everyone** lists each person with their position, department and manager, their type and start date, their contract, and what they cost a month. Filter by department, show people who have left, choose columns, and download everything as a CSV. A person's page holds their contact details (work and private email, phone, address), their contract and pay, every agreement, the payments recorded and a change log.
+- **Organisations** lists agencies, suppliers, platforms and your own companies, with their contact, the people who came through them and what you have paid them. Each organisation has its own page with its details, agreements and payments.
+- **Org chart** shows who reports to whom.
+- **Suggestions** shows what your other systems know that Staff doesn't, and nothing changes until you accept it, one at a time or all at once:
+  - **Google Workspace.** Outflare reads your company's Google directory (read only) and suggests people missing from Staff, a position, work phone or department a record lacks, and people whose account is suspended or deleted. Connect your own Google Workspace under Connectors and, in Google Admin, also authorize its service account for the Directory `user.readonly` scope. Until then, this part stays off and says what to add.
+  - **Bank statement.** Pick a statement your bank exported as CSV. It is read in your browser and never uploaded. Payments out whose payee matches a person or organisation appear for you to record, and a payment already recorded is never offered again.
+- **Lists** lets you rename, reorder, add and hide the values Staff offers, such as person types, how someone was hired and how they are paid. Each value keeps what it counts as (an employee or a contractor, a platform or an agency), and a value someone still uses stays on their record.
+
+Add a person or an organisation with the button at the top. Add agreements and payments on their page. When pay changes, start a new agreement so the old one stays in the history. Payments are only records: Outflare never sends money and never writes to a bank, payroll, Google or an e-signature tool. For the signed copy, store a link or say where it is kept, never the file. The change log shows who changed which fields and when, never the values. A field that looks like a password or a recovery phrase is refused.
+
+Every screen has its own link to share with another owner: `/{workspace}/staff`, `/staff/org-chart`, `/staff/organisations`, `/staff/suggestions`, `/staff/lists`, and one for each person or organisation.
+
 ## API and MCP
 
 | What | REST API | MCP tools |
 | --- | --- | --- |
-| People | `GET`/`POST /v1/workspaces/{ws}/staff`, `GET`/`PATCH`/`DELETE .../staff/{id}` | `list_staff`, `get_staff_member`, `create_staff_member`, `update_staff_member` |
+| People | `GET`/`POST /v1/workspaces/{ws}/staff` (`status=current` for people who work here now), `GET`/`PATCH`/`DELETE .../staff/{id}`, `GET`/`PUT`/`DELETE .../staff/{id}/photo` | `list_staff`, `get_staff_member`, `create_staff_member`, `update_staff_member` |
 | Departments | `GET`/`POST .../departments`, `PATCH`/`DELETE .../departments/{id}` | `list_departments`, `create_department` |
 | Company accounts | `GET`/`POST .../staff-accounts`, `GET`/`PATCH`/`DELETE .../staff-accounts/{id}` | `list_staff_accounts`, `get_staff_account`, `create_staff_account`, `update_staff_account` |
 | Telegram sign-in | `GET`/`PATCH .../staff-accounts/{id}/telegram`, `POST .../telegram/connect`, `.../password`, `.../check`, `.../disconnect` | `get_telegram_session` |
 | Telegram sync | `POST .../staff-accounts/{id}/telegram/sync`, `POST .../telegram/sync/pause` | |
+| Private records (owners only) | `GET .../staff-details`, `GET`/`PATCH .../staff-details/{id}`, `GET .../staff-details/export` (CSV), `.../staff-options`, `.../staff-organizations`, `.../staff-agreements`, `.../staff-payments`, `GET .../staff-changes`, `GET .../staff-suggestions` | `list_staff_details`, `get_staff_details`, `update_staff_details`, `list_staff_organizations`, `create_staff_organization`, `list_staff_agreements`, `create_staff_agreement`, `list_staff_payments`, `record_staff_payment`, `list_staff_changes`, `list_staff_suggestions` |
 | Synced chats | `GET /v1/brands/{brand}/telegram-chats` (`match_status` and `mine` for the queue, `waiting` for customers waiting), `GET`/`PATCH .../telegram-chats/{id}`, `GET .../telegram-chats/{id}/messages`, `POST .../telegram-chats/{id}/match`, `POST .../telegram-chats/{id}/summary` | `list_telegram_chats`, `list_telegram_messages`, `update_telegram_chat`, `match_telegram_chat`, `summarize_telegram_chat` |
 
-Reading needs the `members.read` scope and changing needs `members.manage`, which owners and admins have. Synced chats need `customers.read`, and `customers.manage` to sort and match them. Every change is in the audit log.
+Reading needs the `members.read` scope and changing needs `members.manage`, which owners and admins have. Synced chats need `customers.read`, and `customers.manage` to sort and match them. Private records need the `staff.private` permission, which only the Owner role has. Every change is in the audit log.

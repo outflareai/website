@@ -67,7 +67,7 @@ Outflare's own mission agent reads the same context and pinned memories every tu
 | Possible duplicate people, new product event names that look like a typo | The agent merges, links or dismisses the people, and asks you whether each event name is a typo |
 | CRM imports that failed | The agent runs the import again |
 
-Each blocker names the tool an agent calls next, the dashboard page that fixes it, and whether the agent or a person has to act. Home's **Needs you** list shows the same list, so there is one place for every module's to-dos.
+Each blocker names the tool an agent calls next, the dashboard page that fixes it, and whether the agent or a person has to act. Home shows the same list, under **For you today** and, for set-up and connections, **Needs setup**, so there is one place for every module's to-dos.
 
 When a call fails, the agent gets the error code and a plain next step (for example, which scope to add to its token), so it fixes the cause or tells you exactly what to do instead of retrying blindly.
 
