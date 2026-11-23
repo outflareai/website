@@ -2,7 +2,7 @@
 	"version": "2026.11.23",
 	"date": "2026-11-23",
 	"status": "in-progress",
-	"updated": "2026-11-23T14:04:00Z",
+	"updated": "2026-11-23T14:55:36Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -227,7 +227,14 @@
 			"edition": "open-source",
 			"text": "Sales lists and conversations show each lead's email address under the name, with a copy button, and the lists can be searched by email, name or company. From a person's page, a Sales rep can email them or add them to a sequence: it opens the rep's own Sales conversation with them, or says which teammate holds it.",
 			"at": "2026-11-23T14:04:00Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Sales templates and sequences are written in wider editors with a preview beside them, buttons that put {first_name}, {company} and {my_name} in at the cursor, and a fallback for each field when a person has no value. Write with AI has larger boxes, and the composer warns when a message still holds a {field}.",
+			"at": "2026-11-23T14:55:36Z"
 		}
 	],
-	"through": "bd113a2+bd113a2"
+	"through": "d8aa4ca+d8aa4ca"
 }
