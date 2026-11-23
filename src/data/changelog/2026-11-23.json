@@ -2,7 +2,7 @@
 	"version": "2026.11.23",
 	"date": "2026-11-23",
 	"status": "in-progress",
-	"updated": "2026-11-23T17:19:14Z",
+	"updated": "2026-11-23T18:02:57Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -262,7 +262,14 @@
 			"edition": "open-source",
 			"text": "CRM → Lead finder says plainly when a search is waiting for tomorrow because it reached today's spend limit, and how many companies are waiting.",
 			"at": "2026-11-23T17:19:14Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Funnels can start at the tracker's own clicks: pick \"Clicked a campaign link\" as a step and it counts every click the tracker redirected, before any page loads. The next step then shows how many of those clicks reached your pages, so you can see how many were lost before the first page, by campaign, traffic source, country or one of the click's custom fields.",
+			"at": "2026-11-23T18:02:57Z"
 		}
 	],
-	"through": "ae83388+ae83388"
+	"through": "ef5e293+ef5e293"
 }
