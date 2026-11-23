@@ -2,7 +2,7 @@
 	"version": "2026.11.23",
 	"date": "2026-11-23",
 	"status": "in-progress",
-	"updated": "2026-11-23T12:45:11Z",
+	"updated": "2026-11-23T12:50:56Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -185,7 +185,14 @@
 			"edition": "open-source",
 			"text": "Security improvements to sign-in.",
 			"at": "2026-11-23T12:45:11Z"
+		},
+		{
+			"kind": "fix",
+			"area": "social",
+			"edition": "open-source",
+			"text": "Podcast mentions read transcripts written by speech to text tools as JSON, and quote what was said instead of the transcript's code.",
+			"at": "2026-11-23T12:50:56Z"
 		}
 	],
-	"through": "1038fb9+1038fb9"
+	"through": "4572bc9+4572bc9"
 }
