@@ -23,7 +23,7 @@ Some products cost more or less to deliver than the rest. Under **By product**, 
 
 The table shows each product's share of your sales, so you can see which numbers matter most. Your margin at the top is each product's share at its own cost, and everything else at the company's.
 
-Owners and admins can change the numbers. Everyone else can read them.
+Owners and admins can change the numbers. Everyone else can read them. Someone whose access is limited to some brands sees only those brands' products and can't change the numbers, because they feed every brand's reports.
 
 ## Where it is used
 
