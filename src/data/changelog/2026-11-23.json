@@ -2,7 +2,7 @@
 	"version": "2026.11.23",
 	"date": "2026-11-23",
 	"status": "in-progress",
-	"updated": "2026-11-23T22:57:03Z",
+	"updated": "2026-11-23T23:00:38Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -318,7 +318,14 @@
 			"edition": "open-source",
 			"text": "Discovery lanes now show companies that fit but have no named person as \"Reachable another way\", with the channels found for each: a shared inbox, a messenger, a contact form, a partner page or a social page. Each lane shows how many of its companies can be reached that way, and you can filter a lane's companies by it.",
 			"at": "2026-11-23T22:12:47Z"
+		},
+		{
+			"kind": "fix",
+			"area": "outreach",
+			"edition": "open-source",
+			"text": "An EmailBison campaign that has emailed everyone in it is no longer treated as finished: EmailBison reopens it as soon as people are added, so its sequence stays usable and a run adding people to it no longer pauses.",
+			"at": "2026-11-23T23:00:38Z"
 		}
 	],
-	"through": "9c2c0b9+9c2c0b9"
+	"through": "293d1b9+293d1b9"
 }
