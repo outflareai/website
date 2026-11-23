@@ -33,7 +33,16 @@ Each scan looks for videos from the last month that name your brand or a competi
 
 ### Podcasts
 
-Each scan searches episode titles, show notes and the people in each episode. A name in an episode's title or show notes is a mention straight away. Many shows publish a transcript with each episode; Outflare reads it once, from the show's own host, and each name said in it is a mention with the words around it and, when the transcript has times, the second it was said. Episodes without a transcript are matched on their title and show notes only: Outflare doesn't download or transcribe audio.
+Each scan searches episode titles, show notes and the people in each episode. A name in an episode's title or show notes is a mention straight away. Many shows publish a transcript with each episode; Outflare reads it once, from the show's own host, and each name said in it is a mention with the words around it and, when the transcript has times, the second it was said. Episodes without a transcript are matched on their title and show notes only, unless you listen to what's said.
+
+#### Listening to what's said
+
+Many shows publish no transcript, so a name said only aloud is in neither the title nor the show notes. Under **Sources → Podcasts → Listen to what's said**, pick a speech to text connection, and Outflare writes out what's said in those episodes on your own account:
+
+- recent episodes with no transcript, a few each scan, newest first;
+- the newest episodes of shows that named your brand or a competitor before, so a show that talked about you once is listened to again.
+
+Each name said is then a mention with the words around it and the second it was said. It's off until you pick a connection. [Groq](https://console.groq.com) runs open-source Whisper models and its free plan covers a few hours of audio a day, with no card: make a key under **API Keys** in the Groq console and connect it under **Connectors**. Above the free plan's limits Groq bills your own account by the second, and an episode that hits a limit is tried again later.
 
 ## What it listens for
 
