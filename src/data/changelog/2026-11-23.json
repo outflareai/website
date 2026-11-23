@@ -2,7 +2,7 @@
 	"version": "2026.11.23",
 	"date": "2026-11-23",
 	"status": "in-progress",
-	"updated": "2026-11-23T21:00:18Z",
+	"updated": "2026-11-23T21:13:12Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -290,7 +290,14 @@
 			"edition": "open-source",
 			"text": "Scenarios: a scenario on a dashboard now has its sliders on the tile. Move one to try a number right there; nothing is saved, and one click goes back to the saved scenario.",
 			"at": "2026-11-23T20:25:10Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "social",
+			"edition": "open-source",
+			"text": "Mentions can listen to what's said in podcasts: pick a speech to text connection under Sources, Podcasts (Groq's free plan is enough), and episodes with no published transcript are written out on your own account, so names said only aloud are found with their second.",
+			"at": "2026-11-23T21:13:12Z"
 		}
 	],
-	"through": "18c189d+18c189d"
+	"through": "d1e66a1+d1e66a1"
 }
