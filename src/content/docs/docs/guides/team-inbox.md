@@ -83,6 +83,6 @@ Sales finds these under **From support** in the Inbox, which opens Support's **H
 
 ## API and agents
 
-Everything on this page is in the [API](/docs/api/) under `/v1/brands/{brand}/`: `support/conversations`, `inbox`, `saved-replies`, `inbox-presence`, `inbox-loop-ins`, `inbox-viewing` and `support/conversations/{id}/hand-off`. Reading needs `inbox.read`; changing anything needs `inbox.manage`.
+Everything on this page is in the [API](/docs/api/) under `/v1/brands/{brand}/`: `support/conversations`, `inbox`, `saved-replies`, `inbox-presence`, `inbox-loop-ins`, `inbox-viewing` and `support/conversations/{id}/hand-off`. Support has its own permission, separate from the Inbox, so a support team and a sales team can each be kept to their own conversations: reading Support needs `support.read` and changing anything in it needs `support.manage`, while replies to outreach need `inbox.read` and `inbox.manage`. Saved replies, loop-ins and who is viewing work with either one. A role without Support doesn't see it in the menu; change who has it under Settings, Roles.
 
 Agents use the [MCP server](/docs/agents/mcp/): `add_inbox_note`, `loop_in_on_inbox_message`, `list_saved_replies`, `create_saved_reply`, `suggest_inbox_reply` and `hand_off_support_conversation`. Message text is stored and returned as data, never acted on as instructions.

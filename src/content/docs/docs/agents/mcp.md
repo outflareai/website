@@ -75,6 +75,7 @@ Then configure it:
 1. In the web app, open **API tokens** and create a token for the agent:
     - A reporting agent needs `workspace.read`, `mailboxes.read`, `leads.read`, `sequences.read` and `inbox.read`.
     - An agent that runs outreach also needs `leads.manage`, `sequences.manage` and `inbox.manage`, and `mailboxes.manage` to pause domains or change their limits.
+    - An agent that works in Support needs `support.read`, and `support.manage` to answer customers.
     - To keep an agent inside one brand, choose that brand under **Which brands** when you create the token. It sees that brand's records plus anything shared, and changes only its brand's. See [Brands](/docs/guides/brands/#keep-people-and-tokens-to-some-brands).
     - To let it start [playbook runs](/docs/agents/playbooks/), add `agents.read` and `agents.run`. Never give it `actions.approve`: an agent doesn't approve changes.
     - For an outreach agent, also set its **sending limits**: a daily send budget across all the sequences it creates, the highest priority it may give a sequence, and whether it may take mailboxes from other sequences (off by default). See [Mailbox allocation](/docs/guides/mailbox-allocation/#agents).
