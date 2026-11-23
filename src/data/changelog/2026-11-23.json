@@ -2,7 +2,7 @@
 	"version": "2026.11.23",
 	"date": "2026-11-23",
 	"status": "in-progress",
-	"updated": "2026-11-23T00:22:41Z",
+	"updated": "2026-11-23T02:31:20Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -24,7 +24,14 @@
 			"edition": "open-source",
 			"text": "Connect Linear, Notion or ClickUp, read only, and agents can search and read your issues, tasks, projects and docs when they need them, so they know what the team is working on and what it decided. Nothing is copied into Outflare, and nothing in your tools changes.",
 			"at": "2026-11-23T00:22:41Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Tags behave the same everywhere. On saved search reports and brand assets, as on other saved reports, a tag that repeats another in different capitals is dropped, extra spaces are tidied, and an empty tag is ignored rather than refused.",
+			"at": "2026-11-23T02:31:20Z"
 		}
 	],
-	"through": "05a7c1e+05a7c1e"
+	"through": "f021657+f021657"
 }
