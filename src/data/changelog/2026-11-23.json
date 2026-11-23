@@ -2,7 +2,7 @@
 	"version": "2026.11.23",
 	"date": "2026-11-23",
 	"status": "in-progress",
-	"updated": "2026-11-23T18:02:57Z",
+	"updated": "2026-11-23T19:47:45Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -269,7 +269,14 @@
 			"edition": "open-source",
 			"text": "Funnels can start at the tracker's own clicks: pick \"Clicked a campaign link\" as a step and it counts every click the tracker redirected, before any page loads. The next step then shows how many of those clicks reached your pages, so you can see how many were lost before the first page, by campaign, traffic source, country or one of the click's custom fields.",
 			"at": "2026-11-23T18:02:57Z"
+		},
+		{
+			"kind": "fix",
+			"area": "outreach",
+			"edition": "open-source",
+			"text": "A contact without a person's name, such as a company's shared inbox, can now be added to an EmailBison campaign: EmailBison requires a first name, so the company's name is sent in its place. When EmailBison refuses one person's details, only that person is left out; the others in the batch go in and the run no longer pauses.",
+			"at": "2026-11-23T19:47:45Z"
 		}
 	],
-	"through": "ef5e293+ef5e293"
+	"through": "84b7848+84b7848"
 }
