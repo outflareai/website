@@ -146,8 +146,10 @@ The scopes are:
 | `suppressions.manage` | Remove entries from the suppression list. Owners and admins only by default. |
 | `sequences.read` | List sequences, their leads and the message log; preview a sequence for a lead. |
 | `sequences.manage` | Create, change, activate, pause and delete sequences; add and stop leads. |
-| `inbox.read` | Read the inbox and conversations. |
+| `inbox.read` | Read the inbox: replies to outreach. |
 | `inbox.manage` | Mark messages read and reply from the inbox. |
+| `support.read` | Read Support: conversations with customers, its reports and settings. |
+| `support.manage` | Reply to customers, assign and close conversations, and change Support's settings. |
 | `integrations.read` | List connectors and their status. |
 | `integrations.manage` | Connect, change and disconnect connectors, which means handling their API keys. |
 | `outcomes.read` | Read meetings, deals, spend and cost reports; export them. |
