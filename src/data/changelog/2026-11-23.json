@@ -2,7 +2,7 @@
 	"version": "2026.11.23",
 	"date": "2026-11-23",
 	"status": "in-progress",
-	"updated": "2026-11-23T21:27:18Z",
+	"updated": "2026-11-23T21:34:40Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -304,7 +304,14 @@
 			"edition": "open-source",
 			"text": "Headline numbers on Channels, Outcomes, Organic conversions, Sending reports and AI answer share now show what they were in the period just before, on a \"Before:\" line under each number, so you can tell at a glance whether a number went up or down. The AI answer share API returns the earlier totals as `previous`.",
 			"at": "2026-11-23T21:27:18Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Balances: each customer's page now shows what they hold of every balance you have saved, with when they last added to it and last used it. The API's balance customer list takes `record_id` for one customer.",
+			"at": "2026-11-23T21:34:40Z"
 		}
 	],
-	"through": "4f625c9+4f625c9"
+	"through": "ca17ccb+ca17ccb"
 }
