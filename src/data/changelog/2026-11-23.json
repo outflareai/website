@@ -2,7 +2,7 @@
 	"version": "2026.11.23",
 	"date": "2026-11-23",
 	"status": "in-progress",
-	"updated": "2026-11-23T06:25:53Z",
+	"updated": "2026-11-23T13:14:04Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -129,7 +129,91 @@
 			"edition": "open-source",
 			"text": "Distribution can show how usage is spread, not only payments: pick \"Times they did an event\" or \"Usage: a number on an event\" to see how many customers use a little and how many a lot, and how much of all usage the top tenth carry. Agents pass `event_count` or `event_total` with `event` to `run_distribution`.",
 			"at": "2026-11-23T06:25:53Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Anyone who can add tasks can now note a decision on a goal, including agents. Changing or replacing a decision still needs the permission to manage goals.",
+			"at": "2026-11-23T07:29:48Z"
+		},
+		{
+			"kind": "launch",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Our team: everyone in the company now sees who works here, with their photo, position, department, what they look after, work email, Telegram, GitHub and Slack. Members are linked to the staff directory by work email, so nobody is entered twice, and adding someone to Staff can also invite them to Outflare.",
+			"at": "2026-11-23T07:46:53Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Balances shows how long the amount held would last: \"Lasts about\" is what is held now divided by the last 30 days' rate of use. Agents read it as `days_of_use` from `run_balance`.",
+			"at": "2026-11-23T07:56:55Z"
+		},
+		{
+			"kind": "launch",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Roles per brand: someone can now be on a different role for single brands, such as a viewer of the workspace who is a Member on one brand, or a Member who only views another. Open a person under Settings, Members to pick a role for each brand. On that brand its role decides what they can do, and API tokens they made follow it.",
+			"at": "2026-11-23T08:07:17Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "general",
+			"edition": "open-source",
+			"text": "The Agents page has a side column in place of its row of tabs: what waits for you, the history and what agents may do each open from it, and each has its own address.",
+			"at": "2026-11-23T08:25:32Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "general",
+			"edition": "open-source",
+			"text": "The menu now follows the parts of a business: Customers, Growth, Support and Analytics for the brand you picked, then the company's own sections. Email, search, social, ads, partnerships and automations sit together under Growth. Replies to outreach moved from the top of the menu to Growth, Outreach, Replies; old Inbox links still open them.",
+			"at": "2026-11-23T08:25:32Z"
+		},
+		{
+			"kind": "fix",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Sales emails from your own mailbox, including sequences, are no longer refused because the person is on a customer list, a partner list or a sequencer's outreach blocklist. Those only keep people out of cold email. A refusal now names the address and the reason, such as unsubscribed or bounced, and clears when you pick another address.",
+			"at": "2026-11-23T10:43:40Z"
+		},
+		{
+			"kind": "security",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Security improvements to sign-in.",
+			"at": "2026-11-23T12:45:11Z"
+		},
+		{
+			"kind": "fix",
+			"area": "social",
+			"edition": "open-source",
+			"text": "Podcast mentions read transcripts written by speech to text tools as JSON, and quote what was said instead of the transcript's code.",
+			"at": "2026-11-23T12:50:56Z"
+		},
+		{
+			"kind": "fix",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Distribution: Total paid now starts as what customers paid, with refunds left out, so no range starts below zero. A new Refunds control switches between gross and net, and with refunds taken off the first range reads \"Under $10\". The Management report template's tile counts the same way.",
+			"at": "2026-11-23T13:04:12Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Support has its own permission, separate from the Inbox: a role can now see and answer support conversations without seeing replies to outreach, or the other way round. Everyone who could use the Inbox keeps Support until you change their role under Settings, Roles. API tokens use the new `support.read` and `support.manage` scopes.",
+			"at": "2026-11-23T13:04:12Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Finances can show the company's money in your own currency: an owner picks it on the Money page (US dollars until then), and every brand's money is converted at each day's exchange rate. Cost categories now have the same names on the Money and Outcomes pages.",
+			"at": "2026-11-23T13:14:04Z"
 		}
 	],
-	"through": "4cf03d2+4cf03d2"
+	"through": "5b70a00+5b70a00"
 }
