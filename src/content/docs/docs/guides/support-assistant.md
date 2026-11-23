@@ -23,7 +23,7 @@ It writes like a capable person on your team: short, plain, no filler such as "G
 
 ## Turn it on
 
-1. Open **Support**, then **Support settings**, and find **AI assistant**.
+1. Open **Support**, then **Settings**, and find **AI assistant**.
 2. For **Email** and **Website chat**, choose **Off**, **Draft** or **Auto**.
 3. Give it a name, such as "Northpeak help". It signs as that name, marked as an AI assistant.
 4. Use **Try it** to ask a question the way a customer would. You see what it would answer, ask or hand off. Nothing is stored or sent.
@@ -73,7 +73,7 @@ What it finds goes to **Knowledge → Review** with where it came from and the e
 
 ## See how it's doing
 
-Support settings show the last 30 days against the 30 before: how often it answered or handed off and why, how many drafts went out as written, and what chat visitors said. Over the API:
+Support's **Reports** page and its Settings show the last 30 days against the 30 before: how often it answered or handed off and why, how many drafts went out as written, and what chat visitors said. Over the API:
 
 - `GET /v1/brands/{brand}/support/assistant/stats`: its answers, questions, hand-offs and their reasons.
 - `GET /v1/brands/{brand}/support/conversations/{id}/assistant`: what it decided on a conversation.
