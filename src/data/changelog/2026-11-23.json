@@ -2,7 +2,7 @@
 	"version": "2026.11.23",
 	"date": "2026-11-23",
 	"status": "in-progress",
-	"updated": "2026-11-23T02:50:06Z",
+	"updated": "2026-11-23T03:15:29Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -45,7 +45,14 @@
 			"edition": "open-source",
 			"text": "Support is now an area of its own in the menu, with Conversations, Saved replies, Reports, Help centre and Settings as pages. The Inbox holds only replies to your outreach. Old links to a support conversation or the help centre open in their new place.",
 			"at": "2026-11-23T02:50:06Z"
+		},
+		{
+			"kind": "launch",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Two-factor sign-in: add an authenticator app under Your account and type its code after your password, with ten backup codes for a lost phone, and \"Remember this device for 7 days\" so a trusted browser isn't asked every time. An owner can require it for everyone in the workspace, and reset it for a member who is locked out. Signing in with a passkey already counts.",
+			"at": "2026-11-23T03:15:29Z"
 		}
 	],
-	"through": "d4d6ee4+d4d6ee4"
+	"through": "396ba7c+396ba7c"
 }
