@@ -2,7 +2,7 @@
 	"version": "2026.11.23",
 	"date": "2026-11-23",
 	"status": "in-progress",
-	"updated": "2026-11-23T13:57:17Z",
+	"updated": "2026-11-23T14:04:00Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -220,7 +220,14 @@
 			"edition": "open-source",
 			"text": "Sales templates can be for every source or only for conversations from chosen Sales channels, and writing a message starts by picking one (or writing from scratch). Templates and sequences fill in more fields, including the person's own form answers, with fallbacks, and the sequence preview shows which fields were empty.",
 			"at": "2026-11-23T13:57:17Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Sales lists and conversations show each lead's email address under the name, with a copy button, and the lists can be searched by email, name or company. From a person's page, a Sales rep can email them or add them to a sequence: it opens the rep's own Sales conversation with them, or says which teammate holds it.",
+			"at": "2026-11-23T14:04:00Z"
 		}
 	],
-	"through": "8b239b6+8b239b6"
+	"through": "bd113a2+bd113a2"
 }
