@@ -2,7 +2,7 @@
 	"version": "2026.11.23",
 	"date": "2026-11-23",
 	"status": "in-progress",
-	"updated": "2026-11-23T08:07:17Z",
+	"updated": "2026-11-23T08:25:32Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -157,7 +157,21 @@
 			"edition": "open-source",
 			"text": "Roles per brand: someone can now be on a different role for single brands, such as a viewer of the workspace who is a Member on one brand, or a Member who only views another. Open a person under Settings, Members to pick a role for each brand. On that brand its role decides what they can do, and API tokens they made follow it.",
 			"at": "2026-11-23T08:07:17Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "general",
+			"edition": "open-source",
+			"text": "The Agents page has a side column in place of its row of tabs: what waits for you, the history and what agents may do each open from it, and each has its own address.",
+			"at": "2026-11-23T08:25:32Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "general",
+			"edition": "open-source",
+			"text": "The menu now follows the parts of a business: Customers, Growth, Support and Analytics for the brand you picked, then the company's own sections. Email, search, social, ads, partnerships and automations sit together under Growth. Replies to outreach moved from the top of the menu to Growth, Outreach, Replies; old Inbox links still open them.",
+			"at": "2026-11-23T08:25:32Z"
 		}
 	],
-	"through": "853d6fd+853d6fd"
+	"through": "a7fccda+a7fccda"
 }
