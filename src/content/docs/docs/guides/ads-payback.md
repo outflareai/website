@@ -40,6 +40,18 @@ Each campaign with what a customer costs there, how much of its spend has come b
 
 Under the table, a slider estimates what spending more each day would do to the cost of a customer, from how your own weeks have gone. It is an estimate, and it gets weaker the further you go past what you have spent before.
 
+## Filters
+
+A row of filters sits above every view. Pick some, and every number, chart, verdict and table recalculates for just those campaigns, so you can combine networks, split them apart, or look at one kind of campaign on its own.
+
+- **Network**: one or several ad networks.
+- **Type**: search, display, video and so on, as the network names it.
+- **Campaign**: tick the campaigns to keep.
+- **Name contains**: campaigns with that text in their name. Separate several with commas to keep any of them, for example `display, video`.
+- **Name doesn't contain**: leaves out campaigns with that text in their name.
+
+A campaign must pass every filter you set. The row says how many campaigns are in view, and **Clear filters** shows everything again.
+
 ## How it is counted
 
 - **Your target** is the brand's payback period, twelve months unless you change it under Paid ads → Settings.
@@ -50,4 +62,4 @@ Under the table, a slider estimates what spending more each day would do to the 
 
 ## For agents and the API
 
-`GET /v1/brands/{brand}/ads/payback` (MCP: `get_ads_payback`) returns everything the page shows. Query: `from` and `to` (the last 14 days when left out), `basis` (`profit` or `revenue`), `connector` for one network, `branded=true` to count your own name, and `timezone`.
+`GET /v1/brands/{brand}/ads/payback` (MCP: `get_ads_payback`) returns everything the page shows. Query: `from` and `to` (the last 14 days when left out), `basis` (`profit` or `revenue`), `branded=true` to count your own name, `timezone`, and the filters `connector`, `campaign`, `objective`, `name` and `name_not`, each of which can repeat.
