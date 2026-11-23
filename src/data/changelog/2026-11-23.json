@@ -2,7 +2,7 @@
 	"version": "2026.11.23",
 	"date": "2026-11-23",
 	"status": "in-progress",
-	"updated": "2026-11-23T13:04:12Z",
+	"updated": "2026-11-23T13:14:04Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -206,7 +206,14 @@
 			"edition": "open-source",
 			"text": "Support has its own permission, separate from the Inbox: a role can now see and answer support conversations without seeing replies to outreach, or the other way round. Everyone who could use the Inbox keeps Support until you change their role under Settings, Roles. API tokens use the new `support.read` and `support.manage` scopes.",
 			"at": "2026-11-23T13:04:12Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Finances can show the company's money in your own currency: an owner picks it on the Money page (US dollars until then), and every brand's money is converted at each day's exchange rate. Cost categories now have the same names on the Money and Outcomes pages.",
+			"at": "2026-11-23T13:14:04Z"
 		}
 	],
-	"through": "147345c+147345c"
+	"through": "5b70a00+5b70a00"
 }
