@@ -2,7 +2,7 @@
 	"version": "2026.11.23",
 	"date": "2026-11-23",
 	"status": "in-progress",
-	"updated": "2026-11-23T06:25:53Z",
+	"updated": "2026-11-23T07:29:48Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -129,7 +129,14 @@
 			"edition": "open-source",
 			"text": "Distribution can show how usage is spread, not only payments: pick \"Times they did an event\" or \"Usage: a number on an event\" to see how many customers use a little and how many a lot, and how much of all usage the top tenth carry. Agents pass `event_count` or `event_total` with `event` to `run_distribution`.",
 			"at": "2026-11-23T06:25:53Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Anyone who can add tasks can now note a decision on a goal, including agents. Changing or replacing a decision still needs the permission to manage goals.",
+			"at": "2026-11-23T07:29:48Z"
 		}
 	],
-	"through": "4cf03d2+4cf03d2"
+	"through": "3538438+3538438"
 }
