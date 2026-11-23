@@ -2,7 +2,7 @@
 	"version": "2026.11.23",
 	"date": "2026-11-23",
 	"status": "in-progress",
-	"updated": "2026-11-23T14:55:36Z",
+	"updated": "2026-11-23T15:31:36Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -234,7 +234,14 @@
 			"edition": "open-source",
 			"text": "Sales templates and sequences are written in wider editors with a preview beside them, buttons that put {first_name}, {company} and {my_name} in at the cursor, and a fallback for each field when a person has no value. Write with AI has larger boxes, and the composer warns when a message still holds a {field}.",
 			"at": "2026-11-23T14:55:36Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Coming back to Sales from a person's page, or from a conversation, shows the list as you left it, at once: the same tab, filters, search and place in the list. A person's page opened from a conversation has a link back to it, and a conversation opened from a person's page has a link back to the person.",
+			"at": "2026-11-23T15:31:36Z"
 		}
 	],
-	"through": "d8aa4ca+d8aa4ca"
+	"through": "49eb05d+49eb05d"
 }
