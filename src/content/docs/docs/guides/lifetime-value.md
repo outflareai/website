@@ -16,6 +16,7 @@ In the app, open **Analytics** in the sidebar, then **Lifetime value**. It runs 
 - **Customers who first paid** in the last 12, 24 or 36 months.
 - **Split by** the product, product category, channel, source or landing page of the first payment, or any field on the customer, such as country or plan. Up to 10 groups show, largest first.
 - **Add up by** month or week.
+- **+ Filter** counts only some first payments, such as one product or one first channel. Add up to five; all of them must hold.
 - **Take off refunds**, on by default. Turn it off to see what was paid before refunds and chargebacks.
 
 ## Read it
@@ -29,6 +30,8 @@ In the app, open **Analytics** in the sidebar, then **Lifetime value**. It runs 
 
 A customer who first paid two months ago can't tell you about month six. So each month's step counts only the customers who have reached that month, and newer customers never drag the later months down. Faded numbers are months some customers are still inside: they can still grow.
 
+**Click a number of customers** (the total, a group's or a month's) to see who they are: each customer with when they first paid, how many payments they made and what they have paid so far, biggest first, each linked to their record. This needs permission to read customers.
+
 Payments with no customer on them are left out.
 
 ## Save it
@@ -37,7 +40,7 @@ Name the report and press **Save** to keep it for everyone in the brand. It keep
 
 ## For agents and the API
 
-Agents run it with the MCP tool `run_lifetime_value`. Over the API:
+Agents run it with the MCP tool `run_lifetime_value`, and list its customers with `list_lifetime_value_customers`. Over the API:
 
 ```http
 POST /v1/brands/{brand}/insights/lifetime-value

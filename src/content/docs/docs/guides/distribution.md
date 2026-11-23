@@ -21,6 +21,7 @@ In the app, open **Analytics** in the sidebar, then **Distribution**. It runs in
   - **Days since last payment**: who has gone quiet.
 - **In** the last 12, 24 or 36 months, this year, the last 30 or 90 days, or between two dates.
 - **Split by** the product, product category, channel or source of the customer's first payment in the dates, or any field on the customer.
+- **+ Filter** counts only some payments, such as one product. Add up to five; all of them must hold.
 - **Ranges** are chosen for you as round numbers that fit your data. To set your own, type where each range ends, such as `25, 50, 100, 250`.
 
 ## Read it
