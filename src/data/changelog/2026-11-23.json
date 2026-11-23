@@ -2,7 +2,7 @@
 	"version": "2026.11.23",
 	"date": "2026-11-23",
 	"status": "in-progress",
-	"updated": "2026-11-23T02:31:20Z",
+	"updated": "2026-11-23T02:41:44Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -31,7 +31,14 @@
 			"edition": "open-source",
 			"text": "Tags behave the same everywhere. On saved search reports and brand assets, as on other saved reports, a tag that repeats another in different capitals is dropped, extra spaces are tidied, and an empty tag is ignored rather than refused.",
 			"at": "2026-11-23T02:31:20Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Lifetime value and Distribution reports now have a Filter button, so you can count only some payments, such as one product or one first channel. On Lifetime value, click any number of customers to see who they are, with what each has paid.",
+			"at": "2026-11-23T02:41:44Z"
 		}
 	],
-	"through": "f021657+f021657"
+	"through": "870c8e7+870c8e7"
 }
