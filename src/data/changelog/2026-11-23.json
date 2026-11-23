@@ -2,7 +2,7 @@
 	"version": "2026.11.23",
 	"date": "2026-11-23",
 	"status": "in-progress",
-	"updated": "2026-11-23T08:25:32Z",
+	"updated": "2026-11-23T10:43:40Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -171,7 +171,14 @@
 			"edition": "open-source",
 			"text": "The menu now follows the parts of a business: Customers, Growth, Support and Analytics for the brand you picked, then the company's own sections. Email, search, social, ads, partnerships and automations sit together under Growth. Replies to outreach moved from the top of the menu to Growth, Outreach, Replies; old Inbox links still open them.",
 			"at": "2026-11-23T08:25:32Z"
+		},
+		{
+			"kind": "fix",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Sales emails from your own mailbox, including sequences, are no longer refused because the person is on a customer list, a partner list or a sequencer's outreach blocklist. Those only keep people out of cold email. A refusal now names the address and the reason, such as unsubscribed or bounced, and clears when you pick another address.",
+			"at": "2026-11-23T10:43:40Z"
 		}
 	],
-	"through": "a7fccda+a7fccda"
+	"through": "bd82dad+bd82dad"
 }
