@@ -2,7 +2,7 @@
 	"version": "2026.11.23",
 	"date": "2026-11-23",
 	"status": "in-progress",
-	"updated": "2026-11-23T07:56:55Z",
+	"updated": "2026-11-23T08:07:17Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -150,7 +150,14 @@
 			"edition": "open-source",
 			"text": "Balances shows how long the amount held would last: \"Lasts about\" is what is held now divided by the last 30 days' rate of use. Agents read it as `days_of_use` from `run_balance`.",
 			"at": "2026-11-23T07:56:55Z"
+		},
+		{
+			"kind": "launch",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Roles per brand: someone can now be on a different role for single brands, such as a viewer of the workspace who is a Member on one brand, or a Member who only views another. Open a person under Settings, Members to pick a role for each brand. On that brand its role decides what they can do, and API tokens they made follow it.",
+			"at": "2026-11-23T08:07:17Z"
 		}
 	],
-	"through": "8030c97+8030c97"
+	"through": "853d6fd+853d6fd"
 }
