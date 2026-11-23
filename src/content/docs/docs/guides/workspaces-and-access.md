@@ -66,6 +66,19 @@ API tokens never hold more than the person who made them, and never `members.rem
 
 In the API: `GET /v1/workspaces/{ws}/roles` lists the roles with their scopes (MCP: `list_roles`); `POST /roles`, `PATCH /roles/{role}` and `DELETE /roles/{role}` (`?move_to=` when it's in use) need `roles.manage`. Members and invites take `role` (a starting role) or `role_id` (one of the workspace's own roles).
 
+### A different role on one brand
+
+A person has one role in the workspace, and can be on another role for single brands: a Viewer of the workspace who is a Member on Summitly, or a Member who only views one brand. Open the person under **Settings → Members** (Edit), untick "Same role on every brand" and pick a role for each brand, or "No access".
+
+- On that brand, the brand's role decides what they can do. On every other brand their workspace role applies.
+- What belongs to the workspace and not to a brand (connections, mailboxes, settings) always follows the workspace role.
+- Only a role without workspace-wide permissions (settings, people, roles, API tokens or the audit log) can be a brand's role, and only for a person whose own role has none: an owner or admin is the same on every brand.
+- The rules above apply on each brand: you can't give what you don't have, and lowering someone on a brand needs **Remove people**.
+- API tokens a person made never do more on a brand than their role there allows.
+- Every change is in the audit log (`member.brand_roles_changed`).
+
+In the API: `PATCH /v1/workspaces/{ws}/members/{user}` takes `brand_roles` (`[{"brand_id": "summitly", "role": "operator"}]`), which replaces the person's roles on single brands; an empty list clears them. `GET /members` returns each member's `brand_roles`, and `GET /v1/workspaces/{ws}` returns your own, with the `scopes` each gives you on its brand.
+
 ## Invites
 
 Admins and owners invite people by email from **Settings → Members**, picking any role they could give themselves (Admin by default; only owners invite owners). For a role without workspace-wide permissions, you can also keep the person to some brands. **Send invite** emails them a link to join, through the instance's account email service, and shows you the link once so you can share it another way too (an instance with no email service only shows it). The link starts with `ofi_`, works once and expires after 7 days. A new invite to the same address replaces a pending one, and someone already in the workspace can't be invited again. Pending invites can be revoked. Invite links use your instance's `PUBLIC_URL`, so set it when you run behind a domain.
