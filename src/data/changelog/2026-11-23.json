@@ -2,7 +2,7 @@
 	"version": "2026.11.23",
 	"date": "2026-11-23",
 	"status": "in-progress",
-	"updated": "2026-11-23T03:20:32Z",
+	"updated": "2026-11-23T04:42:31Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -66,7 +66,49 @@
 			"edition": "cloud",
 			"text": "The agent's chat shows a reply while it is being written, and long conversations keep working instead of being cut off. You can rate a reply, ask for it again, edit your last message, see the sources behind a reply, get charts in replies, and print a chat or save it as a PDF or Word file.",
 			"at": "2026-11-23T03:20:32Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Lifetime value can count from the first time a customer did an event, such as signing up, instead of from their first payment. Customers who never paid count too, so the average is what a sign-up is worth. Pick it under \"Customers who first\" on the Lifetime value page; agents pass `start_event` to `run_lifetime_value`.",
+			"at": "2026-11-23T04:42:31Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Balances can be split by a field of the customer or their company, such as plan or country. Pick it under \"Split by\" to see what each group holds, how many customers it has and how much sits untouched, and click a group to list its customers. Agents pass `breakdown` to `run_balance`.",
+			"at": "2026-11-23T04:42:31Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Staff now suggests people, details and leavers from your Google Workspace, and payments from a bank statement you pick as CSV (read in your browser, never uploaded); nothing changes until an owner accepts. Owners can also edit Staff's lists, such as person types.",
+			"at": "2026-11-23T04:42:31Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Dashboard templates: the Dashboards page now offers ready-made dashboards you add in one click. The first is a management report built from your payments: revenue, new customers, revenue by product, order value, lifetime value and money kept. Every report in it is yours to change. Agents use `list_dashboard_templates`.",
+			"at": "2026-11-23T04:42:31Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Every saved report has its own address. Lifecycle and stickiness questions and saved Tracker reports now open straight from All reports, a link or a reload, where before they opened the page and left you to find the report. Revenue and a campaign's spend also show the amount in the period before next to the change.",
+			"at": "2026-11-23T04:42:31Z"
+		},
+		{
+			"kind": "launch",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Team directory: owners can now keep contact details, contracts, pay and payments for everyone who works for the company, people and organisations alike (employees, freelancers, contractors, agencies, service providers), with a change log, a monthly pay summary and a CSV export. Only owners can see it, enforced on the server.",
+			"at": "2026-11-23T04:42:31Z"
 		}
 	],
-	"through": "ebc7cb0+ebc7cb0"
+	"through": "25e60e1+25e60e1"
 }
