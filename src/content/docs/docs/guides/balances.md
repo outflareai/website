@@ -28,8 +28,10 @@ A customer never holds less than nothing: using more than they added leaves them
 - **Held now** is what customers have paid for and not used, with how many customers hold some and the median balance.
 - **Untouched** is the part held by customers whose balance has not moved for the days you set. It is money for service that may never be asked for, and a list of people worth a message.
 - **Used in the last 30 days** sits beside what came in over the same days. Use running ahead of top-ups means balances are draining.
+- **Lasts about** is how many days what customers hold now would last at the last 30 days' rate of use. It shows a dash when nothing was used in those days.
 - **Days between top-ups** is the median time from one top-up to the same customer's next.
 - The **chart** shows, month by month, what came in, what was used and what was held at the end of the month.
+- **Split by** shows who holds the balance. Pick a field of the customer or their company, such as plan or country, and a table lists what each group holds, its share, how many customers it has, their median balance and how much sits untouched. Click a group to list its customers below.
 - **Biggest balances** lists who holds the most, with when each last topped up and last used, linked to their record. Tick the box to see only the untouched ones. This needs permission to read customers.
 
 ## Save it and put it on a dashboard
@@ -38,4 +40,4 @@ Name it and press **Save** to open it again from the page or from All reports. O
 
 ## Agents and the API
 
-Agents run it with `run_balance` and list who holds the most with `list_balance_customers`. Through the API it is `POST /v1/brands/{brand}/insights/balance` with `in` and `out` (parts of kind `payment`, `event` or `refund`), and optionally `unit`, `expires_days`, `idle_days` and a `date_range`. A money balance is in the currency's minor unit (cents); a number on an event counts as whole units of the currency.
+Agents run it with `run_balance` and list who holds the most with `list_balance_customers`. Through the API it is `POST /v1/brands/{brand}/insights/balance` with `in` and `out` (parts of kind `payment`, `event` or `refund`), and optionally `unit`, `expires_days`, `idle_days`, a `date_range` and a `breakdown` (`person:<field>` or `company:<field>`), which adds `groups` to the answer. A money balance is in the currency's minor unit (cents); a number on an event counts as whole units of the currency.

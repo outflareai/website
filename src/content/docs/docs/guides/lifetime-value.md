@@ -14,6 +14,7 @@ In the app, open **Analytics** in the sidebar, then **Lifetime value**. It runs 
 ## Ask it
 
 - **Customers who first paid** in the last 12, 24 or 36 months.
+- **Customers who first** did something else: pick an event, such as signing up, to count from the first time each customer did it instead of from their first payment. Everyone who did it counts, paying or not, so the average is what a sign-up is worth. Splits are then by a field on the customer, and filters on the first payment don't apply.
 - **Split by** the product, product category, channel, source or landing page of the first payment, or any field on the customer, such as country or plan. Up to 10 groups show, largest first.
 - **Add up by** month or week.
 - **+ Filter** counts only some first payments, such as one product or one first channel. Add up to five; all of them must hold.
