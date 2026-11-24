@@ -2,7 +2,7 @@
 	"version": "2026.11.24",
 	"date": "2026-11-24",
 	"status": "in-progress",
-	"updated": "2026-11-24T02:48:35Z",
+	"updated": "2026-11-24T02:52:35Z",
 	"items": [
 		{
 			"kind": "fix",
@@ -17,7 +17,14 @@
 			"edition": "open-source",
 			"text": "Sales AI fields: write a field such as {ai_use_case} with a prompt and a research source (what you already know about the person, or their company's homepage). Each person gets one sentence from your own AI model, shown with the passage it rests on and its cost, editable before it sends. A sentence the research doesn't support is never invented. Reps have a daily limit you set.",
 			"at": "2026-11-24T02:48:35Z"
+		},
+		{
+			"kind": "launch",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Add an activity: record a call, a meeting or a chat on Telegram, WhatsApp, Slack, Discord or LinkedIn on a person, with when it happened and a comment. It shows on their timeline and in their Sales conversation, counts as contact (so a lead qualified on a call can be introduced to an account manager by a new email), and can stop a running sequence.",
+			"at": "2026-11-24T02:52:35Z"
 		}
 	],
-	"through": "e9e5239+e9e5239"
+	"through": "382d625+382d625"
 }
