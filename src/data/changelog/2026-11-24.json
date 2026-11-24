@@ -2,7 +2,7 @@
 	"version": "2026.11.24",
 	"date": "2026-11-24",
 	"status": "in-progress",
-	"updated": "2026-11-24T23:22:57Z",
+	"updated": "2026-11-24T23:44:35Z",
 	"items": [
 		{
 			"kind": "fix",
@@ -220,7 +220,14 @@
 			"edition": "open-source",
 			"text": "Recruitment: keep the jobs you hire for, each with its own questions and pipeline, take applications in from your careers page or hiring agent over the API, and move candidates through stages with a full history. Access is per job, and candidates only ever see the status wording you choose.",
 			"at": "2026-11-24T23:22:57Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Sales: \"Qualified: hand over to an AE\" replaces the introduction email. One step makes the account manager the owner, marks the conversation Good and stops its sequence, with nothing sent to the lead. The mark also counts in the quality numbers per source. The SDR can take it back while the account manager still has it.",
+			"at": "2026-11-24T23:44:35Z"
 		}
 	],
-	"through": "cb8ecba+cb8ecba"
+	"through": "dfc8592+dfc8592"
 }
