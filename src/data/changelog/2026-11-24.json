@@ -2,7 +2,7 @@
 	"version": "2026.11.24",
 	"date": "2026-11-24",
 	"status": "in-progress",
-	"updated": "2026-11-24T18:15:07Z",
+	"updated": "2026-11-24T18:23:40Z",
 	"items": [
 		{
 			"kind": "fix",
@@ -136,7 +136,28 @@
 			"edition": "open-source",
 			"text": "Adding someone to a Sales conversation no longer lets a reply reach them when they are on your blocklist, and everyone copied on a reply passes the full opt-out check. Someone taken off a conversation no longer gets a copy that was already queued.",
 			"at": "2026-11-24T18:15:07Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "inbox",
+			"edition": "open-source",
+			"text": "When your knowledge has no answer to a customer's question, the support assistant now also looks in the docs, issues and tasks of your connected Linear, Notion and ClickUp, read only, and suggests what it finds in Knowledge for you to approve. Switch it off per brand in Support settings.",
+			"at": "2026-11-24T18:23:40Z"
+		},
+		{
+			"kind": "launch",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Owners can close a whole module, such as Support or Finances, to everyone but owners, or open it to chosen roles and teams to view or edit, under Settings, Members, Module access. A closed module is gone for everyone else, and for the agents and API keys they made.",
+			"at": "2026-11-24T18:23:40Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "A partner's page now lets you add, change or remove its company. Companies get their logo from their own website, shown on partners, pipeline boards and deal boards. Owner dropdowns show each person's picture, every card and link opens in a new tab with Ctrl or Cmd, and Ask AI opens the agent's chat beside the partner where your server runs an agent.",
+			"at": "2026-11-24T18:23:40Z"
 		}
 	],
-	"through": "30c08f5+30c08f5"
+	"through": "8816b92+8816b92"
 }
