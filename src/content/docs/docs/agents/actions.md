@@ -86,17 +86,27 @@ curl -X POST "$OUTFLARE_URL/v1/workspaces/$WS/action-grants" \
   -d '{"token_id": "'$AGENT'", "method": "POST", "path": "brands/*/ads/items/*/remove", "mode": "run", "conditions": {"disapproved_only": true, "max_spend_micros": 0}}'
 ```
 
-## Approve a pattern once
+## Always approve
 
-When you approve a held change you can choose **Approve and remember**: changes that match the same fields run from then on, and anything outside the pattern still waits. Over the API, add `remember` to the approval:
+Every waiting change has **Always approve this from now on**. Tick it and approve, and the agent makes changes of that kind on its own from then on, for every item of the kind, not only the one you approved: approve one edit to a customer record, and the agent's next edits to any record in that brand run without asking. **Narrow it down** adds a daily limit, or fields that must match this change.
+
+When you tick several changes and press **Approve**, a box lists each kind of change in them (for example "Change or archive a customer record, 48 changes"), each with its own tick. After you approve, a message says what the new rule allows, with **Undo**. Every rule is under **What agents may do**, **Rules**, in words, and you can remove it there. **Waiting for you** links there too.
+
+Always approve is never offered for changes that can't be undone, spend or move money, or send to people: deleting, removing ads, campaigns or keywords, approving or paying for plans, orders, payouts, invoices and budgets, sending, and changes that always need a person. Those cards say why in one line, and each one waits for you every time.
+
+The rules list shows every agent, including AI apps you connected (such as Claude), with who set each one up and the brand it is kept to. **New rule** lets you pick from the kinds of change that agent has made; a path by hand is under **Something else**.
+
+Over the API, add `remember` to the approval (the answer's `remembered` is the rule it made), or `always_approve` to a batch with the ids whose kind runs from now on. Each action's `always_approve` says whether it can be, and why not.
 
 ```sh
 curl -X POST "$OUTFLARE_URL/v1/brands/$BRAND/actions/$ACTION/approve" \
   -H "Cookie: outflare_session=..." -H "Content-Type: application/json" \
   -d '{"note": "Good", "remember": {"fields": ["template_id"], "daily_limit": 20}}'
-```
 
-A pattern never lets through a change that always needs a person.
+curl -X POST "$OUTFLARE_URL/v1/brands/$BRAND/actions/decide" \
+  -H "Cookie: outflare_session=..." -H "Content-Type: application/json" \
+  -d '{"approve": ["'$A'", "'$B'"], "always_approve": ["'$A'"]}'
+```
 
 ## Decide
 

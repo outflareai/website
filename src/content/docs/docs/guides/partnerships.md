@@ -1,6 +1,6 @@
 ---
 title: Partnerships
-description: One menu for every site and person a brand works with, from finding them to paying them, in six tabs that follow the work in order.
+description: One menu for every site and person a brand works with, with a partner CRM first, then tabs that follow the work from finding a site to paying it.
 sidebar:
   order: 9.5
 ---
@@ -11,6 +11,7 @@ Choose a [brand](/docs/guides/brands/), then open **Partnerships**. Each tab has
 
 | Tab | What you do there |
 | --- | --- |
+| **Partners** | Every partner in one list, and a board for each pipeline. Open a partner to see its stage, people, emails, chats, tasks and notes. See [The partner CRM](#the-partner-crm). |
 | **Find** | See sites worth being on, ranked: sites that link to or mention your competitors but not you. From here you can open pages that lost links and sellers' price lists. |
 | **Offers** | Follow every offer, link order and agreement with one site or person on one board, paid or free. (Sales deals are in CRM, not here.) The columns are Draft, Offer sent, Negotiating, Agreed, Live and Done, and a card moves by itself when its status changes. Declined and lost ones stay hidden until you show them. |
 | **Live** | See everywhere your brand appears right now, earned or paid. Outflare checks each page and tells you when a link or mention disappears. |
@@ -19,6 +20,39 @@ Choose a [brand](/docs/guides/brands/), then open **Partnerships**. Each tab has
 | **Results** | See how each creator deal is doing, then what you spent on links, how many paid links are live, the cost per paid link and how often a price was agreed, then the return on each link. |
 
 **New offer** on the Offers tab opens the offer form, and clicking a card opens it on a page of its own.
+
+## The partner CRM
+
+Partnerships opens on **Partners**, with **All partners**: one list of every partner in every pipeline. Search it, filter it by owner, and sort it by pipeline, stage or when it last changed. Partners use the same companies, people and emails as your [customer records](/docs/guides/customer-records/), so a company you sell to and partner with is one company, not two.
+
+### Pipelines
+
+A pipeline is one kind of partnership with its own stages, such as resellers or agencies. The dropdown above the list chooses one; type in it to search. Its board shows below, one column per stage. Drag a card to move the partner to another stage, or switch to the list for a table you can filter by stage and owner. **Add partner** takes the partner's website and adds it to that pipeline.
+
+**Edit pipeline** renames the pipeline and changes its stages: add one, rename one, drag them into a new order, or remove one. If the stage you remove has partners in it, Outflare asks which stage to move them to first, so no partner is left without a stage. **New pipeline** in the dropdown makes one of your own. Pipelines and stages belong to the brand, so each brand sets its own.
+
+### A partner's page
+
+Click a partner to open its page. It has its own address, and arrows at the top go to the previous and next partner in the pipeline.
+
+- **The stage** is a button beside the name. It shows the stage, where that is in the pipeline and how long the partner has been there. Press it to move the partner, and to see when it entered each stage.
+- **At a glance**: the next step, the next task (red when it is overdue), the main contact and the last contact.
+- **Needs attention** appears when something is slipping: an overdue task, no owner, no contact, no next step, a chat waiting for your answer, a review date that has passed, or two weeks without contact.
+
+Below that are six tabs:
+
+| Tab | What it shows |
+| --- | --- |
+| **Activity** | Everything that happened with the partner and its company, newest first, with who did it. Log a call or a chat here. |
+| **Emails** | Emails with the company and each of its people in one history, with a filter per person. Write an email here, or press the mail icon beside a person to write to them. |
+| **Chats** | The Telegram groups and direct chats linked to the partner, and Slack messages that mention it. **Link a chat** lists the Telegram chats nobody is matched to yet, so you can link one to the company or to a person. |
+| **Tasks** | Open and done tasks for the partner. |
+| **Notes** | Notes your team wrote about the partner. |
+| **People** | The people at the partner's company. Add one you already have, paste several new ones, or remove one. Choose which one is the main contact. |
+
+The side column shows every field of the partner, which you edit in place, its company, its people, and the other pipelines and deals the same company is in.
+
+An email is kept on the person it was with. The partner's page gathers the emails of everyone at the company, so a conversation with one person there shows on the partner too, and your [email sharing rules](/docs/guides/crm-email/) still decide who can read each one. Emails and chats come from your own connected accounts: connect your own Gmail, Telegram or Slack under [connectors](/docs/integrations/connectors/), and each tab stays empty until you do.
 
 ## Sending an offer
 
@@ -71,11 +105,12 @@ The rule in force when you send an offer is written into it, so changing the rul
 
 ## Where the old pages went
 
-Presence, Partners, Link orders, Link ROI and Link building now open inside Partnerships, and their old addresses still work:
+The pages that used to be called Presence, Partners, Link orders, Link ROI and Link building now open inside Partnerships, and their old addresses still work:
 
 | Before | Now |
 | --- | --- |
 | Outreach → Presence | Partnerships → Live (and Find for opportunities) |
+| The Presence partnerships board | Partnerships → Partners |
 | Partners | Partnerships → Affiliates |
 | SEO → Link orders | Partnerships → Offers |
 | SEO → Link ROI | Partnerships → Results |
@@ -83,6 +118,6 @@ Presence, Partners, Link orders, Link ROI and Link building now open inside Part
 
 ## Who sees what
 
-Each tab shows only what you're allowed to read. Offers from partner programs need access to Partners, link orders need access to Presence, and agreements and payments need access to Presence finances. An admin can change this under [roles](/docs/guides/workspaces-and-access/).
+Each tab shows only what you're allowed to read. Offers from partner programs need access to Partners, link orders need access to placements (shown as Coverage in roles), and agreements and payments need access to its finances. Partners needs access to customer records, and editing a pipeline's stages needs access to the fields catalog. An admin can change this under [roles](/docs/guides/workspaces-and-access/).
 
-Agents and the API use the same calls as before (link orders, partner proposals and payouts, and the Presence resources), so nothing changes for scripts or the [MCP server](/docs/agents/mcp/).
+Agents and the API use the same calls as before (link orders, partner proposals and payouts, and the coverage resources), so nothing changes for scripts or the [MCP server](/docs/agents/mcp/).

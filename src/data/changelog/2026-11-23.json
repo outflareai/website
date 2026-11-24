@@ -1,8 +1,8 @@
 {
 	"version": "2026.11.23",
 	"date": "2026-11-23",
-	"status": "in-progress",
-	"updated": "2026-11-23T13:57:17Z",
+	"status": "final",
+	"updated": "2026-11-24T00:11:18Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -220,7 +220,112 @@
 			"edition": "open-source",
 			"text": "Sales templates can be for every source or only for conversations from chosen Sales channels, and writing a message starts by picking one (or writing from scratch). Templates and sequences fill in more fields, including the person's own form answers, with fallbacks, and the sequence preview shows which fields were empty.",
 			"at": "2026-11-23T13:57:17Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Sales lists and conversations show each lead's email address under the name, with a copy button, and the lists can be searched by email, name or company. From a person's page, a Sales rep can email them or add them to a sequence: it opens the rep's own Sales conversation with them, or says which teammate holds it.",
+			"at": "2026-11-23T14:04:00Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Sales templates and sequences are written in wider editors with a preview beside them, buttons that put {first_name}, {company} and {my_name} in at the cursor, and a fallback for each field when a person has no value. Write with AI has larger boxes, and the composer warns when a message still holds a {field}.",
+			"at": "2026-11-23T14:55:36Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Coming back to Sales from a person's page, or from a conversation, shows the list as you left it, at once: the same tab, filters, search and place in the list. A person's page opened from a conversation has a link back to it, and a conversation opened from a person's page has a link back to the person.",
+			"at": "2026-11-23T15:31:36Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Sales templates and sequences keep directions for AI, which Write with AI and Personalize with AI follow. AI writes merge fields with fallbacks, the composer fills them in and shows what will be sent, and a send or sequence start with a field that has no value and no fallback is stopped with a fix offered on the spot.",
+			"at": "2026-11-23T16:48:31Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "CRM → Lead finder shows each day: companies judged, how many passed and their grades, how many have a verified contact, what was spent and what one verified contact cost. A cost that includes spend with no price yet is marked as a minimum.",
+			"at": "2026-11-23T16:48:31Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "CRM → Lead finder says plainly when a search is waiting for tomorrow because it reached today's spend limit, and how many companies are waiting.",
+			"at": "2026-11-23T17:19:14Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Funnels can start at the tracker's own clicks: pick \"Clicked a campaign link\" as a step and it counts every click the tracker redirected, before any page loads. The next step then shows how many of those clicks reached your pages, so you can see how many were lost before the first page, by campaign, traffic source, country or one of the click's custom fields.",
+			"at": "2026-11-23T18:02:57Z"
+		},
+		{
+			"kind": "fix",
+			"area": "outreach",
+			"edition": "open-source",
+			"text": "A contact without a person's name, such as a company's shared inbox, can now be added to an EmailBison campaign: EmailBison requires a first name, so the company's name is sent in its place. When EmailBison refuses one person's details, only that person is left out; the others in the batch go in and the run no longer pauses.",
+			"at": "2026-11-23T19:47:45Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Paid ads has a Payback tab: see day by day whether ad spend is on pace to come back, how long a customer takes to pay for themselves, and which campaigns have room for more budget, as profit or revenue, filtered by network, campaign type, name or campaign. Company has a new Cost and margin page, where you set your cost of goods once, for everything or per product.",
+			"at": "2026-11-23T20:16:46Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Scenarios: a scenario on a dashboard now has its sliders on the tile. Move one to try a number right there; nothing is saved, and one click goes back to the saved scenario.",
+			"at": "2026-11-23T20:25:10Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "social",
+			"edition": "open-source",
+			"text": "Mentions can listen to what's said in podcasts: pick a speech to text connection under Sources, Podcasts (Groq's free plan is enough), and episodes with no published transcript are written out on your own account, so names said only aloud are found with their second.",
+			"at": "2026-11-23T21:13:12Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Headline numbers on Channels, Outcomes, Organic conversions, Sending reports and AI answer share now show what they were in the period just before, on a \"Before:\" line under each number, so you can tell at a glance whether a number went up or down. The AI answer share API returns the earlier totals as `previous`.",
+			"at": "2026-11-23T21:27:18Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Balances: each customer's page now shows what they hold of every balance you have saved, with when they last added to it and last used it. The API's balance customer list takes `record_id` for one customer.",
+			"at": "2026-11-23T21:34:40Z"
+		},
+		{
+			"kind": "launch",
+			"area": "outreach",
+			"edition": "open-source",
+			"text": "Discovery lanes now show companies that fit but have no named person as \"Reachable another way\", with the channels found for each: a shared inbox, a messenger, a contact form, a partner page or a social page. Each lane shows how many of its companies can be reached that way, and you can filter a lane's companies by it.",
+			"at": "2026-11-23T22:12:47Z"
+		},
+		{
+			"kind": "fix",
+			"area": "outreach",
+			"edition": "open-source",
+			"text": "An EmailBison campaign that has emailed everyone in it is no longer treated as finished: EmailBison reopens it as soon as people are added, so its sequence stays usable and a run adding people to it no longer pauses.",
+			"at": "2026-11-23T23:00:38Z"
 		}
 	],
-	"through": "8b239b6+8b239b6"
+	"through": "c0e0c0d+c0e0c0d"
 }

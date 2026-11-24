@@ -26,6 +26,9 @@ Add up to 20 steps. Each one is:
 - **Page view**: a view of a page, filtered by its path, address, referrer or a query parameter such as `ref`.
 - **Conversion**: one of your conversions, with the event and filters it already has.
 - **Payment**: a successful payment, filtered by amount, product or currency. Tick **first** to count only someone's first ever payment.
+- **Clicked a campaign link**: a click on one of your [campaign links](/docs/guides/campaign-links/), counted where the tracker redirects it, before any page loads, with likely bots left out. Filter it by campaign, traffic source, the traffic source's click id, country, device, whether it reached your page, or one of the click's custom fields.
+
+Start a funnel with **Clicked a campaign link** to see every click the tracker took and how many reached your pages. A click that your landing page reported (the [website snippet](/docs/guides/website-tracking/) sends the click with the page view) is the same person as that visit and carries on to the later steps. A click no page reported counts at this step only. So the drop after it is the clicks you lost before your first page: people who left, pages without the snippet, or visitors with tracking switched off. Someone who clicks twice counts once, so the step can be a little under the click count on the campaign report. It isn't available when a funnel counts companies, or in **Leave out people who…**.
 
 Drag a step by its handle to move it, or use **Move up** and **Move down**. Time limits, breakdowns and exclusions that name a step follow it to its new place, and the funnel tells you when one had to be reset. Remove any step, the first included, with its ×; the rest are numbered again.
 

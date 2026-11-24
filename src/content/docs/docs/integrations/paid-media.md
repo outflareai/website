@@ -276,6 +276,10 @@ Outflare stores no IP address or user agent with a visit, so the check is coarse
 
 Everything is in the brand's currency. Money in a currency with no exchange rate is left out, and **How this is counted** names it. **Download CSV** saves every number on the page. In the API: `GET /v1/brands/{brand}/ads/business` (MCP: `get_ads_business`).
 
+## Payback: is the spend coming back fast enough
+
+**Paid ads → Payback** shows, day by day and over the long run, what the customers your ads brought have paid back against what they cost, as profit or revenue, with a verdict per campaign. It has its own guide: [Paid ads payback](/docs/guides/ads-payback/). Profit uses the cost of goods you set under [Cost and margin](/docs/guides/cost-and-margin/).
+
 ## Creatives: which ads to scale, fix or stop
 
 **Paid ads → Creatives** shows every ad that ran in the period as a large preview with its verdict, most spend first. Switch between **Gallery** and **List** at the top right; Outflare remembers your choice for the brand. Filter by verdict or by network.
