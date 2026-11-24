@@ -2,7 +2,7 @@
 	"version": "2026.11.24",
 	"date": "2026-11-24",
 	"status": "in-progress",
-	"updated": "2026-11-24T18:23:40Z",
+	"updated": "2026-11-24T19:10:41Z",
 	"items": [
 		{
 			"kind": "fix",
@@ -157,7 +157,14 @@
 			"edition": "open-source",
 			"text": "A partner's page now lets you add, change or remove its company. Companies get their logo from their own website, shown on partners, pipeline boards and deal boards. Owner dropdowns show each person's picture, every card and link opens in a new tab with Ctrl or Cmd, and Ask AI opens the agent's chat beside the partner where your server runs an agent.",
 			"at": "2026-11-24T18:23:40Z"
+		},
+		{
+			"kind": "fix",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "When a rep emails someone added to a Sales conversation in a separate thread, replies and sequence emails in the conversation keep going to the conversation's own person.",
+			"at": "2026-11-24T19:10:41Z"
 		}
 	],
-	"through": "8816b92+8816b92"
+	"through": "c5db9b9+c5db9b9"
 }
