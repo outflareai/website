@@ -28,7 +28,7 @@ You see money in, money out, profit and margin for this month, last month or the
 
 ## Accounts
 
-**Accounts** lists everywhere the company holds money, with each balance. An account has a type: a bank account, a card, a payment account (a payment company that holds your customers' money until it pays it out) or crypto. An account belongs to the whole company or to one brand, and a card can have a holder from your team, who answers for its lines.
+**Accounts** lists everywhere the company holds money, with each balance. An account has a type: a bank account, a card, a payment account (a payment company that holds your customers' money until it pays it out) or crypto (coins at a crypto payment gateway, or a wallet you add by hand). An account belongs to the whole company or to one brand, and a card can have a holder from your team, who answers for its lines.
 
 ### Your cash position
 
@@ -63,6 +63,17 @@ Open **Connectors**, set the category to **Bank accounts** and connect **Airwall
 Export the statement from your bank as a CSV file and choose **Import CSV**. You see what was found and which column is which before anything is saved. A line the account already has is skipped, so importing the same statement twice never doubles anything.
 
 Use one way per account: connect the bank, or import its statements.
+
+### Crypto
+
+Coins count as cash too. Open **Connectors**, set the category to **Bank accounts** and connect **Sheepy**. Each coin balance your Sheepy account holds becomes an account by itself:
+
+- **Balance** is what the coins are worth in euros, at Sheepy's own rate when last read, so it adds into your cash position. The coins themselves show beside it, such as "0.5 BTC".
+- **A balance in euros** at Sheepy is an account too. Its lines are your withdrawals to the bank once they are done. Give them a transfer category.
+- **Coin balances have no lines.** Payouts in coins are not read yet.
+- A balance with nothing in it gets no account.
+
+It runs on your own Sheepy key: in Sheepy's production profile, create an API key with no permission but `withdrawal:get`. Balances need none, and without `withdrawal:get` the balances still read, without lines.
 
 ### Payment companies
 
