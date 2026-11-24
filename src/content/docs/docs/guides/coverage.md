@@ -138,6 +138,21 @@ For places you want to be mentioned or linked from, use **SEO links**. Its stage
 
 Type a site into **Add prospect**, or ask a [connected AI app](/docs/agents/connect/): "Add these sites to the SEO links pipeline as prospects." The app uses `add_partnership` with the stage you name, and `update_record` to move a card later. A site is never added to the same board twice. Adding needs the people and companies permission on that app's connection.
 
+### Add to pipeline from anywhere
+
+You don't have to type a site in. Wherever a site or company shows up, an **Add to pipeline** button puts it on one of your pipelines in one click:
+
+- a row in **Opportunities**
+- a site in **Found**
+- a page where a competitor appears
+- a company or a person in the CRM (a person goes on through their company)
+
+Pick the pipeline from the dropdown. The card lands at that pipeline's first stage, and adding the same company again opens the card it already has, so nothing is added twice. The dropdown lists every pipeline your brand has.
+
+Everything links to everything else. An opportunity shows the pipelines its site is already on, such as "Comparison listing · Prospect", and clicking one opens the card. A company's or person's page in the CRM shows, near the top, the pipelines it's on and where else its site shows up: placements, links to you, mentions and opportunities. Each one is a link, so it opens in a new tab too.
+
+An AI app can do the same with `add_partnership`, giving `company` (a company already in your CRM) instead of `website`.
+
 If you set up SEO links before the Researching stage existed, ask your AI app to apply the SEO links kit again (`apply_kit` with `partnerships-seo`), and the stage is added in front of Prospect.
 
 ## Check publication, links and accuracy
