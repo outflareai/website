@@ -2,7 +2,7 @@
 	"version": "2026.11.24",
 	"date": "2026-11-24",
 	"status": "in-progress",
-	"updated": "2026-11-24T19:39:23Z",
+	"updated": "2026-11-24T21:17:38Z",
 	"items": [
 		{
 			"kind": "fix",
@@ -171,7 +171,35 @@
 			"edition": "open-source",
 			"text": "New goals, projects and tasks open with a \"Describe it\" box: type it in a sentence and your own AI model fills in the form for you to check. Every date now follows one format, set for the company under Settings, General, with a personal choice under Your account.",
 			"at": "2026-11-24T19:39:23Z"
+		},
+		{
+			"kind": "fix",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "In a Sales conversation with people added to it, emails its own person isn't on no longer decide who replies and sequence emails go to or what they answer, including in conversations already affected. AI drafts are told who sent each message and leave those emails out.",
+			"at": "2026-11-24T21:17:38Z"
+		},
+		{
+			"kind": "launch",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "SEO overview has an AI crawlers view: which AI crawlers each site's robots.txt lets in, any newly blocked since the last crawl, llms.txt and content-use signals, and your key pages with what keeps each from AI answers, such as a blocked AI search crawler or content shown only with JavaScript.",
+			"at": "2026-11-24T21:17:38Z"
+		},
+		{
+			"kind": "launch",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "SEO overview has a Google updates view: each Google ranking update of the last year against your search clicks before and after, by page template, with the pages that won and lost and the domains that moved in your tracked top 10, plus the weeks clicks fell, marked as during an update or not, so you can tell Google's change from your own.",
+			"at": "2026-11-24T21:17:38Z"
+		},
+		{
+			"kind": "launch",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "SEO overview has an Indexing view: every page Outflare knows grouped by template and language, how many are in a sitemap, can be indexed and are indexed, why the rest aren't in Google's own words, which pages fell out of the index this week, and the 30-day trend.",
+			"at": "2026-11-24T21:17:38Z"
 		}
 	],
-	"through": "c819e4c+c819e4c"
+	"through": "db10d0d+db10d0d"
 }
