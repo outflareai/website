@@ -1,11 +1,11 @@
 ---
-title: Manage your brand's presence
+title: Where your brand appears
 description: Track where your brand appears online (articles, backlinks, influencer posts, YouTube videos, forums, MCP directories, app listings and paid placements) with the partners behind them, publication checks, commercial delivery, maintenance work and growth reports.
 sidebar:
   order: 15
 ---
 
-Presence shows everywhere your brand appears online, and the publishers, agencies, partners and creators behind it. Use it for earned articles, comparisons, profiles, case studies, backlinks, influencer posts, YouTube videos, forum threads, MCP directory and app store listings, paid editorial, newsletters and advertising. It was called Coverage before, and the API still uses that name.
+**Partnerships → Live** shows everywhere your brand appears online, and the publishers, agencies, partners and creators behind it. Use it for earned articles, comparisons, profiles, case studies, backlinks, influencer posts, YouTube videos, forum threads, MCP directory and app store listings, paid editorial, newsletters and advertising. It was called Presence, and Coverage before that; the API still uses the name coverage.
 
 Choose a [brand](/docs/guides/brands/), then open **Partnerships → Live** (see [Partnerships](/docs/guides/partnerships/)). Its records belong to that brand. CRM permissions still control which contacts and conversations you can see.
 
@@ -50,7 +50,7 @@ Search, advanced all/any filters and private or team saved views help teammates 
 
 ## Discover new mentions and links
 
-Presence looks for new finds by itself once a day, from:
+Outflare looks for new finds by itself once a day, from:
 
 - your brand's [news searches](/docs/guides/news-watch/),
 - [backlink sources](/docs/guides/backlinks/) and link prospects,
@@ -205,7 +205,7 @@ For contracts, invoices or media kits, add a document link and paste the source 
 
 For advertising and other inventory, add dated delivery reports with their source and evidence. Unknown impressions, clicks or conversions remain unknown. A publisher's delivery report and Outflare's recorded attribution are different measurements.
 
-Separate commercial work tracks upcoming renewals, cancellation notices, invoices due and overdue delivery. Finance access does not follow automatically from ordinary Presence access.
+Separate commercial work tracks upcoming renewals, cancellation notices, invoices due and overdue delivery. Finance access does not follow automatically from ordinary access to placements.
 
 ## Review growth over time
 
@@ -227,6 +227,6 @@ Save an immutable snapshot for a weekly review or export the displayed report. S
 
 ## API and agents
 
-The brand-scoped API starts at `/v1/brands/{brand}/coverage`. The TypeScript and Python SDKs expose the same operations, and MCP provides Presence tools for records, checks, discovery, reviews, reports and commercial extraction. The people and companies on a placement are the `parties` resource; remove one with `delete_coverage_parties`. Web searches are the `searches` resource, and `run_coverage_search` runs one now. Competitor scans are `/coverage/competitors` and `/coverage/competitor_placements`; `list_coverage_competitor_placements` with `gap` lists the sites to go after, and `scan_coverage_competitor` scans one now. Opportunities are `/coverage/opportunities`; `list_coverage_opportunities` gives agents the next outreach, highest leverage first. Assignments are `/coverage/sites` (who manages each site) and `/coverage/sites/claim`; MCP has `list_coverage_sites` and `claim_coverage_site`, and `owner=me|none|others` filters opportunities. Each placement carries `traction`, and the report from `get_coverage_reports` carries `momentum` and `share_of_voice`.
+The brand-scoped API starts at `/v1/brands/{brand}/coverage`. The TypeScript and Python SDKs expose the same operations, and MCP provides coverage tools for records, checks, discovery, reviews, reports and commercial extraction. The people and companies on a placement are the `parties` resource; remove one with `delete_coverage_parties`. Web searches are the `searches` resource, and `run_coverage_search` runs one now. Competitor scans are `/coverage/competitors` and `/coverage/competitor_placements`; `list_coverage_competitor_placements` with `gap` lists the sites to go after, and `scan_coverage_competitor` scans one now. Opportunities are `/coverage/opportunities`; `list_coverage_opportunities` gives agents the next outreach, highest leverage first. Assignments are `/coverage/sites` (who manages each site) and `/coverage/sites/claim`; MCP has `list_coverage_sites` and `claim_coverage_site`, and `owner=me|none|others` filters opportunities. Each placement carries `traction`, and the report from `get_coverage_reports` carries `momentum` and `share_of_voice`.
 
 Use `get_coverage_schema` to inspect available fields. Base records use `coverage.read` and `coverage.manage`; commercial data has separate finance scopes, and agreement approval requires `coverage.approve` and a human principal. Existing CRM, Knowledge and analytics access rules still apply.
