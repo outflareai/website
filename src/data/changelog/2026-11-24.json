@@ -2,7 +2,7 @@
 	"version": "2026.11.24",
 	"date": "2026-11-24",
 	"status": "in-progress",
-	"updated": "2026-11-24T13:08:45Z",
+	"updated": "2026-11-24T14:11:10Z",
 	"items": [
 		{
 			"kind": "fix",
@@ -80,7 +80,21 @@
 			"edition": "open-source",
 			"text": "Pipeline items that failed or were skipped can be put back in the step they stopped in and tried again, also on a run that had finished. Before, an item that gave up while a provider was down could not be run again.",
 			"at": "2026-11-24T13:08:45Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "The conversion send log now shows what Google did with each conversion after accepting it: one Google refused while processing turns failed, with Google's reason, instead of staying sent. A failed conversion can be sent again once its cause is fixed, and Google still counts it once.",
+			"at": "2026-11-24T14:11:10Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "Always approve: when you approve an agent's change, tick \"Always approve this from now on\" and changes of that kind run on their own from then on, for every item, not just the one you approved. Approving several at once lets you pick per kind, and connected AI apps now show in the rules.",
+			"at": "2026-11-24T14:11:10Z"
 		}
 	],
-	"through": "a713926+a713926"
+	"through": "6a6602f+6a6602f"
 }
