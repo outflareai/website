@@ -2,7 +2,7 @@
 	"version": "2026.11.24",
 	"date": "2026-11-24",
 	"status": "in-progress",
-	"updated": "2026-11-24T19:39:23Z",
+	"updated": "2026-11-24T20:36:17Z",
 	"items": [
 		{
 			"kind": "fix",
@@ -171,7 +171,21 @@
 			"edition": "open-source",
 			"text": "New goals, projects and tasks open with a \"Describe it\" box: type it in a sentence and your own AI model fills in the form for you to check. Every date now follows one format, set for the company under Settings, General, with a personal choice under Your account.",
 			"at": "2026-11-24T19:39:23Z"
+		},
+		{
+			"kind": "fix",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "In a Sales conversation with people added to it, emails its own person isn't on no longer decide who replies and sequence emails go to or what they answer, including in conversations already affected. AI drafts are told who sent each message and leave those emails out.",
+			"at": "2026-11-24T20:36:17Z"
+		},
+		{
+			"kind": "launch",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "SEO overview has an Indexing view: every page Outflare knows grouped by template and language, how many are in a sitemap, can be indexed and are indexed, why the rest aren't in Google's own words, which pages fell out of the index this week, and the 30-day trend.",
+			"at": "2026-11-24T20:36:17Z"
 		}
 	],
-	"through": "c819e4c+c819e4c"
+	"through": "fa7bd45+fa7bd45"
 }
