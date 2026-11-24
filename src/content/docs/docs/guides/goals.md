@@ -29,6 +29,16 @@ A task is one thing someone has to do, for the company or a brand, often toward 
 
 Tasks about one person or company (call Ana back, send the contract to Acme) are CRM tasks on that [customer record](/docs/guides/customer-records/) instead.
 
+## Describe it
+
+Each new goal, project or task form opens with a box: type it the way you'd say it ("Sam to send the Summitly price list to the resellers by Friday") and click **Fill in for me**. Your company's own AI model fills in the fields it can from the names the form offers (brands, departments, teams, people, open goals and active projects you may see): the title, who, the goal or project, the dates, the measure and numbers, and who sees it. Dates like "Friday" or "end of June" are worked out from today. Nothing is added until you check the form and click **Add**. A name that isn't in the company is left out, with a note under the box.
+
+It runs on the AI model your company connected under [AI settings](/docs/guides/ai-usage/), inside its spend limits; without one, the box says which connection to add. Outflare never supplies a model.
+
+## Dates
+
+Every date in the app is written and typed in one format: day/month/year (23/11/2026) unless the company picks month/day/year or year-month-day under **Settings → General**. Anyone can pick their own under **Your account**. Date boxes take a date typed in that format, or a pick from the calendar button.
+
 ## Who can see what
 
 Each project, goal, task and decision has one of four levels:
@@ -61,6 +71,6 @@ Someone kept to some brands sees the company's items and their brands', and chan
 
 ## For agents and developers
 
-- **API:** `/v1/workspaces/{ws}/projects`, `/goals`, `/tasks`, `/decisions` and `/goal-settings`, each item at `/{id}`. See the [API reference](/docs/api/).
+- **API:** `/v1/workspaces/{ws}/projects`, `/goals`, `/tasks`, `/decisions` and `/goal-settings`, each item at `/{id}`. `POST /v1/workspaces/{ws}/work-drafts` with `kind` and `text` fills in a form; poll `GET .../work-drafts/{id}` until `status` is `ready`. `PATCH /v1/me/preferences` sets your own `date_format`. See the [API reference](/docs/api/).
 - **MCP:** `list_company_projects`, `list_goals`, `list_tasks`, `create_task`, `record_decision` and the rest ([MCP server](/docs/agents/mcp/)).
-- **SQL:** the `work_projects`, `goals`, `work_tasks` and `decisions` tables, described in the data catalog.
+- **SQL:** the `work_projects`, `goals`, `work_tasks`, `decisions` and `work_drafts` (only your own) tables, described in the data catalog.
