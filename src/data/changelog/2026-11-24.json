@@ -2,7 +2,7 @@
 	"version": "2026.11.24",
 	"date": "2026-11-24",
 	"status": "in-progress",
-	"updated": "2026-11-24T12:30:17Z",
+	"updated": "2026-11-24T13:08:45Z",
 	"items": [
 		{
 			"kind": "fix",
@@ -73,7 +73,14 @@
 			"edition": "open-source",
 			"text": "Partnerships is now a partner CRM. It opens on all your partners, a dropdown picks a pipeline and shows its board, and you can rename a pipeline and add, remove, rename and reorder its stages. A partner opens on its own page with its stage, what needs attention, activity, emails, chats, tasks, notes and people. Old Presence links still work.",
 			"at": "2026-11-24T12:30:17Z"
+		},
+		{
+			"kind": "fix",
+			"area": "outreach",
+			"edition": "open-source",
+			"text": "Pipeline items that failed or were skipped can be put back in the step they stopped in and tried again, also on a run that had finished. Before, an item that gave up while a provider was down could not be run again.",
+			"at": "2026-11-24T13:08:45Z"
 		}
 	],
-	"through": "0f7b13f+0f7b13f"
+	"through": "a713926+a713926"
 }
