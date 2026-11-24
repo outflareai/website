@@ -79,6 +79,22 @@ A person has one role in the workspace, and can be on another role for single br
 
 In the API: `PATCH /v1/workspaces/{ws}/members/{user}` takes `brand_roles` (`[{"brand_id": "summitly", "role": "operator"}]`), which replaces the person's roles on single brands; an empty list clears them. `GET /members` returns each member's `brand_roles`, and `GET /v1/workspaces/{ws}` returns your own, with the `scopes` each gives you on its brand.
 
+### Teams
+
+A team gives a group of people the same access, set up once. Under **Settings → Members**, in **Teams**, open a team (or make one), pick the role it carries on each brand, or one role on every brand, and add people. An agency that only works on Summitly's ads is a team with one role on one brand.
+
+- Everyone in a team may do what the team's roles allow, on top of their own role. Someone in several teams gets everything those teams allow.
+- A team can open a brand to someone who isn't on that brand themselves.
+- Taking someone out of a team, or a role off the team, takes that access away straight away.
+- A team's role is one without workspace-wide permissions (settings, people, roles, API tokens or the audit log), and it counts for people whose own role has none: an owner or admin already does everything on every brand.
+- What belongs to the workspace and not to a brand always follows the person's own workspace role.
+- You can't give a team more than you may do yourself. Taking a role off a team with people in it, taking people out of a team that carries a role, or deleting such a team needs **Remove people**.
+- A role a team carries can't gain workspace-wide permissions or be deleted until the team changes.
+- API tokens are made from their maker's own role: a team never lets a token do more.
+- Every change is in the audit log (`team.access_changed`).
+
+In the API a team has `role` (every brand) and `brand_roles` (`GET` and `POST /v1/workspaces/{ws}/teams`, `PATCH /v1/workspaces/{ws}/teams/{id}`), and `GET /v1/workspaces/{ws}` lists what you may do on each brand in `brand_access`.
+
 ## Invites
 
 Admins and owners invite people by email from **Settings → Members**, picking any role they could give themselves (Admin by default; only owners invite owners). For a role without workspace-wide permissions, you can also keep the person to some brands. **Send invite** emails them a link to join, through the instance's account email service, and shows you the link once so you can share it another way too (an instance with no email service only shows it). The link starts with `ofi_`, works once and expires after 7 days. A new invite to the same address replaces a pending one, and someone already in the workspace can't be invited again. Pending invites can be revoked. Invite links use your instance's `PUBLIC_URL`, so set it when you run behind a domain.
