@@ -2,7 +2,7 @@
 	"version": "2026.11.24",
 	"date": "2026-11-24",
 	"status": "in-progress",
-	"updated": "2026-11-24T16:11:08Z",
+	"updated": "2026-11-24T18:15:07Z",
 	"items": [
 		{
 			"kind": "fix",
@@ -129,7 +129,14 @@
 			"edition": "open-source",
 			"text": "Sales emails can now be formatted: bold, italics, bulleted and numbered lists, and a link on a word, in the reply box, the first email, templates and sequence steps. The person gets it formatted, with a plain-text version for mail apps that show text only. Emails nobody formats are sent exactly as before.",
 			"at": "2026-11-24T16:11:08Z"
+		},
+		{
+			"kind": "fix",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Adding someone to a Sales conversation no longer lets a reply reach them when they are on your blocklist, and everyone copied on a reply passes the full opt-out check. Someone taken off a conversation no longer gets a copy that was already queued.",
+			"at": "2026-11-24T18:15:07Z"
 		}
 	],
-	"through": "35d8426+35d8426"
+	"through": "30c08f5+30c08f5"
 }
