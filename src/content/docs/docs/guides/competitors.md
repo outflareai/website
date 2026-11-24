@@ -7,7 +7,7 @@ sidebar:
 
 <span class="pill shipped">Shipped</span> Suggested and tracked competitors, their weekly numbers and a feed of what changed, in the app, through the API and for agents.
 
-Outflare keeps one list of the sites you compete with for each of your websites, and tells you what changes at them. The same list is used everywhere: [Presence](/docs/guides/coverage/) scans where they appear, [AI visibility](/docs/guides/ai-visibility/) counts them in AI answers, and agents read it. Every day Outflare suggests new ones; say yes or no. Track the ones that matter, and Outflare follows their numbers and what they publish.
+Outflare keeps one list of the sites you compete with for each of your websites, and tells you what changes at them. The same list is used everywhere: [Partnerships](/docs/guides/coverage/) scans where they appear, [AI visibility](/docs/guides/ai-visibility/) counts them in AI answers, and agents read it. Every day Outflare suggests new ones; say yes or no. Track the ones that matter, and Outflare follows their numbers and what they publish.
 
 In the app, open **Competitors** under **Company**: **Overview** ranks you against them, and **Competitors** is the list.
 
@@ -68,7 +68,7 @@ Gaps compare against what your own connection read for you, so a gap can be a ke
 | Keywords in the top 3 | The same overview |
 | Linking sites | The same overview (referring domains) |
 | AI answers | [AI visibility](/docs/guides/ai-visibility/): how many of your sampled answers in the last 28 days name each one |
-| Placements | Presence: your live placements against the pages Presence still sees for each competitor |
+| Placements | Partnerships: your live placements against the pages it still sees for each competitor |
 | Social followers | Your own social accounts, and each competitor's followed profiles (below), read daily |
 | Reviews | Review counts on your own review pages, and on each competitor's followed ones |
 
@@ -95,7 +95,7 @@ Under each name it says the day of its latest search numbers, or that it has non
 
 Click a competitor for its own page: its score and rank next to yours, its Domain Rating, keywords, domain age and pages next to yours, every area head to head, and both shares over the year. It also shows:
 
-- **Their placements**: every page Presence found them on, most valuable to you first, with how each link is got (can't buy, earned, paid or free to get), its value from 0 to 100 and why ([how it's judged](/docs/guides/coverage/#see-where-competitors-appear)), its Domain Rating, whether it looks paid for and whether you're on that site too. This is what their Placements number counts, and **Only sites you're not on** narrows it to your openings.
+- **Their placements**: every page Partnerships found them on, most valuable to you first, with how each link is got (can't buy, earned, paid or free to get), its value from 0 to 100 and why ([how it's judged](/docs/guides/coverage/#see-where-competitors-appear)), its Domain Rating, whether it looks paid for and whether you're on that site too. This is what their Placements number counts, and **Only sites you're not on** narrows it to your openings.
 - **Their search**: their top keywords with your position beside each, their pages that get the most search visits, the sites linking to them (and whether each links to you too) and the newest pages in their sitemap. It shows only what is stored, so it costs nothing.
 - **Read their search data** reads their numbers, top 100 keywords, top 100 linking sites and top 25 pages now, on your own SEO connection (Ahrefs first, else DataForSEO) within its budget. The weekly read covers keywords and linking sites for only five competitors a site, so this fills in the rest. It shows what it would read and about what it costs first, and skips what that connection read in the last 30 days, so asking again costs nothing more. Without an SEO connection it says which to add.
 
