@@ -95,6 +95,20 @@ A team gives a group of people the same access, set up once. Under **Settings �
 
 In the API a team has `role` (every brand) and `brand_roles` (`GET` and `POST /v1/workspaces/{ws}/teams`, `PATCH /v1/workspaces/{ws}/teams/{id}`), and `GET /v1/workspaces/{ws}` lists what you may do on each brand in `brand_access`.
 
+### Module access
+
+Roles say what someone may do. Module access says which whole parts of Outflare they can get into at all. Under **Settings → Members**, in **Module access**, an owner sets each module (Customers, Growth, Support, Analytics, Agents, Finances, People, Goals) to one of three:
+
+- **Everyone whose role allows it.** The default: each person's role decides.
+- **Only owners.** The module is gone for everyone else: out of their menu and pages, and out of reach of the API tokens and agents they made, whatever their role says.
+- **Only the roles and teams I pick.** Owners, plus the roles and teams you choose, each to **View** or to **Edit**. View reads the module; Edit also changes things in it.
+
+Finances and People start as owners only and can't be opened to everyone: you open them to the roles and teams you choose, without making anyone an owner. For example, a Finance team can view Finances while everyone else never sees it.
+
+A change applies straight away. Owners always get into every module, and only an owner, signed in, changes module access. Every change is in the audit log (`module.access_changed`).
+
+In the API, `GET /v1/workspaces/{ws}/module-access` lists each module with its `access` (`everyone`, `owners` or `chosen`) and `grants`, and `PUT /v1/workspaces/{ws}/module-access/{module}` sets one.
+
 ## Invites
 
 Admins and owners invite people by email from **Settings → Members**, picking any role they could give themselves (Admin by default; only owners invite owners). For a role without workspace-wide permissions, you can also keep the person to some brands. **Send invite** emails them a link to join, through the instance's account email service, and shows you the link once so you can share it another way too (an instance with no email service only shows it). The link starts with `ofi_`, works once and expires after 7 days. A new invite to the same address replaces a pending one, and someone already in the workspace can't be invited again. Pending invites can be revoked. Invite links use your instance's `PUBLIC_URL`, so set it when you run behind a domain.
