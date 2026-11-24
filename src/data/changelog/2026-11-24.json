@@ -2,7 +2,7 @@
 	"version": "2026.11.24",
 	"date": "2026-11-24",
 	"status": "in-progress",
-	"updated": "2026-11-24T21:17:38Z",
+	"updated": "2026-11-24T21:51:36Z",
 	"items": [
 		{
 			"kind": "fix",
@@ -199,7 +199,14 @@
 			"edition": "open-source",
 			"text": "SEO overview has an Indexing view: every page Outflare knows grouped by template and language, how many are in a sitemap, can be indexed and are indexed, why the rest aren't in Google's own words, which pages fell out of the index this week, and the 30-day trend.",
 			"at": "2026-11-24T21:17:38Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "connectors",
+			"edition": "open-source",
+			"text": "You can now save an MCP server connection before its server is switched on, one key at a time: it shows as not connected, with the HTTP status as the reason, until the server answers. Its address is sealed like a key.",
+			"at": "2026-11-24T21:51:36Z"
 		}
 	],
-	"through": "db10d0d+db10d0d"
+	"through": "5cc5b27+5cc5b27"
 }
