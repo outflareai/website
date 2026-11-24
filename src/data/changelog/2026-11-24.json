@@ -2,7 +2,7 @@
 	"version": "2026.11.24",
 	"date": "2026-11-24",
 	"status": "in-progress",
-	"updated": "2026-11-24T14:11:10Z",
+	"updated": "2026-11-24T14:46:11Z",
 	"items": [
 		{
 			"kind": "fix",
@@ -94,7 +94,14 @@
 			"edition": "open-source",
 			"text": "Always approve: when you approve an agent's change, tick \"Always approve this from now on\" and changes of that kind run on their own from then on, for every item, not just the one you approved. Approving several at once lets you pick per kind, and connected AI apps now show in the rules.",
 			"at": "2026-11-24T14:11:10Z"
+		},
+		{
+			"kind": "launch",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Teams can carry access: give a team a role on every brand or on single brands under Settings, Members, Teams, and everyone in the team may do what it allows, on top of their own role. Taking someone out of the team takes that access away straight away.",
+			"at": "2026-11-24T14:46:11Z"
 		}
 	],
-	"through": "6a6602f+6a6602f"
+	"through": "1a3b990+1a3b990"
 }
