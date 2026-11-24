@@ -2,7 +2,7 @@
 	"version": "2026.11.24",
 	"date": "2026-11-24",
 	"status": "in-progress",
-	"updated": "2026-11-24T02:10:56Z",
+	"updated": "2026-11-24T02:48:35Z",
 	"items": [
 		{
 			"kind": "fix",
@@ -10,7 +10,14 @@
 			"edition": "open-source",
 			"text": "A Sales conversation a teammate passes you is listed at the top of your lists until you open it, with an email if you haven't within a few minutes. Assignment counts now match the filtered list, Seen shows at once, and every Sales rep can see Team activity.",
 			"at": "2026-11-24T02:10:56Z"
+		},
+		{
+			"kind": "launch",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Sales AI fields: write a field such as {ai_use_case} with a prompt and a research source (what you already know about the person, or their company's homepage). Each person gets one sentence from your own AI model, shown with the passage it rests on and its cost, editable before it sends. A sentence the research doesn't support is never invented. Reps have a daily limit you set.",
+			"at": "2026-11-24T02:48:35Z"
 		}
 	],
-	"through": "7d869dd+7d869dd"
+	"through": "e9e5239+e9e5239"
 }
