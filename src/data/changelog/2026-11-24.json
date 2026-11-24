@@ -2,7 +2,7 @@
 	"version": "2026.11.24",
 	"date": "2026-11-24",
 	"status": "in-progress",
-	"updated": "2026-11-24T21:51:36Z",
+	"updated": "2026-11-24T22:58:00Z",
 	"items": [
 		{
 			"kind": "fix",
@@ -206,7 +206,14 @@
 			"edition": "open-source",
 			"text": "You can now save an MCP server connection before its server is switched on, one key at a time: it shows as not connected, with the HTTP status as the reason, until the server answers. Its address is sealed like a key.",
 			"at": "2026-11-24T21:51:36Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Sales conversations count as seen when they were really on your screen or you opened them, with nothing to click: New labels and unread numbers clear for you alone. Each conversation says who saw it and when they opened it, and Team activity counts seen, opened and copied.",
+			"at": "2026-11-24T22:58:00Z"
 		}
 	],
-	"through": "5cc5b27+5cc5b27"
+	"through": "f39afbc+f39afbc"
 }
