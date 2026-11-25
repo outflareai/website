@@ -19,10 +19,10 @@ It needs your own ad accounts connected ([Paid media](/docs/integrations/paid-me
 
 You can't wait three months to learn that this week went wrong. This view judges each day on its own sign-ups.
 
-- A grey bar is that day's ad spend.
-- A line is what that day's sign-ups are worth after a number of days: 1, 2, 3, 7, 14, 30, 60, 90, 180 or 365. Click a number to show or hide its line; 90 days shows first.
-- A dashed line is a projection, because those days haven't passed yet. It is what the sign-ups have paid so far, carried forward at the usual pace of your earlier sign-ups.
-- A green dot means the day pays for itself by then. A red dot means it does not.
+- A grey bar is that day's ad spend. Beside it is what the people those ads brought in have paid so far: green once it covers the spend, red while it doesn't.
+- Below the chart, a table has a row per day, newest first: what you spent, how many signed up, how many of them have paid, and what came back after 1, 3, 7 and 14 days and so far. Each amount also shows as a percent of the day's spend, in the same green or red.
+- Nothing here is a projection. Where the days haven't passed yet, the cell says when it fills in.
+- Days before Outflare first saw a sign-up from your ads are left out, so a gap in tracking never looks like ads that brought nothing back.
 
 Above the chart, **Right now** says in one sentence whether spend is on pace against your payback target. Campaigns that are off course are listed first, each with **Pause** or **Lower budget**.
 
@@ -54,6 +54,7 @@ A campaign must pass every filter you set. The row says how many campaigns are i
 
 ## How it is counted
 
+- **Who the ads brought in.** Only people who signed up from an ad click. Someone who clicked an ad and then paid without signing up already had an account, so they count as an existing customer.
 - **Your target** is the brand's payback period, twelve months unless you change it under Paid ads → Settings.
 - **Your own name.** Campaigns on your brand's name are listed but left out of the totals and the verdict, because most of those people were looking for you already. Tick **Count your own name** to put them back.
 - **Why the ad networks show more revenue.** A network counts every payment by anyone who clicked an ad. This page counts only customers the ads brought in. One bar shows the difference: first payments, later payments by those customers, and payments by people who were customers before the click.
