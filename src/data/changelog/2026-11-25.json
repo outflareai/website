@@ -2,7 +2,7 @@
 	"version": "2026.11.25",
 	"date": "2026-11-25",
 	"status": "in-progress",
-	"updated": "2026-11-25T16:55:00Z",
+	"updated": "2026-11-25T17:14:33Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -164,7 +164,28 @@
 			"edition": "open-source",
 			"text": "The reply rule for referrals can now be limited to the campaigns you choose: with `from_sequence_ids`, only a referral from someone in one of those sequences adds the person named, and a referral from any other campaign is just suggested in the conversation. A rule that names a sequencer campaign for referrals no longer needs an Outflare sequence as well.",
 			"at": "2026-11-25T16:52:04Z"
+		},
+		{
+			"kind": "fix",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "When the workspace's AI provider refuses a call (a bad request, an account out of credit, an outage), the error now keeps the provider's own message, with the key removed, and carries the `ai_failed` code, so a failed task can say why instead of reporting an internal error.",
+			"at": "2026-11-25T17:14:33Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Dates are now written with the month as a word, 25/Nov/2026, across the app, and every date box takes them that way (25/Nov/2026, 25 nov 26 or 25/11/2026, or a pick from the calendar). People who chose month/day/year or year-month-day keep it.",
+			"at": "2026-11-25T17:14:33Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "The app now calls a workspace a company: settings, menus, members, brands and messages say \"company\". Nothing else changes, and the API still names it a workspace.",
+			"at": "2026-11-25T17:14:33Z"
 		}
 	],
-	"through": "fa99b98+fa99b98"
+	"through": "1a1b9cb+1a1b9cb"
 }
