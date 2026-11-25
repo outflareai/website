@@ -41,7 +41,7 @@ When you make a journey, choose who goes through it: people or companies. A comp
 
 Choose **Each deal** and every deal goes through the journey on its own. It starts on the deal's own events (created, moved a stage, won, lost, reopened), its checks read the deal's fields such as its stage, value and close date, and it ends when that deal reaches its goal, so a journey that chases a proposal stops the moment the deal is won. Its steps act on the deal: tasks, fields, owners, alerts, signals and webhooks. Deals have no tags, so the tag steps are left out, and email steps need a journey about people.
 
-Steps that call another service use your workspace's own connection to it, and stay off until you connect it.
+Steps that call another service use your company's own connection to it, and stay off until you connect it.
 
 ## Holdouts: what a journey changed
 

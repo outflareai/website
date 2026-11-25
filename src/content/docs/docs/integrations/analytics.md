@@ -225,7 +225,7 @@ and signs in with it when needed.
 
 Each Google connector asks for the Analytics and the Search Console scope
 together. When the person grants both, Outflare connects the other tool too,
-unless the workspace already has it or the account has no properties there.
+unless the company already has it or the account has no properties there.
 Anyone can untick a scope on Google's consent screen, and only what they grant
 gets connected.
 

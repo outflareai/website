@@ -35,7 +35,7 @@ The preview shows what you'd bring over before anything is copied:
 - **Every object.** People, Companies, Deals and any custom ones, with how many records each holds.
 - **Every field.** Its type, its options or pipeline stages in order, which objects a reference points at, and how many records fill it in, so unused fields are easy to spot.
 - **Every list and pipeline**, with its own fields and how many entries it has.
-- **How many notes, tasks and members** the workspace has.
+- **How many notes, tasks and members** the company has.
 
 Each count stops at 5,000 and says so, so the preview answers in seconds even for a large CRM.
 

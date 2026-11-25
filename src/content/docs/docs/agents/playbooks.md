@@ -9,13 +9,13 @@ sidebar:
 
 A **playbook** is a ready-made recipe for growth, such as welcoming new sign-ups, answering interested replies within the hour or getting named in AI answers. Each one says what data and connections it needs, the steps it takes with Outflare's tools, what it will never do, how you'll know it worked, and the prompt that runs it. Browse them all at [outflare.ai/playbooks](/playbooks/).
 
-## What your workspace shows
+## What your company shows
 
-**Playbooks** in the sidebar lists every playbook with whether your workspace is ready for it:
+**Playbooks** in the sidebar lists every playbook with whether your company is ready for it:
 
 - **Ready**: every required connection and data source is in place.
 - **Connect first**: a connection is missing. Only your own accounts count: Outflare never lends its keys, so the playbook won't start until you connect what it needs. It names the connectors that work, with a link to [Connectors](/docs/integrations/connectors/).
-- **Needs data**: your workspace doesn't collect what the playbook reads yet (for example, no site added to SEO). It can still start, and the agent tells you what it found.
+- **Needs data**: your company doesn't collect what the playbook reads yet (for example, no site added to SEO). It can still start, and the agent tells you what it found.
 
 Open one to see what it needs, its steps and the API operations each step uses, what it won't do, how to tell it worked, and its prompt with your inputs filled in.
 
@@ -45,11 +45,11 @@ Missions started from a playbook carry `playbook_id` and `playbook_version`, so 
 
 ## Setup kits
 
-Some playbooks need things set up before their first run, such as a pipeline in the CRM, fields on people and email drafts. Those playbooks come with a **setup kit**, so you don't build it by hand and every workspace gets the same fields, which reports and other playbooks can rely on.
+Some playbooks need things set up before their first run, such as a pipeline in the CRM, fields on people and email drafts. Those playbooks come with a **setup kit**, so you don't build it by hand and every company gets the same fields, which reports and other playbooks can rely on.
 
 When you open such a playbook, **What it sets up** lists each part of the kit:
 
-- **Adds**: new to your workspace.
+- **Adds**: new to your company.
 - **Extends**: an option list you made yourself gains the options it's missing.
 - **Have**: already there and set up the same way.
 - **Conflict**: you already have something under the same name, set up differently (for example a text field where the kit wants a number).
@@ -66,7 +66,7 @@ Setting up a kit needs permission to manage the data catalog (`catalog.manage`),
 | --- | --- |
 | `GET /v1/playbooks` | Every playbook. Public, no key needed |
 | `GET /v1/playbooks/{id}` | One playbook |
-| `GET /v1/workspaces/{ws}/playbooks` | Playbooks with `readiness` and `runs` for your workspace (`missions.read`) |
+| `GET /v1/workspaces/{ws}/playbooks` | Playbooks with `readiness` and `runs` for your company (`missions.read`) |
 | `GET /v1/workspaces/{ws}/playbooks/{id}` | One, with its readiness (`missions.read`) |
 | `POST /v1/workspaces/{ws}/playbooks/{id}/runs` | Start one as a mission draft (`missions.run`); `apply_kit: true` also sets up its kit |
 | `GET /v1/kits`, `GET /v1/kits/{id}` | Setup kits, with the playbooks that use each. Public, no key needed |
@@ -75,4 +75,4 @@ Setting up a kit needs permission to manage the data catalog (`catalog.manage`),
 
 ## Write your own
 
-Playbooks are open source (Apache-2.0): one `playbook.yaml` per folder in [`playbooks/`](https://github.com/outflareai/outflare/tree/main/playbooks#readme) in the Outflare repository, with optional setup kits in `playbooks/kits/`. Recommend the connectors you trust, including your own tool once it is a connector, and send a pull request. The checks make sure every step names a real API operation and every recommended connector exists; a maintainer reviews it. Once merged, it ships with the next deploy and shows on outflare.ai and in every workspace, with a Community badge and your GitHub handle.
+Playbooks are open source (Apache-2.0): one `playbook.yaml` per folder in [`playbooks/`](https://github.com/outflareai/outflare/tree/main/playbooks#readme) in the Outflare repository, with optional setup kits in `playbooks/kits/`. Recommend the connectors you trust, including your own tool once it is a connector, and send a pull request. The checks make sure every step names a real API operation and every recommended connector exists; a maintainer reviews it. Once merged, it ships with the next deploy and shows on outflare.ai and in every company, with a Community badge and your GitHub handle.

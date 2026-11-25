@@ -9,7 +9,7 @@ sidebar:
 
 **Channels** shows where your visits, sign-ups and revenue come from, and what each channel costs. Every report, channel and ad uses the same credit, so the numbers add up the same way everywhere.
 
-In the app, open **Analytics** in the sidebar, then **Channels**. Attribution runs inside Outflare and calls no third-party service. It works from the visits [website tracking](/docs/guides/website-tracking/) records and the customer events your workspace sends or syncs, such as sign-ups and [payments from Stripe](/docs/guides/revenue-from-stripe/). With no tracking snippet on your site, the page shows how to add one.
+In the app, open **Analytics** in the sidebar, then **Channels**. Attribution runs inside Outflare and calls no third-party service. It works from the visits [website tracking](/docs/guides/website-tracking/) records and the customer events your company sends or syncs, such as sign-ups and [payments from Stripe](/docs/guides/revenue-from-stripe/). With no tracking snippet on your site, the page shows how to add one.
 
 ## Each visit's channel
 
@@ -88,7 +88,7 @@ Your [daily or weekly digest](/docs/guides/digests/) has a **Channels** section:
 
 ## Who can do what
 
-Everyone in the workspace can see the reports (`analytics.read`). Owners, admins and operators can change the default model, the lookback and which events count (`analytics.manage`). Changing the lookback or the events credits every past conversion again within a few minutes.
+Everyone in the company can see the reports (`analytics.read`). Owners, admins and operators can change the default model, the lookback and which events count (`analytics.manage`). Changing the lookback or the events credits every past conversion again within a few minutes.
 
 ## For agents and scripts
 

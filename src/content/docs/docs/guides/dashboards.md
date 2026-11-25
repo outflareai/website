@@ -33,7 +33,7 @@ Every saved report has its own address, lifecycle and stickiness questions and s
 
 At the top of Dashboards is a box: type what you want to know ("How many people opened the app each week, by plan?") and press **Ask**. You get a chart with a sentence on how it was built. **Open in the builder** to change it, or **Save this chart** to keep it and put it on a dashboard.
 
-- **It runs on your own AI model.** The workspace connects its own key under **Connectors** and picks the model for "Analytics questions" in the AI settings. Until it does, the box stays off and links to Connectors. Outflare never supplies a model.
+- **It runs on your own AI model.** The company connects its own key under **Connectors** and picks the model for "Analytics questions" in the AI settings. Until it does, the box stays off and links to Connectors. Outflare never supplies a model.
 - **The model never sees your data.** It gets the question and the names of your events, their descriptions and property names from the [event dictionary](/docs/guides/customer-records/), your conversions and the fields a chart can break down by. Outflare runs the chart itself, so no people, values or numbers leave it. The better your dictionary describes your events, the better the answers.
 - **When it can't answer**, it says why instead of drawing a chart.
 
@@ -83,15 +83,15 @@ Deleting a saved insight leaves its tile in place, saying so, until someone take
 
 ## Share by link
 
-Under **Edit dashboard**, **Share by link** makes a link to the dashboard for people outside the workspace: a client, an investor, the wider team. Anyone with it sees the dashboard read-only at `app.outflare.ai/share/…`, every tile run live over the dashboard's dates (or dates they pick), and nothing else of the brand. Add a **password** so the link alone isn't enough, and an expiry (7 days to a year). A dashboard has one link: making a new one replaces it, and **Take the link back** stops it at once. The card says how often the link was opened.
+Under **Edit dashboard**, **Share by link** makes a link to the dashboard for people outside the company: a client, an investor, the wider team. Anyone with it sees the dashboard read-only at `app.outflare.ai/share/…`, every tile run live over the dashboard's dates (or dates they pick), and nothing else of the brand. Add a **password** so the link alone isn't enough, and an expiry (7 days to a year). A dashboard has one link: making a new one replaces it, and **Take the link back** stops it at once. The card says how often the link was opened.
 
 ## In the digest
 
-Tick **Put its trends in the digest** and the dashboard's trends appear in the workspace's [digest](/docs/guides/digests/) as a "Dashboards" section: each number over the digest's week or day, against the period before.
+Tick **Put its trends in the digest** and the dashboard's trends appear in the company's [digest](/docs/guides/digests/) as a "Dashboards" section: each number over the digest's week or day, against the period before.
 
 ## Who can do what
 
-Everyone in the workspace can open dashboards (`analytics.read`). Owners, admins and operators can create, change, arrange and delete them (`analytics.manage`).
+Everyone in the company can open dashboards (`analytics.read`). Owners, admins and operators can create, change, arrange and delete them (`analytics.manage`).
 
 ## For agents and scripts
 

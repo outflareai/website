@@ -1,13 +1,13 @@
 ---
 title: Brands
-description: Market several businesses from one workspace, each with its own website, context, sequences and mailboxes, without reconnecting tools or re-inviting people.
+description: Market several businesses from one company, each with its own website, context, sequences and mailboxes, without reconnecting tools or re-inviting people.
 sidebar:
   order: 1.4
 ---
 
 <span class="pill shipped">Shipped</span> Brands with their own context, records, mailboxes and analytics, in the web app, the REST API and the MCP server.
 
-Many companies market more than one business. Northpeak runs northpeak.example and summitly.example, and also makes games, on the web, on phones and on TVs. Separate workspaces would mean connecting every tool twice and inviting every person twice, and nobody could see everything at once. So a workspace can hold **brands** instead.
+Many companies market more than one business. Northpeak runs northpeak.example and summitly.example, and also makes games, on the web, on phones and on TVs. Separate companies would mean connecting every tool twice and inviting every person twice, and nobody could see everything at once. So a company can hold **brands** instead.
 
 Each brand has its own website (its point of truth), its own context for agents, and its own sequences, lead lists, domains and mailboxes. Brands share only your team, your billing and the tools you connect, so nobody switches accounts or keys. Everything else, including leads and the unsubscribe list, belongs to one brand. You can also keep a person or an API token to some brands, so a brand's agency or contractor sees only that brand.
 
@@ -15,7 +15,7 @@ Each brand has its own website (its point of truth), its own context for agents,
 
 ## Add a brand
 
-Open the brand switcher at the top of the sidebar, choose **Add a brand** and give its name, website and where it ships (web, iOS, Android, TV and so on). Add its other domains on its page (**Company → Brand** while you're in it), such as an app or help site. Inside a brand you only see that brand: other brands are in the switcher. A workspace without brands works exactly as before. Anyone but a viewer can add a brand, and so can an API token or connected AI app that can make changes (the `context.manage` scope); only the workspace's own name and URL need `workspace.manage`.
+Open the brand switcher at the top of the sidebar, choose **Add a brand** and give its name, website and where it ships (web, iOS, Android, TV and so on). Add its other domains on its page (**Company → Brand** while you're in it), such as an app or help site. Inside a brand you only see that brand: other brands are in the switcher. A company without brands works exactly as before. Anyone but a viewer can add a brand, and so can an API token or connected AI app that can make changes (the `context.manage` scope); only the company's own name and URL need `workspace.manage`.
 
 Also on its page, under **Links**, add everywhere else the brand lives: its App Store and Google Play listings, TV app stores, the Chrome Web Store, Steam, socials and docs. Paste the address and Outflare works out what it is (apps.apple.com is the App Store); add a label such as "Fire TV" where it helps. Agents read the links with the brand's context. With your own Geonode account connected, Outflare also reads the brand's website and suggests the socials and listings it links to, for you to add or dismiss ([Finding a brand's links](/docs/guides/social/#finding-a-brands-links)).
 
@@ -23,7 +23,7 @@ With your own [Geonode](/docs/integrations/connectors/) connection, Outflare als
 
 Outflare also fills in the brand's logo and main colour from its own website, under **Company → Logo and colours**: when you add the brand, when its website changes, and when you open that card with no logo yet (or press **Find on website**). OutflareBot reads the home page, obeying robots.txt, and takes the logo the site names for itself, or else its icon, plus its theme colour. It only fills in what is empty and never replaces a logo or colour you set. This needs no connection or key.
 
-**Settings → Brands** lists every brand in the workspace, as cards or as a table you can sort (it remembers which you picked). Open it from the switcher with **Manage brands**. It is also where you add, archive and restore brands, move records between brands and set the rule for [contacting the same person](#keep-brands-from-emailing-the-same-person).
+**Settings → Brands** lists every brand in the company, as cards or as a table you can sort (it remembers which you picked). Open it from the switcher with **Manage brands**. It is also where you add, archive and restore brands, move records between brands and set the rule for [contacting the same person](#keep-brands-from-emailing-the-same-person).
 
 ## Tell agents about it
 
@@ -47,7 +47,7 @@ What a brand is for (its offer, its audience) goes in its context, who it sells 
 
 Like a project in PostHog, you work on one brand at a time. The brand picker sits at the top of the sidebar, under your workspace (on a phone, in the top bar), and narrows every page to that brand: sequences, lead lists, mailboxes, domains, agents, playbook automations, connectors, SEO, analytics, reports, ad platforms, site audits and search. There is no view across all brands: Outflare opens on the brand you picked last, or your first brand.
 
-The brand is part of every link, after the workspace: `app.outflare.ai/acme/summitly/seo`. A link you share opens on the same brand and the same screen (see [A link to any screen](/docs/guides/workspaces-and-access/#a-link-to-any-screen)), and older links ending in `?brand=summitly` still work. Pages for the whole workspace, such as Members and API tokens, have no brand in their link. Because handles sit in links, a brand's handle can't be the name of a page or an area, such as `seo`, `outreach` or `members`.
+The brand is part of every link, after the company: `app.outflare.ai/acme/summitly/seo`. A link you share opens on the same brand and the same screen (see [A link to any screen](/docs/guides/workspaces-and-access/#a-link-to-any-screen)), and older links ending in `?brand=summitly` still work. Pages for the whole company, such as Members and API tokens, have no brand in their link. Because handles sit in links, a brand's handle can't be the name of a page or an area, such as `seo`, `outreach` or `members`.
 
 Switching brand reloads the page you're on with that brand's records. If you had something open that belongs to the other brand, such as a site audit or a sequence, you go back to that page's list for the new brand.
 
@@ -61,14 +61,14 @@ Nothing sits outside a brand, so there is nothing to take out of one: move a dom
 
 ## Connect a tool once for every brand
 
-Connectors belong to the workspace, so you connect Google Analytics, Search Console, your verification service or your ad accounts once and every brand uses them. Each brand still reads its own GA4 property, Search Console site or ad account on that one connection (see below).
+Connectors belong to the company, so you connect Google Analytics, Search Console, your verification service or your ad accounts once and every brand uses them. Each brand still reads its own GA4 property, Search Console site or ad account on that one connection (see below).
 
 You can narrow it down on the **Connectors** page, where the **Used by** column says who uses each connection. Open **More → Choose who uses it** to pick:
 
-- **Shared from the workspace**: every brand, or only the brands you tick.
+- **Shared from the company**: every brand, or only the brands you tick.
 - **One brand's own**: for a brand with an account of its own, say Summitly's own Plausible. Only that brand uses it, and it takes the place of the shared Plausible for Summitly alone. The other brands keep the shared one.
 
-With one brand picked, Connectors lists what that brand uses and marks each one as **Shared from workspace**, **Split by site** or the brand's own. A split connection (Google Analytics, Search Console, ad accounts) imports nothing into a brand wholesale. Each of its sites or accounts belongs to one brand, and **More → Choose {brand}'s sites** picks which ones. **Disconnect for every brand** removes the connection from the whole workspace, so to stop a site counting for one brand, choose its sites instead. When you connect something new there, choose **Every brand** or **Only Summitly**. Someone kept to some brands only sees the connections their brands use.
+With one brand picked, Connectors lists what that brand uses and marks each one as **Shared from company**, **Split by site** or the brand's own. A split connection (Google Analytics, Search Console, ad accounts) imports nothing into a brand wholesale. Each of its sites or accounts belongs to one brand, and **More → Choose {brand}'s sites** picks which ones. **Disconnect for every brand** removes the connection from the whole company, so to stop a site counting for one brand, choose its sites instead. When you connect something new there, choose **Every brand** or **Only Summitly**. Someone kept to some brands only sees the connections their brands use.
 
 In the API, every connection has `brand_id` (set on a brand's own) and `brand_ids` (the brands a shared one is shared with; empty means every brand). `GET /v1/workspaces/{ws}/integrations?brand=summitly` lists what a brand uses. Set who uses a connection with `brand_id` or `brand_ids` on `POST` or `PATCH /integrations`, or `?brand=` on the sign-in link. The MCP tools are `list_integrations` and `update_integration`.
 
@@ -80,7 +80,7 @@ In the API, `GET /v1/workspaces/{ws}/connections/unassigned` returns `signed_in_
 
 ## See every domain in one list
 
-A workspace sets up domains in several places: each brand's website, SEO sites, website tracking, cold email sending domains, Lifecycle email domains and tracking domains for links. `GET /v1/workspaces/{ws}/domains` lists each domain once, by its registrable name, so `www.acme.example` and `mail.acme.example` both show under `acme.example`. Each entry has:
+A company sets up domains in several places: each brand's website, SEO sites, website tracking, cold email sending domains, Lifecycle email domains and tracking domains for links. `GET /v1/workspaces/{ws}/domains` lists each domain once, by its registrable name, so `www.acme.example` and `mail.acme.example` both show under `acme.example`. Each entry has:
 
 - `uses`: every place the domain is set up, with its `purpose` (`website`, `seo`, `site_tracking`, `cold_email`, `lifecycle_email` or `tracking_links`), the exact `host`, its `status` and the `id` that opens it in its own part of the app.
 - `needs_attention`: the purposes with a use still pending or failing, such as a sending domain whose DNS records aren't in place yet.
@@ -94,7 +94,7 @@ To look up a domain someone else owns (is it free mail, a disposable address, a 
 
 Each site in your analytics tools, such as a GA4 property, a Search Console site or a PostHog project, belongs to one brand: the one you picked for it, else the brand whose website it is, else the brand of the connection it was read through, else your first brand. A site is a brand's website when its domain is one of the brand's domains or a subdomain of one, so `sc-domain:summitly.example` and app.summitly.example are Summitly's. So when one Google sign-in can read the Search Console properties of several of your brands, each property's clicks and pages show only under its own brand, even if nobody picked. Pick or change a site's brand yourself (`PUT /v1/workspaces/{ws}/analytics/{id}/site-brand`); `auto` goes back to the brand whose website it is.
 
-You connect Google Analytics (or any analytics tool) once for the workspace, and every property ends up in one of two places: a brand, or **Don't import**. Outflare suggests a brand for each and says why ("Matches summitly.example", "Name matches"), and nothing is imported until every property has a choice. A property no brand fits can start one: **New brand from this site** makes a brand named after it, with its domain as the website. Outflare never makes a brand on its own.
+You connect Google Analytics (or any analytics tool) once for the company, and every property ends up in one of two places: a brand, or **Don't import**. Outflare suggests a brand for each and says why ("Matches summitly.example", "Name matches"), and nothing is imported until every property has a choice. A property no brand fits can start one: **New brand from this site** makes a brand named after it, with its domain as the website. Outflare never makes a brand on its own.
 
 With one brand picked and no analytics counting for it yet, the Analytics page offers **Pick from Google Analytics**: it uses the connection you already have, with no second sign-in, and lists only that brand's properties and the ones no brand has yet. Someone kept to some brands, or their API token, can only place properties in their own brands, never another brand's property. Campaigns inside a brand are told apart with UTM tags on their links, not with separate properties.
 
@@ -119,7 +119,7 @@ Someone kept to some brands:
 - sees those brands' sequences, lists, mailboxes, domains, inbox, overview and analytics, plus anything shared;
 - changes only their brands' records, so shared records are read-only to them;
 - makes new records in their brand;
-- can't use what needs every brand, such as workspace settings and connecting tools. The app hides those pages, and the API answers `403`. In the [API reference](/docs/api/), these endpoints aren't marked `brand_limited`.
+- can't use what needs every brand, such as company settings and connecting tools. The app hides those pages, and the API answers `403`. In the [API reference](/docs/api/), these endpoints aren't marked `brand_limited`.
 
 Changing someone's brands is in the audit log as `member.brands_changed`.
 
@@ -146,7 +146,7 @@ You can move a brand back the same way. You can't move a company's only brand. B
 
 ## API and MCP
 
-What belongs to a brand lives under `/v1/brands/{brand}/`, where `{brand}` is the brand's id (`GET /v1/workspaces/{ws}/brands` lists them). Only what the whole workspace shares, such as members, API tokens, connections and billing, stays under `/v1/workspaces/{ws}/`. An older workspace route for brand data answers `410` with the error code `route_moved` and names its brand route. MCP tools that read or change a brand's data take `brand`.
+What belongs to a brand lives under `/v1/brands/{brand}/`, where `{brand}` is the brand's id (`GET /v1/workspaces/{ws}/brands` lists them). Only what the whole company shares, such as members, API tokens, connections and billing, stays under `/v1/workspaces/{ws}/`. An older company route for brand data answers `410` with the error code `route_moved` and names its brand route. MCP tools that read or change a brand's data take `brand`.
 
 | What | REST | MCP tool |
 | --- | --- | --- |
@@ -163,7 +163,7 @@ What belongs to a brand lives under `/v1/brands/{brand}/`, where `{brand}` is th
 | A brand's reports | `GET /v1/brands/{brand}/reports`, `GET /v1/brands/{brand}/outcomes/report` | `get_report`, `get_outcomes_report` |
 | Analytics sites by brand | `GET /analytics/site-brands`, `PUT /analytics/{id}/site-brand` | `list_analytics_site_brands`, `set_analytics_site_brand` |
 
-`{brand}` is the brand's handle (such as `summitly`) or its id. Brand data is under `/v1/brands/{brand}/…`. The few workspace lists that take `?brand=` accept a handle or id, or `none` for records in no brand. Set `OUTFLARE_BRAND` on the MCP server to make one brand its default.
+`{brand}` is the brand's handle (such as `summitly`) or its id. Brand data is under `/v1/brands/{brand}/…`. The few company lists that take `?brand=` accept a handle or id, or `none` for records in no brand. Set `OUTFLARE_BRAND` on the MCP server to make one brand its default.
 
 ```sh
 curl -X POST https://app.outflare.ai/v1/workspaces/$WS/brands \

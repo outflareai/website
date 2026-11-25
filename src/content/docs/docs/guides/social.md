@@ -42,7 +42,7 @@ Publishing, listening for mentions and replying on X and LinkedIn come next, in 
 
 ## Your own accounts only
 
-Outflare never uses a shared X, Geonode or LinkedIn key. Followers come from each profile's public page, read through your own Geonode account (a token or so a day per profile). X posts and their numbers need your workspace's own X developer app, and LinkedIn your own sign-in. Until you connect one, nothing is read for that channel.
+Outflare never uses a shared X, Geonode or LinkedIn key. Followers come from each profile's public page, read through your own Geonode account (a token or so a day per profile). X posts and their numbers need your company's own X developer app, and LinkedIn your own sign-in. Until you connect one, nothing is read for that channel.
 
 X bills the owner of the developer app for each post it reads. To keep that small, Outflare reads each X account once a day and at most 50 of its recent posts. You pay X directly.
 
@@ -87,7 +87,7 @@ Without Geonode, finding links answers `409 connector_needed`.
 
 Each page and profile becomes an account on the Social page.
 
-- **Brand.** When the workspace has one brand, new accounts get it. Otherwise, pick the brand for each account, and its posts follow.
+- **Brand.** When the company has one brand, new accounts get it. Otherwise, pick the brand for each account, and its posts follow.
 - **Pause** an account to stop reading it.
 - **Disconnected.** If a connection stops reaching an account (for example, you no longer administer a page), the account is marked disconnected and keeps its history.
 

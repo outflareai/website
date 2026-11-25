@@ -63,7 +63,7 @@ Agents get the same issues, with stable `code` values, from the API and the `lis
 
 The list shows each domain's active mailboxes, emails sent in the last 24 hours against its daily capacity, and bounces and replies over the last 7 days with their rates. A domain's page adds sends, replies and bounces per day for the last 14 days (UTC), with a table view.
 
-Daily capacity is the sum of the daily limits of the domain's active mailboxes, held to the domain's cap. It is 0 while the domain is paused. The workspace overview's capacity is the sum over domains.
+Daily capacity is the sum of the daily limits of the domain's active mailboxes, held to the domain's cap. It is 0 while the domain is paused. The company overview's capacity is the sum over domains.
 
 ## Settings
 

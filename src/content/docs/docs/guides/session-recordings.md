@@ -78,7 +78,7 @@ Deleted recordings and cleared heatmaps are gone for good.
 
 Recordings are kept as files, so the server needs file storage; the Recordings page says so when it has none. When you host Outflare yourself, set an S3-compatible bucket (Cloudflare R2, Amazon S3, MinIO) with `OUTFLARE_S3_ENDPOINT`, `OUTFLARE_S3_BUCKET`, `OUTFLARE_S3_ACCESS_KEY_ID` and `OUTFLARE_S3_SECRET_ACCESS_KEY`. Heatmaps need no bucket.
 
-A recording stops at 4 hours or 60 MB and keeps what it has, and a workspace stores at most 5 GB of new recordings a day.
+A recording stops at 4 hours or 60 MB and keeps what it has, and a company stores at most 5 GB of new recordings a day.
 
 ## API and agents
 

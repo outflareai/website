@@ -66,7 +66,7 @@ After that, an unknown domain comes back with `analysis.status` of `queued`, Out
 Some things it won't do:
 
 - **Spend without a ceiling.** Research stops at your monthly research limit, US$200 by default, or at your overall AI limit, whichever comes first. Set the limit to 0 to stop it. A domain is looked at again only after 90 days, and at most once a day.
-- **Share what you paid for.** A verdict belongs to your workspace. Nobody else sees it, and it never changes the data Outflare ships.
+- **Share what you paid for.** A verdict belongs to your company. Nobody else sees it, and it never changes the data Outflare ships.
 - **Overrule what Outflare knows.** Where research disagrees with a reviewed provider, the reviewed answer stands and the suggested action becomes `review`, for a person to settle.
 - **Do as a web page tells it.** The homepage goes to the model as quoted evidence, and the model is told to treat every word of it as evidence about the site, never as an instruction.
 
@@ -80,6 +80,6 @@ The data ships with Outflare, so a self-hosted server doesn't call anyone else f
 - the [disposable-email-domains](https://github.com/disposable-email-domains/disposable-email-domains) list (CC0),
 - the [fakefilter](https://github.com/7c/fakefilter) list (BSD 3-Clause).
 
-Reviewed providers win when a list disagrees. Mail-server details come from DNS. Nothing your workspace does changes this data, and no other customer's lookups go into it.
+Reviewed providers win when a list disagrees. Mail-server details come from DNS. Nothing your company does changes this data, and no other customer's lookups go into it.
 
 The free built-in checks in [email verification](/docs/integrations/email-verification/) use the same data. That means they block the same throwaway domains, and they count Proton as a private mailbox, not a free one.

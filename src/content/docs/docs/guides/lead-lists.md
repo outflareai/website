@@ -40,7 +40,7 @@ Paste an API key in **Connectors** (or from the Lead lists page). See [Connector
    - *Most leads per run* (`max_leads`, default 500) and a *credit cap per run* (`credit_cap`). A run stops cleanly at either.
    - *Minimum fit score* (`min_score`): people scored below it are left out before any credits are spent.
    - *Verify emails* before adding (on by default, through your verification service or the built-in checks), and optionally *only verified emails*.
-   - *Leave out* people emailed in the last N days (`skip_contacted_days`, default 90), people already in an active sequence, and anyone on the suppression list. This works across every list and campaign in the workspace.
+   - *Leave out* people emailed in the last N days (`skip_contacted_days`, default 90), people already in an active sequence, and anyone on the suppression list. This works across every list and campaign in the company.
 5. **Build, then refresh.** A build runs in the background. Refresh adds people who are new since last time, by hand or every N days (`refresh_every_days`). People already in the list are skipped for free.
 
 Each run reports what it found, added and enriched, what it left out and why (`already_in_list`, `low_score`, `no_email`, `unverified`, `undeliverable`, `suppressed`, `contacted`, `in_sequence`), the credits it spent per provider and why it stopped early, if it did. Credits go into the spend ledger, so cost per meeting includes data costs.
@@ -86,7 +86,7 @@ Anything that can send an HTTP request can add leads: a Clay HTTP API column, Za
 
 ## Permissions
 
-Reading lists and runs needs `leads.read`; creating, editing, running and deleting needs `leads.manage` (see [Workspaces and access](/docs/guides/workspaces-and-access/)). A brand token sees only its brand's lists and the shared ones, and creates lists in its brand.
+Reading lists and runs needs `leads.read`; creating, editing, running and deleting needs `leads.manage` (see [Companies and access](/docs/guides/workspaces-and-access/)). A brand token sees only its brand's lists and the shared ones, and creates lists in its brand.
 
 ## Agents
 

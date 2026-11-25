@@ -1,13 +1,13 @@
 ---
 title: Daily and weekly digests
-description: One summary of the whole workspace each day or week, kept in the app, sent as a webhook, and emailed through your own email provider when you choose.
+description: One summary of the whole company each day or week, kept in the app, sent as a webhook, and emailed through your own email provider when you choose.
 sidebar:
   order: 15
 ---
 
 <span class="pill shipped">Shipped</span> Digests in the app, through the API, as a webhook and for agents.
 
-A digest is a daily or weekly summary of the whole workspace in one place: what needs a person, fixes found and confirmed, deploys, site health, outreach, lifecycle email, missions, channels (visits, conversions, revenue and cost) and [paid ads](/docs/integrations/paid-media/#in-the-weekly-digest) (spend, the sign-ups and new paying customers the ads brought, and what a new paying customer cost), each number shown next to the period before. Every part of Outflare that has something to say adds its own section, so a digest covers the whole tool, not one part of it.
+A digest is a daily or weekly summary of the whole company in one place: what needs a person, fixes found and confirmed, deploys, site health, outreach, lifecycle email, missions, channels (visits, conversions, revenue and cost) and [paid ads](/docs/integrations/paid-media/#in-the-weekly-digest) (spend, the sign-ups and new paying customers the ads brought, and what a new paying customer cost), each number shown next to the period before. Every part of Outflare that has something to say adds its own section, so a digest covers the whole tool, not one part of it.
 
 Each digest is kept in the app (**Settings → Digests**), sent as the `digest.ready` [webhook](/docs/api/webhooks/) so Slack, a CRM or your own system can post it, and emailed only when you choose to.
 
@@ -28,7 +28,7 @@ A period with nothing in it is skipped rather than sent empty. If the server was
 
 ## Email
 
-Digest email goes only through the workspace's own email provider (Amazon SES, Postmark or Resend, connected under [Lifecycle email](/docs/guides/lifecycle-email/)), from an address on one of its verified sending domains. Outflare never sends it from an account of its own. Until the provider and sender are set up, digests are still kept and sent as webhooks, and the Digests page says what is missing.
+Digest email goes only through the company's own email provider (Amazon SES, Postmark or Resend, connected under [Lifecycle email](/docs/guides/lifecycle-email/)), from an address on one of its verified sending domains. Outflare never sends it from an account of its own. Until the provider and sender are set up, digests are still kept and sent as webhooks, and the Digests page says what is missing.
 
 It goes to members who see every brand (a digest covers all of them) and have confirmed their email address. Anyone can turn it off for themselves on the Digests page.
 

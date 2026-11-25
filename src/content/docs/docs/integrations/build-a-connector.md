@@ -7,7 +7,7 @@ sidebar:
 
 <span class="pill shipped">Shipped</span> Manifest connectors for email verification, the Verified and Community badges, and listing through a pull request.
 
-Anyone can add their service to Outflare. A connector is a folder in [`integrations/`](https://github.com/outflareai/outflare/tree/main/integrations) on GitHub. It holds a short YAML manifest that describes your API, a logo, and recorded answers that prove the manifest works. You don't write any Go. Once it is merged, your connector shows up in every workspace's Connectors page, in the API catalog (`GET /v1/connectors`), for agents through MCP, and on [outflare.ai/integrations](/integrations/).
+Anyone can add their service to Outflare. A connector is a folder in [`integrations/`](https://github.com/outflareai/outflare/tree/main/integrations) on GitHub. It holds a short YAML manifest that describes your API, a logo, and recorded answers that prove the manifest works. You don't write any Go. Once it is merged, your connector shows up in every company's Connectors page, in the API catalog (`GET /v1/connectors`), for agents through MCP, and on [outflare.ai/integrations](/integrations/).
 
 The Bouncer and Reoon connectors, which the Outflare team looks after, are written this way, so you can copy either one as a starting point. Everything in `integrations/` is Apache-2.0.
 
@@ -18,7 +18,7 @@ A manifest is data, not code. Outflare reads it and makes the calls itself:
 - Every request goes to one `base_url` of yours, over https. A person's key is only ever sent there.
 - Templates only fill in values, such as `{{api_key}}` or the address being checked (`{{email}}`). There are no expressions or scripts.
 - Answers are read with dotted paths (`result.status`, `domain.acceptAll`) and mapped onto Outflare's own types. Every feature that uses that capability then works with your connector, exactly as it does with one built into Outflare.
-- Every connection uses the workspace's own key for your service. Outflare never supplies one.
+- Every connection uses the company's own key for your service. Outflare never supplies one.
 
 ## What a manifest can do today
 
@@ -62,4 +62,4 @@ A connector can't claim a verified publisher's name. To be verified, [open an is
 
 ## Private connectors
 
-A connector for your own company's platform, one you'd rather not list publicly, isn't supported yet. Private connectors added to a single workspace are planned.
+A connector for your own company's platform, one you'd rather not list publicly, isn't supported yet. Private connectors added to a single company are planned.

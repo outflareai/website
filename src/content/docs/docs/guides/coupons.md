@@ -57,7 +57,7 @@ Two things can go wrong, and both have a safe default:
 
 ## For your developer
 
-Every call uses your workspace's API token and the brand's id: `https://app.outflare.ai/v1/brands/{brand}/…`. In the app, **Coupons → Developer guide** shows the same calls with this brand's address already filled in, and a box that turns green when a call arrives.
+Every call uses your company's API token and the brand's id: `https://app.outflare.ai/v1/brands/{brand}/…`. In the app, **Coupons → Developer guide** shows the same calls with this brand's address already filled in, and a box that turns green when a call arrives.
 
 ### 1. Report a code being used (needed)
 

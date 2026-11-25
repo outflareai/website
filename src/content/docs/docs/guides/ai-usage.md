@@ -15,7 +15,7 @@ When you connect an AI model, Outflare asks you to confirm this before it saves 
 
 **Settings → AI usage** shows one month at a time:
 
-- **What you spent**, against the workspace's monthly AI limit, with the number of calls and tokens.
+- **What you spent**, against the company's monthly AI limit, with the number of calls and tokens.
 - **Each day**, so a spike stands out.
 - **By tool**: which part of Outflare made the calls, what they cost and their share of the month.
 - **By model**, across your providers.
@@ -43,13 +43,13 @@ Costs are each model's price times the tokens, rounded up to the cent per call, 
 
 ## Limit what each tool can spend
 
-The workspace's **monthly AI limit** (US$50 by default, under [AI model](/docs/agents/ai-models/#limit-what-ai-can-spend)) covers every AI call. On the AI usage page an owner or admin can also give any tool a **monthly limit of its own**, such as US$10 for reply labelling. A call stops at whichever limit comes first: planning answers `409` with `ai_budget_reached`, missions pause and say why, and background work such as reply labelling waits for next month or a higher limit. A limit of 0 turns the tool's AI off.
+The company's **monthly AI limit** (US$50 by default, under [AI model](/docs/agents/ai-models/#limit-what-ai-can-spend)) covers every AI call. On the AI usage page an owner or admin can also give any tool a **monthly limit of its own**, such as US$10 for reply labelling. A call stops at whichever limit comes first: planning answers `409` with `ai_budget_reached`, missions pause and say why, and background work such as reply labelling waits for next month or a higher limit. A limit of 0 turns the tool's AI off.
 
 Limits count calendar months in UTC.
 
 ### Warn only
 
-Every limit stops calls by default. To keep AI running past a limit, untick **Stop** next to that tool, or **Stop all AI calls at the workspace's monthly limit** for the workspace's limit, then save. A limit set to warn only still sends both emails below, but the calls carry on and your provider keeps billing you. Your provider's own hard limit still applies either way.
+Every limit stops calls by default. To keep AI running past a limit, untick **Stop** next to that tool, or **Stop all AI calls at the company's monthly limit** for the company's limit, then save. A limit set to warn only still sends both emails below, but the calls carry on and your provider keeps billing you. Your provider's own hard limit still applies either way.
 
 ## Warnings before a limit is reached
 
@@ -60,7 +60,7 @@ When this month's AI spend reaches **80%** of a limit, and again when it **reach
 | Endpoint | MCP tool | What it does |
 | --- | --- | --- |
 | `GET /v1/workspaces/{ws}/ai-usage?month=2026-10` | `get_ai_usage` | A month of AI calls by tool, model and day, each tool's limit, and the 50 latest calls |
-| `PUT /v1/workspaces/{ws}/ai-usage/limits` | `update_ai_tool_limits` | Replace the per-tool limits, in US cents, and choose which limits stop calls (`hard_stop` for the workspace's limit, `hard_stops` per tool; `false` only warns) |
+| `PUT /v1/workspaces/{ws}/ai-usage/limits` | `update_ai_tool_limits` | Replace the per-tool limits, in US cents, and choose which limits stop calls (`hard_stop` for the company's limit, `hard_stops` per tool; `false` only warns) |
 
 ```sh
 curl -X PUT https://outflare.example.com/v1/workspaces/$WS/ai-usage/limits \

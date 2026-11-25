@@ -30,12 +30,12 @@ Outflare turns each record, reply, meeting and deal into a vector: a list of num
 Making a vector is a small AI call, called an embedding, made with **your own AI key** and billed by your provider to your account, like every AI call in Outflare. Outflare never supplies a key. It works with an OpenAI, Gemini, Mistral or OpenRouter [AI model connection](/docs/agents/ai-models/). Claude doesn't offer embeddings, so if Claude is your only AI model, connect one of these too.
 
 - **Each item is sent once**, and again only when it changes. Each search sends only what you typed, and asking the same thing again within 10 minutes is free.
-- **It is cheap.** OpenAI's embedding model costs US$0.02 per million tokens, so a workspace with tens of thousands of emails usually spends cents to embed them all, and less than that each month after.
-- **You can see and cap it.** It is its own line, **Meaning-based search**, in [AI usage](/docs/guides/ai-usage/), where you can give it a monthly limit. Your workspace's AI limit applies too.
+- **It is cheap.** OpenAI's embedding model costs US$0.02 per million tokens, so a company with tens of thousands of emails usually spends cents to embed them all, and less than that each month after.
+- **You can see and cap it.** It is its own line, **Meaning-based search**, in [AI usage](/docs/guides/ai-usage/), where you can give it a monthly limit. Your company's AI limit applies too.
 
 ### On by default, and how to turn it off
 
-It switches on by itself once your workspace has an AI connection that makes embeddings, and is ready within minutes. To turn it off, an owner or admin opens **Settings → Meaning-based search** and chooses **Turn off** (API: `PUT /v1/workspaces/{ws}/semantic-search` with `{"enabled": false}`). That stops its AI calls and deletes the vectors. Search by words keeps working. The same card shows how many items are ready and which model makes them.
+It switches on by itself once your company has an AI connection that makes embeddings, and is ready within minutes. To turn it off, an owner or admin opens **Settings → Meaning-based search** and chooses **Turn off** (API: `PUT /v1/workspaces/{ws}/semantic-search` with `{"enabled": false}`). That stops its AI calls and deletes the vectors. Search by words keeps working. The same card shows how many items are ready and which model makes them.
 
 When a person or company is deleted, merged or archived, or a reply, meeting or deal is deleted, its vector is deleted within minutes.
 
@@ -89,7 +89,7 @@ Every kind of data Outflare stores, brings in from a connection or computes is a
 
 **Data → Queries** works on the brand picked in the sidebar. It lists your saved queries; each one opens on its own page, with Save and Cancel.
 
-**Describe it in English.** Type what you want, such as "customers who spent over $500 in total: their email, user id, sign-up date and lifetime spend, biggest spenders first", and press **Build it**. Your workspace's own AI model (connect one under [AI models](/docs/agents/ai-models/); Outflare never supplies a key, and the box says what to connect when there is none) turns it into a builder, or into SQL when a builder can't say it, or tells you which data is missing. It sees your table and field names, never your customers' data, and Outflare runs every answer once, with your permissions, before you see it. On a query you already have, describe a change: "also show their country". The API is `POST /v1/brands/{brand}/query/ask`, then `GET .../query/ask/{question}` for the answer.
+**Describe it in English.** Type what you want, such as "customers who spent over $500 in total: their email, user id, sign-up date and lifetime spend, biggest spenders first", and press **Build it**. Your company's own AI model (connect one under [AI models](/docs/agents/ai-models/); Outflare never supplies a key, and the box says what to connect when there is none) turns it into a builder, or into SQL when a builder can't say it, or tells you which data is missing. It sees your table and field names, never your customers' data, and Outflare runs every answer once, with your permissions, before you see it. On a query you already have, describe a change: "also show their country". The API is `POST /v1/brands/{brand}/query/ask`, then `GET .../query/ask/{question}` for the answer.
 
 **The builder** makes a query without SQL: pick the table to start from, the columns (including totals from related tables, such as each person's total payments, shown as money), filters, the order and how many rows. Results update as you change it. The **SQL** tab shows the SQL it writes; editing it by hand turns the builder off for that query. `POST /v1/brands/{brand}/query/build` answers a builder's SQL.
 
@@ -120,11 +120,11 @@ curl -X POST https://app.outflare.ai/v1/brands/$BRAND/query-endpoints/new-signup
 
 Search and Query see exactly what the person or agent asking could see anywhere else in Outflare:
 
-- **Only this workspace.** Another workspace's data is never reachable.
+- **Only this company.** Another company's data is never reachable.
 - **Only your brands.** Someone kept to some brands, or an agent connected for one brand, sees those brands and what all brands share.
 - **Only what you may read.** Each kind of data needs the same permission as everywhere else, such as Customers to read people or Outcomes to read deals. Query tells you which permission a table needs.
 
-Query runs as its own read-only database user for each workspace, which can read only these tables, so even a hand-written query can't reach anything else.
+Query runs as its own read-only database user for each company, which can read only these tables, so even a hand-written query can't reach anything else.
 
 ## Self-hosting
 

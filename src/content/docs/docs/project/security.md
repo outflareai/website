@@ -13,7 +13,7 @@ Do **not** open a public issue. Report it privately with the **Report a vulnerab
 
 - **Mailbox passwords and provider keys are encrypted at rest** with your instance's `OUTFLARE_SECRET_KEY`, and the API never returns them.
 - **Tokens are stored as hashes.** API tokens, sessions and invites are random secrets with visible prefixes (`oft_`, `ofs_`, `ofi_`) so a leaked one is easy to recognise and revoke. Only a hash is stored.
-- **Workspaces are isolated.** Every query is filtered by workspace, and a workspace you cannot see returns `404`.
+- **Companies are isolated.** Every query is filtered by company, and a company you cannot see returns `404`.
 - **Least privilege.** API tokens carry explicit scopes that cannot exceed their creator's.
 - **Everything is audited**, in the same transaction as the change.
 - **Sign-in is rate limited**: ten failed attempts for one email, or 100 from one network, in 15 minutes are refused. Accepting an invite with an existing account's password counts toward the same limits. The counts are kept in Postgres, so a restart or deploy doesn't reset them.

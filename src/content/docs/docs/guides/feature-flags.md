@@ -107,7 +107,7 @@ For a version of a split, open the flag in **Analytics → Feature flags** (or a
 
 **Layers** lists the page's headings, text, buttons, links and images, to pick one without hunting for it. **Changes** lists everything the version changes: point at one to see it on the page, or remove it.
 
-**Ask AI**, on a version of an A/B test of a page: describe a change to the whole page, or pick a part first and describe a change to just that part, such as "make this shorter and say Start free". Your own AI model writes it and it shows on the page at once: **Keep** it or **Undo** it. This uses the AI model your workspace connected under **Settings → AI model**, billed to your own AI provider account; without one, the editor says where to connect it.
+**Ask AI**, on a version of an A/B test of a page: describe a change to the whole page, or pick a part first and describe a change to just that part, such as "make this shorter and say Start free". Your own AI model writes it and it shows on the page at once: **Keep** it or **Undo** it. This uses the AI model your company connected under **Settings → AI model**, billed to your own AI provider account; without one, the editor says where to connect it.
 
 Changes can apply to phones only or wider screens only. **Preview on a phone** opens the page in a phone-sized window. Under **Settings** in the editor, a version can have its own CSS (looks only) and can send its visitors to another page of your site instead, for a split URL test. **Save** in the editor, and visitors who get that version see the changes within a minute.
 

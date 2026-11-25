@@ -34,7 +34,7 @@ Under **Settings → Alerts**, owners and admins choose who gets each kind by em
 
 To mute many kinds at once, use **Show** (for example **Not muted for me**, or by who gets the email) or the search box to narrow the list. Then click **Mute all for me**, which mutes every kind shown in one click. Tick boxes let you pick only some, and **Undo** puts back exactly what that click changed. **Unmute all for me** works the same way.
 
-A brand can choose differently from the workspace through the API:
+A brand can choose differently from the company through the API:
 
 ```sh
 curl -X PUT https://outflare.example.com/v1/brands/$BRAND/alerts/settings \
@@ -42,7 +42,7 @@ curl -X PUT https://outflare.example.com/v1/brands/$BRAND/alerts/settings \
   -d '{"brand_id": "'$BRAND_ID'", "kind": "visitor.hot", "email": "off"}'
 ```
 
-`email` is `owner`, `admins`, `off`, or `null` to follow the workspace again. Changing settings needs `workspace.manage`.
+`email` is `owner`, `admins`, `off`, or `null` to follow the company again. Changing settings needs `workspace.manage`.
 
 ## Slack
 

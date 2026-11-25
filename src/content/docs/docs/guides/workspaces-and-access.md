@@ -1,21 +1,23 @@
 ---
-title: Workspaces and access
-description: Workspaces, members, roles, invites, API tokens and the audit log.
+title: Companies and access
+description: Companies, members, roles, invites, API tokens and the audit log.
 sidebar:
   order: 1
 ---
 
 <span class="pill shipped">Shipped</span>
 
-## Workspaces
+## Companies
 
-A workspace holds everything for one team or client: mailboxes, pools, leads, lists, the suppression list, sequences, sent and received mail, members and tokens. Nothing is shared between workspaces. Anyone signed in can create a workspace and becomes its owner.
+A company holds everything for one team or client: mailboxes, pools, leads, lists, the suppression list, sequences, sent and received mail, members and tokens. Nothing is shared between companies. Anyone signed in can create a company and becomes its owner.
 
-### Workspace URL
+The API calls a company a workspace: its routes are under `/v1/workspaces/{workspace}` and its rows carry `workspace_id`.
 
-Each workspace has a short name for its URL, made from its name when it is created: a workspace called Acme opens at `https://app.outflare.ai/acme`, and each page follows it, such as `/acme/members`, or `/acme/summitly/outreach/sequences` for a page of the brand Summitly. Owners and admins can rename the workspace and change its URL under **Settings → General**. The URL can use 3 to 40 lowercase letters, numbers and dashes, and a few words the app needs for its own pages (such as `admin`, `signup` and `settings`) are taken.
+### Company URL
 
-Changing the URL doesn't break links: the old one keeps leading to the workspace until another workspace takes it. Links from before workspace URLs existed (`/w/<workspace id>/...`) still work and switch to the new address.
+Each company has a short name for its URL, made from its name when it is created: a company called Acme opens at `https://app.outflare.ai/acme`, and each page follows it, such as `/acme/members`, or `/acme/summitly/outreach/sequences` for a page of the brand Summitly. Owners and admins can rename the company and change its URL under **Settings → General**. The URL can use 3 to 40 lowercase letters, numbers and dashes, and a few words the app needs for its own pages (such as `admin`, `signup` and `settings`) are taken.
+
+Changing the URL doesn't break links: the old one keeps leading to the company until another company takes it. Links from before company URLs existed (`/w/<workspace id>/...`) still work and switch to the new address.
 
 Sequences, lead lists, missions, sending servers, infrastructure plans, API tokens and webhooks get readable URLs too, made from their names: `/acme/summitly/outreach/sequences/q3-founders`. Two with the same name become `q3-founders` and `q3-founders-2`. Renaming one gives it a new URL, and its old URL still opens it, so shared links keep working.
 
@@ -25,7 +27,7 @@ A connection's URL is named after what it connects, not what you called it: `/ac
 
 Every screen has a link of its own, so you can send a teammate the link instead of "open this page, then click that tab". Copy it from the address bar: whoever opens it, and may see that screen, lands on exactly the same page, tab, item and layout, on the same brand.
 
-A link reads from big to small: the workspace, the brand, the area, the page, then what is open on it.
+A link reads from big to small: the company, the brand, the area, the page, then what is open on it.
 
 | Link | Screen |
 | --- | --- |
@@ -35,7 +37,7 @@ A link reads from big to small: the workspace, the brand, the area, the page, th
 | `/acme/summitly/seo/declining` | The SEO overview's Declining view |
 | `/acme/summitly/partners/{id}/payouts` | One partner, on the Payouts tab |
 | `/acme/summitly/company/brand/table` | Brands, as a table instead of cards |
-| `/acme/members` | Members, which belongs to the whole workspace |
+| `/acme/members` | Members, which belongs to the whole company |
 
 - **Tabs and layouts are part of the link.** A tab, a tab inside an item, and a layout such as list or gallery, board or table, each add a word to the link. The first tab of a page has no word.
 - **Searching and sorting a list are in the link too**, after a `?`: `?search=acme&order=-revenue` is the list searched for "acme", biggest revenue first. The link without them opens the same screen, unfiltered.
@@ -44,7 +46,7 @@ A link reads from big to small: the workspace, the brand, the area, the page, th
 
 ## Roles
 
-Each member has one role in each workspace, and the role decides what they can do. Every workspace starts with four:
+Each member has one role in each company, and the role decides what they can do. Every company starts with four:
 
 | Role | What it's for |
 | --- | --- |
@@ -56,23 +58,23 @@ Each member has one role in each workspace, and the role decides what they can d
 Change what Admin, Member or Viewer allows, or add roles of your own (a "Content writer" with only SEO and Social, say), under **Settings → Members → Roles**. Each role opens on its own page, with a level for each area: **None**, **View** or **Edit**. Open an area to see the single permissions inside it and switch them one by one (the level then shows **Custom**). Edit gives reading and changing only: actions that need their own say, such as sending email, posting to social accounts, approving missions and spending or removing ads, are separate switches inside the area, so picking Edit never hands out an approval. The **Company** card holds settings, the unsubscribe list, shared fields, webhooks, API tokens and the audit log; **People and access** holds inviting people, adding people to teams, editing teams, editing roles, removing people and resetting two-factor. Save applies the whole page at once. A changed starting role can be reset to its defaults.
 
 - **You can't give what you don't have.** Every permission in a role you create or edit, or a role you give someone, must be one you hold.
-- **You can't change someone who can do more than you.** Only owners make, change or remove owners, and a workspace always keeps at least one.
+- **You can't change someone who can do more than you.** Only owners make, change or remove owners, and a company always keeps at least one.
 - **People permissions are separate.** **Add people to teams** (`teams.members`) puts people in a team or takes them out; **Edit teams** (`teams.manage`) also creates, renames and deletes teams and changes what they allow; **Reset someone's two-factor** (`members.two_factor`) is owners only by default. Roles that could invite people before can still edit teams, and roles that could remove people can still reset two-factor.
 - **Taking access away is its own permission.** Removing someone, moving them to a role that can do less, or taking brands away from them needs **Remove people** (`members.remove`). Only owners have it by default; an owner can switch it on for any role.
 - **Changes apply at once**, and API tokens a person made lose the permissions their role no longer has. Every change is in the audit log (`role.created`, `role.updated`, `role.deleted`, `member.role_changed`).
 - **Deleting a role in use** asks where its people and pending invites should move.
-- **Anyone can leave** a workspace under Settings → Members, except its last owner.
+- **Anyone can leave** a company under Settings → Members, except its last owner.
 
-API tokens never hold more than the person who made them, and never `members.remove` or `roles.manage`. Connected AI apps never get people, roles, tokens, workspace settings or approvals, whatever the role allows.
+API tokens never hold more than the person who made them, and never `members.remove` or `roles.manage`. Connected AI apps never get people, roles, tokens, company settings or approvals, whatever the role allows.
 
-In the API: `GET /v1/workspaces/{ws}/roles` lists the roles with their scopes (MCP: `list_roles`); `POST /roles`, `PATCH /roles/{role}` and `DELETE /roles/{role}` (`?move_to=` when it's in use) need `roles.manage`. Members and invites take `role` (a starting role) or `role_id` (one of the workspace's own roles).
+In the API: `GET /v1/workspaces/{ws}/roles` lists the roles with their scopes (MCP: `list_roles`); `POST /roles`, `PATCH /roles/{role}` and `DELETE /roles/{role}` (`?move_to=` when it's in use) need `roles.manage`. Members and invites take `role` (a starting role) or `role_id` (one of the company's own roles).
 
 ### A different role on one brand
 
-A person has one role in the workspace, and can be on another role for single brands: a Viewer of the workspace who is a Member on Summitly, or a Member who only views one brand. Open the person under **Settings → Members** (Edit), untick "Same role on every brand" and pick a role for each brand, or "No access".
+A person has one role in the company, and can be on another role for single brands: a Viewer of the company who is a Member on Summitly, or a Member who only views one brand. Open the person under **Settings → Members** (Edit), untick "Same role on every brand" and pick a role for each brand, or "No access".
 
-- On that brand, the brand's role decides what they can do. On every other brand their workspace role applies.
-- What belongs to the workspace and not to a brand (connections, mailboxes, settings) always follows the workspace role.
+- On that brand, the brand's role decides what they can do. On every other brand their company role applies.
+- What belongs to the company and not to a brand (connections, mailboxes, settings) always follows the company role.
 - Only a role without workspace-wide permissions (settings, people, roles, API tokens or the audit log) can be a brand's role, and only for a person whose own role has none: an owner or admin is the same on every brand.
 - The rules above apply on each brand: you can't give what you don't have, and lowering someone on a brand needs **Remove people**.
 - API tokens a person made never do more on a brand than their role there allows.
@@ -88,7 +90,7 @@ A team gives a group of people the same access, set up once. Under **Settings �
 - A team can open a brand to someone who isn't on that brand themselves.
 - Taking someone out of a team, or a role off the team, takes that access away straight away.
 - A team's role is one without workspace-wide permissions (settings, people, roles, API tokens or the audit log), and it counts for people whose own role has none: an owner or admin already does everything on every brand.
-- What belongs to the workspace and not to a brand always follows the person's own workspace role.
+- What belongs to the company and not to a brand always follows the person's own company role.
 - You can't give a team more than you may do yourself. Taking a role off a team with people in it, taking people out of a team that carries a role, or deleting such a team needs **Remove people**.
 - A role a team carries can't gain workspace-wide permissions or be deleted until the team changes.
 - API tokens are made from their maker's own role: a team never lets a token do more.
@@ -112,7 +114,7 @@ In the API, `GET /v1/workspaces/{ws}/module-access` lists each module with its `
 
 ## Invites
 
-Admins and owners invite people by email from **Settings → Members**, picking any role they could give themselves (Admin by default; only owners invite owners). For a role without workspace-wide permissions, you can also keep the person to some brands. **Send invite** emails them a link to join, through the instance's account email service, and shows you the link once so you can share it another way too (an instance with no email service only shows it). The link starts with `ofi_`, works once and expires after 7 days. A new invite to the same address replaces a pending one, and someone already in the workspace can't be invited again. Pending invites can be revoked. Invite links use your instance's `PUBLIC_URL`, so set it when you run behind a domain.
+Admins and owners invite people by email from **Settings → Members**, picking any role they could give themselves (Admin by default; only owners invite owners). For a role without workspace-wide permissions, you can also keep the person to some brands. **Send invite** emails them a link to join, through the instance's account email service, and shows you the link once so you can share it another way too (an instance with no email service only shows it). The link starts with `ofi_`, works once and expires after 7 days. A new invite to the same address replaces a pending one, and someone already in the company can't be invited again. Pending invites can be revoked. Invite links use your instance's `PUBLIC_URL`, so set it when you run behind a domain.
 
 ## Signing in
 
@@ -146,9 +148,9 @@ Under **Your account**, anyone can turn on two-factor sign-in: scan the QR code 
 - Ten wrong codes in 15 minutes are refused until the window passes (`429` with `Retry-After`).
 - API tokens, MCP and connected agents are not asked for a code: they never sign in with a password.
 
-**Required for everyone.** A workspace can require two-factor: people without it see the set-up screen before anything else in that workspace. An owner switches the rule under **Settings → General** (`require_two_factor` on `PATCH /v1/workspaces/{workspace}`, signed-in owners only). It is on unless an owner turns it off; a self-hosted server changes the default for workspaces that haven't chosen with `REQUIRE_TWO_FACTOR=false` ([Configuration](/docs/self-hosting/configuration/)).
+**Required for everyone.** A company can require two-factor: people without it see the set-up screen before anything else in that company. An owner switches the rule under **Settings → General** (`require_two_factor` on `PATCH /v1/workspaces/{workspace}`, signed-in owners only). It is on unless an owner turns it off; a self-hosted server changes the default for companies that haven't chosen with `REQUIRE_TWO_FACTOR=false` ([Configuration](/docs/self-hosting/configuration/)).
 
-**A lost phone.** **Settings → Members** shows who has two-factor on. Someone with **Reset someone's two-factor** (owners by default) can **Reset two-factor** for a member, who then sets it up again at their next sign-in. The reset only works when they own every workspace the member belongs to, so one workspace can't weaken someone's sign-in for another.
+**A lost phone.** **Settings → Members** shows who has two-factor on. Someone with **Reset someone's two-factor** (owners by default) can **Reset two-factor** for a member, who then sets it up again at their next sign-in. The reset only works when they own every company the member belongs to, so one company can't weaken someone's sign-in for another.
 
 `GET /v1/me` shows `two_factor` and `two_factor_verified`; a session that still owes its code gets `401` with the code `two_factor_required` on every route until `POST /v1/auth/two-factor` succeeds.
 
@@ -164,9 +166,9 @@ These emails go through Postmark, Resend or Cloudflare Email Service (`EMAIL_FRO
 
 Scripts, integrations and agents use API tokens instead of a person's session. To connect Claude, ChatGPT or Cursor, use [Connect your AI](/docs/agents/connect/) instead: the app signs in, and its connection isn't listed under API tokens.
 
-Under **Settings → API tokens**, **New token** asks for a name, what it can do (**Read only**, **Can make changes**, or **Choose** to set each area to No, See or Change), anything riskier under **Also allow** (spending, approving missions, the suppression list, people, tokens, workspace settings), and when it expires (90 days unless you choose otherwise). The list shows who created each token, what it can do, and when it was last used and expires; a token made by another token or an agent, or by someone whose account was deleted, shows **Unknown** under **Created by**. Click a token later to rename it, change what it may do or its sending limits, or revoke it. A change applies on the token's next request. A token:
+Under **Settings → API tokens**, **New token** asks for a name, what it can do (**Read only**, **Can make changes**, or **Choose** to set each area to No, See or Change), anything riskier under **Also allow** (spending, approving missions, the suppression list, people, tokens, company settings), and when it expires (90 days unless you choose otherwise). The list shows who created each token, what it can do, and when it was last used and expires; a token made by another token or an agent, or by someone whose account was deleted, shows **Unknown** under **Created by**. Click a token later to rename it, change what it may do or its sending limits, or revoke it. A change applies on the token's next request. A token:
 
-- belongs to one workspace,
+- belongs to one company,
 - holds an explicit list of scopes, which can never exceed the scopes of the person who created it,
 - can expire after 1 to 3650 days, or never,
 - starts with `oft_` so a leaked one is easy to recognise, and is shown only once. Only a hash is stored.
@@ -175,8 +177,8 @@ The scopes are:
 
 | Scope | Allows |
 | --- | --- |
-| `workspace.read` | Read the workspace. |
-| `workspace.manage` | Rename the workspace and change its URL (slug). Owners and admins only by default. |
+| `workspace.read` | Read the company. |
+| `workspace.manage` | Rename the company and change its URL (slug). Owners and admins only by default. |
 | `members.read` | List members. |
 | `members.manage` | Change roles and manage invites. |
 | `members.remove` | Remove members or reduce their access. Owners only by default; never on an API token. |
@@ -213,7 +215,7 @@ The scopes are:
 | `seo.read` | See [SEO sites](/docs/guides/site-audits/), their crawls and the pages they found. |
 | `seo.manage` | Add and change SEO sites, check that you own them, and start or stop crawls. Operators have it. |
 | `webhooks.read` | List [webhooks](/docs/api/webhooks/) and their deliveries. |
-| `webhooks.manage` | Add, change, test and remove webhooks, and see and rotate their signing secrets. Owners and admins only by default, since webhooks receive workspace data. |
+| `webhooks.manage` | Add, change, test and remove webhooks, and see and rotate their signing secrets. Owners and admins only by default, since webhooks receive company data. |
 
 Give each agent its own token with only the scopes it needs, so its actions are attributed to it in the audit log and you can revoke it on its own.
 

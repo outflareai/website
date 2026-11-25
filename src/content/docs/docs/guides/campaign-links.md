@@ -126,7 +126,7 @@ Over the API, `DELETE /v1/brands/{brand}/offers/{id}` and `DELETE /v1/brands/{br
 
 ## Who can do what
 
-Everyone in the workspace can see campaigns and links (`analytics.read`). Owners, admins and operators can make and change them (`analytics.manage`).
+Everyone in the company can see campaigns and links (`analytics.read`). Owners, admins and operators can make and change them (`analytics.manage`).
 
 ## For agents and scripts
 

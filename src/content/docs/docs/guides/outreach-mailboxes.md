@@ -29,7 +29,7 @@ The **Domains** tab lists every domain with its status, its mail records and how
 3. Say how many mailboxes each person gets. Outflare suggests addresses in a mix of forms (first.last, first initial and so on) and spreads them across your domains, emptiest first, up to the brand's limit of mailboxes per domain (5 unless you change it in the brand's settings).
 4. Review the addresses, change any you like, then place the order.
 
-An order is paid from your workspace's balance, in full, before anything is set up. If the balance doesn't cover it, the order waits until you add funds or cancel it. You can save an order as a draft and finish it later.
+An order is paid from your company's balance, in full, before anything is set up. If the balance doesn't cover it, the order waits until you add funds or cancel it. You can save an order as a draft and finish it later.
 
 The **Orders** tab shows each order's progress: paid, being set up, then ready. Outflare checks that every mailbox is set up correctly before it calls it ready.
 

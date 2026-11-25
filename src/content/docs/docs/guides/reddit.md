@@ -15,7 +15,7 @@ Reddit is the first channel of the Social module. In the app, open **Reddit** at
 
 - **No bought upvotes, no other accounts, no undisclosed posts.** Replies go out from the brand's own account only, and every reply ends with a disclosure line such as "Disclosure: I work at Northpeak." Outflare refuses a reply without it.
 - **No reply without a person.** Only someone signed in to Outflare can approve a reply. API tokens and AI agents can find posts and draft replies, but never approve them.
-- **No shared keys.** Outflare searches and posts with your workspace's own Reddit app, and drafts with your workspace's own [AI model](/docs/integrations/connectors/). Until you connect them, nothing runs. Without an AI model, you write replies yourself.
+- **No shared keys.** Outflare searches and posts with your company's own Reddit app, and drafts with your company's own [AI model](/docs/integrations/connectors/). Until you connect them, nothing runs. Without an AI model, you write replies yourself.
 
 ## Set up
 

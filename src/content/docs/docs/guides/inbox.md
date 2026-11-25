@@ -30,7 +30,7 @@ Each message is matched to the email it answers by its `In-Reply-To` and `Refere
 | `reply` | A lead wrote back. | The lead's active sequences stop (`replied`), unless a sequence has **stop on reply** turned off. |
 | `reply` with `opt_out` | A reply asking not to be contacted, such as "unsubscribe", "remove me from your list" or "stop emailing me", or a complaint (a spam report or a legal threat). | The address is added to the [suppression list](/docs/guides/import-leads/) and all of the lead's sequences stop (`unsubscribed`). Only the new text is read, never the quoted email below it. |
 | `auto_reply` | Out-of-office and other automatic replies ([RFC 3834](https://www.rfc-editor.org/rfc/rfc3834) `Auto-Submitted`, and the usual vacation headers and subjects). | Shown, but the sequence carries on. |
-| `bounce` | A delivery failure report ([RFC 3464](https://www.rfc-editor.org/rfc/rfc3464)) or a plain-text bounce from a mailer daemon. | Addresses that failed permanently (5.x.x) are suppressed with reason `bounced` and their sequences stop. Only addresses this workspace actually emailed are acted on, so a forged report cannot suppress anyone else. Delays are ignored. |
+| `bounce` | A delivery failure report ([RFC 3464](https://www.rfc-editor.org/rfc/rfc3464)) or a plain-text bounce from a mailer daemon. | Addresses that failed permanently (5.x.x) are suppressed with reason `bounced` and their sequences stop. Only addresses this company actually emailed are acted on, so a forged report cannot suppress anyone else. Delays are ignored. |
 | `other` | Not about a lead: newsletters, mail between your own mailboxes. | Kept, out of the way. |
 
 Every action is recorded in the audit log (`lead.replied`, `lead.unsubscribed`, `lead.bounced`).
@@ -56,7 +56,7 @@ Each reply also gets a label for what it means. Labels come in four groups, so y
 | `closed` | `not_interested`, `wrong_person`, `unsubscribe`, `complaint` | Finished. Opt-outs and complaints are suppressed. |
 | `automatic` | `out_of_office`, `auto_reply` | Sent by a machine. |
 
-Built-in rules label the clear cases as they arrive. What they can't place is left unlabelled, so a person or an agent can read it and decide, unless the workspace has connected its own AI model.
+Built-in rules label the clear cases as they arrive. What they can't place is left unlabelled, so a person or an agent can read it and decide, unless the company has connected its own AI model.
 
 ### AI labelling with your own key
 
@@ -67,7 +67,7 @@ Connect an AI model under Connectors (Claude, OpenAI, Gemini, Mistral, xAI, Deep
 - **Opt-outs:** a reply the AI reads as `unsubscribe` or `complaint` is suppressed whatever its confidence, and flagged when unsure. Change its label to anything else and the suppression is lifted in one step; the sequences it stopped stay stopped as replied.
 - **Details:** what the reply states, such as `return_date`, `referral_name`, `referral_email`, `meeting_time` or `objection`, goes in `details`, and why in `category_reason`.
 
-The model is told the reply is data, never instructions, and only the new text is sent, not the quoted thread. Each call is billed by your provider to your account and counts towards the workspace's monthly AI limit. A label a person or agent already set is never overwritten.
+The model is told the reply is data, never instructions, and only the new text is sent, not the quoted thread. Each call is billed by your provider to your account and counts towards the company's monthly AI limit. A label a person or agent already set is never overwritten.
 
 Every reply says:
 
@@ -82,10 +82,10 @@ The inbox opens on what still needs handling. Unsubscribes and automatic replies
 | Field | What it does |
 | --- | --- |
 | `category` | Label a reply, or correct the rules. |
-| `assigned_to` | Give it to a workspace member (a user id), or `null`. |
+| `assigned_to` | Give it to a company member (a user id), or `null`. |
 | `snoozed_until` | Hide it until a time. It comes back on its own. |
 | `done` | Mark it handled, or reopen it. |
-| `labels` | Your own tags, such as `pricing` or `follow up in q1`. A new one joins the workspace's tags. |
+| `labels` | Your own tags, such as `pricing` or `follow up in q1`. A new one joins the company's tags. |
 | `needs_review` | Flag it for a person to check, or clear the flag. |
 
 ```sh
@@ -116,7 +116,7 @@ Once a reply has a label Outflare is sure of, a reply rule acts on it. "Sure" me
 | Out of office | **Wait**: the lead's next email moves to the day after the return date the AI read. Or keep the sequence as it is. |
 | Referral, and wrong person naming someone else | **Offer to add them**: the reply shows an "Add … as a lead" button. **Add them** as a lead on the referrer's lists, marked `referred_by`. Or **add and enrol** them in a sequence you pick. Someone on the opt-out list is never enrolled. |
 
-Choose the workspace's rules under **Rules** in the inbox. A sequence can have its own rules for some labels, which win label by label for its replies, through the API or MCP. A project's rules became its sequences' rules when projects were removed.
+Choose the company's rules under **Rules** in the inbox. A sequence can have its own rules for some labels, which win label by label for its replies, through the API or MCP. A project's rules became its sequences' rules when projects were removed.
 
 ```sh
 curl -X PUT https://outflare.example.com/v1/workspaces/$WS/reply-rules \
@@ -136,7 +136,7 @@ Reply rules can also keep your pipeline in Outflare's own CRM up to date. In **R
 - A deal only moves forward. A later "not now" never drags it back, and a stage a person set by hand is never overridden.
 - A deal in a closed stage (won and lost by default) is left alone. With no open deal, a new one opens at that stage, named after the company and linked to the person and company.
 
-Every workspace has a [Deal type](/docs/guides/customer-records/#deals) ready for this, and the deals it opens count in your outcomes. Another record type works too, if it has a status field for its stages and a field that points at a person or a company. Rules on automatic labels such as auto-reply and out of office can't move deals. Through the API, add a `deal` to a label's rule:
+Every company has a [Deal type](/docs/guides/customer-records/#deals) ready for this, and the deals it opens count in your outcomes. Another record type works too, if it has a status field for its stages and a field that points at a person or a company. Rules on automatic labels such as auto-reply and out of office can't move deals. Through the API, add a `deal` to a label's rule:
 
 ```sh
 curl -X PUT https://outflare.example.com/v1/workspaces/$WS/reply-rules \

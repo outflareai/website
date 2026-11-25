@@ -112,7 +112,7 @@ The sequence's `stats` count leads by status, plus `sent` emails.
 Every email carries `List-Unsubscribe` and `List-Unsubscribe-Post: List-Unsubscribe=One-Click` headers ([RFC 8058](https://www.rfc-editor.org/rfc/rfc8058)), which Gmail and Yahoo require of bulk senders and show as an unsubscribe button. The link points to `PUBLIC_URL/u/...`, so set [`PUBLIC_URL`](/docs/self-hosting/configuration/) to an address recipients can reach.
 
 - Opening the link shows a page with an **Unsubscribe** button. It does not unsubscribe on its own, because security scanners open links in email.
-- Unsubscribing (the button, or a mail provider's one-click POST) adds the address to the [suppression list](/docs/guides/import-leads/) with reason `unsubscribed` and stops every active sequence for it in the workspace.
+- Unsubscribing (the button, or a mail provider's one-click POST) adds the address to the [suppression list](/docs/guides/import-leads/) with reason `unsubscribed` and stops every active sequence for it in the company.
 - Links are signed, so they cannot be guessed or altered.
 
 When the receiving server rejects an address outright (a 5xx answer to `RCPT TO`), the address is suppressed with reason `bounced` and the lead's enrollment ends as `bounced`. Temporary failures are retried with backoff. A mailbox whose sign-in starts failing is set to `error` and leaves the rotation until you fix and re-verify it.
@@ -130,4 +130,4 @@ Filter by `sequence_id`, `lead_id`, `mailbox_id`, `enrollment_id` or `status`, a
 
 ## Scopes
 
-`sequences.read` lists sequences, enrollments and messages, and runs previews. `sequences.manage` creates and changes them. See [Workspaces and access](/docs/guides/workspaces-and-access/).
+`sequences.read` lists sequences, enrollments and messages, and runs previews. `sequences.manage` creates and changes them. See [Companies and access](/docs/guides/workspaces-and-access/).

@@ -11,7 +11,7 @@ The brand profile is what your agents know about your company: who you are, what
 
 It is kept as separate facts, not a few long text boxes. An agent can point to the fact it used, and you can correct one fact without rewriting a page.
 
-In the app, open **Company** in the sidebar, then **Brand profile**. Each [brand](/docs/guides/brands/) has its own profile, and a profile is never shared with another brand or another workspace.
+In the app, open **Company** in the sidebar, then **Brand profile**. Each [brand](/docs/guides/brands/) has its own profile, and a profile is never shared with another brand or another company.
 
 ## The twelve sections
 

@@ -31,7 +31,7 @@ Override the database with `make run DATABASE_URL=postgres://...`.
 | Path | What |
 | --- | --- |
 | `engine/cmd/outflare` | The binary: `serve`, `migrate` and `version` commands |
-| `engine/internal/api` | HTTP handlers, authentication and workspace scoping |
+| `engine/internal/api` | HTTP handlers, authentication and company scoping |
 | `engine/internal/jobs` | The Postgres job queue |
 | `engine/internal/mailbox` | CSV import, provider detection, SMTP/IMAP checks, DNS health |
 | `engine/internal/db/migrations` | Append-only numbered SQL migrations |
@@ -47,4 +47,4 @@ Change `api/openapi.yaml` first, then regenerate the SDK types:
 pnpm --filter @outflare/sdk generate
 ```
 
-CI fails if `sdk/ts/src/schema.ts` does not match the spec. Read [`AGENTS.md`](https://github.com/outflareai/outflare/blob/main/AGENTS.md) before your first change: it lists the rules every change follows, such as workspace scoping, audit events and running side effects in jobs.
+CI fails if `sdk/ts/src/schema.ts` does not match the spec. Read [`AGENTS.md`](https://github.com/outflareai/outflare/blob/main/AGENTS.md) before your first change: it lists the rules every change follows, such as company scoping, audit events and running side effects in jobs.

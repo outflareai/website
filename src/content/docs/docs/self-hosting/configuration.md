@@ -25,7 +25,7 @@ The engine is configured only through environment variables. When you use the bu
 | `CLOUDFLARE_EMAIL_API_TOKEN` | no | none | Sends account emails through [Cloudflare Email Service](https://developers.cloudflare.com/email-service/), with `CLOUDFLARE_ACCOUNT_ID`. Needs the Workers Paid plan and the sender's domain onboarded to Email Sending. Set only one of the three email keys. With none, links are written to the server log and nothing is sent. |
 | `CLOUDFLARE_ACCOUNT_ID` | with the Cloudflare key | none | The Cloudflare account that sends, shown in the dashboard's account home. |
 | `PASSKEYS` | no | `auto` | `auto` turns passkey sign-in on once `PUBLIC_URL` is `https://`. `on` also allows `http://localhost` for trying them out; `off` turns them off. Passkeys are tied to `PUBLIC_URL`, so set its final address first. |
-| `REQUIRE_TWO_FACTOR` | no | `true` | Whether workspaces require [two-factor sign-in](/docs/guides/workspaces-and-access/#two-factor-sign-in) from everyone until an owner chooses otherwise. `false` makes it optional by default; each workspace's owner can still switch it either way. |
+| `REQUIRE_TWO_FACTOR` | no | `true` | Whether companies require [two-factor sign-in](/docs/guides/workspaces-and-access/#two-factor-sign-in) from everyone until an owner chooses otherwise. `false` makes it optional by default; each company's owner can still switch it either way. |
 | `OUTFLARE_SIGNED_IN_COOKIE_DOMAIN` | no | none | A parent domain of `PUBLIC_URL`'s host, such as `example.com` for `app.example.com`. While someone is signed in, the server keeps an `outflare_signed_in=1` cookie there, so your website can show a **Dashboard** link instead of **Sign in**. The cookie says nothing else and scripts on your site can read it; the session cookie itself stays HttpOnly on the app's own host. The server refuses to start if the domain isn't its own host or a parent of it. |
 | `CLIENT_IP_HEADER` | no | none | Header your proxy puts the visitor's address in, such as `Fly-Client-IP` or `CF-Connecting-IP`. Rate limits use it. Only set it when every request comes through that proxy, or visitors could fake it. |
 | `WEBHOOKS_ALLOW_PRIVATE` | no | `false` | `true` lets [webhooks](/docs/api/webhooks/) go to private, loopback and plain-`http` addresses, for receivers on the same network as the server. Leave it off on a server anyone else can add webhooks to. |
@@ -53,7 +53,7 @@ Compose-only settings:
 
 ## Third-party keys
 
-Every workspace brings its own keys for every third-party API, AI models and connectors alike, with no exceptions: each one connects its own Claude, OpenAI, Gemini, Mistral, Geonode, Apollo or DataForSEO account on the [Connectors](/docs/integrations/connectors/) page. Outflare never lends a key of its own, and neither does your server. At start-up the engine removes vendor keys such as `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY` or `GOOGLE_APPLICATION_CREDENTIALS` from its environment and logs which it ignored, so setting one does nothing. The only third-party settings above are for running Outflare itself: account email, OAuth app ids (people still sign in to their own accounts) and your own product analytics.
+Every company brings its own keys for every third-party API, AI models and connectors alike, with no exceptions: each one connects its own Claude, OpenAI, Gemini, Mistral, Geonode, Apollo or DataForSEO account on the [Connectors](/docs/integrations/connectors/) page. Outflare never lends a key of its own, and neither does your server. At start-up the engine removes vendor keys such as `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY` or `GOOGLE_APPLICATION_CREDENTIALS` from its environment and logs which it ignored, so setting one does nothing. The only third-party settings above are for running Outflare itself: account email, OAuth app ids (people still sign in to their own accounts) and your own product analytics.
 
 ## Rotating the secret key
 
@@ -74,7 +74,7 @@ Off by default. Set `OUTFLARE_POSTHOG_KEY` to a PostHog **project** key and Outf
 
 - The browser only talks to your server. `/ingest/` forwards to PostHog and strips your session cookie and API tokens on the way.
 - Signed-in people are identified by their Outflare user id, email and name (on the PostHog person, never on events), and grouped by workspace.
-- Customer data stays out. All page text, inputs and element attributes are masked in autocapture and replays. URLs keep only the page (`/:ws/sequences/:item`), never workspace names, ids, domains, invite tokens or query strings other than UTM tags.
+- Customer data stays out. All page text, inputs and element attributes are masked in autocapture and replays. URLs keep only the page (`/:ws/sequences/:item`), never company names, ids, domains, invite tokens or query strings other than UTM tags.
 - Signing out resets the identity on that browser.
 
 `GET /v1/meta` includes `product_analytics` while it's on. PostHog keeps an anonymous id in a first-party cookie, so if your users need to consent to that, add your own banner or leave this off.

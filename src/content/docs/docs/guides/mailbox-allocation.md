@@ -41,11 +41,11 @@ When a sequence is still short, its Mailboxes card says by how much and why, for
 
 A **sender** is who a mailbox sends as: a **person**, a **persona**, or a **shared** identity such as "Acme Partnerships". Senders belong to one or more teams, or to none (shared). **Teams** own sequences and senders.
 
-You confirm which sender each mailbox is; Outflare never guesses. Name a sender exactly like its mailboxes' display name and Teams & senders offers to confirm the matches in one click. A workspace without teams shares every mailbox and needs no senders at all. Once you add teams, a mailbox without a confirmed sender isn't allocated.
+You confirm which sender each mailbox is; Outflare never guesses. Name a sender exactly like its mailboxes' display name and Teams & senders offers to confirm the matches in one click. A company without teams shares every mailbox and needs no senders at all. Once you add teams, a mailbox without a confirmed sender isn't allocated.
 
 ## Automatic or suggest
 
-In **automatic** mode, the default, changes happen straight away and show under **Allocation** with their reasons. In **suggest** mode they wait for someone to apply them. Set the mode for the workspace, override it for a team, or for one sequence.
+In **automatic** mode, the default, changes happen straight away and show under **Allocation** with their reasons. In **suggest** mode they wait for someone to apply them. Set the mode for the company, override it for a team, or for one sequence.
 
 ## Pausing, locks and doing it by hand
 

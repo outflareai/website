@@ -23,7 +23,7 @@ Outflare remembers the business, not the conversation.
 Chat transcripts are never stored. When you tell an agent something lasting, it saves it as a one-line memory and tells you, so you can correct it. Memories are notes for agents, never permissions: your limits, token scopes and the send policy still decide what runs.
 
 
-If you market several brands from one workspace, each [brand](/docs/guides/brands/) adds its own context and memories on top of the company's. Agents ask for a brand with `get_context` and `brand`, and read only that brand's memories plus the company's.
+If you market several brands from one company, each [brand](/docs/guides/brands/) adds its own context and memories on top of the company's. Agents ask for a brand with `get_context` and `brand`, and read only that brand's memories plus the company's.
 
 ## The Company page
 
@@ -35,7 +35,7 @@ Until the company name, what you do, goals and voice are filled in, agents ask f
 
 ## In Claude, ChatGPT and Cursor
 
-The MCP server tells every agent to start with `get_context`. One call returns the company context, pinned and recent memories, your brands and the workspace status. The agent asks only for what is missing, saves your answers with `update_context`, and saves anything lasting you say with `remember`.
+The MCP server tells every agent to start with `get_context`. One call returns the company context, pinned and recent memories, your brands and the company status. The agent asks only for what is missing, saves your answers with `update_context`, and saves anything lasting you say with `remember`.
 
 Try these in any connected client:
 
@@ -47,7 +47,7 @@ Outflare's own mission agent reads the same context and pinned memories every tu
 
 ## What is blocked, and who fixes it
 
-`get_status` (and `GET /v1/workspaces/{ws}/status`) lists everything stopping the workspace, worst first:
+`get_status` (and `GET /v1/workspaces/{ws}/status`) lists everything stopping the company, worst first:
 
 | Blocker | Who acts |
 | --- | --- |

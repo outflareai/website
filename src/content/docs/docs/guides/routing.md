@@ -19,7 +19,7 @@ A rule has:
 - who it is about: **companies** (`account`) or **people** (`person`);
 - up to five **conditions** on the record's fields, the same tests [rules](/docs/guides/rules/) and [scores](/docs/guides/scores/) use: `company_size` `gt` `200`, `country` `eq` `DE`, `scores.fit_band` `eq` `high`. With several, `match` says whether `all` must hold or `any`. A rule with no conditions and no territory takes every record of its type: keep one last as the catch-all, so nobody is left without an owner;
 - a **territory**, when it should keep to one: `countries`, a list of two-letter country codes (`["DE", "FR"]`). The rule then takes only records whose Country field is one of them. A record with no country is in no territory, so a rule further down gets it;
-- a **pool**: who gets what the rule takes. Either a list of one to 50 workspace members (`members`), or a team (`team_id`, from the workspace's teams). With one member, everything goes to them. With several, each record goes to whoever owns the fewest of the brand's records at that moment; on a tie, the member listed first. A team's pool is whoever is in the team when the record is routed, so a new teammate starts getting records by being added to the team, with nothing to change in the rules;
+- a **pool**: who gets what the rule takes. Either a list of one to 50 company members (`members`), or a team (`team_id`, from the company's teams). With one member, everything goes to them. With several, each record goes to whoever owns the fewest of the brand's records at that moment; on a tie, the member listed first. A team's pool is whoever is in the team when the record is routed, so a new teammate starts getting records by being added to the team, with nothing to change in the rules;
 - a **status**: a `paused` rule is skipped.
 
 A brand keeps up to 50 rules. The list is saved whole, in order:
@@ -57,4 +57,4 @@ Someone with nothing set is always at work and has no limit. Among the people wh
 
 ## What it doesn't do
 
-Routing never takes a record from its owner by itself, and it doesn't rebalance: when a teammate joins a pool they get new records until they have as many as the others. A member who leaves the workspace is skipped; when a rule's whole pool has left, or its team is empty or has been deleted, its records stay without an owner and the page says so.
+Routing never takes a record from its owner by itself, and it doesn't rebalance: when a teammate joins a pool they get new records until they have as many as the others. A member who leaves the company is skipped; when a rule's whole pool has left, or its team is empty or has been deleted, its records stay without an owner and the page says so.

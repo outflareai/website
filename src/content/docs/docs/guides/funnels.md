@@ -9,7 +9,7 @@ sidebar:
 
 A **funnel** shows how many people got through each step of a journey, where the rest dropped off and how long each step took. For example: clicks on your Google ads, then website visitors from those ads, then sign-ups, then a first purchase within 3 days of signing up.
 
-In the app, open **Analytics** in the sidebar, then **Funnels**. Funnels run inside Outflare and call no third-party service. They work from the visits [website tracking](/docs/guides/website-tracking/) records, the events your workspace sends or syncs, your [conversions](/docs/guides/attribution/), [payments](/docs/guides/transactions/) and, for the ad clicks bar, the numbers your connected ad accounts report.
+In the app, open **Analytics** in the sidebar, then **Funnels**. Funnels run inside Outflare and call no third-party service. They work from the visits [website tracking](/docs/guides/website-tracking/) records, the events your company sends or syncs, your [conversions](/docs/guides/attribution/), [payments](/docs/guides/transactions/) and, for the ad clicks bar, the numbers your connected ad accounts report.
 
 ## People, not events
 
@@ -100,7 +100,7 @@ Choose a moving date range, such as the last 30 days, and a saved funnel stays c
 
 ## Who can do what
 
-Everyone in the workspace can run funnels and the comparison (`analytics.read`); seeing the people behind a step needs `customers.read`, and saving them as a list `customers.manage`. Owners, admins and operators can save, change and delete funnels (`analytics.manage`).
+Everyone in the company can run funnels and the comparison (`analytics.read`); seeing the people behind a step needs `customers.read`, and saving them as a list `customers.manage`. Owners, admins and operators can save, change and delete funnels (`analytics.manage`).
 
 ## For agents and scripts
 

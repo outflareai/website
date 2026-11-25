@@ -39,9 +39,9 @@ Because jobs are enqueued in the same transaction as the write that caused them,
 
 `api/openapi.yaml` describes every endpoint, and the running server serves it at `/v1/openapi.yaml` ([ADR 4](https://github.com/outflareai/outflare/blob/main/docs/adr/0004-openapi-contract.md)). The web app has no private API: it uses the same TypeScript SDK you can use, generated from that file. CI fails if the SDK types drift from the spec. The [endpoint reference](/docs/api/reference/) on this site is generated from it too.
 
-## Workspaces isolate everything
+## Companies isolate everything
 
-Every row a workspace owns carries its `workspace_id`, and every query filters by it. A request for a workspace you cannot see returns `404`, so its existence is not leaked. People have a role in each workspace, and API tokens are bound to one workspace with explicit scopes. See [Workspaces and access](/docs/guides/workspaces-and-access/).
+Every row a company owns carries its `workspace_id`, and every query filters by it. A request for a company you cannot see returns `404`, so its existence is not leaked. People have a role in each company, and API tokens are bound to one company with explicit scopes. See [Companies and access](/docs/guides/workspaces-and-access/).
 
 ## Everything is audited
 
@@ -49,7 +49,7 @@ Every significant action writes an audit event in the same transaction as the ch
 
 ## One policy check on every send
 
-Every outbound email will pass through a single policy check: suppression, unsubscribes, mailbox daily limits and workspace rules. There is no code path that sends around it. See [The policy check](/docs/concepts/policy-check/).
+Every outbound email will pass through a single policy check: suppression, unsubscribes, mailbox daily limits and company rules. There is no code path that sends around it. See [The policy check](/docs/concepts/policy-check/).
 
 ## Treat external content as data
 

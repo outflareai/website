@@ -9,7 +9,7 @@ sidebar:
 
 A **trend** is any number over time: website visits, sign-ups, people who did something, revenue, your ad networks' clicks and spend, by day, week or month. Put several on one chart, split them by campaign or country, and work out a number between them, such as cost per sign-up.
 
-In the app, open **Analytics** in the sidebar, then **Trends**. Trends run inside Outflare and call no third-party service. They work from the visits [website tracking](/docs/guides/website-tracking/) records, the events your workspace sends or syncs, your [conversions](/docs/guides/attribution/), [payments](/docs/guides/transactions/) and the daily numbers your connected ad accounts report.
+In the app, open **Analytics** in the sidebar, then **Trends**. Trends run inside Outflare and call no third-party service. They work from the visits [website tracking](/docs/guides/website-tracking/) records, the events your company sends or syncs, your [conversions](/docs/guides/attribution/), [payments](/docs/guides/transactions/) and the daily numbers your connected ad accounts report.
 
 ## Series
 
@@ -67,7 +67,7 @@ Under a saved trend, **Alert on this number** sets a line: when the number **goe
 
 ## Who can do what
 
-Everyone in the workspace can run trends (`analytics.read`). Owners, admins and operators can save, change and delete them (`analytics.manage`).
+Everyone in the company can run trends (`analytics.read`). Owners, admins and operators can save, change and delete them (`analytics.manage`).
 
 ## For agents and scripts
 

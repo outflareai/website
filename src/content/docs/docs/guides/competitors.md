@@ -22,7 +22,7 @@ In the app, open **Competitors** under **Company**: **Overview** ranks you again
 - **Tracked.** Select **Yes** on a suggestion, or type one or several domains, separated by commas, at the top of the page and select **Add**. There is no limit. A competitor with a website that you add to an AI visibility cohort is tracked here too.
 - **Dismissed.** A dismissed suggestion stays away when the connection suggests it again. Removing a competitor instead deletes it with its history, and the connection may suggest it again.
 
-When your workspace has a customer record with the competitor's domain, the competitor is linked to it.
+When your company has a customer record with the competitor's domain, the competitor is linked to it.
 
 **Name it** in a competitor's menu to give it a name and the other names it goes by, such as a short name AI answers use. Agents set them with `update_seo_competitor`.
 

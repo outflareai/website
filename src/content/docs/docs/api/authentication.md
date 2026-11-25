@@ -39,7 +39,7 @@ Rules that keep tokens safe to hand to automation:
 - A `403` for a missing scope says how to get it, with a link to the token (or, for a connected AI app, to its switches).
 - Revoke a token with `DELETE /v1/workspaces/{ws}/api-tokens/{id}`. List active tokens, with when each was last used and who created it (`created_by`, the person's id and name, or `null` when another token or an agent made it), with `GET /v1/workspaces/{ws}/api-tokens`.
 
-See [Workspaces and access](/docs/guides/workspaces-and-access/#api-tokens) for the list of scopes.
+See [Companies and access](/docs/guides/workspaces-and-access/#api-tokens) for the list of scopes.
 
 ## Session cookie
 

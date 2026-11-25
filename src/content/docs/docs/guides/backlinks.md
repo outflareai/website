@@ -76,7 +76,7 @@ Once something is marked, **Download disavow file** gives you the text file for 
 
 ## Link opportunities on the fixes list
 
-Each weekly read, and each review, puts what is worth doing about a site's links on the workspace's [fixes list](/docs/guides/site-audits/#the-fixes-list), next to the site audit's fixes:
+Each weekly read, and each review, puts what is worth doing about a site's links on the company's [fixes list](/docs/guides/site-audits/#the-fixes-list), next to the site audit's fixes:
 
 | Fix | One per | When |
 | --- | --- | --- |

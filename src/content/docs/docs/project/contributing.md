@@ -22,7 +22,7 @@ The open-source engine is published at [outflareai/outflare](https://github.com/
 
 ## Rules every change follows
 
-- Every table a workspace owns has `workspace_id`, and every query on it filters by workspace.
+- Every table a company owns has `workspace_id`, and every query on it filters by company.
 - Every significant action writes an audit event in the same transaction as the change.
 - Side effects such as sending mail or calling providers run in jobs, never in request handlers.
 - Every outbound email passes the policy check. There is no code path around it.
