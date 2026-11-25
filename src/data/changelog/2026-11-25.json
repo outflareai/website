@@ -2,7 +2,7 @@
 	"version": "2026.11.25",
 	"date": "2026-11-25",
 	"status": "in-progress",
-	"updated": "2026-11-25T00:20:46Z",
+	"updated": "2026-11-25T00:35:42Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -10,7 +10,14 @@
 			"edition": "open-source",
 			"text": "Discovery shows two more channels a company can be reached on, QQ and WeChat, in a lane's companies and on the Channels page; a QQ number or a WeChat id with no link is shown as text.",
 			"at": "2026-11-25T00:20:46Z"
+		},
+		{
+			"kind": "fix",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Sales AI fields in My sequences: a company site typed on a form, or a second company address, is read; a site that can't be read uses the fallback and is tried again after a day; you can write your own when one fails. Models that think first have room: up to about 12 US cents a sentence and $12 per rep per day at a limit of 100 on Claude Opus 5.5 (calculated, not measured).",
+			"at": "2026-11-25T00:35:42Z"
 		}
 	],
-	"through": "09ff536+09ff536"
+	"through": "92ea221+92ea221"
 }
