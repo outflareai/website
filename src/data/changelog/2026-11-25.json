@@ -2,7 +2,7 @@
 	"version": "2026.11.25",
 	"date": "2026-11-25",
 	"status": "in-progress",
-	"updated": "2026-11-25T19:37:32Z",
+	"updated": "2026-11-25T21:14:58Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -213,7 +213,14 @@
 			"edition": "open-source",
 			"text": "First messages: a new page shows the first message of every campaign in your connected sequencer, where you can edit its subject and text so everyone added from then on gets it, and restore an earlier version (saving works with EmailBison today; other sequencers' campaigns are listed read-only).",
 			"at": "2026-11-25T19:37:32Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "The lead finder page says when a run waits for your AI account: out of credits, calls that keep failing, or a rate limit, each with what to do, instead of calling it a full campaign.",
+			"at": "2026-11-25T21:14:58Z"
 		}
 	],
-	"through": "3e69cfb+3e69cfb"
+	"through": "a42a45e+a42a45e"
 }
