@@ -21,8 +21,8 @@ Reddit, news and competitor scans read only what your other features already fou
 | --- | --- |
 | Reddit | Your brand's [Reddit watches](/docs/guides/reddit/). |
 | News | Your brand's [news searches](/docs/guides/news-watch/), which run on your own Geonode account. |
-| Videos, podcasts and forums | The pages your [competitor scans](/docs/guides/competitors/) found naming a tracked competitor: YouTube videos, podcast episodes, X, Hacker News and Bluesky posts, and forum threads. |
-| YouTube | Your own Geonode connection, which searches YouTube for your brand and each competitor, then reads each new video's page and captions. Searches and pages use your Geonode tokens. |
+| Videos, podcasts and forums | The pages your [competitor scans](/docs/guides/competitors/) found naming a tracked competitor: YouTube videos, podcast episodes, X, Hacker News and Bluesky posts, and forum threads. YouTube videos from them show only while YouTube is on too, because Outflare needs to read each video to know whose channel it is. |
+| YouTube | Your own Geonode connection, which searches YouTube for your brand and each competitor, then reads each new video's page and captions; your own [Filmot](https://filmot.com) key, which searches what videos say; or both. Geonode searches and pages use your Geonode tokens, Filmot searches your Filmot credits. |
 | Podcasts | Your own [Podcast Index](https://podcastindex.org) key. Podcast Index is an open directory of every public podcast, and its key is free: make one at api.podcastindex.org and connect it under **Connectors**. |
 
 **Sources** shows each one with a switch, and **Set up** takes you to what feeds it when nothing does yet. YouTube and Podcasts stay off until you turn them on there.
@@ -30,6 +30,8 @@ Reddit, news and competitor scans read only what your other features already fou
 ### YouTube
 
 Each scan looks for videos from the last month that name your brand or a competitor. A name in a video's title or description is a mention straight away. Outflare then reads each new video once: who made it, its views, when it was published, and its captions. Each name said in the captions is a mention with the words around it and the second it was said, so the link starts the video right there.
+
+With Filmot connected, each scan also searches what YouTube videos say, so a video that names you only out loud is found too, with its channel, views and the second each name is said. Make an API key at filmot.com/api-keys and connect it under **Connectors**; each search uses 5 of your Filmot credits. If you keep one language, only captions in that language are searched.
 
 ### Podcasts
 
@@ -43,6 +45,10 @@ Many shows publish no transcript, so a name said only aloud is in neither the ti
 - the newest episodes of shows that named your brand or a competitor before, so a show that talked about you once is listened to again.
 
 Each name said is then a mention with the words around it and the second it was said. It's off until you pick a connection. [Groq](https://console.groq.com) runs open-source Whisper models and its free plan covers a few hours of audio a day, with no card: make a key under **API Keys** in the Groq console and connect it under **Connectors**. Above the free plan's limits Groq bills your own account by the second, and an episode that hits a limit is tried again later.
+
+## Languages
+
+Mentions keep every language until you pick some. Under **Sources → Languages**, tick the ones you want, such as English only. Mentions in other languages are then hidden, and podcasts in other languages aren't listened to. Outflare tells a mention's language from its words and, for a podcast, the show's own language; one too short to tell is kept. Hidden mentions aren't deleted: untick everything (or **Keep every language**) and they come back.
 
 ## What it listens for
 
@@ -64,7 +70,7 @@ A video a competitor posts on its own channel names it, but nobody else is talki
 
 **Mentions** lists each one with where it was said (a video's thumbnail and title, the channel or show with a link, and its views), the quote with the name marked and the second it was said, when, a score from 0 to 100 and its status. Filter by who was named (your brand or a competitor), source, competitor and status. The score is a first sort: a competitor mention, a bigger audience, a video or episode and a fresh one rank higher.
 
-Open one to watch a video from the second the name is said, read and copy the quote, see why it scores what it does, and open the channel or show. **Next step** moves it along: **Contacted**, **Replied**, **On board** or **Not a fit**.
+Open one to watch a video from the second the name is said, read and copy the quote, see why it scores what it does, and open the channel or show. A podcast mention shows the show with its artwork, the episode with its date, length and show notes, a player that starts where the name is said, and links to find it on Apple Podcasts, Spotify, YouTube and Podcast Index, the episode's own page and the show's RSS feed. **Next step** moves it along: **Contacted**, **Replied**, **On board** or **Not a fit**.
 
 **Creators** puts each person's mentions together, once per channel, with how often and about whom they talk.
 
