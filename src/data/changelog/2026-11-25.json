@@ -2,7 +2,7 @@
 	"version": "2026.11.25",
 	"date": "2026-11-25",
 	"status": "in-progress",
-	"updated": "2026-11-25T17:46:02Z",
+	"updated": "2026-11-25T18:22:26Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -185,7 +185,28 @@
 			"edition": "open-source",
 			"text": "The app now calls a workspace a company: settings, menus, members, brands and messages say \"company\". Nothing else changes, and the API still names it a workspace.",
 			"at": "2026-11-25T17:14:33Z"
+		},
+		{
+			"kind": "fix",
+			"area": "agents",
+			"edition": "open-source",
+			"text": "A change an AI app connected with OAuth left waiting for approval now runs when a person approves it hours later, as long as the app is still connected and the person who connected it still has access. Before, it failed once the app's short-lived access token had run out.",
+			"at": "2026-11-25T18:22:26Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "Each brand's page now shows its brand ID with a copy button, and the API panel on every page shows the picked brand's ID next to the workspace ID, so you can copy it straight into an API call or integration.",
+			"at": "2026-11-25T18:22:26Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Paid ads has a Search terms tab: every search that showed your ads, with its campaign, ad group, status, cost and its own purchases and lifetime value, filters on every column, and bulk exclude to an ad group, a campaign or a Google Ads exclusion list. Exclusion lists can be made, renamed and edited in Outflare, and every change waits for Save.",
+			"at": "2026-11-25T18:22:26Z"
 		}
 	],
-	"through": "e42bdc9+e42bdc9"
+	"through": "dbc437a+dbc437a"
 }
