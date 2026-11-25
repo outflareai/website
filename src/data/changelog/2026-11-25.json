@@ -1,0 +1,72 @@
+{
+	"version": "2026.11.25",
+	"date": "2026-11-25",
+	"status": "in-progress",
+	"updated": "2026-11-25T11:08:50Z",
+	"items": [
+		{
+			"kind": "improvement",
+			"area": "outreach",
+			"edition": "open-source",
+			"text": "Discovery shows two more channels a company can be reached on, QQ and WeChat, in a lane's companies and on the Channels page; a QQ number or a WeChat id with no link is shown as text.",
+			"at": "2026-11-25T00:20:46Z"
+		},
+		{
+			"kind": "fix",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Sales AI fields in My sequences: a company site typed on a form, or a second company address, is read; a site that can't be read uses the fallback and is tried again after a day; you can write your own when one fails. Models that think first have room: up to about 12 US cents a sentence and $12 per rep per day at a limit of 100 on Claude Opus 5.5 (calculated, not measured).",
+			"at": "2026-11-25T00:35:42Z"
+		},
+		{
+			"kind": "launch",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Bring a WhatsApp or Telegram conversation into a person's history: paste the messages, add the exported file or upload screenshots, check and correct every message, and save it. Exports are read for free; screenshots are read by your own AI, with the cost shown first.",
+			"at": "2026-11-25T01:41:09Z"
+		},
+		{
+			"kind": "launch",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Sales managers get a Team report: for any period, how many leads came in and from where, who saw, opened, was assigned, messaged or passed on what, and which leads nobody has touched, with the list behind every number. It replaces Team activity for managers and counts assignments for who received them.",
+			"at": "2026-11-25T02:12:55Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "What support hands to sales is now marked New until you have seen or opened it, beside New conversations in Sales and with a dot in Support and the Inbox. Each row says who on the team saw it and when they opened it.",
+			"at": "2026-11-25T02:42:24Z"
+		},
+		{
+			"kind": "fix",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Conversions now go to your ad platforms within minutes even while a large import of past events is running. Past events sent late also no longer queue lifecycle and metric work they can't change, so imports finish faster.",
+			"at": "2026-11-25T10:13:55Z"
+		},
+		{
+			"kind": "fix",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "The Owner column on the partners list shows the owner's name again. For a teammate who was in your staff list before they had a sign-in, it showed an id instead.",
+			"at": "2026-11-25T10:28:24Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Paid ads, Payback: the Day to day chart shows what each day's ad spend brought back as a percent of that day's spend, with a line at 100% for a day that paid for itself, or as amounts over bars of spend. Hover a day to see every number for it. A line with no numbers yet says so.",
+			"at": "2026-11-25T11:08:50Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Each role now opens on its own page, with a level per area and the single permissions inside it. Adding people to teams (`teams.members`), editing teams (`teams.manage`) and resetting someone's two-factor (`members.two_factor`) are permissions of their own; roles and API tokens that could do these before keep them.",
+			"at": "2026-11-25T11:08:50Z"
+		}
+	],
+	"through": "d1ed459+d1ed459"
+}

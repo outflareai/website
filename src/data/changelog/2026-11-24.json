@@ -1,8 +1,8 @@
 {
 	"version": "2026.11.24",
 	"date": "2026-11-24",
-	"status": "in-progress",
-	"updated": "2026-11-24T15:38:57Z",
+	"status": "final",
+	"updated": "2026-11-25T00:20:46Z",
 	"items": [
 		{
 			"kind": "fix",
@@ -115,7 +115,119 @@
 			"edition": "open-source",
 			"text": "SEO overview has a Conversion view: organic landing pages compared with the rest of their template, with the sign-ups and revenue each would add at the template's median, and its page speed, scroll depth, clicks, heatmap and session recordings beside it, so you can fix the pages that already get traffic but don't convert.",
 			"at": "2026-11-24T15:38:57Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "social",
+			"edition": "open-source",
+			"text": "The Mentions table has an Added column showing when each mention was found, next to when it was said, and lists the newest finds first.",
+			"at": "2026-11-24T16:11:08Z"
+		},
+		{
+			"kind": "launch",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Sales emails can now be formatted: bold, italics, bulleted and numbered lists, and a link on a word, in the reply box, the first email, templates and sequence steps. The person gets it formatted, with a plain-text version for mail apps that show text only. Emails nobody formats are sent exactly as before.",
+			"at": "2026-11-24T16:11:08Z"
+		},
+		{
+			"kind": "fix",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Adding someone to a Sales conversation no longer lets a reply reach them when they are on your blocklist, and everyone copied on a reply passes the full opt-out check. Someone taken off a conversation no longer gets a copy that was already queued.",
+			"at": "2026-11-24T18:15:07Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "inbox",
+			"edition": "open-source",
+			"text": "When your knowledge has no answer to a customer's question, the support assistant now also looks in the docs, issues and tasks of your connected Linear, Notion and ClickUp, read only, and suggests what it finds in Knowledge for you to approve. Switch it off per brand in Support settings.",
+			"at": "2026-11-24T18:23:40Z"
+		},
+		{
+			"kind": "launch",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Owners can close a whole module, such as Support or Finances, to everyone but owners, or open it to chosen roles and teams to view or edit, under Settings, Members, Module access. A closed module is gone for everyone else, and for the agents and API keys they made.",
+			"at": "2026-11-24T18:23:40Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "A partner's page now lets you add, change or remove its company. Companies get their logo from their own website, shown on partners, pipeline boards and deal boards. Owner dropdowns show each person's picture, every card and link opens in a new tab with Ctrl or Cmd, and Ask AI opens the agent's chat beside the partner where your server runs an agent.",
+			"at": "2026-11-24T18:23:40Z"
+		},
+		{
+			"kind": "fix",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "When a rep emails someone added to a Sales conversation in a separate thread, replies and sequence emails in the conversation keep going to the conversation's own person.",
+			"at": "2026-11-24T19:10:41Z"
+		},
+		{
+			"kind": "launch",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "New goals, projects and tasks open with a \"Describe it\" box: type it in a sentence and your own AI model fills in the form for you to check. Every date now follows one format, set for the company under Settings, General, with a personal choice under Your account.",
+			"at": "2026-11-24T19:39:23Z"
+		},
+		{
+			"kind": "fix",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "In a Sales conversation with people added to it, emails its own person isn't on no longer decide who replies and sequence emails go to or what they answer, including in conversations already affected. AI drafts are told who sent each message and leave those emails out.",
+			"at": "2026-11-24T21:17:38Z"
+		},
+		{
+			"kind": "launch",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "SEO overview has an AI crawlers view: which AI crawlers each site's robots.txt lets in, any newly blocked since the last crawl, llms.txt and content-use signals, and your key pages with what keeps each from AI answers, such as a blocked AI search crawler or content shown only with JavaScript.",
+			"at": "2026-11-24T21:17:38Z"
+		},
+		{
+			"kind": "launch",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "SEO overview has a Google updates view: each Google ranking update of the last year against your search clicks before and after, by page template, with the pages that won and lost and the domains that moved in your tracked top 10, plus the weeks clicks fell, marked as during an update or not, so you can tell Google's change from your own.",
+			"at": "2026-11-24T21:17:38Z"
+		},
+		{
+			"kind": "launch",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "SEO overview has an Indexing view: every page Outflare knows grouped by template and language, how many are in a sitemap, can be indexed and are indexed, why the rest aren't in Google's own words, which pages fell out of the index this week, and the 30-day trend.",
+			"at": "2026-11-24T21:17:38Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "connectors",
+			"edition": "open-source",
+			"text": "You can now save an MCP server connection before its server is switched on, one key at a time: it shows as not connected, with the HTTP status as the reason, until the server answers. Its address is sealed like a key.",
+			"at": "2026-11-24T21:51:36Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Sales conversations count as seen when they were really on your screen or you opened them, with nothing to click: New labels and unread numbers clear for you alone. Each conversation says who saw it and when they opened it, and Team activity counts seen, opened and copied.",
+			"at": "2026-11-24T22:58:00Z"
+		},
+		{
+			"kind": "launch",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Recruitment: keep the jobs you hire for, each with its own questions and pipeline, take applications in from your careers page or hiring agent over the API, and move candidates through stages with a full history. Access is per job, and candidates only ever see the status wording you choose.",
+			"at": "2026-11-24T23:22:57Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Sales: \"Qualified: hand over to an AE\" replaces the introduction email. One step makes the account manager the owner, marks the conversation Good and stops its sequence, with nothing sent to the lead. The mark also counts in the quality numbers per source. The SDR can take it back while the account manager still has it.",
+			"at": "2026-11-24T23:44:35Z"
 		}
 	],
-	"through": "e47a6fa+e47a6fa"
+	"through": "dfc8592+dfc8592"
 }

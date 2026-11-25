@@ -23,7 +23,7 @@ Choose a [brand](/docs/guides/brands/), then open **Partnerships**. Each tab has
 
 ## The partner CRM
 
-Partnerships opens on **Partners**, with **All partners**: one list of every partner in every pipeline. Search it, filter it by owner, and sort it by pipeline, stage or when it last changed. Partners use the same companies, people and emails as your [customer records](/docs/guides/customer-records/), so a company you sell to and partner with is one company, not two.
+Partnerships opens on **Partners**, with **All partners**: one list of every partner in every pipeline. Search it, filter it by owner, and sort it by pipeline, stage or when it last changed. Each partner shows its company's logo, and each owner their picture. Partners use the same companies, people and emails as your [customer records](/docs/guides/customer-records/), so a company you sell to and partner with is one company, not two.
 
 ### Pipelines
 
@@ -50,7 +50,21 @@ Below that are six tabs:
 | **Notes** | Notes your team wrote about the partner. |
 | **People** | The people at the partner's company. Add one you already have, paste several new ones, or remove one. Choose which one is the main contact. |
 
-The side column shows every field of the partner, which you edit in place, its company, its people, and the other pipelines and deals the same company is in.
+The side column shows every field of the partner, which you edit in place, its company, its people, and the other pipelines and deals the same company is in. A field that holds several web addresses shows each one as its own link.
+
+Under **Company** you edit the company's website, industry, size, country and LinkedIn page in place. **Change company** swaps it for another one: search the companies you have, or type a new name to add one. **Remove** takes the company off the partner, and **Add a company** puts one on a partner that has none.
+
+### Company logos
+
+Outflare finds a company's logo by reading the company's own website, and saves it on the company as its **Logo** field. It needs no connection. The logo then shows wherever the company does: on the partner's page, in the lists, on pipeline boards and on the deal boards in CRM. It appears shortly after you first see the company. To use another picture, put its address in the company's Logo field; Outflare never replaces one you set. A company with no logo shows the first letter of its name.
+
+### Opening things in a new tab
+
+Every partner, card, person and link is a real link. Hold Ctrl (Cmd on a Mac) and click, or click with the middle button, to open it in a new tab.
+
+### Ask AI
+
+<span class="pill cloud">Outflare Cloud</span> **Ask AI** on a partner's page opens the [brand agent](/docs/agents/brand-agent/) in a bar on the right, with four questions ready to click: what the status is, what you need to do, what the blockers are, and a catch-up. You can also type your own. The agent reads the partner's emails, chats, tasks and notes and answers there, on your own AI account.
 
 An email is kept on the person it was with. The partner's page gathers the emails of everyone at the company, so a conversation with one person there shows on the partner too, and your [email sharing rules](/docs/guides/crm-email/) still decide who can read each one. Emails and chats come from your own connected accounts: connect your own Gmail, Telegram or Slack under [connectors](/docs/integrations/connectors/), and each tab stays empty until you do.
 
