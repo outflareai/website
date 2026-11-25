@@ -12,11 +12,13 @@ const liveConnectors = integrations.filter((i) => i.status === 'available').leng
 // Real screenshots of the web app (outflare web/), taken from a local demo
 // workspace where every name and domain is fictional (.example).
 const shots = [
-	{ id: 'home', label: 'Home', alt: 'Home: visits and first payments for the last 28 days against the period before, and For you today, with a sending domain to fix, possible duplicate people and unread replies' },
-	{ id: 'dashboards', label: 'Dashboards', alt: 'Dashboards: a Management report with revenue and new customers by month, both growing over the last year' },
+	{ id: 'agents', label: 'Agents', alt: 'Agents: four changes an agent asks to make wait for approval, each with its reason: a drafted reply to a lead, and a new partnership prospect, with Approve and Reject' },
+	{ id: 'home', label: 'Home', alt: 'Home: visits, sign-ups and first payments for the last 28 days against the period before, and For you today, with a sending domain to fix, possible duplicate people and unread replies' },
+	{ id: 'dashboards', label: 'Analytics', alt: 'Analytics: a Management report dashboard with revenue and new customers by month, both growing over the last year' },
+	{ id: 'funnels', label: 'Funnels', alt: 'Funnels: of 679 people who signed up in 90 days, 58% started a trial, 28% made a report and 10% made a first payment, with the biggest drop named' },
+	{ id: 'customer', label: 'Customers', alt: 'Customers: one person\'s record, with her owner, company, open deals, what she paid in the last 30 days, and the account plan: goal, next step, hesitations and limits' },
+	{ id: 'events', label: 'Events', alt: 'Events: every event the product sends, such as Report created, Signed up and Trial started, with what it means, how often it happened and how many people did it in the last 30 days' },
 	{ id: 'partnerships', label: 'Partnerships', alt: 'Partnerships: every partner across the sponsorship, SEO and integration pipelines, with its stage, owner and next step' },
-	{ id: 'inbox-item', label: 'Inbox', alt: 'Inbox: replies from every mailbox in one list, with one conversation open and a reply box sending from the same address' },
-	{ id: 'deals', label: 'CRM', alt: 'CRM: the deals board, with deals for each company by stage, from lead to proposal, with their value' },
 	{ id: 'money', label: 'Money', alt: 'Money: money in, money out, profit and margin for this month across every brand, and money in and out for each of the last 12 months' },
 	{ id: 'seo', label: 'SEO', alt: 'SEO overview: organic revenue, payments, sign-ups and search clicks for today, yesterday, the month so far, its forecast and last month, each against the period before' },
 ];
