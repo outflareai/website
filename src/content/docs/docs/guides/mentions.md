@@ -22,7 +22,7 @@ Reddit, news and competitor scans read only what your other features already fou
 | Reddit | Your brand's [Reddit watches](/docs/guides/reddit/). |
 | News | Your brand's [news searches](/docs/guides/news-watch/), which run on your own Geonode account. |
 | Videos, podcasts and forums | The pages your [competitor scans](/docs/guides/competitors/) found naming a tracked competitor: YouTube videos, podcast episodes, X, Hacker News and Bluesky posts, and forum threads. YouTube videos from them show only while YouTube is on too, because Outflare needs to read each video to know whose channel it is. |
-| YouTube | Your own Geonode connection, which searches YouTube for your brand and each competitor, then reads each new video's page and captions. Searches and pages use your Geonode tokens. |
+| YouTube | Your own Geonode connection, which searches YouTube for your brand and each competitor, then reads each new video's page and captions; your own [Filmot](https://filmot.com) key, which searches what videos say; or both. Geonode searches and pages use your Geonode tokens, Filmot searches your Filmot credits. |
 | Podcasts | Your own [Podcast Index](https://podcastindex.org) key. Podcast Index is an open directory of every public podcast, and its key is free: make one at api.podcastindex.org and connect it under **Connectors**. |
 
 **Sources** shows each one with a switch, and **Set up** takes you to what feeds it when nothing does yet. YouTube and Podcasts stay off until you turn them on there.
@@ -30,6 +30,8 @@ Reddit, news and competitor scans read only what your other features already fou
 ### YouTube
 
 Each scan looks for videos from the last month that name your brand or a competitor. A name in a video's title or description is a mention straight away. Outflare then reads each new video once: who made it, its views, when it was published, and its captions. Each name said in the captions is a mention with the words around it and the second it was said, so the link starts the video right there.
+
+With Filmot connected, each scan also searches what YouTube videos say, so a video that names you only out loud is found too, with its channel, views and the second each name is said. Make an API key at filmot.com/api-keys and connect it under **Connectors**; each search uses 5 of your Filmot credits. If you keep one language, only captions in that language are searched.
 
 ### Podcasts
 
