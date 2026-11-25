@@ -9,7 +9,7 @@ sidebar:
 
 **Paths** show where people actually go. Start from a page or an event (everyone who landed on the pricing page), or work back from one (everyone who paid), and see the pages they viewed and the things they did at each step, how many took each route, and where they stopped. Funnels check the route you expect; paths show the routes people take.
 
-In the app, open **Analytics** in the sidebar, then **Paths**. Paths run inside Outflare and call no third-party service. They work from the page views [website tracking](/docs/guides/website-tracking/) records and the events your workspace sends or syncs.
+In the app, open **Analytics** in the sidebar, then **Paths**. Paths run inside Outflare and call no third-party service. They work from the page views [website tracking](/docs/guides/website-tracking/) records and the events your company sends or syncs.
 
 ## Ask it
 
@@ -31,7 +31,7 @@ Save a question for everyone in the brand with a name; it keeps only the questio
 
 ## Who can do what
 
-Everyone in the workspace can run paths (`analytics.read`). Owners, admins and operators can save, change and delete questions (`analytics.manage`).
+Everyone in the company can run paths (`analytics.read`). Owners, admins and operators can save, change and delete questions (`analytics.manage`).
 
 ## For agents and scripts
 

@@ -7,7 +7,7 @@ sidebar:
 
 <span class="pill shipped">Shipped</span> The email finder proposes a likely work email for a person at a company, and checks whether an address is good to send to. It learns the address shape each company uses from your own contacts and their verification results, so it works best on companies you already have people at. Finding is free; checking an address uses your own connected verifier only when it has to.
 
-Everything here is scoped to one workspace. A company's email shape is learned from, and used for, that workspace alone — nothing is shared between workspaces, and Outflare never supplies a key for any of it.
+Everything here is scoped to one company. A company's email shape is learned from, and used for, that company alone — nothing is shared between companies, and Outflare never supplies a key for any of it.
 
 ## In the web app
 
@@ -45,4 +45,4 @@ Through [MCP](/docs/agents/mcp/) the same three are `email_pattern`, `find_email
 
 ## What it never does
 
-It never shares one workspace's data with another, and it never uses an Outflare-provided key: the verifier it rolls up to is always the account you connected. Every third-party service in Outflare runs on your own connected account.
+It never shares one company's data with another, and it never uses an Outflare-provided key: the verifier it rolls up to is always the account you connected. Every third-party service in Outflare runs on your own connected account.

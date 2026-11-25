@@ -238,7 +238,7 @@ Without consent, the campaign tags a visitor landed with are kept with that firs
 
 To have Outflare show the banner for you, with each region's rules, Google Consent Mode and the ad platforms' consent signals, and keep a cookie policy that updates itself, turn on the [consent banner](/docs/guides/consent-banner/). `outflare.consent()` then also takes categories (`{analytics: true, marketing: false}`), and every choice is kept as the visitor's consent.
 
-Visits are stored in your workspace with the rest of your customer data and aren't shared with anyone.
+Visits are stored in your company with the rest of your customer data and aren't shared with anyone.
 
 ## Page speed
 

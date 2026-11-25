@@ -9,7 +9,7 @@ sidebar:
 
 **Retention** answers who came back. Take everyone who first did something in a given week (a cohort): visited, signed up, paid. How many of them did it again, or did something else, in the week after, and the one after that? Cohorts that stick are the ones to learn from; cohorts that fade point at what changed.
 
-In the app, open **Analytics** in the sidebar, then **Retention**. Retention runs inside Outflare and calls no third-party service. It works from the visits [website tracking](/docs/guides/website-tracking/) records, the events your workspace sends or syncs, your [conversions](/docs/guides/attribution/) and [payments](/docs/guides/transactions/).
+In the app, open **Analytics** in the sidebar, then **Retention**. Retention runs inside Outflare and calls no third-party service. It works from the visits [website tracking](/docs/guides/website-tracking/) records, the events your company sends or syncs, your [conversions](/docs/guides/attribution/) and [payments](/docs/guides/transactions/).
 
 ## Ask it
 
@@ -58,7 +58,7 @@ Hover a bar for its people and share. Stickiness questions save and go on dashbo
 
 ## Who can do what
 
-Everyone in the workspace can run retention (`analytics.read`). Owners, admins and operators can save, change and delete questions (`analytics.manage`).
+Everyone in the company can run retention (`analytics.read`). Owners, admins and operators can save, change and delete questions (`analytics.manage`).
 
 ## For agents and scripts
 

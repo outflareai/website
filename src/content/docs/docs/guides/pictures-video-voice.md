@@ -11,7 +11,7 @@ A brand can ask an AI account of its own for a picture, a video or a voice recor
 
 ## Your own accounts, always
 
-Every request runs on an account the workspace connected itself ([Connectors](/docs/integrations/connectors/)), and is paid by the workspace to that provider. Outflare has no account of its own for this, on Outflare Cloud or self-hosted: without the connection nothing is made, and the answer names what to connect.
+Every request runs on an account the company connected itself ([Connectors](/docs/integrations/connectors/)), and is paid by the company to that provider. Outflare has no account of its own for this, on Outflare Cloud or self-hosted: without the connection nothing is made, and the answer names what to connect.
 
 | To make | Connect | Where |
 |---|---|---|

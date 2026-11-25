@@ -110,7 +110,7 @@ curl localhost:8080/v1/workspaces/$WS/emailbison-compat/calls -H "Authorization:
 
 | EmailBison call | What Outflare does |
 | --- | --- |
-| `GET /api/users` | Answers with the workspace |
+| `GET /api/users` | Answers with the company |
 | `GET /api/sender-emails`, `GET /api/sender-emails/{id or email}` | Lists mailboxes as senders, paginated like EmailBison |
 | `POST /api/sender-emails/imap-smtp`, `POST /api/sender-emails/bulk` | Imports mailboxes |
 | `PATCH /api/sender-emails/{id}` | Changes the daily limit and name; a new password re-imports the mailbox |

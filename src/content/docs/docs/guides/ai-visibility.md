@@ -64,7 +64,7 @@ Open a question to see every week in full, each assistant's latest answer side b
 
 ## Who else is named
 
-Every brand the answers name is counted against you on the leaderboard, scored on the same questions. Brands the answers name that you don't track yet are sorted for you, once each, using the sites the answers cited where they were named, on the workspace's own AI model:
+Every brand the answers name is counted against you on the leaderboard, scored on the same questions. Brands the answers name that you don't track yet are sorted for you, once each, using the sites the answers cited where they were named, on the company's own AI model:
 
 - a competitor goes to the brand's [Competitors](/docs/guides/competitors/) page as a suggestion with its website: say yes to count it from the next run on, or no to drop it. One Outflare isn't sure of asks "Is this their website?";
 - a product of a competitor you track ("Acme Cloud API" for Acme) counts as that competitor, with nothing to do;
@@ -98,7 +98,7 @@ Under **Settings → Assistants**, pick up to 8. Each uses one of your AI connec
 
 ## Runs
 
-A run asks every chosen assistant every question, in the background. Start one with **Run now** or let the schedule do it. Only one run per question set goes at a time, and you can stop it. Every answer is kept with its assistant, its text, the brands it names, the pages it cites and what it cost. A run stops early, and says why, when it reaches the workspace's **monthly AI limit** or AI visibility's **own monthly limit** (US$10 unless you change it under Settings). If one answer fails, it is kept as failed with the reason, and the run carries on.
+A run asks every chosen assistant every question, in the background. Start one with **Run now** or let the schedule do it. Only one run per question set goes at a time, and you can stop it. Every answer is kept with its assistant, its text, the brands it names, the pages it cites and what it cost. A run stops early, and says why, when it reaches the company's **monthly AI limit** or AI visibility's **own monthly limit** (US$10 unless you change it under Settings). If one answer fails, it is kept as failed with the reason, and the run carries on.
 
 ## Share, download and the digest
 

@@ -142,7 +142,7 @@ Each time what the policy lists changes, a new version is published, recording w
 
 - **On your own page:** add `<div data-outflare-cookie-policy></div>` where the policy should go. The script fills it in, with a button that opens the banner.
 - **Hosted page:** `https://app.outflare.ai/cookie-policy/{site key id}`, linked from the Cookies panel.
-- **API:** `GET .../site-keys/{id}/cookie-policy?format=markdown` (or `text` or `html`) for your workspace. Your site's pages can also fetch the public `GET /v1/site/cookie-policy?key=ofk_...&format=json` (or `markdown`, `text` or `html`).
+- **API:** `GET .../site-keys/{id}/cookie-policy?format=markdown` (or `text` or `html`) for your company. Your site's pages can also fetch the public `GET /v1/site/cookie-policy?key=ofk_...&format=json` (or `markdown`, `text` or `html`).
 - **MCP:** `get_cookie_policy`.
 
 The policy's own text is in English for now.

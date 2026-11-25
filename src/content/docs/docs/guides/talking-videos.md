@@ -11,7 +11,7 @@ A talking video is a person in a scene saying a script to the camera: the kind o
 
 ## Your own accounts, always
 
-Every stage that calls a provider is a request like any other [picture, video or voice](/docs/guides/pictures-video-voice/): it runs on an account the workspace connected itself ([Connectors](/docs/integrations/connectors/)) and is paid by the workspace to that provider. Outflare has no account of its own for this, on Outflare Cloud or self-hosted. Without the connections nothing is made, and the answer names what to connect.
+Every stage that calls a provider is a request like any other [picture, video or voice](/docs/guides/pictures-video-voice/): it runs on an account the company connected itself ([Connectors](/docs/integrations/connectors/)) and is paid by the company to that provider. Outflare has no account of its own for this, on Outflare Cloud or self-hosted. Without the connections nothing is made, and the answer names what to connect.
 
 - **ElevenLabs** reads the script and times every word. The key needs Text to Speech and Speech to Text.
 - **fal.ai** renders the video and upscales it.

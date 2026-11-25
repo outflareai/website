@@ -33,7 +33,7 @@ By category, including what is planned:
 | Code and deploys | [GitHub, Vercel](/docs/integrations/deploys/): when each website ships, read only |
 | Messaging | [Telegram](/docs/guides/team/#sign-a-telegram-account-in-to-outflare), with your company's own Telegram app: the company's Telegram accounts sign in by QR code, read only |
 | Knowledge sources | Slack (knowledge), read only: the [support assistant](/docs/guides/support-assistant/#when-your-knowledge-has-no-answer) looks in the channels you pick for answers your team already gave. Separate from the Slack connection that posts [alerts](/docs/guides/alerts/) |
-| Social | [Reddit](/docs/guides/reddit/), with your workspace's own app: find posts and post replies a person approves from the brand's own account |
+| Social | [Reddit](/docs/guides/reddit/), with your company's own app: find posts and post replies a person approves from the brand's own account |
 | Podcasts | Podcast Index, with your own free key: [mentions](/docs/guides/mentions/) of your brand and competitors in podcast episodes. Groq, with your own key (its free plan is enough): [listening to what's said](/docs/guides/mentions/#listening-to-whats-said) in episodes with no transcript |
 | Ad platforms | [Google Ads, Meta Ads, Microsoft Advertising, Reddit Ads, X Ads, LinkedIn Ads, ChatGPT Ads](/docs/integrations/paid-media/), with your own ad accounts: spend and results, conversions sent back, and campaign changes a person approves |
 | DNS and registrars | Cloudflare, Namecheap, GoDaddy, Route 53 |
@@ -72,7 +72,7 @@ If the server has no OAuth app for a provider, the dialog says so and asks for t
 | OpenRouter | OpenRouter, no app to register | API key |
 | Everything else | Not offered by the vendor | API key or token |
 
-In a workspace with [brands](/docs/guides/brands/), a connection is made once and shared with every brand, or with the brands you pick, and a brand with an account of its own can connect that one for itself. See [Connect a tool once for every brand](/docs/guides/brands/#connect-a-tool-once-for-every-brand).
+In a company with [brands](/docs/guides/brands/), a connection is made once and shared with every brand, or with the brands you pick, and a brand with an account of its own can connect that one for itself. See [Connect a tool once for every brand](/docs/guides/brands/#connect-a-tool-once-for-every-brand).
 
 Each catalog entry says how it connects. `auth_methods` lists the ways, recommended first. `auth_options` says which of them work on this server, and what to set when one doesn't. Each connection records its `auth_method` (`oauth2` or `api_key`).
 
@@ -105,7 +105,7 @@ PostHog and HubSpot used to be two connectors each (`posthog_cloud`, `hubspot_pr
 
 `GET /v1/workspaces/{ws}/connections` lists every account the workspace has connected, in one shape: connectors (the same as `GET /integrations`) and the Google and Microsoft sign-ins for mailboxes (the same as `GET /oauth-connections`). Each entry says its `kind` (`integration` or `mailbox_oauth`), `connector` (for example `hubspot`, or `google` for a mailbox sign-in), `name`, `category`, `status` and `brand_id`, and its `id` opens it in its own list. Add `?category=crm` for one category; `mailboxes` includes the mailbox sign-ins.
 
-With `?brand=summitly` it lists the connections that brand uses. Mailbox sign-ins belong to the whole workspace, so they are left out when a brand is picked or the caller is kept to some brands. It needs scope `integrations.read`; the MCP tool is `list_connections`.
+With `?brand=summitly` it lists the connections that brand uses. Mailbox sign-ins belong to the whole company, so they are left out when a brand is picked or the caller is kept to some brands. It needs scope `integrations.read`; the MCP tool is `list_connections`.
 
 ## Let an agent connect things
 
@@ -113,7 +113,7 @@ You tell an agent what you want, and it connects what it needs. It never asks yo
 
 1. The agent calls `request_connection` (MCP) or `POST /v1/workspaces/{ws}/connect-requests` with the service and one sentence on why it needs it.
 2. It gives you a one-time link.
-3. You open the link and sign in to Outflare. Only an owner or admin of the workspace that asked can use it; anyone else is told the link isn't for them. The page names the workspace, the service, who asked and the agent's reason. Paste the key there, or sign in with the provider. Only connect when you expected the request: Outflare never asks for keys in an email or a chat.
+3. You open the link and sign in to Outflare. Only an owner or admin of the company that asked can use it; anyone else is told the link isn't for them. The page names the company, the service, who asked and the agent's reason. Paste the key there, or sign in with the provider. Only connect when you expected the request: Outflare never asks for keys in an email or a chat.
 4. The key is tested and saved, and the agent sees the request turn `connected` and carries on.
 
 Links work once, expire after 24 hours by default, can be cancelled, and can only connect the one service they name. The audit log records which token asked.
@@ -129,7 +129,7 @@ What you can count on:
 
 - **Every delivery is checked.** With a signing secret, a delivery whose signature doesn't match is refused. Without one, the address itself is the secret, so keep it private. **New address** replaces it, and the old one stops working straight away.
 - **Repeats are ignored.** An event sent twice is handled once.
-- **Everything is logged.** The connection's page shows its recent events, and **Logs → Incoming webhooks** lists every event in the workspace for 90 days, with any error. A failed event can be **run again** for 30 days. From Geonode, Outflare keeps the job id, status and counts, never page content. Events nothing in Outflare uses yet are marked "logged".
+- **Everything is logged.** The connection's page shows its recent events, and **Logs → Incoming webhooks** lists every event in the company for 90 days, with any error. A failed event can be **run again** for 30 days. From Geonode, Outflare keeps the job id, status and counts, never page content. Events nothing in Outflare uses yet are marked "logged".
 - **Self-hosted servers must be reachable.** Live updates need `PUBLIC_URL` set to the server's public https address. A server on `localhost` or a private network can't receive webhooks, and the card says so.
 
 Over the API: `POST /v1/workspaces/{ws}/integrations/{id}/hook` turns live updates on (`GET` to read it, `DELETE` to turn it off), `POST .../hook/rotate` makes a new address, `PUT .../hook/signing-secret` saves a signing secret, `GET /v1/workspaces/{ws}/hook-events` lists events, and `POST .../hook-events/{event}/replay` runs one again. The MCP tools are `get_connection_hook`, `set_up_connection_hook`, `rotate_connection_hook`, `remove_connection_hook`, `list_hook_events` and `replay_hook_event`.

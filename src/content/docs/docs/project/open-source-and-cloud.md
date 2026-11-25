@@ -14,7 +14,7 @@ If a person does it or measures it, it's in the open-source engine. If it decide
 Two promises come with it:
 
 - **Nothing moves back.** A feature in the open-source engine never becomes paid.
-- **Bring your own keys, everywhere.** Neither the open-source engine nor Cloud lends you an API key or pays for your AI or data. Each workspace connects its own accounts, and you pay those providers directly. See [Connectors](/docs/integrations/connectors/).
+- **Bring your own keys, everywhere.** Neither the open-source engine nor Cloud lends you an API key or pays for your AI or data. Each company connects its own accounts, and you pay those providers directly. See [Connectors](/docs/integrations/connectors/).
 
 ## What you get
 

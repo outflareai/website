@@ -49,7 +49,7 @@ This guide maps each thing you do with PostHog today to its Outflare counterpart
 - **Identify comes from your server, or is signed by it.** PostHog trusts `posthog.identify` from any page. Outflare does not, so nobody can pose as another user from a browser console.
 - **Money is sent once.** Send each payment as a transaction or as an `Order Completed` event with the same id; Outflare keeps it once either way, and counts `payment.succeeded`. Don't also send a custom "purchase" event for revenue reports.
 - **Dates on old events.** Events carry your own `timestamp`, so a replay of recent history lands on the right days. Send each with the `messageId` it had, and sending it twice stores it once.
-- **Your own accounts.** Every third-party service a feature uses runs on an account your workspace connects. Outflare never supplies a key of its own.
+- **Your own accounts.** Every third-party service a feature uses runs on an account your company connects. Outflare never supplies a key of its own.
 
 ## Checking it worked
 

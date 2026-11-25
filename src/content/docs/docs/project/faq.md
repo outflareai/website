@@ -4,7 +4,7 @@ description: Common questions about Outflare.
 ---
 
 **What is Outflare?**
-The open-source operating system for an online business: all your data in one place, AI agents do the work, and you approve. It starts with growth, bringing your website analytics, SEO, customer records, email, social and paid media into one workspace, with money, people and goals coming next, and gives your agents one API to work through. See the [introduction](/docs/).
+The open-source operating system for an online business: all your data in one place, AI agents do the work, and you approve. It starts with growth, bringing your website analytics, SEO, customer records, email, social and paid media into one company, with money, people and goals coming next, and gives your agents one API to work through. See the [introduction](/docs/).
 
 **Who is it for?**
 Founders of online businesses, and the teams around them, who want their company's data in one place, in their own database if they choose, and agents doing the work through a real API while they approve.
@@ -19,7 +19,7 @@ Yes: Outflare Cloud at [app.outflare.ai](https://app.outflare.ai/), free during 
 Yes. Cold email runs as [sequences](/docs/guides/sequences/) across your mailboxes, and product email such as receipts and onboarding goes out through your own Amazon SES, Postmark or Resend account ([lifecycle email](/docs/guides/lifecycle-email/)). Every email passes the [policy check](/docs/concepts/policy-check/) first.
 
 **Does Outflare give me an AI or data provider key?**
-No. Every workspace connects its own accounts for AI models, data providers and every other service, on Cloud and self-hosted alike, and pays those providers directly. A feature stays off until you connect what it needs. See [Connectors](/docs/integrations/connectors/).
+No. Every company connects its own accounts for AI models, data providers and every other service, on Cloud and self-hosted alike, and pays those providers directly. A feature stays off until you connect what it needs. See [Connectors](/docs/integrations/connectors/).
 
 **Which mailbox providers work?**
 Google Workspace and Microsoft 365 are detected automatically. Any provider with SMTP and IMAP works if you give its servers in the CSV. Google Workspace and Microsoft 365 can also connect without passwords, through [OAuth or an admin connection](/docs/integrations/google-and-microsoft/). Mailboxes bought from Cheap Inboxes [import straight from your account](/docs/integrations/cheap-inboxes/), no CSV needed.

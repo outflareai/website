@@ -11,7 +11,7 @@ sidebar:
 
 ## How visitors are named
 
-Outflare names a visitor it can tie to someone already in your workspace. It has no identity data of its own and never guesses. The exceptions are optional and run on your own accounts: [company lookups](#company-lookups) and [people by name](#people-by-name) below.
+Outflare names a visitor it can tie to someone already in your company. It has no identity data of its own and never guesses. The exceptions are optional and run on your own accounts: [company lookups](#company-lookups) and [people by name](#people-by-name) below.
 
 - **Your product.** When your product tells Outflare who signed up or signed in (see [website tracking](/docs/guides/website-tracking/)), their earlier and later visits join their record.
 - **Email clicks.** When someone clicks a link to your own site in a sequence or lifecycle email you sent them, the link carries a short signed token (`ofvisit`). The snippet sends it with the first page view and removes it from the address bar, and that browser's visits join the person the email went to.

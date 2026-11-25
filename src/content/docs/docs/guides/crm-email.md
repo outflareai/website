@@ -41,7 +41,7 @@ This is a different connection from the [Google Workspace admin connection for o
 
 ### Or each person connects their own Gmail
 
-Without a Workspace connection, an eligible person can connect their own Google account from their email settings, with read-only access to Gmail. The rules below apply the same way. Someone who connected their own account keeps it when an admin adds the Workspace connection. A person's connection says `via: personal` or `via: workspace`.
+Without a Workspace connection, an eligible person can connect their own Google account from their email settings, with read-only access to Gmail. The rules below apply the same way. Someone who connected their own account keeps it when an admin adds the Company connection. A person's connection says `via: personal` or `via: workspace`.
 
 ## Choose whose mail is read
 
@@ -94,8 +94,8 @@ An owner or admin can switch on **Team email sharing** in **CRM → Settings →
 - Every member of the brand is told at once, and sharing starts 48 hours later. Switching it off is immediate, and tells everyone again.
 - A contact whose owner made no choice is shared in full with the brand. A contact its owner set private stays private.
 - Mail from payroll, HR, benefits, banking and expense services is never saved while it's on.
-- Before a colleague sees an email or meeting, your workspace's own AI model reads its subject (or a meeting's title) and first lines. Anything about pay, a job offer, HR, a legal dispute, health or family stays with its owner, and so does anything the model is unsure about or hasn't read yet. Mail a person shares on purpose isn't checked.
-- The check runs on your workspace's own AI connection, within its AI limits ([AI usage](/docs/guides/ai-usage/)). Without one, colleagues see no shared email.
+- Before a colleague sees an email or meeting, your company's own AI model reads its subject (or a meeting's title) and first lines. Anything about pay, a job offer, HR, a legal dispute, health or family stays with its owner, and so does anything the model is unsure about or hasn't read yet. Mail a person shares on purpose isn't checked.
+- The check runs on your company's own AI connection, within its AI limits ([AI usage](/docs/guides/ai-usage/)). Without one, colleagues see no shared email.
 
 Every member sees whether it's on, and from when, in their own email settings.
 
@@ -106,7 +106,7 @@ With `gmail.send` delegated, a person can send from their own address through Ou
 - Every recipient goes through the same checks as any reply first: the suppression list and withdrawn consent.
 - The email is sent in the background and kept on the contact, like captured mail.
 - A retry looks in your Sent mail first, so an email is never sent twice.
-- Only eligible people whose mailbox is read through the Workspace connection can send. A person's own Google sign-in reads only.
+- Only eligible people whose mailbox is read through the Company connection can send. A person's own Google sign-in reads only.
 
 ## Sales email
 

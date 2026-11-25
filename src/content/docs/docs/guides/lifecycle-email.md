@@ -49,7 +49,7 @@ Each topic is one of two kinds:
 - **Everyone, until they leave.** For email people expect from you.
 - **Only people who opt in.** For extras such as a beta program. It goes only to people who joined.
 
-The unsubscribe link in a lifecycle email opens a preference page with your workspace's name on it. One button leaves the email's topic, a box per topic lets people choose what they get, and one more turns off all marketing email. A mail app's own unsubscribe button leaves just the email's topic. An email with no topic works as before: unsubscribing stops all lifecycle email to that address. Receipts and password resets still go either way.
+The unsubscribe link in a lifecycle email opens a preference page with your company's name on it. One button leaves the email's topic, a box per topic lets people choose what they get, and one more turns off all marketing email. A mail app's own unsubscribe button leaves just the email's topic. An email with no topic works as before: unsubscribing stops all lifecycle email to that address. Receipts and password resets still go either way.
 
 What people choose is saved on their [customer record](/docs/guides/customer-records/) as a consent, so the CRM and the API see the same answer. Your app can record consent itself, for example from your own settings page, with `POST /v1/brands/{brand}/records/{record}/consents` (channel `email`, the topic's key, purpose `marketing`). When someone is skipped, the email shows `suppressed` and why, such as "unsubscribed from Product updates".
 

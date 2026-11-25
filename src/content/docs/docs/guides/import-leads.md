@@ -5,7 +5,7 @@ sidebar:
   order: 6
 ---
 
-<span class="pill shipped">Shipped</span> Leads are the people a workspace emails. Import them from any CSV export, group them into lists, and keep a suppression list of people and domains that must never be emailed.
+<span class="pill shipped">Shipped</span> Leads are the people a company emails. Import them from any CSV export, group them into lists, and keep a suppression list of people and domains that must never be emailed.
 
 ## Import a CSV
 
@@ -44,7 +44,7 @@ Standard fields are recognised under the names data providers, CRMs and spreadsh
 
 ### Deduplication and updates
 
-Leads are unique by email within a workspace, ignoring case.
+Leads are unique by email within a company, ignoring case.
 
 - A row for a lead that already exists **updates** it: non-empty values replace stored ones, empty values keep what is stored, and custom fields are merged. Re-importing an enriched export fills in the gaps rather than creating duplicates.
 - Rows that repeat an email within one file are merged first and counted as `duplicates`.

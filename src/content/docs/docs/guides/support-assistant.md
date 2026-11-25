@@ -28,7 +28,7 @@ It writes like a capable person on your team: short, plain, no filler such as "G
 3. Give it a name, such as "Northpeak help". It signs as that name, marked as an AI assistant.
 4. Use **Try it** to ask a question the way a customer would. You see what it would answer, ask or hand off. Nothing is stored or sent.
 
-A brand can have its own settings; otherwise it uses the workspace's.
+A brand can have its own settings; otherwise it uses the company's.
 
 ### Draft
 

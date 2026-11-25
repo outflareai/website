@@ -17,20 +17,20 @@ set, pauses and resumes a campaign and sets its daily budget ("Managing
 campaigns" below). That is all it changes: it never creates campaigns, ads,
 audiences or creative, and never changes bids or targeting.
 
-Every connection is the workspace's own: it signs in to its own ad accounts and,
+Every connection is the company's own: it signs in to its own ad accounts and,
 where the platform needs one, adds its own developer token. Outflare never
 provides an ad account, an API token or a developer token, and an ad platform
-stays off until the workspace connects it.
+stays off until the company connects it.
 
 Google Ads no longer takes a developer token (Google retired them on
 9 September 2026, and ignores one sent anyway). Its API access level now
 belongs to the Google Cloud project of the server's Google sign-in app
 (`GOOGLE_OAUTH_CLIENT_ID`, or `CONNECTOR_GOOGLE_ADS_CLIENT_ID`), so whoever
-runs the server applies for it once, for every workspace: in the Google Cloud
+runs the server applies for it once, for every company: in the Google Cloud
 console, open that project, then the Google Ads API, and apply for Basic
 access (it needs a project whose branding Google verified). The data stays the
-workspace's own: each one signs in to its own Google Ads accounts. A token a
-workspace added before is still sent and does no harm.
+company's own: each one signs in to its own Google Ads accounts. A token a
+company added before is still sent and does no harm.
 
 ## Platforms
 
@@ -67,9 +67,9 @@ Maps campaigns report spend, impressions and taps only.
 
 Signing in uses the operator's OAuth app (`CONNECTOR_<ID>_CLIENT_ID` and
 `_CLIENT_SECRET`, see [connectors.md](/docs/self-hosting/configuration/)); the tokens it produces
-belong to the workspace's own ad account. Amazon Ads also sends that app's
+belong to the company's own ad account. Amazon Ads also sends that app's
 client id (not its secret) with every call, as Amazon requires, so the
-connection keeps it beside the workspace's tokens. When a connection still needs a
+connection keeps it beside the company's tokens. When a connection still needs a
 developer token, `GET /v1/workspaces/{ws}/ads/connections` lists it under
 `setup_needed`, and a person adds it in Integrations
 (`PUT /v1/workspaces/{ws}/ads/connections/{id}/setup`). Outflare checks the
@@ -217,7 +217,7 @@ you confirm ([how it works](/docs/guides/website-tracking/)).
 each campaign's spend. It shows the visits that came through the campaign
 (matched by the ids its tracking template put on the landing page), and the
 conversions and revenue [attribution](/docs/guides/attribution/) credits to those visits
-under the workspace's model, with the return on spend. The platform's own
+under the company's model, with the return on spend. The platform's own
 conversion count is shown next to it for comparison, never added in.
 
 A campaign with spend and no tracked visits is listed too: it usually has no
@@ -319,7 +319,7 @@ connector, and a payment sent more than one way is counted once
 ([One payment, counted once](/docs/guides/transactions/#one-payment-counted-once)). A rule
 on `order_completed` sends only payments that arrive as orders.
 
-A rule can also name one of the workspace's
+A rule can also name one of the company's
 conversion definitions (`"conversion": "qualified_call"`)
 instead of a bare event. It then sends only the events that meet the
 definition's conditions, such as a call over a minute, and each one is worth
@@ -372,7 +372,7 @@ MCP tool is `get_signup_quality`.
 | TikTok Ads | A pixel, through the Events API, as CompletePayment, CompleteRegistration, SubmitForm and so on | `ttclid`, the `_ttp` cookie (`ttp`), hashed email, phone and record id, and the person's IP address and browser | The sign-in's Pixel and Events access; if TikTok refuses it, an Events API access token from Events Manager on the connection |
 | Snapchat Ads | A Snap Pixel, through the Conversions API, as PURCHASE, SIGN_UP, SUBSCRIBE and so on | `ScCid`, the `_scid` cookie (`scid`), hashed email, phone and record id, and the person's IP address and browser | The sign-in's access; if Snapchat refuses it, a Conversions API token from Ads Manager → Business Details on the connection |
 | Taboola Ads | An active event-based conversion (Realize → Tracking, "Create conversions using code"), by its event name, as a server-to-server action | `tblci` only | Nothing: the bulk S2S endpoint takes no token |
-| Pinterest Ads | The Conversions API, as checkout, signup, lead and so on | `epik`, hashed email, phone and record id, and the person's IP address and browser | The workspace's own conversion access token, from Pinterest Ads Manager → Conversions |
+| Pinterest Ads | The Conversions API, as checkout, signup, lead and so on | `epik`, hashed email, phone and record id, and the person's IP address and browser | The company's own conversion access token, from Pinterest Ads Manager → Conversions |
 | ChatGPT Ads | Your pixel, through OpenAI's Conversions API, as `registration_completed`, `order_created`, `lead_created`, `subscription_created` and so on | `oppref`, the pixel's browser reference, hashed email, phone and record id; beside them the IP address the event's own context carries (`context.ip`), the person's browser (from the event, else from their latest visit recorded by the Outflare site script, so your server doesn't need to send it) and their country, unhashed as OpenAI asks | Your own pixel ID and conversion key from OpenAI Ads Manager → Conversions, and your website address. OpenAI takes conversions from the last 7 days only. |
 
 The IP address and browser are the ones the event's own context carries (`context.ip`, `context.userAgent`); the browser falls back to the one the site script stored on the person's latest earlier event, up to 90 days back. They go to Meta, TikTok, Snapchat, Pinterest, Reddit, X and ChatGPT Ads, unhashed as each asks, only beside a click id or an identifier, never as the only thing sent, and only when the conversion passes the consent check below. The send log lists them as `ip_address` and `user_agent`. On server events, send the user's own address and browser in `context`, not your server's.
@@ -444,7 +444,7 @@ How it works:
   country is unknown, a conversion is sent only when they said yes to ad data
   (a consent with channel `ads` and purpose `ad_user_data`, recorded with
   `POST /v1/brands/{brand}/records/{id}/consents` when your consent banner
-  says yes). Elsewhere the workspace's setting decides: **Everyone,
+  says yes). Elsewhere the company's setting decides: **Everyone,
   unless they opted out** (`opt_out`, the default) or **Only people who said
   yes** (`opt_in`). Anyone who withdrew consent is never sent.
   A brand whose own site already asks every visitor for consent to ad data
@@ -515,7 +515,7 @@ before you switch a first-payments rule on. In the API this is the rule's
 | `PATCH`, `DELETE /v1/workspaces/{ws}/ads/conversion-rules/{id}` | Change, switch off or delete a rule |
 | `GET /v1/workspaces/{ws}/ads/conversion-sends` | The send log, newest first |
 | `GET /v1/brands/{brand}/ads/conversion-check?days=` | Per conversion action, conversions sent against what the network counts, with a status and the same per day |
-| `GET`, `PUT /v1/brands/{brand}/ads/settings` | The brand's `consent_mode`: `opt_out`, `opt_in` or `collected` (the workspace route is deprecated and acts on the first brand) |
+| `GET`, `PUT /v1/brands/{brand}/ads/settings` | The brand's `consent_mode`: `opt_out`, `opt_in` or `collected` (the company route is deprecated and acts on the first brand) |
 
 The MCP tools are `list_ad_conversion_targets`, `list_ad_conversion_rules`,
 `create_ad_conversion_rule`, `update_ad_conversion_rule`,
@@ -543,7 +543,7 @@ several ad networks. It is under **Paid ads, Audiences**, and at
 `/v1/brands/{brand}/ads/audiences` (`POST` with `name`, `list_id` and
 `ad_account_ids`; `PATCH` to rename it, turn it on or off, point it at another
 list or change where it goes; `POST .../{id}/sync` to sync now; `DELETE`).
-It runs on the workspace's own ad accounts and stays off until one is
+It runs on the company's own ad accounts and stays off until one is
 connected ([Platforms](#platforms)).
 
 - **What Outflare does on the network.** Through your own connection it
@@ -754,7 +754,7 @@ limit is refused with a reason:
 Each call checks the campaign (yours, on an active account, in a state the
 change makes sense for) and answers `202` with the **change**: what the campaign was before, what was asked, who asked and,
 for an agent, its action. A job (`ads.change`) then makes the one call on the
-workspace's own account, reads the campaign back from the platform, and
+company's own account, reads the campaign back from the platform, and
 records how it ended: `applied` with `verified_at` when the platform shows
 the change, `applied` with a `verify_note` when it shows something else or
 could not be read back (the next sync corrects the mirror), or `failed` with
@@ -830,7 +830,7 @@ write one through the API too. Each is a **draft**:
 
 Drafts are checked against the platform's rules when written, and wait for
 a person on the **Actions** tab under **New ads**. Approving one makes it
-on the workspace's own account, everything paused: on Google in one batch,
+on the company's own account, everything paused: on Google in one batch,
 so a refused draft makes nothing. Check it on the platform, then **Turn on**:
 the ad, and the ad group and campaign when the draft made them, are turned
 on. Nothing spends until then.
@@ -887,7 +887,7 @@ wrong and what it would do instead. It reads what you said about earlier
 advice (Good advice, Bad advice) before it answers. It can also answer
 questions about your audiences, and propose a campaign's places or a new
 name, which wait for your OK like its other changes. The agent runs on the
-workspace's own AI key ([Brand agent](/docs/agents/brand-agent/)).
+company's own AI key ([Brand agent](/docs/agents/brand-agent/)).
 
 ## Coming next
 

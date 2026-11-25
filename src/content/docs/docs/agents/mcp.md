@@ -79,7 +79,7 @@ Then configure it:
     - To keep an agent inside one brand, choose that brand under **Which brands** when you create the token. It sees that brand's records plus anything shared, and changes only its brand's. See [Brands](/docs/guides/brands/#keep-people-and-tokens-to-some-brands).
     - To let it start [playbook runs](/docs/agents/playbooks/), add `agents.read` and `agents.run`. Never give it `actions.approve`: an agent doesn't approve changes.
     - For an outreach agent, also set its **sending limits**: a daily send budget across all the sequences it creates, the highest priority it may give a sequence, and whether it may take mailboxes from other sequences (off by default). See [Mailbox allocation](/docs/guides/mailbox-allocation/#agents).
-2. Add the server to your client. The token already says which workspace it belongs to.
+2. Add the server to your client. The token already says which company it belongs to.
 
 **Claude Code:**
 
@@ -116,14 +116,14 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `get_context` | Start here: what Outflare knows about the company, its memories and brands, and what is blocked. Pass `brand` to add that brand's context and memories. See [Memory and status](/docs/agents/memory/) | |
 | `get_onboarding` | The [Get started](/docs/guides/getting-started/) steps (one brand, AI key, goal, website and DNS, tools, star and follow, first playbook, then team), each done or skipped, with the tool that does it | |
 | `update_onboarding` | Pick what to do first, skip Get started steps, bring them back, or close the walk-through in the app | Yes |
-| `get_status` | Everything stopping the workspace, worst first, with the tool that fixes each and who must act | |
+| `get_status` | Everything stopping the company, worst first, with the tool that fixes each and who must act | |
 | `list_memories` | Search the preferences, decisions and facts people and agents saved | |
 | `update_context`, `remember`, `update_memory`, `forget` | Save the company context, remember something lasting, correct or forget a memory | Yes |
 | `list_brands` | The brands the company markets, each with its website, domains, platforms and what it owns. Empty for a one-brand company | |
 | `get_brand_context`, `update_brand_context` | Read or save what is true for one brand: about, audience, goals, voice, rules (added to the company's) and notes | Yes |
 | `list_company_projects`, `list_goals`, `list_tasks`, `list_decisions`, their `get_`, `create_`, `update_` and `delete_` tools, `record_decision`, `get_goal_settings` | The company's and each brand's [projects, goals, tasks and decisions](/docs/guides/goals/), with who can see each one; agents see only what their person may see | Yes |
-| `list_ideal_customer_profiles`, `get_ideal_customer_profile` | Who the workspace sells to: each profile's description, filters and brand | |
-| `get_outcomes_report` | Cost per reply, meeting and won deal, for the workspace or by sequence or brand, with what is estimated or unpriced | |
+| `list_ideal_customer_profiles`, `get_ideal_customer_profile` | Who the company sells to: each profile's description, filters and brand | |
+| `get_outcomes_report` | Cost per reply, meeting and won deal, for the company or by sequence or brand, with what is estimated or unpriced | |
 | `list_meetings`, `list_deals` | Meetings and deals, with which sequence each counts for | |
 | `list_spend`, `list_recurring_spend`, `list_spend_rates` | The spend ledger, recurring costs, and unit prices with usage still unpriced | |
 | `list_outcome_syncs` | Each calendar and CRM source: last run and last error | |
@@ -146,9 +146,9 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `list_list_runs`, `get_list_run` | Builds, refreshes and enrichments: found, added, left out by reason, credits spent | |
 | `get_lead_sources` | Which data provider a lead came from | |
 | `check_recipients` | Ask the send policy whether addresses may be emailed, without sending | |
-| `email_pattern` | The address shape a company domain uses, learned from this workspace's own data, with a confidence. Free | |
+| `email_pattern` | The address shape a company domain uses, learned from this company's own data, with a confidence. Free | |
 | `find_emails` | Propose the most likely work address for each person (name + company domain), with a confidence and a code. Free; up to 50 a call | |
-| `verify_addresses` | Check a small batch cheapest tier first, rolling up to the workspace's own verifier only when needed; a per-address code matched by ref, up to 50 a call | Yes, *provider* |
+| `verify_addresses` | Check a small batch cheapest tier first, rolling up to the company's own verifier only when needed; a per-address code matched by ref, up to 50 a call | Yes, *provider* |
 | `list_suppressions` | Emails and domains that are never emailed | |
 | `list_sequences`, `get_sequence` | Sequences with steps and counts | |
 | `preview_sequence` | Render every step for one lead, with missing variables | |
@@ -156,10 +156,10 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `list_messages` | Every send attempt, including ones the policy blocked and why | |
 | `list_inbox`, `get_inbox_message` | Replies from every mailbox and connected sequencer, filtered by label group (hot, later, closed, automatic), source, tag or review, and the whole conversation with a lead | |
 | `list_inbox_tags`, `list_inbox_views` | Reply tags with counts, and the inbox views people saved | |
-| `get_reply_rules` | What happens when a reply gets a label, for the workspace or a sequence | |
-| `list_webhook_event_types`, `list_webhooks`, `list_webhook_deliveries` | The events webhooks can send; the workspace's webhooks and their health; what was sent to one and how the receiver answered | |
+| `get_reply_rules` | What happens when a reply gets a label, for the company or a sequence | |
+| `list_webhook_event_types`, `list_webhooks`, `list_webhook_deliveries` | The events webhooks can send; the company's webhooks and their health; what was sent to one and how the receiver answered | |
 | `list_events` | What happened since the last call: replies, bounces, opt-outs, paused mailboxes, held changes. Keep `next_after` and pass it back as `after` | |
-| `list_logs`, `get_log` | Every API call in the workspace with status, duration, error code and who made it; filter by level, source, operation, tool and time, or look one up by the `request_id` an error returned. Needs `audit.read`. See [Logs](/docs/api/logs/) | |
+| `list_logs`, `get_log` | Every API call in the company with status, duration, error code and who made it; filter by level, source, operation, tool and time, or look one up by the `request_id` an error returned. Needs `audit.read`. See [Logs](/docs/api/logs/) | |
 | `list_jobs`, `get_job` | Background work (syncs, imports, DNS checks) and how it went; a call that queued work returns `job.id` to follow | |
 | `import_supplier_mailboxes` | Import a supplier's mailboxes, named or all, with the same checks as a CSV | Yes |
 | `sync_supplier_mailboxes` | Read a supplier account again now | Yes |
@@ -225,7 +225,7 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `update_ai_settings` | Choose the AI model Outflare's agent uses, its price and the monthly AI limit | Yes |
 | `run_playbook` | Start a [playbook](/docs/agents/playbooks/) as a run of Outflare's agent, in copilot, autonomous or dry run mode | Yes |
 | `write_to_agent_run`, `pause_agent_run`, `stop_agent_run` | Write instructions to a run, pause it, or end it for good | Yes |
-| `list_connectors` | Services the workspace can connect (verification, sequencers to import from, mailbox suppliers, CRMs, data and more), with the fields each needs | |
+| `list_connectors` | Services the company can connect (verification, sequencers to import from, mailbox suppliers, CRMs, data and more), with the fields each needs | |
 | `request_connection`, `get_connection_request` | The usual way to connect anything: a one-time link the user opens to paste a key or sign in, so the agent never sees keys; then its status | Yes |
 | `get_oauth_link` | A sign-in link for an OAuth connector | |
 | `connect_integration`, `update_integration`, `test_integration`, `disconnect_integration` | Connect with credentials the agent already holds, rename or replace a key, sign in again, or remove an account | Yes |
@@ -239,10 +239,10 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `get_mailbox_health`, `update_mailbox_health_settings` | Every mailbox graded worst first with the fix, and when mailboxes pause automatically | Yes |
 | `preview_import`, `start_import`, `get_import` | Bring campaigns, leads and sending accounts over from Instantly or Smartlead: look first, import, check progress | Yes |
 | `get_report` | Sends, contacts, bounces, replies and opt-outs for a period | |
-| `list_members`, `triage_inbox_message` | Workspace members; label, assign, snooze, tag, close or flag a reply for review | Yes |
+| `list_members`, `triage_inbox_message` | Company members; label, assign, snooze, tag, close or flag a reply for review | Yes |
 | `create_inbox_tag`, `update_inbox_tag`, `delete_inbox_tag` | Add, rename, recolour or delete a reply tag | Yes |
 | `create_inbox_view`, `update_inbox_view`, `delete_inbox_view` | Save, change or delete a shared set of inbox filters | Yes |
-| `set_reply_rules` | Choose what happens for a not now, an out-of-office or a referral, and which deal stage a labelled reply moves its deal to, for the workspace or a sequence | Yes |
+| `set_reply_rules` | Choose what happens for a not now, an out-of-office or a referral, and which deal stage a labelled reply moves its deal to, for the company or a sequence | Yes |
 | `add_reply_referral` | Add the person a reply refers you to as a lead, and optionally enrol them | Yes |
 | `list_alerts` | What needs someone now: hot replies, hot website visitors, with the page that has each | |
 | `get_alert_settings` | Who gets each kind of alert by email, and the kinds you muted | |
@@ -265,12 +265,12 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `verify_seo_site`, `start_crawl`, `get_crawl`, `list_crawls`, `stop_crawl` | Check the DNS record, meta tag or file that proves ownership; crawl a site and follow the crawl | Yes |
 | `list_crawl_pages`, `get_crawl_page` | Every URL a crawl found: HTTP status, redirects, noindex, nofollow, robots.txt blocks, title, description, canonical, h1, hreflang, structured data, word count, links in and out | |
 | `list_crawl_issues`, `get_crawl_issue` | A crawl's audit: the rules its pages break, by URL template, with why and how to fix each, and the pages behind one rule | |
-| `list_fixes`, `update_fix` | The workspace's shared fixes list (site audits' and AI visibility's fixes): take a fix, mark it done (the next crawl or run checks), ignore it, or leave a note | Yes |
+| `list_fixes`, `update_fix` | The company's shared fixes list (site audits' and AI visibility's fixes): take a fix, mark it done (the next crawl or run checks), ignore it, or leave a note | Yes |
 | `list_deploy_options`, `list_deploy_targets`, `add_deploy_target`, `update_deploy_target`, `remove_deploy_target`, `check_deploys`, `list_deploys` | Watch a [GitHub repository or Vercel project](/docs/integrations/deploys/) for production deploys, tied to the site it serves, and see when each website went live | Yes |
 | `get_fix_prompt`, `verify_fix` | Hand a fix to a coding agent as a prompt, then report it live so a fresh crawl confirms it or opens it again | Yes |
 | `list_fix_tickets`, `get_fix_ticket`, `get_fix_ticket_prompt` | Fixes grouped into tickets, one per problem and site with every page behind it: the AI-written brief (summary, why, the change, done when), search impact, related tickets and guidelines, and the ticket as a Markdown issue for a coding agent. See [Fix tickets](/docs/guides/site-audits/#fix-tickets) | |
 | `write_fix_ticket`, `review_fix_ticket` | Have your own AI model write or rewrite a ticket (with feedback), then approve, reject or reopen it, saving the reason as a guideline | Yes |
-| `list_fix_guidelines`, `create_fix_guideline`, `delete_fix_guideline` | The rules every ticket follows, for the workspace, a brand or a site | Yes |
+| `list_fix_guidelines`, `create_fix_guideline`, `delete_fix_guideline` | The rules every ticket follows, for the company, a brand or a site | Yes |
 | `get_site_indexability`, `list_indexability_pages` | A site's [indexability](/docs/guides/site-audits/#indexability): every page from the crawl, sitemaps, Search Console and an SEO tool, whether it can be indexed and whether Google indexed it, the issues and 90 days of history | |
 | `start_fix`, `get_fix_autonomy`, `update_fix_autonomy` | [Fix autonomy](/docs/guides/fix-autonomy/): take a fix before changing the site, and choose how far agents may go on their own (copilot, rules or autonomous); redirect, canonical, indexing and robots fixes always wait for a person | Yes |
 | `get_ai_visibility` | How often AI answers name each brand: mention rate, share of voice against competitors, position, cited pages, by model and week. See [AI visibility](/docs/guides/ai-visibility/) | |
@@ -282,7 +282,7 @@ Set `OUTFLARE_MCP_READ_ONLY=1` as well to register only the tools that change no
 | `list_ai_facts`, `add_ai_fact`, `update_ai_fact`, `delete_ai_fact` | What is true about each brand, and how often AI answers agree with or contradict each fact | Yes |
 | `get_crawl_ai_access` | What a crawled site's robots.txt lets each AI search, user and training crawler read, and whether it has an llms.txt | |
 | `get_ai_bot_hits` | How often AI crawlers requested each site, per crawler and day, from your own Cloudflare request logs | |
-| `get_digest_settings`, `update_digest_settings`, `list_digests`, `preview_digest`, `send_digest` | The workspace's [daily or weekly digest](/docs/guides/digests/): when it is made, who gets it by email through your own provider, past digests, a preview, and one made now | Yes |
+| `get_digest_settings`, `update_digest_settings`, `list_digests`, `preview_digest`, `send_digest` | The company's [daily or weekly digest](/docs/guides/digests/): when it is made, who gets it by email through your own provider, past digests, a preview, and one made now | Yes |
 | `list_experiments`, `create_experiment`, `get_experiment`, `list_experiment_pages`, `start_experiment`, `stop_experiment`, `delete_experiment` | [SEO experiments](/docs/guides/seo-experiments/): split a site's pages into matched treatment and control groups, start measuring on the next deploy, and read the lift, p-value and verdict from your own Search Console data | Yes |
 
 The tools that make email go out, the ones that can spend data provider credits (marked *provider*), and `approve_infra_plan`, which spends money, are marked as reaching the outside world in their MCP annotations, so clients that support it can ask you before running them.

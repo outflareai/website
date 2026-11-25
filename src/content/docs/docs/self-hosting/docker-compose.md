@@ -38,7 +38,7 @@ docker compose up -d
 
 No version has been released yet, so for now install from the repository as shown above. Release images send the [anonymous daily report](/docs/self-hosting/telemetry/) unless you turn it off.
 
-Open `http://your-server:8080` and complete setup. The first visit creates the owner account and first workspace.
+Open `http://your-server:8080` and complete setup. The first visit creates the owner account and first company.
 
 ## Settings
 

@@ -21,7 +21,7 @@ Open **Infrastructure → New plan** and fill in:
 | Mailbox provider | Google Workspace or Microsoft 365. |
 | Ready by | Optional. The plan warns you if the date is too soon and says what would make it, such as a shorter warm-up or a later date. |
 | Who buys them | You, at any registrar and provider, or a [supplier connector](#buy-through-a-supplier). |
-| Brand | Domain names are suggested from it: `getacme.com`, `acmehq.com`, `tryacme.com`, `.com` first. Names you already have in the workspace are skipped. |
+| Brand | Domain names are suggested from it: `getacme.com`, `acmehq.com`, `tryacme.com`, `.com` first. Names you already have in the company are skipped. |
 | Domains you want | Optional. Your own picks come first and the rest are suggested. A domain you already have here gets mailboxes added instead of being bought. |
 | Who the mailboxes send as | One or more people. Mailboxes are named after them, most natural first: `jane@`, `jane.doe@`, `j.doe@`. |
 | Warm-up and rest | 14 days of warm-up by default (7 to 60), the daily limit once ready, the warm-up score below which a mailbox rests (75), and optionally retiring a mailbox that never recovers. |

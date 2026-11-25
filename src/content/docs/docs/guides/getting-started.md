@@ -1,13 +1,13 @@
 ---
 title: Get started
-description: "A new workspace's first minutes: one brand set up from start to finish, with your AI key, its website script and DNS in one step, the tools your goal needs and a first mission. Every step can be skipped."
+description: "A new company's first minutes: one brand set up from start to finish, with your AI key, its website script and DNS in one step, the tools your goal needs and a first mission. Every step can be skipped."
 sidebar:
   order: 0.5
 ---
 
 <span class="pill shipped">Shipped</span> The Get started page in the web app, the REST API and the MCP server.
 
-A new workspace opens on **Get started** for its owners and admins. It is a page of its own, without the rest of the app, and it sets up **one brand** from start to finish before anything else. It ends with Outflare doing something for you: a first plan, written by your AI, waiting for your approval. Every step can be skipped, and so can the whole thing (**Skip setup**, top right). Outflare works with all of them skipped.
+A new company opens on **Get started** for its owners and admins. It is a page of its own, without the rest of the app, and it sets up **one brand** from start to finish before anything else. It ends with Outflare doing something for you: a first plan, written by your AI, waiting for your approval. Every step can be skipped, and so can the whole thing (**Skip setup**, top right). Outflare works with all of them skipped.
 
 ![Get started: one question per screen](/screens/get-started-brand.png)
 
@@ -49,7 +49,7 @@ Prefer the older menu, with every part of Outflare in one sidebar? Press **Old m
 
 **Search** (⌘K, or Ctrl+K) finds more than pages: type a few letters to find a person, a company, a saved report or dashboard, or a setting, and press Enter to open it.
 
-**Settings** has a search box of its own and a switch between **Brand**, **Workspace** and **You**, so you can see whose settings you are changing. Searching finds a setting inside a page too, such as passkeys, and opens the page at it.
+**Settings** has a search box of its own and a switch between **Brand**, **Company** and **You**, so you can see whose settings you are changing. Searching finds a setting inside a page too, such as passkeys, and opens the page at it.
 
 Rest the pointer on a page in the menu and a card says what it is for. Rest it on any id, key or code and a copy button shows at its end.
 
@@ -63,7 +63,7 @@ Keep what you use most at the top of the menu:
 - **Pinned** lists your pins for the area you are in.
 - **Recents** lists the last things you opened in that area, with how long ago. **Clear** empties it; your pins stay.
 
-Pins and recents are saved to your account, so they are the same on every computer you sign in on. Something pinned inside a page shows on the workspace and brand it belongs to.
+Pins and recents are saved to your account, so they are the same on every computer you sign in on. Something pinned inside a page shows on the company and brand it belongs to.
 
 ## Skip anything, come back any time
 
@@ -71,14 +71,14 @@ Pins and recents are saved to your account, so they are the same on every comput
 - A step **ticks itself off** however it was done: adding a brand on the Brands page, connecting a tool from Connectors, or an agent doing it for you all count.
 - Open Get started again any time from the command palette (⌘K, then "Get started").
 
-Get started is one per workspace, not per person: someone you invite doesn't go through it again.
+Get started is one per company, not per person: someone you invite doesn't go through it again.
 
 ## For agents
 
 Agents see the same steps, so they can offer to help with whatever is left instead of asking you to click through.
 
 - `get_context`, the first call of every conversation, includes `onboarding`.
-- `get_onboarding` lists each step (`brand`, `ai`, `goal`, `website`, `connect`, `community`, `mission`, `team`) with `done`, `skipped`, `walkthrough` (false for inviting the team, which is on Home), the page that does it and the MCP `tool` an agent can use (empty when it needs a person). `goal` is what the workspace picked to do first, and `brand` the brand it sets up. The `website` step is done once the script is on the site and its DNS records are added (`get_brand_dns`).
+- `get_onboarding` lists each step (`brand`, `ai`, `goal`, `website`, `connect`, `community`, `mission`, `team`) with `done`, `skipped`, `walkthrough` (false for inviting the team, which is on Home), the page that does it and the MCP `tool` an agent can use (empty when it needs a person). `goal` is what the company picked to do first, and `brand` the brand it sets up. The `website` step is done once the script is on the site and its DNS records are added (`get_brand_dns`).
 - `update_onboarding` records the goal (`goal`: `outreach`, `search`, `reports` or `nurture`), skips steps (`skip`), brings them back (`unskip`) or closes the walk-through (`dismissed`).
 
 Over the REST API:

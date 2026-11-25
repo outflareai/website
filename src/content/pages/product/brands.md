@@ -17,7 +17,7 @@ docs:
     href: /docs/guides/brand-setup/
   - label: Memory and status
     href: /docs/agents/memory/
-  - label: Workspaces and access
+  - label: Companies and access
     href: /docs/guides/workspaces-and-access/
 faqs:
   - q: What is a brand in Outflare?

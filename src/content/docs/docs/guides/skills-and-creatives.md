@@ -24,7 +24,7 @@ Type the picture model's id once, as your AI account names it; Outflare has no d
 
 ### Say what you want
 
-Under the starter skills is a box for an ad described in your own words, such as "an ad for hikers tired of heavy packs; lead with our weight". **Write the prompt** has the workspace's own AI model draft a skill from it: a name, the prompt for the picture and how to write the words over it. It reads your description and what the brand says about itself (its context and personas), never your customers. Where it needs a number or a proof it wasn't given, it leaves a fill-in in curly brackets instead of inventing one.
+Under the starter skills is a box for an ad described in your own words, such as "an ad for hikers tired of heavy packs; lead with our weight". **Write the prompt** has the company's own AI model draft a skill from it: a name, the prompt for the picture and how to write the words over it. It reads your description and what the brand says about itself (its context and personas), never your customers. Where it needs a number or a proof it wasn't given, it leaves a fill-in in curly brackets instead of inventing one.
 
 Read the draft, change anything and press **Save as a skill**. Until then nothing is saved, and no picture is made or paid for. The draft runs on your own AI model connection and counts toward your AI spend limits (AI tool **Creative prompts**); without one connected, the box says so and links to Connectors.
 

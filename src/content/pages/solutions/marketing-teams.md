@@ -11,7 +11,7 @@ points:
   - "Agents can never approve their own missions or changes"
   - "An audit log of every significant change"
 docs:
-  - label: Workspaces and access
+  - label: Companies and access
     href: /docs/guides/workspaces-and-access/
   - label: Brands
     href: /docs/guides/brands/

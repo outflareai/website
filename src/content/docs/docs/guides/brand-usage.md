@@ -1,13 +1,13 @@
 ---
 title: Usage and limits
-description: See how many events, tracker clicks, contacts and session recordings each brand uses this month, how close its workspace is to a limit, and what stops when a limit is reached. You hear about it before anything stops.
+description: See how many events, tracker clicks, contacts and session recordings each brand uses this month, how close its company is to a limit, and what stops when a limit is reached. You hear about it before anything stops.
 sidebar:
   order: 18
 ---
 
 <span class="pill shipped">Shipped</span> In the app, through the API and for agents.
 
-**Settings → Usage and limits** shows what a brand stores and tracks, next to its whole workspace's total and the workspace's limits:
+**Settings → Usage and limits** shows what a brand stores and tracks, next to its whole company's total and the company's limits:
 
 - **Website and product events** and **tracker clicks** since the 1st of the month (UTC).
 - **Contacts and companies** and **session recordings** the brand keeps now.
@@ -16,9 +16,9 @@ Each card shows the brand's own share, the other brands' share and what is left 
 
 ## Limits are shared
 
-Limits belong to the workspace, so all its brands count toward the same ones. A busy brand can use up a limit for the others; the card shows how much of the total is this brand's.
+Limits belong to the company, so all its brands count toward the same ones. A busy brand can use up a limit for the others; the card shows how much of the total is this brand's.
 
-A self-hosted server has no limits unless its owner adds them, so every card says **no limit**. On Outflare Cloud, the Free plan and a trial that ended without a card have a monthly allowance; paying, trialing and credit workspaces have none. **Raise the limit** opens your plan.
+A self-hosted server has no limits unless its owner adds them, so every card says **no limit**. On Outflare Cloud, the Free plan and a trial that ended without a card have a monthly allowance; paying, trialing and credit companies have none. **Raise the limit** opens your plan.
 
 ## When a limit is close or reached
 

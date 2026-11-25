@@ -7,7 +7,7 @@ sidebar:
 
 <span class="pill shipped">Shipped</span> Claude, OpenAI, Gemini, Mistral, xAI, DeepSeek and three routers (OpenRouter, Vercel AI Gateway, Requesty), a model picker, and a monthly AI limit.
 
-Outflare plans [missions](/docs/agents/missions/) from a goal and runs its own agent with an AI model you connect, using **your own API key**. Usage is billed by the provider, to your account. Every workspace brings its own key: Outflare never supplies, pays for or shares one. You don't need one to use Outflare: your own agent over [MCP](/docs/agents/mcp/) or the API needs no model here at all.
+Outflare plans [missions](/docs/agents/missions/) from a goal and runs its own agent with an AI model you connect, using **your own API key**. Usage is billed by the provider, to your account. Every company brings its own key: Outflare never supplies, pays for or shares one. You don't need one to use Outflare: your own agent over [MCP](/docs/agents/mcp/) or the API needs no model here at all.
 
 ## Pick a provider and a model
 
@@ -56,21 +56,21 @@ The cheaper defaults are Claude's; with another provider every task uses the mai
 
 ## Limit what AI can spend
 
-- **Monthly AI limit** for the workspace, across every plan and every turn of Outflare's agent: US$50 a month by default, or no limit. Once it is reached, planning answers `409` with `ai_budget_reached` and running missions pause and say why.
+- **Monthly AI limit** for the company, across every plan and every turn of Outflare's agent: US$50 a month by default, or no limit. Once it is reached, planning answers `409` with `ai_budget_reached` and running missions pause and say why.
 - **Each mission's own spend limit** still applies, and every plan and turn is recorded in the mission's spend.
-- **A limit per tool**, such as reply labelling or social replies, on top of the workspace's. See where each tool's spend goes and set its limit under [AI usage](/docs/guides/ai-usage/). Owners and admins are emailed at 80% of a limit and when it is reached.
+- **A limit per tool**, such as reply labelling or social replies, on top of the company's. See where each tool's spend goes and set its limit under [AI usage](/docs/guides/ai-usage/). Owners and admins are emailed at 80% of a limit and when it is reached.
 - **Set a limit with the provider too.** Your provider bills your account for every call, and Outflare takes no responsibility for that spend. The provider's limit is the only one that holds whatever happens, so we recommend a key made just for Outflare with a hard spend limit on it. Outflare asks you to confirm this when you connect a model.
 
 ## How your key is kept safe
 
 - **Encrypted at rest** with your instance key, bound to that connection, and deleted with it.
-- **Sent only to the provider's own API.** The addresses are fixed in Outflare; no workspace setting can point a key somewhere else, and redirects are never followed. Only whoever runs the server can route calls through a gateway (see below).
+- **Sent only to the provider's own API.** The addresses are fixed in Outflare; no company setting can point a key somewhere else, and redirects are never followed. Only whoever runs the server can route calls through a gateway (see below).
 - **Never shown again.** Keys are never returned by the API, written to logs, events or the audit log, or given to the model. Error messages from a provider are cleaned of anything that looks like a key before you see them.
 - **The right key in the right box.** An Outflare token pasted into any connector is refused, and a key that is plainly another provider's (say a Gemini key in the OpenAI box) is refused before anything is sent.
 
 ## How the agent is kept on course
 
-Outflare's agent reads text written by people outside your workspace: email replies, lead fields, web pages and data from connected tools. Some of it may try to give the agent orders. So:
+Outflare's agent reads text written by people outside your company: email replies, lead fields, web pages and data from connected tools. Some of it may try to give the agent orders. So:
 
 - The agent is told that only the people in the mission instruct it, and that everything it reads is data.
 - Whatever the model decides, Outflare holds the changes that could send data out or change where mail goes, **even in autonomous mode**, until a person approves them: email replies and test sends, adding or changing mailboxes, sending servers, senders and sign-ins, webhooks, suppressions, connectors, API tokens and the company context.
@@ -94,4 +94,4 @@ Reading the settings needs `integrations.read`; changing them needs `integration
 
 ## Self-hosting
 
-Nothing to set: each workspace brings its own key. To send every call through your own gateway, set `ANTHROPIC_BASE_URL`, `OUTFLARE_OPENAI_BASE_URL`, `OUTFLARE_GEMINI_BASE_URL` or `OUTFLARE_MISTRAL_BASE_URL`. These apply to the whole server, and the gateway sees the keys, so only use one you control. Your own `ANTHROPIC_API_KEY` in the server's environment is never used for a workspace's calls.
+Nothing to set: each company brings its own key. To send every call through your own gateway, set `ANTHROPIC_BASE_URL`, `OUTFLARE_OPENAI_BASE_URL`, `OUTFLARE_GEMINI_BASE_URL` or `OUTFLARE_MISTRAL_BASE_URL`. These apply to the whole server, and the gateway sees the keys, so only use one you control. Your own `ANTHROPIC_API_KEY` in the server's environment is never used for a company's calls.

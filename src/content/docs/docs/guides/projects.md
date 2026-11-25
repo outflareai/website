@@ -19,7 +19,7 @@ If you never used projects, nothing changed for you.
 | Daily send limit across its sequences | Each sequence's own daily send limit. See [Sequences](/docs/guides/sequences/). |
 | Domains and mailboxes | The brand. Any sequence in a brand may send from any of the brand's mailboxes. Shared mailboxes, in no brand, send for any sequence. |
 | Lead lists | The brand. |
-| Project API tokens | Workspace tokens with the same scopes. To keep a token to one brand, create it with `brand`. |
+| Project API tokens | Company tokens with the same scopes. To keep a token to one brand, create it with `brand`. |
 | Reply rules | The rules of each of its sequences. |
 | Costs and results | Per brand or per sequence on the [Outcomes](/docs/guides/outcomes/) page. |
 | Missions, memories, meetings, deals and spend | Keep their brand. |
@@ -30,7 +30,7 @@ If you never used projects, nothing changed for you.
 - **Paused projects.** Their sequences were paused. Start the ones you want running again.
 - **Daily limits.** A project's daily send limit was split evenly over its sequences, rounded down, as each sequence's own limit.
 - **Lead lists.** A list that was in a project now scores against the project's ideal customer profile, through its own `profile_id`.
-- **API tokens.** A token limited to one project became a workspace token with the same scopes, so it can now see and change the whole workspace. Each change is in the audit log. Review your tokens under **Settings → API tokens** and revoke any that should stay narrow, or make a new one kept to a brand.
+- **API tokens.** A token limited to one project became a company token with the same scopes, so it can now see and change the whole company. Each change is in the audit log. Review your tokens under **Settings → API tokens** and revoke any that should stay narrow, or make a new one kept to a brand.
 - **Infrastructure plans and costs** kept the project's brand.
 
 ## For agents and the API

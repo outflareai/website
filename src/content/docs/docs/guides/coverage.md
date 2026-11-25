@@ -66,9 +66,9 @@ Each find gets a type from its address: a YouTube video, a forum thread such as 
 
 Web searches sit at the top of **Discovery**. Each one reads the Google results for a query every day, week or month. Every result that isn't one of your brand's own pages becomes a find. A search for your brand's name, in quotes, is added on the first day, and you can add more, such as `"Your brand" alternatives` or `"Your brand" review`. **Run now** runs a search straight away, and **Pause** stops it.
 
-Web searches run on your workspace's own [DataForSEO or Geonode connection](/docs/integrations/seo/), within that connection's budget. Until you connect one, each search shows **Needs a search results connection** and nothing is spent. News searches stay separate: they find recent articles, while web searches find the pages that rank.
+Web searches run on your company's own [DataForSEO or Geonode connection](/docs/integrations/seo/), within that connection's budget. Until you connect one, each search shows **Needs a search results connection** and nothing is spent. News searches stay separate: they find recent articles, while web searches find the pages that rank.
 
-[Geonode, Ahrefs and DataForSEO](/docs/integrations/seo/) always run on your workspace's own connected accounts and budgets. No Outflare-provided key or fallback account is used. An integration stays unavailable until the workspace connects what it needs; manual records and available native checks remain usable.
+[Geonode, Ahrefs and DataForSEO](/docs/integrations/seo/) always run on your company's own connected accounts and budgets. No Outflare-provided key or fallback account is used. An integration stays unavailable until the company connects what it needs; manual records and available native checks remain usable.
 
 Review each candidate, choose its publisher, and confirm or dismiss it. Matching pages are deduplicated, while source history is retained. A discovered page is not automatically classified as earned or counted as a newly published article.
 
@@ -89,7 +89,7 @@ Filter by how it's got, or sort by Domain Rating or most recent instead. Each pa
 
 Every competitor is scanned once a month by default, so a long competitor list doesn't spend your search and SEO budgets every week. Your top 10, by the keywords you share, can be scanned more often: change how many count as top and how often each group is scanned at the top of the tab, or give one competitor its own cadence. **Scan now** scans a competitor straight away.
 
-Search results and links run on your workspace's own [DataForSEO, Geonode or Ahrefs connection](/docs/integrations/seo/), within that connection's budget. Until you connect one, the competitor says which connection each part needs, and nothing is spent. AI answers need no connection of their own.
+Search results and links run on your company's own [DataForSEO, Geonode or Ahrefs connection](/docs/integrations/seo/), within that connection's budget. Until you connect one, the competitor says which connection each part needs, and nothing is spent. AI answers need no connection of their own.
 
 ## Work the best opportunities first
 
@@ -161,7 +161,7 @@ Open a placement's **Content & links** tab to queue a page check and inspect its
 
 A successful page load alone does not verify brand coverage: first verification needs a positive mention or backlink observation. Page loss or a missing/changed expected link needs two agreeing observations. Network failures preserve previous positive evidence. A missing rotating ad or newsletter placement cannot be inferred from a single sampled page; record its delivery evidence instead.
 
-Native checks follow crawl restrictions. The explicit connected reader uses the workspace's Geonode connection and budget. Pausing monitoring also prevents an already queued scheduled check from fetching the placement.
+Native checks follow crawl restrictions. The explicit connected reader uses the company's Geonode connection and budget. Pausing monitoring also prevents an already queued scheduled check from fetching the placement.
 
 ### Watch each placement over time
 
@@ -171,11 +171,11 @@ A removed mention creates work in the queue, the same as a removed link. Turn ei
 
 ### Review claims against Knowledge
 
-Publish current customer-facing pricing, features and product facts in **Knowledge**, and configure a [workspace AI model](/docs/agents/ai-models/). After a successful page check, select **Review accuracy**.
+Publish current customer-facing pricing, features and product facts in **Knowledge**, and configure a [company AI model](/docs/agents/ai-models/). After a successful page check, select **Review accuracy**.
 
 The result shows the external quote beside the published Knowledge passage and version. Sentiment is separate from factual accuracy, and findings need human review. Historical statements and opinions should not be treated as incorrect current claims merely because they differ from today's positioning.
 
-Changed or withdrawn Knowledge invalidates old assessments. You can also enable **Monitor accuracy** on a placement for scheduled review, no more often than daily and no more frequently than its page checks. When your brand's published Knowledge changes, such as new pricing or a renamed product, placements with **Monitor accuracy** on are checked again within a day, so the brand facts on each page are compared with what is true now. Unchanged page text and Knowledge versions reuse the existing successful analysis. Model calls use the workspace's connection and budget.
+Changed or withdrawn Knowledge invalidates old assessments. You can also enable **Monitor accuracy** on a placement for scheduled review, no more often than daily and no more frequently than its page checks. When your brand's published Knowledge changes, such as new pricing or a renamed product, placements with **Monitor accuracy** on are checked again within a day, so the brand facts on each page are compared with what is true now. Unchanged page text and Knowledge versions reuse the existing successful analysis. Model calls use the company's connection and budget.
 
 AI can also suggest a placement format or prepare an editable thank-you, link request, correction or follow-up. A thank-you and a link request are separate purposes.
 

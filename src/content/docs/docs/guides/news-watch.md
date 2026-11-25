@@ -28,7 +28,7 @@ A new search runs straight away, and **Run now** runs it again whatever its sche
 
 ## Articles
 
-Each run keeps up to 50 results. An article is kept once per workspace, however many searches find it, without tracking tags such as `utm_` parameters, and with the searches that found it. Deleting a search deletes the articles only it found.
+Each run keeps up to 50 results. An article is kept once per company, however many searches find it, without tracking tags such as `utm_` parameters, and with the searches that found it. Deleting a search deletes the articles only it found.
 
 ## Coverage
 

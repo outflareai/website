@@ -14,7 +14,7 @@ It runs only in Outflare Cloud, at [app.outflare.ai](https://app.outflare.ai/). 
 
 ## Your own accounts
 
-Every search, page read, AI call, people search and address check runs on accounts your workspace connects on the [Connectors](/docs/integrations/connectors/) page. The providers bill you directly. Outflare never lends a key, and a search pauses and says which connection to add when one is missing.
+Every search, page read, AI call, people search and address check runs on accounts your company connects on the [Connectors](/docs/integrations/connectors/) page. The providers bill you directly. Outflare never lends a key, and a search pauses and says which connection to add when one is missing.
 
 - **Web search and page reading:** a web data connection such as Geonode, to find companies and read their websites.
 - **AI:** your own AI connection, to plan the searches and check each company against your profile. Its calls show as "Lead finder" on [AI usage](/docs/guides/ai-usage/), where you can give it a limit of its own.

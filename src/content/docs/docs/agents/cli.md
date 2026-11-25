@@ -14,7 +14,7 @@ go install github.com/outflareai/outflare/engine/cmd/outflare@latest
 outflare login --url https://outflare.example.com
 ```
 
-`login` asks for an [API token](/docs/api/authentication/) (it is not echoed), checks it with `GET /v1/whoami`, and saves the server, token and the token's workspace to your config folder (`~/.config/outflare/config.json` on Linux, readable only by you). In CI, skip `login` and set `OUTFLARE_URL` and `OUTFLARE_TOKEN`, or pipe the token in with `outflare login --url ... --token-stdin`. `outflare whoami` shows the token, its workspace and scopes; `outflare logout` forgets it.
+`login` asks for an [API token](/docs/api/authentication/) (it is not echoed), checks it with `GET /v1/whoami`, and saves the server, token and the token's company to your config folder (`~/.config/outflare/config.json` on Linux, readable only by you). In CI, skip `login` and set `OUTFLARE_URL` and `OUTFLARE_TOKEN`, or pipe the token in with `outflare login --url ... --token-stdin`. `outflare whoami` shows the token, its company and scopes; `outflare logout` forgets it.
 
 ## Run any operation
 
@@ -41,14 +41,14 @@ outflare import-leads --data @leads.csv
 | `--curl` | Prints the request as a `curl` command instead of sending it, with the token as `$OUTFLARE_TOKEN`. |
 | `--mission ID` | Acts inside an [agent mission](/docs/agents/missions/). A held write prints its `MissionHeld` answer and says so. |
 | `--idempotency-key K` | Sets the [retry key](/docs/api/#safe-retries). Without it, every write gets a fresh one. |
-| `--workspace ID` | Another workspace you belong to. |
+| `--workspace ID` | Another company you belong to. |
 | `--raw` | Prints the answer exactly as the server sent it. |
 
 When a body field has the same name as one of these (a webhook's `--url`), the flag goes to the body; set the server with `OUTFLARE_URL` for that call.
 
 ## Follow request logs
 
-`outflare logs` prints the latest API calls in the workspace, and `--follow` keeps printing new ones as they happen, like `tail -f`. Filter with `--level`, `--surface`, `--status`, `--operation`, `--mcp-tool`, `--q` and `--since`. It needs the `audit.read` scope. See [Logs](/docs/api/logs/).
+`outflare logs` prints the latest API calls in the company, and `--follow` keeps printing new ones as they happen, like `tail -f`. Filter with `--level`, `--surface`, `--status`, `--operation`, `--mcp-tool`, `--q` and `--since`. It needs the `audit.read` scope. See [Logs](/docs/api/logs/).
 
 ```sh
 outflare logs --follow --level warning,error
@@ -57,7 +57,7 @@ outflare logs --surface mcp --since 1h
 
 ## Listen for events
 
-`outflare listen` shows what happens in the workspace as it happens, from now on. Add `--forward-to URL` to send each event to a receiver on your machine, signed like a real webhook delivery; see [Test a receiver on your machine](/docs/api/webhooks/#test-a-receiver-on-your-machine).
+`outflare listen` shows what happens in the company as it happens, from now on. Add `--forward-to URL` to send each event to a receiver on your machine, signed like a real webhook delivery; see [Test a receiver on your machine](/docs/api/webhooks/#test-a-receiver-on-your-machine).
 
 ```sh
 outflare listen --types lead.replied,mailbox.auto_paused

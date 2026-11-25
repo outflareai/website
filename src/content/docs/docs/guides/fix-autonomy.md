@@ -33,10 +33,10 @@ Owners, admins and anyone with `seo.manage` change it on **Fixes → Agent auton
 
 | Endpoint | MCP tool | What it does |
 | --- | --- | --- |
-| `GET /v1/workspaces/{ws}/fix-autonomy` | `get_fix_autonomy` | The workspace's setting |
+| `GET /v1/workspaces/{ws}/fix-autonomy` | `get_fix_autonomy` | The company's setting |
 | `PUT /v1/workspaces/{ws}/fix-autonomy` | `update_fix_autonomy` | Change it; fields left out keep their value |
-| `GET/PUT /v1/brands/{brand}/seo-sites/{site}/fix-autonomy` | the same tools with `site_id` | A site's own setting, or the workspace's when it has none (`inherited`) |
-| `DELETE /v1/brands/{brand}/seo-sites/{site}/fix-autonomy` | | Put the site back on the workspace's setting |
+| `GET/PUT /v1/brands/{brand}/seo-sites/{site}/fix-autonomy` | the same tools with `site_id` | A site's own setting, or the company's when it has none (`inherited`) |
+| `DELETE /v1/brands/{brand}/seo-sites/{site}/fix-autonomy` | | Put the site back on the company's setting |
 | `POST /v1/brands/{brand}/fixes/{fix}/start` | `start_fix` | Take a fix before changing the site |
 
 ```sh

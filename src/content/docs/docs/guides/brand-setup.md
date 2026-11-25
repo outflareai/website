@@ -9,7 +9,7 @@ sidebar:
 
 Each [brand](/docs/guides/brands/) has its own setup checklist under **Company → Brand setup**. It goes in order, starting with what every brand needs and ending with the tools fewer brands use. Leave whenever you like: Home shows **Continue setting up Acme · 3 of 10** until every step is done or you close it, and you pick up where you left off.
 
-A step is done when the workspace has it, however it got there. Connect Stripe on the Connectors page, or ask Claude to do it over MCP, and the payments step ticks off here too.
+A step is done when the company has it, however it got there. Connect Stripe on the Connectors page, or ask Claude to do it over MCP, and the payments step ticks off here too.
 
 ## The steps
 
@@ -74,6 +74,6 @@ Problems show at the top of the brand's setup page with a **Fix** button, and on
 - `POST .../setup/install` (`install_brand_setup`): the one-click install, queued. `GET .../setup/tag-containers` (`list_tag_containers`) lists the containers to pick from.
 - `POST .../setup/check` (`check_brand_setup`): look for the DNS record now.
 - `GET /v1/workspaces/{ws}/brands/{brand}/dns` (`get_brand_dns`): every DNS record the brand needs, grouped, each `in_place` or `missing`, with the developer message and AI prompt for the whole list.
-- `POST .../brands/{brand}/dns` (`add_brand_dns`): add every missing record through one of the workspace's Cloudflare connections, queued. Answers `409 nothing_to_add` when nothing is missing.
+- `POST .../brands/{brand}/dns` (`add_brand_dns`): add every missing record through one of the company's Cloudflare connections, queued. Answers `409 nothing_to_add` when nothing is missing.
 - `POST .../brands/{brand}/dns/check` (`check_brand_dns`): look for every missing record now, after adding them by hand, and get the list back with each record `in_place` or still `missing`. Sending domains are checked a few seconds later, so read the list again shortly.
 - `GET /v1/brands/{brand}/install-health` (`get_install_health`): every problem above, worst first, each with the tool or page that fixes it. They also appear in `GET /status` as `install_broken` and `install_outdated`, and as the `install.issue_opened` and `install.issue_resolved` [webhooks](/docs/api/webhooks/).

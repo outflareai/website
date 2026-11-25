@@ -7,7 +7,7 @@ sidebar:
 
 <span class="pill shipped">Shipped</span> In the web app (from a list, a saved query, or people and companies you tick), the REST API and the MCP server.
 
-A bulk edit changes many people or companies of one brand at once: give them an owner, add or remove tags, set or clear a field, put them in or take them out of a static list, or archive them. Only the workspace's **owners**, signed in, run one. Anyone who may change records can preview it.
+A bulk edit changes many people or companies of one brand at once: give them an owner, add or remove tags, set or clear a field, put them in or take them out of a static list, or archive them. Only the company's **owners**, signed in, run one. Anyone who may change records can preview it.
 
 Every change a bulk edit makes is written to each record's own history, with who ran it and which bulk edit it was. An undo adds history too: the record shows both the change and the undo.
 

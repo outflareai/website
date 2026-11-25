@@ -49,7 +49,7 @@ curl -X PATCH https://app.outflare.ai/v1/workspaces/$WS/integrations/$INTEGRATIO
 
 ## Over the API
 
-Turn warm-up on for chosen mailboxes, a whole pool, or every mailbox in the workspace:
+Turn warm-up on for chosen mailboxes, a whole pool, or every mailbox in the company:
 
 ```bash
 # Every mailbox in a pool. Leave out pool_id for all, or send mailbox_ids instead.
@@ -58,7 +58,7 @@ curl -X POST https://app.outflare.ai/v1/workspaces/$WS/mailboxes/warmup \
   -d '{"enabled": true, "pool_id": "'$POOL'"}'
 ```
 
-The answer is `{"updated": 12}`. Without `provider`, each mailbox keeps its sequencer or gets a connected one it is in. Listed mailboxes that are in none make the request fail with a 400 that says how many; for every mailbox in the workspace, those are left out. Send `provider` with a sequencer's integration id to choose it; without `mailbox_ids` or `pool_id`, that applies to every mailbox the account has:
+The answer is `{"updated": 12}`. Without `provider`, each mailbox keeps its sequencer or gets a connected one it is in. Listed mailboxes that are in none make the request fail with a 400 that says how many; for every mailbox in the company, those are left out. Send `provider` with a sequencer's integration id to choose it; without `mailbox_ids` or `pool_id`, that applies to every mailbox the account has:
 
 ```bash
 curl -X POST https://app.outflare.ai/v1/workspaces/$WS/mailboxes/warmup \

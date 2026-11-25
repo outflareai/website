@@ -54,7 +54,7 @@ Errors stop approval; warnings are for the person approving to read.
 
 ## With AI
 
-Two tools use your workspace's own [AI model](/docs/agents/ai-models/), under the **PR stories** task. Outflare never uses an AI key of its own: without a connected model these tools stay off and say so, and their calls count against your [AI limits](/docs/guides/ai-usage/).
+Two tools use your company's own [AI model](/docs/agents/ai-models/), under the **PR stories** task. Outflare never uses an AI key of its own: without a connected model these tools stay off and say so, and their calls count against your [AI limits](/docs/guides/ai-usage/).
 
 - **Suggest ideas with AI** suggests up to 10 story ideas from your brand, its facts, its experts' topics, its recent coverage and the last two weeks of news its topic searches found, with an optional brief from you. Each idea becomes a story at **Idea**; a reactive idea keeps the article it answers. Ideas never state numbers or quotes: a data idea says which of your numbers to look up.
 - **Draft with AI** writes the release from the story's headline, notes, facts and approved quotes only, never a draft or withdrawn quote, with optional guidance from you. If there is a release already, **Redraft with AI** improves it. The draft replaces the release and runs the check straight away, so you see at once whether it used a number with no fact or changed a quote. A person still approves it.
@@ -64,9 +64,9 @@ Two tools use your workspace's own [AI model](/docs/agents/ai-models/), under th
 Pitch an approved story to journalists through one of your own [sequences](/docs/guides/sequences/), from your existing mailboxes and their sending rules. On the story's **Pitches** card, choose the sequence and up to 50 journalists, such as those on a [media list](/docs/guides/news-watch/#media-lists).
 
 - **The sequence** must stop on any reply, have one or two steps (one follow-up at most), and use `{{custom.opener}}`. `{{custom.story_title}}` holds the headline.
-- **The opener.** Your workspace's AI model writes two to four sentences for each journalist from the story's facts and approved quotes and the journalist's latest article. It is checked like the release, so an opener with a number that isn't a fact, or a quote that isn't approved, waits for a person to fix it. Without a connected AI model, each pitch waits for a person to write the opener.
+- **The opener.** Your company's AI model writes two to four sentences for each journalist from the story's facts and approved quotes and the journalist's latest article. It is checked like the release, so an opener with a number that isn't a fact, or a quote that isn't approved, waits for a person to fix it. Without a connected AI model, each pitch waits for a person to write the opener.
 - **A person approves each pitch**, editing the opener first if they like. Approving makes the journalist a lead and enrolls them, **held until the story's embargo** lifts.
-- **Gentle with journalists.** A journalist is pitched once per story, and at most once a week by your workspace, whichever brand. Anyone who asked not to be contacted is skipped, and the sequence stops when they reply.
+- **Gentle with journalists.** A journalist is pitched once per story, and at most once a week by your company, whichever brand. Anyone who asked not to be contacted is skipped, and the sequence stops when they reply.
 - **Replies.** Each reply is read as **covering it**, **wants the data**, **wants an interview**, **not my beat**, **declined** or other, shown on the pitch and tagged in the [inbox](/docs/guides/inbox/). Requests for data or an interview also go to a person.
 
 ## Results

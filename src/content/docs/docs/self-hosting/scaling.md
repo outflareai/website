@@ -31,7 +31,7 @@ Website events never wait on the app: the server checks and stores each batch as
 
 ## Metrics, dashboards and alerts
 
-Outflare can report how busy, slow and healthy it is as Prometheus metrics: request rates and latency per route, the job queue, the database connection pool, Postgres itself, and CPU and memory. It's off unless you turn it on, and nothing leaves your server. Metrics never carry workspace ids, people or anything a customer typed.
+Outflare can report how busy, slow and healthy it is as Prometheus metrics: request rates and latency per route, the job queue, the database connection pool, Postgres itself, and CPU and memory. It's off unless you turn it on, and nothing leaves your server. Metrics never carry company ids, people or anything a customer typed.
 
 | Variable | Default | What it does |
 | --- | --- | --- |
@@ -58,4 +58,4 @@ Product events (site visits, tracked events and your server's own usage) live in
 | `OUTFLARE_S3_ENDPOINT`, `OUTFLARE_S3_REGION`, `OUTFLARE_S3_BUCKET`, `OUTFLARE_S3_ACCESS_KEY_ID`, `OUTFLARE_S3_SECRET_ACCESS_KEY` | An S3-compatible bucket (Cloudflare R2, Amazon S3, MinIO) for archived events. Set all of them or none, and give the key access to that one bucket only. |
 | `OUTFLARE_EVENT_RETENTION_DAYS` | How long events stay in Postgres. `0`, the default, keeps everything. |
 
-Every six hours, events older than the retention are moved out of Postgres: written to the bucket first when there is one, kept in ClickHouse when it has copied them, and otherwise deleted. These run your server, like Postgres does, so they are set in the environment, not per workspace. More in [`docs/analytics-storage.md`](https://github.com/outflareai/outflare/blob/main/docs/analytics-storage.md).
+Every six hours, events older than the retention are moved out of Postgres: written to the bucket first when there is one, kept in ClickHouse when it has copied them, and otherwise deleted. These run your server, like Postgres does, so they are set in the environment, not per company. More in [`docs/analytics-storage.md`](https://github.com/outflareai/outflare/blob/main/docs/analytics-storage.md).

@@ -82,7 +82,7 @@ Duplicates count only among pages meant to be indexed: a page marked `noindex`, 
 
 ## The fixes list
 
-Each audit's issues go on the workspace's **fixes list**: one list of work for everyone in the workspace and their agents, so nothing is tracked in two places. A site audit adds one fix per rule and URL template, such as "pages in /blog/* have no meta description", with how many pages are left.
+Each audit's issues go on the company's **fixes list**: one list of work for everyone in the company and their agents, so nothing is tracked in two places. A site audit adds one fix per rule and URL template, such as "pages in /blog/* have no meta description", with how many pages are left.
 
 Other features add to the same list, such as [link opportunities](/docs/guides/backlinks/#link-opportunities-on-the-fixes-list) from your backlinks.
 
@@ -122,7 +122,7 @@ It writes from the issue, the pages, your brand and its website, the other ticke
 - **Ask for changes**: say what to change ("keep titles under 55 characters") and it is written again.
 - **Reject** it, with a reason. Its fixes are ignored, so crawls stop raising them.
 
-Choose to remember a reason, and it becomes a **guideline** for the site, the brand or the whole workspace. Every later ticket follows your guidelines, such as "titles end with | Northpeak" or "never change /legal/*", so recommendations get better the more you review. Manage them under **Guidelines** on the Fixes page.
+Choose to remember a reason, and it becomes a **guideline** for the site, the brand or the whole company. Every later ticket follows your guidelines, such as "titles end with | Northpeak" or "never change /legal/*", so recommendations get better the more you review. Manage them under **Guidelines** on the Fixes page.
 
 **Hand it on.** **Copy as issue** gives the ticket as one Markdown issue, with the guidelines, every page and how to report back, ready for GitHub, Linear or your coding agent. When the change is out, **It's live, check it** crawls the site again to confirm it.
 

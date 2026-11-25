@@ -7,7 +7,7 @@ sidebar:
 
 <span class="pill shipped">Shipped</span> The team directory, in the web app, the REST API and the MCP server.
 
-**Settings → Team** lists everyone who works at the company, whether or not they sign in to Outflare, and the work accounts the company owns and hands to them: Telegram accounts, work emails and phone numbers. It belongs to the workspace, like members and teams, because one person can work across brands.
+**Settings → Team** lists everyone who works at the company, whether or not they sign in to Outflare, and the work accounts the company owns and hands to them: Telegram accounts, work emails and phone numbers. It belongs to the company, like members and teams, because one person can work across brands.
 
 ## People and departments
 
@@ -70,7 +70,7 @@ Once an account is signed in, its chats can go into one brand's CRM. In the acco
 Each synced chat is matched to a customer: a person, or a company for a group chat. Once it is, the customer's Telegram conversations sit on their record with everything else.
 
 1. **Outflare looks first.** A customer who already has the chat's Telegram account is linked straight away. Otherwise Outflare looks for a customer with the same phone number or username, an email address the other side wrote in the chat, or, in a group, a company's domain, and suggests them.
-2. **Then your AI.** For the rest, Outflare asks your workspace's own AI (**Settings → AI**, Telegram matching) to pick from customers with a similar name, using the chat's last few messages. It may also say a chat looks personal; that's only a hint. Without an AI connected, these chats wait as **No customer found**.
+2. **Then your AI.** For the rest, Outflare asks your company's own AI (**Settings → AI**, Telegram matching) to pick from customers with a similar name, using the chat's last few messages. It may also say a chat looks personal; that's only a hint. Without an AI connected, these chats wait as **No customer found**.
 3. **You confirm.** **CRM → Telegram → To confirm** lists the chats on your accounts that need you. **Confirm** the suggestion, **Change** to pick another customer or create one, or mark the chat personal or a colleague from its menu.
 
 Confirming gives the customer that Telegram account, so the next chat with them, on any company account, links by itself. Click a chat to read its messages.
@@ -78,12 +78,12 @@ Confirming gives the customer that Telegram account, so the next chat with them,
 ## Summaries and alerts
 
 - **Customers waiting.** When a customer writes last in a private chat, the chat shows how long they've waited (**CRM → Telegram → Waiting for an answer**). After four hours the account's holder gets an alert, once per wait, by email or Slack as you choose in **Settings → Alerts**. Old waits from the history import don't alert.
-- **Summaries.** Open a chat and press **Summarise**: your workspace's own AI (**Settings → AI**, Telegram summaries) writes what they want, what was agreed, what's still open and who owes the next message. It says when new messages came in since.
+- **Summaries.** Open a chat and press **Summarise**: your company's own AI (**Settings → AI**, Telegram summaries) writes what they want, what was agreed, what's still open and who owes the next message. It says when new messages came in since.
 - **Handovers.** When you give a synced account to someone else in **Settings → Team**, its customer chats from the last 30 days are summarised for them, and they get an alert pointing to the chats.
 
 ## Staff: contracts, pay and organisations (owners only)
 
-**Company → Staff** keeps what the company knows about everyone who works for it: employees, freelancers, contractors, people on an employer of record and advisors, and the organisations it works through, such as its own companies, agencies, hiring platforms and service providers. Only the workspace's owners can see it or change it. The server enforces this for the web app, the API, MCP and the CSV export, and no other role or API token can be given access.
+**Company → Staff** keeps what the company knows about everyone who works for it: employees, freelancers, contractors, people on an employer of record and advisors, and the organisations it works through, such as its own companies, agencies, hiring platforms and service providers. Only the company's owners can see it or change it. The server enforces this for the web app, the API, MCP and the CSV export, and no other role or API token can be given access.
 
 - **Everyone** lists each person with their position, department and manager, their type and start date, their contract, and what they cost a month. Filter by department, show people who have left, choose columns, and download everything as a CSV. A person's page holds their contact details (work and private email, phone, address), their contract and pay, every agreement, the payments recorded and a change log.
 - **Organisations** lists agencies, suppliers, platforms and your own companies, with their contact, the people who came through them and what you have paid them. Each organisation has its own page with its details, agreements and payments.

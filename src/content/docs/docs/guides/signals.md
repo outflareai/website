@@ -26,7 +26,7 @@ A signal goes to the record's owner (its `owner` attribute), or to `owner_id` wh
 - **One open signal per type on a record.** A second churn risk signal about the same company is refused (`409`) until the first is closed.
 - **Five open signals on a record.** The sixth is refused until one is closed.
 - **A due date.** Each type has a number of days (2 by default). Past it the signal shows as late.
-- **Escalation.** An open signal nobody accepted two days past its due date is handed to the workspace's owners and admins once, as a "Signal not picked up" alert.
+- **Escalation.** An open signal nobody accepted two days past its due date is handed to the company's owners and admins once, as a "Signal not picked up" alert.
 
 ## Working a signal
 
@@ -51,7 +51,7 @@ A brand starts with eight types: Churn risk, Upsell, Cross-sell, Renewal, Billin
 
 Customers say what they need in conversations long before it shows in usage: "we're doubling the team", "can you do annual billing?", "we're also trying a competitor". Needs attention, Conversations switches on reading them for a brand (`PUT /v1/brands/{brand}/conversation-signals`). It is off until you switch it on.
 
-- **It runs on your own AI.** Every read is a call on the workspace's own AI account (Settings, AI, task "Conversation signals", with its own model and monthly limit). Without a connected model nothing is read. Outflare supplies no AI.
+- **It runs on your own AI.** Every read is a call on the company's own AI account (Settings, AI, task "Conversation signals", with its own model and monthly limit). Without a connected model nothing is read. Outflare supplies no AI.
 - **What is read.** Support conversations (email and chat), chats from company Telegram accounts that are linked to a person or company, email the team shares, and call transcripts. Choose the channels with `channels`.
 - **Private email is never read.** Email is read only when the brand's team sharing is on, the privacy check found the email to be about work, and its owner shares the contact with the brand. Everything else stays its owner's.
 - **Calls come from your own recorder.** Outflare records no calls. Send a transcript with `POST /v1/brands/{brand}/records/{record}/transcripts` (`text`, and optionally `title` and `occurred_at`), from your recorder's webhook, an automation or an agent (`add_transcript`). The text is kept sealed and removed once it has been read.

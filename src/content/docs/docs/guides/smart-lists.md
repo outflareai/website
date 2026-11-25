@@ -45,7 +45,7 @@ If nothing says who to include, a warning says the list will hold nearly everyon
 
 ### Describe it in words
 
-Type who should be in the list in the box headed **Describe who should be in it**, above the builder, such as "paid in the last 90 days but never opened the app", and press **Fill in for me** (or Enter). Your workspace's own AI model fills in the conditions from your field, event, page and list names. It never sees people or their details. The conditions appear in the builder with a sentence on who they pick, for you to check, change and save. Nothing is saved until you save it. This uses the AI model you connected with your own key; without one, the box links to [Connectors](/docs/integrations/connectors/) to add it. Outflare never supplies an AI key.
+Type who should be in the list in the box headed **Describe who should be in it**, above the builder, such as "paid in the last 90 days but never opened the app", and press **Fill in for me** (or Enter). Your company's own AI model fills in the conditions from your field, event, page and list names. It never sees people or their details. The conditions appear in the builder with a sentence on who they pick, for you to check, change and save. Nothing is saved until you save it. This uses the AI model you connected with your own key; without one, the box links to [Connectors](/docs/integrations/connectors/) to add it. Outflare never supplies an AI key.
 
 ### From a saved query
 
