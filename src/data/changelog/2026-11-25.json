@@ -2,7 +2,7 @@
 	"version": "2026.11.25",
 	"date": "2026-11-25",
 	"status": "in-progress",
-	"updated": "2026-11-25T10:28:24Z",
+	"updated": "2026-11-25T11:08:50Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -52,7 +52,21 @@
 			"edition": "open-source",
 			"text": "The Owner column on the partners list shows the owner's name again. For a teammate who was in your staff list before they had a sign-in, it showed an id instead.",
 			"at": "2026-11-25T10:28:24Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Paid ads, Payback: the Day to day chart shows what each day's ad spend brought back as a percent of that day's spend, with a line at 100% for a day that paid for itself, or as amounts over bars of spend. Hover a day to see every number for it. A line with no numbers yet says so.",
+			"at": "2026-11-25T11:08:50Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Each role now opens on its own page, with a level per area and the single permissions inside it. Adding people to teams (`teams.members`), editing teams (`teams.manage`) and resetting someone's two-factor (`members.two_factor`) are permissions of their own; roles and API tokens that could do these before keep them.",
+			"at": "2026-11-25T11:08:50Z"
 		}
 	],
-	"through": "3107f44+3107f44"
+	"through": "d1ed459+d1ed459"
 }
