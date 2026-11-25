@@ -36,6 +36,7 @@ By category, including what is planned:
 | Social | [Reddit](/docs/guides/reddit/), with your workspace's own app: find posts and post replies a person approves from the brand's own account |
 | Podcasts | Podcast Index, with your own free key: [mentions](/docs/guides/mentions/) of your brand and competitors in podcast episodes. Groq, with your own key (its free plan is enough): [listening to what's said](/docs/guides/mentions/#listening-to-whats-said) in episodes with no transcript |
 | Ad platforms | [Google Ads, Meta Ads, Microsoft Advertising, Reddit Ads, X Ads, LinkedIn Ads, ChatGPT Ads](/docs/integrations/paid-media/), with your own ad accounts: spend and results, conversions sent back, and campaign changes a person approves |
+| Bank accounts | [Airwallex, Aspire, Revolut Business](/docs/guides/finances/#connect-the-bank), with your own read-only key: accounts, balances and settled lines for Finances. [Sheepy](/docs/guides/finances/#crypto): coin balances and withdrawals to your bank |
 | DNS and registrars | Cloudflare, Namecheap, GoDaddy, Route 53 |
 | AI models | [Claude, OpenAI, Gemini, Mistral, xAI, DeepSeek and the routers OpenRouter, Vercel AI Gateway and Requesty](/docs/agents/ai-models/), for planning and running missions and for [AI visibility](/docs/guides/ai-visibility/), with your own key |
 | Custom | Any HTTP API or MCP server you register |
