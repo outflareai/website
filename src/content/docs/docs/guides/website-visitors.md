@@ -36,10 +36,11 @@ A visitor is one browser, so the same person on a laptop and a phone is two visi
 1. **Sign in.** Have your product send `identify` with the user's id and that browser's anonymous id on every sign-up and every sign-in, on every device. This matters most: a sign-in without the anonymous id never joins that browser's visits.
 2. **Click a link in email you sent from Outflare** (above).
 3. **Open a visitor link** you sent them yourself (above).
+4. **Come from the same campaign link click** as one of their other browsers, soon after the click. A lander that opens its offer in a new tab, on a site that keeps no id cookie without consent, reports one click under two browsers: once either is known, both are the person's, so a funnel shows the lander steps too. Only page views that carry the click's `ofclk` soon after it count, only on the same kind of device, browser and system, never more than a few browsers for one click (a link passed around has more), and never two people: when the browsers already belong to different people, nobody moves.
 
 ## When a visitor becomes known
 
-When a browser joins a person, everything it did before (pages, events, visits and consent choices) moves onto their record, and their first and last touch are worked out again. Their timeline shows the moment as **Went from anonymous visitor to known**: when, how (signed in, clicked a link in your email, or opened a visitor link), on which device, when that browser was first seen, and how many visits and events from before joined them. If someone else later signs in on that browser, it goes back to them, and the timeline shows that too.
+When a browser joins a person, everything it did before (pages, events, visits and consent choices) moves onto their record, and their first and last touch are worked out again. Their timeline shows the moment as **Went from anonymous visitor to known**: when, how (signed in, clicked a link in your email, opened a visitor link, or came from the same campaign link click), on which device, when that browser was first seen, and how many visits and events from before joined them. If someone else later signs in on that browser, it goes back to them, and the timeline shows that too.
 
 ## Everyone, and each visitor's journey
 
