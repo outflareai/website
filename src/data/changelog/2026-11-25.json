@@ -2,7 +2,7 @@
 	"version": "2026.11.25",
 	"date": "2026-11-25",
 	"status": "in-progress",
-	"updated": "2026-11-25T17:46:02Z",
+	"updated": "2026-11-25T17:52:03Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -185,7 +185,14 @@
 			"edition": "open-source",
 			"text": "The app now calls a workspace a company: settings, menus, members, brands and messages say \"company\". Nothing else changes, and the API still names it a workspace.",
 			"at": "2026-11-25T17:14:33Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "Each brand's page now shows its brand ID with a copy button, and the API panel on every page shows the picked brand's ID next to the workspace ID, so you can copy it straight into an API call or integration.",
+			"at": "2026-11-25T17:52:03Z"
 		}
 	],
-	"through": "e42bdc9+e42bdc9"
+	"through": "b9238b8+b9238b8"
 }
