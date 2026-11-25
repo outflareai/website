@@ -2,7 +2,7 @@
 	"version": "2026.11.25",
 	"date": "2026-11-25",
 	"status": "in-progress",
-	"updated": "2026-11-25T02:42:24Z",
+	"updated": "2026-11-25T10:13:55Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -38,7 +38,14 @@
 			"edition": "open-source",
 			"text": "What support hands to sales is now marked New until you have seen or opened it, beside New conversations in Sales and with a dot in Support and the Inbox. Each row says who on the team saw it and when they opened it.",
 			"at": "2026-11-25T02:42:24Z"
+		},
+		{
+			"kind": "fix",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Conversions now go to your ad platforms within minutes even while a large import of past events is running. Past events sent late also no longer queue lifecycle and metric work they can't change, so imports finish faster.",
+			"at": "2026-11-25T10:13:55Z"
 		}
 	],
-	"through": "570408a+570408a"
+	"through": "5eefbc3+5eefbc3"
 }
