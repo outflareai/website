@@ -12,13 +12,13 @@ const liveConnectors = integrations.filter((i) => i.status === 'available').leng
 // Real screenshots of the web app (outflare web/), taken from a local demo
 // workspace where every name and domain is fictional (.example).
 const shots = [
-	{ id: 'home', label: 'Home', alt: 'Home: what needs you today, with sends, replies and bounces for the week, mailbox health and active sequences for one brand' },
-	{ id: 'analytics', label: 'Analytics', alt: 'Analytics: a Growth dashboard with website visits, sign-ups and new subscriptions against the month before, visits per week and sign-ups and trials per week' },
-	{ id: 'seo', label: 'SEO', alt: 'SEO overview: non-brand clicks from search per week for the last 12 weeks against the 12 weeks before, from Search Console, analytics and Ahrefs' },
+	{ id: 'home', label: 'Home', alt: 'Home: visits and first payments for the last 28 days against the period before, and For you today, with a sending domain to fix, possible duplicate people and unread replies' },
+	{ id: 'dashboards', label: 'Dashboards', alt: 'Dashboards: a Management report with revenue and new customers by month, both growing over the last year' },
+	{ id: 'partnerships', label: 'Partnerships', alt: 'Partnerships: every partner across the sponsorship, SEO and integration pipelines, with its stage, owner and next step' },
 	{ id: 'inbox-item', label: 'Inbox', alt: 'Inbox: replies from every mailbox in one list, with one conversation open and a reply box sending from the same address' },
-	{ id: 'people', label: 'CRM', alt: 'CRM: people with their job title, company, lifecycle stage and owner' },
-	{ id: 'mailboxes', label: 'Mailboxes', alt: 'Mailboxes: every sending mailbox with its status, warm-up and daily limit' },
-	{ id: 'connectors', label: 'Connectors', alt: 'Connectors: Ahrefs, Google Workspace, HubSpot, PostHog, Slack and Stripe, each connected, and the address to connect an AI agent over MCP' },
+	{ id: 'deals', label: 'CRM', alt: 'CRM: the deals board, with deals for each company by stage, from lead to proposal, with their value' },
+	{ id: 'money', label: 'Money', alt: 'Money: money in, money out, profit and margin for this month across every brand, and money in and out for each of the last 12 months' },
+	{ id: 'seo', label: 'SEO', alt: 'SEO overview: organic revenue, payments, sign-ups and search clicks for today, yesterday, the month so far, its forecast and last month, each against the period before' },
 ];
 
 // Five of these are connectors (Google Analytics to PostHog); "and N more" counts the rest.
@@ -127,7 +127,7 @@ const quickstart = [
 		<div class="relative mx-auto max-w-6xl px-4 pt-16 pb-10 text-center sm:px-6 sm:pt-24">
 			<a href="#modules" class="hit group inline-flex items-center gap-2 rounded-full border bg-background/80 py-1 pr-3 pl-1 text-xs text-muted-foreground shadow-xs backdrop-blur transition-colors hover:text-foreground">
 				<span class="badge badge-live rounded-full">Open source</span>
-				Growth is live. Money, people and goals are coming
+				New: money, people and goals join growth
 				<span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">→</span>
 			</a>
 			<h1 class="mx-auto mt-6 max-w-4xl bg-gradient-to-b from-foreground to-foreground/65 bg-clip-text pb-1 text-4xl font-semibold tracking-tighter text-balance text-transparent sm:text-6xl sm:leading-[1.05]">
@@ -222,17 +222,17 @@ const quickstart = [
 				))
 			}
 		</ul>
-		<h3 class="mt-14 text-lg font-semibold tracking-tight">The rest of the company: coming next</h3>
-		<p class="mt-1 text-sm text-muted-foreground">Money, people and goals join the same data, so agents can work on the whole business. Not live yet.</p>
+		<h3 class="mt-14 text-lg font-semibold tracking-tight">The rest of the company: new</h3>
+		<p class="mt-1 text-sm text-muted-foreground">Money, people and goals use the same data, so agents can work on the whole business.</p>
 		<ul class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 			{
 				companyModules.map((m) => (
-					<li class="card relative flex flex-col border-dashed p-6">
+					<li class={`card relative flex flex-col p-6 ${m.docs ? 'transition-colors has-[a:hover]:border-foreground/20' : ''}`}>
 						<div class="mb-4 flex items-center justify-between gap-2">
 							<span class="flex size-8 items-center justify-center rounded-md border bg-muted/60 text-muted-foreground"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={m.icon} /></span>
 							<span class={`badge ${moduleTag[m.status]}`}>{moduleStatusLabel[m.status]}</span>
 						</div>
-						<h3 class="font-semibold">{m.name}</h3>
+						{m.docs ? <a href={m.docs} class="font-semibold after:absolute after:inset-0 after:content-[''] hover:underline">{m.name}</a> : <h3 class="font-semibold">{m.name}</h3>}
 						<p class="mt-1.5 text-sm text-muted-foreground">{m.summary}</p>
 					</li>
 				))

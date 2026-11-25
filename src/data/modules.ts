@@ -8,7 +8,7 @@ export interface Module {
 	summary: string;
 	status: ModuleStatus;
 	// growth: find, win and keep customers. company: the rest of the business
-	// (money, people, goals), shown as coming until it ships.
+	// (money, people, goals).
 	area: 'growth' | 'company';
 	docs?: string;
 	// Inner SVG markup for a 24x24 stroke icon.
@@ -63,6 +63,14 @@ export const modules: Module[] = [
 		icon: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
 	},
 	{
+		name: 'Lead finder',
+		summary: 'On Outflare Cloud: finds companies that fit your ideal customer, the people to contact there and their work email, then shows the replies and meetings that came of it.',
+		status: 'live',
+		area: 'growth',
+		docs: '/docs/guides/lead-finder/',
+		icon: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><circle cx="11" cy="9" r="2.5"/><path d="M7 15a4 4 0 0 1 8 0"/>',
+	},
+	{
 		name: 'Email campaigns',
 		summary: 'Sequences, sending domains and deliverability checks, with one policy check on every email and limits agents cannot get around.',
 		status: 'live',
@@ -111,6 +119,14 @@ export const modules: Module[] = [
 		icon: '<path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>',
 	},
 	{
+		name: 'Partnerships',
+		summary: 'Every site and person a brand works with in one partner CRM: sponsorships, SEO links, integrations and affiliates, each with its own pipeline, from first contact to what it brought in.',
+		status: 'live',
+		area: 'growth',
+		docs: '/docs/guides/partnerships/',
+		icon: '<path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/><path d="m21 3 1 11h-2"/><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/><path d="M3 4h8"/>',
+	},
+	{
 		name: 'Lifecycle email',
 		summary: 'Receipts, onboarding and product email from your own Amazon SES, Postmark or Resend account, with versioned templates.',
 		status: 'live',
@@ -135,23 +151,25 @@ export const modules: Module[] = [
 	},
 	{
 		name: 'Money',
-		summary: 'Revenue, costs and cash for the whole company from your billing, accounting and bank, added up across every brand.',
-		status: 'building',
+		summary: 'The whole company\'s money in one place: revenue, ad spend, outreach, AI, partner payouts and staff pay across every brand, with profit and margin in your own currency.',
+		status: 'live',
 		area: 'company',
 		icon: '<rect width="20" height="14" x="2" y="5" rx="2"/><path d="M2 10h20"/>',
 	},
 	{
 		name: 'People',
-		summary: 'Everyone who works with you, staff, contractors and agencies, with their role, their team and what they cost.',
-		status: 'building',
+		summary: 'Everyone who works at the company, with their department, team and manager, and the work accounts the company hands them.',
+		status: 'live',
 		area: 'company',
+		docs: '/docs/guides/team/',
 		icon: '<circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/>',
 	},
 	{
 		name: 'Goals',
-		summary: 'The targets the company is working toward, tracked from your own numbers, so people and agents see what matters most.',
-		status: 'planned',
+		summary: 'Goals, projects and tasks for the whole company or one brand, so people and agents see what matters most and work toward it.',
+		status: 'live',
 		area: 'company',
+		docs: '/docs/guides/goals/',
 		icon: '<path d="M4 22V4"/><path d="M4 4h12l-2 4 2 4H4"/>',
 	},
 ];
