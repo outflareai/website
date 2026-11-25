@@ -2,7 +2,7 @@
 	"version": "2026.11.25",
 	"date": "2026-11-25",
 	"status": "in-progress",
-	"updated": "2026-11-25T11:08:50Z",
+	"updated": "2026-11-25T11:26:25Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -66,7 +66,14 @@
 			"edition": "open-source",
 			"text": "Each role now opens on its own page, with a level per area and the single permissions inside it. Adding people to teams (`teams.members`), editing teams (`teams.manage`) and resetting someone's two-factor (`members.two_factor`) are permissions of their own; roles and API tokens that could do these before keep them.",
 			"at": "2026-11-25T11:08:50Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "outreach",
+			"edition": "open-source",
+			"text": "Sales reporting's Discovery view has a Pace section on Outflare Cloud: the new companies that arrived in a profile's flow per 15 minutes over the last 3, 6 or 24 hours, how many fit, and when the last one arrived.",
+			"at": "2026-11-25T11:26:25Z"
 		}
 	],
-	"through": "d1ed459+d1ed459"
+	"through": "fb27e00+fb27e00"
 }
