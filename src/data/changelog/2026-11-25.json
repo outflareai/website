@@ -2,7 +2,7 @@
 	"version": "2026.11.25",
 	"date": "2026-11-25",
 	"status": "in-progress",
-	"updated": "2026-11-25T12:43:24Z",
+	"updated": "2026-11-25T13:36:47Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -87,7 +87,21 @@
 			"edition": "open-source",
 			"text": "The Sales Team report counts what each rep saw and opened among the conversations support handed to sales, its lists load faster, and a day starts at the right moment where the clocks change at midnight.",
 			"at": "2026-11-25T12:31:25Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Link orders: each brand now sets its own limits for which catalog sites are worth a link (lowest rating and traffic, how much traffic may sit on one page, how much a site links out), under Settings. A site with a number missing is marked Needs data instead of OK, and every reason has a code to filter on.",
+			"at": "2026-11-25T13:36:47Z"
+		},
+		{
+			"kind": "launch",
+			"area": "workspace",
+			"edition": "cloud",
+			"text": "Owners can move a brand to a new company or to another company they own, with all its data and history. The page shows what moves, what stays and anything to sort out first.",
+			"at": "2026-11-25T13:36:47Z"
 		}
 	],
-	"through": "d5fd932+d5fd932"
+	"through": "03f175a+03f175a"
 }
