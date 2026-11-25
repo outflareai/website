@@ -53,10 +53,11 @@ Each member has one role in each workspace, and the role decides what they can d
 | **Member** | All the marketing work, and connecting tools. No settings, people, API tokens or audit log. Stored and sent in the API as `operator`. |
 | **Viewer** | Sees everything, changes nothing. |
 
-Change what Admin, Member or Viewer allows, or add roles of your own (a "Content writer" with only SEO and Social, say), under **Settings → Members → Roles**. Each role is a list of areas set to None, View or Edit, plus switches for actions that need their own say: sending email, posting to social accounts, approving missions and spending, the unsubscribe list, shared fields, webhooks, settings, API tokens, the audit log, inviting people, removing people and editing roles. A changed starting role can be reset to its defaults.
+Change what Admin, Member or Viewer allows, or add roles of your own (a "Content writer" with only SEO and Social, say), under **Settings → Members → Roles**. Each role opens on its own page, with a level for each area: **None**, **View** or **Edit**. Open an area to see the single permissions inside it and switch them one by one (the level then shows **Custom**). Edit gives reading and changing only: actions that need their own say, such as sending email, posting to social accounts, approving missions and spending or removing ads, are separate switches inside the area, so picking Edit never hands out an approval. The **Company** card holds settings, the unsubscribe list, shared fields, webhooks, API tokens and the audit log; **People and access** holds inviting people, adding people to teams, editing teams, editing roles, removing people and resetting two-factor. Save applies the whole page at once. A changed starting role can be reset to its defaults.
 
 - **You can't give what you don't have.** Every permission in a role you create or edit, or a role you give someone, must be one you hold.
 - **You can't change someone who can do more than you.** Only owners make, change or remove owners, and a workspace always keeps at least one.
+- **People permissions are separate.** **Add people to teams** (`teams.members`) puts people in a team or takes them out; **Edit teams** (`teams.manage`) also creates, renames and deletes teams and changes what they allow; **Reset someone's two-factor** (`members.two_factor`) is owners only by default. Roles that could invite people before can still edit teams, and roles that could remove people can still reset two-factor.
 - **Taking access away is its own permission.** Removing someone, moving them to a role that can do less, or taking brands away from them needs **Remove people** (`members.remove`). Only owners have it by default; an owner can switch it on for any role.
 - **Changes apply at once**, and API tokens a person made lose the permissions their role no longer has. Every change is in the audit log (`role.created`, `role.updated`, `role.deleted`, `member.role_changed`).
 - **Deleting a role in use** asks where its people and pending invites should move.
@@ -147,7 +148,7 @@ Under **Your account**, anyone can turn on two-factor sign-in: scan the QR code 
 
 **Required for everyone.** A workspace can require two-factor: people without it see the set-up screen before anything else in that workspace. An owner switches the rule under **Settings → General** (`require_two_factor` on `PATCH /v1/workspaces/{workspace}`, signed-in owners only). It is on unless an owner turns it off; a self-hosted server changes the default for workspaces that haven't chosen with `REQUIRE_TWO_FACTOR=false` ([Configuration](/docs/self-hosting/configuration/)).
 
-**A lost phone.** **Settings → Members** shows who has two-factor on. An owner can **Reset two-factor** for a member, who then sets it up again at their next sign-in. The reset only works when that owner owns every workspace the member belongs to, so one workspace can't weaken someone's sign-in for another.
+**A lost phone.** **Settings → Members** shows who has two-factor on. Someone with **Reset someone's two-factor** (owners by default) can **Reset two-factor** for a member, who then sets it up again at their next sign-in. The reset only works when they own every workspace the member belongs to, so one workspace can't weaken someone's sign-in for another.
 
 `GET /v1/me` shows `two_factor` and `two_factor_verified`; a session that still owes its code gets `401` with the code `two_factor_required` on every route until `POST /v1/auth/two-factor` succeeds.
 
@@ -180,6 +181,9 @@ The scopes are:
 | `members.manage` | Change roles and manage invites. |
 | `members.remove` | Remove members or reduce their access. Owners only by default; never on an API token. |
 | `roles.manage` | Create, change and delete roles. Never on an API token. |
+| `teams.members` | Add people to teams and take them out. |
+| `teams.manage` | Create, change and delete teams, and add people to them. |
+| `members.two_factor` | Reset a member's two-factor. Owners only by default; never on an API token. |
 | `tokens.manage` | Create and revoke API tokens. |
 | `audit.read` | Read the audit log. |
 | `mailboxes.read` | List mailboxes, pools and sending-domain health. |
