@@ -2,7 +2,7 @@
 	"version": "2026.11.25",
 	"date": "2026-11-25",
 	"status": "in-progress",
-	"updated": "2026-11-25T10:13:55Z",
+	"updated": "2026-11-25T10:28:24Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -45,7 +45,14 @@
 			"edition": "open-source",
 			"text": "Conversions now go to your ad platforms within minutes even while a large import of past events is running. Past events sent late also no longer queue lifecycle and metric work they can't change, so imports finish faster.",
 			"at": "2026-11-25T10:13:55Z"
+		},
+		{
+			"kind": "fix",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "The Owner column on the partners list shows the owner's name again. For a teammate who was in your staff list before they had a sign-in, it showed an id instead.",
+			"at": "2026-11-25T10:28:24Z"
 		}
 	],
-	"through": "5eefbc3+5eefbc3"
+	"through": "3107f44+3107f44"
 }
