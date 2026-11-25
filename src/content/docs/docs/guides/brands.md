@@ -131,6 +131,19 @@ On the brand's page (**Company → Brand**), the **⋯** menu has **Archive** an
 
 **Delete brand** asks you to type its name, then deletes the brand and everything in it: its people, lists, sequences, mailboxes, domains, sites, connections made for it, settings and history. Nothing moves to another brand, and it can't be undone. The brand leaves the switcher at once, you move to another brand, and the rest is cleared in the background. Only owners and admins can delete a brand. You can't delete your only brand, or one that a member or invite is limited to: give them another brand first. With the API, `DELETE /v1/workspaces/{ws}/brands/{brand}` (scope `workspace.manage`).
 
+## Move a brand to another company
+
+<span class="pill cloud">Outflare Cloud</span> An owner can move a brand, with all its data and history, to a new company or to another company they own. Use it when a business is sold, spun out or run by a different team.
+
+On the brand's page, the **⋯** menu has **Move to another company**. The page asks where it is going, shows what moves and what stays, and lists anything to sort out first. Nothing changes until you type the brand's name and press **Move**.
+
+- **Moves with it:** its contacts, lists, sequences, mailboxes, sending domains, agent, tasks, brand profile, sales, spend, reports and their history. Contacts shared with other brands are copied for it, and each moved contact's history says it moved.
+- **Stays behind:** connections shared with other brands (the other company connects its own), and people. Roles and team access for the brand are removed, so invite who you want once it has moved.
+- **Billing:** a new company starts its own plan.
+- **What can stop it:** someone who can only see this brand (give them another brand or remove them), or something the brand uses that has to stay in this company, such as a team member a sales target names. The page says which.
+
+You can move a brand back the same way. You can't move a company's only brand. Both companies' audit logs record the move (`brand.moved_out` and `brand.moved_in`).
+
 ## API and MCP
 
 What belongs to a brand lives under `/v1/brands/{brand}/`, where `{brand}` is the brand's id (`GET /v1/workspaces/{ws}/brands` lists them). Only what the whole workspace shares, such as members, API tokens, connections and billing, stays under `/v1/workspaces/{ws}/`. An older workspace route for brand data answers `410` with the error code `route_moved` and names its brand route. MCP tools that read or change a brand's data take `brand`.
