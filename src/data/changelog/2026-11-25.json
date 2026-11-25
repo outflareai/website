@@ -2,7 +2,7 @@
 	"version": "2026.11.25",
 	"date": "2026-11-25",
 	"status": "in-progress",
-	"updated": "2026-11-25T16:34:58Z",
+	"updated": "2026-11-25T16:52:04Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -150,7 +150,21 @@
 			"edition": "open-source",
 			"text": "Every dropdown now opens with a search field: type a few letters to find the option, filter, action or column you want instead of scrolling.",
 			"at": "2026-11-25T16:34:58Z"
+		},
+		{
+			"kind": "fix",
+			"area": "api",
+			"edition": "open-source",
+			"text": "A POST, PUT, PATCH or DELETE sent to an address outside the API (for example a base URL missing `/v1`) now fails with a 404 error that says API endpoints start with `/v1/`, instead of answering 200 with the web app's page as if the request had worked.",
+			"at": "2026-11-25T16:52:04Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "inbox",
+			"edition": "open-source",
+			"text": "The reply rule for referrals can now be limited to the campaigns you choose: with `from_sequence_ids`, only a referral from someone in one of those sequences adds the person named, and a referral from any other campaign is just suggested in the conversation. A rule that names a sequencer campaign for referrals no longer needs an Outflare sequence as well.",
+			"at": "2026-11-25T16:52:04Z"
 		}
 	],
-	"through": "5ae8e7d+5ae8e7d"
+	"through": "661916e+661916e"
 }
