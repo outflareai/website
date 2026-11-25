@@ -2,7 +2,7 @@
 	"version": "2026.11.25",
 	"date": "2026-11-25",
 	"status": "in-progress",
-	"updated": "2026-11-25T15:39:07Z",
+	"updated": "2026-11-25T16:34:58Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -129,7 +129,28 @@
 			"edition": "open-source",
 			"text": "You can change a partner's owner straight from the partners list: click the Owner cell to pick someone from the team, or pick Nobody to remove them.",
 			"at": "2026-11-25T15:39:07Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "social",
+			"edition": "open-source",
+			"text": "Mentions can find YouTube videos that say your brand's or competitors' names out loud: connect your own Filmot API key, and with YouTube on each scan searches what videos say, with the channel, views and the second each name is said. Filmot alone is enough for YouTube.",
+			"at": "2026-11-25T16:34:58Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "social",
+			"edition": "open-source",
+			"text": "Mentions: keep only the languages you pick (English only, for example). A podcast mention's page shows the show, the episode's notes, a player at the moment it was said and links to Apple Podcasts, Spotify and YouTube. Competitor-scan YouTube videos show only while YouTube is on, so own channels are left out.",
+			"at": "2026-11-25T16:34:58Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "general",
+			"edition": "open-source",
+			"text": "Every dropdown now opens with a search field: type a few letters to find the option, filter, action or column you want instead of scrolling.",
+			"at": "2026-11-25T16:34:58Z"
 		}
 	],
-	"through": "5768066+5768066"
+	"through": "5ae8e7d+5ae8e7d"
 }
