@@ -2,7 +2,7 @@
 	"version": "2026.11.26",
 	"date": "2026-11-26",
 	"status": "in-progress",
-	"updated": "2026-11-26T20:04:28Z",
+	"updated": "2026-11-26T20:09:58Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -129,7 +129,14 @@
 			"edition": "open-source",
 			"text": "Finished mailbox sync jobs are now cleaned up after 14 days like other finished jobs, so the job table no longer grows with every sync of a connected mailbox.",
 			"at": "2026-11-26T20:04:28Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Paid ads, Search terms: click any column header to sort the table up or down, filter by conversions as well as clicks, cost, purchases and lifetime value, and share a link that opens the table with the same order and number filters.",
+			"at": "2026-11-26T20:09:58Z"
 		}
 	],
-	"through": "30272f4+30272f4"
+	"through": "173b8ca+173b8ca"
 }
