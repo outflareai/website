@@ -2,7 +2,7 @@
 	"version": "2026.11.26",
 	"date": "2026-11-26",
 	"status": "in-progress",
-	"updated": "2026-11-26T00:23:44Z",
+	"updated": "2026-11-26T11:15:54Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -10,7 +10,14 @@
 			"edition": "open-source",
 			"text": "Sales reporting's Live flow shows the companies found in a period as a small tree: discovered, researched and fit, then a branch for each outreach channel (email from verified to in a campaign to replied, LinkedIn, and other with the most common messengers). Each node opens what is behind it: a step's parts, or a part's companies.",
 			"at": "2026-11-26T00:23:44Z"
+		},
+		{
+			"kind": "fix",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Conversions sent to Google Ads reach it within a minute or two again, instead of waiting about 15 minutes behind the check for refunds. A conversion Google gave no verdict for within a day is now checked again every hour for a week, so a late answer from Google shows in the send log instead of \"no verdict\".",
+			"at": "2026-11-26T11:15:54Z"
 		}
 	],
-	"through": "7a79ddb+7a79ddb"
+	"through": "86990e8+86990e8"
 }
