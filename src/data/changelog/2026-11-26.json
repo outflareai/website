@@ -2,7 +2,7 @@
 	"version": "2026.11.26",
 	"date": "2026-11-26",
 	"status": "in-progress",
-	"updated": "2026-11-26T13:55:14Z",
+	"updated": "2026-11-26T14:07:10Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -38,7 +38,14 @@
 			"edition": "open-source",
 			"text": "The \"An event stopped arriving\" alert no longer fires for Outflare's own server events, such as the one sent when stored secrets are re-encrypted after a key change. Those follow restarts and server settings rather than how your product is used, so their stopping was never a problem to fix.",
 			"at": "2026-11-26T12:37:59Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Conversions now go to their ad platform as soon as they are matched, without waiting for the rest of the round that also handles refunds and verdicts.",
+			"at": "2026-11-26T14:07:10Z"
 		}
 	],
-	"through": "5ae49de+5ae49de"
+	"through": "8e70cc5+8e70cc5"
 }
