@@ -265,6 +265,40 @@ Outflare ties a visit to a person only by what the browser itself says: a sign-i
 
 Outflare stores no IP address or user agent with a visit, so the check is coarser than what such tools use; read its accuracy as a lower bound. In the API: `GET /v1/brands/{brand}/ads/match-check?days=30` (MCP: `get_ads_match_check`).
 
+## Search terms: what people searched before they clicked
+
+The **Search terms** tab lists every search that showed one of the brand's ads in the dates you pick, across all its accounts, the way Google Ads' search terms report does. Each row shows:
+
+- the search and how it matched;
+- whether it is already one of the ad group's keywords, excluded, or neither (**Added / excluded**);
+- its campaign, ad group and campaign type;
+- impressions, clicks, CTR, average cost per click and per thousand impressions, and cost;
+- its own **purchases**, cost per purchase and **lifetime value**, once the ad account sends first payments to Google Ads (see [Sending conversions back](#sending-conversions-back)).
+
+A total row sits under the table. Filter by added or excluded, campaign, match type or campaign type (each menu has a search field), add a filter on any number with **+ Add filter**, or pick **Spent, no purchases**. Click a search for its own page: what it cost each day, and every campaign and ad group it showed in, with the keyword it matched.
+
+### Exclude searches
+
+Tick searches and press **Exclude…**. A page asks where they go:
+
+- **Ad group**: only the ad group each search came from.
+- **Campaign**: only the campaign each search came from.
+- **Exclusion list**: every campaign the list applies to, for searches you never want, such as competitors.
+
+Choose exact (only this search) or phrase (every search that contains these words) for each, see what they cost, and press **Save**. Nothing changes in Google Ads before that. **Add as keyword** adds ticked searches as keywords to the ad group each came from.
+
+### Searches to exclude from the whole account
+
+Suggested searches to exclude wait in a card at the top of the tab, and the tab shows how many are left to review. Each row shows the search, why it was suggested, its clicks and purchases over the last 30 days, its cost, and the exclusion list it would go on. You can pick another list from a searchable menu. Press **Exclude** to add it to that list, or **Don't exclude** to turn it down; a search you turn down isn't suggested again for 90 days. **Exclude all** and **Don't exclude any** decide the whole card at once. The search's own page shows its suggestion too.
+
+Anyone who can manage ads, or an agent, can suggest a search (`propose_ad_finding` in MCP). Only a person can say yes, so nothing changes in Google Ads until someone presses Exclude. Outflare adds the numbers from its own data. In Outflare Cloud, each brand's agent suggests searches every morning, on your company's own AI model ([connect one](/docs/agents/ai-models/) if you haven't).
+
+### Exclusion lists
+
+**Exclusion lists** are Google Ads' negative keyword lists, read at every sync. Make a new one, rename one, add or take off searches, and choose the campaigns it applies to. Each list's page shows its searches, when each was added and whether in Outflare or in Google Ads, and what the searches cost in the 30 days before. Every change waits for **Save**, is sent to Google Ads and read back (the list shows **Sending to Google** until then), and is listed under **Settings, Change history**. A change an agent asks for always waits for a person's approval.
+
+Agents read the same data: `list_ad_search_terms`, `list_ad_search_term_days`, `list_ad_negative_lists` and `get_ad_negative_list` in MCP, and the `ad_search_terms_daily`, `ad_search_term_conversions_daily`, `ad_negative_lists`, `ad_negative_list_keywords` and `ad_negative_list_campaigns` tables in SQL.
+
 ## Whole business: all ad spend against all revenue
 
 **Paid ads → Whole business** leaves attribution out of its headline. It sets every payment the brand received (less refunds, from ads or not) against what every connected network charged in the same days: "Every $1 of ads brought back $3.90 in revenue." No network's own counting can move that number.
