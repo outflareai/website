@@ -2,7 +2,7 @@
 	"version": "2026.11.26",
 	"date": "2026-11-26",
 	"status": "in-progress",
-	"updated": "2026-11-26T11:15:54Z",
+	"updated": "2026-11-26T11:54:12Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -17,7 +17,21 @@
 			"edition": "open-source",
 			"text": "Conversions sent to Google Ads reach it within a minute or two again, instead of waiting about 15 minutes behind the check for refunds. A conversion Google gave no verdict for within a day is now checked again every hour for a week, so a late answer from Google shows in the send log instead of \"no verdict\".",
 			"at": "2026-11-26T11:15:54Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Searches to exclude from a whole Google Ads account can be suggested with a reason, by a person or an agent. They wait at the top of Paid ads, Search terms, with their cost and the exclusion list each goes on, and nothing reaches Google Ads until someone presses Exclude.",
+			"at": "2026-11-26T11:54:12Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "cloud",
+			"text": "Every morning, each brand's agent looks over the brand's Google Ads searches on the company's own AI model and suggests the ones to exclude from the whole account, with a reason and the exclusion list each goes on. They wait at the top of Paid ads, Search terms; nothing changes in Google Ads until a person presses Exclude.",
+			"at": "2026-11-26T11:54:12Z"
 		}
 	],
-	"through": "86990e8+86990e8"
+	"through": "005e2e7+005e2e7"
 }
