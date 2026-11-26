@@ -2,7 +2,7 @@
 	"version": "2026.11.26",
 	"date": "2026-11-26",
 	"status": "in-progress",
-	"updated": "2026-11-26T14:59:14Z",
+	"updated": "2026-11-26T16:18:22Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -66,7 +66,28 @@
 			"edition": "cloud",
 			"text": "The daily search review never suggests excluding a search that brought a conversion, so a search that sells is never suggested while its purchases are still syncing.",
 			"at": "2026-11-26T14:59:14Z"
+		},
+		{
+			"kind": "fix",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Conversions reach their ad platform within minutes again: matching now checks only the events not sent yet, instead of every event of the last week on each round.",
+			"at": "2026-11-26T16:18:22Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "Creating an API token now lists every permission with a plain name, what it allows and its exact API scope, such as `customers.read`. Search by any of them, or paste the scopes an integration asks for and turn them all on at once.",
+			"at": "2026-11-26T16:18:22Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "outreach",
+			"edition": "open-source",
+			"text": "A shared outreach blocklist connection now takes the company and project your brand sends under, and gets every unsubscribe and opt-out the brand records written to it, each once and retried until it lands. Outreach and marketing email asks it again as it goes out: a blocked address is skipped, and an email waits while the list can't answer.",
+			"at": "2026-11-26T16:18:22Z"
 		}
 	],
-	"through": "1434e44+1434e44"
+	"through": "0ee0e6c+0ee0e6c"
 }
