@@ -2,7 +2,7 @@
 	"version": "2026.11.26",
 	"date": "2026-11-26",
 	"status": "in-progress",
-	"updated": "2026-11-26T14:50:52Z",
+	"updated": "2026-11-26T14:59:14Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -52,7 +52,21 @@
 			"edition": "open-source",
 			"text": "Link orders: read a catalog site's age from its domain's public registration record when no file gave it, for free, from the site's card or the API. A brand can set the lowest age of a site it buys a link on; younger sites are then marked Skip, and sites whose age is not known are marked Needs data.",
 			"at": "2026-11-26T14:50:52Z"
+		},
+		{
+			"kind": "fix",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Large Google Ads accounts sync their search terms again: big report pages are read in full. Purchases and lifetime value per search, and the account's exclusion lists, now load even when another part of the sync fails. Search terms shows one network at a time, Google Ads unless you pick another.",
+			"at": "2026-11-26T14:59:14Z"
+		},
+		{
+			"kind": "fix",
+			"area": "paid-ads",
+			"edition": "cloud",
+			"text": "The daily search review never suggests excluding a search that brought a conversion, so a search that sells is never suggested while its purchases are still syncing.",
+			"at": "2026-11-26T14:59:14Z"
 		}
 	],
-	"through": "3949ed2+3949ed2"
+	"through": "1434e44+1434e44"
 }
