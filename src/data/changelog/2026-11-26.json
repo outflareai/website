@@ -2,7 +2,7 @@
 	"version": "2026.11.26",
 	"date": "2026-11-26",
 	"status": "in-progress",
-	"updated": "2026-11-26T18:59:49Z",
+	"updated": "2026-11-26T19:18:35Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -115,7 +115,14 @@
 			"edition": "open-source",
 			"text": "A reply you write in Sales conversations, or any email you send from your own mailbox in Outflare, now goes out at once, even when Outflare has a lot of other background work waiting. Before, it could stay queued for many minutes.",
 			"at": "2026-11-26T18:59:49Z"
+		},
+		{
+			"kind": "fix",
+			"area": "self-hosting",
+			"edition": "open-source",
+			"text": "Finished mailbox sync jobs are now cleaned up after 14 days like other finished jobs, so the job table no longer grows with every sync of a connected mailbox.",
+			"at": "2026-11-26T19:18:35Z"
 		}
 	],
-	"through": "3ca17ff+3ca17ff"
+	"through": "3fc4e4e+3fc4e4e"
 }
