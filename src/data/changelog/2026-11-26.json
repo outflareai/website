@@ -2,7 +2,7 @@
 	"version": "2026.11.26",
 	"date": "2026-11-26",
 	"status": "in-progress",
-	"updated": "2026-11-26T12:04:33Z",
+	"updated": "2026-11-26T12:37:59Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -31,7 +31,14 @@
 			"edition": "cloud",
 			"text": "Every morning, each brand's agent looks over the brand's Google Ads searches on the company's own AI model and suggests the ones to exclude from the whole account, with a reason and the exclusion list each goes on. They wait at the top of Paid ads, Search terms; nothing changes in Google Ads until a person presses Exclude.",
 			"at": "2026-11-26T11:54:12Z"
+		},
+		{
+			"kind": "fix",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "The \"An event stopped arriving\" alert no longer fires for Outflare's own server events, such as the one sent when stored secrets are re-encrypted after a key change. Those follow restarts and server settings rather than how your product is used, so their stopping was never a problem to fix.",
+			"at": "2026-11-26T12:37:59Z"
 		}
 	],
-	"through": "3f5903f+3f5903f"
+	"through": "9bf928f+9bf928f"
 }
