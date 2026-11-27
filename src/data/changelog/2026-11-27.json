@@ -2,7 +2,7 @@
 	"version": "2026.11.27",
 	"date": "2026-11-27",
 	"status": "in-progress",
-	"updated": "2026-11-27T01:13:17Z",
+	"updated": "2026-11-27T02:31:03Z",
 	"items": [
 		{
 			"kind": "fix",
@@ -17,7 +17,14 @@
 			"edition": "open-source",
 			"text": "Sales reporting's Live flow has a second view, Sales process: the companies open for the team to contact and the conversations that came in, joining into taken, handed to an account manager and customer, each number one click from its conversations, and By person with what each teammate did. Its numbers are the Team report's for the same period.",
 			"at": "2026-11-27T01:13:17Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "outreach",
+			"edition": "open-source",
+			"text": "A sequence can now be set to \"Only these senders\". Outflare then never fills a shortage with someone else's mailbox, and one attached by hand in the sequencer shows under Needs attention with a one-click Detach, which now also works on a running EmailBison campaign.",
+			"at": "2026-11-27T02:31:03Z"
 		}
 	],
-	"through": "c95df18+c95df18"
+	"through": "c7639be+c7639be"
 }
