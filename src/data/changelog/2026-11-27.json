@@ -1,0 +1,16 @@
+{
+	"version": "2026.11.27",
+	"date": "2026-11-27",
+	"status": "in-progress",
+	"updated": "2026-11-27T00:07:44Z",
+	"items": [
+		{
+			"kind": "fix",
+			"area": "records",
+			"edition": "open-source",
+			"text": "A choice field such as Seniority no longer looks empty when it holds a value that isn't in its list: it shows \"Senior · not in the list\" so you can pick the right option. Values written as an option's name or a common other word (\"Head of\", \"C-level\", \"founder\") are saved as that option, and lists your team made get \"Add option\" right in the picker.",
+			"at": "2026-11-27T00:07:44Z"
+		}
+	],
+	"through": "508e12a+508e12a"
+}
