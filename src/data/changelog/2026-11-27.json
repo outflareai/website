@@ -2,7 +2,7 @@
 	"version": "2026.11.27",
 	"date": "2026-11-27",
 	"status": "in-progress",
-	"updated": "2026-11-27T16:43:24Z",
+	"updated": "2026-11-27T17:04:21Z",
 	"items": [
 		{
 			"kind": "fix",
@@ -178,7 +178,28 @@
 			"edition": "open-source",
 			"text": "The tracker's Offers, Landers, Flows, Traffic sources and Affiliate networks lists now show each row's clicks, conversions, revenue, cost, profit and ROI for the dates you pick, as Campaigns does. Click a number column to sort by it, press Refresh to read the newest numbers, and open the Report for one row from its chart button.",
 			"at": "2026-11-27T16:43:24Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Brand search: every brand is now measured by its name alone. A longer search with the name in it (\"northpeak pricing\") or its domain is marked \"split only\": it helps split a name someone else has too, and is no longer added to the brand's searches, so adding such terms can't put one brand ahead of the others.",
+			"at": "2026-11-27T17:04:21Z"
+		},
+		{
+			"kind": "fix",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Brand search: removing a search that means the other holder of a shared name now works when the row has many searches. The other holder's searches have their own limit of 20, apart from the brand's own 20.",
+			"at": "2026-11-27T17:04:21Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Sales reporting, Discovery: lanes are a short list, one row each with the lane's name, its idea on one line and its fit and interested companies for the period. Opening a lane gives its own page with every number from found to customers, including researched and replied.",
+			"at": "2026-11-27T17:04:21Z"
 		}
 	],
-	"through": "50ddf0c+50ddf0c"
+	"through": "8ab33dd+8ab33dd"
 }
