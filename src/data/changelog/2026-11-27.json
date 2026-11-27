@@ -2,7 +2,7 @@
 	"version": "2026.11.27",
 	"date": "2026-11-27",
 	"status": "in-progress",
-	"updated": "2026-11-27T08:30:28Z",
+	"updated": "2026-11-27T08:49:19Z",
 	"items": [
 		{
 			"kind": "fix",
@@ -52,7 +52,28 @@
 			"edition": "open-source",
 			"text": "Sales reporting's Live flow now starts the email branch with Emails found: every address found for the period's companies, split into first email, follow-ups, support@ and not sent yet, which add up to it. When discovery is paused, a line above the tree says why.",
 			"at": "2026-11-27T08:30:28Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "The number beside New conversations counts the conversations nobody has taken, and stays live as you work. Sales > Team lists at the top who has no Sales role yet, each with a role picker.",
+			"at": "2026-11-27T08:49:19Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "On a person's Sales view, anyone with a Sales role can write in a plain box under the thread, with templates as one button beside Send. Without a mailbox the box asks you to connect one, and on a colleague's conversation one line says who owns it, with Take over while it is new.",
+			"at": "2026-11-27T08:49:19Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Sales managers connect their own mailbox and can write in any Sales conversation, a colleague's too, which stays the colleague's. Anyone with a Sales role can write in a new conversation nobody has taken, and sending takes it. A reply from your own mailbox now works on a new conversation whose thread came through EmailBison and starts it, without sending the introduction first.",
+			"at": "2026-11-27T08:49:19Z"
 		}
 	],
-	"through": "6c247f3+6c247f3"
+	"through": "565dcd6+565dcd6"
 }
