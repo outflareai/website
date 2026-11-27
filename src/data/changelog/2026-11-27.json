@@ -2,7 +2,7 @@
 	"version": "2026.11.27",
 	"date": "2026-11-27",
 	"status": "in-progress",
-	"updated": "2026-11-27T13:27:38Z",
+	"updated": "2026-11-27T14:08:44Z",
 	"items": [
 		{
 			"kind": "fix",
@@ -150,7 +150,14 @@
 			"edition": "open-source",
 			"text": "The tracker's Report can show more columns: bot clicks, suspect clicks, and a count and revenue column for each conversion type your networks send (leads, sales and so on). Columns now picks which columns the table shows, with presets such as Profit, Funnel and Traffic quality, and a saved view keeps your choice.",
 			"at": "2026-11-27T13:27:38Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "The tracker's Report breaks down by four more things: the affiliate network an offer belongs to, the flow a campaign runs, one hour of one day, and what your IP lookup connection found for the click (proxy, VPN, Tor, hosting, crawler or clean).",
+			"at": "2026-11-27T14:08:44Z"
 		}
 	],
-	"through": "a451bd8+a451bd8"
+	"through": "08aba10+08aba10"
 }
