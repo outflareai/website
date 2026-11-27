@@ -2,7 +2,7 @@
 	"version": "2026.11.27",
 	"date": "2026-11-27",
 	"status": "in-progress",
-	"updated": "2026-11-27T17:04:21Z",
+	"updated": "2026-11-27T22:34:57Z",
 	"items": [
 		{
 			"kind": "fix",
@@ -199,7 +199,14 @@
 			"edition": "open-source",
 			"text": "Sales reporting, Discovery: lanes are a short list, one row each with the lane's name, its idea on one line and its fit and interested companies for the period. Opening a lane gives its own page with every number from found to customers, including researched and replied.",
 			"at": "2026-11-27T17:04:21Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "api",
+			"edition": "open-source",
+			"text": "A pipeline feature can now send stopped items back to an earlier stage, not only the one they stopped in, so a finished decision can be made again from the start.",
+			"at": "2026-11-27T22:34:57Z"
 		}
 	],
-	"through": "8ab33dd+8ab33dd"
+	"through": "ab604f7+ab604f7"
 }
