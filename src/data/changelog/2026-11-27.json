@@ -2,7 +2,7 @@
 	"version": "2026.11.27",
 	"date": "2026-11-27",
 	"status": "in-progress",
-	"updated": "2026-11-27T14:08:44Z",
+	"updated": "2026-11-27T15:26:25Z",
 	"items": [
 		{
 			"kind": "fix",
@@ -157,7 +157,21 @@
 			"edition": "open-source",
 			"text": "The tracker's Report breaks down by four more things: the affiliate network an offer belongs to, the flow a campaign runs, one hour of one day, and what your IP lookup connection found for the click (proxy, VPN, Tor, hosting, crawler or clean).",
 			"at": "2026-11-27T14:08:44Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Paid ads, Search terms tags searches that name your brand or a competitor you follow, with a Brand filter. Its review card now also suggests searches to add as keywords, and agents can suggest one with `propose_ad_keyword`; only a person adds it.",
+			"at": "2026-11-27T15:26:25Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "cloud",
+			"text": "The daily search review on Paid ads, Search terms now also suggests excluding searches for competitors you follow, and adding searches as keywords: ones that buy at or under your target cost, and ways of writing your own name that people click. The competitor and keyword suggestions don't need your AI model.",
+			"at": "2026-11-27T15:26:25Z"
 		}
 	],
-	"through": "08aba10+08aba10"
+	"through": "21f4dde+21f4dde"
 }
