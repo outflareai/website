@@ -2,7 +2,7 @@
 	"version": "2026.11.27",
 	"date": "2026-11-27",
 	"status": "in-progress",
-	"updated": "2026-11-27T09:17:08Z",
+	"updated": "2026-11-27T09:53:36Z",
 	"items": [
 		{
 			"kind": "fix",
@@ -80,7 +80,35 @@
 			"edition": "open-source",
 			"text": "My board: Sales conversations open as a board of your own columns. Drag a card, or use Move to…, to set its stage; share chosen columns with colleagues, who see the cards and can add their own. Dropping a card on Handed to account manager or Lost hands it over or archives it.",
 			"at": "2026-11-27T09:17:08Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Where a server runs a daily review of the searches, the Search terms card says when it last ran and what came of it, with a button to run it now.",
+			"at": "2026-11-27T09:53:36Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "New conversations now lists only people who showed interest: a reply labelled interested, meeting booked or question, or a hand-over post. Everyone else waiting, such as a referral or a signup posted in Slack, sits under a new Others list with where they came from, and moves to New when an interested reply arrives. The menu's number counts New only.",
+			"at": "2026-11-27T09:53:36Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Inviting someone now has its own page, like a member's: pick their role, a different role on some brands if you want, and the teams they join. They get all of it when they accept. The API takes `brand_roles` and `team_ids` on a new invite and shows them on pending invites.",
+			"at": "2026-11-27T09:53:36Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "cloud",
+			"text": "The daily search review on Paid ads, Search terms now runs for every brand with Google Ads, with or without a brand agent. The card shows when it last ran and what it found, and a Review now button runs it straight away.",
+			"at": "2026-11-27T09:53:36Z"
 		}
 	],
-	"through": "fd4a017+fd4a017"
+	"through": "312e1fb+312e1fb"
 }
