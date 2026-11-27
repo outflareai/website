@@ -2,7 +2,7 @@
 	"version": "2026.11.27",
 	"date": "2026-11-27",
 	"status": "in-progress",
-	"updated": "2026-11-27T10:34:17Z",
+	"updated": "2026-11-27T12:44:47Z",
 	"items": [
 		{
 			"kind": "fix",
@@ -115,7 +115,14 @@
 			"edition": "open-source",
 			"text": "People with a Sales role get a Sales block at the top of the left menu in every area: New conversations, Others, My conversations, Sales reporting and First messages, one click away. The Sales page's own list is shorter: the daily lists on top, with personal and team set-up folded into two groups.",
 			"at": "2026-11-27T10:34:17Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "The tracker's Report is quicker to slice: tick rows and pick Drill into to turn them into a filter and regroup by anything else, or click a chip to change the first level. It can now break down by browser version, OS version, device model, referrer and month, and shows tracking fields by the name your traffic source gives them. Report, Campaigns and Logs have a Refresh button.",
+			"at": "2026-11-27T12:44:47Z"
 		}
 	],
-	"through": "125b143+125b143"
+	"through": "d7eb3bb+d7eb3bb"
 }
