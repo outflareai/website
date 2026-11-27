@@ -2,7 +2,7 @@
 	"version": "2026.11.27",
 	"date": "2026-11-27",
 	"status": "in-progress",
-	"updated": "2026-11-27T12:57:56Z",
+	"updated": "2026-11-27T13:04:57Z",
 	"items": [
 		{
 			"kind": "fix",
@@ -136,7 +136,14 @@
 			"edition": "cloud",
 			"text": "When the daily search review can't finish, the Search terms card says why: the AI account is out of credit, over a limit, or didn't answer.",
 			"at": "2026-11-27T12:57:56Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Content: each brand now has its own page types, such as guide, use case or city page, instead of one fixed list for everyone. An item names its page type, and your site still gets a standard type (post, landing page, comparison and so on) to route on. Change a brand's page types in its catalog; the content list can be filtered by page type.",
+			"at": "2026-11-27T13:04:57Z"
 		}
 	],
-	"through": "3f93835+3f93835"
+	"through": "06fb933+06fb933"
 }
