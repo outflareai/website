@@ -2,7 +2,7 @@
 	"version": "2026.11.27",
 	"date": "2026-11-27",
 	"status": "in-progress",
-	"updated": "2026-11-27T12:44:47Z",
+	"updated": "2026-11-27T12:57:56Z",
 	"items": [
 		{
 			"kind": "fix",
@@ -122,7 +122,21 @@
 			"edition": "open-source",
 			"text": "The tracker's Report is quicker to slice: tick rows and pick Drill into to turn them into a filter and regroup by anything else, or click a chip to change the first level. It can now break down by browser version, OS version, device model, referrer and month, and shows tracking fields by the name your traffic source gives them. Report, Campaigns and Logs have a Refresh button.",
 			"at": "2026-11-27T12:44:47Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Search terms opens on the searches worth a look first: neither added nor excluded, no purchase, and at least 1 spent. Clear all shows every search. Where a review of the searches failed, the card says why, such as an AI account out of credit.",
+			"at": "2026-11-27T12:57:56Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "cloud",
+			"text": "When the daily search review can't finish, the Search terms card says why: the AI account is out of credit, over a limit, or didn't answer.",
+			"at": "2026-11-27T12:57:56Z"
 		}
 	],
-	"through": "d7eb3bb+d7eb3bb"
+	"through": "3f93835+3f93835"
 }
