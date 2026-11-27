@@ -2,7 +2,7 @@
 	"version": "2026.11.27",
 	"date": "2026-11-27",
 	"status": "in-progress",
-	"updated": "2026-11-27T13:04:57Z",
+	"updated": "2026-11-27T13:27:38Z",
 	"items": [
 		{
 			"kind": "fix",
@@ -143,7 +143,14 @@
 			"edition": "open-source",
 			"text": "Content: each brand now has its own page types, such as guide, use case or city page, instead of one fixed list for everyone. An item names its page type, and your site still gets a standard type (post, landing page, comparison and so on) to route on. Change a brand's page types in its catalog; the content list can be filtered by page type.",
 			"at": "2026-11-27T13:04:57Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "The tracker's Report can show more columns: bot clicks, suspect clicks, and a count and revenue column for each conversion type your networks send (leads, sales and so on). Columns now picks which columns the table shows, with presets such as Profit, Funnel and Traffic quality, and a saved view keeps your choice.",
+			"at": "2026-11-27T13:27:38Z"
 		}
 	],
-	"through": "06fb933+06fb933"
+	"through": "a451bd8+a451bd8"
 }
