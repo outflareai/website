@@ -2,7 +2,7 @@
 	"version": "2026.11.27",
 	"date": "2026-11-27",
 	"status": "in-progress",
-	"updated": "2026-11-27T15:26:25Z",
+	"updated": "2026-11-27T16:43:24Z",
 	"items": [
 		{
 			"kind": "fix",
@@ -171,7 +171,14 @@
 			"edition": "cloud",
 			"text": "The daily search review on Paid ads, Search terms now also suggests excluding searches for competitors you follow, and adding searches as keywords: ones that buy at or under your target cost, and ways of writing your own name that people click. The competitor and keyword suggestions don't need your AI model.",
 			"at": "2026-11-27T15:26:25Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "The tracker's Offers, Landers, Flows, Traffic sources and Affiliate networks lists now show each row's clicks, conversions, revenue, cost, profit and ROI for the dates you pick, as Campaigns does. Click a number column to sort by it, press Refresh to read the newest numbers, and open the Report for one row from its chart button.",
+			"at": "2026-11-27T16:43:24Z"
 		}
 	],
-	"through": "21f4dde+21f4dde"
+	"through": "50ddf0c+50ddf0c"
 }
