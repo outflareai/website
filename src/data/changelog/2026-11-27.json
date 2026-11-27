@@ -2,7 +2,7 @@
 	"version": "2026.11.27",
 	"date": "2026-11-27",
 	"status": "in-progress",
-	"updated": "2026-11-27T07:23:18Z",
+	"updated": "2026-11-27T08:30:28Z",
 	"items": [
 		{
 			"kind": "fix",
@@ -38,7 +38,21 @@
 			"edition": "open-source",
 			"text": "Feedback inside Outflare: send a note about any page with a screenshot (paste, drop, choose or capture the page), kept private or shared as a thread in your team's Slack, whose replies show under it. Settings, Feedback lists every item with its status: New, Planned, Doing, Done or Won't do.",
 			"at": "2026-11-27T07:23:18Z"
+		},
+		{
+			"kind": "fix",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Brand search: follow any tracked competitor from a search box (before, only the first 40 were offered), with a link to your competitor list. Following, stopping and editing a brand's searches now show at once and save in the background, and searches are chips you add with Enter and remove with one click.",
+			"at": "2026-11-27T08:30:28Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Sales reporting's Live flow now starts the email branch with Emails found: every address found for the period's companies, split into first email, follow-ups, support@ and not sent yet, which add up to it. When discovery is paused, a line above the tree says why.",
+			"at": "2026-11-27T08:30:28Z"
 		}
 	],
-	"through": "38de47c+38de47c"
+	"through": "6c247f3+6c247f3"
 }
