@@ -114,7 +114,15 @@ In the API, `GET /v1/workspaces/{ws}/module-access` lists each module with its `
 
 ## Invites
 
-Admins and owners invite people by email from **Settings → Members**, picking any role they could give themselves (Admin by default; only owners invite owners). For a role without workspace-wide permissions, you can also keep the person to some brands. **Send invite** emails them a link to join, through the instance's account email service, and shows you the link once so you can share it another way too (an instance with no email service only shows it). The link starts with `ofi_`, works once and expires after 7 days. A new invite to the same address replaces a pending one, and someone already in the company can't be invited again. Pending invites can be revoked. Invite links use your instance's `PUBLIC_URL`, so set it when you run behind a domain.
+Admins and owners invite people from **Settings → Members** with **Invite someone**, which opens a page like a member's, with the access they will have once they join:
+
+- **Role:** any role you could give yourself (Admin by default; only owners invite owners).
+- **In each brand:** the same role on every brand, including brands added later, or, for a role without workspace-wide permissions, a role per brand or "No access", as on [a member's page](#a-different-role-on-one-brand).
+- **Teams:** the [teams](#teams) they join, each showing what it gives. Picking teams needs **Add people to teams** (`teams.members`).
+
+They get all of it when they accept; a brand or team deleted in the meantime is skipped. Pending invites show their brand roles and teams. **Send invite** emails them a link to join, through the instance's account email service, and shows you the link once so you can share it another way too (an instance with no email service only shows it). The link starts with `ofi_`, works once and expires after 7 days. A new invite to the same address replaces a pending one, and someone already in the company can't be invited again. Pending invites can be revoked. Invite links use your instance's `PUBLIC_URL`, so set it when you run behind a domain.
+
+In the API, `POST /v1/workspaces/{ws}/invites` takes `email`, `role`, `brand_ids`, `brand_roles` (`[{"brand_id", "role"}]`, for brands where they get a different role) and `team_ids`, and `GET /v1/workspaces/{ws}/invites` returns them on each pending invite.
 
 ## Signing in
 
