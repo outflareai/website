@@ -2,7 +2,7 @@
 	"version": "2026.11.28",
 	"date": "2026-11-28",
 	"status": "in-progress",
-	"updated": "2026-11-28T16:10:48Z",
+	"updated": "2026-11-28T17:27:03Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -220,7 +220,14 @@
 			"edition": "open-source",
 			"text": "Costs & capacity shows what each paid tool has left, what it spent today, in 7 and in 30 days, and how long it lasts at that rate. Outflare warns you when a tool runs low, and at once when one runs out; for a provider that doesn't report a balance, type it after a top-up.",
 			"at": "2026-11-28T16:10:48Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "Sales reporting no longer reads a Lead Portal connection. Tools & spend lists what Outflare booked for the sales tools (AI, verification, sending, mailboxes, domains) for today, the last 7 and the last 30 days, Sales mailbox capacity comes from the brand's own mailboxes, and a build with its own discovery flow fills Discovery, its search lanes and Agent performance from its records.",
+			"at": "2026-11-28T17:27:03Z"
 		}
 	],
-	"through": "089129a+089129a"
+	"through": "b573774+b573774"
 }
