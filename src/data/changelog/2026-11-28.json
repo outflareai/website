@@ -2,7 +2,7 @@
 	"version": "2026.11.28",
 	"date": "2026-11-28",
 	"status": "in-progress",
-	"updated": "2026-11-28T13:10:42Z",
+	"updated": "2026-11-28T14:11:10Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -143,7 +143,70 @@
 			"edition": "open-source",
 			"text": "A Sales conversation now opens as a deal-style page: who it is, their company, state and owner on top, then tabs for Chats (the thread with the reply box), Tasks, Notes, People at the company, Meetings and More. Add to sequence stays in the header on every tab, and only Sales managers see who opened a conversation.",
 			"at": "2026-11-28T13:10:42Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "The tracker has a Settings page: campaign names, the tracking domain, click filter rules, IP lookups and full click details sit on one page with a list on the left. New there is a naming template for campaigns, such as `{source} - {brand} - {date}`, so every new campaign of a brand starts with the same kind of name.",
+			"at": "2026-11-28T14:11:10Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Click filters can be grouped under named rules, such as \"Known scrapers\" or \"Our office\", and each rule switched off and on again without losing what is in it. Find them under Tracker, Setup, Click filters.",
+			"at": "2026-11-28T14:11:10Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "The tracker has a Dashboard: your clicks, conversions, revenue, cost, profit and ROI against the period before, a day-by-day chart, the campaigns losing money, bot and suspect clicks, and your best campaigns, sources, offers, landers, countries and devices. Every number opens the Report on it.",
+			"at": "2026-11-28T14:11:10Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Tracker reports can be grouped and filtered by the extra values a conversion's postback carried (p1 to p20), such as a plan, a product or a sub id from your affiliate network, so you can see which of them your revenue comes from.",
+			"at": "2026-11-28T14:11:10Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Tracker reports can be grouped and filtered by connection type (mobile, residential, data centre and so on) and by zip or postal code, for the clicks your IP lookup connection checked. Both come from your own IPQualityScore account, at no extra lookups.",
+			"at": "2026-11-28T14:11:10Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Clickadu and Evadav are ready-made traffic sources in the click tracker: their click id and up to 15 details of each click (zone, campaign, creative, place, device, connection type and more) are filled in for you.",
+			"at": "2026-11-28T14:11:10Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Adcash is a ready-made traffic source in the click tracker: its click id, cost and 15 details (zone, campaign, creative, place, device and more) are filled in for you.",
+			"at": "2026-11-28T14:11:10Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "The Zeropark traffic source template now captures ten more values from each click: traffic type, keyword match, visitor type, target URL, browser, carrier, region, city, device ID and the campaign's UUID. New Zeropark traffic sources get them; for an existing one, add the parameters you want on its page.",
+			"at": "2026-11-28T14:11:10Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "The tracker's Report filters rows by their numbers (Profit under 0, Visits at least 100), compares every number with the period before, and has ready-made reports to start from, such as Campaigns losing money and Spend with no conversions. Saved views keep all of it.",
+			"at": "2026-11-28T14:11:10Z"
 		}
 	],
-	"through": "558fba8+558fba8"
+	"through": "8f5f384+8f5f384"
 }
