@@ -60,6 +60,7 @@ Change what Admin, Member or Viewer allows, or add roles of your own (a "Content
 - **You can't give what you don't have.** Every permission in a role you create or edit, or a role you give someone, must be one you hold.
 - **You can't change someone who can do more than you.** Only owners make, change or remove owners, and a company always keeps at least one.
 - **People permissions are separate.** **Add people to teams** (`teams.members`) puts people in a team or takes them out; **Edit teams** (`teams.manage`) also creates, renames and deletes teams and changes what they allow; **Reset someone's two-factor** (`members.two_factor`) is owners only by default. Roles that could invite people before can still edit teams, and roles that could remove people can still reset two-factor.
+- **Brands and billing are their own switches.** **Create and delete brands** (`brands.manage`) adds a brand or removes one; **Billing and plan** (`billing.manage`, on Outflare Cloud) shows invoices and changes the plan. Owners and admins have both by default, Members and Viewers don't. Both are about the whole company, so a role with either is the same on every brand and can't be kept to some of them.
 - **Taking access away is its own permission.** Removing someone, moving them to a role that can do less, or taking brands away from them needs **Remove people** (`members.remove`). Only owners have it by default; an owner can switch it on for any role.
 - **Changes apply at once**, and API tokens a person made lose the permissions their role no longer has. Every change is in the audit log (`role.created`, `role.updated`, `role.deleted`, `member.role_changed`).
 - **Deleting a role in use** asks where its people and pending invites should move.
@@ -187,6 +188,8 @@ The scopes are:
 | --- | --- |
 | `workspace.read` | Read the company. |
 | `workspace.manage` | Rename the company and change its URL (slug). Owners and admins only by default. |
+| `brands.manage` | Add a brand or delete one. Owners and admins only by default. |
+| `billing.manage` | On Outflare Cloud, see invoices and change the plan. Owners and admins only by default; never on an API token. |
 | `members.read` | List members. |
 | `members.manage` | Change roles and manage invites. |
 | `members.remove` | Remove members or reduce their access. Owners only by default; never on an API token. |
