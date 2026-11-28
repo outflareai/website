@@ -2,7 +2,7 @@
 	"version": "2026.11.28",
 	"date": "2026-11-28",
 	"status": "in-progress",
-	"updated": "2026-11-28T09:16:41Z",
+	"updated": "2026-11-28T11:41:01Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -115,7 +115,14 @@
 			"edition": "open-source",
 			"text": "Suggestions in the Tracker: Outflare now finds the placements of a network campaign whose clicks don't load your page while the campaign's other placements' do, lists them with their clicks and cost, and blocks them on the network when you press Accept change. Nothing changes until you accept, and any placement can be resumed from Targets.",
 			"at": "2026-11-28T09:16:41Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "A new alert, Conversions look arranged: when nearly all of a tracker campaign's conversions come from one placement or publisher that sends a small part of its clicks, and those clicks look alike (the same browser every time, or the same wait from click to conversion), the owners and admins hear once, so scripted or rewarded conversions are caught before more are paid for.",
+			"at": "2026-11-28T11:41:01Z"
 		}
 	],
-	"through": "35e10bc+35e10bc"
+	"through": "900c556+900c556"
 }
