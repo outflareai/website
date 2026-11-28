@@ -2,7 +2,7 @@
 	"version": "2026.11.28",
 	"date": "2026-11-28",
 	"status": "in-progress",
-	"updated": "2026-11-28T02:51:20Z",
+	"updated": "2026-11-28T04:26:06Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -87,7 +87,28 @@
 			"edition": "open-source",
 			"text": "A new alert, Campaign tracking stopped: when a tracker campaign keeps getting clicks but its page loads or its conversions, which came steadily before, have stopped, the owners and admins hear once, so a removed snippet or a silent conversion feed is caught the same day instead of in next week's report.",
 			"at": "2026-11-28T02:51:20Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Paid ads now shows what each Google campaign bids on: its custom goal and the conversion actions in it, or its standard goals. Conversions by type also counts an action in campaigns that don't bid on it, so you can see what Google credits beyond what bidding learns from.",
+			"at": "2026-11-28T04:26:06Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "The conversion send log now says which click each conversion went with and where the click id came from. When an ad platform refuses a conversion because its click is too old, Outflare sends it once more without the click id, so it can still be matched on the person's hashed email or phone.",
+			"at": "2026-11-28T04:26:06Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Your site's own server can now report the ad clicks it sees arrive (`POST /v1/site/landings`). Tracking health then shows, per network, how many clicks reached your site but never ran the website script, and how many of them were crawlers.",
+			"at": "2026-11-28T04:26:06Z"
 		}
 	],
-	"through": "8c5ad4a+8c5ad4a"
+	"through": "1d28786+1d28786"
 }
