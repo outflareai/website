@@ -2,7 +2,7 @@
 	"version": "2026.11.28",
 	"date": "2026-11-28",
 	"status": "in-progress",
-	"updated": "2026-11-28T02:24:13Z",
+	"updated": "2026-11-28T02:51:20Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -80,7 +80,14 @@
 			"edition": "open-source",
 			"text": "Your server can now name the tracker click a person came from: send `properties.ofclk` with their `userId`, and the browser that landed with that click joins them, so a funnel follows one person from the ad click into your app. Funnels with a very busy first step no longer time out, and the events list refuses too large a page clearly.",
 			"at": "2026-11-28T02:24:13Z"
+		},
+		{
+			"kind": "launch",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "A new alert, Campaign tracking stopped: when a tracker campaign keeps getting clicks but its page loads or its conversions, which came steadily before, have stopped, the owners and admins hear once, so a removed snippet or a silent conversion feed is caught the same day instead of in next week's report.",
+			"at": "2026-11-28T02:51:20Z"
 		}
 	],
-	"through": "6f2f3ce+6f2f3ce"
+	"through": "8c5ad4a+8c5ad4a"
 }
