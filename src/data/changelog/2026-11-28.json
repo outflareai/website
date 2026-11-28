@@ -1,0 +1,86 @@
+{
+	"version": "2026.11.28",
+	"date": "2026-11-28",
+	"status": "in-progress",
+	"updated": "2026-11-28T02:24:13Z",
+	"items": [
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Content: each brand can now set the languages its site is written in, a default language, and where each page type goes on the site (section, address pattern, layout to follow). A new page then gets its language and address by itself. Set it under Content settings on the Content page.",
+			"at": "2026-11-28T02:24:13Z"
+		},
+		{
+			"kind": "fix",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Funnels, trends and the other analytics pages no longer answer \"internal error\" when the database has no shared memory left for a parallel query: the question is asked again in a way that needs none.",
+			"at": "2026-11-28T02:24:13Z"
+		},
+		{
+			"kind": "fix",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Zeropark cost and targets: a traffic source that passes the campaign's long id ({long_campaign_id}) is now matched to Zeropark by it. Until now the short {campaign_id} number was used even then, which Zeropark refuses, so no cost or targets arrived.",
+			"at": "2026-11-28T02:24:13Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "New customer revenue can count a customer's signup from any of several events (`start_events`), so signups recorded under another event name, such as dates brought in from an earlier system, count too. The report page lets you add more than one signup event.",
+			"at": "2026-11-28T02:24:13Z"
+		},
+		{
+			"kind": "security",
+			"area": "workspace",
+			"edition": "open-source",
+			"text": "Security improvements to sign-in.",
+			"at": "2026-11-28T02:24:13Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "seo",
+			"edition": "open-source",
+			"text": "Brand search: a competitor whose name is a common word is no longer credited with every search for that word. Each competitor's domain is read beside its name, and a name searched far more than its domain, against the other names you follow, is marked \"common word\" and counted by an estimate. It needs five followed names to compare.",
+			"at": "2026-11-28T02:24:13Z"
+		},
+		{
+			"kind": "fix",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "A click or sign-up tracked on an ad's landing page no longer starts a second visit without the ad's click id, so paid visits are counted once and keep their click id. In the paid ads report, a paused campaign whose customer paid again keeps its row, so the rows add up to the totals.",
+			"at": "2026-11-28T02:24:13Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "A brand can now keep each tracker click's full referrer, full user agent and IP address: turn each on under Tracker, Setup, and choose how many days to keep them. They show in the click log and as three new breakdowns in the Report. All three are off until you turn them on, and turning one off deletes what was kept.",
+			"at": "2026-11-28T02:24:13Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "Tracker report: percentages now show two decimals (5.00%). Grouped by offer, the clicks that never went on to an offer are named \"No offer reached\" instead of \"(none)\", and an offer's lander views, lander clicks and lander CTR are left blank, because every click with an offer came through a lander click and the rate always read 100%.",
+			"at": "2026-11-28T02:24:13Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "partners",
+			"edition": "open-source",
+			"text": "Removing a partner now comes with your removal email picked and shown as that partner will get it. A program remembers its removal notice, and if you have none yet you can create one in the same dialog from a starting wording, then reword it under Templates.",
+			"at": "2026-11-28T02:24:13Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "Your server can now name the tracker click a person came from: send `properties.ofclk` with their `userId`, and the browser that landed with that click joins them, so a funnel follows one person from the ad click into your app. Funnels with a very busy first step no longer time out, and the events list refuses too large a page clearly.",
+			"at": "2026-11-28T02:24:13Z"
+		}
+	],
+	"through": "6f2f3ce+6f2f3ce"
+}
