@@ -2,7 +2,7 @@
 	"version": "2026.11.28",
 	"date": "2026-11-28",
 	"status": "in-progress",
-	"updated": "2026-11-28T11:44:18Z",
+	"updated": "2026-11-28T13:10:42Z",
 	"items": [
 		{
 			"kind": "improvement",
@@ -122,7 +122,28 @@
 			"edition": "open-source",
 			"text": "A new alert, Conversions look arranged: when nearly all of a tracker campaign's conversions come from one placement or publisher that sends a small part of its clicks, and those clicks look alike (the same browser every time, or the same wait from click to conversion), the owners and admins hear once, so scripted or rewarded conversions are caught before more are paid for.",
 			"at": "2026-11-28T11:41:01Z"
+		},
+		{
+			"kind": "launch",
+			"area": "analytics",
+			"edition": "open-source",
+			"text": "A Vercel connection can now take your site's request log from a log drain. Outflare keeps one landing per page request that carried a click id (an ad network's, or one of your own campaign links') with the status the visitor got, and drops the rest unread, so you see which paid clicks arrived but never ran the page. Turn it on under Connectors, Vercel, Live updates.",
+			"at": "2026-11-28T13:10:42Z"
+		},
+		{
+			"kind": "fix",
+			"area": "paid-ads",
+			"edition": "open-source",
+			"text": "The conversion send log now shows the click id itself and the day of the click when the click id came from the ad platform's own cookie. It showed the whole cookie value and the day of the visit before.",
+			"at": "2026-11-28T13:10:42Z"
+		},
+		{
+			"kind": "improvement",
+			"area": "crm",
+			"edition": "open-source",
+			"text": "A Sales conversation now opens as a deal-style page: who it is, their company, state and owner on top, then tabs for Chats (the thread with the reply box), Tasks, Notes, People at the company, Meetings and More. Add to sequence stays in the header on every tab, and only Sales managers see who opened a conversation.",
+			"at": "2026-11-28T13:10:42Z"
 		}
 	],
-	"through": "73fdb8f+73fdb8f"
+	"through": "558fba8+558fba8"
 }
